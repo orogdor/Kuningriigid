@@ -1,0 +1,48 @@
+name: V47 veebimängu avaldamine
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Kuningriigid_V47_GitHub_Pages.zip'
+      - '.github/workflows/avaldamine.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Laadi hoidla
+        uses: actions/checkout@v4
+      - name: Paki mäng juurkausta
+        run: |
+          unzip -q -o Kuningriigid_V47_GitHub_Pages.zip -d .
+          test -s index.html
+          test -s civilization.js
+          test -s vendor/three.module.js
+      - name: Salvesta mängu veebifailid main-harru
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Avalda V47 veebimängu failid"
+            git push
+          fi
+      - name: Seadista Pages
+        id: configure
+        continue-on-error: true
+        uses: actions/configure-pages@v5
+      - name: Laadi lehe artefakt
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: '.'
+      - name: Avalda GitHub Pagesis
+        id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4

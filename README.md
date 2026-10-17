@@ -2,6 +2,6 @@
 
 V47 — reaalajas tsivilisatsioonimäng veebibrauseris.
 
-Mängu avaldamiseks kasutame GitHub Pagesi. Allikas: vestluses koostatud V47 veebimäng.
+Avaldatakse GitHub Pagesis: https://orogdor.github.io/Kuningriigid/
 
-Kui Pages on aktiveeritud: https://orogdor.github.io/Kuningriigid/
+Veebifailid paiknevad juurkaustas pärast GitHub Actionsi lahtipakkimist.
