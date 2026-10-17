@@ -1,4 +1,5 @@
 import * as T from './vendor/three.module.js';
+import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js';
 import {createAtlasBiomeDetail} from './atlas-biomes-v47.js';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
@@ -134,6 +135,17 @@ export function createCityMiniature(team,age){
   for(let x of [-9,9])put('cube',x,.35,0,1.2,.25,25,'#46575e');
  }else {for(let i=0;i<9;i++){const x=(i%3-1)*8,z=(Math.floor(i/3)-1)*8,h=(i===4?18:6+(i*7)%10);put('cube',x,h/2,z,5.4,h,5.1,i%2?'#8fa6ad':'#a8b6ba');put('cube',x,h*.60,z+2.63,4.8,.23,.14,'#3b596a');put('cube',x,h+.2,z,5.6,.4,5.5,'#6f8185')}
   for(const z of [-12,12])put('cube',0,.12,z,27,.15,1,'#596b73');
+ }
+ // Authored source quad meshes: visible at city scale with the original age-specific skyline kept intact.
+ const accentModel=(name,x,z,scale,rot=0)=>{const model=createV48Mesh(name,scale);model.position.set(x,.5,z);model.rotation.y=rot;model.castShadow=false;g.add(model)};
+ if(age<=3){
+  accentModel('timber_house_1000_3',-9,7,1.75,.25);
+  accentModel('timber_house_1000_3',8,7,1.55,-.25);
+  if(age>=1)accentModel('market_1000_3',0,7.5,1.65);
+ }else if(age===4){
+  accentModel('timber_house_1000_3',-9,7,1.65,.1);
+  accentModel('market_1000_3',7,6,1.7,.3);
+  accentModel('windmill_1000_3',-11,-8,2.2);
  }
  g.userData.age=age;return g;
 }

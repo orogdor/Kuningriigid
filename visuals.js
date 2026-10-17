@@ -1,4 +1,5 @@
 import * as T from './vendor/three.module.js';
+import {createV48Mesh} from './model-runtime-v48.js';
 const geometries=new Map(),materials=new Map();
 function geom(key,make){if(!geometries.has(key)){const g=make();g.userData.shared=true;geometries.set(key,g)}return geometries.get(key)}
 function material(color,metal=false){const key=color+metal;if(!materials.has(key))materials.set(key,new T.MeshStandardMaterial({color,roughness:metal?.48:.88,metalness:metal?.55:0}));return materials.get(key)}
@@ -26,22 +27,10 @@ export function animateSoldier(root,time,moving=false,attack=false){const r=root
 if(active){if(['musketeer','rifleman','motorized'].includes(r.kind)){r.arms[0].rotation.x=-1.25;r.arms[1].rotation.x=-1.35;r.body.rotation.y=-.04*Math.sin(phase*Math.PI);r.body.rotation.x=phase>.65?-.07:0}else if(r.kind==='archer'){const draw=phase<.65?phase/.65:Math.max(0,(1-phase)/.35);r.arms[0].rotation.x=-1.55;r.arms[0].rotation.z=.12;r.arms[1].rotation.x=-1.4;r.arms[1].rotation.z=-.65*draw;r.arms[1].position.z=-.22*draw;r.body.rotation.y=-.2*draw}else{const swing=Math.sin(phase*Math.PI);r.arms[1].rotation.x=-2.3+phase*2.8;r.arms[1].rotation.z=.65*swing;r.arms[0].rotation.x=-.5;r.body.rotation.y=-.3+.7*phase;r.body.rotation.x=.1*swing}}
 const action=typeof attack==='object'?attack.action:null,cycle=time*2*Math.PI+r.phase;if(action&&!moving){r.arms.forEach(a=>a.rotation.set(0,0,0));r.body.rotation.set(0,0,0);if(action==='fishing'){const cast=(Math.sin(time*.8+r.phase)+1)/2;r.arms[1].rotation.x=-.7-cast*.9;r.arms[0].rotation.x=-.75;r.body.rotation.x=.05+.06*Math.sin(time*.8)}else if(['chop','mine','build','forge','hunt','train'].includes(action)){const stroke=(Math.sin(cycle*(action==='build'?1.5:1))+1)/2;r.arms[1].rotation.x=-.25-stroke*(action==='chop'?2.2:1.8);r.arms[1].rotation.z=.2*Math.sin(cycle);r.arms[0].rotation.x=['mine','chop'].includes(action)?-.3-stroke*1.4:-.8;r.body.rotation.x=.08+(1-stroke)*.16;r.body.rotation.y=.12*Math.sin(cycle)}else if(['gather','plant','farm'].includes(action)){r.body.rotation.x=.35+.18*Math.sin(cycle*.7);r.arms[0].rotation.x=-.35+.45*Math.sin(cycle);r.arms[1].rotation.x=-.35-.45*Math.sin(cycle);r.legs[0].rotation.x=.12;r.legs[1].rotation.x=-.12}else if(action==='water'){r.arms[0].rotation.x=-1+Math.sin(cycle)*.6;r.arms[1].rotation.x=-1-Math.sin(cycle)*.6;r.body.rotation.x=.1}else if(action==='saw'){r.arms[0].rotation.x=-1;r.arms[1].rotation.x=-1;r.arms[0].position.z=Math.sin(cycle)*.18;r.arms[1].position.z=Math.sin(cycle)*.18;r.body.rotation.x=.12}else if(action==='mill'){r.arms[0].rotation.x=-1+Math.sin(cycle)*.3;r.arms[1].rotation.x=-1+Math.cos(cycle)*.3;r.arms[1].rotation.z=Math.sin(cycle)*.3}else{r.arms[0].rotation.x=-.8+Math.sin(cycle)*.25;r.arms[1].rotation.x=-.8-Math.sin(cycle)*.25;r.body.rotation.x=.1}}if(action==='carry'){r.arms[0].rotation.x=-.9;r.arms[1].rotation.x=-.9}if(attack?.hit)r.body.rotation.x=-.2;r.horseLegs.forEach((v,i)=>v.rotation.x=moving?Math.sin(p+i*Math.PI*.7)*.5:0);r.body.position.y=(r.kind==='motorized'?1.22:r.riding?.85:0)+(moving?Math.abs(Math.sin(p))*.035:Math.sin(time*2+r.phase)*.008)}
 export function addTree(parent,x,y,z,seed=0,scale=1){
- // Two natural tree silhouettes: broadleaf canopies and layered conifers.
- // Geometry is shared across instances to keep the polygon count affordable.
- const root=new T.Group(),broadleaf=(Math.floor(Math.abs(seed)*3)%4!==0),bark=seed%3===0?'#625039':'#796045';
- const trunk=part(root,'cylinder',bark,0,1.35,0,.18,2.7,.18);trunk.castShadow=true;
- if(broadleaf){
-  const shades=['#496d44','#527849','#638552','#6c8551'];
-  for(let i=0;i<5;i++){
-   const a=i*2.399+seed*.11,rad=i===0?0:.7+(i%2)*.2,cx=Math.cos(a)*rad,cz=Math.sin(a)*rad,cy=2.9+Math.sin(a)*.35;
-   const branch=part(root,'cylinder',bark,cx*.42,2.08,cz*.42,.075,1.1,.075);branch.rotation.z=-Math.sin(a)*.42;branch.rotation.x=Math.cos(a)*.42;
-   const leaf=part(root,'sphere',shades[(i+Math.abs(Math.floor(seed)))%shades.length],cx,cy,cz,1.08,1.01,1.03);leaf.rotation.z=Math.sin(a)*.17;
-  }
-  part(root,'sphere','#587e48',0,3.32,0,1.08,1.13,1.07);
- }else{
-  for(let i=0;i<4;i++){
-   const leafy=part(root,'cone',i%2?'#385a3b':'#466c46',0,2.4+i*.53,0,1.48-i*.22,1.75-i*.18,1.48-i*.22);leafy.rotation.y=seed*.13+i*.5;
-  }
- }
- root.position.set(x,y,z);root.rotation.y=seed*.39;root.scale.setScalar(scale);parent.add(root);return root;
+ // V48 artist-authored quad mesh shared between every nearby tree (also exported as GLB).
+ const broadleaf=(Math.floor(Math.abs(seed)*3)%4!==0);
+ const model=createV48Mesh(broadleaf?'oak_1000_3':'pine_1000_3');
+ model.position.set(x,y,z);model.rotation.y=seed*.39;
+ model.scale.setScalar(scale*(broadleaf?2.1:1.85));
+ parent.add(model);return model;
 }

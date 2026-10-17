@@ -1,0 +1,53 @@
+{
+  "workflow": "custom quad-profile world assets, adapted 1000/3 design budget (not certified Mudelitehas 0.1.2 image-based reconstruction)",
+  "models": {
+    "oak_1000_3": {
+      "quads": 692,
+      "triangles": 1296,
+      "parts": 10,
+      "glb_bytes": 19300
+    },
+    "pine_1000_3": {
+      "quads": 444,
+      "triangles": 772,
+      "parts": 5,
+      "glb_bytes": 11464
+    },
+    "palm_1000_3": {
+      "quads": 228,
+      "triangles": 432,
+      "parts": 10,
+      "glb_bytes": 11160
+    },
+    "cactus_1000_3": {
+      "quads": 180,
+      "triangles": 304,
+      "parts": 3,
+      "glb_bytes": 6748
+    },
+    "rock_1000_3": {
+      "quads": 135,
+      "triangles": 270,
+      "parts": 3,
+      "glb_bytes": 5200
+    },
+    "timber_house_1000_3": {
+      "quads": 71,
+      "triangles": 140,
+      "parts": 12,
+      "glb_bytes": 8100
+    },
+    "market_1000_3": {
+      "quads": 168,
+      "triangles": 336,
+      "parts": 9,
+      "glb_bytes": 10524
+    },
+    "windmill_1000_3": {
+      "quads": 168,
+      "triangles": 312,
+      "parts": 6,
+      "glb_bytes": 9216
+    }
+  }
+}
