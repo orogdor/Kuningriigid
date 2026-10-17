@@ -1,4 +1,4 @@
-name: Kuningriigid GitHub Pages
+name: Kuningriigid V50 GitHub Pages
 on:
   push:
     branches: [main]
@@ -20,13 +20,21 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Get V47 website
+      - name: Fetch game
         uses: actions/checkout@v4
-      - name: Validate game files
+      - name: Apply V50 game update
         run: |
+          unzip -qo Kuningriigid_V50_GitHub_patch.zip -d .
           test -s index.html
           test -s civilization.js
+          test -s model-runtime-v50.js
+          test -s models-v50/stone_builder_1000_2.glb
+          test -s models-v50/modern_builder_1000_2.glb
+          test -s MUDELID_V50.html
           test -s vendor/three.module.js
+          node --check civilization.js
+          node --check research-ui.js
+          node -e "import('./model-runtime-v50.js').then(m=>{if(m.characterQuadCount('stone_builder')>1000||m.characterQuadCount('modern_builder')>1000)process.exit(1); console.log('V50 builders OK')})"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload website
