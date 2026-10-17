@@ -1,0 +1,3 @@
+export function upgradeLevel(state,team){const known=state.research[team].known;return known.includes('modernity')?6:known.includes('industrialization')?5:known.includes('renaissance')?4:known.includes('medieval_crafts')?3:known.includes('iron_crafts')?2:known.includes('bronze_crafts')?1:0}
+export function productionBonus(state,team){return 1+upgradeLevel(state,team)*.25+(state.research[team].known.includes('stone_crafts')?.1:0)}
+export function upgradedName(state,team,type,name){const level=upgradeLevel(state,team),prefix=['','Pronksriistadega ','Raudriistadega ','Meistrite ','Renessansiaegne ','Tööstuslik ','Moodne '][level];return prefix+(type==='quarry'?'kiviraidur':name)}

@@ -1,0 +1,9 @@
+KUNINGRIIGID – GitHub Pages
+
+1. Loo GitHubis uus avalik hoidla Kuningriigid ja lisa README.
+2. Paki ZIP lahti. Laadi selle ZIP-i sisu (mitte ZIP ise) GitHubi hoidla juurkausta: index.html, *.js, style.css ja vendor/ kataloog.
+3. GitHub: Settings -> Pages -> Build and deployment -> Source: Deploy from a branch -> main -> /(root) -> Save.
+4. Oota GitHubi kinnitust. Oodatud aadress on https://orogdor.github.io/Kuningriigid/ .
+5. Kuni GitHub Pages ei ole töötamist kinnitanud, pole see veel kontrollitud testilink.
+
+Väline WebView2Loader.dll viga MANG Web Runneris ei mõjuta GitHub Pagesis tavabrauseriga avamist.

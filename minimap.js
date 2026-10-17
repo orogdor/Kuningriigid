@@ -1,0 +1,1 @@
+export function minimapCell(clientX,clientY,rect,cols,rows){if(!rect.width||!rect.height)return null;return {c:Math.max(0,Math.min(cols-1,Math.floor((clientX-rect.left)/rect.width*cols))),r:Math.max(0,Math.min(rows-1,Math.floor((clientY-rect.top)/rect.height*rows)))}}
