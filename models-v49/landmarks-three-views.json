@@ -1,0 +1,167 @@
+{
+  "head_top": {
+    "front": [
+      0,
+      1.705
+    ],
+    "side": [
+      -0.016,
+      1.705
+    ],
+    "top": [
+      0,
+      -0.016
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "chin": {
+    "front": [
+      0,
+      1.265
+    ],
+    "side": [
+      0.03,
+      1.265
+    ],
+    "top": [
+      0,
+      0.03
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "nose": {
+    "front": [
+      0,
+      1.46
+    ],
+    "side": [
+      0.17,
+      1.46
+    ],
+    "top": [
+      0,
+      0.17
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "left_shoulder": {
+    "front": [
+      -0.3,
+      1.18
+    ],
+    "side": [
+      0,
+      1.18
+    ],
+    "top": [
+      -0.3,
+      0
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "right_shoulder": {
+    "front": [
+      0.3,
+      1.18
+    ],
+    "side": [
+      0,
+      1.18
+    ],
+    "top": [
+      0.3,
+      0
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "left_hand": {
+    "front": [
+      -0.31,
+      0.57
+    ],
+    "side": [
+      0.05,
+      0.57
+    ],
+    "top": [
+      -0.31,
+      0.05
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "right_hand": {
+    "front": [
+      0.31,
+      0.57
+    ],
+    "side": [
+      0.05,
+      0.57
+    ],
+    "top": [
+      0.31,
+      0.05
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "left_hip": {
+    "front": [
+      -0.135,
+      0.77
+    ],
+    "side": [
+      0,
+      0.77
+    ],
+    "top": [
+      -0.135,
+      0
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "right_hip": {
+    "front": [
+      0.135,
+      0.77
+    ],
+    "side": [
+      0,
+      0.77
+    ],
+    "top": [
+      0.135,
+      0
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "left_toe": {
+    "front": [
+      -0.135,
+      0.075
+    ],
+    "side": [
+      0.21,
+      0.075
+    ],
+    "top": [
+      -0.135,
+      0.21
+    ],
+    "source": "procedural profile, not observed photograph"
+  },
+  "right_toe": {
+    "front": [
+      0.135,
+      0.075
+    ],
+    "side": [
+      0.21,
+      0.075
+    ],
+    "top": [
+      0.135,
+      0.21
+    ],
+    "source": "procedural profile, not observed photograph"
+  }
+}

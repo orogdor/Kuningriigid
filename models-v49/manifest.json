@@ -1,0 +1,104 @@
+{
+  "workflow": "1000 quads, level 2 inspired custom anatomical profile; not fully certified Mudelitehas 0.1.2 image reconstruction",
+  "rig_sections": [
+    "body",
+    "head",
+    "leftArm",
+    "rightArm",
+    "leftLeg",
+    "rightLeg"
+  ],
+  "models": {
+    "villager": {
+      "quads": 896,
+      "triangles": 1584,
+      "sections": {
+        "body": 158,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 35268
+    },
+    "worker": {
+      "quads": 896,
+      "triangles": 1584,
+      "sections": {
+        "body": 158,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 35212
+    },
+    "builder": {
+      "quads": 896,
+      "triangles": 1584,
+      "sections": {
+        "body": 158,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 35240
+    },
+    "merchant": {
+      "quads": 922,
+      "triangles": 1636,
+      "sections": {
+        "body": 152,
+        "head": 306,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 35796
+    },
+    "warrior": {
+      "quads": 980,
+      "triangles": 1736,
+      "sections": {
+        "body": 172,
+        "head": 280,
+        "leftArm": 144,
+        "rightArm": 144,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 37212
+    },
+    "modern": {
+      "quads": 980,
+      "triangles": 1736,
+      "sections": {
+        "body": 172,
+        "head": 280,
+        "leftArm": 144,
+        "rightArm": 144,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 37172
+    },
+    "scholar": {
+      "quads": 896,
+      "triangles": 1584,
+      "sections": {
+        "body": 158,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 35248
+    }
+  }
+}
