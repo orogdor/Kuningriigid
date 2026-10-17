@@ -1,0 +1,42 @@
+name: Paigalda Kuningriigid V50 failid
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Kuningriigid_V50_patch.zip'
+      - '.github/workflows/install-v50.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  extract-v50:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Laadi Kuningriigid
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Paki V50 mudelid ja mängumootor lahti
+        run: |
+          unzip -q -o Kuningriigid_V50_patch.zip -d .
+          test -s index.html
+          test -s MUDELID_V50.html
+          test -s model-runtime-v50.js
+          test -s models-v50/mesh-data.js
+          test -s models-v50/stone_builder_1000_2.glb
+          grep -q 'Kuningriigid V50' index.html
+      - name: Kontrolli JavaScripti süntaksit ja mudeleid
+        run: |
+          node --check civilization.js
+          node --check research-ui.js
+          node --check model-runtime-v50.js
+          node TEST_V50.mjs
+      - name: Salvesta V50 päris lähtefailid GitHubi
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Avalda V50 mäng ja 3D ehitajate mudelid"
+            git push origin HEAD:main
+          fi
