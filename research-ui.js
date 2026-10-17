@@ -22,9 +22,14 @@ export function renderResearchUI(game,{choose,queue,remove}){
  if(document.getElementById('researchpanel').hidden)return;
  tree.innerHTML='';const ages=ERA_NAMES;
  for(let age=0;age<ages.length;age++){
+  const visibleTechs=Object.entries(TECHS).filter(([id,t])=>t.age===age).filter(([id])=>{
+   if(r.known.includes(id)||id===active||(r.queue||[]).includes(id))return true;
+   return !techBlock(r,id);
+  });
+  if(!visibleTechs.length)continue;
   const column=document.createElement('section');column.className='tech-column';
   const heading=document.createElement('h3');heading.textContent=ages[age];column.append(heading);
-  for(const[id,t]of Object.entries(TECHS).filter(([,t])=>t.age===age)){
+  for(const[id,t]of visibleTechs){
    const known=r.known.includes(id),blocked=techBlock(r,id),cost=researchCost(s,t),progressValue=r.progress[id]||0,
     boosted=r.boosted?.includes(id),card=document.createElement('button');
    card.className='tech-card '+(known?'known':id===active?'researching':blocked?'locked':'available');

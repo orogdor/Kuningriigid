@@ -1,0 +1,196 @@
+{
+  "workflow": "V50 custom Mudelitehas-like 1000-quad workflow for people; age-specific builders exported as GLB and used directly in Three.js.",
+  "models": {
+    "villager": {
+      "quads": 890,
+      "triangles": 1572,
+      "sections": {
+        "body": 152,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 34540
+    },
+    "worker": {
+      "quads": 890,
+      "triangles": 1572,
+      "sections": {
+        "body": 152,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 34488
+    },
+    "builder": {
+      "quads": 914,
+      "triangles": 1620,
+      "sections": {
+        "body": 170,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 118,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 37400
+    },
+    "merchant": {
+      "quads": 922,
+      "triangles": 1636,
+      "sections": {
+        "body": 152,
+        "head": 306,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 35796
+    },
+    "warrior": {
+      "quads": 980,
+      "triangles": 1736,
+      "sections": {
+        "body": 172,
+        "head": 280,
+        "leftArm": 144,
+        "rightArm": 144,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 37212
+    },
+    "modern": {
+      "quads": 980,
+      "triangles": 1736,
+      "sections": {
+        "body": 172,
+        "head": 280,
+        "leftArm": 144,
+        "rightArm": 144,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 37172
+    },
+    "scholar": {
+      "quads": 890,
+      "triangles": 1572,
+      "sections": {
+        "body": 152,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 112,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 34520
+    },
+    "stone_builder": {
+      "quads": 926,
+      "triangles": 1644,
+      "sections": {
+        "body": 176,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 124,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 39064
+    },
+    "bronze_builder": {
+      "quads": 926,
+      "triangles": 1644,
+      "sections": {
+        "body": 170,
+        "head": 280,
+        "leftArm": 112,
+        "rightArm": 124,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 38880
+    },
+    "iron_builder": {
+      "quads": 932,
+      "triangles": 1656,
+      "sections": {
+        "body": 182,
+        "head": 274,
+        "leftArm": 112,
+        "rightArm": 124,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 39544
+    },
+    "medieval_builder": {
+      "quads": 926,
+      "triangles": 1644,
+      "sections": {
+        "body": 170,
+        "head": 280,
+        "leftArm": 112,
+        "rightArm": 124,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 39180
+    },
+    "renaissance_builder": {
+      "quads": 932,
+      "triangles": 1656,
+      "sections": {
+        "body": 170,
+        "head": 280,
+        "leftArm": 118,
+        "rightArm": 124,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 40004
+    },
+    "industrial_builder": {
+      "quads": 932,
+      "triangles": 1656,
+      "sections": {
+        "body": 170,
+        "head": 280,
+        "leftArm": 118,
+        "rightArm": 124,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 39764
+    },
+    "modern_builder": {
+      "quads": 938,
+      "triangles": 1668,
+      "sections": {
+        "body": 170,
+        "head": 280,
+        "leftArm": 118,
+        "rightArm": 130,
+        "leftLeg": 120,
+        "rightLeg": 120
+      },
+      "size": 40368
+    }
+  },
+  "builder_tiers": [
+    "stone_builder",
+    "bronze_builder",
+    "iron_builder",
+    "medieval_builder",
+    "renaissance_builder",
+    "industrial_builder",
+    "modern_builder"
+  ]
+}

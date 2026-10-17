@@ -1,23 +1,30 @@
 import * as T from './vendor/three.module.js';
 import {createV48Mesh} from './model-runtime-v48.js';
-import {createV49CharacterRig} from './model-runtime-v49.js';
+import {createV50CharacterRig} from './model-runtime-v50.js';
 const geometries=new Map(),materials=new Map();
 function geom(key,make){if(!geometries.has(key)){const g=make();g.userData.shared=true;geometries.set(key,g)}return geometries.get(key)}
 function material(color,metal=false){const key=color+metal;if(!materials.has(key))materials.set(key,new T.MeshStandardMaterial({color,roughness:metal?.48:.88,metalness:metal?.55:0}));return materials.get(key)}
 function part(parent,shape,color,x,y,z,sx,sy,sz,metal=false){const geometry=geom(shape,()=>shape==='sphere'?new T.SphereGeometry(1,8,6):shape==='cylinder'?new T.CylinderGeometry(1,1,1,8):shape==='cone'?new T.ConeGeometry(1,1,8):new T.BoxGeometry(1,1,1));const m=new T.Mesh(geometry,material(color,metal));m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+function normalizeKind(kind){
+ if(/^(stone|bronze|iron|medieval|renaissance|industrial|modern)_builder$/.test(kind))return 'builder';
+ return kind.replace(/^(bronze_|master_)/,'');
+}
 function humanArchetype(kind){
+ if(['stone_builder','bronze_builder','iron_builder','medieval_builder','renaissance_builder','industrial_builder','modern_builder'].includes(kind))return kind;
  if(kind==='market_woman')return 'merchant';
  if(['builder','shipwright'].includes(kind))return 'builder';
  if(['artisan'].includes(kind))return 'scholar';
  if(['rifleman','motorized'].includes(kind))return 'modern';
  if(['slinger','spearman','axeman','archer','musketeer','infantry','militia','cavalry'].includes(kind))return 'warrior';
- if(['lumberjack','miner','forester','stone_lumber','stone_miner','stone_forester','stone_fisher','farmer','watercarrier','gatherer','trainer'].includes(kind))return 'worker';
+ if(['lumberjack','miner','forester','stone_lumber','stone_miner','stone_forester','stone_fisher','stone_worker','farmer','watercarrier','gatherer','trainer'].includes(kind))return 'worker';
  return 'villager';
 }
 export function createSoldier(parent,x,z,color,kind){
- const toolColor=kind.startsWith('bronze_')?'#b98a48':kind.startsWith('master_')?'#d0c6a2':'#a2aaa2';
- kind=kind.replace(/^(bronze_|master_)/,'');
- const root=new T.Group(),rig=createV49CharacterRig(root,humanArchetype(kind)),{body,arms,legs,head}=rig;
+ const visualKind=kind;
+ const toolColor=kind.startsWith('stone_')?'#8f9185':kind.startsWith('bronze_')?'#b98a48':kind.startsWith('iron_')?'#8c959d':kind.startsWith('renaissance_')||kind.startsWith('industrial_')?'#a8afb5':kind.startsWith('modern_')?'#cfb95a':kind.startsWith('master_')?'#d0c6a2':'#a2aaa2';
+ const archetype=humanArchetype(visualKind);
+ kind=normalizeKind(kind);
+ const root=new T.Group(),rig=createV50CharacterRig(root,archetype),{body,arms,legs,head}=rig;
  const riding=kind==='cavalry',primitive=['slinger','spearman','axeman','settler','stone_lumber','stone_miner','stone_forester','stone_worker','stone_fisher','builder','shipwright','market_woman','gatherer','farmer','watercarrier','artisan','trainer'].includes(kind);
  body.position.y=riding?.85:0;
  // A restrained faction-coloured textile strip keeps armies recognizable in the world view.

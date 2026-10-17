@@ -211,6 +211,10 @@ export class Civilization{
  constructionTime(type){return BUILDINGS[type].time*tempoMultiplier(this.s)}
  scienceRate(team){return scienceRate(this.s,team)}
  bonus(team){return productionBonus(this.s,team)}
+ builderTier(team){return Math.max(0,Math.min(6,this.s.ages?.[team]||0))}
+ builderProfile(team){const tier=this.builderTier(team);const names=['Kiviaja ehitaja','Pronksiaja ehitaja','Rauaaja ehitaja','Keskaegne meisterehitaja','Renessansiaja ehitaja','Tööstusajastu ehitaja','Moodsa ajastu ehitaja'];const archetypes=['stone_builder','bronze_builder','iron_builder','medieval_builder','renaissance_builder','industrial_builder','modern_builder'];const power=[1,1.2,1.4,1.7,1.95,2.25,2.6];return {tier,name:names[tier],archetype:archetypes[tier],power:power[tier]}}
+ builderStrength(team){return this.builderProfile(team).power}
+ builderLabel(team){const p=this.builderProfile(team);return `${p.name} ×${p.power.toFixed(2)}`}
   consumeHouseholds(ctx,r,foodNeed,waterNeed){
    // Consumption follows actual population, not number of buildings. Market
    // deliveries are already deducted from the stock when picked up.
