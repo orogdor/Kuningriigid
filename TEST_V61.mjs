@@ -4,7 +4,7 @@ import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization
 import {initialState} from './economy.js';
 import {armyUnits} from './v51-systems.js';
 import {createBattle,tickBattle} from './campaign.js';
-import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=61b';
+import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=61c';
 import {createAgeBuilding} from './buildings.js';
 
 assert.equal(TECHS.fortifications.age,0);
