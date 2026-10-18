@@ -4,6 +4,7 @@ import {TECHS,BUILD_TECH,techBlock} from './research.js';
 import {START,RESOURCE_NAMES,MATERIAL_KEYS,initialState,tickEconomy,storageLimit} from './economy.js';
 import {createBuildingModel} from './buildings.js';
 import {recordWorldStep,roadKey,roadLevel} from './roads.js?v=60';
+import {planTrade} from './trade-network.js';
 
 const additions=['pottery','animal_husbandry','masonry','wheel','copper_tin','road_construction'];
 const structures=['claypit','pottery_kiln','pasture','mason','cartwright','coppermine','tinmine','bronze_foundry','road_depot'];
@@ -67,4 +68,28 @@ assert.equal(potFood,160,'pottery kiln adds food storage to hall');
 const traffic={time:5,worldRoads:{},roadRevision:0},a={c:1,r:1},b={c:2,r:1};
 recordWorldStep(traffic,a,b,'roadworks',5);assert.equal(roadLevel(traffic.worldRoads[roadKey(a,b)].heat),0,'road crew must not create roads after one passage');
 recordWorldStep(traffic,a,b,'roadworks',5);assert.ok(roadLevel(traffic.worldRoads[roadKey(a,b)].heat)>=1,'road crews build roads through repeated traffic');
+// Crafted wagons must affect real intercity cargo, not merely inventory counters.
+const fromStock={...START,wood:500,stone:500,plank:500,bread:100,water:100,carts:3};
+const toStock={...START,wood:0,stone:0,plank:0,bread:0,water:0,carts:0};
+const depot={type:'road_depot',ready:true,hp:350,assigned:1,disabled:false};
+const from={id:0,c:8,r:8,team:0,economy:{realms:[{resources:fromStock}],buildings:[depot]}};
+const to={id:1,c:9,r:8,team:0,economy:{realms:[{resources:toStock}],buildings:[]}};
+const tradeGame={
+ s:{cities:[from,to],shipments:[],nextShipment:1,research:[{known:[]}]},
+ cityReady:(c,type)=>c.economy.buildings.some(b=>b.type===type&&b.ready&&!b.disabled),
+ allBuildings:c=>c.economy.buildings,
+ landPath:(_from,dest)=>[{c:dest.c,r:dest.r}],
+ storageCap:()=>1000,storageUsed:(_city,key,stock)=>stock[key]||0
+};
+assert.equal(planTrade(tradeGame),1,'one scheduled convoy');
+let shipment=tradeGame.s.shipments[0];
+assert.equal(shipment.wagon,true,'wagon must be attached to road cargo');
+assert.equal(shipment.roadCrew,true,'active road workshop upgrades dispatched caravan');
+assert.ok(Object.values(shipment.goods).reduce((sum,n)=>sum+n,0)>36,'wagon should exceed pedestrian trade cargo capacity');
+assert.equal(fromStock.carts,2,'wagon is consumed on dispatch');
+depot.disabled=true;tradeGame.s.shipments=[];fromStock.carts=3;
+assert.equal(planTrade(tradeGame),1);
+shipment=tradeGame.s.shipments[0];
+assert.equal(shipment.roadCrew,false,'disabled workshop gives no road maintenance');
+assert.equal(shipment.wagon,true);
 console.log('V60 PASS: six discoveries, nine modelled buildings, real production, clay/copper/tin sites, migration, roundtrip save, repeated traffic');
