@@ -34,7 +34,20 @@ function tri(arr,a,b,c){V(arr,a);V(arr,b);V(arr,c)}
 function strip(arr,a,b,c,d){tri(arr,a,b,c);tri(arr,c,b,d)}
 function buffers(vertices,color,{standard=false,opacity=1}={}){
  if(!vertices.length)return null;
- const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.computeVertexNormals();geo.computeBoundingSphere();
+ // Weld shared vertices into an indexed mesh. Consecutive river/road
+ // sections now share actual vertices and normals, instead of separate
+ // face triangles placed edge-to-edge (which caused faceting and seams).
+ const unique=[],indices=[],lookup=new Map();
+ for(let i=0;i<vertices.length;i+=3){
+  const x=vertices[i],y=vertices[i+1],z=vertices[i+2];
+  const key=Math.round(x*1000)+','+Math.round(y*1000)+','+Math.round(z*1000);
+  let n=lookup.get(key);
+  if(n===undefined){n=unique.length/3;unique.push(x,y,z);lookup.set(key,n)}
+  indices.push(n);
+ }
+ const geo=new T.BufferGeometry();
+ geo.setAttribute('position',new T.Float32BufferAttribute(unique,3));
+ geo.setIndex(indices);geo.computeVertexNormals();geo.computeBoundingSphere();
  const mat=standard?new T.MeshStandardMaterial({color,roughness:.55,metalness:.10,transparent:opacity!==1,opacity,side:T.DoubleSide,depthWrite:opacity===1}):new T.MeshBasicMaterial({color,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  return new T.Mesh(geo,mat);
 }
