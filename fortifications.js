@@ -1,6 +1,15 @@
 // V61: One civilian worker mans each tower; wall soldiers come only from real units.
 export const WALL_TYPES=new Set(['palisade','stonewall']);
 export const TOWER_TYPES=new Set(['watchtower','stonetower']);
+// Real collision footprint follows the selected segment orientation.
+// A 7-unit wall otherwise leaves navigation holes at its ends.
+export function configureWallFootprint(b){
+ if(!WALL_TYPES.has(b?.type))return b;
+ b.wallAxis=b.wallAxis?1:0;
+ b.navWidth=b.wallAxis?1.1:3.6;
+ b.navDepth=b.wallAxis?3.6:1.1;
+ return b;
+}
 export const wallCapacity=type=>type==='stonewall'?3:type==='palisade'?2:0;
 export const wallHeight=type=>type==='stonewall'?3.8:type==='palisade'?3.1:0;
 export function wallGuards(state,ctx,building){
