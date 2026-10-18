@@ -161,7 +161,9 @@ function refreshResourceArea(){
  if(key===resourceArea)return;
  resourceArea=key;
  // Old versions leaked a sprite material and CanvasTexture at every camera pan.
- for(const {sprite} of resourceSprites){worldScene.remove(sprite);sprite.material?.map?.dispose();sprite.material?.dispose()}
+ // Shared icon materials and CanvasTextures are cached in icons; disposing here
+  // corrupts every later icon after moving the map. Remove instances only.
+  for(const {sprite} of resourceSprites)worldScene.remove(sprite);
  resourceSprites.length=0;
  let fishIcons=0;
  const tiles=[];
