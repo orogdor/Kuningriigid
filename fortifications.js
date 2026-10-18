@@ -10,6 +10,7 @@ export function wallGuards(state,ctx,building){
   unit.garrison.x===building.x&&unit.garrison.z===building.z);
 }
 export function stationWall(game,ctx,building,source=null){
+ if(game.s.battle&&!game.s.battle.result)return {error:'Lahingu ajal garnisoni muuta ei saa.'};
  if(!WALL_TYPES.has(building.type)||!ctx.economy.buildings.includes(building))return {error:'Vali oma linna müürilõik.'};
  if(!building.ready||building.hp<=0||building.disabled)return {error:'Müür peab olema valmis ja kasutuskõlblik.'};
  if(wallGuards(game.s,ctx,building).length>=wallCapacity(building.type))return {error:'Müüril pole rohkem sõdurikohti.'};
@@ -23,6 +24,7 @@ export function stationWall(game,ctx,building,source=null){
  return {ok:true,source:chosen.index};
 }
 export function releaseWall(game,ctx,building){
+ if(game.s.battle&&!game.s.battle.result)return {error:'Lahingu ajal garnisoni muuta ei saa.'};
  const soldiers=wallGuards(game.s,ctx,building),chosen=soldiers.at(-1);
  if(!chosen)return {error:'Sellel müüril pole sõdureid.'};
  let army=game.s.armies.find(a=>a.team===ctx.team&&a.embarked==null&&a.c===ctx.c&&a.r===ctx.r&&!a.path?.length&&game.s.units.some(u=>u.team===ctx.team&&u.hp>0&&!u.garrison&&(u.armyId||0)===(a.id||0)));
