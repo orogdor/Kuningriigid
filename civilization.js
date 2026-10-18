@@ -9,7 +9,7 @@ import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js';
 import {housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT} from './labor.js';
 import {BattleFeedback} from './battle-feedback.js';
-import {WALL_TYPES,TOWER_TYPES,wallHeight,fortifyBattle,configureWallFootprint,towerManned} from './fortifications.js?v=62';
+import {WALL_TYPES,TOWER_TYPES,wallHeight,fortifyBattle,configureWallFootprint,towerManned,wallCapacity} from './fortifications.js?v=62';
 import {persistSiegeDamage} from './medieval-v62.js';
 import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock} from './research.js';
 import {researchCost} from './science.js';
@@ -167,12 +167,12 @@ function renderUI(){drawOverview();renderLabor(game,view==='local'?activeCity():
  const error=game.buildRule(localCity,type),missing=missingMaterials(localCity.economy.realms[0].resources,d.cost),unavailable=!!error||!!missing;
  const label=d.icon+' '+game.buildingName(localCity.team,type)+'\n'+price(d.cost)+'\n⏱ '+timeLabel(game.constructionTime(type))+' · ⚒ '+game.builderLabel(localCity.team)+(missing?'\n⚠ Puudu: '+missing:error?'\n⚠ '+error:'');
  const b=button($('tray'),label,()=>{commandMode='select';mode=type;renderCommandHUD();say(d.name+': puuduta vaba ehituskohta.')},unavailable);b.style.whiteSpace='normal'}else for(const[k,d]of Object.entries(TROOPS).filter(([k,d])=>k!=="militia"&&(SHIPS[k]?s.research[0].known.includes('shipbuilding')&&game.cityReady(localCity,'harbor'):d.age<=age&&(!UNIT_TECH[k]||s.research[0].known.includes(UNIT_TECH[k]))))){button($('tray'),d.name+'\n'+price(d.cost)+'\n⏱ '+timeLabel(d.time*tempoMultiplier(s))+' · 1 '+(SHIPS[k]?'laevaehitaja':'väljaõpetaja'),()=>{const r=game.recruit(localCity,k);say(r.error||d.name+' lisatud väljaõppejärjekorda.');renderUI();save()},(!SHIPS[k]&&d.age>age)||(UNIT_TECH[k]&&!s.research[0].known.includes(UNIT_TECH[k])))}}
- if(tab==='build'&&localCity?.team===0&&!Object.keys(BUILDINGS).some(k=>k!=='hall'&&game.canBuildNow(localCity,k))){const note=document.createElement('p');note.textContent='Ehitamiseks vajad täiendavaid materjale või järgmisi tehnoloogiaid. Hallid valikud näitavad puuduvat kogust.';$('tray').prepend(note)}if(view==='local'&&localCity?.team===0&&WALL_TYPES.has(mode))button($('actions'),'↻ Pööra müüri 90° (R)',()=>{wallAxis=wallAxis?0:1;updateGhost();renderUI()});
+ if(tab==='build'&&localCity?.team===0&&!Object.keys(BUILDINGS).some(k=>k!=='hall'&&game.canBuildNow(localCity,k))){const note=document.createElement('p');note.textContent='Ehitamiseks vajad täiendavaid materjale või järgmisi tehnoloogiaid. Hallid valikud näitavad puuduvat kogust.';$('tray').prepend(note)}if(view==='local'&&localCity?.team===0&&WALL_TYPES.has(mode)&&mode!=='keep')button($('actions'),'↻ Pööra müüri 90° (R)',()=>{wallAxis=wallAxis?0:1;updateGhost();renderUI()});
 if(view==='local'&&localCity?.team===0&&!s.battle&&selectedBuilding&&WALL_TYPES.has(selectedBuilding.type)&&localCity.economy.buildings.includes(selectedBuilding)){
  const b=selectedBuilding,guards=game.wallGuards(localCity,b);
- button($('actions'),'🛡 Müüril '+guards.length+'/'+(b.type==='stonewall'?3:2)+' sõdurit · saada järgmine armeest',()=>{
+ button($('actions'),'🛡 Müüril '+guards.length+'/'+wallCapacity(b.type)+' sõdurit · saada järgmine armeest',()=>{
   const result=game.stationWall(localCity,b);say(result.error||'Sõdur määrati müürile. Ta ei liigu enam armeega kaasa.');renderUI();save()
- },!b.ready||guards.length>=(b.type==='stonewall'?3:2));
+ },!b.ready||guards.length>=wallCapacity(b.type));
  button($('actions'),'↩ Kutsu sõdur müürilt tagasi',()=>{
   const result=game.releaseWall(localCity,b);say(result.error||'Sõdur naasis mobiilsesse armeesse.');renderUI();save()
  },guards.length===0);
@@ -180,7 +180,7 @@ if(view==='local'&&localCity?.team===0&&!s.battle&&selectedBuilding&&WALL_TYPES.
 if(view==='local'&&localCity?.team===0&&selectedBuilding&&TOWER_TYPES.has(selectedBuilding.type)&&localCity.economy.buildings.includes(selectedBuilding)){
  button($('actions'),'♜ '+(towerManned(selectedBuilding)?'Torn kaitseb (1 valvur)':'Torn vajab 1 töötajat · ava tööjõud'),()=>setCityTab('workers'))
 }
-if(localCity)button($('actions'),'♟ Tööjõud ja tootmine',()=>setCityTab('workers'));if(localCity?.team===0){const parent=game.parentCity(localCity);button($('actions'),parent.tradeDisabled?'▶ Luba linnadevahelised kaubaveod':'Ⅱ Peata selle linna kaubaveod',()=>{parent.tradeDisabled=!parent.tradeDisabled;renderUI();save()})}if(localCity?.districtOf!=null)button($('actions'),'⌂ Ava linnakeskus',()=>openTile(game.cell(game.parentCity(localCity))));renderCityHealth();$('battlepanel').hidden=!s.battle||view!=='local';if(s.battle){$('localtitle').textContent=s.battle.fortress?'Linna piiramine':'Lahing';$('battledetail').textContent=s.battle.result?(s.battle.result==='victory'?'Võit!':'Lahing kaotatud.'):'Oma vägesid: '+s.battle.squads.filter(u=>u.team===0&&u.hp>0).length+' · Vastase vägesid: '+s.battle.squads.filter(u=>u.team!==0&&u.hp>0).length+(s.battle.fortress?' · Linn: '+Math.ceil(s.battle.fortress.hp):'');$('attackall').hidden=!!s.battle.result;$('retreat').textContent=s.battle.result?'Tagasi maailmakaardile':'Tagane';}syncCityPanel();renderCommandHUD();renderV51UI();
+if(localCity)button($('actions'),'♟ Tööjõud ja tootmine',()=>setCityTab('workers'));if(localCity?.team===0){const parent=game.parentCity(localCity);button($('actions'),parent.tradeDisabled?'▶ Luba linnadevahelised kaubaveod':'Ⅱ Peata selle linna kaubaveod',()=>{parent.tradeDisabled=!parent.tradeDisabled;renderUI();save()})}if(localCity?.districtOf!=null)button($('actions'),'⌂ Ava linnakeskus',()=>openTile(game.cell(game.parentCity(localCity))));renderCityHealth();$('battlepanel').hidden=!s.battle||view!=='local';if(s.battle){$('localtitle').textContent=s.battle.fortress?'Linna piiramine':'Lahing';$('battledetail').textContent=s.battle.result?(s.battle.result==='victory'?'Võit!':'Lahing kaotatud.'):'Oma vägesid: '+s.battle.squads.filter(u=>u.team===0&&u.hp>0).length+' · Vastase vägesid: '+s.battle.squads.filter(u=>u.team!==0&&u.hp>0).length+(s.battle.fortress?' · Linn: '+Math.ceil(s.battle.fortress.hp)+' HP · Müürid: '+(s.battle.siegeSections||[]).filter(w=>w.hp>0).length+(s.battle.siegeBreached?' · LÄBIMURRE':''):'');$('attackall').hidden=!!s.battle.result;$('retreat').textContent=s.battle.result?'Tagasi maailmakaardile':'Tagane';}syncCityPanel();renderCommandHUD();renderV51UI();
 }
 function checkEncounter(){
  if(s.battle||s.winner!==null)return;
@@ -191,7 +191,7 @@ function checkEncounter(){
   if(!foes.length&&(!city||city.team===a.team))continue;
   a.path=[];for(const foe of foes)foe.path=[];
   const cell=game.cell(a),b=createBattle(cell,s.units),present=s.armies.filter(g=>g.embarked==null&&tileKey(g)===tileKey(a)&&armyUnits(s,g).length);
-  const sources=new Set(s.units.map((u,i)=>({u,i})).filter(({u})=>present.some(g=>g.team===u.team&&(g.id||0)===(u.armyId||0))).map(({i})=>i));
+  const sources=new Set(s.units.map((u,i)=>({u,i})).filter(({u})=>!u.garrison&&present.some(g=>g.team===u.team&&(g.id||0)===(u.armyId||0))).map(({i})=>i));
   b.squads=b.squads.filter(q=>sources.has(q.source));
   const teams=[...new Set(present.map(g=>g.team))];b.attackerTeam=city?(teams.find(t=>t!==city.team)??a.team):a.team;
   if(city&&teams.some(t=>t!==city.team)){
