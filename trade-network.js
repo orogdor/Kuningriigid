@@ -2,10 +2,10 @@ import {railRoute,airRouteAvailable,airFreightCost,flightDuration} from './infra
 // V39: supply-and-demand trade planning for physically travelling caravans.
 // Ownership, storage ceilings, in-transit cargo and reserves are checked before dispatch.
 import {FOOD_KEYS} from './economy.js';
-const keys=['bread','water','wood','stone','plank','grain','flour','ore','coal','iron','weapons','paper','saltpeter','gunpowder','steel','machines','oil','fuel','vehicles'];
+const keys=['bread','water','wood','stone','plank','grain','flour','ore','coal','iron','weapons','paper','saltpeter','gunpowder','steel','machines','oil','fuel','vehicles','clay','pottery','cutstone','copper','tin','bronze','carts'];
 const food=stock=>[...FOOD_KEYS].reduce((n,k)=>n+(stock[k]||0),0);
 export function cityReserves(city){const pop=city.economy.realms[city.team].pop||3;
- return {bread:Math.max(20,pop*2.4),water:Math.max(18,pop*2.0),wood:50,stone:28,plank:20,grain:10,flour:10,ore:12,coal:10,iron:8,weapons:5,paper:8,saltpeter:8,gunpowder:8,steel:12,machines:10,oil:12,fuel:10,vehicles:3};
+ return {bread:Math.max(20,pop*2.4),water:Math.max(18,pop*2.0),wood:50,stone:28,plank:20,grain:10,flour:10,ore:12,coal:10,iron:8,weapons:5,paper:8,saltpeter:8,gunpowder:8,steel:12,machines:10,oil:12,fuel:10,vehicles:3,clay:8,pottery:5,cutstone:5,copper:5,tin:4,bronze:5,carts:2};
 }
 export function suggestGoods(game,from,to,inbound=[],maxLoad=40){
  if(from.team!==to.team||from.tradeDisabled||to.tradeDisabled)return {};
@@ -49,18 +49,21 @@ export function planTrade(game){const shipments=game.s.shipments;
    const flightFuel=mode==='air'?airFreightCost(from,to):0;
    // Fuel needed for the flight is never also advertised as transferable cargo.
    if(mode==='air')src.fuel-=flightFuel;
-   const goods=suggestGoods(game,from,to,shipments,mode==='rail'?90:mode==='air'?75:game.cityReady(from,'market')?52:36);
+   const wagon=mode==='road'&&(src.carts||0)>=1;
+   const roadCrew=mode==='road'&&game.cityReady(from,'road_depot');
+   const goods=suggestGoods(game,from,to,shipments,(mode==='rail'?90:mode==='air'?75:game.cityReady(from,'market')?52:36)+(wagon?16:0));
    if(mode==='air')src.fuel+=flightFuel;
    if(!Object.keys(goods).length)continue;
 
    const worth=Object.values(goods).reduce((n,v)=>n+v,0)/Math.sqrt(mode==='air'?flightDuration(from,to)/2:mode==='rail'?Math.max(1,route.length/3):route.length);
-   options.push({from,goods,route,mode,worth});
+   options.push({from,goods,route,mode,worth,wagon,roadCrew});
   }
   options.sort((a,b)=>b.worth-a.worth);
   const chosen=options[0];if(!chosen)continue;
   if(chosen.mode==='air'){const cost=airFreightCost(chosen.from,to);if((chosen.from.economy.realms[to.team].resources.fuel||0)<cost+6)continue;chosen.from.economy.realms[to.team].resources.fuel-=cost}
+  if(chosen.wagon)chosen.from.economy.realms[to.team].resources.carts=Math.max(0,(chosen.from.economy.realms[to.team].resources.carts||0)-1);
   for(const[k,n]of Object.entries(chosen.goods))chosen.from.economy.realms[to.team].resources[k]-=n;
-  shipments.push({id:game.s.nextShipment++,team:to.team,from:chosen.from.id,to:to.id,c:chosen.from.c,r:chosen.from.r,path:chosen.route||[],mode:chosen.mode,flightDuration:chosen.mode==='air'?flightDuration(chosen.from,to):0,flightLeft:chosen.mode==='air'?flightDuration(chosen.from,to):0,goods:chosen.goods,startedAt:game.s.time});dispatched++;
+  shipments.push({id:game.s.nextShipment++,team:to.team,from:chosen.from.id,to:to.id,c:chosen.from.c,r:chosen.from.r,path:chosen.route||[],mode:chosen.mode,wagon:!!chosen.wagon,roadCrew:!!chosen.roadCrew,flightDuration:chosen.mode==='air'?flightDuration(chosen.from,to):0,flightLeft:chosen.mode==='air'?flightDuration(chosen.from,to):0,goods:chosen.goods,startedAt:game.s.time});dispatched++;
  }
  return dispatched;
 }
