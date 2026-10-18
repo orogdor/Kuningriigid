@@ -20,7 +20,7 @@ import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
 import {renderResearchUI} from './research-ui.js';
 import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
-import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=67';
+import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=67d';
 import {createWorldAtlasProps} from './world-props.js?v=58';
 import * as T from './vendor/three.module.js';
 import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=66';
