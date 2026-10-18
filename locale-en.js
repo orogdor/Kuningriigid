@@ -1974,5 +1974,13 @@ export const ENGLISH_PAIRS=[
  ["Näita ressursse","Show Resources"],
  ["Peida ressursid","Hide Resources"],
  ["Ressursid ruudul","Resources on This Tile"],
- ["Teadaolevaid ressursse pole","No Known Resources"]
+ ["Teadaolevaid ressursse pole","No Known Resources"],
+ ["Vasemaak","Copper Ore"],
+ ["Tinamaak","Tin Ore"],
+ ["Ulukid","Wild Game"],
+ ["Magevesi","Fresh Water"],
+ ["Viljakas maa","Fertile Soil"],
+ ["Naftamaardla","Oil Deposit"],
+ ["Rauamaak","Iron Ore"],
+ ["Kala","Fish"]
 ];
