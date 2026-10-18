@@ -59,3 +59,25 @@
 #v51slots .v51slot{display:flex;gap:5px;align-items:center;flex-wrap:wrap}#v51slots .v51slot span{font-size:12px;flex:1;min-width:85px}#v51slots .v51slot button{flex:0 0 auto}
 body:not(.atlas) #v51insights,body:not(.atlas) #v51cities{display:none}body:has(#startmenu:not([hidden])) #v51insights,body:has(#startmenu:not([hidden])) #v51cities{display:none}
 @media(max-width:690px){#v51insights{left:6px;bottom:48px;width:min(270px,calc(100vw - 12px));font-size:11px}#v51cities{left:6px;bottom:5px;width:min(270px,calc(100vw - 12px))}#v51tips{max-height:92px}}
+
+
+/* V54 UI refresh: use image-backed cards and cleaner grouped panels */
+:root{--parchment-url:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 180'%3E%3Crect width='300' height='180' fill='%23d7c39a'/%3E%3Cg opacity='.22' stroke='%239b7c46' stroke-width='2'%3E%3Cpath d='M-20 20 C 40 0 70 35 130 18 S 220 8 320 28'/%3E%3Cpath d='M-10 78 C 60 55 100 110 170 86 S 250 72 320 92'/%3E%3Cpath d='M-10 136 C 40 110 90 160 150 138 S 235 122 320 144'/%3E%3C/g%3E%3C/svg%3E");--panel-ornament:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Cg fill='none' stroke='%23cfbd8c' stroke-width='2' opacity='.55'%3E%3Cpath d='M18 40h46m72 0h46M78 40c8-10 16-16 22-16s14 6 22 16c-8 10-16 16-22 16s-14-6-22-16Z'/%3E%3C/g%3E%3C/svg%3E");}
+header{backdrop-filter:blur(10px);box-shadow:0 8px 26px #0005}
+#atlaspanel,#battlepanel,#citypanel aside,#help,.menu-card,#commandhud,#v51insights,#v51cities,#atlasoverview,#researchstatus{background-image:var(--parchment-url);background-size:cover;background-blend-mode:overlay;}
+.menu-card,.research-window,#help,#atlaspanel,#battlepanel,#commandhud,#v51insights,#v51cities,#atlasoverview,#researchstatus,#settlerpanel,#citypanel{box-shadow:0 18px 50px #08191f88}
+.menu-hero{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid #bba16b88;border-radius:10px;background:#1c393bb8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Cpath d='M10 56l22-24 16 10 16-19 22 17 24 16' fill='none' stroke='%23ebd6a1' stroke-width='4' opacity='.6'/%3E%3Ccircle cx='92' cy='22' r='7' fill='%23ebd6a1' opacity='.55'/%3E%3C/svg%3E") right 10px center/110px auto no-repeat;margin:8px 0 10px}
+.hero-badge{flex:0 0 auto;padding:8px 10px;border-radius:999px;background:#d7bf84;color:#1a2f2b;font-weight:700;font-size:11px;letter-spacing:1px}
+.hero-text strong{display:block;color:#fff0c7;font-size:14px;margin-bottom:4px}.hero-text span{display:block;color:#d5e0c7;font-size:11px;line-height:1.45}
+#atlaspanel h2,#battlepanel h2,.city-panel-heading h2,.menu-card h1{position:relative;padding-bottom:10px;background:var(--panel-ornament) center bottom/180px 18px no-repeat}
+#resources span{padding:8px 10px;border-radius:10px;background:rgba(12,26,27,.24);border:1px solid rgba(208,188,121,.18)}
+#tools{padding:6px 8px;background:rgba(15,33,35,.82);border:1px solid rgba(199,173,113,.35);border-radius:12px;box-shadow:0 10px 26px #081d234d}
+#tools button{border-radius:10px}
+#atlaspanel button,#battlepanel button,#v51citiestoggle,#newgame,#continue,#quality,#selectsettler,#selectarmy,#attackcity,#opencity,#viewenemy{border-radius:10px}
+.atlas-card strong{display:flex;align-items:center;gap:8px;color:#f4e4bc}.atlas-card-tips strong::before{content:'🧭';font-size:16px}.atlas-card-cities #v51citiestoggle::before{content:'🏘 ';}
+#atlasoverview{border-radius:14px}.atlas #atlasoverview span{font-size:11px}
+#atlaspanel p,#battlepanel p,#citypanel p,#help p,.menu-card p{color:#d9dfcf}
+#atlaspanel details{background:rgba(17,35,34,.18);border:1px solid rgba(199,173,113,.14);border-radius:10px;padding:8px 10px}
+#atlaspanel summary{font-weight:600}
+#v51insights,#v51cities{border-radius:14px;background-color:rgba(18,34,34,.90)}
+@media(max-width:760px){.menu-hero{background-size:84px auto;padding:10px}.hero-text strong{font-size:13px}.hero-text span{font-size:10px}}
