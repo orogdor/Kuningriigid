@@ -20,7 +20,7 @@ import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js?
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
-import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=61b';
+import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=61c';
 export {BUILDINGS,RESOURCE_NAMES};
 RESOURCE_NAMES.bread='Toit';BUILDINGS.harbor={name:'Sadam ja laevatehas',icon:'⚓',cost:{wood:60,plank:25,stone:25},requires:['lumber','quarry'],workers:0,time:40};BUILDINGS.hall.name='Algusmaja · 3 töölist';
 Object.assign(BUILDINGS.house,{cost:{wood:15},requires:['hall']});
