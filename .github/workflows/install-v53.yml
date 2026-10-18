@@ -1,0 +1,44 @@
+name: Paigalda V53 mäng ja teede parandus
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Kuningriigid_V53_patch.zip'
+      - '.github/workflows/install-v53.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  install-v53:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Laadi hoidlasse salvestatud mäng
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Paigalda uusimad mängufailid
+        run: |
+          unzip -q -o Kuningriigid_V53_patch.zip -d .
+          test -s index.html
+          test -s TEST_V53.mjs
+          test -s roads.js
+          grep -q 'Kuningriigid V53' index.html
+      - name: Kontrolli avastusi, teid, mudeleid ja varasemat mängu
+        run: |
+          node --check civilization.js
+          node --check civilization-core.js
+          node --check atlas-style.js
+          node --check research.js
+          node TEST_V53.mjs
+          node TEST_V51.mjs
+          node TEST_V48.mjs
+          node TEST_V50.mjs
+      - name: Avalda kinnitatud failid
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "V53: õpikoja avastus ja liiklusest tekkivad uued teed"
+            git push origin HEAD:main
+          fi
