@@ -1,8 +1,8 @@
 import {CommandVisuals} from './command-visuals.js';
-import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=63c';
+import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=64a';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
-import {fishingRange,fishingEraText} from './fishery.js?v=64';
+import {fishingRange,fishingEraText} from './fishery.js?v=64a';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailWorldRoads,createDetailTrailLinks} from './detail-roads.js?v=59';
@@ -21,7 +21,7 @@ import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=5
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=59';
 import {createWorldAtlasProps} from './world-props.js?v=58';
 import * as T from './vendor/three.module.js';
-import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=62m3';
+import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=64a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js';
 import {detailHeight,featureNames} from './world-details.js';
 import {createAgeBuilding,animateBuilding} from './buildings.js';
