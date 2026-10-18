@@ -41,6 +41,8 @@ assert.equal(game.buildRule(city,'claypit'),'');
 assert.match(game.buildRule(city,'coppermine'),/Uuri:/);
 game.s.research[0].known.push('bronze','masonry','copper_tin');
 game.s.ages[0]=1;
+assert.match(game.buildRule(city,'coppermine'),/Vaja: Kivimurd/,'mines still need a completed quarry');
+city.economy.buildings.push({type:'quarry',team:0,x:8,z:0,ready:true,hp:350});
 assert.equal(game.buildRule(city,'coppermine'),'');
 stock.bronze=7;
 const saved=JSON.parse(JSON.stringify(game.s)),loaded=new Civilization(saved);
