@@ -1,5 +1,5 @@
 import {visibleNow,updateEnemyIntel,armyUnits,activeArmies,splitArmy,mergeArmies,cityProblems} from './v51-systems.js';
-import {buildDrainage,openStartingPassages} from './world-geography.js';
+import {buildDrainage,openStartingPassages} from './world-geography.js?v=65c';
 import {createLandmarks,collectLandmark,findExplorationPath} from './world-discoveries.js';
 import {buildRailNetworks} from './infrastructure.js';
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js';
