@@ -1,5 +1,5 @@
 import {CommandVisuals} from './command-visuals.js';
-import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=63';
+import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=63b';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
 import {minimapCell} from './minimap.js';
