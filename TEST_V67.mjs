@@ -34,8 +34,12 @@ for(const seed of [17,12345,20261018]){
  assert.ok(world.children.some(c=>c.name==='continuous water surface'),'entire world river is one connected batched water surface');
  assert.ok(detail.children.some(c=>c.name==='continuous water surface'),'all 9 detailed neighbourhood tiles share one water surface');
  assert.ok(world.userData.riverVertexCount>detail.userData.riverVertexCount);
- const original=world.children.find(c=>c.name==='continuous water surface').geometry.attributes.position;
- const projected=detail.children.find(c=>c.name==='continuous water surface').geometry.attributes.position;
+ const worldWater=world.children.find(c=>c.name==='continuous water surface');
+ const detailWater=detail.children.find(c=>c.name==='continuous water surface');
+ assert.ok(worldWater.geometry.index&&detailWater.geometry.index,'rivers form indexed continuous 3D surfaces');
+ assert.ok(worldWater.geometry.attributes.position.count<worldWater.geometry.index.count,'river vertices are shared across triangles');
+ const original=worldWater.geometry.attributes.position;
+ const projected=detailWater.geometry.attributes.position;
  const firstGlobal=[original.getX(0),original.getY(0),original.getZ(0)],firstDetail=[projected.getX(0),projected.getY(0),projected.getZ(0)];
  const p=worldToLocal(cell,firstGlobal[0],firstGlobal[2]);
  assert.ok(Math.abs(firstDetail[0]-p.x)<.001&&Math.abs(firstDetail[2]-p.z)<.001,'same river mesh x/z coordinates, just world-to-detail projection');
@@ -52,6 +56,13 @@ for(const seed of [17,12345,20261018]){
   assert.equal(network.children.filter(c=>c.name==='continuous road pavement').length,1,'all roads share one road mesh');
   assert.equal(local.children.filter(c=>c.name==='continuous road pavement').length,1,'all detailed roads share one road mesh');
   assert.ok(local.userData.roadEdges>0);
+  const worldRoad=network.children.find(c=>c.name==='continuous road pavement').geometry;
+  const localRoad=local.children.find(c=>c.name==='continuous road pavement').geometry;
+  assert.ok(worldRoad.index&&localRoad.index,'roads have welded vertices across adjacent segments');
+  const W=worldRoad.attributes.position,L=localRoad.attributes.position;
+  assert.ok(Math.abs(L.getX(0)-(W.getX(0)-orig.x)*3)<.002);
+  assert.ok(Math.abs(L.getY(0)-(W.getY(0)-.7)*.30)<.002);
+  assert.ok(Math.abs(L.getZ(0)-(W.getZ(0)-orig.z)*2.6)<.002);
   disposeNetwork(network);disposeNetwork(local);
  }
  console.log('V67',seed,{watersheds:edges.length,detailRiverTriangles:detail.userData.riverVertexCount/3,fullRiverTriangles:world.userData.riverVertexCount/3});
