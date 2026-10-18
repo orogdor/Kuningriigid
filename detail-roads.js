@@ -4,6 +4,7 @@
 import * as T from './vendor/three.module.js';
 import {COLS,ROWS} from './campaign.js';
 import {roadLevel,roadStrength} from './roads.js?v=59';
+import {roadCurve,worldToDetail,segmentTouchesTile} from './landscape-shared.js?v=65';
 
 const COLORS=['#000000','#b09a73','#bea982','#9e9585','#8f9291'];
 function appendRibbon(vertices,colors,a,b,width,color,height){
@@ -37,12 +38,16 @@ export function createDetailWorldRoads(game,tile,nav,height){
   if(other.c<0||other.r<0||other.c>=COLS||other.r>=ROWS||!game.seen(0,other))continue;
   const level=roadLevel(roadStrength(game.s,tile,other,game.s.time));
   if(!level)continue;
-  const start=nav.nearest({x:0,z:0},35),end=nav.nearest({x:dc*69,z:dr*59},14);
-  if(!start||!end)continue;
-  const path=nav.route(start,end);
-  if(!path?.length)continue;
-  const color=new T.Color(COLORS[level]),width=1.8+level*1.1;
-  for(let i=1;i<path.length;i++)appendRibbon(vertices,colors,path[i-1],path[i],width,color,height);
+  // Match the atlas road exactly. Road centerlines are derived from the
+  // same world tile centers and bend; no independent local path generation.
+  const points=roadCurve(game,tile,other,12),color=new T.Color(COLORS[level]);
+  const width=1.8+level*1.1;
+  for(let i=1;i<points.length;i++){
+   if(!segmentTouchesTile(tile,points[i-1],points[i],0))continue;
+   const p=worldToDetail(tile,points[i-1].x,points[i-1].z);
+   const q=worldToDetail(tile,points[i].x,points[i].z);
+   appendRibbon(vertices,colors,p,q,width,color,height);
+  }
  }
  return roadMesh(vertices,colors);
 }
