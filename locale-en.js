@@ -1970,5 +1970,9 @@ export const ENGLISH_PAIRS=[
  ["Läheduses","Nearby"],
  ["Rannikumeri","Coastal Sea"],
  ["Meresügavus","Water Depth"],
- ["Kalaparv","Fish School"]
+ ["Kalaparv","Fish School"],
+ ["Näita ressursse","Show Resources"],
+ ["Peida ressursid","Hide Resources"],
+ ["Ressursid ruudul","Resources on This Tile"],
+ ["Teadaolevaid ressursse pole","No Known Resources"]
 ];
