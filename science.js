@@ -1,7 +1,7 @@
 // Every city contributes basic knowledge; staffed academic buildings add science.
 // Science points are per *game minute*, not flat points per real second.
 import {tempoMultiplier} from './tempo.js';
-export const SCIENCE_BUILDINGS = Object.freeze({study:6,scriptorium:10,academy:16,university:24,observatory:30,polytechnic:42,laboratory:65});
+export const SCIENCE_BUILDINGS = Object.freeze({study:6,scriptorium:10,academy:16,university:24,monastery:16,chapel:10,observatory:30,polytechnic:42,laboratory:65});
 export const SCIENCE_PER_RESIDENT = .45;
 export const SCIENCE_PER_CITY = 2.4;
 export const SCIENCE_PER_TURN = 10;
