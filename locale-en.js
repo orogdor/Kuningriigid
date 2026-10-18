@@ -1934,5 +1934,8 @@ export const ENGLISH_PAIRS=[
  ["ründab","attacking"],
  ["ehitusala","building area"],
  ["Linna ja selle ala detailkaardid","City and District Detail Maps"],
- ["Avastatud vastast","Discovered Rival"]
+ ["Avastatud vastast","Discovered Rival"],
+ ["Puusepatöökoda","Carpenter's Workshop"],
+ ["Käsiveski","Hand Mill"],
+ ["Vibuküttide harjutusplats","Archery Training Ground"]
 ];
