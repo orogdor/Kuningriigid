@@ -2,7 +2,7 @@
 // Generated from the exact same world coordinates as the atlas. Geometry is
 // clipped at each tile border so adjacent city/detail maps join seamlessly.
 import * as T from './vendor/three.module.js';
-import {riverSegmentsNear,lineToDetail,rockSites,worldToDetail} from './landscape-shared.js?v=65';
+import {riverSegmentsNear,lineToDetail,rockSites,worldToDetail} from './landscape-shared.js?v=65c';
 
 const clip=(a,b)=>{
  let u0=0,u1=1;const dx=b.x-a.x,dz=b.z-a.z;
