@@ -21,6 +21,6 @@
 
 ## Kontrollid
 - `TEST_V62.mjs`: 20 maailma kümne eri seemne ja kahe kaarditüübi peale, kokku 80 mängija rannikuäärset alguskohta. Kontrollitud merega vahetu naabrus, läbitav maismaa, lähedane ehitusmaa, minimaalsed vahed, algressursid ning salvestusjärgne samade randade ja liigutatud üksuste säilimine.
-- V61, V60, V59 ja V55 automaatregressioonid läbisid kontrolli.
+- V61, V60, V59 ja V55 automaatregressioonid läbisid kontrolli. V56 avastaja pika liikumise suitsutest läbis kontrolli ühe kaardiseemnega (133 külastatud ruutu, 7 kahe ruudu vahelist tagasipõrget).
 - Avalikul GitHub Pages V62 lehel loodi uus mäng ja kontrolliti nelja mängija alguskohta päris brauseris: 4/4 maismaal, 4/4 otse mere kõrval, 4/4 algressurssidega, JavaScripti vigu ei esinenud.
 - Põhimängu pikk võidu/kaotuse läbimängimine ei kuulu selle muudatuse testide hulka.
