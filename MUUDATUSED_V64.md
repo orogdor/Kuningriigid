@@ -32,13 +32,14 @@
 1. **Hiire ja puute ekraanipinna valimine:** eemaldatud iga liigutuse korral tehtav sadade tuhandete maastikukolmnurkade läbiotsimine. Selle asemel kasutatakse kiiret maapinna kõrgust arvestavat analüütilist kiirlõiget.
 2. **Ülevaatekaart:** 220 × 165 maailmaruudu värviline taust jääb vahemällu. Liigutamisel joonistatakse uuesti ainult kaamera vaateaken ja valitud ruudu tähistus, mitte kogu maailma aluspilt.
 3. **Vähem 3D tippusid:** maailmakaardi pinnavõrk kõrgel/keskmisel graafikaseadel ~145 971 tipu asemel varasemate ~327 856 tipu; säästlikul režiimil ~36 686 tippu. Vähendatud kaartidele kantud ruudustiku geomeetriat.
-4. **Ressursiikoonid:** korraga kuni 160 kaardiikooni, neist kuni 46 kalaparvede märki; kaardi liigutamisel vanad ikoonimaterjalid ja tekstuurid vabastatakse. Enam ei kogune sadu kasutuseta tekstuure iga kaameranihkega.
+4. **Ressursiikoonid:** korraga kuni 160 kaardiikooni, neist kuni 46 kalaparvede märki; kaardi liigutamisel eemaldatakse vanad ikooniobjektid, kuid **jagatud ikoonimaterjalid ja tekstuurid säilitatakse vahemälus**. Varem hävitas ikoonide eemaldamine sama tekstuuri, mida uued ikoonid kasutasid, mistõttu ressursimärgid võisid liigutamisel kaduda. Uued objektid kasutavad sama väikest tekstuurikogu, ilma iga kord sadu uusi tekstuure loomata.
 5. Püsivad teed, linnad, uduloor, armee liikumiskäsud, randade 3D-vaated ja uuritud alade valik jäid alles.
 
 ## Testid
 - `TEST_V64.mjs`: mitu seemet, ainult meres asuvad kalad, ranniku- ja avamerevarud, seitsme ajastu püügipiir, päriselt kaugemale sõitvad kalurid, kalavarude kulumine, töötav saagitootmine, ainult rannikule lubatud kalameheonn, kaugemad hooned ja vanade kalavarude migratsioon.
 - Läbitud `TEST_V63.mjs` (keeled), `TEST_V61.mjs` (müürid/tornid), `TEST_V60.mjs` (majandus) ja `TEST_V56.mjs` (teed ja avastaja).
 - Avalikul GitHub Pages V64 lehel loodud mängus kontrollitud 4/4 mängija rannikualgused, 0 maismaal olevat kalavaruruutu, üle 13 000 kaladega mereruudu ühes seemnes ning maailmakaardi armee liikumine naaberruudule.
+- Täiendav brauseritest: kuus järjestikust maailmakaardi nihet, jagatud ikoonitekstuuride hävitamisi **0**, ressursimärgid säilisid ja JavaScripti vigu ei tekkinud. Kaardinavigatsiooni ja avastaja kordustest `TEST_V56.mjs` läbis viis seemet.
 - Ülevaatekaardi automaattestis muutus valiku/vaate nihutamisel ainult ülekatte loendur; maailma aluskihi uuesti joonistamiste arv jäi samaks. Avalikus brauseris käivitus mäng JavaScripti vigadeta.
 - Mänguseisu **`version:4`** jäi samaks. Sätted ja olemasolevad salvestused on säilitatud.
 
