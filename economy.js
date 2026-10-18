@@ -2,8 +2,8 @@ import {demand,workerEfficiency,HALL_CAPACITY,HOUSE_CAPACITY,housingCapacity,FOO
 // Resource harvesting and workshop output require three times more working time.
 // Movement, building construction, troop training and food consumption are unchanged.
 export const RESOURCE_PRODUCTION_MULTIPLIER=1/3;
-export const RESOURCE_NAMES={wood:'Puit',plank:'Lauad',stone:'Kivi',grain:'Vili',flour:'Jahu',water:'Vesi',bread:'Leib',ore:'Maak',coal:'Süsi',iron:'Raud',weapons:'Relvad',gold:'Kuld',paper:'Paber',saltpeter:'Salpeeter',gunpowder:'Püssirohi',steel:'Teras',machines:'Masinad',oil:'Nafta',fuel:'Kütus',power:'Elektrienergia',vehicles:'Sõidukid'};
-export const MATERIAL_KEYS=new Set(["wood","stone","plank","ore","coal","iron","weapons","paper","saltpeter","gunpowder","steel","machines","oil","fuel","vehicles"]);
+export const RESOURCE_NAMES={wood:'Puit',plank:'Lauad',stone:'Kivi',grain:'Vili',flour:'Jahu',water:'Vesi',bread:'Leib',ore:'Maak',coal:'Süsi',iron:'Raud',weapons:'Relvad',gold:'Kuld',paper:'Paber',saltpeter:'Salpeeter',gunpowder:'Püssirohi',steel:'Teras',machines:'Masinad',oil:'Nafta',fuel:'Kütus',power:'Elektrienergia',vehicles:'Sõidukid',clay:'Savi',pottery:'Keraamika',cutstone:'Tahutud kivi',copper:'Vask',tin:'Tina',bronze:'Pronks',carts:'Vankrid'};
+export const MATERIAL_KEYS=new Set(["wood","stone","plank","ore","coal","iron","weapons","paper","saltpeter","gunpowder","steel","machines","oil","fuel","vehicles","clay","pottery","cutstone","copper","tin","bronze","carts"]);
 export const FOOD_KEYS=new Set(["bread","grain","flour"]);
 // The town eats prepared food first. Grain is edible as porridge in emergencies;
 // flour needs extra preparation. Returned quantity is edible meal equivalents.
@@ -30,8 +30,8 @@ export function foodProductionAllowed(stock,cargo,key,rate,cap,input={}){
  return used-reclaim+rate<=cap+1e-7;
 }
 
-export function storageLimit(buildings,key){const ready=buildings.filter(b=>b.ready&&b.hp>0&&!b.virtual);const count=type=>ready.filter(b=>b.type===type).length;const halls=Math.max(1,count("hall"));if(key==="gold")return Infinity;if(key==="power")return 100;if(key==="water")return 100*halls;if(FOOD_KEYS.has(key))return 100*halls+200*count("cellar");if(MATERIAL_KEYS.has(key))return 120*halls+300*count("warehouse");return Infinity}
-export const START={wood:100,plank:35,stone:30,grain:0,flour:0,water:40,bread:40,ore:0,coal:0,iron:0,weapons:0,paper:0,saltpeter:0,gunpowder:0,steel:0,machines:0,oil:0,fuel:0,power:0,vehicles:0,gold:120};
+export function storageLimit(buildings,key){const ready=buildings.filter(b=>b.ready&&b.hp>0&&!b.virtual);const count=type=>ready.filter(b=>b.type===type).length;const halls=Math.max(1,count("hall"));if(key==="gold")return Infinity;if(key==="power")return 100;if(key==="water")return 100*halls;if(FOOD_KEYS.has(key))return 100*halls+200*count("cellar")+60*count("pottery_kiln");if(MATERIAL_KEYS.has(key))return 120*halls+300*count("warehouse");return Infinity}
+export const START={wood:100,plank:35,stone:30,grain:0,flour:0,water:40,bread:40,ore:0,coal:0,iron:0,weapons:0,paper:0,saltpeter:0,gunpowder:0,steel:0,machines:0,oil:0,fuel:0,power:0,vehicles:0,gold:120,clay:0,pottery:0,cutstone:0,copper:0,tin:0,bronze:0,carts:0};
 // Rolling minute buckets record goods actually received, not theoretical output.
 export function recordDelivery(realm,seconds,key,amount){
  if(!amount||amount<=0)return;
