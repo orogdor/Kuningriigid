@@ -50,3 +50,12 @@
 
 .model-gallery-link{display:block;margin:7px 0;padding:11px;border:1px solid #bba16b88;border-radius:7px;background:#1c393bb3;text-align:center;color:#e5d09b;text-decoration:none;font-size:12px;font-weight:600}
 .model-gallery-link:hover,.model-gallery-link:focus-visible{background:#34514d;border-color:#f2d8a3;color:#fff4d7}
+
+/* V51 compact empire overview, suggestions and safe save slots. */
+#v51insights,#v51cities{position:fixed;bottom:12px;left:12px;width:min(360px,calc(100vw - 24px));z-index:16;background:rgba(15,33,35,.90);border:1px solid #648074;border-radius:12px;color:#f0e5c6;padding:9px 12px;font-size:13px;box-shadow:0 2px 15px #0005}
+#v51insights{bottom:60px}#v51tips{max-height:150px;overflow:auto}#v51tips button,#v51cityrows button,#v51armies button{display:block;text-align:left;width:100%;font-size:12px;padding:5px 7px;margin:3px 0;border-radius:6px;background:#2b4947;color:#ede6cf;border:1px solid #53706b}#v51tips small{display:block;color:#b5c7c1}
+#v51cities button{width:100%;padding:6px}#v51cityrows{max-height:220px;overflow:auto}#v51cityrows p{font-size:12px;margin:3px}
+#v51saves{padding:10px;border:1px solid #65807a;border-radius:8px;margin:10px 0}#v51saves button{margin:4px 2px;padding:7px;font-size:12px}#v51saves h3{margin:3px 0 8px;font-size:15px}
+#v51slots .v51slot{display:flex;gap:5px;align-items:center;flex-wrap:wrap}#v51slots .v51slot span{font-size:12px;flex:1;min-width:85px}#v51slots .v51slot button{flex:0 0 auto}
+body:not(.atlas) #v51insights,body:not(.atlas) #v51cities{display:none}body:has(#startmenu:not([hidden])) #v51insights,body:has(#startmenu:not([hidden])) #v51cities{display:none}
+@media(max-width:690px){#v51insights{left:6px;bottom:48px;width:min(270px,calc(100vw - 12px));font-size:11px}#v51cities{left:6px;bottom:5px;width:min(270px,calc(100vw - 12px))}#v51tips{max-height:92px}}

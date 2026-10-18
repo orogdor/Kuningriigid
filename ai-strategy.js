@@ -38,6 +38,9 @@ function eligible(game,city,type){return !!BUILDINGS[type]&&!game.buildRule(city
 export function selectAIBuild(game,team,city){
  const r=city.economy.realms[team],stock=r.resources,age=game.s.ages[team],science=game.s.research[team];
  const buildings=game.allBuildings(city);
+ // Do not bankrupt a city by stacking construction orders with zero usable builders.
+ const waiting=buildings.filter(b=>!b.ready&&b.hp>0&&!b.disabled);
+ if(waiting.length>=3&&game.s.ages[team]>0)return null;
  const gaps=science.ageWait?ageDeficit(game.s,team,science.ageWait.id):{};
  const missing=Object.keys(gaps).length>0;
  const housing=game.allBuildings(city).filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
