@@ -50,7 +50,7 @@ export function planTrade(game){const shipments=game.s.shipments;
    // Fuel needed for the flight is never also advertised as transferable cargo.
    if(mode==='air')src.fuel-=flightFuel;
    const wagon=mode==='road'&&(src.carts||0)>=1;
-   const roadCrew=mode==='road'&&game.cityReady(from,'road_depot');
+   const roadCrew=mode==='road'&&game.allBuildings(from).some(b=>b.type==='road_depot'&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>0);
    const goods=suggestGoods(game,from,to,shipments,(mode==='rail'?90:mode==='air'?75:game.cityReady(from,'market')?52:36)+(wagon?16:0));
    if(mode==='air')src.fuel+=flightFuel;
    if(!Object.keys(goods).length)continue;
