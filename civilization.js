@@ -1,4 +1,5 @@
 import {CommandVisuals} from './command-visuals.js';
+import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=63';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
 import {minimapCell} from './minimap.js';
@@ -7,11 +8,11 @@ import {createDetailWorldRoads,createDetailTrailLinks} from './detail-roads.js?v
 import {SHIPS} from './naval.js';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js';
-import {housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT} from './labor.js';
+import {housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT,BASIC_JOBS} from './labor.js';
 import {BattleFeedback} from './battle-feedback.js';
 import {WALL_TYPES,TOWER_TYPES,wallHeight,fortifyBattle,configureWallFootprint,towerManned,wallCapacity} from './fortifications.js?v=62m3';
 import {persistSiegeDamage} from './medieval-v62.js';
-import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock} from './research.js';
+import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock,ERA_NAMES} from './research.js';
 import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
 import {renderResearchUI} from './research-ui.js';
@@ -27,6 +28,7 @@ import {createSoldier,animateSoldier,addTree} from './visuals.js';
 import {createGroundCover} from './graphics-v46.js';
 import {door} from './navigation.js';
 const $=id=>document.getElementById(id),dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),copy=x=>JSON.parse(JSON.stringify(x));
+initializeLocalization({BUILDINGS,TECHS,TROOPS,AGES,RESOURCE_NAMES,SHIPS,BASIC_JOBS,ERA_NAMES,onChange:()=>{renderUI();if(typeof slotUI==='function')slotUI()}});
 let recovered=false,state;const validState=v=>v?.version===4&&Number.isFinite(v.seed)&&Array.isArray(v.cities)&&Array.isArray(v.settlers)&&Array.isArray(v.units)&&Array.isArray(v.armies);for(const key of ['kingdoms-civ4','kingdoms-civ4-backup']){try{const saved=JSON.parse(localStorage.getItem(key));if(validState(saved)){state=saved;recovered=key.endsWith('-backup');break}}catch{}}if(!state)try{state=migrateGame(JSON.parse(localStorage.getItem('kingdoms-v1')))}catch{}state??=createGame(Math.floor(Math.random()*2147483647));
 let commandMode='select',hoverPoint=null;const cameraKeys=new CameraKeys();let lastMenuRevision=0,lastOverviewStamp='';let selectedShip=null;let cityTab='info';let restarting=false;let game=new Civilization(state),s=game.s,view='world',activeTile=null,chosen=game.cell(s.settlers.find(a=>a.team===0)||s.cities.find(c=>c.team===0)||{c:10,r:11}),selectedMover=s.settlers.find(a=>a.team===0)?.id??null,armySelected=false,selectedArmyId=0,selectedTrade=null,selectedUnit=null,mode=null,wallAxis=0,tab='build',menuOpen=true,paused=false,speed=1,toastTime=0,zoom=950,drag=null,focus=new T.Vector3(),last=performance.now(),saveTimer=0,uiTimer=0,signature='',localTerrain=null,frameDelta=0,selectedBuilding=null,ghost=null,ghostPoint=null,ghostKey='',lastTrailTime=-1,lastTrailChanges=-1;
 const renderer=new T.WebGLRenderer({canvas:$('world'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
@@ -311,4 +313,4 @@ function sampleV51FPS(dt){if(menuOpen||document.hidden)return;fpsFrames++;fpsSec
  if(highFpsSeconds>=12&&v51Resolution<1){v51Resolution=1;renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?.85:quality==='medium'?1.15:1.6));highFpsSeconds=0}
 }
 
-$('seedinfo').textContent='Maailma seeme: '+s.seed+' · tempo: '+tempoName(s);if($('tempo'))$('tempo').value=s.tempo||'normal';if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();openWorld();worldSync();if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={camera,pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
+$('seedinfo').textContent='Maailma seeme: '+s.seed+' · tempo: '+tempoName(s);if($('tempo'))$('tempo').value=s.tempo||'normal';if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();openWorld();worldSync();if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={camera,pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
