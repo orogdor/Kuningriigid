@@ -11,7 +11,7 @@ export function demand(b,definitions){
  if(b.disabled||b.virtual||b.hp<=0)return 0;
  if(!b.ready)return 1;
  const d=definitions[b.type];
- return (d?.out||['watchtower','stonetower','forester','warehouse','market','harbor','study','scriptorium','academy','university','observatory','polytechnic','laboratory','railstation','airfield'].includes(b.type))?(d?.workers||0):0;
+ return (d?.out||['watchtower','stonetower','guildhall','infirmary','trade_yard','inn','monastery','chapel','keep','gatehouse','siegeworkshop','forester','warehouse','market','harbor','study','scriptorium','academy','university','observatory','polytechnic','laboratory','railstation','airfield'].includes(b.type))?(d?.workers||0):0;
 }
 function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,stock={}){
  const need=(k)=>Math.max(0,eraNeed[k]||0);
@@ -62,6 +62,8 @@ function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,st
  if(b.type==='warehouse')return 38;
  if(b.type==='market')return 42;
  if(['study','scriptorium','academy','university','observatory','polytechnic','laboratory'].includes(b.type))return foodCritical||waterCritical?35:61;
+ if(['keep','gatehouse','infirmary'].includes(b.type))return foodCritical?22:72;
+ if(['guildhall','trade_yard','inn','monastery','chapel','siegeworkshop'].includes(b.type))return foodCritical?20:56;
  if(b.type==='forester')return 35;
  if(b.type==='saw')return 65;
  if(['mine','coal','smelter','smith','printer','nitrate','powdermill','steelworks','engineworks','oilwell','refinery','powerplant','autofactory'].includes(b.type))return 55;
