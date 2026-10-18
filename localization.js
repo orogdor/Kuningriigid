@@ -20,7 +20,7 @@ const HELP_EN=[
 ];
 const specialSelectors=[
  ['#startmenu .menu-card > p','Stone Age → Bronze Age → Iron Age → Middle Ages → Renaissance → Industrial Age → Modern Age. Start with a settler and three workers, and compete against three rival civilizations on a 220 × 165 world map.'],
- ['#startmenu .menu-hero .hero-text span','V66: Every tile belonging to a city is part of one shared construction area. Stockpiles, workers, prerequisites and the construction queue are shared; place buildings across city tiles.'],
+ ['#startmenu .menu-hero .hero-text span','V67: Rivers, mountains and roads are now generated as continuous 3D landscapes. The world and city detail maps use the same terrain heights, river geometry and road network.'],
  ['#startmenu .menu-note','60 game seconds = one turn. The game pauses in the menu, while paused, and when the tab is in the background. Game pace affects research, construction and training time, but not food consumption. Starting a new game replaces your current autosave; export it first if you want to keep it.'],
  ['#atlaspanel > .atlas-legend p:nth-of-type(2)','Your scout can automatically explore the unknown, visit villages and ruins, and receive a one-time reward on the first visit.'],
  ['#researchpanel .research-explanation','Choose one topic to research. Prerequisites unlock new branches; changing topics preserves progress. Queue up to four further discoveries. Your cities and staffed science buildings produce research points. Discovery bonuses give an extra 35%. Game time pauses in menus and while the tab is hidden.'],
@@ -98,7 +98,7 @@ function renderAll(){
  if(document.body)visit(document.body);
  updateSpecialCopy();
  document.documentElement.lang=language;
- document.title=language==='en'?'Kingdoms V66 – Real-Time Strategy':'Kuningriigid V66 – reaalajastrateegia';
+ document.title=language==='en'?'Kingdoms V67 – Real-Time Strategy':'Kuningriigid V67 – reaalajastrateegia';
  for(const id of ['language','menulanguage']){const c=document.getElementById(id);if(c)c.value=language}
 }
 export function changeLanguage(next,{notify=true}={}){
