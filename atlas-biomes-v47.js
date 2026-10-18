@@ -1,6 +1,7 @@
 // World-scale foliage and geological landmarks, light-weight instanced geometry.
 // This module affects only the presentation. No gameplay pathfinding or yield changes.
 import * as T from './vendor/three.module.js';
+import {surface,riverNear} from './continuous-landscape.js?v=68';
 
 function instanceGroup(group, kind, entries, geometry, color, castShadow=false){
  if(!entries.length)return null;
@@ -46,14 +47,14 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
   const effective=density*factor,count=Math.floor(effective+(j(cell.c+17,cell.r+201)<effective%1?1:0));
   for(let i=0;i<count;i++){
    const nx=j(cell.c*29+i*1.7,cell.r*7+i*13.2),nz=j(cell.c*11+i*17.8,cell.r*23+i*4.9);
-   const x=cell.x+(nx-.5)*39,z=cell.z+(nz-.5)*39,y=game.atlasHeight(x,z);
-   if(y<3||y>32)continue;
+   const x=cell.x+(nx-.5)*39,z=cell.z+(nz-.5)*39,y=surface(game,x,z,'world'),stream=riverNear(game,x,z);
+   if(y<3||y>45||stream.distance<stream.width+3.2)continue;
    const k=j(cell.c*13+i*4.1,cell.r*19+i*2.9),size=3.8+k*4.2,rot=k*6.28;
    const target=type==='pine'?pine:type==='palm'?palm:type==='cactus'?cactus:oak;
    target.push({x,y,z,scale:size/(type==='pine'?1.7:type==='cactus'?1.7:1.45),rot,tint:k>.78?'#d5e4c4':'#ffffff'});
   }
   if(['steppe','desert','tundra','mesa','coastal_steppe'].includes(biome)&&j(cell.c+126,cell.r+113)>.72){
-   const x=cell.x+(j(cell.c+31,cell.r+72)-.5)*33,z=cell.z+(j(cell.c+13,cell.r+61)-.5)*33,y=game.atlasHeight(x,z),size=2.2+j(cell.c+7,cell.r+99)*4;
+   const x=cell.x+(j(cell.c+31,cell.r+72)-.5)*33,z=cell.z+(j(cell.c+13,cell.r+61)-.5)*33,y=surface(game,x,z,'world'),size=2.2+j(cell.c+7,cell.r+99)*4;
    rock.push({x,y,z,scale:size/1.5,rot:j(cell.c,cell.r)*6.28});
   }
  }
