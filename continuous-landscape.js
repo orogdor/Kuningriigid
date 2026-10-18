@@ -94,7 +94,7 @@ export function baseHeight(game,x,z){
  // Ridge systems are actual elevated continuous terrain, not grey material
  // patches. Two frequencies create mountain crests and steep rock faces.
  const crest=Math.pow(1-Math.abs(Math.sin(x*.052+Math.cos(z*.018)*1.4)*Math.cos(z*.048-x*.011)),2);
- const ridge=(7.5+18*crest+4.5*Math.max(0,fold))*steep;
+ const ridge=(12+22*crest+4.5*Math.max(0,fold))*steep;
  // Sloping continental shelf: the underwater seabed is visibly BELOW the
  // sea surface even where riverbeds descend toward the coast.
  const sub=Math.max(0,.72-h);
