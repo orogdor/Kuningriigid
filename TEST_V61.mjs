@@ -72,6 +72,17 @@ assert.equal(beforeOrientation.open(wall.x+3,wall.z),false,'wall blocks travel t
 wall.wallAxis=1;configureWallFootprint(wall);beforeOrientation.rebuild();
 assert.equal(beforeOrientation.open(wall.x,wall.z+3),false,'rotated wall blocks vertical travel');
 assert.equal(beforeOrientation.open(wall.x+3,wall.z),true,'rotated wall does not block lateral free ground');
+// A player can construct a researched wall through the real economy/placement pipeline.
+game.s.research[0].known.push('stone_tools','warfare','fortifications');
+const treasury=city.economy.realms[0].resources;
+treasury.wood=1000;treasury.stone=1000;
+const candidates=[{x:18,z:0},{x:18,z:8},{x:12,z:10},{x:6,z:12},{x:0,z:12},{x:-18,z:10},{x:-18,z:0}];
+const spot=candidates.find(p=>!game.previewBuild(city,'palisade',p).error);
+assert.ok(spot,'the player must be able to place a researched wall on the local map');
+const built=game.build(city,'palisade',spot);
+assert.ok(built.building,'researched wall must enter normal construction queue');
+assert.equal(built.building.ready,false,'new wall is not instantly complete');
+assert.ok(treasury.wood<1000&&treasury.stone<1000,'construction spends resources');
 const saved=JSON.parse(JSON.stringify(game.s)),loaded=new Civilization(saved);
 assert.equal(loaded.s.version,4,'Save schema unchanged');
 assert.equal(loaded.s.units.filter(u=>u.garrison).length,2,'Garrison persists after reload');
