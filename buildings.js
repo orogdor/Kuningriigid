@@ -67,6 +67,48 @@ else if(type==='stonetower'){
  for(const h of [2,4.3,6])box(g,0,h,2.62,.36,.7,.08,'#343d3e','stone');
  box(g,0,.85,2.91,1.1,1.7,.13,'#4c4a3e','wood');
 }
+// V62: original medieval silhouettes: mills, civic halls, castles and gatehouse.
+else if(type==='reinforced_wall'){
+ box(g,0,2,0,7,4,1.6,'#8c8d88','stone');box(g,0,4,0,7.6,.45,2,'#b7b8ab','stone');
+ for(let x=-3.15;x<=3.15;x+=1.05)box(g,x,4.62,0,.67,.95,1.65,'#9c9e95','stone');
+ for(const x of [-2.7,2.7])box(g,x,1.6,.85,.24,3,.18,'#61615a','metal');
+}
+else if(type==='gatehouse'){
+ for(const x of [-2.1,2.1]){cylinder(g,x,3.3,0,1.4,1.6,6.6,'#92968b','stone',12);cylinder(g,x,6.6,0,1.65,1.55,.4,'#b2b6a7','stone',12);for(let i=0;i<8;i++){const a=i*Math.PI/4;box(g,x+Math.cos(a)*1.4,7.05,Math.sin(a)*1.4,.65,.75,.65,'#a3a79c','stone');}}
+ box(g,0,5,0,2.9,2.5,2,'#9b9b90','stone');
+ box(g,0,2,1.05,2.2,3.9,.18,'#6c5340','wood');
+ for(let x=-.9;x<1;x+=.45)box(g,x,2,1.18,.085,3.75,.1,'#a5926e','metal');
+}
+else if(type==='keep'){
+ box(g,0,2.7,0,5.4,5.4,5.1,'#93988f','stone');box(g,0,5.5,0,5.8,.35,5.6,'#c0c0b2','stone');
+ for(const x of [-2.1,2.1])for(const z of [-2.1,2.1]){box(g,x,4.1,z,.95,8.2,.95,'#999e95','stone');cone(g,x,9,z,.87,1.7,'#5d6b76');}
+ for(const x of [-2,0,2])for(const z of [-2.25,2.25])box(g,x,6,z,.9,.85,.8,'#b5b8aa','stone');
+ box(g,0,.9,2.65,1.2,1.8,.16,'#5d4434','wood');for(const h of [3.3,4.8])window(g,0,h,2.62,.36,.62);
+}
+else if(type==='watermill'||type==='windmill'){
+ cottage(g,-.8,-.45,3.2,3,3.2,type==='windmill'?'#7c6756':'#837465');
+ if(type==='watermill'){const w=cylinder(g,1.55,1.35,.35,1.3,1.3,.24,'#745839','wood',12);w.rotation.z=Math.PI/2;for(let i=0;i<8;i++){const a=i*Math.PI/4;box(g,1.72,1.35+Math.cos(a)*.9,.35+Math.sin(a)*.9,.12,.5,.5,'#997248','wood')}}else{box(g,1,4,-.6,.2,3.5,.25,'#8e7b5f','wood');for(let i=0;i<4;i++){const a=i*Math.PI/2,wing=box(g,1+Math.cos(a)*1.1,4+Math.sin(a)*1.1,.35,.75,2.2,.16,'#bdb49b','wood');wing.rotation.z=-a}}
+}
+else if(type==='monastery'||type==='chapel'){
+ cottage(g,-.8,-.35,3.7,3.1,3.5,'#555c6a');box(g,1.7,3.6,-.7,1.25,7.2,1.5,'#a7a698','stone');cone(g,1.7,8,-.7,1.1,1.6,'#616770');
+ beam(g,[1.7,8.7,-.7],[1.7,10,-.7],.18,'#a9a9a0');beam(g,[1.1,9.4,-.7],[2.3,9.4,-.7],.14,'#a9a9a0');
+}
+else if(type==='siegeworkshop'){
+ cottage(g,-1.5,-1,2.7,2.3,2,'#7a634c',true);
+ for(const x of [-.3,2]){const wheel=cylinder(g,x,.6,1.5,.55,.55,.13,'#594b3b','wood',12);wheel.rotation.z=Math.PI/2}
+ box(g,.9,1.2,.6,3,.25,1.7,'#98774d','wood');beam(g,[.3,1.5,.4],[1.55,4,.4],.19);box(g,1.65,4.05,.4,.6,.75,.55,'#89765d','wood');
+}
+else if(type==='armor_workshop'||type==='crossbow_range'||type==='guildhall'||type==='master_workshop'||type==='infirmary'||type==='trade_yard'||type==='inn'){
+ const colors={armor_workshop:'#7a6b64',crossbow_range:'#836a52',guildhall:'#9b8065',master_workshop:'#82664c',infirmary:'#bec1ad',trade_yard:'#9e7851',inn:'#a77658'};
+ cottage(g,-.3,-.45,3.6,2.9,2.65,colors[type]);
+ if(type==='crossbow_range'){for(const x of [-1.75,0,1.75]){box(g,x,1.1,2.15,.13,2.1,.1,'#72533c','wood');box(g,x,2.15,2.15,.8,.8,.13,'#c3a66e','wood');}}
+ if(type==='armor_workshop'){for(const x of [-1.2,0,1.2]){cylinder(g,x,.6,2,.5,.5,.16,'#849095','metal');box(g,x,1.15,2,.75,.5,.16,'#8f9594','metal');}}
+ if(type==='guildhall'){for(const x of [-1.8,1.8])box(g,x,3.8,0,.65,1,.65,'#b8ac81','stone');}
+ if(type==='master_workshop')for(let i=0;i<5;i++)box(g,-1.8+i*.7,.35,2,.3,.45,1.8,'#8e754c','wood');
+ if(type==='infirmary'){box(g,0,3.7,1.5,.3,1.1,.2,'#ba5b53');box(g,0,3.7,1.52,1.1,.3,.18,'#ba5b53');}
+ if(type==='trade_yard')for(let i=0;i<4;i++)crate(g,-1.5+i*.95,2.1);
+ if(type==='inn'){for(let i=0;i<3;i++)box(g,-1.7+i*1.2,.5,2,.75,.25,.65,'#916842','wood');chimney(g,1.1,-.8,4)}
+}
 else if(type==='hall'){box(g,0,.2,0,5.8,.4,4.1,'#a49d85','stone');cottage(g,0,0,3.4,2.8,3.4,'#6c7180');for(const x of [-2.1,2.1]){box(g,x,2,0,1.2,4,1.5,'#b7b49c','stone');cone(g,x,4.7,0,1,1.8,'#687284',6);window(g,x,2.8,.79,.25,.7)}box(g,0,4.7,0,.07,3,.07,'#70563a');box(g,.65,5.7,0,1.25,.7,.04,flag);}
 else if(type==='house'){cottage(g,0,-.25,3.4,2.7,2.8,'#a66d48');box(g,0,1.75,1.16,3.4,.12,.1,'#6a5137');window(g,-1,2.5,1.17);window(g,1,2.5,1.17);chimney(g,1,-.8,3.8);fence(g,0,1.95,3.5);}
 else if(type==='lumber'){cottage(g,-.35,-.4,2.7,2.4,1.8,'#806145',true);logs(g,1.65,-.3,4);box(g,0,.6,1.65,1.4,.3,.65,'#8b6845','wood');box(g,.35,1,1.65,.07,.7,.07,'#69533a');box(g,.5,1.3,1.65,.3,.18,.04,'#9caba2','metal');}
@@ -123,7 +165,7 @@ export function createBuildingModel(type,team=0){const root=new T.Group();for(co
 // Neither should show medieval windmill sails or a motorized circular saw.
 if(['bakery','smith','smelter','coal','steelworks','refinery','powerplant'].includes(type)){const smoke=new T.Group();const origin=type==='bakery'?[1.45,3.4,-.1]:type==='smith'?[-1.2,4,-.6]:type==='smelter'?[.7,4.3,-.45]:[0,2.7,-.3];smoke.position.set(...origin);for(let i=0;i<4;i++){const m=new T.Mesh(new T.SphereGeometry(1,6,4),new T.MeshBasicMaterial({color:0xaaa99e,transparent:true,opacity:.16,depthWrite:false}));m.scale.setScalar(.14+i*.05);smoke.add(m)}root.add(smoke);root.userData.smoke=smoke}return root}
 export function animateBuilding(root,time,active,ready){for(const a of root.userData.animations||[]){if(ready&&(!a.node.userData.workOnly||active))a.node.rotation[a.axis]=time*a.speed}const smoke=root.userData.smoke;if(smoke){smoke.visible=ready&&active;smoke.children.forEach((p,i)=>{const f=(time*.23+i*.25)%1;p.position.set(f*.35,f*1.5,Math.sin(i+time*.15)*.06);p.scale.setScalar(.12+f*.35);p.material.opacity=(1-f)*.18})}}
-export function createAgeBuilding(type,team,age=0){if(['palisade','stonewall','watchtower','stonetower'].includes(type))return createBuildingModel(type,team);if(type==='harbor'){const g=new T.Group();box(g,0,.3,2,6,.6,9,'#94724b','wood');for(const x of [-2.5,2.5])for(const z of [-1,3,6])cylinder(g,x,.1,z,.16,.2,2,'#68543a','wood');box(g,0,1.7,-2,4,2.8,3,'#b7a27c','wood');gable(g,0,3.5,-2,5,4,1.2,age>=2?'#797e83':'#98744c');box(g,0,3.7,3,.12,5,.12,'#735a3a','wood');box(g,.7,5.3,3,1.4,.8,.05,['#8fb6a2','#b77c61','#aa8bc5','#ceb66b'][team]);return g}if(type==='bridge'){const g=new T.Group();for(const x of [-2.2,2.2])for(const z of [-1.2,1.2])cylinder(g,x,.9,z,.16,.16,1.8,'#7a5a3d','wood');for(const z of [-1.2,1.2])box(g,0,1.35,z,5.5,.22,.18,'#8b6845','wood');for(const x of [-2.6,-.9,.9,2.6])box(g,x,1.05,0,.18,.75,2.9,'#9d7b55','wood');box(g,0,.72,0,6.2,.2,3.4,'#a88c65','wood');if(age>=2){box(g,0,.92,0,6.4,.28,3.8,'#9a9b95','stone')}return g}if(age>0){const g=createBuildingModel(type,team);g.userData.upgradeAge=age;g.add(createArchitecturalDetails(type,team,age));if(age>=2){box(g,0,.25,0,6,.5,6,'#92958d','stone');for(const x of [-2.5,2.5])box(g,x,1.8,2.6,.15,3.3,.12,'#747f84','metal')}if(age>=5){box(g,0,.2,0,6.7,.42,6.7,'#858e90','metal');box(g,1.85,5.5,-1.7,.7,3.5,.7,'#69757a','metal')}if(age>=6){for(const x of [-1.6,0,1.6])box(g,x,4.25,2.57,.8,.85,.06,'#a7cad2','plain');}if(age>=3){for(const z of [-2.7,2.7])box(g,0,2.8,z,5.7,.18,.18,'#c5b779','metal');box(g,2.1,4.2,-1.6,.7,2.5,.7,'#969c92','stone')}return g;}const key='prehistoric:'+type+team;if(!models.has(key)){const g=new T.Group(),flag=team?'#ae6650':'#748e8d';const hut=(x,z,size=1)=>{cylinder(g,x,1*size,z,1.35*size,1.65*size,2*size,'#a48c62','plain',12);cone(g,x,2.5*size,z,2*size,2.4*size,'#80684d',10);box(g,x,.65*size,z+1.5*size,.6*size,1.3*size,.08,'#302c23');for(let i=0;i<8;i++){const a=i*Math.PI/4;beam(g,[x+Math.cos(a)*1.65*size,0,z+Math.sin(a)*1.65*size],[x,3.8*size,z],.085,'#65503b')}};
+export function createAgeBuilding(type,team,age=0){if(['palisade','stonewall','watchtower','stonetower','reinforced_wall',...['armor_workshop','crossbow_range','guildhall','master_workshop','watermill','windmill','infirmary','trade_yard','inn','monastery','chapel','keep','gatehouse','siegeworkshop']].includes(type))return createBuildingModel(type,team);if(type==='harbor'){const g=new T.Group();box(g,0,.3,2,6,.6,9,'#94724b','wood');for(const x of [-2.5,2.5])for(const z of [-1,3,6])cylinder(g,x,.1,z,.16,.2,2,'#68543a','wood');box(g,0,1.7,-2,4,2.8,3,'#b7a27c','wood');gable(g,0,3.5,-2,5,4,1.2,age>=2?'#797e83':'#98744c');box(g,0,3.7,3,.12,5,.12,'#735a3a','wood');box(g,.7,5.3,3,1.4,.8,.05,['#8fb6a2','#b77c61','#aa8bc5','#ceb66b'][team]);return g}if(type==='bridge'){const g=new T.Group();for(const x of [-2.2,2.2])for(const z of [-1.2,1.2])cylinder(g,x,.9,z,.16,.16,1.8,'#7a5a3d','wood');for(const z of [-1.2,1.2])box(g,0,1.35,z,5.5,.22,.18,'#8b6845','wood');for(const x of [-2.6,-.9,.9,2.6])box(g,x,1.05,0,.18,.75,2.9,'#9d7b55','wood');box(g,0,.72,0,6.2,.2,3.4,'#a88c65','wood');if(age>=2){box(g,0,.92,0,6.4,.28,3.8,'#9a9b95','stone')}return g}if(age>0){const g=createBuildingModel(type,team);g.userData.upgradeAge=age;g.add(createArchitecturalDetails(type,team,age));if(age>=2){box(g,0,.25,0,6,.5,6,'#92958d','stone');for(const x of [-2.5,2.5])box(g,x,1.8,2.6,.15,3.3,.12,'#747f84','metal')}if(age>=5){box(g,0,.2,0,6.7,.42,6.7,'#858e90','metal');box(g,1.85,5.5,-1.7,.7,3.5,.7,'#69757a','metal')}if(age>=6){for(const x of [-1.6,0,1.6])box(g,x,4.25,2.57,.8,.85,.06,'#a7cad2','plain');}if(age>=3){for(const z of [-2.7,2.7])box(g,0,2.8,z,5.7,.18,.18,'#c5b779','metal');box(g,2.1,4.2,-1.6,.7,2.5,.7,'#969c92','stone')}return g;}const key='prehistoric:'+type+team;if(!models.has(key)){const g=new T.Group(),flag=team?'#ae6650':'#748e8d';const hut=(x,z,size=1)=>{cylinder(g,x,1*size,z,1.35*size,1.65*size,2*size,'#a48c62','plain',12);cone(g,x,2.5*size,z,2*size,2.4*size,'#80684d',10);box(g,x,.65*size,z+1.5*size,.6*size,1.3*size,.08,'#302c23');for(let i=0;i<8;i++){const a=i*Math.PI/4;beam(g,[x+Math.cos(a)*1.65*size,0,z+Math.sin(a)*1.65*size],[x,3.8*size,z],.085,'#65503b')}};
 if(type==='hall'){hut(0,-.4,1.35);for(let i=0;i<9;i++){const a=i*Math.PI*2/9;mesh(g,new T.DodecahedronGeometry(.3,0),'#8e9081','plain',Math.cos(a),.2,2+Math.sin(a))}cone(g,0,.6,2,.3,1,'#d58c4f',6);beam(g,[2.5,0,-1],[2.5,4,-1],.14);box(g,2.85,3.3,-1,.7,.7,.04,flag)}
 else if(type==='house'){hut(0,0,1);logs(g,1.8,1.3,3)}
 else if(type==='quarry'){for(let i=0;i<7;i++)mesh(g,new T.DodecahedronGeometry(.7+i%2*.25,0),'#a8aa96','plain',(i%3-1)*1.2,.4+Math.floor(i/3)*.25,Math.floor(i/3)-1);beam(g,[1,0,1.5],[1,1.5,1.5],.12);box(g,1.2,1.4,1.5,.5,.3,.14,'#929381')}
