@@ -359,7 +359,7 @@ export class Civilization{
  // An order can be given on any tile owned by the parent city. Coordinates
  // supplied by a detail-map click may extend into one of its eight neighbours.
  // Convert to the destination tile's local geometry before validation.
- buildInArea(city,type,at){
+ resolveAreaSite(city,at){
   const parent=this.parentCity(city);
   if(!parent)return {error:'Linna ehitusala ei leitud.'};
   const dc=Math.floor((at.x+75)/150),dr=Math.floor((at.z+65)/130);
@@ -367,12 +367,20 @@ export class Civilization{
   const destination=this.cell({c:city.c+dc,r:city.r+dr});
   if(!destination?.land||this.territoryOwner(destination)?.id!==parent.id)
    return {error:'Valitud ruut ei kuulu selle linna ühisesse ehitusalasse.'};
-  const p={x:Math.round((at.x-dc*150)/2)*2,z:Math.round((at.z-dr*130)/2)*2};
-  // Do not create a separate district context until the world-tile ownership
-  // check succeeds; all new building inventory belongs to this same city.
+  const point={x:Math.round((at.x-dc*150)/2)*2,z:Math.round((at.z-dr*130)/2)*2};
+  // The destination remains a separate *physical* tile but not a city.
   const ctx=this.contextAt(destination,true);
-  const result=this.build(ctx,type,p);
-  return {...result,ctx,point:p};
+  return {ctx,point};
+ }
+ previewInArea(city,type,at){
+  const site=this.resolveAreaSite(city,at);
+  if(site.error)return site;
+  return {...this.previewBuild(site.ctx,type,site.point),...site};
+ }
+ buildInArea(city,type,at){
+  const site=this.resolveAreaSite(city,at);
+  if(site.error)return site;
+  return {...this.build(site.ctx,type,site.point),...site};
  }
  wallGuards(city,b){return wallGuards(this.s,city,b)}
  stationWall(city,b,source=null){return stationWall(this,city,b,source)}
