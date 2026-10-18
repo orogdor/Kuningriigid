@@ -9,7 +9,7 @@ export const RESOURCE_CHAINS={
  steel:['mine','coal','smelter','steelworks'],
  machines:['steelworks','engineworks'],oil:['oilwell'],fuel:['oilwell','refinery'],clay:['claypit'],pottery:['claypit','pottery_kiln'],cutstone:['quarry','mason'],copper:['coppermine'],tin:['tinmine'],bronze:['coppermine','tinmine','bronze_foundry'],carts:['cartwright']
 };
-export const RESOURCE_SITES={claypit:'clay',pasture:'grain',coppermine:'copper',tinmine:'tin',lumber:'wood',quarry:'stone',hunter:'game',fisher:'fish',well:'water',farm:'grain',mine:'ore',oilwell:'oil'};
+export const RESOURCE_SITES={claypit:'clay',pasture:'grain',coppermine:'copper',tinmine:'tin',lumber:'wood',quarry:'stone',hunter:'game',fisher:'coast',well:'water',farm:'grain',mine:'ore',oilwell:'oil'};
 export const CRITICAL_BUILDINGS=new Set(['lumber','quarry','well','hunter','fisher','farm','saw','mill','bakery','mine','coal','smelter','nitrate','powdermill','steelworks','engineworks','oilwell','refinery','house','warehouse','cellar','forester','claypit','pottery_kiln','pasture','mason','coppermine','tinmine','bronze_foundry','cartwright']);
 function healthy(b){return b.hp>0&&!b.disabled}
 export function hasWorkingSource(buildings,type){return buildings.some(b=>b.type===type&&healthy(b)&&!(b.ready&&/pole ligipääsetavat|maardla puudub/.test(b.status||'')))}
