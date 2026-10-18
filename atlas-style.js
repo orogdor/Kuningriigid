@@ -114,10 +114,9 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
    if(!d)continue;
    const width=[0,9,13,18,24][level],nx=-dz/d,nz=dx/d;
    const fillCol=new T.Color(palette[level]),edgeCol=new T.Color(edgePalette[level]);
-   const main=[],verge=[],ruts=[[],[]];
+   const main=[],verge=[],ruts=[[],[]],roadSamples=roadCurve(game,a,b,12);
    for(let k=0;k<=12;k++){
-    const t=k/12,x=aa.x+dx*t,z=aa.z+dz*t;
-    const curved=roadCurve(game,a,b,12)[k],X=curved.x,Z=curved.z;
+    const curved=roadSamples[k],X=curved.x,Z=curved.z;
      const spot=(offset,y)=>{const px=X+nx*offset,pz=Z+nz*offset;return [px,game.atlasHeight(px,pz)+y,pz]};
     main.push([spot(-width*.5,2.3),spot(width*.5,2.3)]);
     verge.push([spot(-width*.67,2.06),spot(width*.67,2.06)]);
