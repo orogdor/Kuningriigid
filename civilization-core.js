@@ -4,7 +4,7 @@ import {createLandmarks,collectLandmark,findExplorationPath} from './world-disco
 import {buildRailNetworks} from './infrastructure.js';
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js';
 import {selectAIBuild,usefulDistrictTypes} from './ai-strategy.js';
-import {tickBuilders,tickMarketHouseholds,operateWorker,trainingWorker} from './builders.js';
+import {tickBuilders,tickMarketHouseholds,operateWorker,trainingWorker} from './builders.js?v=66';
 import {SHIPS,seaAllowed,seaPath,harborExit,buildShip,finishShip,tickShips,embark,disembark,aiNavy} from './naval.js';
 import {initializeFisheries,isShore,fishingHarvest} from './fishery.js?v=64b';
 import {upgradeLevel,productionBonus,upgradedName} from './upgrades.js';
