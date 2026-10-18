@@ -2,7 +2,7 @@ import * as T from './vendor/three.module.js';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
 import {createAtlasBiomeDetail} from './atlas-biomes-v47.js';
-import {pointsOfRiver,rockSites,roadCurve} from './landscape-shared.js?v=65';
+import {pointsOfRiver,rockSites,roadCurve} from './landscape-shared.js?v=65c';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
 const palette={
  sea:'#173f58',deepSea:'#102d4e',shallow:'#64aba7',beach:'#dfcea0',coastGrass:'#b7c28b',
