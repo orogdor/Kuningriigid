@@ -58,9 +58,18 @@ Object.assign(TECHS,{
  modern_science:{name:'Moodne teadus',age:6,turns:9,requires:['electricity','industrial_education'],unlocks:'Uurimislabor'},
  aviation:{name:'Lennundus',age:6,turns:9,requires:['combustion','modern_science'],unlocks:'Lennuväli'}
 });
+// V60: Optional early-economy research branches. No new mandatory era gates.
+Object.assign(TECHS,{
+ pottery:{name:'Savitöö ja keraamika',age:0,turns:2,requires:['stone_tools'],unlocks:'Savivõtukoht ja pottsepatöökoda; rohkem toidu säilitamise ruumi'},
+ animal_husbandry:{name:'Loomakasvatus',age:0,turns:3,requires:['hunting','agriculture'],unlocks:'Karjamaa ja loomakasvatusest saadav toit'},
+ masonry:{name:'Kivitahumine',age:0,turns:3,requires:['stone_tools'],unlocks:'Kiviraiduri töökoda ja tahutud kivi'},
+ wheel:{name:'Ratta valmistamine',age:1,turns:3,requires:['bronze','woodworking'],unlocks:'Vankritöökoda ja kiiremad kaubavankrid'},
+ copper_tin:{name:'Vase- ja tinatöö',age:1,turns:4,requires:['bronze','masonry'],unlocks:'Vase- ja tinakaevandused ning pronksisulatus'},
+ road_construction:{name:'Teedeehitus',age:1,turns:4,requires:['wheel','copper_tin'],unlocks:'Teemeistrite töökoda: liiklusega kujunevate teede tõhusam hooldus'}
+});
 export const ERA_NAMES=['Kiviaeg','Pronksiaeg','Rauaaeg','Keskaeg','Renessanss','Tööstusajastu','Moodne ajastu'];
 
-export const BUILD_TECH={study:'learning',printer:'printing',observatory:'astronomy',nitrate:'gunpowder',powdermill:'gunpowder',steelworks:'steelmaking',engineworks:'steam_engine',polytechnic:'industrial_education',railstation:'railways',oilwell:'oil_drilling',refinery:'petroleum',powerplant:'electricity',autofactory:'combustion',laboratory:'modern_science',airfield:'aviation',scriptorium:'writing',academy:'philosophy',university:'scholasticism',warehouse:'storage',cellar:'cellaring',market:'commerce',harbor:'shipbuilding',bridge:'bridges',quarry:'stone_tools',hunter:'hunting',fisher:'fishing',barracks:'warfare',forester:'forestry',farm:'agriculture',saw:'woodworking',mill:'milling',bakery:'milling',archery:'archery',mine:'iron',coal:'iron',smelter:'smelting',smith:'smithing',stable:'horsemanship'};
+export const BUILD_TECH={claypit:'pottery',pottery_kiln:'pottery',pasture:'animal_husbandry',mason:'masonry',cartwright:'wheel',coppermine:'copper_tin',tinmine:'copper_tin',bronze_foundry:'copper_tin',road_depot:'road_construction',study:'learning',printer:'printing',observatory:'astronomy',nitrate:'gunpowder',powdermill:'gunpowder',steelworks:'steelmaking',engineworks:'steam_engine',polytechnic:'industrial_education',railstation:'railways',oilwell:'oil_drilling',refinery:'petroleum',powerplant:'electricity',autofactory:'combustion',laboratory:'modern_science',airfield:'aviation',scriptorium:'writing',academy:'philosophy',university:'scholasticism',warehouse:'storage',cellar:'cellaring',market:'commerce',harbor:'shipbuilding',bridge:'bridges',quarry:'stone_tools',hunter:'hunting',fisher:'fishing',barracks:'warfare',forester:'forestry',farm:'agriculture',saw:'woodworking',mill:'milling',bakery:'milling',archery:'archery',mine:'iron',coal:'iron',smelter:'smelting',smith:'smithing',stable:'horsemanship'};
 export const UNIT_TECH={musketeer:'gunpowder',rifleman:'rifles',motorized:'combustion',slinger:'warfare',spearman:'warfare',axeman:'warfare',archer:'archery',infantry:'smithing',cavalry:'horsemanship'};
 export const newResearch=()=>({known:[],active:null,progress:{},completed:[],queue:[],paused:false,boosted:[],rate:0});
 export function techBlock(research,id){const tech=TECHS[id];if(!tech)return 'Tundmatu tehnoloogia.';if(research.known.includes(id))return 'Juba uuritud.';const missing=tech.requires.filter(t=>!research.known.includes(t));if(missing.length)return 'Eeldab: '+missing.map(t=>TECHS[t].name).join(', ');if(tech.oneOf&&!tech.oneOf.some(t=>research.known.includes(t)))return 'Eeldab üht: '+tech.oneOf.map(t=>TECHS[t].name).join(' või ');return ''}
