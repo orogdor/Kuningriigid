@@ -52,7 +52,7 @@ assert.ok(loaded.s.research[0].known.includes('copper_tin'),'new research surviv
 
 // Full goods production and haul-to-hall processing via the existing economy engine.
 const e=initialState(19),r=e.realms[0];r.pop=100;
-Object.assign(r.resources,{wood:900,stone:900,plank:900,grain:900,clay:35,pottery:0,copper:30,tin:30,cutstone:0,bronze:0,carts:0,bread:200,water:200});
+Object.assign(r.resources,{wood:900,stone:900,plank:900,grain:900,clay:0,pottery:0,copper:0,tin:0,cutstone:0,bronze:0,carts:0,bread:200,water:200});
 e.buildings=[{type:'hall',team:0,x:0,z:0,hp:1200,ready:true}];
 const factories=['claypit','pottery_kiln','pasture','mason','coppermine','tinmine','bronze_foundry','cartwright'];
 for(let i=0;i<factories.length;i++)e.buildings.push({type:factories[i],team:0,x:i*4+6,z:0,parent:0,hp:350,ready:true,timer:0});
@@ -60,7 +60,7 @@ const env={skipDemographics:true,workerBudget:()=>100,assigned:b=>BUILDINGS[b.ty
  storageCap:()=>5000,storageUsed:(_team,k,st)=>st[k]||0,spawnPoint:b=>b,moveCargo:()=>true,operateWork:(_b,dt)=>dt};
 const foodBefore=r.resources.bread;
 for(let i=0;i<650;i++)tickEconomy(e,1,env);
-for(const resource of ['pottery','cutstone','bronze','carts'])assert.ok(r.resources[resource]>0,'factory must actually deliver '+resource);
+for(const resource of ['clay','copper','tin','pottery','cutstone','bronze','carts'])assert.ok(r.resources[resource]>0,'factory must actually deliver '+resource);
 assert.ok(r.resources.bread>foodBefore,'pasture must produce edible food');
 const potFood=storageLimit(e.buildings,'bread');
 assert.equal(potFood,160,'pottery kiln adds food storage to hall');
