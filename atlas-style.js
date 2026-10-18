@@ -101,8 +101,8 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
   // Each traversed segment is drawn as a continuous terrain-conforming trail.
   // A dark verge, colored track and twin wagon ruts develop with traffic.
   const vertices=[],rgb=[],verges=[],vergeColors=[],rutLines=[];
-  const palette=['#000000','#b38c5c','#bfa37c','#c1b9a6','#a8aaa4'];
-  const edgePalette=['#000000','#736347','#82735b','#767568','#5c6569'];
+  const palette=['#000000','#d0a877','#c8ad85','#c4bb9e','#b6bbab'];
+  const edgePalette=['#000000','#775839','#897253','#646354','#525b5b'];
   const addQuad=(out,colors,a,b,c,d,col)=>{
    for(const v of [a,b,c,c,b,d]){out.push(...v);colors.push(col.r,col.g,col.b)}
   };
@@ -112,7 +112,7 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
    if(a.c<0||a.c>=COLS||b.c<0||b.c>=COLS||a.r<0||a.r>=ROWS||b.r<0||b.r>=ROWS)continue;
    const aa=center(a.c,a.r),bb=center(b.c,b.r),dx=bb.x-aa.x,dz=bb.z-aa.z,d=Math.hypot(dx,dz);
    if(!d)continue;
-   const width=[0,3.2,5.4,8.0,11.4][level],nx=-dz/d,nz=dx/d;
+   const width=[0,9,13,18,24][level],nx=-dz/d,nz=dx/d;
    const fillCol=new T.Color(palette[level]),edgeCol=new T.Color(edgePalette[level]);
    const main=[],verge=[],ruts=[[],[]];
    for(let k=0;k<=12;k++){
@@ -120,9 +120,9 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
     const bend=Math.sin(t*Math.PI)*game.noise(a.c*7+b.c,a.r*7+b.r)*2;
     const X=x+nx*bend,Z=z+nz*bend;
     const spot=(offset,y)=>{const px=X+nx*offset,pz=Z+nz*offset;return [px,game.atlasHeight(px,pz)+y,pz]};
-    main.push([spot(-width*.5,1.52),spot(width*.5,1.52)]);
-    verge.push([spot(-width*.68,1.35),spot(width*.68,1.35)]);
-    if(level>=2)for(let i=0;i<2;i++)ruts[i].push(spot((i?1:-1)*width*.24,1.66));
+    main.push([spot(-width*.5,2.3),spot(width*.5,2.3)]);
+    verge.push([spot(-width*.67,2.06),spot(width*.67,2.06)]);
+    if(level>=2)for(let i=0;i<2;i++)ruts[i].push(spot((i?1:-1)*width*.24,2.48));
    }
    for(let k=0;k<12;k++){
     addQuad(verges,vergeColors,verge[k][0],verge[k][1],verge[k+1][0],verge[k+1][1],edgeCol);
@@ -135,7 +135,7 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
    const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(coords,3));geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));
    const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({vertexColors:true,transparent:true,opacity,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));mesh.frustumCulled=false;roadGroup.add(mesh)
   };
-  emit(verges,vergeColors,.85);emit(vertices,rgb,.99);
+  emit(verges,vergeColors,.94);emit(vertices,rgb,1);
   if(rutLines.length)roadGroup.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(rutLines,3)),new T.LineBasicMaterial({color:'#655f4e',transparent:true,opacity:.52,depthTest:true})));
   // Permanent rail sleepers are separate from traffic-eroded footpaths.
   const rails=[];

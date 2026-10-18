@@ -28,3 +28,52 @@ export function buildDrainage(cells,noise,starts=[]){
  }
  return {riverCells:rivers,totalCells:n,drainageDown:down,accumulation:acc};
 }
+
+// V56: keep natural ridges, but make sure a capital is not enclosed by an
+// artificial 3x3 flat plateau surrounded on every side by impassable peaks.
+// Open one narrow, elevation-conscious mountain pass to a sizable traversable
+// region. This is deterministic for a seed; it is recomputed on load because
+// world topology is generated rather than saved per tile.
+export function openStartingPassages(cells, starts, minRegion=120){
+ const n=cells.length,flags=new Int32Array(n).fill(-1),sizes=[],waypoints=[];
+ const traversable=p=>p&&p.land&&!p.mountain&&(!p.river||p.ford||p.bridge);
+ const componentAt=()=>{
+  flags.fill(-1);sizes.length=0;
+  for(let index=0;index<n;index++){
+   if(flags[index]!==-1||!traversable(cells[index]))continue;
+   const id=sizes.length,queue=[index];flags[index]=id;
+   for(let q=0;q<queue.length;q++){
+    const k=queue[q],c=k%COLS,r=Math.floor(k/COLS);
+    for(const [dc,dr] of steps){const x=c+dc,y=r+dr,j=y*COLS+x;
+     if(x>=0&&x<COLS&&y>=0&&y<ROWS&&flags[j]===-1&&traversable(cells[j])){flags[j]=id;queue.push(j)}
+    }
+   }
+   sizes.push(queue.length);
+  }
+ };
+ for(const start of starts){
+  componentAt();const at=start.r*COLS+start.c;
+  if(at<0||at>=n||!cells[at]?.land)continue;
+  if(flags[at]>=0&&sizes[flags[at]]>=minRegion)continue;
+  const heap=new Heap(),dist=new Float64Array(n).fill(Infinity),parent=new Int32Array(n).fill(-1);
+  dist[at]=0;heap.push(0,at);let target=-1;
+  while(heap.length){const [cost,i]=heap.pop();if(cost>dist[i]+1e-7)continue;
+   if(i!==at&&flags[i]>=0&&sizes[flags[i]]>=minRegion){target=i;break}
+   const c=i%COLS,r=Math.floor(i/COLS);
+   for(const [dc,dr] of steps){const x=c+dc,y=r+dr;if(x<0||x>=COLS||y<0||y>=ROWS)continue;
+    const j=y*COLS+x,p=cells[j];if(!p.land)continue;
+    const weight=p.mountain?3.6:p.river&&!p.ford&&!p.bridge?2.2:1;
+    const d=cost+weight;if(d<dist[j]){dist[j]=d;parent[j]=i;heap.push(d,j)}
+   }
+  }
+  if(target<0)continue;
+  let opened=0,length=0;
+  for(let k=target;k!==at&&k>=0;k=parent[k]){
+   const p=cells[k];if(p.mountain){p.mountain=false;p.h=Math.min(26,p.h);p.biome='plains';opened++}
+   if(p.river&&!p.ford&&!p.bridge){p.ford=true;opened++}
+   length++;
+  }
+  waypoints.push({from:{...start},to:{c:target%COLS,r:Math.floor(target/COLS)},length,opened});
+ }
+ return waypoints;
+}

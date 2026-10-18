@@ -21,7 +21,19 @@ export function findExplorationPath(game,army){
  const sites=(game.s.landmarks||[]).filter(l=>l.claimedBy==null&&seen[l.c+':'+l.r]&&Math.abs(army.c-l.c)+Math.abs(army.r-l.r)<=16).sort((a,b)=>Math.abs(army.c-a.c)+Math.abs(army.r-a.r)-Math.abs(army.c-b.c)-Math.abs(army.r-b.r));
  for(const site of sites){const route=game.landPath(army,site,army.team);if(route?.length)return route;}
  const queue=new Int32Array(total),prev=new Int32Array(total).fill(-2),start=army.r*w+army.c;let head=0,tail=1;queue[0]=start;prev[start]=-1;
- const reachableFrontier=(c,r)=>{for(let y=Math.max(0,r-2);y<=Math.min(h-1,r+2);y++)for(let x=Math.max(0,c-2);x<=Math.min(w-1,c+2);x++)if(!seen[x+':'+y])return true;return false};
+ // The explorer reveals radius 2 with a Manhattan limit of radius+1.
+ // The former 5x5 square test counted four diagonally hidden corners as
+ // "reachable frontier" although standing on the tile cannot reveal them.
+ // That made the scout alternate forever between two already visited tiles.
+ const revealRadius=3;
+ const reachableFrontier=(c,r)=>{
+  for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){
+   if(Math.abs(dc)+Math.abs(dr)>revealRadius)continue;
+   const x=c+dc,y=r+dr;
+   if(x>=0&&x<w&&y>=0&&y<h&&!seen[x+':'+y])return true;
+  }
+  return false;
+ };
  while(head<tail){const i=queue[head++],c=i%w,r=Math.floor(i/w);
   // Start is explored already; avoid a zero-distance search loop.
   if(i!==start&&reachableFrontier(c,r)){
