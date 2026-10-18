@@ -48,7 +48,10 @@ function buffers(vertices,color,{standard=false,opacity=1}={}){
  const geo=new T.BufferGeometry();
  geo.setAttribute('position',new T.Float32BufferAttribute(unique,3));
  geo.setIndex(indices);geo.computeVertexNormals();geo.computeBoundingSphere();
- const mat=standard?new T.MeshStandardMaterial({color,roughness:.55,metalness:.10,transparent:opacity!==1,opacity,side:T.DoubleSide,depthWrite:opacity===1}):new T.MeshBasicMaterial({color,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
+ const tint=new T.Color(color),vertexColors=new Float32Array(unique.length);
+ for(let i=0;i<vertexColors.length;i+=3){vertexColors[i]=tint.r;vertexColors[i+1]=tint.g;vertexColors[i+2]=tint.b}
+ geo.setAttribute('color',new T.Float32BufferAttribute(vertexColors,3));
+ const mat=standard?new T.MeshStandardMaterial({vertexColors:true,roughness:.55,metalness:.10,transparent:opacity!==1,opacity,side:T.DoubleSide,depthWrite:opacity===1}):new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  return new T.Mesh(geo,mat);
 }
 function visible(tile,path,radius=90){if(!tile)return true;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
