@@ -91,7 +91,7 @@ export function selectAIBuild(game,team,city){
   const development=['house','barracks','archery','watchtower','palisade','claypit','pottery_kiln','pasture','mason',
    ...(age>=1?['stonetower','stonewall','cartwright','coppermine','tinmine','bronze_foundry','road_depot','saw','warehouse','cellar','market','scriptorium','forester','mill','bakery','harbor']:[]),
    ...(age>=2?['mine','coal','smelter','smith','academy','stable']:[]),
-   ...(age>=3?['university']:[]),
+   ...(age>=3?['guildhall','master_workshop','watermill','windmill','infirmary','trade_yard','inn','armor_workshop','crossbow_range','monastery','chapel','keep','gatehouse','siegeworkshop','reinforced_wall','university']:[]),
    ...(age>=4?['printer','observatory','nitrate','powdermill']:[]),
    ...(age>=5?['steelworks','engineworks','polytechnic','railstation']:[]),
    ...(age>=6?['oilwell','refinery','powerplant','autofactory','laboratory','airfield']:[])];
