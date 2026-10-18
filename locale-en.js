@@ -1982,5 +1982,14 @@ export const ENGLISH_PAIRS=[
  ["Viljakas maa","Fertile Soil"],
  ["Naftamaardla","Oil Deposit"],
  ["Rauamaak","Iron Ore"],
- ["Kala","Fish"]
+ ["Kala","Fish"],
+ ["ühine ehitusala","shared construction area"],
+ ["ruutu","tiles"],
+ ["ehitusjärjekord","construction queue"],
+ ["sama linna ühine ehitusala","same city-wide construction area"],
+ ["Linna ehitusala ei leitud.","City construction area not found."],
+ ["Vali ehituskoht linna kuuluval detailkaardil.","Select a build location within your city's territory."],
+ ["Valitud ruut ei kuulu selle linna ühisesse ehitusalasse.","This tile is not part of the city's shared construction area."],
+ ["Linna ühises ehitusjärjekorras on juba 12 hoonet.","This city's shared construction queue is full (12 buildings)."],
+ ["Ehitus algas","Construction started"]
 ];
