@@ -4,7 +4,7 @@ import {ENGLISH_PAIRS} from './locale-en.js';
 // reversible presentation preference, defaulting to English for every device.
 const english=new Map(ENGLISH_PAIRS);
 const sorted=[...english].filter(([s])=>s.length>=3).sort((a,b)=>b[0].length-a[0].length)
- .map(([source,target])=>({source,target,re:new RegExp('(?<![\\p{L}])'+source.replace(/[.*+?^$\\{\\}()|[\\]\\]/g,'\\$&')+'(?![\\p{L}])','gu')}));
+ .map(([source,target])=>({source,target,re:new RegExp('(?<![\\p{L}])'+[...source].map(c=>'.*+?^${}()|[]\\\\'.includes(c)?'\\\\'+c:c).join('')+'(?![\\p{L}])','gu')}));
 let language='en',binding=[],observer=null;
 const texts=new WeakMap(),attributes=new WeakMap(),helpOriginal=new WeakMap();
 const HELP_EN=[
