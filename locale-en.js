@@ -1959,5 +1959,16 @@ export const ENGLISH_PAIRS=[
  ["Kaugemal meres","Farther Offshore"],
  ["Rannikul","On the Coast"],
  ["Kaugemale merele","Farther Out to Sea"],
- ["Sadam vajab rannikuruutu, mille kõrval on meri.","The harbor must be built on land directly beside the sea."]
+ ["Sadam vajab rannikuruutu, mille kõrval on meri.","The harbor must be built on land directly beside the sea."],
+ ["Viljakas maa","Fertile Land"],
+ ["Magevesi","Fresh Water"],
+ ["Rauamaak","Iron Ore"],
+ ["Ulukid","Wild Game"],
+ ["Tavaline maastikutootlikkus","Normal Terrain Productivity"],
+ ["Maastik","Terrain"],
+ ["Kõrge tootlikkus","High Productivity"],
+ ["Läheduses","Nearby"],
+ ["Rannikumeri","Coastal Sea"],
+ ["Meresügavus","Water Depth"],
+ ["Kalaparv","Fish School"]
 ];
