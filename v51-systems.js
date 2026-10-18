@@ -58,7 +58,7 @@ export function actionTips(game,team=0){
  if(!tips.length)tips.push({text:'Avasta uusi alasid või arenda oma linnu',why:'Kiireloomulisi puudujääke ei leitud',weight:1});
  return tips.sort((a,b)=>(b.weight||0)-(a.weight||0)).slice(0,3);
 }
-export function armyUnits(s,army){return s.units.filter(u=>u.team===army.team&&u.hp>0&&(u.armyId||0)===(army.id||0))}
+export function armyUnits(s,army){return s.units.filter(u=>u.team===army.team&&u.hp>0&&!u.garrison&&(u.armyId||0)===(army.id||0))}
 export function activeArmies(s,team){return s.armies.filter(a=>a.team===team&&armyUnits(s,a).length>0)}
 export function splitArmy(s,army){const units=armyUnits(s,army);if(units.length<2)return {error:'Armee jagamiseks on vaja vähemalt kahte elusat sõdalast.'};
  s.nextArmyId??=1;const id=s.nextArmyId++;const group={team:army.team,id,c:army.c,r:army.r,path:[],stance:'defend'};
