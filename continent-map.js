@@ -55,5 +55,18 @@ export function continentHeight(layout,x,z,smooth,legacy=false){
  const mountainBelt=Math.max(0,(broad-.43)*2.7);
  const base=Math.min(24,coast*810)*(.55+relief*.48);
  const rockiness=Math.min(1,Math.max(0,(coast-.018)*24));
- return base+rockiness*mountainBelt*(ridge*19+micro*7);
+ // Orogenic mountain arcs follow plate-boundary-like curved belts within landmasses.
+ // Broad mountains, foothills and rain shadows are more geographic than isolated random cones.
+ let orogeny=0;
+ if(!legacy)for(let i=0;i<layout.centers.length;i++){
+  const center=layout.centers[i],du=(u-center.x)/.18,dv=(v-center.y)/.22;
+  const along=du*.64+dv*.77,across=du*.77-dv*.64;
+  if(Math.abs(along)>1.4)continue;
+  const arc=across+.24*Math.sin(along*2.9+i*1.3)+.11*Math.sin(along*6.1+i);
+  const belt=Math.exp(-Math.pow(arc/.29,2))*Math.max(0,1-Math.pow(along/1.42,4));
+  orogeny=Math.max(orogeny,belt);
+ }
+ const ridged=Math.pow(1-Math.abs(smooth(u*94+17,v*94+29)*2-1),1.35);
+ return base+rockiness*mountainBelt*(ridge*19+micro*7)+Math.max(0,Math.min(1,coast*120))*orogeny*(13+ridged*23);
+
 }

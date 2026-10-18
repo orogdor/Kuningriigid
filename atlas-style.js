@@ -74,7 +74,24 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  rocks.forEach((a,i)=>{dummy.position.set(a.x-10,height(a.x-10,a.z)+2,a.z);dummy.rotation.set(0,i*1.4,0);dummy.scale.set(3.5,2.4,3);dummy.updateMatrix();stones.setMatrixAt(i,dummy.matrix)});
  group.add(plots,stones);
  const nature=createAtlasBiomeDetail(game,group,quality);
- const rivers=new T.Group();group.add(rivers);const riverPts=[];for(const cell of game.cells.filter(c=>c.river)){const y=height(cell.x,cell.z)+.58,w=cell.bridge?7:(cell.ford?5.5:4.2);if(cell.riverDir==='v'){riverPts.push(cell.x-w,y,cell.z,cell.x+w,y,cell.z)}else if(cell.riverDir==='h'){riverPts.push(cell.x,y,cell.z-w,cell.x,y,cell.z+w)}else if(cell.riverDir==='d1'){riverPts.push(cell.x-w*.75,y,cell.z-w*.75,cell.x+w*.75,y,cell.z+w*.75)}else{riverPts.push(cell.x-w*.75,y,cell.z+w*.75,cell.x+w*.75,y,cell.z-w*.75)}if(cell.ford||cell.bridge){const deck=new T.Mesh(new T.PlaneGeometry(10,cell.bridge?18:12),new T.MeshBasicMaterial({color:cell.bridge?'#a88663':'#cab684',transparent:true,opacity:cell.bridge?.78:.45,side:T.DoubleSide,depthWrite:false}));deck.rotation.x=-Math.PI/2;deck.position.set(cell.x,y+.02,cell.z);if(cell.riverDir==='v')deck.rotation.z=Math.PI/2; else if(cell.riverDir==='d1')deck.rotation.z=Math.PI/4; else if(cell.riverDir==='d2')deck.rotation.z=-Math.PI/4;rivers.add(deck)}}if(riverPts.length)rivers.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(riverPts,3)),new T.LineBasicMaterial({color:'#81c4d8',transparent:true,opacity:.8})));
+ const rivers=new T.Group();group.add(rivers);const riverPts=[],bankPts=[],ribbon=[];
+ for(const cell of game.cells.filter(c=>c.river)){
+  const y=height(cell.x,cell.z)+.58,w=cell.bridge?7:(cell.ford?5.5:4.2);
+  if(cell.riverTo){const target=game.cell(cell.riverTo),dx=target.x-cell.x,dz=target.z-cell.z,len=Math.hypot(dx,dz)||1,nx=-dz/len,nz=dx/len,wide=cell.riverWidth||3;
+   for(let i=0;i<5;i++){const t=i/4,x=cell.x+dx*t,z=cell.z+dz*t;const a=[x+nx*wide,height(x+nx*wide,z+nz*wide)+.68,z+nz*wide],b=[x-nx*wide,height(x-nx*wide,z-nz*wide)+.68,z-nz*wide];
+    if(i){const prev=ribbon._previous,aa=prev[0],bb=prev[1];ribbon.push(...aa,...bb,...a,...a,...bb,...b)}ribbon._previous=[a,b];
+    if(i){const prev=riverPts._previous;bankPts.push(...prev[0],...a,...prev[1],...b)}riverPts._previous=[a,b];
+   }
+   delete ribbon._previous;delete riverPts._previous;
+  }else if(cell.riverDir==='v')riverPts.push(cell.x-w,y,cell.z,cell.x+w,y,cell.z);
+  else if(cell.riverDir==='h')riverPts.push(cell.x,y,cell.z-w,cell.x,y,cell.z+w);
+  else if(cell.riverDir==='d1')riverPts.push(cell.x-w*.75,y,cell.z-w*.75,cell.x+w*.75,y,cell.z+w*.75);
+  else riverPts.push(cell.x-w*.75,y,cell.z+w*.75,cell.x+w*.75,y,cell.z-w*.75);
+  if(cell.ford||cell.bridge){const deck=new T.Mesh(new T.PlaneGeometry(10,cell.bridge?18:12),new T.MeshBasicMaterial({color:cell.bridge?'#a88663':'#cab684',transparent:true,opacity:cell.bridge?.78:.45,side:T.DoubleSide,depthWrite:false}));deck.rotation.x=-Math.PI/2;deck.position.set(cell.x,y+.12,cell.z);if(cell.riverDir==='v')deck.rotation.z=Math.PI/2; else if(cell.riverDir==='d1')deck.rotation.z=Math.PI/4; else if(cell.riverDir==='d2')deck.rotation.z=-Math.PI/4;rivers.add(deck)}
+ }
+ if(ribbon.length)rivers.add(new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(ribbon,3)),new T.MeshBasicMaterial({color:'#559abd',transparent:true,opacity:.94,depthWrite:false,side:T.DoubleSide})));
+ if(bankPts.length)rivers.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(bankPts,3)),new T.LineBasicMaterial({color:'#b0dee1',transparent:true,opacity:.7})));
+ if(riverPts.length)rivers.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(riverPts,3)),new T.LineBasicMaterial({color:'#81c4d8',transparent:true,opacity:.8})));
  // Real-world traffic generates the atlas road network (no roads appear just because a route was planned).
  const roadGroup=new T.Group();group.add(roadGroup);let roadStamp='';
  function roads(state){

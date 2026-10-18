@@ -81,3 +81,6 @@ header{backdrop-filter:blur(10px);box-shadow:0 8px 26px #0005}
 #atlaspanel summary{font-weight:600}
 #v51insights,#v51cities{border-radius:14px;background-color:rgba(18,34,34,.90)}
 @media(max-width:760px){.menu-hero{background-size:84px auto;padding:10px}.hero-text strong{font-size:13px}.hero-text span{font-size:10px}}
+
+/* V55 explorer action */
+#autoexplore{border-color:#b6a16c99;background:linear-gradient(120deg,#214e46,#23483a);color:#f6e0a7;font-weight:700}#autoexplore.active{background:#6c6540;color:#fff4c9;box-shadow:inset 0 0 0 1px #e1c378}#autoexplore:disabled{opacity:.45}
