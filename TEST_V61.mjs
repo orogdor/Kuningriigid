@@ -56,6 +56,15 @@ const noCrewCity={...city,economy:{...econ,buildings:[hall,idleTower]}};
 const empty={squads:[],fortress:{team:0,hp:600,maxHp:600}};
 fortifyBattle(game,noCrewCity,empty);
 assert.equal(empty.defensePosts.length,0,'No worker means no tower attack');
+const quarterCity={...city,economy:{...econ,buildings:[hall,{...tower,assigned:.25}]}};
+const quarter={squads:[],fortress:{team:0,hp:600,maxHp:600}};
+fortifyBattle(game,quarterCity,quarter);
+assert.equal(quarter.defensePosts.length,0,'A fractional worker is not a complete tower guard');
+const inactive={cell:position,squads:[{...attacker,hp:120}],fortress:{team:0,x:0,z:0,hp:600,maxHp:600,cool:10},
+ defensePosts:[{team:0,x:-9,z:0,damage:9,range:25,cool:0,active:false}],elapsed:0,result:null};
+tickBattle(inactive,.1,{slinger:{hp:120,dmg:0,range:10,speed:2}},0);
+assert.equal(inactive.squads[0].hp,120,'A tower with removed guard must not shoot');
+
 const guardBefore=b.squads[0].x;
 b.squads.push({source:99,team:1,kind:'slinger',hp:120,maxHp:120,morale:100,x:60,z:0,cool:0,target:null});
 b.elapsed=0;b.result=null;
