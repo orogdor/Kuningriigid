@@ -1,5 +1,7 @@
+// V62: medieval walls, castles and independent siege sections.
+import {attachSiegeSections} from './medieval-v62.js';
 // V61: One civilian worker mans each tower; wall soldiers come only from real units.
-export const WALL_TYPES=new Set(['palisade','stonewall']);
+export const WALL_TYPES=new Set(['palisade','stonewall','reinforced_wall']);
 export const TOWER_TYPES=new Set(['watchtower','stonetower']);
 // Real collision footprint follows the selected segment orientation.
 // A 7-unit wall otherwise leaves navigation holes at its ends.
@@ -11,8 +13,8 @@ export function configureWallFootprint(b){
  return b;
 }
 export const towerManned=b=>TOWER_TYPES.has(b?.type)&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>=.99;
-export const wallCapacity=type=>type==='stonewall'?3:type==='palisade'?2:0;
-export const wallHeight=type=>type==='stonewall'?3.8:type==='palisade'?3.1:0;
+export const wallCapacity=type=>type==='reinforced_wall'?4:type==='stonewall'?3:type==='palisade'?2:0;
+export const wallHeight=type=>type==='reinforced_wall'?4.35:type==='stonewall'?3.8:type==='palisade'?3.1:0;
 export function wallGuards(state,ctx,building){
  return state.units.map((unit,source)=>({unit,source})).filter(({unit})=>
   unit.hp>0&&unit.team===ctx.team&&unit.garrison&&
@@ -53,11 +55,12 @@ export function fortifyBattle(game,city,battle){
  const buildings=city.economy.buildings.filter(b=>b.ready&&b.hp>0&&!b.disabled);
  const walls=buildings.filter(b=>WALL_TYPES.has(b.type));
  const towers=buildings.filter(b=>TOWER_TYPES.has(b.type));
- const barrier=walls.reduce((n,b)=>n+(b.type==='stonewall'?160:85)*Math.max(.1,b.hp/350),0);
+ const barrier=walls.reduce((n,b)=>n+(b.type==='reinforced_wall'?220:b.type==='stonewall'?160:85)*Math.max(.1,b.hp/350),0);
  const towerArmor=towers.reduce((n,b)=>n+(b.type==='stonetower'?95:55)*Math.max(.1,b.hp/350),0);
  battle.fortress.hp+=(barrier+towerArmor);
  battle.fortress.maxHp+=(barrier+towerArmor);
  battle.fortress.defenseBonus=barrier+towerArmor;
+ attachSiegeSections(city,battle);
  battle.defensePosts=towers.filter(towerManned).map(b=>({
   x:b.x,z:b.z,team:city.team,buildingIndex:city.economy.buildings.indexOf(b),active:true,damage:b.type==='stonetower'?12:8,range:b.type==='stonetower'?31:25,cool:0
  }));
