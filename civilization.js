@@ -197,7 +197,7 @@ function checkEncounter(){
    b.fortress={team:city.team,cityId:city.id,x:hall.x,z:hall.z,hp:city.hp,maxHp:600,cool:0};
   }
   if(b.fortress){mobilizeCity(b,city);fortifyBattle(game,city,b)}
-  const nav=game.nav(cell);for(const u of b.squads){const p=nav.nearest(u,80);if(p){u.x=p.x;u.z=p.z}}
+  const nav=game.nav(cell);for(const u of b.squads){if(u.guardPost)continue;const p=nav.nearest(u,80);if(p){u.x=p.x;u.z=p.z}}
   s.battle=b;if(!b.squads.some(u=>u.team===0)&&b.fortress?.team!==0)return;
   chosen=cell;openTile(cell);say('Lahing algas. Vali vägi või vajuta „Ründa“.');return;
  }
