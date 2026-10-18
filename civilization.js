@@ -6,7 +6,7 @@ import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=65';
-import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=67b';
+import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=67c';
 import {surface,localSurface} from './continuous-landscape.js?v=67';
 import {SHIPS} from './naval.js';
 import {createShipModel} from './naval-visual.js';
