@@ -1,4 +1,4 @@
-import {ENGLISH_PAIRS} from './locale-en.js?v=63c';
+import {ENGLISH_PAIRS} from './locale-en.js?v=64a';
 
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
