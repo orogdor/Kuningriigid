@@ -1,4 +1,4 @@
-import {ENGLISH_PAIRS} from './locale-en.js?v=65e';
+import {ENGLISH_PAIRS} from './locale-en.js?v=66b';
 
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
@@ -20,11 +20,11 @@ const HELP_EN=[
 ];
 const specialSelectors=[
  ['#startmenu .menu-card > p','Stone Age → Bronze Age → Iron Age → Middle Ages → Renaissance → Industrial Age → Modern Age. Start with a settler and three workers, and compete against three rival civilizations on a 220 × 165 world map.'],
- ['#startmenu .menu-hero .hero-text span','V64: Fish schools now live in coastal and offshore waters. Stone Age fishers work from shore, later eras sail farther. Build anywhere on your own city territory without the old distance limit.'],
+ ['#startmenu .menu-hero .hero-text span','V66: Every tile belonging to a city is part of one shared construction area. Stockpiles, workers, prerequisites and the construction queue are shared; place buildings across city tiles.'],
  ['#startmenu .menu-note','60 game seconds = one turn. The game pauses in the menu, while paused, and when the tab is in the background. Game pace affects research, construction and training time, but not food consumption. Starting a new game replaces your current autosave; export it first if you want to keep it.'],
  ['#atlaspanel > .atlas-legend p:nth-of-type(2)','Your scout can automatically explore the unknown, visit villages and ruins, and receive a one-time reward on the first visit.'],
  ['#researchpanel .research-explanation','Choose one topic to research. Prerequisites unlock new branches; changing topics preserves progress. Queue up to four further discoveries. Your cities and staffed science buildings produce research points. Discovery bonuses give an extra 35%. Game time pauses in menus and while the tab is hidden.'],
- ['#citypane-build > .muted','Choose a building, then select its location on the detail map. Construction times assume sufficient workers.'],
+ ['#citypane-build > .muted','Your whole city territory is one construction area. Choose a building and place it on any owned detail tile. All materials, builders and the queue are shared.'],
  ['#citypane-workers > .muted','Allocate workers in increments of 0.25. Resource collection and production take three times longer; building and training times are unchanged.']
 ];
 const originalHTML=new Map();
