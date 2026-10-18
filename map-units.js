@@ -9,5 +9,42 @@ box(body,-.8,1.7,-.5,.07,3.3,.07,'#715a3b');box(body,-.45,2.9,-.5,.7,.5,.04,['#8
 if(type==='plane'){box(body,0,1,0,.65,.4,2.7,'#afbfc1');box(body,0,.9,0,3,.11,.52,'#bfcbd0');box(body,0,1.15,-1,.9,.05,.45,'#748d93');box(body,0,1.4,-1.22,.08,.6,.35,'#95a8ac')}
 body.scale.setScalar(type==='army'||type==='motorizedArmy'?10:12);
 const ring=new T.Mesh(new T.RingGeometry(15,17,48),new T.MeshBasicMaterial({color:'#f5dc85',side:T.DoubleSide,transparent:true,opacity:.95,depthWrite:false,depthTest:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.8;ring.visible=false;root.add(ring);root.userData={type,men,body,ring};return root}
-export function updateWorldUnit(root,entity,time,height,selected=false){const p=center(entity.c,entity.r),key=entity.c+':'+entity.r,data=root.userData;data.entity=entity;if(data.key!==key){data.from=root.position.clone();data.changed=time;data.key=key;if(!data.started)data.from.set(p.x,height(p.x,p.z),p.z);data.started=true}const f=Math.min(1,(time-data.changed)/.35);root.position.set(data.from.x+(p.x-data.from.x)*f,height(p.x,p.z)+(data.type==='plane'?65:.8),data.from.z+(p.z-data.from.z)*f);const next=entity.path?.[0];if(next){const target=center(next.c,next.r);data.body.rotation.y=Math.atan2(target.x-p.x,target.z-p.z)}if(entity.mode==='air'&&entity.flightPosition){const q=center(entity.flightPosition.c,entity.flightPosition.r);root.position.set(q.x,height(q.x,q.z)+65,q.z);data.body.rotation.y=entity.flightHeading||0}
-data.ring.visible=selected;for(const m of data.men)animateSoldier(m,time,!!next,false)}
+// Rendering interpolation only: logical positions and encounters stay tile-based.
+export function worldTravelSample(entity){
+ const here=center(entity.c,entity.r),next=entity.path?.[0];
+ const ship=entity.kind==='transport'||entity.kind==='warship';
+ const duration=ship?3:entity.travelDuration||0;
+ const elapsed=ship?entity.clock||0:entity.travelClock||0;
+ if(!next||!(duration>0))return {x:here.x,z:here.z,moving:false,fraction:0};
+ const to=center(next.c,next.r);
+ const fraction=Math.max(0,Math.min(1,elapsed/duration));
+ return {x:here.x+(to.x-here.x)*fraction,z:here.z+(to.z-here.z)*fraction,moving:true,fraction};
+}
+export function updateWorldUnit(root,entity,time,height,selected=false){
+ const p=center(entity.c,entity.r),key=entity.c+':'+entity.r,data=root.userData;
+ data.entity=entity;
+ if(data.key!==key){
+  data.from=root.position.clone();
+  data.changed=time;
+  data.key=key;
+  if(!data.started)data.from.set(p.x,height(p.x,p.z),p.z);
+  data.started=true;
+ }
+ const pose=worldTravelSample(entity);
+ const f=Math.max(0,Math.min(1,(time-data.changed)/.35));
+ const x=pose.moving?pose.x:data.from.x+(p.x-data.from.x)*f;
+ const z=pose.moving?pose.z:data.from.z+(p.z-data.from.z)*f;
+ root.position.set(x,height(x,z)+(data.type==='plane'?65:.8),z);
+ const next=entity.path?.[0];
+ if(next){
+  const target=center(next.c,next.r);
+  data.body.rotation.y=Math.atan2(target.x-x,target.z-z);
+ }
+ if(entity.mode==='air'&&entity.flightPosition){
+  const q=center(entity.flightPosition.c,entity.flightPosition.r);
+  root.position.set(q.x,height(q.x,q.z)+65,q.z);
+  data.body.rotation.y=entity.flightHeading||0;
+ }
+ data.ring.visible=selected;
+ for(const m of data.men)animateSoldier(m,time,!!next,false);
+}
