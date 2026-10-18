@@ -1,4 +1,4 @@
-// V57: GPU-efficient deployment of five low-poly World Atlas GLB props.
+// V58: evenly distributed, quality-aware GPU deployment of five low-poly World Atlas GLB props.
 // Uses real GLB geometry. Does not claim 3-view Mudelitehas 0.1.2 certification.
 import * as T from './vendor/three.module.js';
 import {loadWorldGLB} from './scripts/glb_lite.js';
@@ -8,10 +8,19 @@ export function createWorldAtlasProps(game,scene,quality='medium'){
  const group=new T.Group();scene.add(group);
  const templates=new Map(),instanced=[],dummy=new T.Object3D(),obj=new T.Object3D();
  let ready=false,lastRevision=null;
+ // Select props evenly across the whole map. Taking the first N from the
+ // row-major cell array made distant southern areas comparatively empty.
+ // Keep crossings independent of detail quality: visible bridges aid navigation.
+ const density=quality==='low'?.5:quality==='high'?1:.75;
+ function spreadAcrossMap(sites,limit){
+  if(sites.length<=limit)return sites;
+  const step=sites.length/limit;
+  return Array.from({length:limit},(_,i)=>sites[Math.floor((i+.5)*step)]);
+ }
  const candidates={
-  rock:game.cells.filter(c=>c.mountain&&game.noise(c.c*11+5,c.r*7+25)>.972).slice(0,260),
-  forest:game.cells.filter(c=>c.land&&!c.mountain&&c.biome==='forest'&&game.noise(c.c*17+15,c.r*13+24)>.964).slice(0,220),
-  bridge:game.cells.filter(c=>c.land&&(c.bridge||c.ford)&&c.river).slice(0,120)
+  rock:spreadAcrossMap(game.cells.filter(c=>c.mountain&&game.noise(c.c*11+5,c.r*7+25)>.972),Math.round(260*density)),
+  forest:spreadAcrossMap(game.cells.filter(c=>c.land&&!c.mountain&&c.biome==='forest'&&game.noise(c.c*17+15,c.r*13+24)>.964),Math.round(220*density)),
+  bridge:spreadAcrossMap(game.cells.filter(c=>c.land&&(c.bridge||c.ford)&&c.river),120)
  };
  const multipliers={rock:1.65,forest:1.55,bridge:1.35};
  function materialize(){
