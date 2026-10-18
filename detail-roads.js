@@ -3,7 +3,7 @@
 // local footpaths connect adjacent cells that have accumulated enough traffic.
 import * as T from './vendor/three.module.js';
 import {COLS,ROWS} from './campaign.js';
-import {roadLevel,roadStrength} from './roads.js';
+import {roadLevel,roadStrength} from './roads.js?v=59';
 
 const COLORS=['#000000','#b09a73','#bea982','#9e9585','#8f9291'];
 function appendRibbon(vertices,colors,a,b,width,color,height){
