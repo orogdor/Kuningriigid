@@ -4,7 +4,7 @@ import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization
 import {initialState} from './economy.js';
 import {armyUnits} from './v51-systems.js';
 import {createBattle,tickBattle} from './campaign.js';
-import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle} from './fortifications.js?v=61';
+import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=61b';
 import {createAgeBuilding} from './buildings.js';
 
 assert.equal(TECHS.fortifications.age,0);
@@ -61,6 +61,17 @@ b.squads.push({source:99,team:1,kind:'slinger',hp:120,maxHp:120,morale:100,x:60,
 b.elapsed=0;b.result=null;
 tickBattle(b,.1,TROOPS,0);
 assert.equal(b.squads[0].x,guardBefore,'Guard stays assigned to wall');
+// New wall collision boxes follow 90-degree rotation and persist when loaded.
+const horizontal=configureWallFootprint({type:'palisade',wallAxis:0}),vertical=configureWallFootprint({type:'stonewall',wallAxis:1});
+assert(horizontal.navWidth>horizontal.navDepth,'horizontal wall must block its full length');
+assert(vertical.navDepth>vertical.navWidth,'vertical wall must rotate collision');
+configureWallFootprint(wall);
+assert.equal(wall.navWidth,3.6);
+const beforeOrientation=game.nav(city);
+assert.equal(beforeOrientation.open(wall.x+3,wall.z),false,'wall blocks travel to its real end');
+wall.wallAxis=1;configureWallFootprint(wall);beforeOrientation.rebuild();
+assert.equal(beforeOrientation.open(wall.x,wall.z+3),false,'rotated wall blocks vertical travel');
+assert.equal(beforeOrientation.open(wall.x+3,wall.z),true,'rotated wall does not block lateral free ground');
 const saved=JSON.parse(JSON.stringify(game.s)),loaded=new Civilization(saved);
 assert.equal(loaded.s.version,4,'Save schema unchanged');
 assert.equal(loaded.s.units.filter(u=>u.garrison).length,2,'Garrison persists after reload');
