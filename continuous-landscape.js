@@ -91,14 +91,21 @@ export function baseHeight(game,x,z){
  // rocks, peaks, cones or local patches with incompatible boundaries.
  const steep=smooth((h-18)/19);
  const fold=Math.sin(x*.033+Math.sin(z*.015)*1.3)*Math.cos(z*.045-Math.sin(x*.014));
- const ridge=(2.5+2.3*fold+1.1*Math.cos(x*.075+z*.028))*steep;
- return h+ridge;
+ // Ridge systems are actual elevated continuous terrain, not grey material
+ // patches. Two frequencies create mountain crests and steep rock faces.
+ const crest=Math.pow(1-Math.abs(Math.sin(x*.052+Math.cos(z*.018)*1.4)*Math.cos(z*.048-x*.011)),2);
+ const ridge=(7.5+18*crest+4.5*Math.max(0,fold))*steep;
+ // Sloping continental shelf: the underwater seabed is visibly BELOW the
+ // sea surface even where riverbeds descend toward the coast.
+ const sub=Math.max(0,.72-h);
+ const oceanFloor=sub?(2.5*smooth(sub/7)+sub*.10):0;
+ return h+ridge-oceanFloor;
 }
 export function worldElevation(game,x,z){
  const base=baseHeight(game,x,z),{distance:d,width:w}=riverNear(game,x,z);
  if(!Number.isFinite(d))return base;
  const inner=w*.92,outer=Math.max(inner+2.8,w*1.65+3);
- const incise=2.1+Math.min(2.4,w*.20);
+ const incise=3.8+Math.min(3,w*.31);
  const depth=d<inner?incise:d<outer?incise*(1-smooth((d-inner)/(outer-inner))):0;
  return base-depth;
 }
