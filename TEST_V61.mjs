@@ -74,6 +74,7 @@ assert.equal(beforeOrientation.open(wall.x,wall.z+3),false,'rotated wall blocks 
 assert.equal(beforeOrientation.open(wall.x+3,wall.z),true,'rotated wall does not block lateral free ground');
 // A player can construct a researched wall through the real economy/placement pipeline.
 game.s.research[0].known.push('stone_tools','warfare','fortifications');
+city.economy.buildings.push({type:'lumber',team:0,x:-19,z:-15,hp:350,ready:true});
 const treasury=city.economy.realms[0].resources;
 treasury.wood=1000;treasury.stone=1000;
 const candidates=[{x:18,z:0},{x:18,z:8},{x:12,z:10},{x:6,z:12},{x:0,z:12},{x:-18,z:10},{x:-18,z:0}];
