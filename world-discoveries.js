@@ -49,6 +49,6 @@ export function collectLandmark(game,team,pos){
   earned.push('+'+amount+' '+({bread:'toitu',wood:'puitu',stone:'kivi',gold:'kulda'}[kind]||kind));
  }
  const name=LANDMARK_NAMES[landmark.kind];const text=name+' avastatud! '+earned.join(', ')+'.';
- if(team===0){game.s.events??=[];game.s.events.push({time:game.s.time,text});if(game.s.events.length>40)game.s.events.shift()}
+ if(team===0){game.s.events??=[];game.s.events.push({time:game.s.time,text});if(game.s.events.length>40)game.s.events.shift();(game.discoveryEvents??=[]).push(text)}
  game.uiRevision++;return {landmark,text};
 }
