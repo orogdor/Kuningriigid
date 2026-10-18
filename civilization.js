@@ -234,15 +234,62 @@ if(s.ages[city.team]>=5)text+=' · Raudteeühendusi '+Object.values(s.railLinks|
 if(s.ages[city.team]>=6)text+=' · Õhuvedusid teel '+s.shipments.filter(c=>c.mode==='air'&&(c.from===parent.id||c.to===parent.id)).length;if(city.districtOf!=null)text+=' · jagatud varud ja tööjõud';$('cityhealth').textContent=text;if(selectedBuilding&&city.economy.buildings.includes(selectedBuilding)){$('selection').textContent=game.buildingName(city.team,selectedBuilding.type);$('detail').textContent=selectedBuilding.ready?(selectedBuilding.status||'Valmis')+(selectedBuilding.type==='house'?' · 3 elanikukohta · 0,6 toitu ja 0,45 vett elaniku kohta minutis':' · '+BUILDINGS[selectedBuilding.type].workers+' töölist · '+Math.round((selectedBuilding.efficiency??1)*100)+'%')+(BUILDINGS[selectedBuilding.type].out?' · toodang: '+BUILDINGS[selectedBuilding.type].rate+' '+RESOURCE_NAMES[BUILDINGS[selectedBuilding.type].out]+' / töötsükkel (3× aeglasem)':''):((selectedBuilding.materialsRemaining||0)>0?'Materjale tuleb tuua: '+Math.ceil(selectedBuilding.materialsRemaining)+' ühikut · ':'')+'Ehitus '+Math.floor(100*(selectedBuilding.progress||0)/game.constructionTime(selectedBuilding.type))+'% · '+timeLabel((game.constructionTime(selectedBuilding.type)-(selectedBuilding.progress||0))/(selectedBuilding.efficiency||0));if(city.team===0&&selectedBuilding.ready&&selectedBuilding.type!=='hall')button($('actions'),selectedBuilding.disabled?'▶ Jätka tööd':'Ⅱ Peata töö',()=>{game.toggleBuilding(city,selectedBuilding);renderUI();save()})}else if(selectedUnit&&selectedUnit.hp>0){$('selection').textContent=TROOPS[selectedUnit.kind].name;$('detail').textContent=Math.ceil(selectedUnit.hp)+' / '+TROOPS[selectedUnit.kind].hp+' tervist'+(selectedUnit.target?' · liigub':' · ootab');button($('actions'),'■ Peatu',()=>{selectedUnit.target=null;selectedUnit.advance=false;renderUI();save()})}}
 function showJournal(){$('journalpanel').hidden=false;const list=$('journalentries');list.innerHTML='';const events=[...(s.events||[])];for(const c of s.cities.filter(c=>c.team===0))for(const e of c.economy.realms[0].log||[])events.push({time:e.time+(c.foundedAt||0),text:c.name+' · '+e.text});for(const e of events.sort((a,b)=>b.time-a.time).slice(0,60)){const p=document.createElement('p');p.textContent='Käik '+(Math.floor(e.time/60)+1)+' · '+e.text;list.append(p)}}
 $('journal').onclick=showJournal;$('closejournal').onclick=()=>{$('journalpanel').hidden=true};
-function drawOverview(){const canvas=$('atlasminimap'),ctx=canvas.getContext('2d'),stamp=[chosen.c,chosen.r,view,Math.round(focus.x/25),Math.round(focus.z/25),Math.round(zoom),s.cities.length,game.uiRevision,s.roadRevision||0,s.railRevision||0,s.visionRevision||0].join(':');if(stamp===lastOverviewStamp)return;lastOverviewStamp=stamp;canvas.width=COLS*2;canvas.height=ROWS*2;ctx.fillStyle='#1f5368';ctx.fillRect?.(0,0,COLS*2,ROWS*2);for(const c of game.cells){const seen=game.seen(0,c);const owner=game.territoryOwner(c);ctx.fillStyle=!seen?'#c9b68f':owner?(['#83b4a1','#af7d62','#9b82bb','#c3aa62'][owner.team]):!c.land?'#2a697b':c.river?(c.bridge?'#7ba5ad':c.ford?'#6ea4be':'#5490ad'):c.biome==='forest'?'#65804f':c.biome==='hills'?'#b0ac91':'#a6b577';ctx.fillRect?.(c.c*2,c.r*2,2,2)}ctx.strokeStyle='rgba(97,77,42,.25)';for(const c of game.cells){if(game.seen(0,c))continue;const roll=game.noise(c.c*9+4,c.r*7+8);if(roll<.985)continue;ctx.beginPath();if(!c.land){ctx.moveTo(c.c*2+.2,c.r*2+1.3);ctx.quadraticCurveTo(c.c*2+1,c.r*2+.3,c.c*2+1.8,c.r*2+1.3);ctx.stroke()}else if(c.mountain){ctx.moveTo(c.c*2+.2,c.r*2+1.7);ctx.lineTo(c.c*2+1,c.r*2+.3);ctx.lineTo(c.c*2+1.8,c.r*2+1.7);ctx.stroke()}else{ctx.arc(c.c*2+1,c.r*2+1,.55,0,Math.PI*2);ctx.stroke()}}for(const[key,edge]of Object.entries(s.worldRoads||{})){
- const [a,b]=roadPoints(key),level=roadLevel(roadStrength(s,a,b,s.time));if(!level||!game.seen(0,a)||!game.seen(0,b))continue;
- ctx.strokeStyle=['','#a57941','#bc995f','#dac18c','#eadbc1'][level];ctx.lineWidth=level>=3?3:level===2?2.4:1.8;
- ctx.beginPath();ctx.moveTo(a.c*2+1,a.r*2+1);ctx.lineTo(b.c*2+1,b.r*2+1);ctx.stroke();
- }for(const key of Object.keys(s.railEdges||{})){
- const[a,b]=roadPoints(key);if(!game.seen(0,a)||!game.seen(0,b))continue;
- ctx.strokeStyle='#36424a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(a.c*2+1,a.r*2+1);ctx.lineTo(b.c*2+1,b.r*2+1);ctx.stroke();
- }for(const c of s.cities){if(c.team!==0&&!game.seen(0,c))continue;ctx.fillStyle=['#e9dfad','#ed9c7e','#c2a4ea','#f0d16f'][c.team];ctx.fillRect?.(c.c*2,c.r*2,3,3)}for(const landmark of s.landmarks||[]){if(!game.seen(0,landmark))continue;ctx.fillStyle=landmark.claimedBy==null?(landmark.kind==='village'?'#ebc16a':'#c0a4df'):'#9e997f';ctx.beginPath();ctx.arc(landmark.c*2+1,landmark.r*2+1,2.2,0,Math.PI*2);ctx.fill()}
- ctx.strokeStyle='#f4d488';ctx.lineWidth=2;ctx.strokeRect?.(chosen.c*2,chosen.r*2,2,2);if(view==='world'){const w=zoom*camera.aspect*.55/25,h=zoom*.55/25;ctx.strokeStyle='#d9eee1';ctx.lineWidth=1;ctx.strokeRect?.((focus.x-ORIGIN_X)/25-w/2,(focus.z-ORIGIN_Z)/25-h/2,w,h)}}
+// The minimap base layer is expensive (36,300 world cells). Cache it, and
+// redraw only the viewport/highlight during camera movement. V64 world FPS fix.
+const overviewBase=document.createElement('canvas');overviewBase.width=COLS*2;overviewBase.height=ROWS*2;
+const overviewBaseCtx=overviewBase.getContext('2d');let overviewBaseStamp='',overviewBaseDraws=0,overviewOverlayDraws=0;
+function drawOverview(){
+ const canvas=$('atlasminimap'),ctx=canvas.getContext('2d');
+ const stamp=[chosen.c,chosen.r,view,Math.round(focus.x/25),Math.round(focus.z/25),Math.round(zoom)].join(':');
+ game.refreshTerritory(); // one territory lookup per repaint, never per tile
+ const baseStamp=[s.visionRevision||0,s.roadRevision||0,s.railRevision||0,game.territoryStamp,s.cities.map(c=>c.id+':'+c.team+':'+c.c+':'+c.r).join(','),(s.landmarks||[]).map(l=>l.claimedBy==null?'0':'1').join('')].join('|');
+ if(baseStamp!==overviewBaseStamp){
+  overviewBaseStamp=baseStamp;overviewBaseDraws++;
+  const base=overviewBaseCtx;
+  base.fillStyle='#1f5368';base.fillRect(0,0,COLS*2,ROWS*2);
+  for(const c of game.cells){
+   const seen=game.seen(0,c),owner=game.territory.get(c.c+':'+c.r);
+   base.fillStyle=!seen?'#c9b68f':owner?(['#83b4a1','#af7d62','#9b82bb','#c3aa62'][owner.team]):!c.land?'#2a697b':c.river?(c.bridge?'#7ba5ad':c.ford?'#6ea4be':'#5490ad'):c.biome==='forest'?'#65804f':c.biome==='hills'?'#b0ac91':'#a6b577';
+   base.fillRect(c.c*2,c.r*2,2,2);
+   // Fish shoals are represented in real seawater, not on land.
+   if(seen&&!c.land&&c.deposits.fish&&game.noise(c.c*17,c.r*19)>.80){base.fillStyle=c.fishDepth<=2?'#8dd3ce':'#c0c6e4';base.fillRect(c.c*2+.7,c.r*2+.7,.95,.95)}
+  }
+  base.strokeStyle='rgba(97,77,42,.25)';
+  for(const c of game.cells){if(game.seen(0,c)||game.noise(c.c*9+4,c.r*7+8)<.985)continue;
+   base.beginPath();if(!c.land){base.moveTo(c.c*2+.2,c.r*2+1.3);base.quadraticCurveTo(c.c*2+1,c.r*2+.3,c.c*2+1.8,c.r*2+1.3)}
+   else if(c.mountain){base.moveTo(c.c*2+.2,c.r*2+1.7);base.lineTo(c.c*2+1,c.r*2+.3);base.lineTo(c.c*2+1.8,c.r*2+1.7)}
+   else base.arc(c.c*2+1,c.r*2+1,.55,0,Math.PI*2);base.stroke();
+  }
+  for(const key of Object.keys(s.worldRoads||{})){
+   const[a,b]=roadPoints(key),level=roadLevel(roadStrength(s,a,b,s.time));
+   if(!level||!game.seen(0,a)||!game.seen(0,b))continue;
+   base.strokeStyle=['','#a57941','#bc995f','#dac18c','#eadbc1'][level];base.lineWidth=level>=3?3:level===2?2.4:1.8;
+   base.beginPath();base.moveTo(a.c*2+1,a.r*2+1);base.lineTo(b.c*2+1,b.r*2+1);base.stroke();
+  }
+  for(const key of Object.keys(s.railEdges||{})){
+   const[a,b]=roadPoints(key);if(!game.seen(0,a)||!game.seen(0,b))continue;
+   base.strokeStyle='#36424a';base.lineWidth=2;base.beginPath();base.moveTo(a.c*2+1,a.r*2+1);base.lineTo(b.c*2+1,b.r*2+1);base.stroke();
+  }
+  for(const city of s.cities){if(city.team!==0&&!game.seen(0,city))continue;
+   base.fillStyle=['#e9dfad','#ed9c7e','#c2a4ea','#f0d16f'][city.team];base.fillRect(city.c*2,city.r*2,3,3);
+  }
+  for(const l of s.landmarks||[]){if(!game.seen(0,l))continue;
+   base.fillStyle=l.claimedBy==null?(l.kind==='village'?'#ebc16a':'#c0a4df'):'#9e997f';
+   base.beginPath();base.arc(l.c*2+1,l.r*2+1,2.2,0,Math.PI*2);base.fill();
+  }
+ }
+ if(stamp===lastOverviewStamp&&baseStamp===drawOverview.lastBaseStamp)return;
+ lastOverviewStamp=stamp;drawOverview.lastBaseStamp=baseStamp;overviewOverlayDraws++;
+ if(canvas.width!==COLS*2||canvas.height!==ROWS*2){canvas.width=COLS*2;canvas.height=ROWS*2}
+ ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(overviewBase,0,0);
+ ctx.strokeStyle='#f4d488';ctx.lineWidth=2;ctx.strokeRect(chosen.c*2,chosen.r*2,2,2);
+ if(view==='world'){
+  const w=zoom*camera.aspect*.55/25,h=zoom*.55/25;
+  ctx.strokeStyle='#d9eee1';ctx.lineWidth=1;
+  ctx.strokeRect((focus.x-ORIGIN_X)/25-w/2,(focus.z-ORIGIN_Z)/25-h/2,w,h);
+ }
+}
+function overviewMetrics(){return {baseDraws:overviewBaseDraws,overlayDraws:overviewOverlayDraws}}
 $('atlasminimap').onpointerdown=e=>{const at=minimapCell(e.clientX,e.clientY,e.currentTarget.getBoundingClientRect(),COLS,ROWS);if(!at)return;if(view!=='world'){if(s.battle&&!s.battle.result)return say('Lõpeta lahing või tagane enne maailmakaardile liikumist.');openWorld()}chosen=game.cell(at);focus.set(chosen.x,0,chosen.z);renderUI()};
 const commandOverlay=new CommandVisuals(worldScene,localScene);
 function inputBlocked(){return menuOpen||document.hidden||!$('help').hidden||!$('researchpanel').hidden||!$('journalpanel').hidden}
@@ -313,4 +360,4 @@ function sampleV51FPS(dt){if(menuOpen||document.hidden)return;fpsFrames++;fpsSec
  if(highFpsSeconds>=12&&v51Resolution<1){v51Resolution=1;renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?.85:quality==='medium'?1.15:1.6));highFpsSeconds=0}
 }
 
-$('seedinfo').textContent='Maailma seeme: '+s.seed+' · tempo: '+tempoName(s);if($('tempo'))$('tempo').value=s.tempo||'normal';if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();openWorld();worldSync();if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={camera,pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
+$('seedinfo').textContent='Maailma seeme: '+s.seed+' · tempo: '+tempoName(s);if($('tempo'))$('tempo').value=s.tempo||'normal';if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();openWorld();worldSync();if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={camera,pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,overviewMetrics,setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
