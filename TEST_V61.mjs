@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {TECHS,BUILD_TECH,techBlock} from './research.js';
-import {BUILDINGS,BUILD_AGE,Civilization,createGame} from './civilization-core.js';
+import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization-core.js';
 import {initialState} from './economy.js';
 import {armyUnits} from './v51-systems.js';
 import {createBattle,tickBattle} from './campaign.js';
@@ -59,7 +59,7 @@ assert.equal(empty.defensePosts.length,0,'No worker means no tower attack');
 const guardBefore=b.squads[0].x;
 b.squads.push({source:99,team:1,kind:'slinger',hp:120,maxHp:120,morale:100,x:60,z:0,cool:0,target:null});
 b.elapsed=0;b.result=null;
-tickBattle(b,.1,{slinger:{hp:120,dmg:7,range:10,speed:2},archer:{hp:100,dmg:10,range:14,speed:2}},0);
+tickBattle(b,.1,TROOPS,0);
 assert.equal(b.squads[0].x,guardBefore,'Guard stays assigned to wall');
 const saved=JSON.parse(JSON.stringify(game.s)),loaded=new Civilization(saved);
 assert.equal(loaded.s.version,4,'Save schema unchanged');
