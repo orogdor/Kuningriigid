@@ -68,12 +68,15 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  // All tributaries and banks are one connected world-space 3D network.
  const rivers=createRiverNetwork(game,'world');group.add(rivers);
  // Real-world traffic generates the atlas road network (no roads appear just because a route was planned).
- const roadGroup=new T.Group();group.add(roadGroup);let roadStamp='';
+ const roadGroup=new T.Group();roadGroup.name='V67 continuous road graph';roadGroup.userData.roadNetwork=true;group.add(roadGroup);let roadStamp='';
  function roads(state){
   const stamp=(state.roadRevision||0)+':'+(state.railRevision||0)+':'+(state.visionRevision||0);
   if(stamp===roadStamp)return;roadStamp=stamp;
   for(const o of [...roadGroup.children]){roadGroup.remove(o);disposeNetwork(o)}
-  roadGroup.add(createUnifiedRoadNetwork(game,'world'));
+  const network=createUnifiedRoadNetwork(game,'world');
+  roadGroup.userData.roadEdges=network.userData.roadEdges;
+  roadGroup.userData.roadVertexCount=network.userData.roadVertexCount;
+  for(const mesh of [...network.children])roadGroup.add(mesh);
   // Permanent rail sleepers are separate from traffic-eroded footpaths.
   const rails=[];
   for(const key of Object.keys(state.railEdges||{})){
