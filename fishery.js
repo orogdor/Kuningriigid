@@ -70,14 +70,14 @@ export function fishingHarvest(game,city,b,definition,workDt,nav,multiplier){
   const sites=fishingBanks(game,city,age);
   if(!sites.length){b.status='Ligipääsetavaid kalu pole';w.retry=3;return 0}
   const target=sites[Math.min(sites.length-1,Math.floor(game.noise(city.c+game.s.time*.03,city.r+id)*Math.min(6,sites.length)))];
-  w.catchTile={c:target.cell.c,r:target.cell.r};w.depth=target.depth;w.trip=age===0?0:Math.max(1,Math.ceil(target.dist*2.5));w.work=0;w.phase='out';w.moving=true;
+  w.catchTile={c:target.cell.c,r:target.cell.r};w.portTile={c:city.c,r:city.r};w.depth=target.depth;w.trip=age===0?0:Math.max(1,Math.ceil(target.dist*2.5));w.tripTotal=w.trip;w.work=0;w.phase='out';w.moving=true;if(age>=1)game.reveal(b.team,w.catchTile,1);
  }
  if(w.phase==='out'){b.status=age===0?'Läheb rannale':'Sõidab püügialale';w.moving=true;w.trip-=workDt;if(w.trip<=0)w.phase='work';return 0}
  if(w.phase==='work'){
   const target=game.cell(w.catchTile),stock=target&&stockFor(game,target);
   if(!target?.deposits.fish||!stock?.amount){w.phase='seek';return 0}
   w.working=true;w.action='fishing';b.status=age===0?'Püüab kaldalt':fishingEraText(age);w.work+=workDt*multiplier;
-  if(w.work>=definition.cycle){w.carried=takeFish(game,target,definition.rate);w.trip=age===0?0:Math.max(1,Math.ceil(Math.hypot(w.catchTile.c-city.c,w.catchTile.r-city.r)*2.5));w.phase='return';w.work=0}
+  if(w.work>=definition.cycle){w.carried=takeFish(game,target,definition.rate);w.trip=w.tripTotal||0;w.phase='return';w.work=0}
   return 0;
  }
  if(w.phase==='return'){b.status='Toob kalasaaki';w.moving=w.trip>0;w.trip-=workDt;if(w.trip<=0){const result=w.carried||0;w.carried=0;w.phase='seek';return result}return 0}
