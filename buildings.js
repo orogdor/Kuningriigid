@@ -58,7 +58,7 @@ else if(type==='watchtower'){
  for(const y of [2,4.5,6.7]){box(g,0,y,0,5.1,.35,5.1,'#8f6e4b','wood');for(const x of [-2,2])box(g,x,y-.8,0,.23,1.5,4.3,'#73553c','wood')}
  for(const z of [-2,2])box(g,0,6.9,z,5.1,1,.18,'#785d40','wood');
  for(const x of [-2,2])box(g,x,6.9,0,.18,1,5.1,'#785d40','wood');
- gable(g,0,8,0,6,5.2,2.2,'#886247');
+ for(const x of [-1.8,1.8])for(const z of [-1.8,1.8])box(g,x,7.85,z,.48,.8,.48,'#957550','wood');
 }
 else if(type==='stonetower'){
  cylinder(g,0,3.5,0,2.6,3.1,7,'#92958f','stone',12);
