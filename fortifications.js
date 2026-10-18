@@ -19,7 +19,7 @@ export function stationWall(game,ctx,building,source=null){
  });
  const chosen=source==null?soldiers.find(({unit})=>unit.kind!=='scout')||soldiers[0]:soldiers.find(({index})=>index===source);
  if(!chosen)return {error:'Saada oma armee selle linna ruudule ja peata liikumine, seejärel määra sõdur müürile.'};
- chosen.unit.garrison={c:ctx.c,r:ctx.r,x:building.x,z:building.z,wallType:building.type};
+ chosen.unit.garrison={c:ctx.c,r:ctx.r,x:building.x,z:building.z,wallType:building.type,wallAxis:building.wallAxis||0,slot:wallGuards(game.s,ctx,building).length};
  return {ok:true,source:chosen.index};
 }
 export function releaseWall(game,ctx,building){
@@ -54,7 +54,7 @@ export function fortifyBattle(game,city,battle){
    if(battle.squads.some(q=>q.source===source))continue;
    const slot=wallGuards(game.s,city,wall).findIndex(q=>q.source===source);
    battle.squads.push({source,team:unit.team,kind:unit.kind,hp:unit.hp,maxHp:unit.hp,morale:unit.morale??100,
-    x:wall.x+(slot-0.5)*1.6,z:wall.z,heading:0,target:null,cool:0,guardPost:true,wallType:wall.type,advance:false});
+    x:wall.x+(wall.wallAxis?0:(slot-0.5)*1.6),z:wall.z+(wall.wallAxis?(slot-0.5)*1.6:0),heading:0,target:null,cool:0,guardPost:true,wallType:wall.type,advance:false});
   }
  }
  return battle;
