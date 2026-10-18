@@ -276,7 +276,24 @@ function checkEncounter(){
  }
 }
 function applyBattle(){const b=s.battle;if(!b?.result||b.applied)return;for(const q of b.squads)if(s.units[q.source])s.units[q.source].hp=q.hp;if(b.fortress){const city=s.cities.find(c=>c.id===b.fortress.cityId);settleDefenders(b,city);persistSiegeDamage(city,b);city.hp=Math.max(0,Math.min(city.hp,b.fortress.hp));if(city.hp<=0){game.transferCity(city,b.winnerTeam??b.attackerTeam);city.hp=300;;const remaining=[...new Set([...s.cities.map(c=>c.team),...s.settlers.map(a=>a.team)])];if(!remaining.includes(0)){s.winner=city.team;say('Sinu viimane linn langes.')}else if(remaining.length===1){s.winner=0;say('Võit! Kõik vastased on alistatud.')}}}rememberBattle(s,b);b.applied=true;save();renderUI()}
-function pick(e){pointer.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(pointer,camera);return (view==='world'?ray.intersectObjects([atlasLand,...atlasDecor.group.children.filter(o=>o.userData.water)]):ray.intersectObjects([localTerrain,...neighbourTerrains]))[0]?.point}
+// V64: analytic atlas picking avoids raycasting hundreds of thousands of
+// terrain triangles on every mouse/touch movement.
+const worldPickPlane=new T.Plane(new T.Vector3(0,1,0),0),worldPickPoint=new T.Vector3();
+function pick(e){
+ pointer.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);
+ ray.setFromCamera(pointer,camera);
+ if(view==='world'){
+  worldPickPlane.constant=0;
+  const hit=ray.ray.intersectPlane(worldPickPlane,worldPickPoint);
+  if(!hit)return null;
+  for(let i=0;i<3;i++){
+   worldPickPlane.constant=-Math.max(.72,game.atlasHeight(hit.x,hit.z));
+   if(!ray.ray.intersectPlane(worldPickPlane,hit))break;
+  }
+  return hit;
+ }
+ return ray.intersectObjects([localTerrain,...neighbourTerrains])[0]?.point;
+}
 $('world').onpointerdown=e=>{if(inputBlocked())return;drag={x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,moved:false};$('world').setPointerCapture(e.pointerId)};
 $('world').onpointermove=e=>{if(inputBlocked())return;hoverPoint=pick(e)||null;if(commandMode==='move')renderCommandHUD();if(view==='local'&&mode){const p=pick(e);if(p)ghostPoint={x:Math.round(p.x/2)*2,z:Math.round(p.z/2)*2};updateGhost()}if(!drag)return;const dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6)drag.moved=true;if(drag.moved){panCamera(-dx*zoom/innerHeight*.8,-dy*zoom/innerHeight*.8);focus.x=Math.max(view==='world'?ORIGIN_X+50:-225,Math.min(view==='world'?ORIGIN_X+WORLD_WIDTH-50:225,focus.x));focus.z=Math.max(view==='world'?ORIGIN_Z+50:-195,Math.min(view==='world'?ORIGIN_Z+WORLD_DEPTH-50:195,focus.z))}drag.lastX=e.clientX;drag.lastY=e.clientY};
 function activeArmy(){return s.armies.find(a=>a.team===0&&(a.id||0)===selectedArmyId)||s.armies[0]}
