@@ -14,7 +14,7 @@ export function roadStrength(state,a,b,now=state.time||0){const edge=state.world
 export function roadBoost(state,a,b,now){return roadLevel(roadStrength(state,a,b,now))?ROAD_SPEED:1}
 export function recordWorldStep(state,a,b,kind='army',now=state.time||0){if(!a||!b||Math.abs(a.c-b.c)+Math.abs(a.r-b.r)!==1)return;
  const key=roadKey(a,b),roads=state.worldRoads??={};const old=roads[key];const previous=old?ageTraffic(old.heat,now-old.last):0;
- const amount=kind==='caravan'?5.5:kind==='settler'?2.5:kind==='builder'?3:3.5;
+ const amount=kind==='roadworks'?8:kind==='caravan'?5.5:kind==='settler'?2.5:kind==='builder'?3:3.5;
  const next=clamp(previous+amount);roads[key]={heat:next,last:now};
  if(roadLevel(previous)!==roadLevel(next))state.roadRevision=(state.roadRevision||0)+1;
 }
