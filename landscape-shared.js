@@ -40,7 +40,7 @@ export function riverSegmentsNear(game,tile){
 }
 export function rockSites(game,cell){
  if(!cell?.mountain)return [];
- const amount=cell.h>40?5:cell.h>29?4:3,result=[];
+ const amount=cell.h>38?3:2,result=[];
  for(let i=0;i<amount;i++){
   const x=cell.x+(game.noise(cell.c*11+i,cell.r+308)-.5)*33;
   const z=cell.z+(game.noise(cell.c+i,cell.r*17+408)-.5)*33;
@@ -51,6 +51,9 @@ export function rockSites(game,cell){
  return result;
 }
 export function roadCurve(game,a,b,count=12){
+ // Canonical endpoint order is required: both neighbouring detail tiles and
+ // the world atlas must bend the same side of a road.
+ if(a.r*COLS+a.c>b.r*COLS+b.c)[a,b]=[b,a];
  const aa=game.cell(a),bb=game.cell(b);if(!aa||!bb)return [];
  const dx=bb.x-aa.x,dz=bb.z-aa.z,dist=Math.hypot(dx,dz)||1;
  const nx=-dz/dist,nz=dx/dist;
