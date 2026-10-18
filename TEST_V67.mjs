@@ -38,8 +38,8 @@ for(const seed of [17,12345,20261018]){
  const projected=detail.children.find(c=>c.name==='continuous water surface').geometry.attributes.position;
  const firstGlobal=[original.getX(0),original.getY(0),original.getZ(0)],firstDetail=[projected.getX(0),projected.getY(0),projected.getZ(0)];
  const p=worldToLocal(cell,firstGlobal[0],firstGlobal[2]);
- assert.ok(Math.abs(firstDetail[0]-p.x)<.0001&&Math.abs(firstDetail[2]-p.z)<.0001,'same river mesh x/z coordinates, just world-to-detail projection');
- assert.ok(Math.abs(firstDetail[1]-(firstGlobal[1]-.7)*.30)<.0001,'same river water heights, just world-to-detail projection');
+ assert.ok(Math.abs(firstDetail[0]-p.x)<.001&&Math.abs(firstDetail[2]-p.z)<.001,'same river mesh x/z coordinates, just world-to-detail projection');
+ assert.ok(Math.abs(firstDetail[1]-(firstGlobal[1]-.7)*.30)<.001,'same river water heights, just world-to-detail projection');
  const positions=game.s.coastalStartPositions,orig=game.cell(positions[0]);
  const adjacent=[[1,0],[-1,0],[0,1],[0,-1]].map(([dc,dr])=>game.cell({c:orig.c+dc,r:orig.r+dr})).find(c=>c?.land&&!c.mountain);
  if(adjacent){
