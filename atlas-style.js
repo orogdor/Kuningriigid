@@ -2,7 +2,8 @@ import * as T from './vendor/three.module.js';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
 import {createAtlasBiomeDetail} from './atlas-biomes-v47.js';
-import {pointsOfRiver,rockSites,roadCurve} from './landscape-shared.js?v=65c';
+import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=67';
+import {surface} from './continuous-landscape.js?v=67';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
 const palette={
  sea:'#173f58',deepSea:'#102d4e',shallow:'#64aba7',beach:'#dfcea0',coastGrass:'#b7c28b',
@@ -52,17 +53,9 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  const shore=[];for(let z=ORIGIN_Z;z<ORIGIN_Z+WORLD_DEPTH;z+=10)for(let x=ORIGIN_X;x<ORIGIN_X+WORLD_WIDTH;x+=10){const points=[[x,z],[x+10,z],[x+10,z+10],[x,z+10]],hits=[];for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],ha=game.atlasHeight(...a)-.8,hb=game.atlasHeight(...b)-.8;if((ha>0)!==(hb>0)){const t=ha/(ha-hb);hits.push([a[0]+(b[0]-a[0])*t,1.04,a[1]+(b[1]-a[1])*t])}}if(hits.length===2)shore.push(...hits[0],...hits[1])}group.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(shore,3)),new T.LineBasicMaterial({color:'#dbeddf',transparent:true,opacity:.35})));
  // Sparse ocean strokes give water scale without animated shader cost.
  const waves=[];for(const cell of game.cells)if(!cell.land&&!cell.coast&&game.noise(cell.c,cell.r+77)>.88){const x=cell.x,z=cell.z;for(let i=0;i<5;i++){const a=x-14+i*6,b=a+6;waves.push(a,.84,z+Math.sin(i*.9)*2,b,.84,z+Math.sin((i+1)*.9)*2)}}const waveLines=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(waves,3)),new T.LineBasicMaterial({color:'#91c1bd',transparent:true,opacity:.11}));group.add(waveLines);group.userData.waveLines=waveLines;
- // Faceted mountain silhouettes: irregular polygonal slopes instead of repeated simple cones.
- function cragGeometry(top=false){const n=9,rings=top?[[.57,.48],[.84,.32],[1,.06]]:[[0,1],[.40,.86],[.73,.49],[1,.06]],verts=[],indices=[];
-  for(const [y,r] of rings)for(let i=0;i<n;i++){const a=i*Math.PI*2/n,irreg=1+.12*Math.sin(i*2.3+1)+.07*Math.sin(i*4.4);verts.push(Math.cos(a)*r*irreg+y*.22, y, Math.sin(a)*r*irreg+y*.12)}
-  for(let j=0;j<rings.length-1;j++)for(let i=0;i<n;i++){const a=j*n+i,b=j*n+(i+1)%n,c=(j+1)*n+i,d=(j+1)*n+(i+1)%n;indices.push(a,c,b,b,c,d)}
-  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(verts,3));g.setIndex(indices);g.computeVertexNormals();return g;
- }
- const peaks=game.cells.filter(c=>c.mountain).flatMap(c=>rockSites(game,c));
-  const mountains=new T.InstancedMesh(cragGeometry(),material('#777b76'),peaks.length),snowPeaks=peaks.filter(a=>a.h>29),caps=new T.InstancedMesh(cragGeometry(true),material('#dce3df'),snowPeaks.length),dummy=new T.Object3D();
- peaks.forEach((a,i)=>{dummy.position.set(a.x,a.h+.25,a.z);dummy.scale.set(a.size*1.35,a.size*1.75,a.size*1.25);dummy.rotation.set(0,a.angle,0);dummy.updateMatrix();mountains.setMatrixAt(i,dummy.matrix);mountains.setColorAt(i,new T.Color(i%3?'#8b918c':'#767e7b'))});
- snowPeaks.forEach((a,i)=>{dummy.position.set(a.x,a.h+.25,a.z);dummy.scale.set(a.size*1.35,a.size*1.75,a.size*1.25);dummy.rotation.set(0,a.angle,0);dummy.updateMatrix();caps.setMatrixAt(i,dummy.matrix)});
- group.add(mountains,caps);
+ // Continuous terrain relief replaces separate rock instances.
+ const peaks=game.cells.filter(c=>c.mountain);
+ const dummy=new T.Object3D();
  // Civ-style world variety: fields, forests, jungles, tundra woods, deserts and mesas.
  const fields=game.cells.filter(c=>c.deposits.grain),
        plots=new T.InstancedMesh(new T.PlaneGeometry(17,12),material('#b9aa60'),fields.length),
@@ -72,69 +65,15 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  rocks.forEach((a,i)=>{dummy.position.set(a.x-10,height(a.x-10,a.z)+2,a.z);dummy.rotation.set(0,i*1.4,0);dummy.scale.set(3.5,2.4,3);dummy.updateMatrix();stones.setMatrixAt(i,dummy.matrix)});
  group.add(plots,stones);
  const nature=createAtlasBiomeDetail(game,group,quality);
- // Shared V65 meandering waterways, identical centerline on every detail tile.
- const rivers=new T.Group();group.add(rivers);const ribbon=[],bankPts=[];
- for(const cell of game.cells){
-  if(!cell.river||!cell.riverTo)continue;
-  const points=pointsOfRiver(game,cell,10);
-  for(let i=1;i<points.length;i++){
-   const p=points[i-1],q=points[i],dx=q.x-p.x,dz=q.z-p.z,len=Math.hypot(dx,dz)||1,nx=-dz/len,nz=dx/len;
-   const edge=(v,k)=>{const x=v.x+nx*v.width*k,z=v.z+nz*v.width*k;return [x,height(x,z)+.83,z]};
-   const l=edge(p,1),r=edge(p,-1),ll=edge(q,1),rr=edge(q,-1);
-   ribbon.push(...l,...r,...ll,...ll,...r,...rr);
-   bankPts.push(...l,...ll,...r,...rr);
-  }
-  if(cell.bridge||cell.ford){
-   const p=points[0],q=points[1]||p;
-   const deck=new T.Mesh(new T.PlaneGeometry(cell.bridge?15:8,cell.bridge?15:10),new T.MeshBasicMaterial({color:cell.bridge?'#ac8760':'#ccbb99',transparent:true,opacity:cell.bridge?.88:.54,side:T.DoubleSide,depthWrite:false}));
-   deck.rotation.x=-Math.PI/2;deck.rotation.z=Math.atan2(q.z-p.z,q.x-p.x);deck.position.set(p.x,height(p.x,p.z)+.93,p.z);rivers.add(deck);
-  }
- }
- if(ribbon.length)rivers.add(new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(ribbon,3)),new T.MeshBasicMaterial({color:'#518eab',transparent:true,opacity:.96,depthWrite:false,side:T.DoubleSide})));
- if(bankPts.length)rivers.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(bankPts,3)),new T.LineBasicMaterial({color:'#a3d5c3',transparent:true,opacity:.7})));
+ // All tributaries and banks are one connected world-space 3D network.
+ const rivers=createRiverNetwork(game,'world');group.add(rivers);
  // Real-world traffic generates the atlas road network (no roads appear just because a route was planned).
  const roadGroup=new T.Group();group.add(roadGroup);let roadStamp='';
  function roads(state){
   const stamp=(state.roadRevision||0)+':'+(state.railRevision||0)+':'+(state.visionRevision||0);
   if(stamp===roadStamp)return;roadStamp=stamp;
-  for(const o of [...roadGroup.children]){o.geometry?.dispose();o.material?.dispose();roadGroup.remove(o)}
-  // Each traversed segment is drawn as a continuous terrain-conforming trail.
-  // A dark verge, colored track and twin wagon ruts develop with traffic.
-  const vertices=[],rgb=[],verges=[],vergeColors=[],rutLines=[];
-  const palette=['#000000','#d0a877','#c8ad85','#c4bb9e','#b6bbab'];
-  const edgePalette=['#000000','#775839','#897253','#646354','#525b5b'];
-  const addQuad=(out,colors,a,b,c,d,col)=>{
-   for(const v of [a,b,c,c,b,d]){out.push(...v);colors.push(col.r,col.g,col.b)}
-  };
-  for(const key of Object.keys(state.worldRoads||{})){
-   const [a,b]=roadPoints(key),strength=roadStrength(state,a,b,state.time),level=roadLevel(strength);
-   if(!level||!game.seen(0,a)||!game.seen(0,b))continue;
-   if(a.c<0||a.c>=COLS||b.c<0||b.c>=COLS||a.r<0||a.r>=ROWS||b.r<0||b.r>=ROWS)continue;
-   const aa=center(a.c,a.r),bb=center(b.c,b.r),dx=bb.x-aa.x,dz=bb.z-aa.z,d=Math.hypot(dx,dz);
-   if(!d)continue;
-   const width=[0,9,13,18,24][level],nx=-dz/d,nz=dx/d;
-   const fillCol=new T.Color(palette[level]),edgeCol=new T.Color(edgePalette[level]);
-   const main=[],verge=[],ruts=[[],[]],roadSamples=roadCurve(game,a,b,12);
-   for(let k=0;k<=12;k++){
-    const curved=roadSamples[k],X=curved.x,Z=curved.z;
-     const spot=(offset,y)=>{const px=X+nx*offset,pz=Z+nz*offset;return [px,game.atlasHeight(px,pz)+y,pz]};
-    main.push([spot(-width*.5,2.3),spot(width*.5,2.3)]);
-    verge.push([spot(-width*.67,2.06),spot(width*.67,2.06)]);
-    if(level>=2)for(let i=0;i<2;i++)ruts[i].push(spot((i?1:-1)*width*.24,2.48));
-   }
-   for(let k=0;k<12;k++){
-    addQuad(verges,vergeColors,verge[k][0],verge[k][1],verge[k+1][0],verge[k+1][1],edgeCol);
-    addQuad(vertices,rgb,main[k][0],main[k][1],main[k+1][0],main[k+1][1],fillCol);
-   }
-   if(level>=2)for(const track of ruts)for(let k=0;k<track.length-1;k++)rutLines.push(...track[k],...track[k+1]);
-  }
-  const emit=(coords,colors,opacity)=>{
-   if(!coords.length)return;
-   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(coords,3));geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));
-   const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({vertexColors:true,transparent:true,opacity,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));mesh.frustumCulled=false;roadGroup.add(mesh)
-  };
-  emit(verges,vergeColors,.94);emit(vertices,rgb,1);
-  if(rutLines.length)roadGroup.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(rutLines,3)),new T.LineBasicMaterial({color:'#655f4e',transparent:true,opacity:.52,depthTest:true})));
+  for(const o of [...roadGroup.children]){roadGroup.remove(o);disposeNetwork(o)}
+  roadGroup.add(createUnifiedRoadNetwork(game,'world'));
   // Permanent rail sleepers are separate from traffic-eroded footpaths.
   const rails=[];
   for(const key of Object.keys(state.railEdges||{})){
@@ -143,11 +82,11 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
    if(!len)continue;const nx=-dz/len*2.4,nz=dx/len*2.4;
    for(const offset of [-1,1]){
     const ax=pa.x+offset*nx,az=pa.z+offset*nz,bx=pb.x+offset*nx,bz=pb.z+offset*nz;
-    rails.push(ax,game.atlasHeight(ax,az)+2.3,az,bx,game.atlasHeight(bx,bz)+2.3,bz);
+    rails.push(ax,surface(game,ax,az,'world')+1.4,az,bx,surface(game,bx,bz,'world')+1.4,bz);
    }
    for(let step=1;step<10;step++){
     const t=step/10,x=pa.x+dx*t,z=pa.z+dz*t;
-    rails.push(x-nx*1.25,game.atlasHeight(x-nx*1.25,z-nz*1.25)+2.15,z-nz*1.25,x+nx*1.25,game.atlasHeight(x+nx*1.25,z+nz*1.25)+2.15,z+nz*1.25);
+    rails.push(x-nx*1.25,surface(game,x-nx*1.25,z-nz*1.25,'world')+1.22,z-nz*1.25,x+nx*1.25,surface(game,x+nx*1.25,z+nz*1.25,'world')+1.22,z+nz*1.25);
    }
   }
   if(rails.length){const railLine=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(rails,3)),new T.LineBasicMaterial({color:'#3f4c56'}));roadGroup.add(railLine)}
