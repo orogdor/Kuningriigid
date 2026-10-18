@@ -81,6 +81,7 @@ export function medievalBonus(game,city,b){
  return 1;
 }
 export function healMedievalArmies(game,city,dt){
+ if(game.s.battle&&!game.s.battle.result)return;
  if(!hasReady(city,'infirmary'))return;
  const workers=city.economy.buildings.filter(b=>b.type==='infirmary'&&b.ready&&b.hp>0&&!b.disabled).reduce((n,b)=>n+Math.min(1,b.assigned||0),0);
  if(workers<.1)return;
@@ -89,6 +90,8 @@ export function healMedievalArmies(game,city,dt){
  for(const u of game.s.units){
   if(u.team!==city.team||u.hp<=0||u.garrison||!armies.some(a=>(a.id||0)===(u.armyId||0)))continue;
   const stats=game.troopDefinitions?.[u.kind];if(!stats||u.hp>=stats.hp||stock.bread<1)continue;
-  u.hp=Math.min(stats.hp,u.hp+dt*.25*workers);
+  const gained=Math.min(stats.hp-u.hp,dt*.25*workers);
+  u.hp+=gained;u.medievalHealSupply=(u.medievalHealSupply||0)+gained;
+  if(u.medievalHealSupply>=12){const meals=Math.min(Math.floor(u.medievalHealSupply/12),Math.floor(stock.bread||0));stock.bread-=meals;u.medievalHealSupply-=12*meals;}
  }
 }
