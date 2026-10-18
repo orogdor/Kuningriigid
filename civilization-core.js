@@ -6,7 +6,7 @@ import {ERA_MATERIALS,ageDeficit} from './era-economy.js';
 import {selectAIBuild,usefulDistrictTypes} from './ai-strategy.js';
 import {tickBuilders,tickMarketHouseholds,operateWorker,trainingWorker} from './builders.js';
 import {SHIPS,seaAllowed,seaPath,harborExit,buildShip,finishShip,tickShips,embark,disembark,aiNavy} from './naval.js';
-import {initializeFisheries,isShore,fishingHarvest} from './fishery.js?v=64';
+import {initializeFisheries,isShore,fishingHarvest} from './fishery.js?v=64a';
 import {upgradeLevel,productionBonus,upgradedName} from './upgrades.js';
 import {continentLayout,continentHeight} from './continent-map.js?v=55';
 import {tempoMultiplier} from './tempo.js';
