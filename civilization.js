@@ -9,7 +9,8 @@ import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js';
 import {housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT} from './labor.js';
 import {BattleFeedback} from './battle-feedback.js';
-import {WALL_TYPES,TOWER_TYPES,wallHeight,fortifyBattle,configureWallFootprint,towerManned} from './fortifications.js?v=61c';
+import {WALL_TYPES,TOWER_TYPES,wallHeight,fortifyBattle,configureWallFootprint,towerManned} from './fortifications.js?v=62';
+import {persistSiegeDamage} from './medieval-v62.js';
 import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock} from './research.js';
 import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
@@ -203,7 +204,7 @@ function checkEncounter(){
   chosen=cell;openTile(cell);say('Lahing algas. Vali vägi või vajuta „Ründa“.');return;
  }
 }
-function applyBattle(){const b=s.battle;if(!b?.result||b.applied)return;for(const q of b.squads)if(s.units[q.source])s.units[q.source].hp=q.hp;if(b.fortress){const city=s.cities.find(c=>c.id===b.fortress.cityId);settleDefenders(b,city);city.hp=Math.max(0,Math.min(city.hp,b.fortress.hp));if(city.hp<=0){game.transferCity(city,b.winnerTeam??b.attackerTeam);city.hp=300;;const remaining=[...new Set([...s.cities.map(c=>c.team),...s.settlers.map(a=>a.team)])];if(!remaining.includes(0)){s.winner=city.team;say('Sinu viimane linn langes.')}else if(remaining.length===1){s.winner=0;say('Võit! Kõik vastased on alistatud.')}}}rememberBattle(s,b);b.applied=true;save();renderUI()}
+function applyBattle(){const b=s.battle;if(!b?.result||b.applied)return;for(const q of b.squads)if(s.units[q.source])s.units[q.source].hp=q.hp;if(b.fortress){const city=s.cities.find(c=>c.id===b.fortress.cityId);settleDefenders(b,city);persistSiegeDamage(city,b);city.hp=Math.max(0,Math.min(city.hp,b.fortress.hp));if(city.hp<=0){game.transferCity(city,b.winnerTeam??b.attackerTeam);city.hp=300;;const remaining=[...new Set([...s.cities.map(c=>c.team),...s.settlers.map(a=>a.team)])];if(!remaining.includes(0)){s.winner=city.team;say('Sinu viimane linn langes.')}else if(remaining.length===1){s.winner=0;say('Võit! Kõik vastased on alistatud.')}}}rememberBattle(s,b);b.applied=true;save();renderUI()}
 function pick(e){pointer.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(pointer,camera);return (view==='world'?ray.intersectObjects([atlasLand,...atlasDecor.group.children.filter(o=>o.userData.water)]):ray.intersectObjects([localTerrain,...neighbourTerrains]))[0]?.point}
 $('world').onpointerdown=e=>{if(inputBlocked())return;drag={x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,moved:false};$('world').setPointerCapture(e.pointerId)};
 $('world').onpointermove=e=>{if(inputBlocked())return;hoverPoint=pick(e)||null;if(commandMode==='move')renderCommandHUD();if(view==='local'&&mode){const p=pick(e);if(p)ghostPoint={x:Math.round(p.x/2)*2,z:Math.round(p.z/2)*2};updateGhost()}if(!drag)return;const dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6)drag.moved=true;if(drag.moved){panCamera(-dx*zoom/innerHeight*.8,-dy*zoom/innerHeight*.8);focus.x=Math.max(view==='world'?ORIGIN_X+50:-225,Math.min(view==='world'?ORIGIN_X+WORLD_WIDTH-50:225,focus.x));focus.z=Math.max(view==='world'?ORIGIN_Z+50:-195,Math.min(view==='world'?ORIGIN_Z+WORLD_DEPTH-50:195,focus.z))}drag.lastX=e.clientX;drag.lastY=e.clientY};
