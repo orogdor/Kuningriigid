@@ -19,6 +19,7 @@
 ## Täiendavad V61 parandused
 - Müürile määratud sõdurite 3D-asend on parandatud: sõdurid seisavad müüri peal, mitte selle sees või maapinnal; sõdurite paigutus joondub müüri suunaga.
 - Müüride navigatsioonitõke katab nüüd kogu 7-ühikulise müürilõigu ja pöördub 90° koos müüriga. Vana salvestuse olemasolevad müürid saavad õiged kokkupõrkemõõtmed automaatselt.
+- Vahitorn tulistab ainult siis, kui tal on **üks täielikult määratud töötaja**. Kui töötaja tööjõumenüüst eemaldatakse või määratakse mujale, lõpetab torn tulistamise ka käimasolevas lahingus.
 - Ehitustest kontrollib lisaks menüülukule ka päris ressursikulu ja ehitusjärjekorda pärast vajaliku metsamaja valmimist.
 
 ## Ühilduvus ja testid
