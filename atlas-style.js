@@ -2,6 +2,7 @@ import * as T from './vendor/three.module.js';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
 import {createAtlasBiomeDetail} from './atlas-biomes-v47.js';
+import {pointsOfRiver,rockSites,roadCurve} from './landscape-shared.js?v=65';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
 const palette={
  sea:'#173f58',deepSea:'#102d4e',shallow:'#64aba7',beach:'#dfcea0',coastGrass:'#b7c28b',
@@ -57,13 +58,10 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
   for(let j=0;j<rings.length-1;j++)for(let i=0;i<n;i++){const a=j*n+i,b=j*n+(i+1)%n,c=(j+1)*n+i,d=(j+1)*n+(i+1)%n;indices.push(a,c,b,b,c,d)}
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(verts,3));g.setIndex(indices);g.computeVertexNormals();return g;
  }
- const peaks=[];for(const cell of game.cells.filter(c=>c.mountain)){
-  const count=game.noise(cell.c*11,cell.r+308)>.58?2:1;
-  for(let i=0;i<count;i++){const x=cell.x+(game.noise(cell.c*11+i,cell.r+308)-.5)*33,z=cell.z+(game.noise(cell.c*19+i,cell.r+408)-.5)*33,h=game.atlasHeight(x,z);if(h>18)peaks.push({x,z,h,size:6+(Math.min(48,h)-15)*.38+game.noise(cell.c+i,cell.r+907)*5})}
- }
- const mountains=new T.InstancedMesh(cragGeometry(),material('#777b76'),peaks.length),snowPeaks=peaks.filter(a=>a.h>29),caps=new T.InstancedMesh(cragGeometry(true),material('#dce3df'),snowPeaks.length),dummy=new T.Object3D();
- peaks.forEach((a,i)=>{dummy.position.set(a.x,a.h+.25,a.z);dummy.scale.set(a.size*1.35,a.size*1.75,a.size*1.25);dummy.rotation.set(0,game.noise(i,80)*6,0);dummy.updateMatrix();mountains.setMatrixAt(i,dummy.matrix);mountains.setColorAt(i,new T.Color(i%3?'#8b918c':'#767e7b'))});
- snowPeaks.forEach((a,i)=>{dummy.position.set(a.x,a.h+.25,a.z);dummy.scale.set(a.size*1.35,a.size*1.75,a.size*1.25);dummy.rotation.set(0,game.noise(peaks.indexOf(a),80)*6,0);dummy.updateMatrix();caps.setMatrixAt(i,dummy.matrix)});
+ const peaks=game.cells.filter(c=>c.mountain).flatMap(c=>rockSites(game,c));
+  const mountains=new T.InstancedMesh(cragGeometry(),material('#777b76'),peaks.length),snowPeaks=peaks.filter(a=>a.h>29),caps=new T.InstancedMesh(cragGeometry(true),material('#dce3df'),snowPeaks.length),dummy=new T.Object3D();
+ peaks.forEach((a,i)=>{dummy.position.set(a.x,a.h+.25,a.z);dummy.scale.set(a.size*1.35,a.size*1.75,a.size*1.25);dummy.rotation.set(0,a.angle,0);dummy.updateMatrix();mountains.setMatrixAt(i,dummy.matrix);mountains.setColorAt(i,new T.Color(i%3?'#8b918c':'#767e7b'))});
+ snowPeaks.forEach((a,i)=>{dummy.position.set(a.x,a.h+.25,a.z);dummy.scale.set(a.size*1.35,a.size*1.75,a.size*1.25);dummy.rotation.set(0,a.angle,0);dummy.updateMatrix();caps.setMatrixAt(i,dummy.matrix)});
  group.add(mountains,caps);
  // Civ-style world variety: fields, forests, jungles, tundra woods, deserts and mesas.
  const fields=game.cells.filter(c=>c.deposits.grain),
@@ -74,24 +72,26 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  rocks.forEach((a,i)=>{dummy.position.set(a.x-10,height(a.x-10,a.z)+2,a.z);dummy.rotation.set(0,i*1.4,0);dummy.scale.set(3.5,2.4,3);dummy.updateMatrix();stones.setMatrixAt(i,dummy.matrix)});
  group.add(plots,stones);
  const nature=createAtlasBiomeDetail(game,group,quality);
- const rivers=new T.Group();group.add(rivers);const riverPts=[],bankPts=[],ribbon=[];
- for(const cell of game.cells.filter(c=>c.river)){
-  const y=height(cell.x,cell.z)+.58,w=cell.bridge?7:(cell.ford?5.5:4.2);
-  if(cell.riverTo){const target=game.cell(cell.riverTo),dx=target.x-cell.x,dz=target.z-cell.z,len=Math.hypot(dx,dz)||1,nx=-dz/len,nz=dx/len,wide=cell.riverWidth||3;
-   for(let i=0;i<5;i++){const t=i/4,x=cell.x+dx*t,z=cell.z+dz*t;const a=[x+nx*wide,height(x+nx*wide,z+nz*wide)+.68,z+nz*wide],b=[x-nx*wide,height(x-nx*wide,z-nz*wide)+.68,z-nz*wide];
-    if(i){const prev=ribbon._previous,aa=prev[0],bb=prev[1];ribbon.push(...aa,...bb,...a,...a,...bb,...b)}ribbon._previous=[a,b];
-    if(i){const prev=riverPts._previous;bankPts.push(...prev[0],...a,...prev[1],...b)}riverPts._previous=[a,b];
-   }
-   delete ribbon._previous;delete riverPts._previous;
-  }else if(cell.riverDir==='v')riverPts.push(cell.x-w,y,cell.z,cell.x+w,y,cell.z);
-  else if(cell.riverDir==='h')riverPts.push(cell.x,y,cell.z-w,cell.x,y,cell.z+w);
-  else if(cell.riverDir==='d1')riverPts.push(cell.x-w*.75,y,cell.z-w*.75,cell.x+w*.75,y,cell.z+w*.75);
-  else riverPts.push(cell.x-w*.75,y,cell.z+w*.75,cell.x+w*.75,y,cell.z-w*.75);
-  if(cell.ford||cell.bridge){const deck=new T.Mesh(new T.PlaneGeometry(10,cell.bridge?18:12),new T.MeshBasicMaterial({color:cell.bridge?'#a88663':'#cab684',transparent:true,opacity:cell.bridge?.78:.45,side:T.DoubleSide,depthWrite:false}));deck.rotation.x=-Math.PI/2;deck.position.set(cell.x,y+.12,cell.z);if(cell.riverDir==='v')deck.rotation.z=Math.PI/2; else if(cell.riverDir==='d1')deck.rotation.z=Math.PI/4; else if(cell.riverDir==='d2')deck.rotation.z=-Math.PI/4;rivers.add(deck)}
+ // Shared V65 meandering waterways, identical centerline on every detail tile.
+ const rivers=new T.Group();group.add(rivers);const ribbon=[],bankPts=[];
+ for(const cell of game.cells){
+  if(!cell.river||!cell.riverTo)continue;
+  const points=pointsOfRiver(game,cell,10);
+  for(let i=1;i<points.length;i++){
+   const p=points[i-1],q=points[i],dx=q.x-p.x,dz=q.z-p.z,len=Math.hypot(dx,dz)||1,nx=-dz/len,nz=dx/len;
+   const edge=(v,k)=>{const x=v.x+nx*v.width*k,z=v.z+nz*v.width*k;return [x,height(x,z)+.83,z]};
+   const l=edge(p,1),r=edge(p,-1),ll=edge(q,1),rr=edge(q,-1);
+   ribbon.push(...l,...r,...ll,...ll,...r,...rr);
+   bankPts.push(...l,...ll,...r,...rr);
+  }
+  if(cell.bridge||cell.ford){
+   const p=points[0],q=points[1]||p;
+   const deck=new T.Mesh(new T.PlaneGeometry(cell.bridge?15:8,cell.bridge?15:10),new T.MeshBasicMaterial({color:cell.bridge?'#ac8760':'#ccbb99',transparent:true,opacity:cell.bridge?.88:.54,side:T.DoubleSide,depthWrite:false}));
+   deck.rotation.x=-Math.PI/2;deck.rotation.z=Math.atan2(q.z-p.z,q.x-p.x);deck.position.set(p.x,height(p.x,p.z)+.93,p.z);rivers.add(deck);
+  }
  }
- if(ribbon.length)rivers.add(new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(ribbon,3)),new T.MeshBasicMaterial({color:'#559abd',transparent:true,opacity:.94,depthWrite:false,side:T.DoubleSide})));
- if(bankPts.length)rivers.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(bankPts,3)),new T.LineBasicMaterial({color:'#b0dee1',transparent:true,opacity:.7})));
- if(riverPts.length)rivers.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(riverPts,3)),new T.LineBasicMaterial({color:'#81c4d8',transparent:true,opacity:.8})));
+ if(ribbon.length)rivers.add(new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(ribbon,3)),new T.MeshBasicMaterial({color:'#518eab',transparent:true,opacity:.96,depthWrite:false,side:T.DoubleSide})));
+ if(bankPts.length)rivers.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(bankPts,3)),new T.LineBasicMaterial({color:'#a3d5c3',transparent:true,opacity:.7})));
  // Real-world traffic generates the atlas road network (no roads appear just because a route was planned).
  const roadGroup=new T.Group();group.add(roadGroup);let roadStamp='';
  function roads(state){
@@ -117,9 +117,8 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
    const main=[],verge=[],ruts=[[],[]];
    for(let k=0;k<=12;k++){
     const t=k/12,x=aa.x+dx*t,z=aa.z+dz*t;
-    const bend=Math.sin(t*Math.PI)*game.noise(a.c*7+b.c,a.r*7+b.r)*2;
-    const X=x+nx*bend,Z=z+nz*bend;
-    const spot=(offset,y)=>{const px=X+nx*offset,pz=Z+nz*offset;return [px,game.atlasHeight(px,pz)+y,pz]};
+    const curved=roadCurve(game,a,b,12)[k],X=curved.x,Z=curved.z;
+     const spot=(offset,y)=>{const px=X+nx*offset,pz=Z+nz*offset;return [px,game.atlasHeight(px,pz)+y,pz]};
     main.push([spot(-width*.5,2.3),spot(width*.5,2.3)]);
     verge.push([spot(-width*.67,2.06),spot(width*.67,2.06)]);
     if(level>=2)for(let i=0;i<2;i++)ruts[i].push(spot((i?1:-1)*width*.24,2.48));
