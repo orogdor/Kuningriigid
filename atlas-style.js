@@ -3,7 +3,7 @@ import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
 import {createAtlasBiomeDetail} from './atlas-biomes-v47.js';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=67d';
-import {surface} from './continuous-landscape.js?v=67';
+import {surface,riverNear} from './continuous-landscape.js?v=68';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
 const palette={
  sea:'#173f58',deepSea:'#102d4e',shallow:'#64aba7',beach:'#dfcea0',coastGrass:'#b7c28b',
@@ -43,13 +43,15 @@ function biomeBaseColor(game,cell,h,x,z){
 export function atlasColor(game,x,z,h){
  const c=Math.min(COLS-1,Math.max(0,Math.floor((x-ORIGIN_X)/50))),r=Math.min(ROWS-1,Math.max(0,Math.floor((z-ORIGIN_Z)/50))),cell=game.cells[r*COLS+c];
  let color=biomeBaseColor(game,cell,h,x,z);
- if(cell?.river)color.lerp(new T.Color(cell.bridge?'#88b5ba':palette.river),cell.bridge?.18:.34);
+ // Water is drawn by the real 3D channel. Do not paint the entire 50 m
+ // river tile blue; it made square-ended ribbons and polygon patches.
+ if(cell?.river){const near=riverNear(game,x,z);if(near.distance<near.width*1.6)color.lerp(new T.Color('#728e74'),.10)}
  color.multiplyScalar(.92+game.smooth(x/17+20,z/17+30)*.14);
  return color;
 }
 export function createAtlasDecor(game,scene,quality='medium'){const group=new T.Group();scene.add(group);const height=(x,z)=>Math.max(.7,surface(game,x,z,'world'));const material=c=>new T.MeshStandardMaterial({color:c,roughness:1});
  // One ocean mesh uses depth-dependent color, showing shelves and deep water.
- const geo=new T.PlaneGeometry(WORLD_WIDTH+200,WORLD_DEPTH+200,COLS*2,ROWS*2);geo.rotateX(-Math.PI/2);geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=game.atlasHeight(x,z),t=Math.max(0,Math.min(1,(-h+.8)/26)),shore=Math.pow(1-t,3),c=new T.Color('#5fa8aa').lerp(new T.Color('#102d4e'),Math.pow(t,.7));c.lerp(new T.Color('#9ac6b5'),shore*.33);c.multiplyScalar(.94+game.smooth(x/130+80,z/130+56)*.10);colors.push(c.r,c.g,c.b)}geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));const water=new T.Mesh(geo,new T.MeshStandardMaterial({vertexColors:true,roughness:.42,metalness:.18}));water.position.y=.72;water.userData.water=true;group.add(water);group.userData.water=water;
+ const geo=new T.PlaneGeometry(WORLD_WIDTH+200,WORLD_DEPTH+200,COLS*2,ROWS*2);geo.rotateX(-Math.PI/2);geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=game.atlasHeight(x,z),t=Math.max(0,Math.min(1,(-h+.8)/26)),shore=Math.pow(1-t,3),c=new T.Color('#5fa8aa').lerp(new T.Color('#102d4e'),Math.pow(t,.7));c.lerp(new T.Color('#9ac6b5'),shore*.33);c.multiplyScalar(.94+game.smooth(x/130+80,z/130+56)*.10);colors.push(c.r,c.g,c.b)}geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));const water=new T.Mesh(geo,new T.MeshStandardMaterial({vertexColors:true,roughness:.42,metalness:.18,transparent:true,opacity:.84,depthWrite:false}));water.position.y=.72;water.userData.water=true;group.add(water);group.userData.water=water;
  const shore=[];for(let z=ORIGIN_Z;z<ORIGIN_Z+WORLD_DEPTH;z+=10)for(let x=ORIGIN_X;x<ORIGIN_X+WORLD_WIDTH;x+=10){const points=[[x,z],[x+10,z],[x+10,z+10],[x,z+10]],hits=[];for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],ha=game.atlasHeight(...a)-.8,hb=game.atlasHeight(...b)-.8;if((ha>0)!==(hb>0)){const t=ha/(ha-hb);hits.push([a[0]+(b[0]-a[0])*t,1.04,a[1]+(b[1]-a[1])*t])}}if(hits.length===2)shore.push(...hits[0],...hits[1])}group.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(shore,3)),new T.LineBasicMaterial({color:'#dbeddf',transparent:true,opacity:.35})));
  // Sparse ocean strokes give water scale without animated shader cost.
  const waves=[];for(const cell of game.cells)if(!cell.land&&!cell.coast&&game.noise(cell.c,cell.r+77)>.88){const x=cell.x,z=cell.z;for(let i=0;i<5;i++){const a=x-14+i*6,b=a+6;waves.push(a,.84,z+Math.sin(i*.9)*2,b,.84,z+Math.sin((i+1)*.9)*2)}}const waveLines=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(waves,3)),new T.LineBasicMaterial({color:'#91c1bd',transparent:true,opacity:.11}));group.add(waveLines);group.userData.waveLines=waveLines;
