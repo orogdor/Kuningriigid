@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import * as T from './vendor/three.module.js';
 import {Civilization,createGame} from './civilization-core.js';
-import {roadKey,roadLevel,roadStrength} from './roads.js';
+import {roadKey,roadLevel,roadStrength,recordWorldStep} from './roads.js?v=59';
 import {createAtlasDecor} from './atlas-style.js';
 
 for(const seed of [17,12345,777,45678,20261018]){
@@ -12,7 +12,9 @@ for(const seed of [17,12345,777,45678,20261018]){
  scout.path=[adjacent];game.tick(3.2);
  const key=roadKey(first,adjacent);
  assert(game.s.worldRoads[key],'Completed traversal must create road');
- assert(roadLevel(roadStrength(game.s,first,adjacent))>=1,'One traversal must produce visible level-1 footpath');
+ assert.equal(roadLevel(roadStrength(game.s,first,adjacent)),0,'One traversal must remain an invisible trace');
+ for(let i=0;i<3;i++)recordWorldStep(game.s,first,adjacent,'army',game.s.time);
+ assert(roadLevel(roadStrength(game.s,first,adjacent))>=1,'Repeated traffic must produce a visible footpath');
  assert(game.seen(0,first)&&game.seen(0,adjacent),'Road must be revealed for own scout');
  const scene=new T.Scene(),decor=createAtlasDecor(game,scene,'low');decor.roads(game.s);
  const roadMeshes=decor.group.children.flatMap(g=>g.children).filter(m=>m.isMesh&&!m.isInstancedMesh&&m.geometry?.attributes?.color?.count&&m.geometry.attributes.position.count<=1200);
