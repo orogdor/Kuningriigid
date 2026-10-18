@@ -88,8 +88,8 @@ export function selectAIBuild(game,team,city){
  if((Object.entries(eraCost).some(([k,n])=>k!=='bread'&&game.storageCap(city,k)<n)||materialCap<120&&age>=1)&&age>=1)add('warehouse',missing?134:108,'Materjalilao piirang');
  // When not bottlenecked, follow a coherent development plan.
  if(!missing){
-  const development=['house','barracks','archery','claypit','pottery_kiln','pasture','mason',
-   ...(age>=1?['cartwright','coppermine','tinmine','bronze_foundry','road_depot','saw','warehouse','cellar','market','scriptorium','forester','mill','bakery','harbor']:[]),
+  const development=['house','barracks','archery','watchtower','palisade','claypit','pottery_kiln','pasture','mason',
+   ...(age>=1?['stonetower','stonewall','cartwright','coppermine','tinmine','bronze_foundry','road_depot','saw','warehouse','cellar','market','scriptorium','forester','mill','bakery','harbor']:[]),
    ...(age>=2?['mine','coal','smelter','smith','academy','stable']:[]),
    ...(age>=3?['university']:[]),
    ...(age>=4?['printer','observatory','nitrate','powdermill']:[]),
