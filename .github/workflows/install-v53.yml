@@ -32,7 +32,20 @@ jobs:
           node TEST_V53.mjs
           node TEST_V51.mjs
           node TEST_V48.mjs
-          node TEST_V50.mjs
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import * as T from './vendor/three.module.js';
+          import {createSoldier,animateSoldier} from './visuals.js';
+          import {characterQuadCount} from './model-runtime-v50.js';
+          for(const age of ['stone','bronze','iron','medieval','renaissance','industrial','modern']){
+            const name=age+'_builder';
+            assert(characterQuadCount(name)>300 && characterQuadCount(name)<=1000,name);
+            const model=createSoldier(new T.Group(),0,0,'#ab9976',name);
+            assert.equal(model.userData.rig.archetype,name);
+            animateSoldier(model,1,true,{phase:-1,action:'build'});
+          }
+          console.log('V50 builder meshes and animations PASS');
+          NODE
       - name: Avalda kinnitatud failid
         run: |
           git config user.name "github-actions[bot]"
