@@ -1,0 +1,41 @@
+// V57: GPU-efficient deployment of five low-poly World Atlas GLB props.
+// Uses real GLB geometry. Does not claim 3-view Mudelitehas 0.1.2 certification.
+import * as T from './vendor/three.module.js';
+import {loadWorldGLB} from './scripts/glb_lite.js';
+const ROOT='./assets/world1000/';
+const FILES={village:'world_village_1000',ruins:'ancient_ruin_1000',rock:'rock_outcrop_1000',bridge:'river_bridge_1000',forest:'forest_cluster_1000'};
+export function createWorldAtlasProps(game,scene,quality='medium'){
+ const group=new T.Group();scene.add(group);
+ const templates=new Map(),instanced=[],dummy=new T.Object3D(),obj=new T.Object3D();
+ let ready=false,lastRevision=null;
+ const candidates={
+  rock:game.cells.filter(c=>c.mountain&&game.noise(c.c*11+5,c.r*7+25)>.972).slice(0,260),
+  forest:game.cells.filter(c=>c.land&&!c.mountain&&c.biome==='forest'&&game.noise(c.c*17+15,c.r*13+24)>.964).slice(0,220),
+  bridge:game.cells.filter(c=>c.land&&(c.bridge||c.ford)&&c.river).slice(0,120)
+ };
+ const multipliers={rock:1.65,forest:1.55,bridge:1.35};
+ function materialize(){
+  for(const kind of ['rock','forest','bridge']){
+   const template=templates.get(kind),sites=candidates[kind];if(!template||!sites?.length)continue;
+   for(const src of template.children){if(!src.isMesh)continue;
+    const mesh=new T.InstancedMesh(src.geometry,src.material,sites.length);
+    mesh.name='atlas1000_'+kind+'_'+src.name;mesh.frustumCulled=false;mesh.userData.worldProp=kind;group.add(mesh);
+    instanced.push({kind,mesh,sites});
+   }
+  }
+ }
+ function update(force=false){if(!ready)return;const rev=game.s.visionRevision||0;if(!force&&rev===lastRevision)return;lastRevision=rev;
+  for(const {kind,mesh,sites} of instanced){sites.forEach((cell,i)=>{
+   const visible=game.seen(0,cell);obj.position.set(cell.x,game.atlasHeight(cell.x,cell.z)+.45,cell.z);
+   const size=visible?multipliers[kind]:0;
+   obj.scale.setScalar(size);
+   const angle=kind==='bridge'?(cell.riverTo?Math.atan2(cell.riverTo.r-cell.r,cell.riverTo.c-cell.c):(cell.riverDir==='h'?Math.PI/2:0)):game.noise(cell.c,cell.r+16)*Math.PI*2;
+   obj.rotation.set(0,angle,0);obj.updateMatrix();mesh.setMatrixAt(i,obj.matrix);
+  });mesh.instanceMatrix.needsUpdate=true;}
+ }
+ function landmark(kind){const src=templates.get(kind);if(!src)return null;const copy=src.clone(true);copy.scale.setScalar(kind==='village'?2.15:2.05);copy.name='World Atlas 1000 '+kind;return copy}
+ const initialized=Promise.allSettled(Object.entries(FILES).map(async ([kind,name])=>{
+  const m=await loadWorldGLB(ROOT+name+'.glb');templates.set(kind,m);return kind;
+ })).then(results=>{const errors=results.filter(r=>r.status==='rejected');if(errors.length)console.warn('World Atlas 1000 GLB load incomplete:',errors.map(r=>r.reason));materialize();ready=true;update(true);return errors.length===0;});
+ return {group,get ready(){return ready},initialized,landmark,update,counts:Object.fromEntries(Object.entries(candidates).map(([k,v])=>[k,v.length]))};
+}
