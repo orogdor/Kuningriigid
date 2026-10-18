@@ -23,12 +23,12 @@ export function suggestGoods(game,from,to,inbound=[],maxLoad=40){
   if(room<=0)break;
   const requested=k==='bread'?need.bread-food(dst)-inboundFood:need[k]-(dst[k]||0)-(incoming[k]||0);
   if(requested<=0)continue;
-  const sourceMin=k==='bread'?Math.max(keep.bread,from.economy.realms[from.team].pop*2.6):keep[k];
+  const sourceMin=k==='bread'?Math.max(keep.bread,(from.economy.realms[from.team].pop||3)*2.6):keep[k];
   const surplus=(src[k]||0)-sourceMin;
   let free=Math.max(0,game.storageCap(to,k)-game.storageUsed(to,k,dst)-(incoming[k]||0));
   if(FOOD_KEYS.has(k))free=Math.min(free,foodRoom);
   const quantity=Math.floor(Math.max(0,Math.min(requested,surplus,free,room,26)));
-  if(quantity<2)continue;
+  if(!Number.isFinite(quantity)||quantity<2)continue;
   goods[k]=quantity;room-=quantity;
   if(FOOD_KEYS.has(k))foodRoom-=quantity;
  }
