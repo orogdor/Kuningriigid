@@ -10,6 +10,7 @@ export function configureWallFootprint(b){
  b.navDepth=b.wallAxis?3.6:1.1;
  return b;
 }
+export const towerManned=b=>TOWER_TYPES.has(b?.type)&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>=.99;
 export const wallCapacity=type=>type==='stonewall'?3:type==='palisade'?2:0;
 export const wallHeight=type=>type==='stonewall'?3.8:type==='palisade'?3.1:0;
 export function wallGuards(state,ctx,building){
@@ -57,8 +58,8 @@ export function fortifyBattle(game,city,battle){
  battle.fortress.hp+=(barrier+towerArmor);
  battle.fortress.maxHp+=(barrier+towerArmor);
  battle.fortress.defenseBonus=barrier+towerArmor;
- battle.defensePosts=towers.filter(b=>(b.assigned||0)>.05).map(b=>({
-  x:b.x,z:b.z,team:city.team,damage:b.type==='stonetower'?12:8,range:b.type==='stonetower'?31:25,cool:0
+ battle.defensePosts=towers.filter(towerManned).map(b=>({
+  x:b.x,z:b.z,team:city.team,buildingIndex:city.economy.buildings.indexOf(b),active:true,damage:b.type==='stonetower'?12:8,range:b.type==='stonetower'?31:25,cool:0
  }));
  for(const wall of walls){
   for(const {unit,source} of wallGuards(game.s,city,wall)){
