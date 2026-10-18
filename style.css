@@ -88,3 +88,10 @@ header{backdrop-filter:blur(10px);box-shadow:0 8px 26px #0005}
 /* V63 language selection stays available during play and on the start screen. */
 .game-language{display:flex;align-items:center;gap:5px;flex:0 0 auto;color:#d9c997;font:12px Inter,Arial,sans-serif;white-space:nowrap}.game-language select{width:93px;background:#203b31;color:#f5eedb;border:1px solid #a4a884aa;border-radius:6px;padding:8px 5px;font:11px Inter,Arial,sans-serif;cursor:pointer}#menulanguage{min-height:42px}
 @media(max-width:760px){header .game-language{order:0;font-size:11px}header .game-language select{width:78px;padding:6px 3px;font-size:10px}header .brand{letter-spacing:.7px}header{row-gap:4px}}
+
+/* V65 atlas resource layer: tapped overlay is legible on mobile and desktop. */
+#resourceoverlay[aria-pressed="true"]{background:#365949;border-color:#d3c28d;color:#fff0cd}
+#tileresources{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 12px;padding:8px 0;border-top:1px solid #8ea89e55;border-bottom:1px solid #8ea89e55}
+#tileresources strong{width:100%;font-size:11px;color:#d6c89d}
+#tileresources .tile-resource{font-size:10px;padding:4px 7px;background:#24463c;border:1px solid #8ea89e66;border-radius:5px;white-space:nowrap}
+@media(max-width:760px){#tileresources .tile-resource{font-size:9px;padding:3px 5px}}
