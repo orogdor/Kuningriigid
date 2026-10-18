@@ -1,4 +1,5 @@
 import {ERA_TECHS,ERA_MATERIALS,ageDeficit,payEraCost} from './era-economy.js';
+import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-v62.js';
 import {researchCost,scienceRate,discoveryUnlocked,EUREKAS,EUREKA_FRACTION} from './science.js';
 import {tempoMultiplier} from './tempo.js';
 export const TURN_SECONDS=60;
@@ -72,10 +73,13 @@ Object.assign(TECHS,{
  fortifications:{name:'Kaitserajatised',age:0,turns:3,requires:['stone_tools','warfare'],unlocks:'Puidust kaitsemüür ja vahitorn (üks töötaja)'},
  stone_fortifications:{name:'Kivist kindlustused',age:1,turns:4,requires:['bronze','fortifications','masonry'],unlocks:'Kivimüür ning kivist kaitsetorn'}
 });
+Object.assign(TECHS,MEDIEVAL_TECHS);
 export const ERA_NAMES=['Kiviaeg','Pronksiaeg','Rauaaeg','Keskaeg','Renessanss','Tööstusajastu','Moodne ajastu'];
 
 export const BUILD_TECH={palisade:'fortifications',watchtower:'fortifications',stonewall:'stone_fortifications',stonetower:'stone_fortifications',claypit:'pottery',pottery_kiln:'pottery',pasture:'animal_husbandry',mason:'masonry',cartwright:'wheel',coppermine:'copper_tin',tinmine:'copper_tin',bronze_foundry:'copper_tin',road_depot:'road_construction',study:'learning',printer:'printing',observatory:'astronomy',nitrate:'gunpowder',powdermill:'gunpowder',steelworks:'steelmaking',engineworks:'steam_engine',polytechnic:'industrial_education',railstation:'railways',oilwell:'oil_drilling',refinery:'petroleum',powerplant:'electricity',autofactory:'combustion',laboratory:'modern_science',airfield:'aviation',scriptorium:'writing',academy:'philosophy',university:'scholasticism',warehouse:'storage',cellar:'cellaring',market:'commerce',harbor:'shipbuilding',bridge:'bridges',quarry:'stone_tools',hunter:'hunting',fisher:'fishing',barracks:'warfare',forester:'forestry',farm:'agriculture',saw:'woodworking',mill:'milling',bakery:'milling',archery:'archery',mine:'iron',coal:'iron',smelter:'smelting',smith:'smithing',stable:'horsemanship'};
 export const UNIT_TECH={musketeer:'gunpowder',rifleman:'rifles',motorized:'combustion',slinger:'warfare',spearman:'warfare',axeman:'warfare',archer:'archery',infantry:'smithing',cavalry:'horsemanship'};
+Object.assign(BUILD_TECH,MEDIEVAL_BUILD_TECH);
+Object.assign(UNIT_TECH,MEDIEVAL_UNIT_TECH);
 export const newResearch=()=>({known:[],active:null,progress:{},completed:[],queue:[],paused:false,boosted:[],rate:0});
 export function techBlock(research,id){const tech=TECHS[id];if(!tech)return 'Tundmatu tehnoloogia.';if(research.known.includes(id))return 'Juba uuritud.';const missing=tech.requires.filter(t=>!research.known.includes(t));if(missing.length)return 'Eeldab: '+missing.map(t=>TECHS[t].name).join(', ');if(tech.oneOf&&!tech.oneOf.some(t=>research.known.includes(t)))return 'Eeldab üht: '+tech.oneOf.map(t=>TECHS[t].name).join(' või ');return ''}
 export function grantTech(research,id){if(!TECHS[id]||research.known.includes(id))return;for(const parent of TECHS[id].requires)grantTech(research,parent);if(TECHS[id].oneOf&&!TECHS[id].oneOf.some(t=>research.known.includes(t)))grantTech(research,TECHS[id].oneOf[0]);research.known.push(id)}
