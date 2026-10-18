@@ -93,6 +93,8 @@ function visit(node){
  }
 }
 function renderAll(){
+ // Snapshot original Estonian paragraphs before the first English DOM pass.
+ saveOriginalHTML();
  if(document.body)visit(document.body);
  updateSpecialCopy();
  document.documentElement.lang=language;
