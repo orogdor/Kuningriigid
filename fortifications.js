@@ -1,20 +1,21 @@
 // V62: medieval walls, castles and independent siege sections.
 import {attachSiegeSections} from './medieval-v62.js';
 // V61: One civilian worker mans each tower; wall soldiers come only from real units.
-export const WALL_TYPES=new Set(['palisade','stonewall','reinforced_wall']);
+export const WALL_TYPES=new Set(['palisade','stonewall','reinforced_wall','keep']);
 export const TOWER_TYPES=new Set(['watchtower','stonetower']);
 // Real collision footprint follows the selected segment orientation.
 // A 7-unit wall otherwise leaves navigation holes at its ends.
 export function configureWallFootprint(b){
  if(!WALL_TYPES.has(b?.type))return b;
+ if(b.type==='keep'){b.navWidth=3.3;b.navDepth=3.3;return b;}
  b.wallAxis=b.wallAxis?1:0;
  b.navWidth=b.wallAxis?1.1:3.6;
  b.navDepth=b.wallAxis?3.6:1.1;
  return b;
 }
 export const towerManned=b=>TOWER_TYPES.has(b?.type)&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>=.99;
-export const wallCapacity=type=>type==='reinforced_wall'?4:type==='stonewall'?3:type==='palisade'?2:0;
-export const wallHeight=type=>type==='reinforced_wall'?4.35:type==='stonewall'?3.8:type==='palisade'?3.1:0;
+export const wallCapacity=type=>type==='keep'?6:type==='reinforced_wall'?4:type==='stonewall'?3:type==='palisade'?2:0;
+export const wallHeight=type=>type==='keep'?6.0:type==='reinforced_wall'?4.35:type==='stonewall'?3.8:type==='palisade'?3.1:0;
 export function wallGuards(state,ctx,building){
  return state.units.map((unit,source)=>({unit,source})).filter(({unit})=>
   unit.hp>0&&unit.team===ctx.team&&unit.garrison&&
