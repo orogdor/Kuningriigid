@@ -27,7 +27,20 @@ jobs:
       - name: Kontrolli JavaScripti ja 3D regressioone
         run: |
           for file in civilization.js civilization-core.js ai-strategy.js navigation.js v51-systems.js; do node --check "$file"; done
-          node TEST_V50.mjs
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import * as T from './vendor/three.module.js';
+          import {createSoldier,animateSoldier} from './visuals.js';
+          import {characterQuadCount} from './model-runtime-v50.js';
+          const archetypes=['villager','worker','builder','merchant','warrior','modern','scholar','stone_builder','bronze_builder','iron_builder','medieval_builder','renaissance_builder','industrial_builder','modern_builder'];
+          for(const variant of archetypes){
+            const quads=characterQuadCount(variant);
+            assert(quads>300&&quads<=1000,variant+' quads='+quads);
+            const model=createSoldier(new T.Group(),0,0,'#b0a078',variant);
+            animateSoldier(model,1.25,true,{phase:-1,action:'build'});
+          }
+          console.log('V50 regression: all 14 human archetypes present');
+          NODE
           V51_SEED=17 V51_STEPS=2400 node TEST_V51.mjs
           V51_SEED=78 V51_STEPS=1200 node TEST_V51.mjs
           V51_SEED=321 V51_STEPS=1200 node TEST_V51.mjs
