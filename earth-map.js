@@ -1,6 +1,6 @@
-import {WORLD_WIDTH,WORLD_DEPTH,ORIGIN_X,ORIGIN_Z} from './campaign.js';
+import {WORLD_WIDTH,WORLD_DEPTH,ORIGIN_X,ORIGIN_Z,COLS,ROWS} from './campaign.js';
 // Deliberately broad, hand-drawn silhouettes: Earth-inspired geography, seeded coasts.
-export const EARTH_STARTS=[{c:66,r:27},{c:87,r:31},{c:68,r:52},{c:104,r:38}];
+export const EARTH_STARTS=[{c:Math.round(COLS*.30),r:Math.round(ROWS*.23)},{c:Math.round(COLS*.40),r:Math.round(ROWS*.26)},{c:Math.round(COLS*.31),r:Math.round(ROWS*.43)},{c:Math.round(COLS*.47),r:Math.round(ROWS*.32)}];
 export const CONTINENTS=[
 [[.575,.36],[.605,.40],[.616,.46],[.594,.474],[.57,.41]],
 [[.07,.2],[.12,.14],[.23,.11],[.32,.16],[.35,.23],[.30,.33],[.31,.40],[.27,.43],[.25,.49],[.22,.46],[.18,.39],[.15,.31],[.1,.28]],

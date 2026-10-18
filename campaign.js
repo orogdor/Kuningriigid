@@ -1,5 +1,5 @@
 import {detailHeight} from './world-details.js';
-export const COLS=160,ROWS=120,TILE=50,ORIGIN_X=-650,ORIGIN_Z=-550,WORLD_WIDTH=COLS*TILE,WORLD_DEPTH=ROWS*TILE,WORLD_CENTER_X=ORIGIN_X+WORLD_WIDTH/2,WORLD_CENTER_Z=ORIGIN_Z+WORLD_DEPTH/2;
+export const COLS=220,ROWS=165,TILE=50,ORIGIN_X=-650,ORIGIN_Z=-550,WORLD_WIDTH=COLS*TILE,WORLD_DEPTH=ROWS*TILE,WORLD_CENTER_X=ORIGIN_X+WORLD_WIDTH/2,WORLD_CENTER_Z=ORIGIN_Z+WORLD_DEPTH/2;
 export function center(c,r){return {x:ORIGIN_X+(c+.5)*TILE,z:ORIGIN_Z+(r+.5)*TILE}}
 export function cellAt(x,z){const c=Math.floor((x-ORIGIN_X)/TILE),r=Math.floor((z-ORIGIN_Z)/TILE);return c>=0&&c<COLS&&r>=0&&r<ROWS?{c,r}:null}
 export function makeGrid(height,noise,preserveStarts=true){let cells=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=center(c,r);let h=height(p.x,p.z);if(preserveStarts&&((r===11&&c>=10&&c<=17)||(c===17&&r>=9&&r<=11)))h=Math.max(h,9);let biome=h<1?'sea':h>30?'hills':noise(c+40,r+60)>.55?'forest':'plains';cells.push({c,r,...p,h,biome,land:biome!=='sea',mountain:biome==='hills'})}return cells}

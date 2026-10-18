@@ -17,7 +17,7 @@ function visualBiome(cell){
  return cell.biome==='forest'?'forest':'grassland';
 }
 function biomeBaseColor(game,cell,h,x,z){
- const vb=visualBiome(cell), climate=cell.visualClimate||{}, north=game.s.geographyVersion?Math.abs((z-ORIGIN_Z)/WORLD_DEPTH-.5)*2:Math.abs(z)/550;
+ const vb=visualBiome(cell), climate=cell.visualClimate||{}, north=game.s.geographyVersion?Math.abs((z-ORIGIN_Z)/WORLD_DEPTH-.5)*2:Math.abs((z-ORIGIN_Z)/WORLD_DEPTH-.5)*2;
  let color=new T.Color(h<.7?palette.shallow:h<3.4?palette.beach:palette.grass);
  if(vb==='grassland')color.set(palette.grass);
  else if(vb==='coastal_grassland')color.set(palette.coastGrass);
@@ -39,7 +39,7 @@ function biomeBaseColor(game,cell,h,x,z){
  return color;
 }
 export function atlasColor(game,x,z,h){
- const c=Math.min(COLS-1,Math.max(0,Math.floor((x+650)/50))),r=Math.min(ROWS-1,Math.max(0,Math.floor((z+550)/50))),cell=game.cells[r*COLS+c];
+ const c=Math.min(COLS-1,Math.max(0,Math.floor((x-ORIGIN_X)/50))),r=Math.min(ROWS-1,Math.max(0,Math.floor((z-ORIGIN_Z)/50))),cell=game.cells[r*COLS+c];
  let color=biomeBaseColor(game,cell,h,x,z);
  if(cell?.river)color.lerp(new T.Color(cell.bridge?'#88b5ba':palette.river),cell.bridge?.18:.34);
  color.multiplyScalar(.92+game.smooth(x/17+20,z/17+30)*.14);
@@ -80,18 +80,46 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  function roads(state){
   const stamp=(state.roadRevision||0)+':'+(state.railRevision||0)+':'+(state.visionRevision||0);
   if(stamp===roadStamp)return;roadStamp=stamp;
-  for(const o of roadGroup.children){o.geometry?.dispose();o.material?.dispose();roadGroup.remove(o)}
-  const vertices=[],rgb=[],palette=['#000000','#ab997a','#c6b48a','#c7b08a','#a6b1ac'];
-  for(const[key,road]of Object.entries(state.worldRoads||{})){
-   const strength=roadStrength(state,...roadPoints(key),state.time),level=roadLevel(strength);
-   if(!level)continue;
-   const [a,b]=roadPoints(key);if(!game.seen(0,a)||!game.seen(0,b))continue;
+  for(const o of [...roadGroup.children]){o.geometry?.dispose();o.material?.dispose();roadGroup.remove(o)}
+  // Each traversed segment is drawn as a continuous terrain-conforming trail.
+  // A dark verge, colored track and twin wagon ruts develop with traffic.
+  const vertices=[],rgb=[],verges=[],vergeColors=[],rutLines=[];
+  const palette=['#000000','#b38c5c','#bfa37c','#c1b9a6','#a8aaa4'];
+  const edgePalette=['#000000','#736347','#82735b','#767568','#5c6569'];
+  const addQuad=(out,colors,a,b,c,d,col)=>{
+   for(const v of [a,b,c,c,b,d]){out.push(...v);colors.push(col.r,col.g,col.b)}
+  };
+  for(const key of Object.keys(state.worldRoads||{})){
+   const [a,b]=roadPoints(key),strength=roadStrength(state,a,b,state.time),level=roadLevel(strength);
+   if(!level||!game.seen(0,a)||!game.seen(0,b))continue;
+   if(a.c<0||a.c>=COLS||b.c<0||b.c>=COLS||a.r<0||a.r>=ROWS||b.r<0||b.r>=ROWS)continue;
    const aa=center(a.c,a.r),bb=center(b.c,b.r),dx=bb.x-aa.x,dz=bb.z-aa.z,d=Math.hypot(dx,dz);
-   if(!d)continue;const width=[0,2.2,3.6,5.1,7.0][level],nx=-dz/d*width*.5,nz=dx/d*width*.5;
-   const col=new T.Color(palette[level]),sides=[];
-   for(let k=0;k<=8;k++){const t=k/8,x=aa.x+dx*t,z=aa.z+dz*t,y=game.atlasHeight(x,z)+1.45;sides.push([[x+nx,y,z+nz],[x-nx,y,z-nz]])}
-   for(let k=0;k<8;k++)for(const v of [sides[k][0],sides[k][1],sides[k+1][0],sides[k+1][0],sides[k][1],sides[k+1][1]]){vertices.push(...v);rgb.push(col.r,col.g,col.b)}
+   if(!d)continue;
+   const width=[0,3.2,5.4,8.0,11.4][level],nx=-dz/d,nz=dx/d;
+   const fillCol=new T.Color(palette[level]),edgeCol=new T.Color(edgePalette[level]);
+   const main=[],verge=[],ruts=[[],[]];
+   for(let k=0;k<=12;k++){
+    const t=k/12,x=aa.x+dx*t,z=aa.z+dz*t;
+    const bend=Math.sin(t*Math.PI)*game.noise(a.c*7+b.c,a.r*7+b.r)*2;
+    const X=x+nx*bend,Z=z+nz*bend;
+    const spot=(offset,y)=>{const px=X+nx*offset,pz=Z+nz*offset;return [px,game.atlasHeight(px,pz)+y,pz]};
+    main.push([spot(-width*.5,1.52),spot(width*.5,1.52)]);
+    verge.push([spot(-width*.68,1.35),spot(width*.68,1.35)]);
+    if(level>=2)for(let i=0;i<2;i++)ruts[i].push(spot((i?1:-1)*width*.24,1.66));
+   }
+   for(let k=0;k<12;k++){
+    addQuad(verges,vergeColors,verge[k][0],verge[k][1],verge[k+1][0],verge[k+1][1],edgeCol);
+    addQuad(vertices,rgb,main[k][0],main[k][1],main[k+1][0],main[k+1][1],fillCol);
+   }
+   if(level>=2)for(const track of ruts)for(let k=0;k<track.length-1;k++)rutLines.push(...track[k],...track[k+1]);
   }
+  const emit=(coords,colors,opacity)=>{
+   if(!coords.length)return;
+   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(coords,3));geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));
+   const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({vertexColors:true,transparent:true,opacity,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));mesh.frustumCulled=false;roadGroup.add(mesh)
+  };
+  emit(verges,vergeColors,.85);emit(vertices,rgb,.99);
+  if(rutLines.length)roadGroup.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(rutLines,3)),new T.LineBasicMaterial({color:'#655f4e',transparent:true,opacity:.52,depthTest:true})));
   // Permanent rail sleepers are separate from traffic-eroded footpaths.
   const rails=[];
   for(const key of Object.keys(state.railEdges||{})){
@@ -108,7 +136,6 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
    }
   }
   if(rails.length){const railLine=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(rails,3)),new T.LineBasicMaterial({color:'#3f4c56'}));roadGroup.add(railLine)}
-  if(vertices.length){const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setAttribute('color',new T.Float32BufferAttribute(rgb,3));const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:.85,depthWrite:false,side:T.DoubleSide}));mesh.frustumCulled=false;roadGroup.add(mesh)}
  }
  const territories=new T.Group(),routes=new T.Group();group.add(territories,routes);let previous='',lastRoute='';
  function disposeGroup(g){for(const o of [...g.children]){o.geometry?.dispose();o.material?.dispose();g.remove(o)}}

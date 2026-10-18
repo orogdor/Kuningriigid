@@ -1,0 +1,54 @@
+import assert from 'node:assert/strict';
+import * as T from './vendor/three.module.js';
+import {COLS,ROWS,center} from './campaign.js';
+import {Civilization,createGame} from './civilization-core.js';
+import {TECHS,BUILD_TECH,techBlock} from './research.js';
+import {ROAD_THRESHOLDS,recordWorldStep,roadLevel,roadPoints,roadKey,roadStrength,roadBoost} from './roads.js';
+import {createAtlasDecor} from './atlas-style.js';
+
+assert.deepEqual([COLS,ROWS],[220,165]);
+assert.equal(BUILD_TECH.study,'learning');
+assert.equal(TECHS.learning.age,0);
+assert.equal(TECHS.learning.requires[0],'stone_tools');
+const fresh=new Civilization(createGame(20261018));
+assert(techBlock(fresh.s.research[0],'learning')); // not visible/researchable on turn one
+const region=new Civilization(createGame(17));
+for(let i=0;i<180;i++)region.tick(1);
+const city=region.s.cities.find(c=>c.team!==0);
+assert(city, 'AI founded a settlement');
+assert.equal(region.buildRule(city,'study')?.startsWith('Uuri: Õpetuse alused'),true,'Study must be locked without technology');
+region.s.research[city.team].known.push('stone_tools');
+assert.equal(techBlock(region.s.research[city.team],'learning'),'');
+region.s.research[city.team].known.push('learning');
+assert.notEqual(region.buildRule(city,'study'),'Uuri: Õpetuse alused');
+// A legacy V51 city with a study should retain it and learn the unlocking tech on reload.
+const legacy=JSON.parse(JSON.stringify(region.s));
+legacy.research[city.team].known=legacy.research[city.team].known.filter(t=>t!=='learning');
+legacy.cities.find(c=>c.id===city.id).economy.buildings.push({type:'study',x:12,z:12,ready:true,hp:200,team:city.team});
+new Civilization(legacy);assert(legacy.research[city.team].known.includes('learning'));
+// V51 road keys used width 160. A V53 game auto-converts old data to width 220.
+const migrated=createGame(31);
+delete migrated.roadKeyCols;
+const old=8*160+20,next=old+1;
+migrated.worldRoads={[old+':'+next]:{heat:19,last:0}};
+const game=new Civilization(migrated);
+const pa={c:20,r:8},pb={c:21,r:8};
+assert.equal(migrated.roadKeyCols,COLS);assert(migrated.worldRoads[roadKey(pa,pb)]);
+assert.deepEqual(roadPoints(roadKey(pa,pb)),[pa,pb]);
+assert.equal(Object.keys(migrated.worldRoads).length,1);
+const a={c:fresh.s.settlers[0].c,r:fresh.s.settlers[0].r},b={c:a.c+1,r:a.r};
+const s=fresh.s;s.worldRoads={};s.roadRevision=0;
+recordWorldStep(s,a,b,'settler',s.time);
+assert.equal(roadLevel(roadStrength(s,a,b)),1,'a single real crossing generates visible footpath');
+assert.equal(s.roadRevision,1);
+assert.equal(roadBoost(s,a,b,s.time),1.5);
+recordWorldStep(s,b,a,'caravan',s.time);assert.equal(roadLevel(roadStrength(s,a,b)),2);
+for(let i=0;i<15;i++)recordWorldStep(s,a,b,'caravan',s.time);
+assert(roadLevel(roadStrength(s,a,b))>=3);
+const scene=new T.Scene(),atlas=createAtlasDecor(fresh,scene,'low');
+for(const p of [a,b])fresh.reveal(0,p,2);
+atlas.roads(s);
+const roadMeshes=atlas.group.children.flatMap(g=>g.children).filter(x=>x.isMesh&&!x.isInstancedMesh&&x.geometry?.attributes?.color?.count&&x.geometry.attributes.position.count<=1200);
+assert(roadMeshes.length>=2,'visible road verges and surface created');
+assert(roadMeshes.every(m=>m.geometry.attributes.position.count>0));
+console.log(JSON.stringify({passed:true,world:[COLS,ROWS],learning:TECHS.learning.name,roadLevels:ROAD_THRESHOLDS,roadMeshes:roadMeshes.length,initialRoad:roadLevel(roadStrength(s,a,b)),migratedRoads:Object.keys(migrated.worldRoads).length}));
