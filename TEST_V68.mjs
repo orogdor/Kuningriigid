@@ -30,9 +30,9 @@ for(const seed of [17,42,12345]){
  const city={id:0,team:0,c:start.c,r:start.r,name:'Military Town',economy:econ,world:g.localWorld(start),hp:600,districts:{}};
  g.s.cities.push(city);g.prepareCity(city);g.s.research[0].known.push('stone_tools','warfare');
  // Explorer remains away from the city; no forced return to recruit.
- const expedition=g.s.armies[0],moved={...expedition};
+ const expedition=g.s.armies[0];
  expedition.c=Math.min(g.cols-1,city.c+4);expedition.r=city.r;expedition.path=[];
- assert.ok(expedition.c!==city.c);
+ assert.ok(expedition.c!==city.c);const fieldLocation={c:expedition.c,r:expedition.r};
  const a=g.recruit(city,'slinger');assert.ok(a.queued,'recruitment must not depend on field army location: '+a.error);
  a.queued.progress=a.queued.total;a.queued.efficiency=0;
  g.tickTraining(city,0);
@@ -46,7 +46,7 @@ for(const seed of [17,42,12345]){
  g.tickTraining(city,0);
  assert.equal(g.s.armies.filter(a=>a.team===0&&a.c===city.c&&a.r===city.r).length,1,'later trainees reuse detachment');
  assert.ok(g.s.units.some(u=>u.kind==='spearman'&&u.armyId===own[0].id));
- assert.equal(expedition.c,moved.c===city.c?city.c+4:expedition.c,'main field army remains away');
+ assert.deepEqual({c:expedition.c,r:expedition.r},fieldLocation,'main field army remains away and is not teleported');
  const oldSave=JSON.parse(JSON.stringify(g.s)),restore=new Civilization(oldSave);
  assert.equal(restore.s.armies.filter(a=>a.team===0&&a.c===city.c&&a.r===city.r).length,1,'local regiment survives save/load');
  console.log('V68 RECRUITS',seed,{field:[expedition.c,expedition.r],home:[own[0].c,own[0].r],homeId:own[0].id,queued:city.training.length});
