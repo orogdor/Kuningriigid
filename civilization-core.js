@@ -175,8 +175,8 @@ export class Civilization{
  makeWorld(cell){return {resources:cell.detail.resources.map(([kind,x,z],id)=>({id,kind:['tree','stone','ore','game','fish'][kind],x,z,amount:kind>=3?96:kind?420:32,removed:false})),heat:{},revision:0,foodResourcesVersion:1}}
  cityAt(p){return this.s.cities.find(c=>c.c===p.c&&c.r===p.r)}
 
- // Independent clocks let walkers and caravans take 2 s per road segment (1.5x)
- // instead of the ordinary 3 s per world tile. All land movers form roads by travel.
+ // Fractional travel clocks let units move smoothly from cell to cell.
+ // Crossings create invisible wear; repeated traffic creates visible roads.
  advanceWorldMovers(dt){
   const travel=(entity,kind)=>{
    if(entity.embarked!=null||!entity.path?.length)return;
@@ -184,6 +184,7 @@ export class Civilization{
    for(let guard=0;guard<6&&entity.path.length;guard++){
     const next=entity.path[0];if(!this.canTraverse(entity.team,next)){entity.path=[];entity.travelClock=0;break}
     const duration=kind==='train'?1:3/roadBoost(this.s,entity,next,this.s.time);
+    entity.travelDuration=duration;
     if(entity.travelClock+1e-7<duration)break;
     entity.travelClock=Math.max(0,entity.travelClock-duration);
     const from={c:entity.c,r:entity.r};Object.assign(entity,entity.path.shift());
@@ -191,7 +192,7 @@ export class Civilization{
     if(kind==='settler'||(kind==='army'&&armyUnits(this.s,entity).some(u=>u.kind==='scout'))){this.reveal(entity.team,entity,2);collectLandmark(this,entity.team,entity)}
     if(kind==='settler')entity.landed=false;
    }
-   if(!entity.path?.length)entity.travelClock=0;
+   if(!entity.path?.length){entity.travelClock=0;entity.travelDuration=0;}
   };
   for(const cargo of this.s.shipments){
    if(cargo.mode==='air'){
