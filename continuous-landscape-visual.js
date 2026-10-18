@@ -18,9 +18,9 @@ function join(pts,game,scope,tile,kind,level=1){
   const outer=width*(isRiver?1.68:1.23);
   const outerL={x:p.x+nx*outer,z:p.z+nz*outer},outerR={x:p.x-nx*outer,z:p.z-nz*outer};
   const waterHeight=baseHeight(game,p.x,p.z)-(1.6+Math.min(2,p.width*.13));
-  const innerY=isRiver?projectHeight(waterHeight,scope):elev(game,p.x,p.z,scope)+(scope==='world'?1.32:.33);
-  const edgeY=isRiver?innerY:elev(game,p.x,p.z,scope)+(scope==='world'?1.3:.32);
-  const bankY=(v)=>elev(game,v.x,v.z,scope)+(scope==='world'?.12:.05);
+  const innerY=isRiver?projectHeight(waterHeight,scope):elev(game,p.x,p.z,scope)+(scope==='world'?1.32:.396);
+  const edgeY=isRiver?innerY:elev(game,p.x,p.z,scope)+(scope==='world'?1.3:.39);
+  const bankY=(v)=>elev(game,v.x,v.z,scope)+(scope==='world'?.12:.036);
   out.push({
    l:{...field(game,left.x,left.z,scope,tile),y:edgeY},
    r:{...field(game,right.x,right.z,scope,tile),y:edgeY},
@@ -70,7 +70,7 @@ export function createRiverNetwork(game,scope='world',tile=null){
   for(let i=0;i<crossings.length;i++){
    const {c,points}=crossings[i],a=points[0],b=points[1],axis=Math.atan2(b.x-a.x,b.z-a.z);
    const p=field(game,a.x,a.z,scope,tile),scale=scope==='world'?1:2.8;
-   o.position.set(p.x,elev(game,a.x,a.z,scope)+(scope==='world'?1.45:.52),p.z);
+   o.position.set(p.x,elev(game,a.x,a.z,scope)+(scope==='world'?1.45:.435),p.z);
    o.rotation.set(0,axis,0);o.scale.set((c.bridge?14:9)*scale,scope==='world'?.7:.35,(c.bridge?6:5)*scale);
    o.updateMatrix();bridges.setMatrixAt(i,o.matrix);
   }
