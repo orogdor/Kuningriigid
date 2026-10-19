@@ -239,6 +239,10 @@ export function aiNavy(game,team){
    if(foe&&!ship.path.length)ship.path=seaPath(game,ship,foe)||[];
    continue;
   }
+  // Split oversized detachments rather than parking transport vessels
+  // forever when a faction's troop count exceeds ship capacity.
+  const oversized=activeArmies(game.s,team).find(a=>a.embarked==null&&armyUnits(game.s,a).length>SHIPS.transport.capacity);
+  if(oversized)game.splitArmy(oversized);
   const combat=activeArmies(game.s,team).filter(a=>a.embarked==null&&armyUnits(game.s,a).length>=2&&armyUnits(game.s,a).length<=SHIPS.transport.capacity)
     .sort((a,b)=>armyUnits(game.s,b).length-armyUnits(game.s,a).length)[0];
   const passenger=cargoArmy(game,ship);
