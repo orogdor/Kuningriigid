@@ -8,7 +8,7 @@ import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=65';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=69a';
 import {surface,localSurface,riverNear} from './continuous-landscape.js?v=69a';
-import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js';
+import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=72a';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js';
 import {housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT,BASIC_JOBS} from './labor.js';
@@ -23,7 +23,7 @@ import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=5
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=69a';
 import {createWorldAtlasProps} from './world-props.js?v=58';
 import * as T from './vendor/three.module.js';
-import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=68d';
+import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=72a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js';
 import {detailHeight,featureNames} from './world-details.js';
 import {createAgeBuilding,animateBuilding} from './buildings.js';
