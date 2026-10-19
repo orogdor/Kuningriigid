@@ -487,5 +487,5 @@ const science=this.s.research[team];if(!science.active&&this.s.cities.some(c=>c.
   options.sort((a,b)=>a.dist-b.dist);
   for(const pos of options.slice(0,12)){const path=this.landPath(army,pos,team);if(path?.length){army.path=path;break}}
  }
- if(army.embarked==null&&this.s.time>=this.s.aiPeaceUntil&&!this.s.battle&&!army.path.length&&armyUnits(this.s,army).length>=3){const target=this.s.cities.filter(c=>c.team!==team&&this.seen(team,c)).sort((a,b)=>Math.abs(a.c-army.c)+Math.abs(a.r-army.r)-Math.abs(b.c-army.c)-Math.abs(b.r-army.r))[0];if(target)army.path=this.landPath(army,target,team)||[]}}
+ if(army.embarked==null&&this.s.time>=this.s.aiPeaceUntil&&!this.s.battle&&!army.path.length&&armyUnits(this.s,army).length>=3){const target=[...this.s.cities,...this.s.settlers].filter(c=>c.team!==team&&this.seen(team,c)).sort((a,b)=>Math.abs(a.c-army.c)+Math.abs(a.r-army.r)-Math.abs(b.c-army.c)-Math.abs(b.r-army.r))[0];if(target)army.path=this.landPath(army,target,team)||[]}}
 }
