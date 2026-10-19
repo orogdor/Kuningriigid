@@ -483,8 +483,9 @@ $('hud-city').onclick=()=>{if(view==='world')$('opencity').click();if(view==='lo
 $('hud-army').onclick=()=>{if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){setCityTab('build');tab='army';renderUI();document.body.classList.add('hud-city-open')}else say('Sõjaväe värbamiseks raja esmalt linn.')};
 $('hud-build').onclick=()=>{if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){setCityTab('build');tab='build';renderUI();document.body.classList.add('hud-city-open')}else say('Ehitamiseks raja esmalt linn.')};$('opencity').onclick=()=>{const city=ownCity(),a=s.settlers.find(a=>a.team===0);if(city)openTile(game.cell(city));else if(a){chosen=game.cell(a);openTile(chosen)}};$('viewenemy').onclick=()=>{const c=s.cities.find(c=>c.team!==0&&game.visibleNow(0,c))||s.settlers.find(a=>a.team!==0&&game.visibleNow(0,a));if(c)openTile(game.cell(c));else say('Vastast pole veel avastatud. Saada avastaja.');};$('attackcity').onclick=()=>{
  const target=game.cityAt(chosen)?.team!==0?game.cityAt(chosen):null;
- const city=target||s.cities.find(c=>c.team!==0&&game.seen(0,c));
- if(!city)return say('Vastase linn pole veel avastatud. Saada avastaja või laev.');
+ const city=target||s.cities.find(c=>c.team!==0&&game.seen(0,c))
+  ||s.settlers.find(a=>a.team!==0&&game.seen(0,a));
+ if(!city)return say('Vastast pole veel avastatud. Saada avastaja või laev.');
  const unit=armySelected?activeArmy():activeArmies(s,0).sort((a,b)=>armyUnits(s,b).length-armyUnits(s,a).length)[0];
  if(!unit||armyUnits(s,unit).length<2)return say('Vali päris sõjavägi, mitte üksik avastaja.');
  const path=game.landPath(unit,city,0);
