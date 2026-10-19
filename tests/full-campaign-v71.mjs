@@ -5,7 +5,8 @@ import {TECHS,techBlock} from '../research.js';
 import {selectAIBuild} from '../ai-strategy.js';
 import {armyUnits,activeArmies} from '../v51-systems.js';
 import {createBattle,mobilizeCity,settleDefenders,tickBattle,rememberBattle} from '../campaign.js';
-import {fortifyBattle,persistSiegeDamage} from '../fortifications.js';
+import {fortifyBattle} from '../fortifications.js';
+import {persistSiegeDamage} from '../medieval-v62.js';
 import {writeFileSync} from 'node:fs';
 
 const seed=Number(process.env.CAMPAIGN_SEED||20261019);
