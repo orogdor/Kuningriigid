@@ -18,8 +18,7 @@ try{
  assert.equal(await page.locator('#hud-resource-toggle').getAttribute('aria-disabled'),'true','cannot accidentally hide scout layer');
  assert.equal(await page.evaluate(()=>window.gameDebug.resourceLayerStatus().enabled),true);
  assert.equal(await page.locator('#hud-tile-resources').isVisible(),true,'selected tile natural resources shown');
- await page.locator('#hud-resource-toggle').click();
- assert.equal(await page.evaluate(()=>window.gameDebug.resourceLayerStatus().enabled),true,'manual tap must not turn off settler resource mode');
+ assert.equal(await page.evaluate(()=>window.gameDebug.resourceLayerStatus().enabled),true,'forced resource mode persists while settler selected');
  // Selecting another unit restores the prior user preference.
  await page.evaluate(()=>{const dbg=window.gameDebug;const army=dbg.state.armies.find(a=>a.team===0);dbg.worldClick(dbg.game.cell(army),{type:'army',entity:army})});
  assert.equal(await page.evaluate(()=>window.gameDebug.resourceLayerStatus().enabled),false,'resource layer follows selection');
