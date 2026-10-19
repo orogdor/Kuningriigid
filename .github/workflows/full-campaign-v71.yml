@@ -4,7 +4,7 @@ on:
     branches:
       - analysis/full-playthrough-v71
     paths:
-      - "tests/full-campaign-v71.mjs"
+      - "tests/full-campaign-v71-strategy.mjs"
       - ".github/workflows/full-campaign-v71.yml"
   workflow_dispatch:
 permissions:
@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 15
     env:
       CAMPAIGN_SEED: "20261019"
-      MAX_SIM_SECONDS: "60000"
+      MAX_SIM_SECONDS: "90000"
       MAX_WALL_SECONDS: "720"
     steps:
       - uses: actions/checkout@v4
@@ -23,11 +23,11 @@ jobs:
         with:
           node-version: "22"
       - name: Run genuine economy, AI, movement and combat simulation
-        run: node tests/full-campaign-v71.mjs
+        run: node tests/full-campaign-v71-strategy.mjs
       - name: Upload match report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: complete-playthrough-v71
-          path: playthrough-v71-report.json
+          name: strategy-playthrough-v71
+          path: playthrough-v71-strategy-report.json
           if-no-files-found: warn
