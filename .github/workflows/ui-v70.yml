@@ -1,0 +1,44 @@
+name: V70 mobile construction and resource HUD
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'civilization.js'
+      - 'hud-v70.css'
+      - 'TEST_V70_UI.mjs'
+      - '.github/workflows/ui-v70.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mobile-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install headless Chrome test harness
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Validate game, screen geometry and building flow
+        run: |
+          node TEST_V69.mjs
+          python3 -m http.server 8765 >/tmp/v70-http.log 2>&1 &
+          node TEST_V70_UI.mjs
+      - name: Save mobile and desktop screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-ui-screenshots
+          path: ui-screenshots-v70/*.png
+          if-no-files-found: ignore
