@@ -1,0 +1,28 @@
+name: V72 long AI navy campaign
+on:
+  push:
+    branches: [dev/v72-naval-victory]
+    paths:
+      - 'TEST_V72_AI_NAVY.mjs'
+      - '.github/workflows/v72-ai-navy.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ai-navy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Simulate 600 minutes without artificial resources
+        run: node TEST_V72_AI_NAVY.mjs
+      - name: Keep AI timeline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-shipbuilding-timeline
+          path: ai-v72-maritime.json
+          if-no-files-found: ignore

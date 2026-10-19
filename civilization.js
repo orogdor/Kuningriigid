@@ -8,7 +8,7 @@ import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=65';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=69a';
 import {surface,localSurface,riverNear} from './continuous-landscape.js?v=69a';
-import {SHIPS} from './naval.js';
+import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=72a';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js';
 import {housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT,BASIC_JOBS} from './labor.js';
@@ -23,7 +23,7 @@ import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=5
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=69a';
 import {createWorldAtlasProps} from './world-props.js?v=58';
 import * as T from './vendor/three.module.js';
-import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=68d';
+import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=72a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js';
 import {detailHeight,featureNames} from './world-details.js';
 import {createAgeBuilding,animateBuilding} from './buildings.js';
@@ -256,7 +256,41 @@ function worldSync(){worldProps.update();refreshResourceArea();if(worldSync.last
   }
  }
  for(const[key,m]of worldMarkers)m.visible=live.has(key);const hp=highlightGeometry.attributes.position;for(let i=0;i<hp.count;i++)hp.setY(i,Math.max(.8,surface(game,chosen.x+hp.getX(i),chosen.z+hp.getZ(i)))+.7);hp.needsUpdate=true;highlightGeometry.computeBoundingSphere();highlight.position.set(chosen.x,0,chosen.z)}
-function renderFleet(){const root=$('navalactions');root.innerHTML='';for(const ship of s.ships.filter(a=>a.team===0&&a.hp>0))button(root,'⚓ '+SHIPS[ship.kind].name+' · '+Math.ceil(ship.hp)+' HP'+(ship.cargo?' · pardal '+(ship.cargo.kind==='army'?'armee':'asunik'):''),()=>{selectedShip=ship.id;selectedTrade=null;selectedMover=null;armySelected=false;chosen=game.cell(ship);openWorld();const p=center(ship.c,ship.r);focus.set(p.x,0,p.z);renderUI()});const ship=s.ships.find(a=>a.id===selectedShip&&a.hp>0);if(!ship)return;const info=document.createElement('p');info.textContent=SHIPS[ship.kind].name+' · '+(s.research[0].known.includes('ocean_sailing')?'Ookeanikõlblik':s.research[0].known.includes('navigation')?'Rannikust kuni 2 ruutu':'Ainult ranniku kõrval');root.append(info);button(root,'■ Peata laev',()=>{ship.path=[];save()});if(ship.kind==='transport'&&!ship.cargo){button(root,'↑ Laadi kõrval olev armee',()=>{say(game.embark(ship,'army')||'Armee on pardal.');renderUI();save()});button(root,'↑ Laadi kõrval olev asunik',()=>{say(game.embark(ship,'settler')||'Asunik on pardal.');renderUI();save()})}if(ship.cargo){const p=document.createElement('p');p.textContent='Maabumiseks puuduta laeva kõrval olevat maismaaruutu.';root.append(p)}}
+function renderFleet(){
+ const root=$('navalactions');root.replaceChildren();
+ for(const ship of s.ships.filter(a=>a.team===0&&a.hp>0))
+  button(root,'⚓ '+SHIPS[ship.kind].name+' · '+Math.ceil(ship.hp)+' HP'+(ship.cargo?' · pardal '+(ship.cargo.kind==='army'?'armee '+(ship.cargo.armyId||0):'asunik'):''),()=>{
+   selectedShip=ship.id;selectedTrade=null;selectedMover=null;armySelected=false;chosen=game.cell(ship);openWorld();
+   const p=center(ship.c,ship.r);focus.set(p.x,0,p.z);renderUI();
+  });
+ const ship=s.ships.find(a=>a.id===selectedShip&&a.hp>0);if(!ship)return;
+ const info=document.createElement('p');
+ info.textContent=SHIPS[ship.kind].name+' · '+(s.research[0].known.includes('ocean_sailing')?'Ookeanikõlblik':s.research[0].known.includes('navigation')?'Rannikust kuni 2 ruutu':'Ainult ranniku kõrval');
+ root.append(info);
+ button(root,'■ Peata laev',()=>{ship.path=[];save();renderUI()});
+ if(ship.kind==='transport'&&!ship.cargo){
+  for(const army of activeArmies(s,0).filter(a=>a.embarked==null&&Math.max(Math.abs(a.c-ship.c),Math.abs(a.r-ship.r))<=1)){
+   const n=armyUnits(s,army).length;
+   button(root,'↑ Laadi armee '+(army.id||0)+' · '+n+'/6 üksust',()=>{
+    const error=game.embark(ship,'army',army.id||0);
+    say(error||'Valitud väesalk on pardal.');renderUI();save();
+   },n>6||n===0);
+  }
+  button(root,'↑ Laadi kõrval olev asunik',()=>{say(game.embark(ship,'settler')||'Asunik on pardal.');renderUI();save()});
+ }
+ if(ship.cargo){
+  const p=document.createElement('p');p.textContent='Maabumiseks anna laevale liikumiskäsk ja puuduta kõrval olevat maismaaruutu.';root.append(p);
+  if(ship.cargo.kind==='army'){
+   const a=cargoArmy(game,ship);
+   button(root,'⚔ Suundu avastatud vastase juurde',()=>{
+    const enemy=(game.cityAt(chosen)?.team!==0?game.cityAt(chosen):null)||s.cities.find(c=>c.team!==0&&game.seen(0,c));
+    if(!enemy)return say('Vastase asukoht on avastamata. Uuri merd.');
+    const success=navyExpedition(game,ship,a,enemy);
+    say(success?'Laev alustas sõjaretke.':'Sellel ajastul puudub ligipääsetav meretee.');renderUI();save();
+   });
+  }
+ }
+}
 function price(cost){return Object.entries(cost||{}).map(([k,v])=>v+' '+RESOURCE_NAMES[k].toLowerCase()).join(' · ')}
 function missingMaterials(stock,cost){return Object.entries(cost||{}).filter(([kind,n])=>(stock[kind]||0)<n).map(([kind,n])=>Math.ceil(n-(stock[kind]||0))+' '+RESOURCE_NAMES[kind].toLowerCase()).join(' · ')}
 function button(parent,text,fn,disabled=false){const b=document.createElement('button');b.textContent=text;b.disabled=disabled;b.onclick=fn;parent.append(b);return b}
@@ -304,9 +338,9 @@ function toggleExploreMenu(force){
 function updateExploreUI(){
  const a=explorerArmy(),enabled=!!a&&a.embarked==null,hasScout=!!a;
  $('hud-explore-select').disabled=!hasScout;
- $('hud-explore-auto').disabled=!enabled;
+ $('hud-explore-auto').disabled=!hasScout;
  $('hud-explore-auto').textContent=a?.autoExplore?'■ Peata automaatne avastamine':'▶ Automaatne avastamine';
- $('hud-explore-state').textContent=!a?'Avastajat ei ole. Värba või loo avastaja.':`Avastaja · ruut ${a.c+1}:${a.r+1} · ${a.autoExplore?'uurib automaatselt':'ootab käsku'}`;
+ $('hud-explore-state').textContent=!a?'Avastajat ei ole. Värba või loo avastaja.':`Avastaja · ruut ${a.c+1}:${a.r+1} · ${a.embarked!=null?'on laeval':a.waitingForShip?'vajab merereisiks transpordilaeva':a.autoExplore?'uurib automaatselt':'ootab käsku'}`;
  $('hud-explore-tile').disabled=view!=='world'||!game.seen(0,chosen);
 }
 function renderUI(){syncResourceLayer();const resourceControl=$('resourceoverlay');resourceControl.setAttribute('aria-pressed',String(showResourceOverlay));resourceControl.disabled=hasSelectedSettler();resourceControl.title=hasSelectedSettler()?'Asunikuga on ressursid alati näha':'';resourceControl.textContent=hasSelectedSettler()?'🧺 Asuniku ressursid aktiivsed':showResourceOverlay?'🧺 Peida ressursid':'🧺 Näita ressursse';drawOverview();renderLabor(game,view==='local'?activeCity():null,BUILDINGS,TROOPS,save);renderResearchUI(game,{choose:chooseResearch,queue:queueTechnology,remove:removeTechnology});const city=ownCity(),localCity=activeCity(),displayCity=localCity?.team===0?game.parentCity(localCity):city,realm=displayCity?.economy.realms[0],settler=settlerHere(),age=s.ages[0],next=AGES[age+1];$('selectarmy').textContent=s.units.filter(u=>u.team===0&&u.hp>0).every(u=>u.kind==='scout')?'♟ Avastaja':'⚔ Armee';const explorer=activeArmy(),hasScout=armyUnits(s,explorer).some(u=>u.kind==='scout');$('autoexplore').disabled=!hasScout;$('autoexplore').textContent=explorer.autoExplore?'◉ Peata automaatne avastamine':'🧭 Automaatne avastamine';$('autoexplore').setAttribute('aria-pressed',String(!!explorer.autoExplore));$('autoexplore').classList.toggle('active',!!explorer.autoExplore);$('resources').innerHTML=Object.entries(RESOURCE_NAMES).filter(([k])=>['wood','stone','plank','bread','water','gold'].includes(k)||(realm?.resources[k]||0)>0).map(([k,n])=>`<span data-resource="${k}">${Math.floor(realm?.resources[k]??(k==='wood'?100:k==='stone'?55:k==='bread'?40:0))}/${displayCity?game.storageCap(displayCity,k)===Infinity?'∞':game.storageCap(displayCity,k):'—'}<small>${n}</small></span>`).join('');$('turn').textContent='Käik '+(Math.floor(s.time/TURN_SECONDS)+1)+' · '+AGES[age].name+' · '+Math.floor(s.time/TURN_SECONDS)+':'+String(Math.floor(s.time%TURN_SECONDS)).padStart(2,'0');$('clock').value=s.time%TURN_SECONDS;$('maplabel').textContent=view==='world'?AGES[age].name.toUpperCase()+' · MAAILMAKAART':`${localCity?.name||featureNames[activeTile.detail.feature]} · ${activeTile.c+1}:${activeTile.r+1}`;$('objective').textContent='V69 · teadus '+game.scienceRate(0).toFixed(1)+' p/min';
@@ -366,7 +400,21 @@ function checkEncounter(){
   chosen=cell;openTile(cell);say('Lahing algas. Vali vägi või vajuta „Ründa“.');return;
  }
 }
-function applyBattle(){const b=s.battle;if(!b?.result||b.applied)return;for(const q of b.squads)if(s.units[q.source])s.units[q.source].hp=q.hp;if(b.fortress){const city=s.cities.find(c=>c.id===b.fortress.cityId);settleDefenders(b,city);persistSiegeDamage(city,b);city.hp=Math.max(0,Math.min(city.hp,b.fortress.hp));if(city.hp<=0){game.transferCity(city,b.winnerTeam??b.attackerTeam);city.hp=300;;const remaining=[...new Set([...s.cities.map(c=>c.team),...s.settlers.map(a=>a.team)])];if(!remaining.includes(0)){s.winner=city.team;say('Sinu viimane linn langes.')}else if(remaining.length===1){s.winner=0;say('Võit! Kõik vastased on alistatud.')}}}rememberBattle(s,b);b.applied=true;save();renderUI()}
+function applyBattle(){
+ const b=s.battle;if(!b?.result||b.applied)return;
+ for(const q of b.squads)if(q.source>=0&&s.units[q.source])s.units[q.source].hp=q.hp;
+ if(b.fortress){
+  const city=s.cities.find(c=>c.id===b.fortress.cityId);
+  settleDefenders(b,city);persistSiegeDamage(city,b);
+  city.hp=Math.max(0,Math.min(city.hp,b.fortress.hp));
+  if(city.hp<=0){
+   const old=city.team;
+   game.transferCity(city,b.winnerTeam??b.attackerTeam);city.hp=300;
+   say('Linn vallutatud! '+old+' → '+city.team+'.'+(s.winner===0?' Kõik vastased alistatud!':''));
+  }
+ }
+ rememberBattle(s,b);b.applied=true;save();renderUI();
+}
 // V64: analytic atlas picking avoids raycasting hundreds of thousands of
 // terrain triangles on every mouse/touch movement.
 const worldPickPlane=new T.Plane(new T.Vector3(0,1,0),0),worldPickPoint=new T.Vector3();
@@ -433,7 +481,22 @@ $('hud-explore-tile').onclick=()=>{if(view==='world'&&game.seen(0,chosen)){toggl
 $('autoexplore').onclick=()=>{const army=activeArmy();if(!armyUnits(s,army).some(u=>u.kind==='scout'))return say('Automaatne avastamine vajab avastajat.');army.autoExplore=!army.autoExplore;if(army.autoExplore){army.path=[];army.travelClock=0;selectedMover=null;selectedShip=null;armySelected=true;commandMode='select';chosen=game.cell(army);say('Avastaja uurib nüüd iseseisvalt tundmatut maad ja leiukohti.')}else{army.path=[];say('Automaatne avastamine peatatud.')}renderUI();save()};$('inspecttile').onclick=()=>openTile(chosen);$('maptoggle').onclick=()=>{if(s.battle&&!s.battle.result)return say('Lõpeta esmalt lahing.');toggleExploreMenu(false);openWorld()};
 $('hud-city').onclick=()=>{if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){setCityTab('info');document.body.classList.add('hud-city-open')}else if(view==='world')say('Vali kõigepealt oma linn.')};
 $('hud-army').onclick=()=>{if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){setCityTab('build');tab='army';renderUI();document.body.classList.add('hud-city-open')}else say('Sõjaväe värbamiseks raja esmalt linn.')};
-$('hud-build').onclick=()=>{if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){setCityTab('build');tab='build';renderUI();document.body.classList.add('hud-city-open')}else say('Ehitamiseks raja esmalt linn.')};$('opencity').onclick=()=>{const city=ownCity(),a=s.settlers.find(a=>a.team===0);if(city)openTile(game.cell(city));else if(a){chosen=game.cell(a);openTile(chosen)}};$('viewenemy').onclick=()=>{const c=s.cities.find(c=>c.team!==0&&game.visibleNow(0,c))||s.settlers.find(a=>a.team!==0&&game.visibleNow(0,a));if(c)openTile(game.cell(c));else say('Vastast pole veel avastatud. Saada avastaja.');};$('attackcity').onclick=()=>{const city=s.cities.find(c=>c.team!==0&&game.visibleNow(0,c));if(!city)return say('Vastase linna asukoht ei ole praegu nähtav. Kasuta avastajat.');if(!s.units.some(u=>u.team===0&&u.hp>0))return say('Värba esmalt sõdalasi.');const unit=armySelected?activeArmy():s.armies[0],path=game.landPath(unit,city,0);if(path){unit.path=path;unit.autoExplore=false;selectedShip=null;commandMode='select';selectedTrade=null;selectedMover=null;armySelected=true;say('Armee marsib vastase linna.')}else say('Sinna ei pääse mööda maad.')};
+$('hud-build').onclick=()=>{if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){setCityTab('build');tab='build';renderUI();document.body.classList.add('hud-city-open')}else say('Ehitamiseks raja esmalt linn.')};$('opencity').onclick=()=>{const city=ownCity(),a=s.settlers.find(a=>a.team===0);if(city)openTile(game.cell(city));else if(a){chosen=game.cell(a);openTile(chosen)}};$('viewenemy').onclick=()=>{const c=s.cities.find(c=>c.team!==0&&game.visibleNow(0,c))||s.settlers.find(a=>a.team!==0&&game.visibleNow(0,a));if(c)openTile(game.cell(c));else say('Vastast pole veel avastatud. Saada avastaja.');};$('attackcity').onclick=()=>{
+ const target=game.cityAt(chosen)?.team!==0?game.cityAt(chosen):null;
+ const city=target||s.cities.find(c=>c.team!==0&&game.seen(0,c))
+  ||s.settlers.find(a=>a.team!==0&&game.seen(0,a));
+ if(!city)return say('Vastast pole veel avastatud. Saada avastaja või laev.');
+ const unit=armySelected?activeArmy():activeArmies(s,0).sort((a,b)=>armyUnits(s,b).length-armyUnits(s,a).length)[0];
+ if(!unit||armyUnits(s,unit).length<2)return say('Vali päris sõjavägi, mitte üksik avastaja.');
+ const path=game.landPath(unit,city,0);
+ if(path){
+  unit.path=path;unit.autoExplore=false;selectedShip=null;commandMode='select';selectedMover=null;armySelected=true;
+  say('Armee marsib valitud vastase linna.');renderUI();save();return;
+ }
+ const transport=s.ships.find(sh=>sh.team===0&&sh.hp>0&&sh.kind==='transport'&&sh.cargo?.kind==='army'&&(sh.cargo.armyId||0)===(unit.id||0));
+ if(transport&&navyExpedition(game,transport,unit,city)){say('Valitud armee alustab meritsi sõjaretke.');renderUI();save();return}
+ say('Maismaateed pole. Ehita rannikule sadam ja transpordilaev, laadi valitud armee ning anna merereisi käsk.');
+};
 $('foundcity').onclick=()=>{const a=settlerHere();if(!a)return;const r=game.found(a.id);if(r.error)return say(r.error);selectedMover=null;chosen=game.cell(r.city);openTile(chosen);save();say('Linn on rajatud. Ava tehnoloogiapuu ja vali jahipidamine, kalapüük või kivitöö.')};$('research').onclick=openResearch;$('attackall').onclick=()=>{if(!s.battle)return;for(const u of s.battle.squads)if(u.team===0)u.advance=true;say('Sõdalased ründavad. Kiviviskajad hoiavad tagapool.')};$('retreat').onclick=()=>{if(s.battle){if(!s.battle.result){s.battle.result='retreat';for(const u of s.battle.squads)if(u.team===0)u.hp*=.8;const own=s.armies.find(a=>a.team===0&&tileKey(a)===tileKey(s.battle.cell))||s.armies[0],ret=s.cities.find(c=>c.team===0);if(ret){own.c=ret.c;own.r=ret.r}own.path=[]}applyBattle();s.battle=null}openWorld();save()};
 $('menubtn').onclick=()=>{toggleExploreMenu(false);slotUI();cameraKeys.clear();menuOpen=true;$('commandhud').hidden=true;$('startmenu').hidden=false};$('continue').onclick=()=>{menuOpen=false;$('startmenu').hidden=true;renderCommandHUD()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'▶':'Ⅱ'};$('zin').onclick=()=>applyZoom(zoom-(view==='world'?100:8));$('zout').onclick=()=>applyZoom(zoom+(view==='world'?100:8));$('home').onclick=()=>{const a=view==='world'?center(chosen.c,chosen.r):{x:0,z:0};focus.set(a.x,0,a.z)};$('closehelp').onclick=()=>$('help').hidden=true;$('reset').onclick=()=>{menuOpen=true;$('help').hidden=true;$('startmenu').hidden=false};$('newgame').onclick=()=>{const raw=$('seed').value.trim(),seed=raw?Array.from(raw).reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0):Math.floor(Math.random()*2147483647);try{restarting=true;const ns=createGame(seed,$('maptype').value);ns.difficulty=$('difficulty')?.value||'normal';ns.tempo='normal';localStorage.setItem('kingdoms-civ4',JSON.stringify(ns));sessionStorage.setItem('kingdoms-civ-start','1');location.reload()}catch{restarting=false;say('Uue mängu salvestamine ebaõnnestus.')}};
 function openResearch(){$('researchpanel').hidden=false;renderUI();$('closeresearch').focus?.()}
@@ -530,7 +593,7 @@ function refreshBattleTowers(b){
   post.active=!!city&&towerManned(city.economy.buildings[post.buildingIndex]);
  }
 }
-function frame(now){requestAnimationFrame(frame);const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.nav(s.battle.cell));applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(lastMenuRevision!==game.uiRevision){lastMenuRevision=game.uiRevision;renderUI()}for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}updateCameraKeys(real);followDetail();if(view==='world'){worldSync();atlasDecor.group.userData.water.position.y=.72+Math.sin(s.time*.6)*.045;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12}else{syncLocal();updateGhost()}updateCommandVisuals();camera.position.set(focus.x+zoom*(view==='world'?.1:.48),zoom*(view==='world'?.76:.78),focus.z+zoom*(view==='world'?.7:.8));camera.lookAt(focus);renderer.render(view==='world'?worldScene:localScene,camera);if(toastTime>0){toastTime-=real;if(toastTime<=0)$('toast').style.display='none'}$('clock').value=s.time%TURN_SECONDS;saveTimer+=real;uiTimer+=real;if(uiTimer>.8){uiTimer=0;renderUI()}if(saveTimer>10&&!menuOpen){saveTimer=0;save()}}
+function frame(now){requestAnimationFrame(frame);const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.nav(s.battle.cell));applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}if(lastMenuRevision!==game.uiRevision){lastMenuRevision=game.uiRevision;renderUI()}for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}updateCameraKeys(real);followDetail();if(view==='world'){worldSync();atlasDecor.group.userData.water.position.y=.72+Math.sin(s.time*.6)*.045;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12}else{syncLocal();updateGhost()}updateCommandVisuals();camera.position.set(focus.x+zoom*(view==='world'?.1:.48),zoom*(view==='world'?.76:.78),focus.z+zoom*(view==='world'?.7:.8));camera.lookAt(focus);renderer.render(view==='world'?worldScene:localScene,camera);if(toastTime>0){toastTime-=real;if(toastTime<=0)$('toast').style.display='none'}$('clock').value=s.time%TURN_SECONDS;saveTimer+=real;uiTimer+=real;if(uiTimer>.8){uiTimer=0;renderUI()}if(saveTimer>10&&!menuOpen){saveTimer=0;save()}}
 // V51 empire panels and manual saves. No network storage is used.
 function renderV51UI(){
  const tips=$('v51tips');if(tips){tips.replaceChildren();for(const item of actionTips(game,0)){const b=document.createElement('button'),small=document.createElement('small');b.textContent=item.text;small.textContent=item.why;b.append(small);b.onclick=()=>{if(item.city){chosen=game.cell(item.city);openTile(chosen)}else openResearch()};tips.append(b)}}

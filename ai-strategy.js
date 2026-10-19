@@ -49,6 +49,9 @@ export function selectAIBuild(game,team,city){
  const add=(type,priority,reason)=>{
   if(type==='house'){if(buildings.some(b=>b.type==='house'&&!b.ready&&b.hp>0))return;}
   else if(hasWorkingSource(buildings,type))return;
+  // Prevent the AI from wasting a whole town's labour on repeated quarries.
+  if(['quarry','lumber','hunter','fisher','well','farm'].includes(type)&&buildings.filter(b=>b.type===type&&b.hp>0).length>=2)return;
+  if(type==='harbor'&&buildings.some(b=>b.type==='harbor'&&b.hp>0))return;
   if(!eligible(game,city,type))return;
   // While saving for an era, build only a resource-producing dependency,
   // storage, or indispensable housing. No military or cosmetic construction.
@@ -58,6 +61,7 @@ export function selectAIBuild(game,team,city){
  // Maintain an early, diverse economy. The first source is important even
  // when current stores are high; dependence on initial stocks is not viable.
  for(const [type,priority] of [['lumber',125],['well',118],['hunter',115],['fisher',109],['farm',105],['quarry',103],['study',98]])add(type,priority,'Algmajandus');
+ if(science.known.includes('shipbuilding')&&!game.s.ships?.some(s=>s.team===team&&s.hp>0)&&!buildings.some(b=>b.type==='harbor'&&b.hp>0))add('harbor',136,'Väljapääs teistele mandritele');
  // Prevent permanent deforestation: start regenerating harvestable woodland
  // as soon as the forester technology is unlocked, *before* wood reaches zero.
  if(age>=1&&game.s.research[team].known.includes('forestry')&&
@@ -123,5 +127,6 @@ export function usefulDistrictTypes(game,team){
  if(totals.water<population*2)deficits.add('well');
  if(game.s.ages[team]>=2&&totals.ore<15)deficits.add('mine');
  if(game.s.ages[team]>=6&&totals.oil<20)deficits.add('oilwell');
+ if(research?.known.includes('shipbuilding')&&!cities.some(c=>game.allBuildings(c).some(b=>b.type==='harbor'&&b.hp>0)))deficits.add('harbor');
  return deficits;
 }
