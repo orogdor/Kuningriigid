@@ -1,7 +1,7 @@
 
 import assert from 'node:assert/strict';
 import {Civilization,createGame,TROOPS} from './civilization-core.js';
-import {SHIPS,harborExit,seaPath,seaAllowed,embark,disembark,cargoArmy,sink,aiNavy,seaExplorePath} from './naval.js';
+import {SHIPS,harborExit,seaPath,seaAllowed,embark,disembark,cargoArmy,sink,aiNavy,seaExplorePath,navyExpedition,landingRoute,tickShips} from './naval.js';
 import {factionAlive,reconcileVictory,captureEnemySettlers} from './victory-v72.js';
 import {usefulDistrictTypes} from './ai-strategy.js';
 import {createBattle,mobilizeCity,tickBattle,settleDefenders} from './campaign.js';
@@ -69,6 +69,27 @@ const heavy=s.ships.push({id:105,kind:'transport',team:0,...water,hp:180,path:[]
 spare.c=home.c;spare.r=home.r;
 assert.match(embark(g,s.ships.at(-1),'army',102),/kuni 6/,'a 9-unit detachment cannot embark');
 console.log('V72 SINK CAPACITY PASS');
+// Follow a complete intercontinental route using actual tickShips movement.
+// No coordinate teleportation or fake cargo state.
+const expedition={id:111,team:0,c:home.c,r:home.r,path:[],embarked:null};
+s.armies.push(expedition);
+for(let i=0;i<4;i++)s.units.push({kind:'spearman',team:0,hp:125,armyId:111});
+const vessel={id:108,kind:'transport',team:0,...water,hp:SHIPS.transport.hp,path:[],clock:0,cargo:null};
+s.ships.push(vessel);
+assert.equal(embark(g,vessel,'army',111),'');
+const crossingRoute=landingRoute(g,vessel,enemy);
+assert.ok(crossingRoute&&crossingRoute.path.length>3,'ocean route must reach enemy coastline');
+assert.equal(navyExpedition(g,vessel,expedition,enemy),true,'selected army receives real invasion route');
+assert.deepEqual(vessel.path,crossingRoute.path);
+for(let i=0;i<crossingRoute.path.length;i++)tickShips(g,3);
+assert.equal(vessel.path.length,0,'vessel arrives after real sailing steps');
+assert.equal(navyExpedition(g,vessel,expedition,enemy),true,'real landing action succeeds');
+assert.equal(vessel.cargo,null);
+assert.equal(expedition.embarked,null);
+assert.ok(g.cell(expedition).land,'expedition stands on enemy continent land');
+assert.ok(expedition.path?.length>0,'landing army receives overland route to its target');
+console.log('V72 INVASION PASS',JSON.stringify({waterSteps:crossingRoute.path.length,landing:[expedition.c,expedition.r],objective:[enemy.c,enemy.r],landSteps:expedition.path.length}));
+
 
 // A fully trained existing AI port must generate a *real* production order
 // rather than being handed a free navy.
