@@ -24,7 +24,8 @@ try{
  mkdirSync('ui-screenshots-v69',{recursive:true});
  for(const layout of layouts){
   await page.setViewportSize({width:layout.width,height:layout.height});
-  await page.waitForTimeout(450);
+  await page.waitForTimeout(650);
+  await page.waitForFunction(()=>{const r=document.getElementById('world').getBoundingClientRect();return Math.abs(r.width-innerWidth)<3&&Math.abs(r.height-innerHeight)<3;},null,{timeout:20000});
   const info=await page.evaluate(()=>{
    const ids=['world','resources','turn','pause','tools','commandhud','atlasoverview','v51insights','atlaspanel','startmenu'];
    const r={};
@@ -39,7 +40,7 @@ try{
    const hiddenTitle=document.querySelector('header .brand')?.textContent?.includes('KUNINGRIIGID');
    return {viewport:[innerWidth,innerHeight],r,conflicts,offscreen,navCount:nav.length,hiddenTitle,navOverflow:document.getElementById('tools').scrollWidth>document.getElementById('tools').clientWidth};
   });
-  console.log('V69 VIEW',layout.label,JSON.stringify({viewport:info.viewport,conflicts:info.conflicts,offscreen:info.offscreen,navCount:info.navCount,navOverflow:info.navOverflow}));
+  console.log('V69 VIEW',layout.label,JSON.stringify({viewport:info.viewport,canvas:info.r.world,conflicts:info.conflicts,offscreen:info.offscreen,navCount:info.navCount,navOverflow:info.navOverflow}));
   assert.equal(info.hiddenTitle,false,'title visible in HUD');
   assert.ok(info.navCount>=6,'major navigation present');
   assert.deepEqual(info.conflicts,[],'HUD collision at '+layout.label);
