@@ -1,0 +1,138 @@
+/* V69 — adaptive 4X HUD. Original gameplay and menu logic remain usable. */
+:root{--hud-ink:#091d22;--hud-gold:#d9b878;--hud-line:rgba(226,183,104,.67);--hud-cream:#f4e8c8;--hud-top:62px;--hud-bottom:62px;--hud-pad:12px}
+html,body{width:100%;height:100%;height:100dvh;overflow:hidden}body{color:var(--hud-cream)}#world{inset:0;width:100vw;height:100vh;height:100dvh}
+header{height:var(--hud-top);min-height:0;padding:6px max(9px,env(safe-area-inset-right)) 6px max(9px,env(safe-area-inset-left));display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:clamp(5px,1vw,15px);z-index:11;background:linear-gradient(180deg,#081d22fa,#183334f7);border-bottom:2px solid var(--hud-line);box-shadow:0 5px 18px #0008}
+header .brand{flex:0 0 47px;min-width:47px;margin:0;text-align:center;font:30px/1 Georgia;color:#e5ca91;letter-spacing:0;text-shadow:0 1px 3px #000}header .brand small{display:none}
+header .game-language{order:4;flex:0 0 auto;white-space:nowrap;margin:0;font-size:10px;color:#cdb987}header .game-language select{min-width:68px;max-width:98px;padding:5px;background:#193630;color:#f4e6c8;border:1px solid var(--hud-line);border-radius:7px}
+#resources{order:1;flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:0;min-width:0;padding:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+#resources::-webkit-scrollbar{display:none}
+#resources span{position:relative;display:flex;flex:0 0 auto;min-width:73px;flex-direction:column;justify-content:center;padding:3px 12px 3px 32px;border-right:1px solid #dbbc7647;font-size:clamp(12px,1.45vw,20px);font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--hud-cream)}
+#resources span::before{content:'◈';position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:21px;color:#dab778}
+#resources span[data-resource="wood"]::before{content:'🪵'}#resources span[data-resource="plank"]::before{content:'🪚'}#resources span[data-resource="stone"]::before{content:'🪨'}#resources span[data-resource="water"]::before{content:'💧'}#resources span[data-resource="bread"]::before{content:'🍞'}#resources span[data-resource="gold"]::before{content:'🪙'}
+#resources span small{display:block;font:9px/1.3 Inter,Arial;letter-spacing:.05em;text-transform:uppercase;color:#b8bea9;margin:3px 0 0}
+header .time{order:2;display:flex;flex:0 0 auto;width:auto;min-width:0;gap:9px;align-items:center;flex-wrap:nowrap;margin-left:auto}
+header .time b{max-width:300px;min-width:0;width:auto;font:600 clamp(10px,1.05vw,13px)/1.25 Inter,Arial;color:#f3e7c7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+header .time progress{width:42px;height:5px;flex-shrink:0}
+#pause{flex:0 0 42px;width:42px;height:42px;min-width:42px;padding:0;border:1px solid var(--hud-line);border-radius:12px;background:#0f2a2b;color:#ead7a4;font:26px Georgia}
+#speed{display:none!important}
+#tools{position:fixed;left:auto;right:max(10px,env(safe-area-inset-right));bottom:max(9px,env(safe-area-inset-bottom));transform:none;max-width:calc(100vw - 20px);width:auto;height:auto;min-height:52px;overflow-x:auto;overflow-y:hidden;display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-end;gap:3px;padding:5px 7px;z-index:16;background:linear-gradient(#0e2d31f5,#091e23f7);border:1px solid var(--hud-line);border-radius:13px;box-shadow:0 7px 20px #0007;scrollbar-width:thin}
+#tools button{flex:0 0 auto;min-height:39px;min-width:43px;max-width:150px;padding:8px 11px;border:1px solid transparent;border-radius:9px;background:transparent;color:#f1e2bd;font-weight:600;font-size:12px;line-height:1.2;white-space:nowrap}
+#tools button.active,#tools button:focus-visible{background:linear-gradient(#604c2c,#342b23);border-color:var(--hud-line)}
+#menubtn{font-size:23px!important}
+#commandhud,body:not(.atlas) #commandhud{position:fixed;left:max(12px,env(safe-area-inset-left));right:auto;top:auto;bottom:calc(max(9px,env(safe-area-inset-bottom)) + 68px);width:clamp(250px,28vw,355px);max-width:calc(100vw - 24px);min-height:0;max-height:min(29vh,185px);padding:10px 13px;overflow:auto;z-index:8;background:linear-gradient(145deg,#092126f4,#173732f4);border:1px solid var(--hud-line);border-radius:13px;box-shadow:0 8px 24px #0007}
+.command-heading{gap:2px}#commandmode{font-size:9px;color:#ddb976;letter-spacing:1.2px}#commandname{font:600 clamp(16px,1.6vw,21px)/1.1 Georgia;color:#f3e4bd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#commandstate{font:11px/1.4 Inter,Arial;max-width:100%;margin:5px 0;color:#dae1cd;overflow-wrap:anywhere}
+.command-buttons{display:flex!important;flex-wrap:nowrap!important;gap:4px!important;align-items:stretch}
+.command-buttons button{flex:1 1 0!important;width:0!important;min-width:0!important;min-height:36px!important;font-size:11px!important;padding:6px 3px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:8px!important}
+.command-buttons kbd{display:none}
+#commandhint{display:none!important}
+#v51insights{position:fixed;top:calc(var(--hud-top) + 10px);left:max(12px,env(safe-area-inset-left));bottom:auto;width:clamp(225px,26vw,330px);max-width:calc(100vw - 24px);max-height:145px;overflow:auto;padding:8px 10px;z-index:9;background:linear-gradient(130deg,#0a2327eb,#1b3831ed);border:1px solid var(--hud-line);border-radius:11px}
+#v51insights strong{font:600 13px Georgia;color:#edce93;line-height:1.25;padding-right:30px}
+#v51tips{max-height:78px;overflow:auto}
+#v51tips button{margin:4px 0 0;padding:6px 8px;font-size:11px;line-height:1.25}
+#v51tips small{line-height:1.25}
+#hud-objective-toggle{position:absolute;right:4px;top:3px;z-index:2;width:30px;height:30px;min-height:30px;padding:0;border:none;background:transparent;color:#e8ce97}
+.hud-objective-closed #v51tips{display:none}
+#v51cities{display:none!important}body.atlas.hud-city-overview #v51cities{display:block!important;position:fixed;top:calc(var(--hud-top) + 170px);bottom:auto;left:12px;width:min(300px,calc(100vw - 24px));max-height:40vh;overflow:auto;z-index:17}
+#atlasoverview{position:fixed;top:calc(var(--hud-top) + 10px);right:max(12px,env(safe-area-inset-right));bottom:auto;width:202px;padding:7px;z-index:7;background:linear-gradient(#09282eef,#153b3feb);border:1px solid var(--hud-line);border-radius:11px;box-shadow:0 6px 23px #0007}
+#atlasoverview span{display:block;font:600 12px Georgia;letter-spacing:.02em;color:#f0dfb4;padding:3px 31px 6px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#atlasoverview canvas{position:relative;display:block;width:100%;height:auto;aspect-ratio:128/100;border:1px solid #adad7f69;border-radius:5px}
+#atlasoverview small{display:none}
+#hud-map-details{position:absolute;right:6px;top:4px;min-height:28px;width:30px;padding:0;border:1px solid #d3b27588;border-radius:6px;background:#173332;color:#f4dfa9;font-size:16px;z-index:2}
+body.atlas:not(.hud-map-open) #atlaspanel{display:none!important}
+#atlaspanel{position:fixed;top:calc(var(--hud-top) + 12px);left:max(12px,env(safe-area-inset-left));right:auto;bottom:auto;width:min(348px,calc(100vw - 24px));max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 22px);padding:14px;overflow:auto;z-index:18;background:#102a2af8;border:1px solid var(--hud-line);border-radius:12px}
+.hud-map-open #v51insights{display:none!important}
+#hud-close-map{display:block;width:100%;min-height:36px;border-color:var(--hud-line);margin:0 0 9px;background:#304a3f}
+#maplabel{display:none!important}
+#researchstatus{position:fixed;right:12px;top:calc(var(--hud-top) + 215px);width:202px;max-height:60px;overflow:hidden;padding:7px;font-size:10px}
+#citypanel{top:calc(var(--hud-top) + 10px);left:12px;bottom:auto;width:min(345px,calc(100vw - 24px));max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 28px);overflow:auto;z-index:10}
+#citypanel .city-panel-heading h2{font-size:clamp(17px,2vw,22px);overflow-wrap:anywhere}
+#citypane-build #tray,#citypane-build #cityqueue{position:static;transform:none;left:auto;right:auto;top:auto;bottom:auto;max-width:100%;width:100%;max-height:220px;overflow:auto;margin:8px 0}
+#citypane-build #tray{display:flex;flex-wrap:nowrap}
+#citypane-build #tray button{flex:0 0 156px;min-height:76px}
+#citypane-build #cityqueue{max-height:130px}
+body:not(.atlas) #commandhud{z-index:8}
+#settlerpanel,#battlepanel{top:calc(var(--hud-top) + 12px);right:12px;left:auto;bottom:auto;max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 26px);overflow:auto}
+#toast{top:calc(var(--hud-top) + 8px);left:50%;right:auto;transform:translateX(-50%);max-width:min(430px,70vw);z-index:19;pointer-events:none}
+#camerahelp{display:none!important}
+#startmenu,.menu-card,#researchpanel,#journalpanel,#help{max-width:100vw;max-height:100dvh}
+#startmenu{overflow-y:auto;padding:10px}
+.menu-card{width:min(600px,96vw);max-height:calc(100dvh - 20px);overflow-y:auto}
+#researchpanel,#journalpanel,#laborpanel{overflow:auto;overscroll-behavior:contain}
+@media(max-width:1080px){
+ :root{--hud-top:56px;--hud-bottom:59px}
+ header .brand{flex-basis:36px;min-width:36px;font-size:26px}
+ #resources span{min-width:64px;padding:3px 8px 3px 29px;font-size:13px}
+ #resources span::before{left:4px;font-size:18px}
+ #resources span small{font-size:8px}
+ #tools button{padding:8px 9px;font-size:11px}
+ #atlasoverview{width:166px}
+ #researchstatus{top:calc(var(--hud-top) + 184px);width:166px}
+ #commandhud,body:not(.atlas) #commandhud{width:285px}
+}
+@media(max-width:760px), (max-height:520px){
+ :root{--hud-top:45px;--hud-bottom:49px}
+ header{height:var(--hud-top);gap:5px;padding:3px max(5px,env(safe-area-inset-right)) 3px max(5px,env(safe-area-inset-left))}
+ header .brand{flex:0 0 31px;min-width:31px;font-size:22px}
+ header .game-language{display:none}
+ #resources{order:1;flex:1 1 auto;justify-content:flex-start;gap:0}
+ #resources span{font-size:12px;min-width:48px;padding:4px 5px 3px 23px;line-height:1.1}
+ #resources span::before{left:1px;font-size:15px}
+ #resources span small{display:none}
+ header .time{order:2;gap:4px;max-width:39vw}
+ header .time b{max-width:calc(39vw - 38px);font-size:10px;white-space:nowrap;text-overflow:ellipsis}
+ header .time progress{display:none}
+ #pause{flex:0 0 34px;min-width:34px;width:34px;height:34px;border-radius:8px;font-size:22px}
+ #tools{left:max(4px,env(safe-area-inset-left));right:max(4px,env(safe-area-inset-right));bottom:max(3px,env(safe-area-inset-bottom));transform:none;width:auto;max-width:none;min-height:43px;overflow-x:auto;justify-content:space-between;gap:2px;padding:2px 3px;border-radius:9px}
+ #tools button{flex:1 0 auto;min-width:0;max-width:none;min-height:37px;padding:7px 6px;font-size:10px}
+ #tools [data-tab="help"],#tools #journal,#tools #home,#tools #zin,#tools #zout{display:none!important}
+ #menubtn{font-size:18px!important;flex:0 0 37px!important}
+ #commandhud,body:not(.atlas) #commandhud,body:not(.atlas):not(.settling):not(.battle) #commandhud,.battle #commandhud,.settling #commandhud{left:max(6px,env(safe-area-inset-left));right:auto;top:auto;bottom:calc(max(3px,env(safe-area-inset-bottom)) + 47px);width:min(248px,calc(100vw - 12px));max-width:calc(100vw - 12px);height:auto;max-height:104px;overflow:hidden;padding:6px 8px;border-radius:9px}
+ #commandname{font-size:15px}
+ #commandmode{font-size:8px}
+ #commandstate{font-size:9px;margin:3px 0;line-height:1.15;max-height:22px;overflow:hidden}
+ .command-buttons button{min-height:29px!important;padding:4px 2px!important;font-size:10px!important}
+ #v51insights{top:calc(var(--hud-top) + 5px);left:max(6px,env(safe-area-inset-left));bottom:auto;width:min(220px,calc(100vw - 165px));min-width:0;max-height:78px;padding:6px 7px;border-radius:8px}
+ #v51insights strong{font-size:10px;line-height:1.1;padding-right:19px}
+ #v51insights strong::before{display:none}
+ #v51tips{max-height:47px}
+ #v51tips button{font-size:9px;line-height:1.1;margin:3px 0 0;padding:4px}
+ #v51tips small{font-size:8px;line-height:1.05}
+ #hud-objective-toggle{width:22px;height:23px;min-height:22px;font-size:11px;right:2px;top:2px}
+ #atlasoverview{display:block!important;top:calc(var(--hud-top) + 5px);right:max(6px,env(safe-area-inset-right));bottom:auto;width:min(145px,31vw);padding:4px;border-radius:8px}
+ body:not(.atlas) #atlasoverview{display:none!important}
+ #atlasoverview span{font-size:9px;padding:2px 22px 3px 3px}
+ #atlasoverview canvas{width:100%;height:auto;aspect-ratio:128/100}
+ #hud-map-details{min-height:23px;width:24px;top:2px;right:2px;font-size:13px}
+ #researchstatus{display:none!important}
+ #atlaspanel{top:calc(var(--hud-top) + 5px);left:6px;right:auto;bottom:auto;max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 10px);width:min(290px,calc(100vw - 12px));padding:8px}
+ #atlaspanel button{min-height:35px}
+ #citypanel{top:calc(var(--hud-top) + 5px);left:6px;right:auto;bottom:auto;width:min(360px,calc(100vw - 12px));max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 11px);padding:9px;z-index:20}
+ body:not(.hud-city-open) #citypanel:not([hidden]){display:none!important}
+ #settlerpanel,#battlepanel,.settling #settlerpanel{top:calc(var(--hud-top) + 5px);right:6px;left:auto;bottom:auto;width:min(215px,45vw);max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 10px);padding:8px}
+ #settlerpanel h2,#battlepanel h2{font-size:14px}
+ #settlerpanel p,#battlepanel p{font-size:10px}
+ #settlerpanel button,#battlepanel button{padding:7px;font-size:10px}
+ #toast{top:calc(var(--hud-top) + 4px);max-width:48vw;font-size:10px;padding:6px}
+ #buildhint{bottom:calc(var(--hud-bottom) + 12px);max-width:calc(100vw - 12px);font-size:10px}
+ #citypane-build #tray button{flex-basis:138px;font-size:10px}
+ .research-window,.journal-window,.labor-window{max-height:calc(100dvh - 12px);overflow:auto}
+}
+@media(max-width:520px) and (orientation:portrait){
+ :root{--hud-top:48px}
+ header .brand{display:none}#resources span{min-width:46px}
+ header .time{max-width:35vw}
+ #v51insights{width:calc(100vw - 162px)}
+ #commandhud,body:not(.atlas) #commandhud{width:calc(100vw - 12px);max-height:104px}
+ #tools{justify-content:flex-start}
+ #tools button{flex:0 0 auto;min-width:64px;font-size:10px}
+ #tools #menubtn{min-width:38px}
+ #atlasoverview{width:144px}
+ #v51cities{max-height:34vh}
+}
+@media(max-width:420px) and (max-height:360px){
+ #v51insights{max-height:52px}
+ #v51tips{display:none}
+ #commandhud,body:not(.atlas) #commandhud{max-height:85px}
+ #atlasoverview{width:108px}
+}
