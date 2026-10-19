@@ -1,0 +1,45 @@
+name: V69 responsive HUD browser tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'civilization.js'
+      - 'hud-v69.css'
+      - 'hud-v69.js'
+      - 'continuous-landscape.js'
+      - 'TEST_V69_UI.mjs'
+      - '.github/workflows/ui-v69.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser test harness
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Test world, mobile and desktop HUD
+        run: |
+          node TEST_V69.mjs
+          python3 -m http.server 8765 >/tmp/v69-http.log 2>&1 &
+          node TEST_V69_UI.mjs
+      - name: Store screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v69-layout-screenshots
+          path: ui-screenshots-v69/*.png
+          if-no-files-found: ignore
