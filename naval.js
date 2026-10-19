@@ -39,7 +39,7 @@ export function disembark(game,ship,p){
  const unit=ship.cargo.kind==='army'?cargoArmy(game,ship):game.s.settlers.find(a=>a.id===ship.cargo.id);
  if(!unit)return 'Reisijat ei leitud.';
  Object.assign(unit,{c:p.c,r:p.r,path:[],embarked:null,landed:false,x:0,z:0,travelClock:0});
- ship.cargo=null;ship.landing=null;ship.targetCity=null;
+ ship.cargo=null;ship.landing=null;ship.targetCity=null;ship.targetKind=null;
  game.reveal?.(ship.team,p,2);
  return '';
 }
@@ -150,14 +150,14 @@ export function navyExpedition(game,ship,army,target=null){
  if(ship.path.length)return false;
  if(ship.cargo){
   if(ship.landing){
-   const landing={...ship.landing},objective=game.s.cities.find(c=>c.id===ship.targetCity)||target;
+   const landing={...ship.landing},objective=(ship.targetKind==='settler'?game.s.settlers:game.s.cities).find(c=>c.id===ship.targetCity)||target;
    const e=disembark(game,ship,landing);
    if(!e&&army){
     if(objective&&objective.team!==army.team)army.path=game.landPath(army,objective,army.team)||[];
    }
    return !e;
   }
-  const possibilities=(target?[target]:game.s.cities.filter(c=>c.team!==ship.team&&game.seen(ship.team,c)))
+  const possibilities=(target?[target]:[...game.s.cities,...game.s.settlers].filter(c=>c.team!==ship.team&&game.seen(ship.team,c)))
     .filter(c=>c?.team!==ship.team);
   let best=null;
   for(const c of possibilities){
@@ -165,7 +165,7 @@ export function navyExpedition(game,ship,army,target=null){
    if(route&&(!best||route.score<best.route.score))best={city:c,route};
   }
   if(best){
-   ship.path=best.route.path;ship.landing=best.route.shore;ship.targetCity=best.city.id;
+   ship.path=best.route.path;ship.landing=best.route.shore;ship.targetCity=best.city.id;ship.targetKind=game.s.cities.includes(best.city)?'city':'settler';
    return true;
   }
   // Put scouts ashore on a genuinely disconnected landmass rather than
@@ -243,7 +243,7 @@ export function aiNavy(game,team){
     .sort((a,b)=>armyUnits(game.s,b).length-armyUnits(game.s,a).length)[0];
   const passenger=cargoArmy(game,ship);
   if(passenger||ship.cargo){navyExpedition(game,ship,passenger);continue;}
-  const enemyKnown=game.s.cities.some(c=>c.team!==team&&game.seen(team,c));
+  const enemyKnown=[...game.s.cities,...game.s.settlers].some(c=>c.team!==team&&game.seen(team,c));
   if(!enemyKnown){
    // A scout must survey inland after the first landfall. Put one aboard when possible.
    const scout=activeArmies(game.s,team).find(a=>armyUnits(game.s,a).some(u=>u.kind==='scout')&&armyUnits(game.s,a).length<=SHIPS.transport.capacity);
