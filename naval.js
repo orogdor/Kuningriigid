@@ -25,7 +25,7 @@ export function embark(game,ship,kind,armyId=0){
   if(units.length>SHIPS.transport.capacity)return 'Laeva mahub kuni 6 väesalka.';
   if(game.s.battle)return 'Lõpeta esmalt lahing.';
   army.embarked=ship.id;army.path=[];army.autoExplore=!!army.autoExplore;
-  ship.cargo={kind:'army',team:ship.team,armyId:army.id||0};
+  ship.cargo={kind:'army',team:ship.team,armyId:army.id||0};ship.boardingLand={c:army.c,r:army.r};
   return '';
  }
  const a=game.s.settlers.find(a=>a.team===ship.team&&a.embarked==null&&near(a,ship)&&!a.path.length);
@@ -126,10 +126,9 @@ export function navyExpedition(game,ship,army,target=null){
  if(ship.path.length)return false;
  if(ship.cargo){
   if(ship.landing){
-   const landing={...ship.landing};
+   const landing={...ship.landing},objective=game.s.cities.find(c=>c.id===ship.targetCity)||target;
    const e=disembark(game,ship,landing);
    if(!e&&army){
-    const objective=game.s.cities.find(c=>c.id===ship.targetCity)||target;
     if(objective&&objective.team!==army.team)army.path=game.landPath(army,objective,army.team)||[];
    }
    return !e;
@@ -145,9 +144,19 @@ export function navyExpedition(game,ship,army,target=null){
    ship.path=best.route.path;ship.landing=best.route.shore;ship.targetCity=best.city.id;
    return true;
   }
+  // Put scouts ashore on a genuinely disconnected landmass rather than
+  // demanding that they chart every water square in the world first.
+  if(army&&armyUnits(game.s,army).some(u=>u.kind==='scout')&&ship.boardingLand){
+   for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+    const shore={c:ship.c+dc,r:ship.r+dr};
+    if(!game.canTraverse(ship.team,shore))continue;
+    if(game.landPath(ship.boardingLand,shore,ship.team)!==null)continue;
+    const error=disembark(game,ship,shore);
+    if(!error){army.autoExplore=true;ship.autoScout=false;return true}
+   }
+  }
   const scout=seaExplorePath(game,ship);
   if(scout?.length){ship.path=scout;return true}
-  // A boat without a reachable landing does not teleport an army ashore.
   return false;
  }
  const scout=seaExplorePath(game,ship);
@@ -211,8 +220,32 @@ export function aiNavy(game,team){
   const passenger=cargoArmy(game,ship);
   if(passenger||ship.cargo){navyExpedition(game,ship,passenger);continue;}
   const enemyKnown=game.s.cities.some(c=>c.team!==team&&game.seen(team,c));
-  if(!enemyKnown){navyExpedition(game,ship,null);continue;}
+  if(!enemyKnown){
+   // A scout must survey inland after the first landfall. Put one aboard when possible.
+   const scout=activeArmies(game.s,team).find(a=>armyUnits(game.s,a).some(u=>u.kind==='scout')&&armyUnits(game.s,a).length<=SHIPS.transport.capacity);
+   if(scout&&ship.path.length===0){
+    if(near(scout,ship)&&scout.embarked==null){
+     if(!embark(game,ship,'army',scout.id||0)){navyExpedition(game,ship,scout);continue}
+    }else if(scout.embarked==null&&!scout.path.length){
+     for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+      const coast={c:ship.c+dc,r:ship.r+dr};
+      if(!game.canTraverse(team,coast))continue;
+      const path=game.landPath(scout,coast,team);
+      if(path){scout.path=path;dr=2;break}
+     }
+    }
+   }
+   if(!ship.path.length)navyExpedition(game,ship,null);
+   continue;
+  }
   if(!combat||game.s.time<(game.s.aiPeaceUntil||0)||ship.path.length)continue;
+  // Once contact is made at sea, return to a home harbor to collect actual troops.
+  const nearby=near(combat,ship);
+  if(!nearby){
+   const ports=cities.flatMap(c=>game.contexts(c)).filter(c=>c.economy.buildings.some(b=>b.type==='harbor'&&b.ready&&!b.disabled));
+   const candidates=ports.map(p=>{const to=harborExit(game,{...p,team});return to?seaPath(game,ship,to):null}).filter(Boolean).sort((a,b)=>a.length-b.length);
+   if(candidates.length&&candidates[0].length){ship.path=candidates[0];continue}
+  }
   if(near(combat,ship)){
    embark(game,ship,'army',combat.id||0);
    continue;
