@@ -1,6 +1,7 @@
 // V69 non-gameplay HUD behaviour. All major actions are dispatched by civilization.js.
 const id=name=>document.getElementById(name);
 const body=document.body;
+if(matchMedia('(max-width:900px), (max-height:580px)').matches){body.classList.add('hud-objective-closed');const t=document.getElementById('hud-objective-toggle');if(t){t.textContent='⌄';t.setAttribute('aria-expanded','false')}}
 function openMapActions(show){
  const open=!!show&&body.classList.contains('atlas');
  body.classList.toggle('hud-map-open',open);
