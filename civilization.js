@@ -392,6 +392,7 @@ $('world').onpointerdown=e=>{
  if(inputBlocked())return;
  if(e.pointerType==='touch'){
   touchPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  $('world').setPointerCapture(e.pointerId);
   if(touchPointers.size>=2){pinch={distance:Math.max(4,pointerDistance()),startZoom:zoom};pinchConsumed=true;drag=null}
  }
  if(touchPointers.size>1)return;
