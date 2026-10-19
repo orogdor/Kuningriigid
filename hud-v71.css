@@ -1,0 +1,54 @@
+/* V71 – touch-native strategy HUD with non-overlapping floating controls. */
+#world{touch-action:none!important;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+#hud-explore-panel{position:fixed;left:max(10px,env(safe-area-inset-left));top:calc(var(--hud-top) + 12px);z-index:19;width:min(300px,calc(100vw - 20px));max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 26px);overflow-y:auto;background:linear-gradient(145deg,#102b2bf5,#193c32f4);border:1px solid #d6b777;border-radius:12px;box-shadow:0 8px 26px #000b;padding:10px;overscroll-behavior:contain}
+#hud-explore-panel[hidden]{display:none!important}
+.hud-explore-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#efdaad;font:600 16px/1.2 Georgia}
+#hud-explore-close{width:33px;min-width:33px;min-height:30px;padding:4px;border:1px solid #bb985f;background:#24423a;border-radius:8px;color:#f6e1ae;font-size:14px}
+#hud-explore-state{font-size:11px;line-height:1.4;color:#ccdbc5;margin:7px 0}
+.hud-explore-actions{display:grid;grid-template-columns:1fr;gap:5px}
+.hud-explore-actions button{min-height:36px;padding:7px 9px;background:linear-gradient(#334c3e,#213d37);border:1px solid #ae986b;border-radius:8px;color:#f0e2c3;font:600 12px/1.25 Inter,Arial;text-align:left}
+.hud-explore-actions button:disabled{opacity:.45}
+body.hud-explore-open #commandhud,body.hud-explore-open #v51insights,body.hud-explore-open #hud-tile-resources,body.hud-explore-open #hud-build-status{display:none!important}
+#hud-zoom-controls{display:none}
+#hud-resource-toggle{z-index:16}
+#hud-tile-resources{z-index:15}
+@media(max-width:900px), (max-height:580px){
+ /* All buttons have their own lane: objective top-left, minimap top-right,
+    zoom in the free space, resource control below the minimap. */
+ #v51insights{top:calc(var(--hud-top) + 5px)!important;left:6px!important;right:auto!important;bottom:auto!important;width:145px!important;min-width:0!important;height:auto;max-height:36px!important;overflow:hidden!important;padding:5px 8px!important;border-radius:8px}
+ #v51insights strong{font-size:10px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;padding-right:23px}
+ body.hud-objective-closed #v51tips{display:none!important}
+ body:not(.hud-objective-closed) #v51insights{width:min(220px,calc(100vw - 166px))!important;max-height:90px!important;overflow:auto!important}
+ #atlasoverview{top:calc(var(--hud-top) + 5px)!important;right:6px!important}
+ body.atlas #hud-resource-toggle{top:calc(var(--hud-top) + 146px)!important;right:6px!important;left:auto!important;max-width:46vw!important;min-height:32px!important;font-size:10px!important;padding:5px 7px!important;border-radius:8px}
+ body.atlas #hud-tile-resources{top:calc(var(--hud-top) + 183px)!important;right:6px!important;max-height:min(125px,calc(100dvh - var(--hud-top) - var(--hud-bottom) - 193px))!important;width:min(198px,46vw)!important}
+ body:not(.atlas) #hud-resource-toggle{top:calc(var(--hud-top) + 6px)!important;right:6px!important;max-width:45vw!important;min-height:32px!important}
+ body:not(.atlas) #hud-tile-resources{top:calc(var(--hud-top) + 44px)!important;right:6px!important;width:min(196px,46vw)!important;max-height:110px!important}
+ #hud-zoom-controls{display:flex;position:fixed;top:calc(var(--hud-top) + 8px);left:50%;transform:translateX(-50%);z-index:16;gap:4px;align-items:center;width:auto;background:#0d2a2ce8;border:1px solid #c6aa74a8;border-radius:9px;padding:3px;box-shadow:0 3px 12px #0007}
+ #hud-zoom-controls button{display:block;width:33px;min-width:33px;height:32px;min-height:32px;padding:0;border-radius:6px;border:1px solid #c4ac7890;background:#25443b;color:#f3dfba;font:600 22px/1 Georgia;touch-action:manipulation}
+ body.hud-explore-open #hud-zoom-controls{display:none!important}
+ #hud-explore-panel{top:calc(var(--hud-top) + 46px);left:6px;width:min(240px,calc(100vw - 170px));max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 52px);padding:8px}
+ .hud-explore-heading{font-size:13px}
+ #hud-explore-close{width:26px;min-width:26px;min-height:25px}
+ #hud-explore-state{font-size:10px;margin:5px 0}
+ .hud-explore-actions button{min-height:30px;padding:5px 7px;font-size:10px}
+ #tools{overflow-x:hidden!important;scrollbar-width:none}
+ #tools button:not([hidden]){flex:1 1 0!important;min-width:0!important;max-width:none!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 2px!important;font-size:clamp(8px,1.8vw,11px)!important}
+ #tools #menubtn{flex:0 0 33px!important;width:33px!important;font-size:19px!important}
+ body.hud-explore-open #hud-resource-toggle{display:none!important}
+ body.hud-city-open #hud-tile-resources{display:none!important}
+}
+@media(max-width:520px) and (orientation:portrait){
+ #hud-zoom-controls{top:calc(var(--hud-top) + 92px)!important;left:6px!important;transform:none!important}
+ #hud-explore-panel{width:min(210px,calc(100vw - 174px));top:calc(var(--hud-top) + 47px);max-height:min(205px,calc(100dvh - var(--hud-top) - var(--hud-bottom) - 70px))}
+ body.atlas #hud-resource-toggle{top:calc(var(--hud-top) + 149px)!important}
+ body.atlas #hud-tile-resources{top:calc(var(--hud-top) + 185px)!important;max-height:125px!important}
+ #atlasoverview{width:137px!important}
+ #v51insights{width:135px!important}
+ body:not(.hud-objective-closed) #v51insights{width:205px!important}
+}
+@media(max-height:420px) and (orientation:landscape){
+ #hud-explore-panel{max-height:calc(100dvh - var(--hud-top) - var(--hud-bottom) - 54px);width:min(220px,calc(100vw - 170px))}
+ body.atlas #hud-tile-resources{max-height:55px!important}
+ #hud-zoom-controls button{height:29px;min-height:29px;width:30px;min-width:30px}
+}
