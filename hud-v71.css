@@ -20,8 +20,8 @@ body.hud-explore-open #commandhud,body.hud-explore-open #v51insights,body.hud-ex
  body.hud-objective-closed #v51tips{display:none!important}
  body:not(.hud-objective-closed) #v51insights{width:min(220px,calc(100vw - 166px))!important;max-height:90px!important;overflow:auto!important}
  #atlasoverview{top:calc(var(--hud-top) + 5px)!important;right:6px!important}
- body.atlas #hud-resource-toggle{top:calc(var(--hud-top) + 146px)!important;right:6px!important;left:auto!important;max-width:46vw!important;min-height:32px!important;font-size:10px!important;padding:5px 7px!important;border-radius:8px}
- body.atlas #hud-tile-resources{top:calc(var(--hud-top) + 183px)!important;right:6px!important;max-height:min(125px,calc(100dvh - var(--hud-top) - var(--hud-bottom) - 193px))!important;width:min(198px,46vw)!important}
+ body.atlas #hud-resource-toggle{top:calc(var(--hud-top) + 161px)!important;right:6px!important;left:auto!important;max-width:46vw!important;min-height:32px!important;font-size:10px!important;padding:5px 7px!important;border-radius:8px}
+ body.atlas #hud-tile-resources{top:calc(var(--hud-top) + 198px)!important;right:6px!important;max-height:min(125px,calc(100dvh - var(--hud-top) - var(--hud-bottom) - 193px))!important;width:min(198px,46vw)!important}
  body:not(.atlas) #hud-resource-toggle{top:calc(var(--hud-top) + 6px)!important;right:6px!important;max-width:45vw!important;min-height:32px!important}
  body:not(.atlas) #hud-tile-resources{top:calc(var(--hud-top) + 44px)!important;right:6px!important;width:min(196px,46vw)!important;max-height:110px!important}
  #hud-zoom-controls{display:flex;position:fixed;top:calc(var(--hud-top) + 8px);left:50%;transform:translateX(-50%);z-index:16;gap:4px;align-items:center;width:auto;background:#0d2a2ce8;border:1px solid #c6aa74a8;border-radius:9px;padding:3px;box-shadow:0 3px 12px #0007}
@@ -41,8 +41,8 @@ body.hud-explore-open #commandhud,body.hud-explore-open #v51insights,body.hud-ex
 @media(max-width:520px) and (orientation:portrait){
  #hud-zoom-controls{top:calc(var(--hud-top) + 92px)!important;left:6px!important;transform:none!important}
  #hud-explore-panel{width:min(210px,calc(100vw - 174px));top:calc(var(--hud-top) + 47px);max-height:min(205px,calc(100dvh - var(--hud-top) - var(--hud-bottom) - 70px))}
- body.atlas #hud-resource-toggle{top:calc(var(--hud-top) + 149px)!important}
- body.atlas #hud-tile-resources{top:calc(var(--hud-top) + 185px)!important;max-height:125px!important}
+ body.atlas #hud-resource-toggle{top:calc(var(--hud-top) + 163px)!important}
+ body.atlas #hud-tile-resources{top:calc(var(--hud-top) + 200px)!important;max-height:125px!important}
  #atlasoverview{width:137px!important}
  #v51insights{width:135px!important}
  body:not(.hud-objective-closed) #v51insights{width:205px!important}
