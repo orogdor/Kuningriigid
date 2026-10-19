@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 15
     env:
       CAMPAIGN_SEED: "20261019"
-      MAX_SIM_SECONDS: "9000"
+      MAX_SIM_SECONDS: "60000"
       MAX_WALL_SECONDS: "720"
     steps:
       - uses: actions/checkout@v4
