@@ -22,6 +22,7 @@ id('hud-objective-toggle')?.addEventListener('click',()=>{
 id('menubtn')?.addEventListener('click',()=>{body.classList.remove('hud-map-open','hud-city-open','hud-city-overview')});
 id('techtoggle')?.addEventListener('click',()=>{body.classList.remove('hud-map-open','hud-city-overview')});
 id('hud-help')?.addEventListener('click',()=>{
+ body.classList.add('hud-help-from-menu');
  id('startmenu').hidden=true;
  id('help').hidden=false;
 });
