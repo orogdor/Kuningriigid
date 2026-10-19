@@ -1,11 +1,11 @@
 // V71 playthrough audit: a deterministic rule-following bot plays the real
 // economy, research, movement, AI and tactical combat. No resources/units granted.
-import {Civilization,createGame,TROOPS,BUILDINGS,FACTION_NAMES} from './civilization-core.js';
-import {TECHS,techBlock} from './research.js';
-import {selectAIBuild} from './ai-strategy.js';
-import {armyUnits,activeArmies} from './v51-systems.js';
-import {createBattle,mobilizeCity,settleDefenders,tickBattle,rememberBattle} from './campaign.js';
-import {fortifyBattle,persistSiegeDamage} from './fortifications.js';
+import {Civilization,createGame,TROOPS,BUILDINGS,FACTION_NAMES} from '../civilization-core.js';
+import {TECHS,techBlock} from '../research.js';
+import {selectAIBuild} from '../ai-strategy.js';
+import {armyUnits,activeArmies} from '../v51-systems.js';
+import {createBattle,mobilizeCity,settleDefenders,tickBattle,rememberBattle} from '../campaign.js';
+import {fortifyBattle,persistSiegeDamage} from '../fortifications.js';
 import {writeFileSync} from 'node:fs';
 
 const seed=Number(process.env.CAMPAIGN_SEED||20261019);
