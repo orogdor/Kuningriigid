@@ -1,0 +1,43 @@
+name: V71 touch and exploration smoke tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'civilization.js'
+      - 'hud-v71.css'
+      - 'hud-v69.js'
+      - 'TEST_V71_UI.mjs'
+      - '.github/workflows/ui-v71.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Chromium test tooling
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Validate scouting, touch zoom and layout
+        run: |
+          node TEST_V69.mjs
+          python3 -m http.server 8765 >/tmp/v71-server.log 2>&1 &
+          node TEST_V71_UI.mjs
+      - name: Save HUD reference screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v71-responsive-ui-screenshots
+          path: ui-screenshots-v71/*.png
+          if-no-files-found: ignore
