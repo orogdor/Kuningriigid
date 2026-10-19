@@ -52,6 +52,7 @@ try{
    const p=rect('citypanel'),nav=rect('tools'),tray=rect('tray'),w=innerWidth,h=innerHeight;
    return {p,nav,tray,w,h,visible:getComputedStyle(el('citypanel')).display!=='none',scroll:el('tray').scrollWidth>el('tray').clientWidth,active:el('citytab-build').getAttribute('aria-selected'),showBuild:getComputedStyle(el('citypane-build')).display!=='none'};
   });
+  console.log('V70 LAYOUT',layout.label,JSON.stringify(m));
   assert.equal(m.visible,true,'city drawer visible '+layout.label);
   assert.equal(m.showBuild,true,'build tab visible '+layout.label);
   assert.ok(m.p.left>=0&&m.p.right<=m.w+3&&m.p.top>=0&&m.p.bottom<=m.h+3,'drawer clipped '+layout.label);
