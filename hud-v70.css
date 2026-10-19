@@ -31,7 +31,7 @@ body.hud-build-placing #commandhud{display:none!important}
  /* The sheet is deliberately at the bottom, never across the whole map. */
  body.hud-city-open #citypanel:not([hidden]){
   position:fixed;display:flex!important;flex-direction:column;
-  top:auto!important;bottom:calc(max(3px,env(safe-area-inset-bottom)) + 49px)!important;
+  top:auto!important;bottom:calc(max(3px,env(safe-area-inset-bottom)) + 83px)!important;
   left:max(6px,env(safe-area-inset-left))!important;right:auto!important;
   width:min(610px,calc(100vw - 12px))!important;max-width:calc(100vw - 12px)!important;
   height:auto;max-height:min(47dvh,250px)!important;
