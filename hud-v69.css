@@ -87,7 +87,7 @@ body:not(.atlas) #commandhud{z-index:8}
  #tools button{flex:1 0 auto;min-width:0;max-width:none;min-height:37px;padding:7px 6px;font-size:10px}
  #tools [data-tab="help"],#tools #journal,#tools #home,#tools #zin,#tools #zout{display:none!important}
  #menubtn{font-size:18px!important;flex:0 0 37px!important}
- #commandhud,body:not(.atlas) #commandhud,body:not(.atlas):not(.settling):not(.battle) #commandhud,.battle #commandhud,.settling #commandhud{left:max(6px,env(safe-area-inset-left));right:auto;top:auto;bottom:calc(max(3px,env(safe-area-inset-bottom)) + 47px);width:min(248px,calc(100vw - 12px));max-width:calc(100vw - 12px);height:auto;max-height:104px;overflow:hidden;padding:6px 8px;border-radius:9px}
+ #commandhud,body:not(.atlas) #commandhud,body:not(.atlas):not(.settling):not(.battle) #commandhud,.battle #commandhud,.settling #commandhud{left:max(6px,env(safe-area-inset-left));right:auto;top:auto;bottom:calc(max(3px,env(safe-area-inset-bottom)) + 72px);width:min(248px,calc(100vw - 12px));max-width:calc(100vw - 12px);height:auto;max-height:104px;overflow:hidden;padding:6px 8px;border-radius:9px}
  #commandname{font-size:15px}
  #commandmode{font-size:8px}
  #commandstate{font-size:9px;margin:3px 0;line-height:1.15;max-height:22px;overflow:hidden}
