@@ -47,9 +47,18 @@ const localMeshes=createDetailTrailLinks(spots,nav,()=>0);
 assert.ok(localMeshes.children[0]?.geometry?.attributes?.position.count>0,'local connected road ribbons should render');
 
 // The same world road becomes a walkable terrain-following strip on detail map.
-const game={s,seen:()=>true};
-const ribbons=createDetailWorldRoads(game,a,nav,()=>0);
+// V65 terrain paths now require world-coordinate cells and a seeded noise function.
+// Keep this V59 regression as a lightweight fixture rather than a full game bootstrap.
+const game={
+ s,
+ seen:()=>true,
+ cell:({c,r})=>({c,r,x:c*50-650,z:r*50-550}),
+ noise:()=>.25,
+};
+const tile=game.cell(a);
+const ribbons=createDetailWorldRoads(game,tile,nav,()=>0);
 assert.ok(ribbons.children[0]?.geometry?.attributes?.position.count>0,'world road must continue onto detail view');
-const fogged=createDetailWorldRoads({...game,seen:(_team,tile)=>tile.c===10},a,nav,()=>0);
+assert.ok(Array.from(ribbons.children[0].geometry.attributes.position.array).every(Number.isFinite),'detail road geometry must use finite 3D coordinates');
+const fogged=createDetailWorldRoads({...game,seen:(_team,tile)=>tile.c===10},tile,nav,()=>0);
 assert.equal(fogged.children.length,0,'no road leak through unexplored neighbouring cell');
 console.log('V59 PASS: roads require traffic in both views, connected detailed geometry, no world unit snapping, ship interpolation');
