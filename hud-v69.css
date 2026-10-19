@@ -136,3 +136,8 @@ body:not(.atlas) #commandhud{z-index:8}
  #commandhud,body:not(.atlas) #commandhud{max-height:85px}
  #atlasoverview{width:108px}
 }
+
+/* V69 layer ordering and view-specific exceptions */
+#help{z-index:32}
+body:has(#researchpanel:not([hidden])) #citypanel,body:has(#startmenu:not([hidden])) #citypanel,body:has(#journalpanel:not([hidden])) #citypanel{display:none!important}
+@media(max-width:760px), (max-height:520px){body.atlas #tools,body:not(.atlas) #tools{bottom:max(3px,env(safe-area-inset-bottom))}body.atlas #atlasoverview{top:calc(var(--hud-top) + 5px);bottom:auto}body.atlas #v51insights{top:calc(var(--hud-top) + 5px);bottom:auto}body.atlas.hud-map-open #v51insights{display:none!important}}
