@@ -1,6 +1,6 @@
 /* V69 — adaptive 4X HUD. Original gameplay and menu logic remain usable. */
 :root{--hud-ink:#091d22;--hud-gold:#d9b878;--hud-line:rgba(226,183,104,.67);--hud-cream:#f4e8c8;--hud-top:62px;--hud-bottom:62px;--hud-pad:12px}
-html,body{width:100%;height:100%;height:100dvh;overflow:hidden}body{color:var(--hud-cream)}#world{inset:0;width:100vw;height:100vh;height:100dvh}
+html,body{width:100%;height:100%;height:100dvh;overflow:hidden}body{color:var(--hud-cream)}#world{inset:0;width:100vw!important;height:100dvh!important;min-width:100vw;min-height:100dvh}
 header{height:var(--hud-top);min-height:0;padding:6px max(9px,env(safe-area-inset-right)) 6px max(9px,env(safe-area-inset-left));display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:clamp(5px,1vw,15px);z-index:11;background:linear-gradient(180deg,#081d22fa,#183334f7);border-bottom:2px solid var(--hud-line);box-shadow:0 5px 18px #0008}
 header .brand{flex:0 0 47px;min-width:47px;margin:0;text-align:center;font:30px/1 Georgia;color:#e5ca91;letter-spacing:0;text-shadow:0 1px 3px #000}header .brand small{display:none}
 header .game-language{order:4;flex:0 0 auto;white-space:nowrap;margin:0;font-size:10px;color:#cdb987}header .game-language select{min-width:68px;max-width:98px;padding:5px;background:#193630;color:#f4e6c8;border:1px solid var(--hud-line);border-radius:7px}
