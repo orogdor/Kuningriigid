@@ -12,8 +12,8 @@
 - Tootmise AI ei ehita piiramatus koguses üht ja sama kivimurdu või muud põhitoorainetootjat.
 
 ## Testimine
-- `TEST_V72.mjs`: tõeline detsembrarmee laadimine, salvestuse taastamine, mereteekond vastase mandrile, maabumine, lahingu arvutus, vastase asunike tabamine ja võiduseisund.
-- `TEST_V72_AI_NAVY.mjs`: 600 mänguminuti pikkune AI simulatsioon, mis kinnitas vähemalt ühe vastase sadama ja laevade valmimise.
+- `TEST_V72.mjs`: valitud väesalga laadimine, salvestuse taastamine, mereteekond vastase mandrile, maabumine, lahingu arvutus, vastase asunike tabamine ja võiduseisund.
+- `TEST_V72_AI_NAVY.mjs`: 600 mänguminuti pikkune AI simulatsioon, kus Ida kuningriik ehitas sadama, transpordilaeva ja sõjalaeva; Põhja kuningriik ehitas sadama.
 - Varem olemas olnud V68/V69 regressioonitestid ja V71 kuue ekraanisuuruse brauseritestid.
 
 ## Oluline piirang
