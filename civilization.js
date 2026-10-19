@@ -6,8 +6,8 @@ import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=65';
-import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=68d';
-import {surface,localSurface,riverNear} from './continuous-landscape.js?v=68d';
+import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=69a';
+import {surface,localSurface,riverNear} from './continuous-landscape.js?v=69a';
 import {SHIPS} from './naval.js';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js';
@@ -20,7 +20,7 @@ import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
 import {renderResearchUI} from './research-ui.js';
 import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
-import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=68d';
+import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=69a';
 import {createWorldAtlasProps} from './world-props.js?v=58';
 import * as T from './vendor/three.module.js';
 import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=68d';
@@ -499,4 +499,4 @@ function sampleV51FPS(dt){if(menuOpen||document.hidden)return;fpsFrames++;fpsSec
  if(highFpsSeconds>=12&&v51Resolution<1){v51Resolution=1;renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?.85:quality==='medium'?1.15:1.6));highFpsSeconds=0}
 }
 
-$('seedinfo').textContent='Maailma seeme: '+s.seed+' · tempo: '+tempoName(s);if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();openWorld();worldSync();if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={camera,localScene,resourceLayerStatus:()=>({enabled:showResourceOverlay,icons:resourceSprites.length}),pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,overviewMetrics,setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
+$('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();openWorld();worldSync();if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={camera,localScene,resourceLayerStatus:()=>({enabled:showResourceOverlay,icons:resourceSprites.length}),pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,overviewMetrics,setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
