@@ -10,6 +10,9 @@
 .hud-explore-actions button:disabled{opacity:.45}
 body.hud-explore-open #commandhud,body.hud-explore-open #v51insights,body.hud-explore-open #hud-tile-resources,body.hud-explore-open #hud-build-status{display:none!important}
 #hud-zoom-controls{display:none}
+/* Canvas intrinsic size was stretching the minimap to 600px on desktop/tablets. */
+body.atlas #atlasoverview{height:auto!important;max-height:190px!important;min-height:0!important;overflow:hidden!important}
+body.atlas #atlasoverview canvas{width:100%!important;height:140px!important;max-height:140px!important;min-height:0!important;aspect-ratio:auto!important}
 #hud-resource-toggle{z-index:16}
 #hud-tile-resources{z-index:15}
 @media(max-width:900px), (max-height:580px){
