@@ -102,6 +102,13 @@ const job=enemy.training.find(x=>x.ship);job.progress=job.total;
 g.tickTraining(enemy,0);
 assert.ok(s.ships.some(x=>x.team===1&&x.kind==='transport'&&x.hp>0),'AI completes a transport at its port');
 console.log('V72 AI HARBOR PASS');
+for(let i=0;i<7;i++)s.units.push({kind:'spearman',team:1,hp:125,armyId:0});
+assert.ok(s.units.filter(u=>u.team===1&&u.hp>0).length>SHIPS.transport.capacity);
+aiNavy(g,1);
+const squads=s.armies.filter(a=>a.team===1).map(a=>s.units.filter(u=>u.team===1&&u.hp>0&&(u.armyId||0)===(a.id||0)).length).filter(Boolean);
+assert.ok(squads.some(n=>n>=3&&n<=6),'AI splits to form a transportable fighting detachment');
+console.log('V72 AI ARMY SPLIT PASS',JSON.stringify({squads}));
+
 
 // The first captured city does not end the game if two opponents still have
 // surviving settlers. Resolve battle damage using the actual combat code.
