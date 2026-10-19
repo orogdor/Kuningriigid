@@ -1,0 +1,48 @@
+name: V72 naval and conquest regression
+on:
+  push:
+    branches: [dev/v72-naval-victory, main]
+    paths:
+      - 'naval.js'
+      - 'civilization-core.js'
+      - 'civilization.js'
+      - 'ai-strategy.js'
+      - 'victory-v72.js'
+      - 'TEST_V72.mjs'
+      - '.github/workflows/v72.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run game rules and conquest tests
+        run: |
+          node TEST_V69.mjs
+          node TEST_V68.mjs
+          node TEST_V72.mjs
+      - name: Prepare Chrome
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Verify mobile and desktop HUD
+        run: |
+          python3 -m http.server 8765 >/tmp/v72-http.log 2>&1 &
+          node TEST_V71_UI.mjs
+      - name: Capture UI reference screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v72-unchanged-hud-screens
+          path: ui-screenshots-v71/*.png
+          if-no-files-found: ignore
