@@ -321,7 +321,7 @@ export class Civilization{
   }
  buildShip(city,kind){return buildShip(this,city,kind)}
  sail(ship,to){const path=seaPath(this,ship,to);if(!path)return 'Seda mereteed ei saa veel läbida. Varased laevad peavad hoiduma ranniku lähedale.';ship.path=path;return ''}
- embark(ship,kind){return embark(this,ship,kind)}
+ embark(ship,kind,armyId=0){return embark(this,ship,kind,armyId)}
  disembark(ship,p){return disembark(this,ship,p)}
  radius(city){const pop=city.economy.realms[city.team].pop;return city.radius=Math.min(4,Math.max(city.radius||1,pop>=64?4:pop>=48?3:pop>=32?2:1))}
  refreshTerritory(){const stamp=this.s.cities.map(c=>[c.id,c.team,c.c,c.r,this.radius(c),Object.entries(c.districts||{}).filter(([,d])=>d.economy.buildings.some(b=>!b.virtual)).map(([k])=>k).join(',')].join(':')).join('|');if(stamp===this.territoryStamp)return;this.territoryStamp=stamp;const candidates=new Map();for(const city of this.s.cities){const radius=this.radius(city),queue=[{c:city.c,r:city.r}],seen=new Set();for(let i=0;i<queue.length;i++){const p=queue[i],key=tileKey(p);if(seen.has(key)||p.c<0||p.c>=COLS||p.r<0||p.r>=ROWS||Math.max(Math.abs(p.c-city.c),Math.abs(p.r-city.r))>radius||!this.cell(p).land)continue;seen.add(key);if(!candidates.has(key))candidates.set(key,[]);candidates.get(key).push(city);for(const[dc,dr]of [[1,0],[-1,0],[0,1],[0,-1]])queue.push({c:p.c+dc,r:p.r+dr})}}
