@@ -94,12 +94,19 @@ export function baseHeight(game,x,z){
  // Ridge systems are actual elevated continuous terrain, not grey material
  // patches. Two frequencies create mountain crests and steep rock faces.
  const crest=Math.pow(1-Math.abs(Math.sin(x*.052+Math.cos(z*.018)*1.4)*Math.cos(z*.048-x*.011)),2);
- const ridge=(12+22*crest+4.5*Math.max(0,fold))*steep;
+ const ridge=(12+25*crest+5.5*Math.max(0,fold))*steep;
+// V69: mountain scarps are real shared 3D elevation. Narrow crests make
+// broken cliffs, with the same metres projected into both map views.
+const jagged=.5+.5*Math.sin(x*.079+Math.cos(z*.043)*1.5)*Math.cos(z*.061-x*.023);
+const scarp=steep*smooth((crest-.16)/.59)*(6.8+8.2*Math.pow(Math.max(0,jagged),2));
+// Intermittent broken coastal ledges (not a continuous seawall).
+const coastal=(smooth((h-3.2)/4)*(1-smooth((h-15)/6)))*4.5*
+ Math.pow(Math.max(0,Math.sin(x*.061+z*.029+Math.sin(z*.031))),4);
  // Sloping continental shelf: the underwater seabed is visibly BELOW the
  // sea surface even where riverbeds descend toward the coast.
  const sub=Math.max(0,.72-h);
  const oceanFloor=sub?(2.5*smooth(sub/7)+sub*.10):0;
- return h+ridge-oceanFloor;
+ return h+ridge+scarp+coastal-oceanFloor;
 }
 export function worldElevation(game,x,z){
  const base=baseHeight(game,x,z),{distance:d,width:w}=riverNear(game,x,z);
