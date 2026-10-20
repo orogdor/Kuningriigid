@@ -140,7 +140,7 @@ function craft(g,type,team){
   bundle(g,-3.1,-2.65,4);bundle(g,2.6,-2.5,4);
  }else if(type==='cellar'){
   // Submerged turf-roof store with dark stone portal, not a normal hut.
-  const mound=make(g,new T.SphereGeometry(3.2,16,9),'moss',0,.45,0);
+  const mound=make(g,new T.SphereGeometry(3.2,16,9,0,Math.PI*2,0,Math.PI/2),'moss',0,.12,0);
   mound.scale.set(1.02,.63,.76);
   cube(g,0,.35,2.35,3.5,.95,.58,'stone');
   doorway(g,0,2.37,1.05,1.8);
