@@ -1,0 +1,58 @@
+/* V82: building inspector, independent of the large city menu.
+   A compact responsive card that never traps the map behind full-screen UI. */
+#building-inspector[hidden]{display:none!important}
+#building-inspector{
+ position:fixed;z-index:35;right:max(12px,env(safe-area-inset-right));
+ bottom:max(18px,env(safe-area-inset-bottom));width:min(355px,calc(100vw - 24px));
+ max-height:min(72dvh,540px);overflow:auto;overscroll-behavior:contain;
+ border:1px solid #d2b47a8c;border-radius:16px;padding:13px 14px;
+ color:#f5eedf;background:linear-gradient(155deg,#18352fec,#203d3be8);
+ box-shadow:0 16px 50px #08171ae0;backdrop-filter:blur(13px);
+ font:12px/1.5 Inter,Arial,sans-serif;
+ pointer-events:auto;
+}
+#building-inspector .bi-header{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+#building-inspector .bi-heading{flex:1;min-width:0}
+#building-inspector .bi-eyebrow{color:#e0c488;text-transform:uppercase;font-size:10px;letter-spacing:.9px}
+#building-inspector h3{margin:2px 0 4px;font-size:18px;line-height:1.28;color:#fff0c9}
+#building-inspector button{
+ background:#294f48;border:1px solid #b59e7299;color:#f7eaca;
+ border-radius:9px;cursor:pointer;padding:9px 10px;min-height:40px;
+ font:600 12px Inter,Arial,sans-serif
+}
+#building-inspector button:focus-visible{outline:2px solid #f8d685;outline-offset:2px}
+#bi-close{min-width:41px;flex:0 0 auto;font-size:17px!important}
+#bi-description{margin:7px 0 11px;color:#dde7dc;font-size:12px}
+#bi-status{margin:0 0 9px;padding:7px 9px;border-left:3px solid #d9b980;background:#29463d9c;color:#fff0d2}
+#bi-stats{display:grid;grid-template-columns:minmax(96px,42%) minmax(0,1fr);gap:0 9px;border-top:1px solid #c5b58744}
+#bi-stats dt,#bi-stats dd{margin:0;padding:6px 0;border-bottom:1px solid #aeb69a24;overflow-wrap:anywhere}
+#bi-stats dt{color:#b7c9b5;font-weight:500}
+#bi-stats dd{color:#fff0cb;font-weight:600}
+#bi-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+#bi-buttons button{flex:1;min-width:115px}
+#bi-buttons button[hidden]{display:none!important}
+body:has(#startmenu:not([hidden])) #building-inspector,
+body:has(#researchpanel:not([hidden])) #building-inspector,
+body:has(#help:not([hidden])) #building-inspector,
+body:has(#journalpanel:not([hidden])) #building-inspector{display:none!important}
+@media(max-width:900px){
+ #building-inspector{
+  left:auto;right:max(7px,env(safe-area-inset-right));
+  bottom:calc(var(--hud-bottom,73px) + 7px);
+  width:min(342px,calc(100vw - 14px));
+  max-height:min(48dvh,360px);padding:11px 12px;border-radius:13px;
+ }
+ #building-inspector h3{font-size:16px}
+ #bi-stats dt,#bi-stats dd{padding:4px 0}
+ #building-inspector button{min-height:43px}
+ body.hud-city-open #building-inspector{display:none!important}
+}
+@media(max-width:900px) and (orientation:landscape) and (max-height:520px){
+ #building-inspector{
+  left:auto;right:8px;bottom:calc(var(--hud-bottom,64px) + 5px);
+  max-height:min(53dvh,230px);width:min(315px,50vw);
+ }
+ #building-inspector h3{font-size:15px}
+ #bi-description{margin:4px 0 7px}
+ #bi-status{padding:4px 6px}
+}
