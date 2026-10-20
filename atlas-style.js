@@ -34,7 +34,7 @@ function biomeBaseColor(game,cell,h,x,z){
  else if(vb==='taiga')color.set(palette.taiga);
  else if(vb==='snow')color.set(palette.snow);
  else if(vb==='mountain')color.set(palette.mountain);
- else if(vb==='snow_mountain')color.set(palette.snow);
+ else if(vb==='snow_mountain')color.set('#929b91');
  if(h<.7)color.set(palette.shallow);
  if(h>=3.4&&vb.startsWith('coastal_'))color.lerp(new T.Color(palette.beach),.16);
  if((vb==='mountain'||vb==='snow_mountain')&&h>22)color.lerp(new T.Color('#9aa09b'),.22);

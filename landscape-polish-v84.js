@@ -9,7 +9,7 @@ export function mountainTint(color,x,z,height,normalY){
  const strata=.5+.5*Math.sin(height*.52+Math.sin(x*.025+z*.018)*1.8);
  const rock=new T.Color('#505d60').lerp(new T.Color('#aaa18e'),strata*.72);
  color.lerp(rock,.24+slope*.69);
- const snow=clamp((height-61)/23)*clamp((Math.abs(normalY)-.38)/.45);
+ const snow=clamp((height-82)/24)*clamp((Math.abs(normalY)-.38)/.45);
  color.lerp(new T.Color('#e5e9df'),snow*.92);
  return color;
 }
@@ -100,12 +100,12 @@ function cragGeometry(){
 }
 export function createMountainOutcrops(game,scope='world',tile=null){
  const group=new T.Group();group.name='V84 stratified mountain crests';group.userData.landscape=true;
- const all=game.cells.filter(c=>c.mountain&&game.noise(c.c*13+8,c.r*17+4)>.53);
+ const all=game.cells.filter(c=>c.mountain);
  const sites=all.filter(c=>!tile||Math.abs(c.x-tile.x)<85&&Math.abs(c.z-tile.z)<85);
  if(!sites.length)return group;
  const geo=cragGeometry(),mat=new T.MeshStandardMaterial({vertexColors:true,roughness:1,flatShading:true}),mesh=new T.InstancedMesh(geo,mat,sites.length),o=new T.Object3D();
- sites.forEach((c,i)=>{const x=c.x+(game.noise(c.c+71,c.r)-.5)*20,z=c.z+(game.noise(c.c,c.r+18)-.5)*20,y=surface(game,x,z),p=scope==='world'?{x,z}:worldToLocal(tile,x,z),size=9+game.noise(c.c+9,c.r+7)*9;
-  o.position.set(p.x,projectHeight(y-.7,scope),p.z);o.rotation.set(0,game.noise(c.c,c.r)*Math.PI*2,0);o.scale.set(size,9+size*.75,size*.72);o.updateMatrix();
+ sites.forEach((c,i)=>{const x=c.x+(game.noise(c.c+71,c.r)-.5)*20,z=c.z+(game.noise(c.c,c.r+18)-.5)*20,y=surface(game,x,z),p=scope==='world'?{x,z}:worldToLocal(tile,x,z),size=12+game.noise(c.c+9,c.r+7)*14;
+  o.position.set(p.x,projectHeight(y-.7,scope),p.z);o.rotation.set(0,game.noise(c.c,c.r)*Math.PI*2,0);o.scale.set(size,20+size*1.25,size*.72);o.updateMatrix();
   if(scope!=='world'){const m=new T.Matrix4().makeScale(3,.30,2.6).multiply(o.matrix);m.setPosition(p.x,projectHeight(y-.7,scope),p.z);mesh.setMatrixAt(i,m)}else mesh.setMatrixAt(i,o.matrix);
  });mesh.receiveShadow=true;mesh.castShadow=false;mesh.name='angular ridge rock';group.add(mesh);group.userData.outcropCount=sites.length;return group;
 }

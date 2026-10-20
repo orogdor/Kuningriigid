@@ -26,7 +26,7 @@ for(const seed of [17,12345,20261018]){
  const rocks=createMountainOutcrops(g);assert.ok(rocks.userData.outcropCount>20);
  const crags=rocks.children[0];assert.ok(crags.geometry.attributes.position.count<300,'batched low-poly crests');
  assert.equal(JSON.stringify(g.s),before,'landscape rendering does not alter saved geography, resources or visibility');
- const rockColor=mountainTint(new T.Color('#65804f'),15,25,90,.95);
+ const rockColor=mountainTint(new T.Color('#65804f'),15,25,114,.95);
  assert.ok(rockColor.r>.5&&rockColor.g>.5,'high gentle crests receive pale snow');
  console.log('V84 LANDSCAPE PASS '+JSON.stringify({seed,crossingSpan:frame.halfSpan*2,outcrops:rocks.userData.outcropCount,riverVertices:water.geometry.attributes.position.count}));
  disposeNetwork(river);disposeNetwork(rocks);
