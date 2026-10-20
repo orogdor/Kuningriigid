@@ -1,8 +1,12 @@
-# Kuningriigid V82
+# Kuningriigid V83
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
 **Mängi:** https://orogdor.github.io/Kuningriigid/?v=82-20261020
+
+## V83 – menüü viimistlus
+
+Jätkamine on kohe nähtav; uue maailma seaded, salvestused ja näidislinnad on kokkupandavad. Käivitus- ja salvestusvead kuvatakse menüüs. [Muudatused](MUUDATUSED_V83.md).
 
 ## V82 – tööstusajastu 3D-hooned ja hooneinfo kõigil ajastutel
 - Tööstusajastu (ajastu 5) sai 65 erineva hooneliigiga tekstureeritud 3D-paketi: kõrge korstnaga kõrgahjud, aurumasinatöökojad, raudteejaam, tehnikaülikool, telliskivimajad ja tehasehooned.

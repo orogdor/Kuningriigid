@@ -1,5 +1,26 @@
 // English localization strings for the originally Estonian game interface.
 export const ENGLISH_PAIRS=[
+["REAALAJA STRATEEGIA · V83", "REAL-TIME STRATEGY · V83"],
+["Sinu järgmine peatükk", "Your next chapter"],
+["Raja linn, avasta maailm ja juhi oma rahvas läbi seitsme ajastu.", "Found a city, explore the world and lead your people through seven eras."],
+["Mängu laadimine…", "Loading game…"],
+["Salvestused ja ülekandmine", "Saves and transfer"],
+["Näidislinnad ja mudelid", "Example cities and models"],
+["Maailmakaardi mudelid ↗", "World map models ↗"],
+["Ehitajate mudelid ↗", "Builder models ↗"],
+["Kiviaja näidislinn", "Stone Age example city"],
+["Pronksiaja näidislinn", "Bronze Age example city"],
+["Keskaja näidislinn", "Medieval example city"],
+["Renessansi näidislinn", "Renaissance example city"],
+["Tööstusajastu näidislinn", "Industrial Age example city"],
+["Alustad asuniku ja kolme töölisega. Maailmas on kolm vastast. Eelmisest automaatsalvestusest tehakse võimalusel varukoopia.", "Start with a settler and three workers against three rivals. Your previous autosave is backed up when storage allows."],
+["Mäng salvestub automaatselt. Käsitsi salvestamiseks kasuta allolevaid kohti; failiga saad mängu teise seadmesse üle viia.", "The game saves automatically. Use the slots below for manual saves, or export a file to continue on another device."],
+["60 mängusekundit = 1 käik. Menüü, pausi ja taustalehe ajal mäng seisab.", "60 game seconds = one turn. The game pauses in menus, while paused and while the tab is in the background."],
+["🧺 Ressursid", "🧺 Resources"],
+["🌍 Maailm", "🌍 World"],
+["🧭 Avasta", "🧭 Explore"],
+["⚔ Väed", "⚔ Forces"],
+["? Abi ja juhend", "? Help and guide"],
  [
   "KUNINGRIIGID",
   "KINGDOMS"

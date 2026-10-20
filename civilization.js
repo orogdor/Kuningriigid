@@ -1,5 +1,5 @@
 import {CommandVisuals} from './command-visuals.js';
-import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=82a';
+import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=83a';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
@@ -595,7 +595,7 @@ $('hud-build').onclick=()=>{if(view==='world')$('opencity').click();if(view==='l
  say('Maismaateed pole. Ehita rannikule sadam ja transpordilaev, laadi valitud armee ning anna merereisi käsk.');
 };
 $('foundcity').onclick=()=>{const a=settlerHere();if(!a)return;const r=game.found(a.id);if(r.error)return say(r.error);selectedMover=null;chosen=game.cell(r.city);openTile(chosen);save();say('Linn on rajatud. Ava tehnoloogiapuu ja vali jahipidamine, kalapüük või kivitöö.')};$('research').onclick=openResearch;$('attackall').onclick=()=>{if(!s.battle)return;for(const u of s.battle.squads)if(u.team===0)u.advance=true;say('Sõdalased ründavad. Kiviviskajad hoiavad tagapool.')};$('retreat').onclick=()=>{if(s.battle){if(!s.battle.result){s.battle.result='retreat';for(const u of s.battle.squads)if(u.team===0)u.hp*=.8;const own=s.armies.find(a=>a.team===0&&tileKey(a)===tileKey(s.battle.cell))||s.armies[0],ret=s.cities.find(c=>c.team===0);if(ret){own.c=ret.c;own.r=ret.r}own.path=[]}applyBattle();s.battle=null}openWorld();save()};
-$('menubtn').onclick=()=>{toggleExploreMenu(false);slotUI();cameraKeys.clear();menuOpen=true;$('commandhud').hidden=true;$('startmenu').hidden=false};$('continue').onclick=()=>{menuOpen=false;$('startmenu').hidden=true;if(sampleDemo){const c=s.cities.find(c=>c.team===0);if(c)openTile(game.cell(c));}renderCommandHUD()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'▶':'Ⅱ'};$('zin').onclick=()=>applyZoom(zoom-(view==='world'?100:8));$('zout').onclick=()=>applyZoom(zoom+(view==='world'?100:8));$('home').onclick=()=>{const a=view==='world'?center(chosen.c,chosen.r):{x:0,z:0};focus.set(a.x,0,a.z)};$('closehelp').onclick=()=>$('help').hidden=true;$('reset').onclick=()=>{menuOpen=true;$('help').hidden=true;$('startmenu').hidden=false};$('newgame').onclick=()=>{const raw=$('seed').value.trim(),seed=raw?Array.from(raw).reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0):Math.floor(Math.random()*2147483647);try{restarting=true;const ns=createGame(seed,$('maptype').value);ns.difficulty=$('difficulty')?.value||'normal';ns.tempo='normal';replaceProtectedGame(localStorage,JSON.stringify(ns),validState);sessionStorage.setItem('kingdoms-civ-start','1');if(sampleDemo)location.replace(location.pathname);else location.reload()}catch{restarting=false;say('Uue mängu salvestamine ebaõnnestus.')}};
+$('menubtn').onclick=()=>{toggleExploreMenu(false);slotUI();cameraKeys.clear();menuOpen=true;$('commandhud').hidden=true;$('startmenu').hidden=false};$('continue').onclick=()=>{menuOpen=false;$('startmenu').hidden=true;if(sampleDemo){const c=s.cities.find(c=>c.team===0);if(c)openTile(game.cell(c));}renderCommandHUD()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'▶':'Ⅱ'};$('zin').onclick=()=>applyZoom(zoom-(view==='world'?100:8));$('zout').onclick=()=>applyZoom(zoom+(view==='world'?100:8));$('home').onclick=()=>{const a=view==='world'?center(chosen.c,chosen.r):{x:0,z:0};focus.set(a.x,0,a.z)};$('closehelp').onclick=()=>$('help').hidden=true;$('reset').onclick=()=>{menuOpen=true;$('help').hidden=true;$('startmenu').hidden=false};$('newgame').onclick=()=>{const raw=$('seed').value.trim(),seed=raw?Array.from(raw).reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0):Math.floor(Math.random()*2147483647);try{restarting=true;$('newgame').disabled=true;$('menu-status').hidden=false;$('menu-status').textContent=currentLanguage()==='en'?'Generating world…':'Maailma loomine…';const ns=createGame(seed,$('maptype').value);ns.difficulty=$('difficulty')?.value||'normal';ns.tempo='normal';replaceProtectedGame(localStorage,JSON.stringify(ns),validState);sessionStorage.setItem('kingdoms-civ-start','1');if(sampleDemo)location.replace(location.pathname);else location.reload()}catch{restarting=false;$('newgame').disabled=false;$('menu-status').textContent=currentLanguage()==='en'?'Could not save the new world. Export your save and check browser storage.':'Uut maailma ei saanud salvestada. Ekspordi mäng ja kontrolli brauseri salvestusruumi.';}};
 function openResearch(){$('researchpanel').hidden=false;renderUI();$('closeresearch').focus?.()}
 function chooseResearch(id){const result=game.research(0,id);say(result.error||'Uurimine algas: '+TECHS[id].name+' · '+Math.round(researchCost(s,TECHS[id]))+' teaduspunkti.');renderUI();save()}
 $('techtoggle').onclick=openResearch;$('researchstatus').onclick=openResearch;$('closeresearch').onclick=()=>{$('researchpanel').hidden=true;$('techtoggle').focus?.()};$('pauseresearch').onclick=()=>{s.research[0].paused=!s.research[0].paused;renderUI();save()};
@@ -731,18 +731,18 @@ slotUI();
 const demoLink=document.createElement('a');
 demoLink.className='model-gallery-link';
 demoLink.href='?v=82-20261020&demo=stone';
-demoLink.textContent='🪨 V79: ava kiviaja näidislinn ja vaata uusi majamudeleid';
-$('continue').parentNode.insertBefore(demoLink,$('continue'));
+demoLink.textContent='Kiviaja näidislinn';
+$('menu-demo-links').append(demoLink);
 const bronzeLink=document.createElement('a');
 bronzeLink.className='model-gallery-link';bronzeLink.href='?v=82-20261020&demo=bronze';
-bronzeLink.textContent='⚒️ V79: ava pronksiaja näidislinn ja võrdle uusi hooneid';
-$('continue').parentNode.insertBefore(bronzeLink,$('continue'));
-const medievalLink=document.createElement('a');medievalLink.className='model-gallery-link';medievalLink.href='?v=82-20261020&demo=medieval';medievalLink.textContent='🏰 V80: ava keskaja näidislinn ja vaata teeradu';$('continue').parentNode.insertBefore(medievalLink,$('continue'));
-const renaissanceLink=document.createElement('a');renaissanceLink.className='model-gallery-link';renaissanceLink.href='?v=82-20261020&demo=renaissance';renaissanceLink.textContent='🏛️ V81: ava renessansi näidislinn ja uued 3D-majad';$('continue').parentNode.insertBefore(renaissanceLink,$('continue'));
+bronzeLink.textContent='Pronksiaja näidislinn';
+$('menu-demo-links').append(bronzeLink);
+const medievalLink=document.createElement('a');medievalLink.className='model-gallery-link';medievalLink.href='?v=82-20261020&demo=medieval';medievalLink.textContent='Keskaja näidislinn';$('menu-demo-links').append(medievalLink);
+const renaissanceLink=document.createElement('a');renaissanceLink.className='model-gallery-link';renaissanceLink.href='?v=82-20261020&demo=renaissance';renaissanceLink.textContent='Renessansi näidislinn';$('menu-demo-links').append(renaissanceLink);
 const industrialLink=document.createElement('a');industrialLink.className='model-gallery-link';
 industrialLink.href='?v=82-20261020&demo=industrial';
-industrialLink.textContent='🏭 V82: ava tööstusajastu 3D-näidislinn ja puuduta maju';
-$('continue').parentNode.insertBefore(industrialLink,$('continue'));
+industrialLink.textContent='Tööstusajastu näidislinn';
+$('menu-demo-links').append(industrialLink);
 if(sampleDemo){
  $('menutitle').textContent=(stoneDemo?'Kiviaja näidislinn – '+DEMO_CITY_NAME:bronzeDemo?'Pronksiaja näidislinn – '+BRONZE_DEMO_NAME:medievalDemo?'Keskaja näidislinn – '+MEDIEVAL_DEMO_NAME:renaissanceDemo?'Renessansi näidislinn – '+RENAISSANCE_DEMO_NAME:'Tööstusajastu näidislinn – '+INDUSTRIAL_DEMO_NAME);
  $('v51export').textContent='↓ Laadi näidislinna salvestus (.json)';

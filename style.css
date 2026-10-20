@@ -133,3 +133,31 @@ header{backdrop-filter:blur(10px);box-shadow:0 8px 26px #0005}
 @media(max-height:480px){
  #building-inspector.binfo{max-height:64dvh;max-width:330px;left:auto;right:8px}
 }
+
+/* V83: keep play/resume in view; secondary settings are deliberately folded. */
+#startmenu .menu-card{width:min(600px,100%);padding:24px;scrollbar-gutter:stable;overscroll-behavior:contain}
+.menu-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.menu-heading .eyebrow{font-size:10px;letter-spacing:1.6px}
+#startmenu .menu-language{margin:0;display:flex;align-items:center;gap:8px;font-size:11px}
+#startmenu .menu-language select{width:auto;min-width:90px;margin:0;padding:8px}
+#startmenu h1{font-size:clamp(25px,5vw,34px);letter-spacing:1px;margin:18px 0 8px}
+#startmenu .menu-intro{font-size:14px;line-height:1.6;margin:0 0 16px}
+#startmenu #continue{background:#b7a16a;color:#172b26;font-weight:700;min-height:48px}
+#startmenu #seedinfo{font-size:11px;margin:8px 0 16px;overflow-wrap:anywhere}
+#startmenu details{border:1px solid #c9b67e55;border-radius:6px;margin:10px 0;background:#11282377}
+#startmenu summary{padding:14px;min-height:46px;cursor:pointer;color:#ead9a8;font-weight:600;font-size:14px}
+#startmenu details[open]>summary{border-bottom:1px solid #c9b67e33}
+#startmenu details>div,#startmenu details>p,#startmenu details>a,#startmenu details>button{margin-left:14px;margin-right:14px}
+#startmenu details>button{width:calc(100% - 28px);margin-bottom:14px}
+.menu-world-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.menu-seed{grid-column:1/-1}
+#startmenu .menu-world-fields label{margin:10px 0}
+.menu-utilities{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#startmenu .menu-utilities button{margin-top:0;font-size:12px}
+#startmenu .menu-note,#startmenu #savestatus{font-size:12px;line-height:1.5}
+#startmenu .menu-footer{margin-bottom:0;color:#b8c6bb}
+#menu-status{padding:10px;border:1px solid #c9b67e66;border-radius:5px;margin-bottom:10px;color:#e4cf91;font-size:13px}
+#menu-status.menu-error{border-color:#d78a71;color:#ffd4bc}
+#startmenu button:disabled{opacity:.5;cursor:wait}
+#startmenu :is(button,summary,select,input,a):focus-visible{outline:2px solid #ffe2a0;outline-offset:3px}
+body:has(#startmenu:not([hidden])) :is(header,#tools,#commandhud,#hud-resource-toggle,#hud-zoom-controls,#hud-minimap-toggle,#researchstatus,#atlasoverview,#camerahelp){visibility:hidden}
+@media(max-width:600px){#startmenu .menu-card{padding:18px}#startmenu .menu-heading{align-items:flex-start}#startmenu .menu-heading .eyebrow{font-size:9px;max-width:130px;line-height:1.7}#startmenu .menu-language{font-size:0}#startmenu .menu-language select{font-size:12px}#startmenu .menu-intro{font-size:13px}.menu-world-fields{grid-template-columns:1fr}.menu-seed{grid-column:auto}}

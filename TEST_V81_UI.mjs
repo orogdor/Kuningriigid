@@ -44,7 +44,8 @@ async function check(label,viewport,isMobile){
   if(label==='phone-portrait'){
    // Menu export exercises an actual ordinary V4 save (not an illustrative
    // scene), without modifying the player's original save.
-   await page.evaluate(()=>{document.getElementById('startmenu').hidden=false;});
+   await page.locator('#menubtn').click();
+  await page.locator('#menu-saves summary').click();
    const download=await Promise.all([
     page.waitForEvent('download',{timeout:30000}),
     page.locator('#v51export').click()
