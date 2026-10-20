@@ -121,5 +121,5 @@ export function createMountainOutcrops(game,scope='world',tile=null){
   const p=scope==='world'?{x,z}:worldToLocal(tile,x,z),height=20+size*1.25+y-base;
   o.position.set(p.x,projectHeight(base,scope),p.z);o.rotation.set(0,game.noise(c.c,c.r)*Math.PI*2,0);o.scale.set(size,height,size*.72);o.updateMatrix();
   if(scope!=='world'){const m=new T.Matrix4().makeScale(3,.30,2.6).multiply(o.matrix);m.setPosition(p.x,projectHeight(base,scope),p.z);mesh.setMatrixAt(i,m)}else mesh.setMatrixAt(i,o.matrix);
- });mesh.receiveShadow=true;mesh.castShadow=false;mesh.name='angular ridge rock';group.add(mesh);group.userData.outcropCount=sites.length;return group;
+ });mesh.receiveShadow=true;mesh.castShadow=scope!=='world';mesh.name='angular ridge rock';group.add(mesh);group.userData.outcropCount=sites.length;return group;
 }
