@@ -6,8 +6,8 @@ import {readFileSync} from 'node:fs';
 const source=readFileSync('boot-v83.js','utf8');
 for(const success of [true,false]){
  const elements=new Map();
- const element=id=>elements.get(id)||elements.set(id,{id,disabled:true,hidden:id==='startmenu',classList:{add(name){this.name=name}},append(child){this.child=child}}).get(id);
- const sandbox={document:{getElementById:element,createElement:()=>({})},window:{},console:{error(){}},location:{reload(){}}};
+ const element=id=>elements.get(id)||elements.set(id,{id,disabled:true,hidden:id==='startmenu',classList:{add(name){this.name=name}},append(child){this.child??=child}}).get(id);
+ const sandbox={document:{getElementById:element,createElement:()=>({append(child){this.child=child}})},window:{},console:{error(){}},location:{reload(){}}};
  const context=vm.createContext(sandbox);
  const mod=new vm.SourceTextModule(source,{context,importModuleDynamically:async()=>{
   if(!success)throw Error('Simulated import/WebGL startup failure');

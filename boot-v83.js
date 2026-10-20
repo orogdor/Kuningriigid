@@ -13,4 +13,7 @@ try{
  status.classList.add('menu-error');status.hidden=false;
  status.textContent=english()?'The game could not start. Reload the page. If the problem persists, check WebGL support and browser storage.':'Mängu ei saanud käivitada. Laadi leht uuesti. Kui viga kordub, kontrolli WebGL-tuge ja brauseri salvestusruumi.';
  const retry=document.createElement('button');retry.textContent=english()?'Reload page':'Laadi leht uuesti';retry.onclick=()=>location.reload();status.append(retry);
+ const details=document.createElement('details'),summary=document.createElement('summary'),message=document.createElement('p');
+ summary.textContent=english()?'Error details':'Vea üksikasjad';message.textContent=String(error?.message||error);
+ details.append(summary,message);status.append(details);
 }
