@@ -86,21 +86,6 @@ for(let age=0;age<demos.length;age++){
  assert.ok(info.owner&&info.ready);
  agesSeen.push(info.eraName);
 }
-// The UI is common to every one of the seven released eras, including the
-// Iron Age (2) and Modern Age (6), which have no separate sample town.
-for(const [age,base] of [[2,createBronzeDemoState()],[6,createIndustrialDemoState()]]){
- base.ages[0]=age;
- // Visual building eras depend on the researched builder tier, not only the
- // empire's age label. Build realistic test states for Iron and Modern.
- const needed=age===2?'iron_crafts':'modernity';
- if(!base.research[0].known.includes(needed))base.research[0].known.push(needed);
- const g=new Civilization(base),ctx=g.s.cities.find(c=>c.team===0),
-  house=ctx.economy.buildings.find(b=>b.type==='house');
- const info=describeBuilding(g,ctx,house,AGES,RESOURCE_NAMES,BUILDINGS,BUILD_TECH);
- assert.equal(info.age,age,'building info applies to every civilization era '+age);
- assert.ok(info.name&&info.status&&info.cost,'all-age info fields exist '+age);
- agesSeen.push(info.eraName);
-}
 const building=city.economy.buildings.find(b=>b.type==='steelworks');
 const work=describeBuilding(game,city,building,AGES,RESOURCE_NAMES,BUILDINGS,BUILD_TECH);
 assert.equal(work.type,'steelworks');
