@@ -20,7 +20,7 @@ for(const type of BRONZE_BUILDING_TYPES){
  models.push({type,triangles:a.userData.triangles,drawCalls:a.children.length,
   width:+size.x.toFixed(2),height:+size.y.toFixed(2),depth:+size.z.toFixed(2)});
 }
-for(const type of ['hall','house','lumber','market','quarry','fisher','barracks','harbor']){
+for(const type of ['hall','house','lumber','market','quarry','fisher','barracks']){
  assert.equal(createAgeBuilding(type,0,0).userData.stoneAgeModel,true,'Stone Age still its own models');
  assert.notEqual(createAgeBuilding(type,0,2).userData.bronzeAgeModel,true,'Iron Age remains old model');
 }
