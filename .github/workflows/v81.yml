@@ -1,0 +1,56 @@
+name: V81 Renaissance architecture and sample city
+on:
+  push:
+    branches: [feature/v81-renaissance-architecture-demo, main]
+    paths:
+      - 'renaissance-*.js'
+      - 'TEST_V81*.mjs'
+      - 'buildings.js'
+      - 'civilization.js'
+      - 'index.html'
+      - '.github/workflows/v81.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  architecture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check Renaissance models, proper era, V4 sample save and old regression tests
+        run: |
+          node --check renaissance-buildings-v81.js
+          node --check renaissance-demo-v81.js
+          node --check civilization.js
+          node --check buildings.js
+          node TEST_V81.mjs
+          node TEST_V80.mjs
+          node TEST_V79.mjs
+          node TEST_V78.mjs
+          node TEST_V77.mjs
+          node TEST_V73.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Visual check phone and desktop screenshots
+        run: |
+          python3 -m http.server 8765 >/tmp/v81-server.log 2>&1 &
+          node TEST_V81_UI.mjs
+      - name: Export demo save, geometry budgets, and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v81-renaissance-town-demo
+          path: |
+            artifacts-v81/
+            ui-screenshots-v81/
+          if-no-files-found: ignore
