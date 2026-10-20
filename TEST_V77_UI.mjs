@@ -43,7 +43,8 @@ async function scenario(label,width,height,isMobile){
   assert.deepEqual(await page.evaluate(keys=>keys.map(k=>[k,localStorage.getItem(k)]),
    noAutosave.map(x=>x[0])),noAutosave,'demo never overwrites existing saves');
   // Export is the real existing V73/V76 JSON export control, with a special name.
-  await page.evaluate(()=>{document.getElementById('startmenu').hidden=false;});
+  await page.locator('#menubtn').click();
+  await page.locator('#menu-saves summary').click();
   const download=await Promise.all([
    page.waitForEvent('download',{timeout:20000}),
    page.locator('#v51export').click()

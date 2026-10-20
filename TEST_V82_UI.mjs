@@ -94,6 +94,7 @@ async function scenario(era,width,height,isMobile,label){
    await page.locator('#building-inspector .binfo-close').click();
    await page.evaluate(()=>document.getElementById('menubtn').click());
    await page.waitForFunction(()=>!document.getElementById('startmenu').hidden);
+   await page.locator('#menu-saves summary').click();
    const download=await Promise.all([
     page.waitForEvent('download',{timeout:30000}),
     page.locator('#v51export').click()

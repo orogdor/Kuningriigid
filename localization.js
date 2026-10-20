@@ -1,4 +1,4 @@
-import {ENGLISH_PAIRS} from './locale-en.js?v=68d';
+import {ENGLISH_PAIRS} from './locale-en.js?v=83a';
 
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
@@ -19,9 +19,6 @@ const HELP_EN=[
  '<b>8. Defenses.</b> Research defensive structures for wooden walls and watchtowers, and stone fortifications for masonry walls and towers. Towers require one fully assigned worker. Station real soldiers from a stopped army on each wall; they stay behind when the army departs. Medieval siege machines can break fortified walls and gates.'
 ];
 const specialSelectors=[
- ['#startmenu .menu-card > p','Stone Age → Bronze Age → Iron Age → Middle Ages → Renaissance → Industrial Age → Modern Age. Start with a settler and three workers, and compete against three rival civilizations on a 220 × 165 world map.'],
- ['#startmenu .menu-hero .hero-text span','V68: Rivers meet the sea naturally, with deeper beds and shorelines and truly elevated mountains. Starting resources and production are scarcer. Train soldiers even when your field army is away.'],
- ['#startmenu .menu-note','60 game seconds = one turn. The game pauses in the menu, while paused, and when the tab is in the background. Game pace affects research, construction and training time, but not food consumption. Starting a new game replaces your current autosave; export it first if you want to keep it.'],
  ['#atlaspanel > .atlas-legend p:nth-of-type(2)','Your scout can automatically explore the unknown, visit villages and ruins, and receive a one-time reward on the first visit.'],
  ['#researchpanel .research-explanation','Choose one topic to research. Prerequisites unlock new branches; changing topics preserves progress. Queue up to four further discoveries. Your cities and staffed science buildings produce research points. Discovery bonuses give an extra 35%. Game time pauses in menus and while the tab is hidden.'],
  ['#citypane-build > .muted','Your whole city territory is one construction area. Choose a building and place it on any owned detail tile. All materials, builders and the queue are shared.'],
@@ -98,7 +95,7 @@ function renderAll(){
  if(document.body)visit(document.body);
  updateSpecialCopy();
  document.documentElement.lang=language;
- document.title=language==='en'?'Kingdoms V82 – Real-Time Strategy':'Kuningriigid V82 – reaalajastrateegia';
+ document.title=language==='en'?'Kingdoms V83 – Real-Time Strategy':'Kuningriigid V83 – reaalajastrateegia';
  for(const id of ['language','menulanguage']){const c=document.getElementById(id);if(c)c.value=language}
 }
 export function changeLanguage(next,{notify=true}={}){

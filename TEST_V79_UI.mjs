@@ -36,7 +36,8 @@ async function test(name,width,height,mobile){
   await page.evaluate(()=>window.gameDebug.refreshLocalRoads());
   await page.waitForFunction(()=>window.gameDebug.localRoadStatus().spots>=8,{timeout:60000});
   await page.screenshot({path:'artifacts-v79/screenshots/'+name+'-bronze-road.png',timeout:60000});
-  await page.evaluate(()=>{document.getElementById('startmenu').hidden=false});
+  await page.locator('#menubtn').click();
+  await page.locator('#menu-saves summary').click();
   const download=await Promise.all([page.waitForEvent('download',{timeout:20000}),page.locator('#v51export').click()]).then(x=>x[0]);
   assert.equal(download.suggestedFilename(),'Kuningriigid_V79_Pronksilinn.json');
   console.log('V79 UI '+name+' '+JSON.stringify({...obj,roadAfter:await page.evaluate(()=>window.gameDebug.localRoadStatus()),file:download.suggestedFilename()}));
