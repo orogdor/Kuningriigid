@@ -1,12 +1,53 @@
 // V80: Medieval-era architectural variants, shared geometries and cached materials.
 import * as T from './vendor/three.module.js';
 export const MEDIEVAL_TYPES=Object.freeze(['hall','house','warehouse','cellar','market','study','lumber','quarry','hunter','fisher','farm','well','barracks','inn','chapel','monastery','guildhall','keep','gatehouse','watchtower','stonetower','stonewall','watermill','windmill','infirmary','trade_yard','armor_workshop','crossbow_range','master_workshop','siegeworkshop']);
-const kinds=new Set(MEDIEVAL_TYPES),cache=new Map();
+const kinds=new Set(MEDIEVAL_TYPES),cache=new Map(),templates=new Map();
 const mat=(color)=>{if(!cache.has(color))cache.set(color,new T.MeshStandardMaterial({color,roughness:.88}));return cache.get(color)};
 function block(g,x,y,z,w,h,d,c){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m}
 function cone(g,x,y,z,r,h,c,n=4){const m=new T.Mesh(new T.ConeGeometry(r,h,n),mat(c));m.position.set(x,y,z);m.rotation.y=Math.PI/4;m.castShadow=true;g.add(m)}
+function batch(root){
+ root.updateMatrixWorld(true);
+ const groups=new Map();
+ root.traverse(o=>{
+  if(!o.isMesh)return;
+  const geo=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();
+  geo.applyMatrix4(o.matrixWorld);
+  const k=o.material.uuid;
+  if(!groups.has(k))groups.set(k,{material:o.material,geometries:[]});
+  groups.get(k).geometries.push(geo);
+ });
+ const pieces=[];
+ for(const {material,geometries} of groups.values()){
+  const length=geometries.reduce((n,g)=>n+g.attributes.position.count,0);
+  const positions=new Float32Array(length*3),normals=new Float32Array(length*3),uvs=new Float32Array(length*2);let at=0;
+  for(const geo of geometries){
+   const n=geo.attributes.position.count;
+   positions.set(geo.attributes.position.array,at*3);
+   if(geo.attributes.normal)normals.set(geo.attributes.normal.array,at*3);
+   if(geo.attributes.uv)uvs.set(geo.attributes.uv.array,at*2);
+   at+=n;geo.dispose();
+  }
+  const merged=new T.BufferGeometry();
+  merged.setAttribute('position',new T.BufferAttribute(positions,3));
+  merged.setAttribute('normal',new T.BufferAttribute(normals,3));
+  merged.setAttribute('uv',new T.BufferAttribute(uvs,2));
+  merged.computeBoundingSphere();
+  pieces.push({geo:merged,material});
+ }
+ root.traverse(o=>{if(o.isMesh)o.geometry.dispose()});
+ return pieces;
+}
 export function createMedievalBuilding(type,team=0){
  if(!kinds.has(type))return null;
+ const key=type+':'+(team===0?0:1);
+ if(templates.has(key)){
+  const root=new T.Group();root.name='V80 medieval '+type;
+  root.userData.medievalAgeModel=true;root.userData.buildingType=type;root.userData.age=3;
+  for(const {geo,material} of templates.get(key)){
+   const mesh=new T.Mesh(geo,material);mesh.castShadow=mesh.receiveShadow=true;root.add(mesh);
+  }
+  return root;
+ }
  const g=new T.Group();g.userData.medievalAgeModel=true;g.userData.buildingType=type;
  const stone='#a8a69b',timber='#6e4e37',roof='#665d5c',plaster='#ded0b0',accent=team?'#9b684b':'#566d83';
  const tall=['hall','keep','guildhall','monastery','chapel','stonetower','watchtower'].includes(type);
@@ -32,5 +73,12 @@ export function createMedievalBuilding(type,team=0){
  if(type==='inn'){block(g,2.8,4.8,3.8,2.1,1.2,.3,accent)}
  if(type==='infirmary'){block(g,0,5,3.6,.65,2,.25,accent);block(g,0,5,3.6,2,.65,.3,accent)}
  if(type==='farm'||type==='hunter'||type==='lumber'||type==='quarry'){for(let i=0;i<3;i++)block(g,-3+i*2.8,.5,5.3,1.4,.9,1.5,i===0?timber:stone)}
- return g;
+ const baked=batch(g);
+ templates.set(key,baked);
+ const root=new T.Group();root.name='V80 medieval '+type;
+ root.userData.medievalAgeModel=true;root.userData.buildingType=type;root.userData.age=3;
+ for(const {geo,material} of baked){
+  const mesh=new T.Mesh(geo,material);mesh.castShadow=mesh.receiveShadow=true;root.add(mesh);
+ }
+ return root;
 }
