@@ -28,6 +28,7 @@ jobs:
           node --check civilization.js
           node --check buildings.js
           node TEST_V81.mjs
+          node TEST_V81_ROADS.mjs
           node TEST_V80.mjs
           node TEST_V79.mjs
           node TEST_V78.mjs
