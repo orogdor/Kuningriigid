@@ -28,7 +28,7 @@ import * as T from './vendor/three.module.js';
 import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=80c';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js';
 import {detailHeight,featureNames} from './world-details.js';
-import {createAgeBuilding,animateBuilding} from './buildings.js?v=80c';
+import {createAgeBuilding,animateBuilding} from './buildings.js?v=81a';
 import {createStoneDemoState,DEMO_CITY_NAME} from './stone-demo-v77.js?v=80c';
 import {createBronzeDemoState,BRONZE_DEMO_NAME} from './bronze-demo-v79.js?v=80c';
 import {createMedievalDemoState,MEDIEVAL_DEMO_NAME} from './medieval-demo-v80.js?v=80c';
