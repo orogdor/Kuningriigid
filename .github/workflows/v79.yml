@@ -1,0 +1,60 @@
+name: V79 Bronze Age architecture and road formation
+on:
+  push:
+    branches: [dev/v79-bronze-buildings-and-roads, main]
+    paths:
+      - 'bronze-buildings-v79.js'
+      - 'bronze-demo-v79.js'
+      - 'navigation.js'
+      - 'detail-roads.js'
+      - 'buildings.js'
+      - 'civilization.js'
+      - 'index.html'
+      - 'TEST_V79.mjs'
+      - 'TEST_V79_UI.mjs'
+      - '.github/workflows/v79.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v79-bronze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check Bronze models, demos, traffic and old saves
+        run: |
+          node --check bronze-buildings-v79.js
+          node --check bronze-demo-v79.js
+          node --check navigation.js
+          node --check detail-roads.js
+          node --check civilization.js
+          node --check TEST_V79_UI.mjs
+          node TEST_V79.mjs
+          node TEST_V78.mjs
+          node TEST_V77.mjs
+          node TEST_V76.mjs
+          node TEST_V75.mjs
+          node TEST_V73.mjs
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Verify Bronze sample on phone and desktop
+        run: |
+          python3 -m http.server 8765 >/tmp/v79-server.log 2>&1 &
+          node TEST_V79_UI.mjs
+      - name: Preserve importable Bronze city JSON and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v79-bronze-age-city-and-road-tests
+          path: artifacts-v79/
+          if-no-files-found: ignore
