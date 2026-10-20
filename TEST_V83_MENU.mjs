@@ -7,7 +7,8 @@ const failures=[],reports=[];
 try{
 for(const device of [{name:'desktop',width:1366,height:900},{name:'phone',width:390,height:844},{name:'landscape',width:844,height:390}]){
  const ctx=await browser.newContext({viewport:{width:device.width,height:device.height},isMobile:device.name!=='desktop',hasTouch:device.name!=='desktop'});
- const page=await ctx.newPage();page.on('pageerror',e=>failures.push(device.name+': '+e.message));
+ const page=await ctx.newPage();page.setDefaultTimeout(30000);page.on('pageerror',e=>{failures.push(device.name+': '+e.message);console.log('V83 PAGE ERROR '+e.message)});
+ console.log('V83 START '+device.name);
  await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.gameDebug||document.querySelector('#menu-status.menu-error'),{timeout:90000});
  assert.ok(await page.evaluate(()=>!!window.gameDebug),await page.locator('#menu-status').textContent());
@@ -18,6 +19,7 @@ for(const device of [{name:'desktop',width:1366,height:900},{name:'phone',width:
  const layout=await page.locator('#continue').evaluate(el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom,width:r.width,viewport:innerHeight,overflow:document.documentElement.scrollWidth>innerWidth}});
  assert.ok(layout.top>=0&&layout.bottom<=layout.viewport,'resume visible without scrolling');assert.equal(layout.overflow,false);
  await page.screenshot({path:`${dir}/${device.name}-menu.png`});
+ console.log('V83 IMAGE menu-'+device.name+' '+(await page.screenshot({type:'jpeg',quality:55})).toString('base64'));
  await page.locator('#menulanguage').selectOption('en');
  assert.equal(await page.locator('#menutitle').innerText(),'Your next chapter');
  assert.equal(await page.locator('#menu-saves summary').innerText(),'Saves and transfer');
