@@ -1,0 +1,46 @@
+name: V75 model size and performance benchmark
+on:
+  push:
+    branches: [test/v75-model-size-perf, main]
+    paths:
+      - 'TEST_V75_PERF.mjs'
+      - '.github/workflows/v75-performance.yml'
+      - 'detail-world-objects.js'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check benchmark and existing site parity
+        run: |
+          node --check TEST_V75_PERF.mjs
+          node TEST_V75.mjs
+          node TEST_V73.mjs
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Measure 3D models and render benchmark
+        run: |
+          python3 -m http.server 8765 >/tmp/v75-perf-server.log 2>&1 &
+          node TEST_V75_PERF.mjs
+      - name: Keep measurement JSON and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v75-performance-measurements
+          path: benchmarks-v75/
+          if-no-files-found: ignore
