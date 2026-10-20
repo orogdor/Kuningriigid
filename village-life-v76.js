@@ -26,7 +26,7 @@ export function villageActivity(id,index,time,threat=false){
  if(index===3)return period==='evening'?'eat':(Math.floor((time+index*13)/17)%4===0?'rest':'play');
  const slot=Math.floor(((time||0)+index*8+(hash(id)%19))/34);
  if(period==='evening'){
-  if(index===1||index===2)return slot%4===0?'eat':'chat';
+  if(index===1||index===2)return 'chat'; // a reliable pair of evening storytellers
   return ['sit','eat','chat','rest','visit'][((slot+index)%5)];
  }
  if(period==='morning'){
