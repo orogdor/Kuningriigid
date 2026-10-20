@@ -5,7 +5,7 @@ import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
-import {createDetailTrailLinks} from './detail-roads.js?v=65';
+import {createDetailTrailLinks} from './detail-roads.js?v=79a';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=69a';
 import {surface,localSurface,riverNear} from './continuous-landscape.js?v=69a';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=72a';
