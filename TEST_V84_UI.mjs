@@ -13,7 +13,7 @@ for(const device of [{label:'desktop',width:1280,height:800},{label:'phone',widt
  const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(45000);
  try{
  await page.goto('http://127.0.0.1:8765/');await page.waitForFunction(()=>!!window.gameDebug,null,{timeout:90000});
- await page.locator('#continue').click();await page.locator('#pause').click();
+ await page.locator('#continue').click();await page.locator('#pause').click();await page.keyboard.press('Escape');
  const sites=await page.evaluate(()=>{
   const d=window.gameDebug,g=d.game,mountains=g.cells.filter(c=>c.mountain&&c.h>30),fords=g.cells.filter(c=>c.ford&&c.river&&c.land);
   const site=fords.find(c=>mountains.some(m=>Math.abs(m.c-c.c)+Math.abs(m.r-c.r)<5))||fords[0];

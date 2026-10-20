@@ -3,7 +3,7 @@ import * as T from './vendor/three.module.js';
 import {Civilization,createGame} from './civilization-core.js';
 import {createRiverNetwork,disposeNetwork} from './continuous-landscape-visual.js';
 import {getRivers,surface,worldToLocal,projectHeight} from './continuous-landscape.js';
-import {crossingFrame,createCrossingModel,createMountainOutcrops,mountainTint} from './landscape-polish-v84.js';
+import {crossingFrame,createCrossingModel,createMountainOutcrops,createCrossingNetwork,mountainTint} from './landscape-polish-v84.js';
 const near=(a,b,e=.004)=>assert.ok(Math.abs(a-b)<e,`${a} != ${b}`);
 for(const seed of [17,12345,20261018]){
  const g=new Civilization(createGame(seed)),edge=getRivers(g).find(e=>e.c.ford&&e.c.land);
@@ -26,6 +26,10 @@ for(const seed of [17,12345,20261018]){
  const rocks=createMountainOutcrops(g);assert.ok(rocks.userData.outcropCount>20);
  const crags=rocks.children[0];assert.ok(crags.geometry.attributes.position.count<300,'batched low-poly crests');
  assert.equal(JSON.stringify(g.s),before,'landscape rendering does not alter saved geography, resources or visibility');
+ const newSite=getRivers(g).find(e=>e.c.land&&!e.c.ford&&!e.c.bridge).c;
+ const oldCrossings=createCrossingNetwork(g);newSite.bridge=true;const newCrossings=createCrossingNetwork(g);
+ assert.equal(newCrossings.userData.crossingCount,oldCrossings.userData.crossingCount+1,'new completed bridge appears without losing or duplicating catalog crossings');newSite.bridge=false;
+ disposeNetwork(oldCrossings);disposeNetwork(newCrossings);
  const rockColor=mountainTint(new T.Color('#65804f'),15,25,114,.95);
  assert.ok(rockColor.r>.5&&rockColor.g>.5,'high gentle crests receive pale snow');
  console.log('V84 LANDSCAPE PASS '+JSON.stringify({seed,crossingSpan:frame.halfSpan*2,outcrops:rocks.userData.outcropCount,riverVertices:water.geometry.attributes.position.count}));

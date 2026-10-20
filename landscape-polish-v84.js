@@ -3,7 +3,7 @@ import * as T from './vendor/three.module.js';
 import {getRivers,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=69a';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
-const templates=new Map(),crossingMaps=new WeakMap();
+const templates=new Map(),crossingMaps=new WeakMap(),crossingCatalogs=new WeakMap();
 export function mountainTint(color,x,z,height,normalY){
  const slope=clamp((1-Math.abs(normalY)-.12)*2.3);
  const strata=.5+.5*Math.sin(height*.52+Math.sin(x*.025+z*.018)*1.8);
@@ -79,7 +79,7 @@ export function createBridgeBuilding(game,tile,height){
 }
 export function createCrossingNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V84 bank-to-bank crossings';group.userData.landscape=true;
- const existing=new Set(createWorldObjectCatalog(game,quality).candidates.bridge.map(c=>c.c+':'+c.r));
+ let existing=crossingCatalogs.get(game);if(!existing){existing=new Set(createWorldObjectCatalog(game,quality).candidates.bridge.map(c=>c.c+':'+c.r));crossingCatalogs.set(game,existing);}
  const sites=getRivers(game).map(e=>e.c).filter(c=>(scope==='world'||!game.contextAt(c,false)?.economy.buildings.some(b=>b.type==='bridge'&&b.ready))&&(c.bridge||c.ford)&&!existing.has(c.c+':'+c.r)&&(!tile||Math.abs(c.x-tile.x)<90&&Math.abs(c.z-tile.z)<90));
  for(const ford of [false,true]){
   const cells=sites.filter(c=>!c.bridge===ford),template=crossingTemplate(ford);if(!cells.length)continue;
