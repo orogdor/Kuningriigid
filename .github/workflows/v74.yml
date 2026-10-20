@@ -37,8 +37,8 @@ jobs:
       - name: Test existing touch gestures and redesigned mobile controls
         run: |
           python3 -m http.server 8765 >/tmp/v74-http.log 2>&1 &
-          node TEST_V71_UI.mjs
           node TEST_V74_UI.mjs
+          node TEST_V71_UI.mjs
       - name: Upload before-and-after reference screenshots
         if: always()
         uses: actions/upload-artifact@v4
