@@ -32,7 +32,7 @@ for(const type of RENAISSANCE_BUILDING_TYPES){
    'renaissance model overhangs registered V80 clearance: '+type+' '+JSON.stringify({size,clear}));
  }
  measures.push({type,triangles:Math.round(triangles),drawCalls:m.children.length,
-  w:+size.x.toFixed(2),h:+size.y.toFixed(2),d:+size.z.toFixed(2)});
+  w:+size.x.toFixed(2),h:+size.y.toFixed(2),d:+size.z.toFixed(2),minx:+box.min.x.toFixed(2),maxx:+box.max.x.toFixed(2),minz:+box.min.z.toFixed(2),maxz:+box.max.z.toFixed(2)});
 }
 assert.equal(createRenaissanceBuilding('nonexistent'),null);
 assert.equal(createRenaissanceBuilding('stonewall'),null,'walls retain orientable collision physics');
