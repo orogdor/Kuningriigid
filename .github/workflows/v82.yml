@@ -1,0 +1,66 @@
+name: V82 Industrial architecture and every-era building inspector
+on:
+  push:
+    branches: [feature/v82-industrial-building-inspector, main]
+    paths:
+      - 'industrial-*.js'
+      - 'building-info-v82.*'
+      - 'TEST_V82*.mjs'
+      - 'buildings.js'
+      - 'navigation.js'
+      - 'civilization.js'
+      - 'index.html'
+      - '.github/workflows/v82.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  industrial-and-inspector:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check industrial models, V4 saves, all seven era inspectors and old regressions
+        run: |
+          node --check industrial-buildings-v82.js
+          node --check industrial-demo-v82.js
+          node --check building-info-v82.js
+          node --check civilization.js
+          node --check buildings.js
+          node TEST_V82.mjs
+          node TEST_V81.mjs
+          node TEST_V81_ROADS.mjs
+          node TEST_V80.mjs
+          node TEST_V79.mjs
+          node TEST_V78.mjs
+          node TEST_V77.mjs
+          node TEST_V73.mjs
+          node TEST_V61.mjs
+          node TEST_V60.mjs
+          node TEST_V59.mjs
+          node TEST_V67.mjs
+          node TEST_V68.mjs
+      - name: Install Chromium for phone and desktop
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Real 3D render and building selection on touch screens
+        run: |
+          python3 -m http.server 8765 >/tmp/v82-server.log 2>&1 &
+          node TEST_V82_UI.mjs
+      - name: Export screenshots and valid saved demo city
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v82-industrial-town-and-building-inspector
+          path: |
+            artifacts-v82/
+            ui-screenshots-v82/
+          if-no-files-found: ignore
