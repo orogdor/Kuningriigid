@@ -12,8 +12,8 @@ open(x,z){const i=this.index(x,z);return i>=0&&this.mask[i]===1}
 nearest(p,max=9){if(this.open(p.x,p.z))return this.point(this.index(p.x,p.z));for(let r=1;r<=max;r++){const points=[];for(let dz=-r;dz<=r;dz++)for(let dx=-r;dx<=r;dx++)if(Math.max(Math.abs(dx),Math.abs(dz))===r&&this.open(p.x+dx,p.z+dz))points.push(this.point(this.index(p.x+dx,p.z+dz)));if(points.length)return points.sort((a,b)=>length(a,p)-length(b,p))[0]}return null}
 clear(a,b){const n=Math.max(1,Math.ceil(length(a,b)*4));for(let i=0;i<=n;i++)if(!this.open(a.x+(b.x-a.x)*i/n,a.z+(b.z-a.z)*i/n))return false;return true}
 // A single local walk creates wear, not a visible road. Repeated visits build permanent paths.
-roadStrength(i){const h=this.world.heat[i]||0;if(!h)return 0;const now=this.world.trailTime||0,last=this.world.heatLast[i];if(last==null){this.world.heatLast[i]=now;return h}const elapsed=Math.max(0,now-last),rate=h>=72?.0015:h>=36?.004:h>=16?.009:h>=6?.012:.015;return Math.max(0,h-rate*elapsed)}
-roadLevel(i){const h=this.roadStrength(i);return h>=72?4:h>=36?3:h>=16?2:h>=6?1:0}
+roadStrength(i){const h=this.world.heat[i]||0;if(!h)return 0;const now=this.world.trailTime||0,last=this.world.heatLast[i];if(last==null){this.world.heatLast[i]=now;return h}const elapsed=Math.max(0,now-last),rate=h>=64?.0012:h>=30?.0028:h>=13?.006:h>=4?.009:.013;return Math.max(0,h-rate*elapsed)}
+roadLevel(i){const h=this.roadStrength(i);return h>=64?4:h>=30?3:h>=13?2:h>=4?1:0}
 roadBoost(i){return this.roadLevel(i)>=1?1.5:1}
 weight(i){return 1/this.roadBoost(i)}
 // Deposit footsteps along the whole travelled segment, not just the final
