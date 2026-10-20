@@ -1,16 +1,42 @@
 // Shared small-agent navigation for citizens, carriers and soldiers.
 const length=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export const door=b=>({x:b.x,z:b.z+3.4});
+// Road clearance uses the physical architecture, including awnings and stairs,
+// rather than the previous 2.5m navigation radius (the visible houses are ~8m wide).
+export function buildingFootprint(b){
+ const type=b.type||'';
+ const large=['hall','keep','gatehouse','guildhall','monastery','chapel','university','academy','market','trade_yard','harbor','warehouse','cellar'];
+ const x=large.includes(type)?4.8:3.7;
+ const z=type==='harbor'?6.2:large.includes(type)?4.35:3.55;
+ return {x:Math.max(x,b.navWidth||0),z:Math.max(z,b.navDepth||0)};
+}
+
 export function clearFootprint(world,b){let changed=false;for(const r of world.resources)if(['tree','berry'].includes(r.kind)&&!r.removed&&Math.abs(r.x-b.x)<Math.max(3.6,b.navWidth||0)+.5&&Math.abs(r.z-b.z)<Math.max(3.5,b.navDepth||0)+.5){r.removed=true;r.cleared=true;r.amount=0;changed=true}if(changed)world.revision=(world.revision||0)+1;return changed}
 export class Navigation{
 constructor(world,passable,buildings=()=>[]){this.world=world;world.heat??={};world.heatLast??={};world.trailTime??=0;world.revision??=0;this.passable=passable;this.buildings=buildings;this.minX=-72;this.minZ=-62;this.w=145;this.h=125;this.n=this.w*this.h;this.base=new Uint8Array(this.n);for(let z=0;z<this.h;z++)for(let x=0;x<this.w;x++)this.base[z*this.w+x]=passable(x+this.minX,z+this.minZ)?1:0;this.cache=new WeakMap();this.version=0;this.signature='';this.rebuild()}
 index(x,z){const xx=Math.round(x)-this.minX,zz=Math.round(z)-this.minZ;return xx>=0&&xx<this.w&&zz>=0&&zz<this.h?zz*this.w+xx:-1}
 point(i){return {x:i%this.w+this.minX,z:Math.floor(i/this.w)+this.minZ}}
-rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings())paint(b.x,b.z,b.navWidth||(b.type==='hall'?3.3:2.5),b.navDepth||2.3,false);for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);this.version++;this.signature=this.buildings().length+':'+this.world.revision}
+rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings()){const {x,z}=buildingFootprint(b);paint(b.x,b.z,x,z,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);this.version++;this.signature=this.buildings().length+':'+this.world.revision}
 refresh(){if(this.signature!==this.buildings().length+':'+this.world.revision)this.rebuild()}
 open(x,z){const i=this.index(x,z);return i>=0&&this.mask[i]===1}
 nearest(p,max=9){if(this.open(p.x,p.z))return this.point(this.index(p.x,p.z));for(let r=1;r<=max;r++){const points=[];for(let dz=-r;dz<=r;dz++)for(let dx=-r;dx<=r;dx++)if(Math.max(Math.abs(dx),Math.abs(dz))===r&&this.open(p.x+dx,p.z+dz))points.push(this.point(this.index(p.x+dx,p.z+dz)));if(points.length)return points.sort((a,b)=>length(a,p)-length(b,p))[0]}return null}
 clear(a,b){const n=Math.max(1,Math.ceil(length(a,b)*4));for(let i=0;i<=n;i++)if(!this.open(a.x+(b.x-a.x)*i/n,a.z+(b.z-a.z)*i/n))return false;return true}
+// Distance from a road centre to the actual outside edge of the architecture.
+// Positive margins allow road ribbons to shrink beside buildings without clipping.
+roadMargin(x,z){
+ let min=20;
+ for(const b of this.buildings()){
+  const size=buildingFootprint(b),dx=Math.max(0,Math.abs(x-b.x)-size.x),dz=Math.max(0,Math.abs(z-b.z)-size.z);
+  min=Math.min(min,Math.hypot(dx,dz));
+ }
+ return min;
+}
+roadSurfaceWidth(a,b,desired=1.8){
+ const mid={x:(a.x+b.x)/2,z:(a.z+b.z)/2};
+ if(!this.clear(a,b)||!this.open(mid.x,mid.z))return 0;
+ const gap=Math.min(this.roadMargin(a.x,a.z),this.roadMargin(mid.x,mid.z),this.roadMargin(b.x,b.z));
+ return gap<.38?0:Math.min(desired,Math.max(.7,2*(gap-.15)));
+}
 // A single local walk creates wear, not a visible road. Repeated visits build permanent paths.
 roadStrength(i){const h=this.world.heat[i]||0;if(!h)return 0;const now=this.world.trailTime||0,last=this.world.heatLast[i];if(last==null){this.world.heatLast[i]=now;return h}const elapsed=Math.max(0,now-last),rate=h>=64?.0012:h>=30?.0028:h>=13?.006:h>=4?.009:.013;return Math.max(0,h-rate*elapsed)}
 roadLevel(i){const h=this.roadStrength(i);return h>=64?4:h>=30?3:h>=13?2:h>=4?1:0}
