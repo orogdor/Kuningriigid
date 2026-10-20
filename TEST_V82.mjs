@@ -109,5 +109,5 @@ mkdirSync('artifacts-v82',{recursive:true});
 writeFileSync('artifacts-v82/Kuningriigid_V82_Aurulinn.json',JSON.stringify(demo));
 writeFileSync('artifacts-v82/industrial-model-metrics.json',JSON.stringify(measures,null,2));
 console.log('V82 INDUSTRIAL MODELS PASS '+JSON.stringify({types:measures.length,minTriangles:Math.min(...measures.map(m=>m.triangles)),maxTriangles:Math.max(...measures.map(m=>m.triangles)),maxCalls:Math.max(...measures.map(m=>m.calls))}));
-console.log('V82 MODEL INFO PASS all 7 age samples +JSON.stringify(agesSeen));
+console.log('V82 MODEL INFO PASS all 7 age samples '+JSON.stringify(agesSeen));
 console.log('V82 INDUSTRIAL DEMO PASS '+JSON.stringify({name:city.name,age:demo.ages[0],buildingCount:demoBuildings.length,roadCells:roadCells.length,safe:true}));
