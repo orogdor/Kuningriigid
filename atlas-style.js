@@ -2,7 +2,7 @@ import * as T from './vendor/three.module.js';
 import {createMountainOutcrops} from './landscape-polish-v84.js?v=85a';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
-import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=68d';
+import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=85a';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=85a';
 import {surface,riverNear} from './continuous-landscape.js?v=85a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
