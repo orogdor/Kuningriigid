@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import * as T from './vendor/three.module.js';
 import {createAgeBuilding} from './buildings.js';
-import {STONE_BUILDING_TYPES,createStoneBuilding} from './stone-buildings-v77.js';
+import {STONE_BUILDING_TYPES,createStoneBuilding} from './stone-buildings-v77.js?v=77a';
 import {createStoneDemoState,DEMO_BUILDINGS,DEMO_CITY_NAME} from './stone-demo-v77.js';
 import {Civilization,createGame} from './civilization-core.js';
 import {mkdirSync,writeFileSync} from 'node:fs';
