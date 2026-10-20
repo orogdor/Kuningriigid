@@ -6,6 +6,8 @@ on:
       - 'renaissance-*.js'
       - 'TEST_V81*.mjs'
       - 'buildings.js'
+      - 'navigation.js'
+      - 'town-streets-v80.js'
       - 'civilization.js'
       - 'index.html'
       - '.github/workflows/v81.yml'
@@ -34,6 +36,11 @@ jobs:
           node TEST_V78.mjs
           node TEST_V77.mjs
           node TEST_V73.mjs
+          node TEST_V61.mjs
+          node TEST_V60.mjs
+          node TEST_V59.mjs
+          node TEST_V67.mjs
+          node TEST_V68.mjs
       - name: Install Chromium
         run: |
           npm install --no-save playwright
