@@ -32,7 +32,7 @@ export function createStoneDemoState(seed=20261020){
  for(const [type,x,z] of DEMO_BUILDINGS){
   if(!BUILDINGS[type])throw Error('Unknown demo building '+type);
   founded.economy.buildings.push({
-   type,x:base.x+x,z:base.z+z,team:0,hp:1000,ready:true,
+   type,x:base.x+x,z:base.z+z,team:0,hp:1000,ready:true,previewAge:0,
    progress:BUILDINGS[type].time||0,assigned:0
   });
  }
