@@ -10,11 +10,12 @@ async function scenario(label,demo,viewport,isMobile){
  const ctx=await browser.newContext({viewport,isMobile,hasTouch:isMobile,
   acceptDownloads:true,deviceScaleFactor:1});
  const page=await ctx.newPage();
+ page.on('console',msg=>{if(msg.type()==='error')errors.push(label+' CONSOLE: '+msg.text());});
  page.on('pageerror',e=>errors.push(label+': '+e.message));
  try{
   await page.goto('http://127.0.0.1:8765/?v=82-tests&demo='+demo,
    {waitUntil:'domcontentloaded',timeout:90000});
-  await page.waitForFunction(()=>window.gameDebug?.view()==='local',{timeout:90000});
+  await page.waitForFunction(()=>window.gameDebug?.view()==='local',null,{timeout:120000});
   const stats=await page.evaluate(()=>{
    const g=window.gameDebug,c=g.state.cities.find(c=>c.team===0);
    return {age:g.state.ages[0],version:g.state.version,name:c.name,
