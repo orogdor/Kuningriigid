@@ -115,14 +115,28 @@
  #commandhud #commandname{font-size:13px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  #commandhud #commandmode{font-size:8px!important}
  #commandhud #commandstate{display:none!important}
- #commandhud .command-buttons,#commandhud #commandhint{display:none!important}
+ /* Movement is a primary RTS action: keep it one tap away, not in a nested menu. */
+ #commandhud .command-heading{padding-right:50px}
+ #commandhud .command-buttons{display:flex!important;position:absolute!important;
+  top:6px;right:43px;width:44px;height:45px;align-items:center;justify-content:center;gap:0!important}
+ #commandhud .command-buttons button:not(#commandmove){display:none!important}
+ #commandhud .command-buttons #commandmove{display:flex!important;align-items:center!important;justify-content:center!important;
+  width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;
+  padding:0!important;font-size:0!important;border:1px solid #c1a674!important;border-radius:9px!important}
+ #commandhud .command-buttons #commandmove::before{content:"➜";font-size:23px;line-height:1}
+ #commandhud #commandhint{display:none!important}
  body.hud-command-open #commandhud,body.hud-command-open:not(.atlas) #commandhud{
   max-height:190px!important;min-height:0!important;height:auto!important;
   width:min(310px,calc(100vw - 86px))!important;padding:8px!important
  }
  body.hud-command-open #commandhud .command-heading{padding-right:35px}
  body.hud-command-open #commandhud #commandstate{display:block!important;max-height:45px!important}
- body.hud-command-open #commandhud .command-buttons{display:flex!important;flex-wrap:wrap!important;margin-top:6px}
+ body.hud-command-open #commandhud .command-buttons{display:flex!important;position:static!important;
+  width:100%!important;height:auto!important;flex-wrap:wrap!important;margin-top:6px;gap:4px!important}
+ body.hud-command-open #commandhud .command-buttons button:not(#commandmove){display:flex!important}
+ body.hud-command-open #commandhud .command-buttons #commandmove{font-size:11px!important;
+  flex:1 1 0!important;width:0!important;min-width:0!important}
+ body.hud-command-open #commandhud .command-buttons #commandmove::before{display:none!important}
  body.hud-command-open #commandhud .command-buttons button{min-height:44px!important;font-size:11px!important}
  /* Single-action bottom sheets. Close them and the world is interactive again. */
  body.hud-city-open #citypanel:not([hidden]){
