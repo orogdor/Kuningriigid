@@ -154,7 +154,7 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
   const ground=(x,z)=>groundForTile(tile,x,z);
   const actors=Array.from({length:targetCount},(_,i)=>makePerson(group,site,i,ground));
   const camp=nearby?null:makeCamp(ground);if(camp)group.add(camp);
-  entry={id:site.id,site,group,parent,actors,count:targetCount,nearby,ground};
+  entry={id:site.id,site,group,parent,actors,camp,count:targetCount,nearby,ground};
   sites.set(key,entry);return entry;
  }
  function update(time=game.s.time,dt=0){
