@@ -30,7 +30,7 @@ Kõik mudelid jäävad alla 2000 kolmnurga ja 12 3D-joonistuskutse. Need ei vaja
 
 `createAgeBuilding(type,team,age)` kasutab uut kiviaja komplekti, kui hoone välimuse ajastu on 0. Pronksi- ja hilisemate ajastute olemasolevad mudelid jäävad alles.
 
-**Mängureegleid ei muudeta:** laod, keldrid ja turud on tavaliselt pronksiaja hooned, mistõttu neid ei avata tavapärases kiviajamängus varasemaks. Näidislinnas kasutatakse nende juures **ainult visuaalseks võrdluseks** kiviaja makette.
+**Mängureegleid ei muudeta:** laod, keldrid ja turud on tavaliselt pronksiaja hooned, mistõttu neid ei avata tavapärases kiviajamängus varasemaks. Näidislinnas kasutatakse nende juures **ainult visuaalseks võrdluseks** kiviaja makette. Näidissalvestus sisaldab neile hoonetele valikulist `previewAge: 0` märget: ka JSON-import säilitab kiviaja välimuse, kuni mängija jõuab pronksiaega. Tavalised salvestused ja hoonete avamise reeglid ei muutu.
 
 ## Näidislinna salvestus
 
