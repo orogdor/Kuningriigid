@@ -30,7 +30,18 @@ export class Navigation{
 constructor(world,passable,buildings=()=>[]){this.world=world;world.heat??={};world.heatLast??={};world.trailTime??=0;world.revision??=0;this.passable=passable;this.buildings=buildings;this.minX=-72;this.minZ=-62;this.w=145;this.h=125;this.n=this.w*this.h;this.base=new Uint8Array(this.n);for(let z=0;z<this.h;z++)for(let x=0;x<this.w;x++)this.base[z*this.w+x]=passable(x+this.minX,z+this.minZ)?1:0;this.cache=new WeakMap();this.version=0;this.signature='';this.rebuild()}
 index(x,z){const xx=Math.round(x)-this.minX,zz=Math.round(z)-this.minZ;return xx>=0&&xx<this.w&&zz>=0&&zz<this.h?zz*this.w+xx:-1}
 point(i){return {x:i%this.w+this.minX,z:Math.floor(i/this.w)+this.minZ}}
-rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings()){const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);this.version++;this.signature=this.currentSignature()}
+rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings()){const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);// When a settlement grows or moves buildings over earlier footpaths,
+ // remove buried wear rather than reviving the road through a new house.
+ // Old V4 saves with roads inside construction footprints repair on load.
+ let buried=0;
+ for(const key of Object.keys(this.world.heat||{})){
+  const i=Number(key);
+  if(!Number.isInteger(i)||i<0||i>=this.n||this.mask[i]!==1){
+   delete this.world.heat[key];delete this.world.heatLast[key];buried++;
+  }
+ }
+ if(buried)this.world.trailChanges=(this.world.trailChanges||0)+buried;
+ this.version++;this.signature=this.currentSignature()}
 currentSignature(){
  // Buildings of equal count can be moved/destroyed; stale nav masks previously
  // caused footsteps to be drawn through a different building at the same index.
