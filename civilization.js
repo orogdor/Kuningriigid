@@ -10,7 +10,7 @@ import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=79a';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=85a';
-import {surface,localSurface,riverNear} from './continuous-landscape.js?v=69a';
+import {surface,localSurface,riverNear} from './continuous-landscape.js?v=85a';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=72a';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js';
@@ -81,7 +81,7 @@ function updateBuildingInfo(){
  }
  buildingInspector.update(describeBuilding(game,ctx,selectedBuilding,AGES,RESOURCE_NAMES,BUILDINGS,BUILD_TECH));
 }
-function terrain(scene,cell=null){const world=!cell,geo=new T.PlaneGeometry(world?WORLD_WIDTH:450,world?WORLD_DEPTH:390,world?COLS*(quality==='low'?1:2):(quality==='high'?450:quality==='low'?180:300),world?ROWS*(quality==='low'?1:2):(quality==='high'?390:quality==='low'?156:260));geo.rotateX(-Math.PI/2);if(world)geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=world?surface(game,x,z,'world'):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/3,cell.z+z/2.6),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
+function terrain(scene,cell=null){const world=!cell,geo=new T.PlaneGeometry(world?WORLD_WIDTH:450,world?WORLD_DEPTH:390,world?COLS*(quality==='low'?2:3):(quality==='high'?450:quality==='low'?180:300),world?ROWS*(quality==='low'?2:3):(quality==='high'?390:quality==='low'?156:260));geo.rotateX(-Math.PI/2);if(world)geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=world?surface(game,x,z,'world'):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/3,cell.z+z/2.6),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
  const color=world?atlasColor(game,x,z,h):new T.Color(
   h<-.15?'#8b9c91':h<.65?'#dbcba0':
   mountain&&h>19?'#8d968b':mountain&&h>12?'#878781':

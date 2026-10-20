@@ -10,7 +10,7 @@ try{
 for(const device of [{label:'desktop',width:1280,height:800},{label:'phone',width:390,height:844}]){
  const context=await browser.newContext({viewport:{width:device.width,height:device.height},isMobile:device.label==='phone',hasTouch:device.label==='phone'});
  await context.addInitScript(raw=>{localStorage.setItem('kingdoms-civ4',raw);localStorage.setItem('kingdoms-language','et');localStorage.setItem('kingdoms-quality','medium')},fixture);
- const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(45000);
+ const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('console',msg=>{if(msg.type()==='error'&&/THREE|shader|WebGLProgram/.test(msg.text()))errors.push(msg.text())});page.setDefaultTimeout(45000);
  try{
  await page.goto('http://127.0.0.1:8765/');await page.waitForFunction(()=>!!window.gameDebug,null,{timeout:90000});
  await page.locator('#continue').click();await page.locator('#pause').click();await page.keyboard.press('Escape');
@@ -39,11 +39,18 @@ for(const device of [{label:'desktop',width:1280,height:800},{label:'phone',widt
  await page.evaluate(p=>{const d=window.gameDebug;d.openTile(d.game.cell(p))},sites.mountain);
  await capture('detail-mountain');
  assert.ok(results.at(-1).rocks?.outcropCount>0,'mountain detail includes actual ridge geometry');
+ await page.evaluate(()=>{
+  const d=window.gameDebug,g=d.game,counts=new Map();
+  for(const c of g.cells)if(c.riverTo){const key=c.riverTo.c+':'+c.riverTo.r;counts.set(key,(counts.get(key)||0)+1)}
+  const junction=g.cells.find(c=>c.land&&c.river&&counts.get(c.c+':'+c.r)>=2&&c.riverWidth>3);
+  if(!junction)throw Error('Missing confluence fixture');g.reveal(0,junction,3);d.openTile(junction);
+ });
+ await capture('detail-confluence');
  const cityTile=await page.evaluate(()=>{
   const d=window.gameDebug,g=d.game,a=d.state.settlers.find(a=>a.team===0);g.land(a.id);
   let city;for(let x=-30;x<=30&&!city;x+=3)for(let z=-24;z<=24&&!city;z+=3)if(!g.siteRule(a,{x,z})){a.x=x;a.z=z;city=g.found(a.id).city;}
   if(!city)throw Error('Could not found border test city');
-  g.reveal(0,city,4);const edge=g.cell({c:city.c+1,r:city.r});d.openTile(edge);return edge;
+  g.reveal(0,city,4);g.refreshTerritory();const candidates=g.cells.filter(c=>g.territory.get(c.c+':'+c.r)?.id===city.id&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dc,dr])=>g.territory.get((c.c+dc)+':'+(c.r+dr))?.id!==city.id));const score=c=>[-1,0,1].flatMap(dc=>[-1,0,1].map(dr=>g.cell({c:c.c+dc,r:c.r+dr})?.land?1:0)).reduce((a,b)=>a+b,0);const edge=candidates.sort((a,b)=>score(b)-score(a))[0];d.openTile(edge);return {c:edge.c,r:edge.r};
  });
  await capture('detail-city-border');
  assert.ok(await page.evaluate(()=>window.gameDebug.localScene.getObjectByName('city territory borders')?.children.length>0),'city border visible on detail map');

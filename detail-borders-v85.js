@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.js';
-import {surface,worldToLocal,projectHeight} from './continuous-landscape.js?v=69a';
+import {surface,worldToLocal,projectHeight} from './continuous-landscape.js?v=85a';
 const colors=['#65d6d0','#ed8f70','#bba1ef','#eed474'];
 // Only the outer perimeter of each city; district seams stay unmarked.
 export function createDetailBorders(game,tile){

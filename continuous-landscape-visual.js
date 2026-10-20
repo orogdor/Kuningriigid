@@ -4,8 +4,8 @@
 import * as T from './vendor/three.module.js';
 import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
-import {riverNear,localToWorld} from './continuous-landscape.js?v=69a';
-import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=69a';
+import {riverNear,localToWorld} from './continuous-landscape.js?v=85a';
+import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=85a';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};

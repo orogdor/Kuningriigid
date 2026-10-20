@@ -106,7 +106,13 @@ const coastal=(smooth((h-3.2)/4)*(1-smooth((h-15)/6)))*4.5*
  // sea surface even where riverbeds descend toward the coast.
  const sub=Math.max(0,.72-h);
  const oceanFloor=sub?(2.5*smooth(sub/7)+sub*.10):0;
- return h+ridge+scarp+coastal-oceanFloor;
+ // Folded rock ridges and eroded gullies are a single height field in both
+ // views. A broad ridge supports smaller crags; no independent scaled rocks.
+ const spine=1-Math.abs(Math.sin(x*.046+Math.sin(z*.019)*1.2)*Math.cos(z*.039-x*.014));
+ const fracture=Math.abs(Math.sin(x*.16+z*.075+Math.sin(z*.083)*.65));
+ const ledge=Math.sin((h+ridge)*.57+Math.sin(x*.037+z*.023));
+ const fractured=steep*(Math.pow(spine,3)*26+Math.pow(fracture,1.4)*6+ledge*2.1);
+ return h+ridge+scarp+fractured+coastal-oceanFloor;
 }
 export function worldElevation(game,x,z){
  const base=baseHeight(game,x,z),{distance:d,width:w}=riverNear(game,x,z);

@@ -12,7 +12,7 @@ for(const seed of [8417,17]){
  // A shared x/z position may never have two water heights at a confluence.
  const heights=new Map();for(let i=0;i<pos.count;i++){const k=pos.getX(i).toFixed(3)+':'+pos.getZ(i).toFixed(3),y=pos.getY(i);if(heights.has(k))assert.ok(Math.abs(heights.get(k)-y)<.003);heights.set(k,y)}
  const mountain=g.cells.find(c=>c.mountain),rocks=createMountainOutcrops(g,'detail',mountain);
- assert.ok(rocks.userData.outcropCount>0);assert.ok(!rocks.children[0].isInstancedMesh,'cliff feet individually fit the terrain instead of scaling a cone');
+ assert.ok(rocks.userData.outcropCount>0);assert.equal(rocks.children.length,0,'no independent cliff caps can hover over the terrain');assert.ok(rocks.userData.continuousRelief);
  assert.equal(JSON.stringify(g.s),state,'rendering leaves campaign state intact');
  // A single owned tile with a neighbouring district has six outer edges,
  // never a boundary through the middle of the same city.

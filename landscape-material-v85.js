@@ -19,7 +19,7 @@ export function landscapeMaterial(kind='terrain',scope='world',tile=null){
  float rock=1.0-smoothstep(0.005,0.075,diffuseColor.g-diffuseColor.r);
  float strata=sin(landP.y*2.6+broad*4.0+sin(landP.x*.14+landP.z*.08));
  float fissure=pow(1.0-abs(sin(landP.x*.29+landP.z*.21+broad*3.0)),16.0);
- diffuseColor.rgb*=mix(.87+grain*.20+broad*.12,.78+grain*.22+broad*.22+strata*.09-fissure*.15,rock);
+ diffuseColor.rgb*=mix(.87+grain*.20+broad*.12,.78+grain*.22+broad*.22+strata*.035-fissure*.18,rock);
  `}`);
  };
  material.customProgramCacheKey=()=>`landscape-v85-${kind}-${scope}-${tile?.x||0}-${tile?.z||0}`;

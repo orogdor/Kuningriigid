@@ -1,7 +1,6 @@
 // V84 visual dressing shares the exact atlas/detail projection and saved rivers.
 import * as T from './vendor/three.module.js';
-import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
-import {getRivers,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=69a';
+import {getRivers,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=85a';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
 const templates=new Map(),crossingMaps=new WeakMap(),crossingCatalogs=new WeakMap();
@@ -89,27 +88,10 @@ export function createCrossingNetwork(game,scope='world',tile=null,quality='medi
  }
  group.userData.crossingCount=sites.length;return group;
 }
-// Closed irregular ridges with a ground-sampled perimeter, rather than a scaled cone.
+// Compatibility holder: V85 ridges are part of the continuous terrain itself.
+// No detached cone/cap geometry can hover over the detail map any longer.
 export function createMountainOutcrops(game,scope='world',tile=null){
  const group=new T.Group();group.name='V84 stratified mountain crests';group.userData.landscape=true;
- const sites=game.cells.filter(c=>c.mountain&&(!tile||Math.abs(c.x-tile.x)<90&&Math.abs(c.z-tile.z)<90));
- const vertices=[],colors=[];
- const push=p=>{const q=scope==='world'?p:{...worldToLocal(tile,p.x,p.z),y:projectHeight(p.y,scope)};vertices.push(q.x,q.y,q.z);const c=mountainTint(new T.Color('#9a8e78'),p.x,p.z,p.y,.5);colors.push(c.r,c.g,c.b)};
- for(const cell of sites){
-  const x=cell.x+(game.noise(cell.c+71,cell.r)-.5)*14,z=cell.z+(game.noise(cell.c,cell.r+18)-.5)*14;
-  const size=19+game.noise(cell.c+9,cell.r+7)*9,n=12,rings=[];
-  for(let r=0;r<5;r++){
-   const radius=[1.12,1,.70,.35,.04][r],ring=[];
-   for(let k=0;k<n;k++){
-    const angle=k*Math.PI*2/n,irregular=.82+game.noise(cell.c*13+k,cell.r*7+r)*.26;
-    const px=x+Math.cos(angle)*size*radius*irregular,pz=z+Math.sin(angle)*size*radius*.82*irregular;
-    const ground=surface(game,px,pz),ridge=r<2?0:Math.sin(r/4*Math.PI*.5)*(6+game.noise(cell.c+k,cell.r+r)*9);
-    ring.push({x:px,z:pz,y:ground+(r===0?-45:r===1?-2:ridge)});
-   }rings.push(ring);
-  }
-  for(let r=1;r<rings.length;r++)for(let k=0;k<n;k++){const j=(k+1)%n;for(const p of [rings[r-1][k],rings[r][k],rings[r-1][j],rings[r-1][j],rings[r][k],rings[r][j]])push(p)}
-  for(let k=1;k<n-1;k++)for(const p of [rings[4][0],rings[4][k+1],rings[4][k]])push(p);
- }
- if(vertices.length){const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));geo.computeVertexNormals();const mesh=new T.Mesh(geo,landscapeMaterial('rock',scope,tile));mesh.receiveShadow=true;mesh.castShadow=scope!=='world';mesh.name='grounded fractured ridges';group.add(mesh)}
- group.userData.outcropCount=sites.length;return group;
+ group.userData.outcropCount=game.cells.filter(c=>c.mountain&&(!tile||Math.abs(c.x-tile.x)<90&&Math.abs(c.z-tile.z)<90)).length;
+ group.userData.continuousRelief=true;return group;
 }
