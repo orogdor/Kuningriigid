@@ -35,6 +35,10 @@
   border:1px solid transparent!important;border-radius:9px!important;
   background:transparent!important;color:#f0ddae!important;
  }
+ /* Override historical mobile display/flex declarations. Only these seven
+    actions belong to the primary bar; hidden utility buttons must not create a new grid row. */
+ #tools [data-tab="help"],#tools #journal,#tools #home,#tools #zin,#tools #zout{display:none!important}
+ #tools #menubtn{display:flex!important;flex:unset!important;width:100%!important;min-width:0!important;max-width:none!important}
  #tools button:not([hidden])::before{display:block;font-size:21px;line-height:25px}
  #tools button:not([hidden])::after{display:block;font:600 10px/13px Inter,Arial,sans-serif}
  #tools #maptoggle::before{content:"🌍"} #tools #maptoggle::after{content:"Kaart"}
