@@ -64,10 +64,13 @@ for(const key of roadCells){
  }
 }
 
+const ironDemo=createBronzeDemoState();ironDemo.ages[0]=2;
+const modernDemo=structuredClone(demo);modernDemo.ages[0]=6;
 const demos=[
- createStoneDemoState(),createBronzeDemoState(),createMedievalDemoState(),
- createRenaissanceDemoState(),demo
+ createStoneDemoState(),createBronzeDemoState(),ironDemo,createMedievalDemoState(),
+ createRenaissanceDemoState(),demo,modernDemo
 ];
+const eras=[0,1,2,3,4,5,6];
 const agesSeen=[];
 for(let age=0;age<demos.length;age++){
  const g=new Civilization(demos[age]),city=g.s.cities.find(c=>c.team===0);
@@ -75,7 +78,7 @@ for(let age=0;age<demos.length;age++){
  assert.ok(building,'there is a house to tap in era '+age);
  const info=describeBuilding(g,city,building,AGES,RESOURCE_NAMES,BUILDINGS,BUILD_TECH);
  assert.ok(info?.name&&info.status&&info.city&&info.eraName,'visible info for age '+age);
- assert.equal(info.age,[0,1,3,4,5][age]);
+ assert.equal(info.age,eras[age]);
  assert.ok(info.hp>0&&info.maxHp>=info.hp);
  assert.ok(info.cost&&typeof info.input==='string');
  assert.ok(info.owner&&info.ready);
@@ -106,5 +109,5 @@ mkdirSync('artifacts-v82',{recursive:true});
 writeFileSync('artifacts-v82/Kuningriigid_V82_Aurulinn.json',JSON.stringify(demo));
 writeFileSync('artifacts-v82/industrial-model-metrics.json',JSON.stringify(measures,null,2));
 console.log('V82 INDUSTRIAL MODELS PASS '+JSON.stringify({types:measures.length,minTriangles:Math.min(...measures.map(m=>m.triangles)),maxTriangles:Math.max(...measures.map(m=>m.triangles)),maxCalls:Math.max(...measures.map(m=>m.calls))}));
-console.log('V82 MODEL INFO PASS all 5 age samples '+JSON.stringify(agesSeen));
+console.log('V82 MODEL INFO PASS all 7 age samples +JSON.stringify(agesSeen));
 console.log('V82 INDUSTRIAL DEMO PASS '+JSON.stringify({name:city.name,age:demo.ages[0],buildingCount:demoBuildings.length,roadCells:roadCells.length,safe:true}));
