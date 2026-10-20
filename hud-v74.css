@@ -168,6 +168,18 @@
   border-radius:15px!important
  }
  body.hud-map-open #atlaspanel button{min-height:44px!important}
+ /* Expanded resource details temporarily replace nearby camera controls. */
+ body.hud-resource-open #hud-zoom-controls,body.hud-resource-open #commandhud{display:none!important}
+ /* Full-screen dialogs stay above every mobile control. */
+ body:has(#startmenu:not([hidden])) #tools,
+ body:has(#researchpanel:not([hidden])) #tools,
+ body:has(#journalpanel:not([hidden])) #tools,
+ body:has(#help:not([hidden])) #tools{display:none!important}
+ body:has(#startmenu:not([hidden])) #hud-resource-toggle,
+ body:has(#startmenu:not([hidden])) #hud-zoom-controls,
+ body:has(#startmenu:not([hidden])) #commandhud,
+ body:has(#researchpanel:not([hidden])) #hud-resource-toggle,
+ body:has(#journalpanel:not([hidden])) #hud-resource-toggle{display:none!important}
  body.hud-city-open #hud-zoom-controls,body.hud-explore-open #hud-zoom-controls,
  body.hud-map-open #hud-zoom-controls,body.hud-city-open #hud-resource-toggle,
  body.hud-explore-open #hud-resource-toggle,body.hud-map-open #hud-resource-toggle,
