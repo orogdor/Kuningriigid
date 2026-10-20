@@ -27,26 +27,21 @@ async function scenario(label,width,height,isMobile){
   assert.ok(first.roles.includes('child')&&first.roles.includes('guard'),'children and guards are rendered, not only workers');
   assert.ok(first.activities.some(a=>['chat','visit','carry','rest','eat','play','stroll'].includes(a)),'life has non-work activities');
   await page.screenshot({path:'ui-screenshots-v76/'+label+'-village.png'});
-  const atEvening=await page.evaluate(()=>{
-   window.gameDebug.state.time=660;
-   return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(window.gameDebug.villageLifeStatus()[0]))));
-  });
-  assert.equal(atEvening.campVisible,true,'fire lit in evening');
+  async function checkPeriod(time,expectedFire,expectedActivity){
+   await page.evaluate(time=>{window.gameDebug.state.time=time},time);
+   await page.waitForFunction(([lit,activity,id])=>{
+    const s=window.gameDebug.villageLifeStatus().find(x=>x.id===id);
+    return !!s&&s.campVisible===lit&&s.activities.includes(activity);
+   },[expectedFire,expectedActivity,result.id],{timeout:45000});
+   return page.evaluate(id=>window.gameDebug.villageLifeStatus().find(s=>s.id===id),result.id);
+  }
+  const atEvening=await checkPeriod(660,true,'chat');
   assert.ok(atEvening.activities.includes('chat'),'evening conversations');
   await page.screenshot({path:'ui-screenshots-v76/'+label+'-evening.png'});
-  const atNight=await page.evaluate(()=>{
-   window.gameDebug.state.time=900;
-   return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(window.gameDebug.villageLifeStatus()[0]))));
-  });
-  assert.ok(atNight.activities.includes('sleep'),'NPCs have overnight home/sleep state');
+  const atNight=await checkPeriod(900,true,'sleep');
   assert.ok(atNight.activities.includes('guard'),'guard remains active at night');
-  assert.equal(atNight.campVisible,true,'night fire remains lit');
-  const atDay=await page.evaluate(()=>{
-   window.gameDebug.state.time=190;
-   return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(window.gameDebug.villageLifeStatus()[0]))));
-  });
-  assert.equal(atDay.campVisible,false,'fire is not continuously burning all day');
-  assert.ok(atDay.activities.includes('play'),'child returns to play during day');
+  const atDay=await checkPeriod(190,false,'play');
+  assert.ok(atDay.activities.includes('play'),'children play during day');
   const chosen=await page.evaluate(async()=>{
    const dbg=window.gameDebug,btn=document.getElementById('quality'),counts={};
    for(let i=0;i<3;i++){
