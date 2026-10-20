@@ -1,8 +1,12 @@
-# Kuningriigid V85
+# Kuningriigid V86
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
 **Mängi:** https://orogdor.github.io/Kuningriigid/?v=82-20261020
+
+## V86 – sujuvam mängukulu ja vähem taustakoormust
+
+Majanduse taastumine puudusest, vajaduspõhine toidutootmine, ligipääsetavad AI ehituskohad ning säästlikum maailmakaardi ja menüüde joonistamine. [Analüüs ja kontrollide ulatus](ANALUUS_V86.md).
 
 ## V85 – kaljud, jõgede ühenduskohad ja detailkaardi linnapiirid
 

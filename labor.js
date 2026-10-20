@@ -1,3 +1,4 @@
+import {availableLabor} from './gameplay-flow-v86.js?v=86a';
 // Fractional workers are shared across every district of a city.
 export const BASIC_JOBS={berries:{name:'Marjakorjajad',type:'berries',kind:'berry',out:'bread',rate:6,cycle:8},wood:{name:'Puidukorjajad',type:'lumber',kind:'tree',out:'wood',rate:8,cycle:6},stone:{name:'Kivikorjajad',type:'quarry',kind:'stone',out:'stone',rate:6,cycle:6}};
 // V36: A worker represents a small household work team. Houses add 3 places.
@@ -14,6 +15,8 @@ export function demand(b,definitions){
  return (d?.out||['watchtower','stonetower','guildhall','infirmary','trade_yard','inn','monastery','chapel','keep','gatehouse','siegeworkshop','forester','warehouse','market','harbor','study','scriptorium','academy','university','observatory','polytechnic','laboratory','railstation','airfield'].includes(b.type))?(d?.workers||0):0;
 }
 function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,stock={}){
+ if(foodCritical&&['hunter','fisher','bakery'].includes(b.type))return 171;
+ if(waterCritical&&b.type==='well')return 169;
  const need=(k)=>Math.max(0,eraNeed[k]||0);
  const low=(k,n)=>(stock[k]||0)<n;
  // Avoid assigning the bulk of the workforce to a factory whose input
@@ -71,7 +74,7 @@ function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,st
 }
 export function allocateCity(game,city){
  const r=city.economy.realms[city.team],mobilized=game.s.battle?.civilianCityId===city.id?game.s.battle.squads.filter(u=>u.civilian).length:0;
- const budget=Math.max(0,(r.housingShortage?Math.min(3,r.pop):r.pop)-mobilized);
+ const budget=availableLabor(r.pop,r.housingShortage,mobilized);
  city.builderCount??=1;const all=game.allBuildings(city);
  const foodCritical=((r.resources.bread||0)+.85*(r.resources.flour||0)+.7*(r.resources.grain||0))<r.pop*2.5,waterCritical=(r.resources.water||0)<r.pop*2;
  const wait=city.team>0?game.s?.research?.[city.team]?.ageWait:null;
@@ -79,7 +82,9 @@ export function allocateCity(game,city){
  const laborScarce=(r.resources.wood||0)<(shortages.plank>0?30:12);
  const pending=all.some(b=>!b.ready&&!b.disabled&&b.workerLimit!==0);
  const entries=all.filter(b=>b.ready).map(b=>{
-  const need=demand(b,game.buildingDefinitions),want=Math.max(0,Math.min(need,b.workerLimit??need));
+  const need=demand(b,game.buildingDefinitions),definition=game.buildingDefinitions[b.type];
+  const inputsReady=!definition?.input||Object.entries(definition.input).every(([key,n])=>(r.resources[key]||0)>=n);
+  const want=inputsReady?Math.max(0,Math.min(need,b.workerLimit??need)):0;
   let priority=jobPriority(b,foodCritical,waterCritical,shortages,laborScarce,r.resources);
   if(b.status?.includes('pole ligipääsetavat')||b.status?.includes('maardla puudub'))priority=9;
   return {b,need,want,priority};
@@ -91,15 +96,18 @@ export function allocateCity(game,city){
  // Guarantee a small portion for each operational task, then assign the rest
  // by criticality. Food and water take precedence during shortages.
  entries.sort((a,b)=>b.priority-a.priority);
- let remaining=budget;
+ const foodSource=entries.some(e=>e.want>0&&['hunter','fisher','bakery'].includes(e.b.type)&&!/pole ligipääsetavat|maardla puudub/.test(e.b.status||''));
+ const emergencyBerries=foodCritical&&!foodSource?Math.min(1,budget*.4,Math.max(0,city.basicJobs?.berries??1)):0;
+ let remaining=budget-emergencyBerries;
  for(const e of entries){const seed=Math.min(e.want,wait?.1:.25,remaining);e.b.assigned=seed;remaining-=seed}
  for(const e of entries){const extra=Math.min(e.want-e.b.assigned,remaining);e.b.assigned+=extra;remaining-=extra}
  for(const e of entries)e.b.efficiency=workerEfficiency(e.b.assigned,e.need);
  for(const b of all.filter(b=>b.ready&&!entries.some(e=>e.b===b))) {b.assigned=0;b.efficiency=0}
  city.buildersAssigned=builders.assigned||0;
- city.basicJobs??={berries:1,wood:1,stone:1};const total=Object.keys(BASIC_JOBS).reduce((n,k)=>n+Math.max(0,city.basicJobs[k]??1),0);
- city.basicAssigned={};for(const k of Object.keys(BASIC_JOBS))city.basicAssigned[k]=total?Math.max(0,city.basicJobs[k]??1)*Math.min(1,remaining/total):0;
- r.employed=budget-remaining+Object.values(city.basicAssigned).reduce((n,v)=>n+v,0);r.availableLabor=budget;
+ city.basicJobs??={berries:1,wood:1,stone:1};const wants=Object.fromEntries(Object.keys(BASIC_JOBS).map(k=>[k,Math.max(0,(city.basicJobs[k]??1)-(k==='berries'?emergencyBerries:0))]));const total=Object.values(wants).reduce((n,v)=>n+v,0);
+ city.basicAssigned={};for(const k of Object.keys(BASIC_JOBS))city.basicAssigned[k]=total?wants[k]*Math.min(1,remaining/total):0;
+ city.basicAssigned.berries=(city.basicAssigned.berries||0)+emergencyBerries;
+ r.employed=budget-remaining-emergencyBerries+Object.values(city.basicAssigned).reduce((n,v)=>n+v,0);r.availableLabor=budget;
  return entries;
 }
 export const secondsLeft=(total,progress=0,efficiency=1)=>efficiency>0?Math.max(0,total-progress)/efficiency:Infinity;

@@ -35,7 +35,7 @@ export function aiResourcePriorities(game,team,city){
  return values.sort((a,b)=>b.pressure-a.pressure);
 }
 function eligible(game,city,type){return !!BUILDINGS[type]&&!game.buildRule(city,type)&&game.canBuildNow(city,type)}
-export function selectAIBuild(game,team,city){
+export function selectAIBuild(game,team,city,excluded=new Set()){
  const r=city.economy.realms[team],stock=r.resources,age=game.s.ages[team],science=game.s.research[team];
  const buildings=game.allBuildings(city);
  // Do not bankrupt a city by stacking construction orders with zero usable builders.
@@ -47,10 +47,14 @@ export function selectAIBuild(game,team,city){
  const capacity=4+housing*3;
  const possibilities=[];
  const add=(type,priority,reason)=>{
+  if(excluded.has(type))return;
   if(type==='house'){if(buildings.some(b=>b.type==='house'&&!b.ready&&b.hp>0))return;}
-  else if(hasWorkingSource(buildings,type))return;
+  else if(hasWorkingSource(buildings,type)){
+   const foodExpansion=['hunter','fisher'].includes(type)&&r.pop>=5&&edibleSupply(stock)<r.pop*3&&!buildings.some(b=>['hunter','fisher','farm','bakery'].includes(b.type)&&!b.ready&&b.hp>0&&!b.disabled);
+   if(!foodExpansion)return;
+  }
   // Prevent the AI from wasting a whole town's labour on repeated quarries.
-  if(['quarry','lumber','hunter','fisher','well','farm'].includes(type)&&buildings.filter(b=>b.type===type&&b.hp>0).length>=2)return;
+  if(['quarry','lumber','hunter','fisher','well','farm'].includes(type)&&buildings.filter(b=>b.type===type&&b.hp>0).length>=(['hunter','fisher'].includes(type)?3:2))return;
   if(type==='harbor'&&buildings.some(b=>b.type==='harbor'&&b.hp>0))return;
   if(!eligible(game,city,type))return;
   // While saving for an era, build only a resource-producing dependency,

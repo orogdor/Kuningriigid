@@ -1,8 +1,9 @@
+import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 import * as T from './vendor/three.module.js';
 import {createMountainOutcrops} from './landscape-polish-v84.js?v=85a';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
-import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=85a';
+import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=86a';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=85a';
 import {surface,riverNear} from './continuous-landscape.js?v=85a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
@@ -66,7 +67,7 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
        stones=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),material('#a4a98e'),rocks.length);
  fields.forEach((a,i)=>{dummy.position.set(a.x+8,height(a.x+8,a.z-11)+.35,a.z-11);dummy.rotation.set(-Math.PI/2,0,game.noise(i,71)*.3);dummy.scale.set(1,1,1);dummy.updateMatrix();plots.setMatrixAt(i,dummy.matrix)});
  rocks.forEach((a,i)=>{dummy.position.set(a.x-10,height(a.x-10,a.z)+2,a.z);dummy.rotation.set(0,i*1.4,0);dummy.scale.set(3.5,2.4,3);dummy.updateMatrix();stones.setMatrixAt(i,dummy.matrix)});
- group.add(plots,stones);
+ group.add(spatialInstances(plots),spatialInstances(stones));
  const nature=createAtlasBiomeDetail(game,group,quality);
  // All tributaries and banks are one connected world-space 3D network.
  let rivers=createRiverNetwork(game,'world',null,quality),crossingRevision=game.s.crossingRevision||0;group.add(rivers);group.add(createMountainOutcrops(game,'world'));
