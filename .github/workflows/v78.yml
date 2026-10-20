@@ -5,6 +5,10 @@ on:
     paths:
       - 'civilization-core.js'
       - 'navigation.js'
+      - 'civilization.js'
+      - 'stone-demo-v77.js'
+      - 'index.html'
+      - 'README.md'
       - 'TEST_V78.mjs'
       - 'TEST_V78_UI.mjs'
       - '.github/workflows/v78.yml'
