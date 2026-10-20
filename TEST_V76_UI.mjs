@@ -20,7 +20,7 @@ async function scenario(label,width,height,isMobile){
    return {c:v.c,r:v.r,id:'landmark:'+v.id,version:dbg.state.version};
   });
   assert.equal(result.version,4,'V76 still loads V4 game state');
-  await page.waitForFunction(id=>window.gameDebug.villageLifeStatus().some(s=>s.id===id),result.id,{timeout:20000});
+  await page.waitForFunction(id=>window.gameDebug.villageLifeStatus().some(s=>s.id===id&&s.activities.some(a=>a!=='home')),result.id,{timeout:30000});
   const first=await page.evaluate(()=>window.gameDebug.villageLifeStatus().find(s=>s.id.startsWith('landmark:village-')));
   const profile=await page.evaluate(()=>window.gameDebug.quality());
   assert.equal(first.actorCount,profile==='low'?4:profile==='high'?9:6,'quality budget sets count');
