@@ -2,7 +2,7 @@ name: V80 Medieval city and roads
 on:
   push:
     branches: [feature/v80-medieval-demo-roads, main]
-    paths: ['medieval-*.js','navigation.js','civilization.js','buildings.js','index.html','TEST_V80.mjs','.github/workflows/v80.yml']
+    paths: ['medieval-*.js','urban-roads-v80.js','bronze-demo-v79.js','stone-demo-v77.js','navigation.js','detail-roads.js','continuous-landscape-visual.js','civilization-core.js','civilization.js','buildings.js','index.html','TEST_V80.mjs','TEST_V80_UI.mjs','.github/workflows/v80.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,3 +22,22 @@ jobs:
           node TEST_V79.mjs
           node TEST_V78.mjs
           node TEST_V73.mjs
+      - name: Install Chromium browser
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Verify medieval and bronze 3D road networks on phone and desktop
+        run: |
+          python3 -m http.server 8765 >/tmp/v80-server.log 2>&1 &
+          node TEST_V80_UI.mjs
+      - name: Archive example saved game and mobile screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v80-medieval-road-city
+          path: artifacts-v80/
+          if-no-files-found: ignore
