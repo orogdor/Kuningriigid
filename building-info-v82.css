@@ -1,0 +1,58 @@
+/* V82 reusable all-era building inspector: independent of the city management UI. */
+#building-inspector[hidden]{display:none!important}
+#building-inspector{
+ position:fixed;right:max(12px,env(safe-area-inset-right));top:82px;
+ z-index:64;width:min(356px,calc(100vw - 22px));max-height:min(66dvh,645px);
+ display:flex;flex-direction:column;overflow:hidden;
+ background:linear-gradient(155deg,rgba(23,47,43,.98),rgba(13,31,35,.97));
+ color:#f3e9d3;border:1px solid #cfb77f9e;border-radius:13px;
+ box-shadow:0 12px 42px #020b0ce0,0 0 0 1px #ffffff0a;
+ font:12px/1.45 Inter,Arial,sans-serif;
+}
+#building-inspector .binfo-header{
+ display:flex;align-items:center;justify-content:space-between;gap:9px;
+ padding:11px 12px 10px;border-bottom:1px solid #c3b07b63;flex:0 0 auto;
+}
+#building-inspector .binfo-heading{display:flex;flex-direction:column;gap:2px;min-width:0}
+#building-inspector .binfo-eyebrow{color:#dec690;font-size:10px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+#building-inspector #building-info-title{font-size:17px;line-height:1.18;margin:0;font-weight:800;color:#fff1cf;overflow-wrap:anywhere}
+#building-inspector #building-info-close{
+ flex-shrink:0;display:grid;place-items:center;width:38px;height:38px;
+ border:1px solid #ccbb9b80;border-radius:8px;color:#f5e6c2;
+ background:#254338;cursor:pointer;font-size:24px;touch-action:manipulation
+}
+#building-inspector #building-info-close:hover{background:#416657}
+#building-inspector .binfo-scroll{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:8px 12px 12px;scrollbar-width:thin}
+#building-inspector .binfo-purpose{font-size:12px;line-height:1.5;margin:0 0 9px;color:#cbd5bd}
+#building-inspector .binfo-section{margin:12px 0 6px;color:#e6c487;font-size:11px;letter-spacing:.06em;font-weight:800;text-transform:uppercase}
+#building-inspector .binfo-row{display:flex;align-items:baseline;gap:9px;justify-content:space-between;padding:4px 0;border-bottom:1px solid #cbd3b817}
+#building-inspector .binfo-key{color:#c0d0c4;flex:0 0 38%;font-size:11px}
+#building-inspector .binfo-value{font-size:12px;color:#f0e8d9;text-align:right;overflow-wrap:anywhere;font-weight:650}
+#building-inspector .binfo-buttons{flex:0 0 auto;display:flex;gap:7px;padding:8px 11px 10px;border-top:1px solid #c3b07b63}
+#building-inspector .binfo-buttons button{
+ border:1px solid #a7b3958c;border-radius:8px;background:#335345;color:#f4eac9;
+ min-height:38px;flex:1;font-size:12px;font-weight:700;touch-action:manipulation
+}
+#building-inspector .binfo-buttons button[hidden]{display:none}
+body:has(#startmenu:not([hidden])) #building-inspector,
+body:has(#researchpanel:not([hidden])) #building-inspector,
+body:has(#help:not([hidden])) #building-inspector,
+body:has(#journalpanel:not([hidden])) #building-inspector{display:none!important}
+@media(max-width:900px),(max-height:580px){
+ #building-inspector{
+  right:max(6px,env(safe-area-inset-right));left:max(6px,env(safe-area-inset-left));
+  top:auto;bottom:calc(max(5px,env(safe-area-inset-bottom)) + 69px);
+  width:auto;max-height:min(53dvh,390px);z-index:40;
+ }
+ #building-inspector #building-info-title{font-size:15px}
+ #building-inspector .binfo-scroll{padding:6px 12px}
+ #building-inspector .binfo-buttons{padding:5px 9px}
+ #building-inspector .binfo-header{padding:6px 10px}
+ #building-inspector .binfo-purpose{font-size:11px}
+ body.hud-city-open #building-inspector,body.hud-explore-open #building-inspector,
+ body.hud-map-open #building-inspector{display:none!important}
+}
+@media(max-width:900px) and (orientation:landscape) and (max-height:520px){
+ #building-inspector{left:auto;right:6px;bottom:calc(max(3px,env(safe-area-inset-bottom)) + 66px);width:min(320px,48vw);max-height:calc(100dvh - 120px)}
+ #building-inspector .binfo-section{margin:7px 0 4px}
+}
