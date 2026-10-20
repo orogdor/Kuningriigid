@@ -88,10 +88,16 @@ async function scenario(era,width,height,isMobile,label){
    await toggle.click();
    const after=await page.evaluate(()=>window.gameDebug.buildingInfoStatus().data.disabled);
    assert.notEqual(after,before,'real building pause/resume controls must work');
-   await page.evaluate(()=>{document.getElementById('startmenu').hidden=false});
-   const downloadPromise=page.waitForEvent('download',{timeout:25000});
-   await page.locator('#v51export').click();
-   const download=await downloadPromise;
+   // The real workflow closes the selected house card, opens the pause menu
+   // through its button, and exports there. Manually unhiding startmenu did
+   // not update menuOpen, leaving the canvas input layer active on mobile.
+   await page.locator('#building-inspector .binfo-close').click();
+   await page.evaluate(()=>document.getElementById('menubtn').click());
+   await page.waitForFunction(()=>!document.getElementById('startmenu').hidden);
+   const download=await Promise.all([
+    page.waitForEvent('download',{timeout:30000}),
+    page.locator('#v51export').click()
+   ]).then(items=>items[0]);
    assert.equal(download.suggestedFilename(),'Kuningriigid_V82_Aurulinn.json');
   }
   console.log('V82 BROWSER PASS '+label+' '+JSON.stringify({
