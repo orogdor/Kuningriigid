@@ -2,6 +2,7 @@
 // Uses real GLB geometry. Does not claim 3-view Mudelitehas 0.1.2 certification.
 import * as T from './vendor/three.module.js';
 import {loadWorldGLB} from './scripts/glb_lite.js';
+import {createWorldObjectCatalog} from './world-object-catalog.js';
 const ROOT='./assets/world1000/';
 const FILES={village:'world_village_1000',ruins:'ancient_ruin_1000',rock:'rock_outcrop_1000',bridge:'river_bridge_1000',forest:'forest_cluster_1000'};
 export function createWorldAtlasProps(game,scene,quality='medium'){
@@ -11,17 +12,7 @@ export function createWorldAtlasProps(game,scene,quality='medium'){
  // Select props evenly across the whole map. Taking the first N from the
  // row-major cell array made distant southern areas comparatively empty.
  // Keep crossings independent of detail quality: visible bridges aid navigation.
- const density=quality==='low'?.5:quality==='high'?1:.75;
- function spreadAcrossMap(sites,limit){
-  if(sites.length<=limit)return sites;
-  const step=sites.length/limit;
-  return Array.from({length:limit},(_,i)=>sites[Math.floor((i+.5)*step)]);
- }
- const candidates={
-  rock:spreadAcrossMap(game.cells.filter(c=>c.mountain&&game.noise(c.c*11+5,c.r*7+25)>.972),Math.round(260*density)),
-  forest:spreadAcrossMap(game.cells.filter(c=>c.land&&!c.mountain&&c.biome==='forest'&&game.noise(c.c*17+15,c.r*13+24)>.964),Math.round(220*density)),
-  bridge:spreadAcrossMap(game.cells.filter(c=>c.land&&(c.bridge||c.ford)&&c.river),120)
- };
+ const catalog=createWorldObjectCatalog(game,quality),candidates=catalog.candidates;
  const multipliers={rock:1.65,forest:1.55,bridge:1.35};
  function materialize(){
   for(const kind of ['rock','forest','bridge']){
@@ -46,5 +37,9 @@ export function createWorldAtlasProps(game,scene,quality='medium'){
  const initialized=Promise.allSettled(Object.entries(FILES).map(async ([kind,name])=>{
   const m=await loadWorldGLB(ROOT+name+'.glb');templates.set(kind,m);return kind;
  })).then(results=>{const errors=results.filter(r=>r.status==='rejected');if(errors.length)console.warn('World Atlas 1000 GLB load incomplete:',errors.map(r=>r.reason));materialize();ready=true;update(true);return errors.length===0;});
- return {group,get ready(){return ready},initialized,landmark,update,counts:Object.fromEntries(Object.entries(candidates).map(([k,v])=>[k,v.length]))};
+ return {group,get ready(){return ready},initialized,landmark,update,
+  // The detail renderer uses exactly the same selected atlas props.
+  siteCatalog:catalog,
+  detailModel(kind){return templates.get(kind)?.clone(true)||null},
+  counts:catalog.counts};
 }
