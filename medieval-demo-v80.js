@@ -1,6 +1,6 @@
 // V80: medieval demonstration is a disposable ordinary V4 state.
 import {createBronzeDemoState} from './bronze-demo-v79.js?v=79a';
-import {Civilization,BUILDINGS} from './civilization-core.js?v=79a';
+import {Civilization,BUILDINGS} from './civilization-core.js?v=80c';
 import {MEDIEVAL_TYPES} from './medieval-buildings-v80.js?v=80a';
 import {grantTech} from './research.js';
 import {seedCityStreetNetwork} from './town-streets-v80.js?v=80c';
