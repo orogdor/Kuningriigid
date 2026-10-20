@@ -110,8 +110,15 @@ export function createMountainOutcrops(game,scope='world',tile=null){
   // Embed the entire foot of the crag, not only its centre on a steep ridge.
   let base=y;
   for(let k=0;k<12;k++){const angle=k*Math.PI/6;base=Math.min(base,surface(game,x+Math.cos(angle)*size*1.15,z+Math.sin(angle)*size*1.15))}
-  base-=1.4;
-  const p=scope==='world'?{x,z}:worldToLocal(tile,x,z),height=20+size*1.25+(y-base)*.65;
+  const yaw=game.noise(c.c,c.r)*Math.PI*2,co=Math.cos(yaw),sn=Math.sin(yaw);
+  // Check the actual rotated polygon, including edge midpoints on narrow gullies.
+  for(let k=0;k<7;k++)for(let step=0;step<3;step++){
+   const a=k*Math.PI*2/7,b=(k+1)*Math.PI*2/7,t=step/3;
+   const bx=(Math.cos(a)*(1-t)+Math.cos(b)*t)*size,bz=(Math.sin(a)*(1-t)+Math.sin(b)*t)*size*.72;
+   base=Math.min(base,surface(game,x+co*bx+sn*bz,z-sn*bx+co*bz));
+  }
+  base-=size*1.5;
+  const p=scope==='world'?{x,z}:worldToLocal(tile,x,z),height=20+size*1.25+y-base;
   o.position.set(p.x,projectHeight(base,scope),p.z);o.rotation.set(0,game.noise(c.c,c.r)*Math.PI*2,0);o.scale.set(size,height,size*.72);o.updateMatrix();
   if(scope!=='world'){const m=new T.Matrix4().makeScale(3,.30,2.6).multiply(o.matrix);m.setPosition(p.x,projectHeight(base,scope),p.z);mesh.setMatrixAt(i,m)}else mesh.setMatrixAt(i,o.matrix);
  });mesh.receiveShadow=true;mesh.castShadow=false;mesh.name='angular ridge rock';group.add(mesh);group.userData.outcropCount=sites.length;return group;
