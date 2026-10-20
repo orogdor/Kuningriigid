@@ -2,7 +2,7 @@ name: V85 Terrain and City Borders
 on:
   push:
     branches: [feature/v85-terrain, main]
-    paths: ['landscape-*.js', 'detail-borders-v85.js', 'civilization.js', 'continuous-landscape-visual.js', 'TEST_V85*.mjs', '.github/workflows/v85.yml']
+    paths: ['landscape-*.js', 'detail-borders-v85.js', 'civilization.js', 'continuous-landscape-visual.js', 'continuous-landscape.js', 'TEST_V85*.mjs', '.github/workflows/v85.yml']
   workflow_dispatch:
 permissions:
   contents: read

@@ -113,7 +113,7 @@ const coastal=(smooth((h-3.2)/4)*(1-smooth((h-15)/6)))*4.5*
  const spine=1-Math.abs(Math.sin(x*.046+Math.sin(z*.019)*1.2)*Math.cos(z*.039-x*.014));
  const fracture=Math.abs(Math.sin(x*.16+z*.075+Math.sin(z*.083)*.65));
  const ledge=Math.sin((h+ridge)*.57+Math.sin(x*.037+z*.023));
- const fractured=steep*(Math.pow(spine,3)*26+Math.pow(fracture,1.4)*6+ledge*2.1);
+ const fractured=steep*(spine*12+smooth((spine-.55)/.035)*20+smooth((spine-.82)/.030)*24+Math.pow(fracture,1.4)*6+ledge*2.1);
  return h+ridge+scarp+fractured+coastal-oceanFloor;
 }
 export function worldElevation(game,x,z){
