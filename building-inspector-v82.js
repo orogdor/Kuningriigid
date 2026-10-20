@@ -13,7 +13,7 @@ export function describeBuilding(game,city,building,ages=[],names={},definitions
  const owner=city.team===0,complete=!!building.ready;
  const era=building.previewAge===game.upgrade(city.team)?building.previewAge:
   typeof game.buildingAge==='function'?game.buildingAge(city.team,building.type):game.upgrade(city.team);
- const maxHp=Math.max(1,building.maxHp||d.hp||building.hp||350);
+ const maxHp=Math.max(1,Number(building.maxHp||0),Number(d.hp||0),Number(building.hp||0),350);
  const required=Math.max(0,d.workers||0);
  const assigned=Math.max(0,building.assigned||0);
  const needed=Math.max(0,building.workerLimit??required);
