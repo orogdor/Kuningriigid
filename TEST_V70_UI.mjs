@@ -52,14 +52,16 @@ try{
    const el=n=>document.getElementById(n);
    const rect=n=>{const r=el(n).getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};
    const p=rect('citypanel'),nav=rect('tools'),tray=rect('tray'),w=innerWidth,h=innerHeight;
-   return {p,nav,tray,w,h,visible:getComputedStyle(el('citypanel')).display!=='none',scroll:el('tray').scrollWidth>el('tray').clientWidth,active:el('citytab-build').getAttribute('aria-selected'),showBuild:getComputedStyle(el('citypane-build')).display!=='none'};
+   return {p,nav,tray,w,h,v74:!!document.querySelector('link[href*="hud-v74.css"]'),visible:getComputedStyle(el('citypanel')).display!=='none',scroll:el('tray').scrollWidth>el('tray').clientWidth,active:el('citytab-build').getAttribute('aria-selected'),showBuild:getComputedStyle(el('citypane-build')).display!=='none'};
   });
   console.log('V70 LAYOUT',layout.label,JSON.stringify(m));
   assert.equal(m.visible,true,'city drawer visible '+layout.label);
   assert.equal(m.showBuild,true,'build tab visible '+layout.label);
   assert.ok(m.p.left>=0&&m.p.right<=m.w+3&&m.p.top>=0&&m.p.bottom<=m.h+3,'drawer clipped '+layout.label);
   if(layout.width<901){
-   assert.ok(m.p.height<=Math.min(m.h*.5,265),'drawer must not occupy whole screen '+layout.label+':'+JSON.stringify(m.p));
+   // V74 intentionally permits a taller readable bottom sheet while preserving the map and bottom navigation.
+   const maxDrawerHeight=m.v74?(m.h<520?Math.min(m.h*.5,205):Math.min(m.h*.56,430)):Math.min(m.h*.5,265);
+   assert.ok(m.p.height<=maxDrawerHeight+2,'drawer must not occupy whole screen '+layout.label+':'+JSON.stringify(m.p));
    assert.ok(m.p.bottom<=m.nav.top+3,'drawer must not overlap navigation '+layout.label);
    assert.ok(m.p.top>=40,'top HUD stays unobstructed');
   }else assert.ok(m.p.width<=370,'desktop city panel remains compact');
