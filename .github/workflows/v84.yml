@@ -1,0 +1,37 @@
+name: V84 Mountain River Bridge Visual Check
+on:
+  push:
+    branches: [feature/v84-landscape, main]
+    paths: ['landscape-polish-v84.js', 'continuous-landscape-visual.js', 'TEST_V84*.mjs', '.github/workflows/v84.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  landscape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify projections, bridge banks, rivers and save compatibility
+        run: |
+          node --check civilization.js
+          node TEST_V84.mjs
+          node TEST_V67.mjs
+          node TEST_V75.mjs
+          node TEST_V73.mjs
+      - run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Render world and detail scenes on desktop and phone
+        run: |
+          python3 -m http.server 8765 >/tmp/v84-server.log 2>&1 &
+          node TEST_V84_UI.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V84-landscape-screenshots
+          path: artifacts-v84/
+          if-no-files-found: ignore

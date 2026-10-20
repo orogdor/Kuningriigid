@@ -1,8 +1,9 @@
 import * as T from './vendor/three.module.js';
+import {createMountainOutcrops} from './landscape-polish-v84.js?v=84a';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
 import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=68d';
-import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=69a';
+import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=84a';
 import {surface,riverNear} from './continuous-landscape.js?v=69a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
 const palette={
@@ -68,10 +69,11 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  group.add(plots,stones);
  const nature=createAtlasBiomeDetail(game,group,quality);
  // All tributaries and banks are one connected world-space 3D network.
- const rivers=createRiverNetwork(game,'world');group.add(rivers);
+ let rivers=createRiverNetwork(game,'world',null,quality),crossingRevision=game.s.crossingRevision||0;group.add(rivers);group.add(createMountainOutcrops(game,'world'));
  // Real-world traffic generates the atlas road network (no roads appear just because a route was planned).
  const roadGroup=new T.Group();roadGroup.name='V67 continuous road graph';roadGroup.userData.roadNetwork=true;group.add(roadGroup);let roadStamp='';
  function roads(state){
+  if(crossingRevision!==(state.crossingRevision||0)){crossingRevision=state.crossingRevision||0;group.remove(rivers);disposeNetwork(rivers);rivers=createRiverNetwork(game,'world',null,quality);group.add(rivers)}
   const stamp=(state.roadRevision||0)+':'+(state.railRevision||0)+':'+(state.visionRevision||0);
   if(stamp===roadStamp)return;roadStamp=stamp;
   for(const o of [...roadGroup.children]){roadGroup.remove(o);disposeNetwork(o)}

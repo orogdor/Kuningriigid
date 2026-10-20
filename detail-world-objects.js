@@ -2,6 +2,7 @@
 // Models reuse atlas GLB geometry and materials; fallback templates are shared,
 // so changing tiles does not allocate new GPU resources on every visit.
 import * as T from './vendor/three.module.js';
+import {createCrossingModel} from './landscape-polish-v84.js?v=84a';
 import {worldToDetail} from './landscape-shared.js?v=65c';
 
 const stone=new T.MeshStandardMaterial({color:'#8f8a81',roughness:1,flatShading:true});
@@ -55,6 +56,13 @@ export function buildDetailWorldObjects(game,worldProps,tile,height){
  for(const site of sites){
   // The local view must not reveal a village/ruin hidden by fog of war on the atlas.
   if(!game.seen(0,site.cell))continue;
+  if(site.kind==='bridge'){
+   const built=game.contextAt(site.cell,false)?.economy.buildings.some(b=>b.type==='bridge'&&b.ready);
+   if(built)continue; // The selectable city building supplies the same crossing.
+   const model=createCrossingModel(game,site.cell,'detail',tile,height);
+   model.userData.worldSiteId=site.id;model.userData.worldProp=site.kind;model.name='detail-world-site '+site.id;
+   holder.add(model);ids.push(site.id);continue;
+  }
   const model=worldProps.detailModel(site.kind)||fallback(site.kind);
   const box=new T.Box3().setFromObject(model);
   const width=Math.max(.01,box.max.x-box.min.x,box.max.z-box.min.z);

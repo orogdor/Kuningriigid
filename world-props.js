@@ -1,6 +1,7 @@
 // V58: evenly distributed, quality-aware GPU deployment of five low-poly World Atlas GLB props.
 // Uses real GLB geometry. Does not claim 3-view Mudelitehas 0.1.2 certification.
 import * as T from './vendor/three.module.js';
+import {crossingTemplate,crossingFrame,applyCrossingTransform} from './landscape-polish-v84.js?v=84a';
 import {loadWorldGLB} from './scripts/glb_lite.js';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const ROOT='./assets/world1000/';
@@ -15,22 +16,29 @@ export function createWorldAtlasProps(game,scene,quality='medium'){
  const catalog=createWorldObjectCatalog(game,quality),candidates=catalog.candidates;
  const multipliers={rock:1.65,forest:1.55,bridge:1.35};
  function materialize(){
+  for(const item of instanced)group.remove(item.mesh);instanced.length=0;
   for(const kind of ['rock','forest','bridge']){
-   const template=templates.get(kind),sites=candidates[kind];if(!template||!sites?.length)continue;
-   for(const src of template.children){if(!src.isMesh)continue;
-    const mesh=new T.InstancedMesh(src.geometry,src.material,sites.length);
-    mesh.name='atlas1000_'+kind+'_'+src.name;mesh.frustumCulled=false;mesh.userData.worldProp=kind;group.add(mesh);
-    instanced.push({kind,mesh,sites});
+   const variants=kind==='bridge'?[false,true]:[null];
+   for(const ford of variants){
+    const template=kind==='bridge'?crossingTemplate(ford):templates.get(kind),sites=candidates[kind].filter(c=>kind!=='bridge'||!c.bridge===ford);if(!template||!sites.length)continue;
+    for(const src of template.children){if(!src.isMesh)continue;
+     const mesh=new T.InstancedMesh(src.geometry,src.material,sites.length);
+     mesh.name='atlas1000_'+kind+'_'+src.name;mesh.frustumCulled=false;mesh.userData.worldProp=kind;group.add(mesh);
+     instanced.push({kind,mesh,sites});
+    }
    }
   }
  }
- function update(force=false){if(!ready)return;const rev=game.s.visionRevision||0;if(!force&&rev===lastRevision)return;lastRevision=rev;
+ let crossingRevision=-1;
+ function update(force=false){if(!ready)return;const bridges=game.s.crossingRevision||0;if(bridges!==crossingRevision){crossingRevision=bridges;materialize();force=true}const rev=game.s.visionRevision||0;if(!force&&rev===lastRevision)return;lastRevision=rev;
   for(const {kind,mesh,sites} of instanced){sites.forEach((cell,i)=>{
-   const visible=game.seen(0,cell);obj.position.set(cell.x,game.atlasHeight(cell.x,cell.z)+.45,cell.z);
-   const size=visible?multipliers[kind]:0;
-   obj.scale.setScalar(size);
-   const angle=kind==='bridge'?(cell.riverTo?Math.atan2(cell.riverTo.r-cell.r,cell.riverTo.c-cell.c):(cell.riverDir==='h'?Math.PI/2:0)):game.noise(cell.c,cell.r+16)*Math.PI*2;
-   obj.rotation.set(0,angle,0);obj.updateMatrix();mesh.setMatrixAt(i,obj.matrix);
+   const visible=game.seen(0,cell);
+   if(kind==='bridge'){
+    applyCrossingTransform(obj,crossingFrame(game,cell));
+    if(!visible)obj.matrix.makeScale(0,0,0);mesh.setMatrixAt(i,obj.matrix);obj.matrixAutoUpdate=true;return;
+   }
+   obj.position.set(cell.x,game.atlasHeight(cell.x,cell.z)+.45,cell.z);obj.scale.setScalar(visible?multipliers[kind]:0);
+   obj.rotation.set(0,game.noise(cell.c,cell.r+16)*Math.PI*2,0);obj.updateMatrix();mesh.setMatrixAt(i,obj.matrix);
   });mesh.instanceMatrix.needsUpdate=true;}
  }
  function landmark(kind){const src=templates.get(kind);if(!src)return null;const copy=src.clone(true);copy.scale.setScalar(kind==='village'?2.15:2.05);copy.name='World Atlas 1000 '+kind;return copy}

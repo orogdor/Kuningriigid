@@ -44,7 +44,7 @@ for(const device of [{name:'desktop',width:1366,height:900},{name:'phone',width:
 }
 // A failed renderer/module cannot leave unexplained dead action buttons.
 const ctx=await browser.newContext(),page=await ctx.newPage();
-await page.route('**/civilization.js?v=83a',route=>route.abort());
+await page.route('**/civilization.js?v=*',route=>route.abort());
 await page.goto('http://127.0.0.1:8765/');
 await page.locator('#menu-status.menu-error').waitFor();
 assert.equal(await page.locator('#newgame').isDisabled(),true);
