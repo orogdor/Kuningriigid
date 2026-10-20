@@ -6,10 +6,10 @@ const length=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const FOOTPRINTS=Object.freeze({
  inn:[6,5], trade_yard:[5,6], siegeworkshop:[5,6], smelter:[5,6], smith:[5,6], coal:[5,6], mine:[5,6], watermill:[6,5], hall:[5.6,5.0],house:[4,3.6],warehouse:[5.6,5],cellar:[5,4.4],
  market:[5.5,5.1],study:[5,5],lumber:[4.8,5],quarry:[4.6,5],
- hunter:[4.6,5],fisher:[4.9,4.6],farm:[4.8,5],well:[3.2,3.2],
+ hunter:[4.6,5],fisher:[4.9,6.4],stable:[5,7],farm:[4.8,5],well:[3.2,3.2],
  barracks:[5,5],harbor:[5.3,8.3],saw:[5,5],mill:[4.8,5],
- bakery:[5,5],archery:[5,5],forester:[4.8,5],claypit:[4.7,4.4],
- pottery_kiln:[4.7,4.6],pasture:[4.8,4.8],mason:[4.8,5],
+ bakery:[5,5],archery:[5,5],forester:[4.8,5],claypit:[4.7,6.4],
+ pottery_kiln:[4.7,4.6],pasture:[4.8,6.4],mason:[4.8,5],
  cartwright:[5,6],coppermine:[5,6],tinmine:[5,6],
  bronze_foundry:[5.3,6],road_depot:[5.2,5],scriptorium:[5,5],
  keep:[5.7,5.3],gatehouse:[5.4,5.1],guildhall:[5.3,5.0],
