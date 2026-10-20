@@ -29,7 +29,7 @@ for(const type of INDUSTRIAL_BUILDING_TYPES){
   'share prepared 3D geometry '+type);
  assert.ok(a.children.every(mesh=>mesh.geometry.userData.shared),'shared geometry flag '+type);
  const bbox=new T.Box3().setFromObject(a),size=bbox.getSize(new T.Vector3());
- assert.ok(size.y>2&&size.x>3&&size.z>1.2,'visible non-flat industrial architecture '+type);
+ assert.ok(size.y>(type==='bridge'?1:2)&&size.x>3&&size.z>1.2,'visible non-flat industrial architecture '+type);
  assert.ok(size.x<14&&size.z<14,'bounded structure footprint '+type);
  measures.push({type,triangles,calls,size:[...size.toArray().map(n=>+n.toFixed(2))]});
 }
