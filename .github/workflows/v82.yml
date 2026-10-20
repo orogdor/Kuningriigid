@@ -1,0 +1,64 @@
+name: V82 Industrial Architecture and All-Era Building Inspector
+on:
+  push:
+    branches: [feature/v82-industrial-buildings-click-info, main]
+    paths:
+      - 'industrial-*.js'
+      - 'building-inspector-v82.js'
+      - 'civilization.js'
+      - 'buildings.js'
+      - 'index.html'
+      - 'style.css'
+      - 'TEST_V82*.mjs'
+      - '.github/workflows/v82.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  all-era-houses:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test industrial meshes, V4 city save and building inspector data
+        run: |
+          node --check industrial-buildings-v82.js
+          node --check industrial-demo-v82.js
+          node --check building-inspector-v82.js
+          node --check civilization.js
+          node --check buildings.js
+          node --check TEST_V82.mjs
+          node --check TEST_V82_UI.mjs
+          node TEST_V82.mjs
+          node TEST_V81.mjs
+          node TEST_V80.mjs
+          node TEST_V79.mjs
+          node TEST_V78.mjs
+          node TEST_V77.mjs
+          node TEST_V76.mjs
+          node TEST_V75.mjs
+          node TEST_V73.mjs
+          node TEST_V61.mjs
+          node TEST_V59.mjs
+      - name: Install Chromium for real touch tests
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Browser check for all five eras, desktop/mobile, touch roof picker and demo export
+        run: |
+          python3 -m http.server 8765 >/tmp/v82-server.log 2>&1 &
+          node TEST_V82_UI.mjs
+      - name: Upload industrial save, model metrics and phone screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: V82-industrial-city-info-test
+          path: artifacts-v82/
+          if-no-files-found: ignore
