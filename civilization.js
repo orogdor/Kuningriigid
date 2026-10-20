@@ -672,19 +672,19 @@ function slotUI(){const root=$('v51slots');root.replaceChildren();for(let i=1;i<
  const saveButton=document.createElement('button');saveButton.textContent='Salvesta';saveButton.disabled=sampleDemo;saveButton.onclick=()=>{try{localStorage.setItem(V51_SLOT_PREFIX+i,snapshotV51());slotUI();say('Salvestatud kohta '+i)}catch{say('Salvestusruum on täis')}};row.append(saveButton);
  const load=document.createElement('button');load.textContent='Laadi';load.disabled=sampleDemo||!stored;load.onclick=()=>{if(!confirm('Laadin salvestuskoha '+i+'. Praegune automaatsalvestus asendatakse.'))return;try{const obj=JSON.parse(localStorage.getItem(V51_SLOT_PREFIX+i));if(!validState(obj))throw Error('Vigane salvestus');replaceProtectedGame(localStorage,JSON.stringify(obj),validState);restarting=true;location.reload()}catch{restarting=false;say('Salvestus on vigane')}};row.append(load);root.append(row)
  }}
-$('v51export').onclick=()=>{const blob=new Blob([snapshotV51()],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=stoneDemo?'Kuningriigid_V77_Kivimetsa_testlinn.json':bronzeDemo?'Kuningriigid_V79_Pronksilinn.json':medievalDemo?'Kuningriigid_V80_Keskaeg.json':'Kuningriigid_V79_kaik_'+(Math.floor(s.time/60)+1)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$('v51export').onclick=()=>{const blob=new Blob([snapshotV51()],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=stoneDemo?'Kuningriigid_V77_Kivimetsa_testlinn.json':bronzeDemo?'Kuningriigid_V79_Pronksilinn.json':medievalDemo?'Kuningriigid_V80_Keskaeg.json':'Kuningriigid_V80_kaik_'+(Math.floor(s.time/60)+1)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 $('v51import').onclick=()=>{if(sampleDemo){say('Impordi testsalvestus tavalisel mängulehel ilma demo parameetrita.');return;}$('v51importfile').click()};
 $('v51importfile').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{if(file.size>15e6)throw Error('Fail on liiga suur');const data=JSON.parse(await file.text());if(!validState(data))throw Error('Vigane mänguseis');if(!confirm('Impordin selle mänguseisu ja asendan automaatsalvestuse?'))return;replaceProtectedGame(localStorage,JSON.stringify(data),validState);restarting=true;location.reload()}catch(error){restarting=false;say('Import ebaõnnestus: '+error.message)}finally{e.target.value=''}};
 slotUI();
 // The example city is opt-in. It opens separately and never replaces autosaves.
 const demoLink=document.createElement('a');
 demoLink.className='model-gallery-link';
-demoLink.href='?v=79-20261020&demo=stone';
-demoLink.textContent='🪨 V79: ava kiviaja näidislinn ja vaata uusi majamudeleid';
+demoLink.href='?v=80-20261020&demo=stone';
+demoLink.textContent='🪨 V80: ava kiviaja näidislinn';
 $('continue').parentNode.insertBefore(demoLink,$('continue'));
 const bronzeLink=document.createElement('a');
-bronzeLink.className='model-gallery-link';bronzeLink.href='?v=79-20261020&demo=bronze';
-bronzeLink.textContent='⚒️ V79: ava pronksiaja näidislinn ja võrdle uusi hooneid';
+bronzeLink.className='model-gallery-link';bronzeLink.href='?v=80-20261020&demo=bronze';
+bronzeLink.textContent='⚒️ V80: pronksiaja näidislinn uue teevõrguga';
 $('continue').parentNode.insertBefore(bronzeLink,$('continue'));
 const medievalLink=document.createElement('a');medievalLink.className='model-gallery-link';medievalLink.href='?v=80-20261020&demo=medieval';medievalLink.textContent='🏰 V80: ava keskaja näidislinn ja vaata teeradu';$('continue').parentNode.insertBefore(medievalLink,$('continue'));
 if(sampleDemo){
