@@ -89,6 +89,25 @@ weight(i){return 1/this.roadBoost(i)}
  }
  pruneTrails(){let changed=false;for(const k of Object.keys(this.world.heat)){const h=this.roadStrength(Number(k));if(h<.2){delete this.world.heat[k];delete this.world.heatLast[k];changed=true}}if(changed)this.world.trailChanges=(this.world.trailChanges||0)+1}
 
+// Reachability queries do not need a weighted A* route. Cache connected
+// regions until the obstacle mask changes; diagonal moves cannot bridge
+// separate four-connected regions because corner cutting is forbidden.
+reachable(from,to){
+ this.refresh();const a=this.nearest(from),b=this.nearest(to);if(!a||!b)return false;
+ if(this.componentVersion!==this.version){
+  const labels=new Int32Array(this.n),queue=new Int32Array(this.n);let id=0;
+  for(let start=0;start<this.n;start++){
+   if(!this.mask[start]||labels[start])continue;id++;let head=0,tail=0;queue[tail++]=start;labels[start]=id;
+   while(head<tail){const k=queue[head++],x=k%this.w,z=Math.floor(k/this.w);
+    for(const j of [x>0?k-1:-1,x+1<this.w?k+1:-1,z>0?k-this.w:-1,z+1<this.h?k+this.w:-1]){
+     if(j>=0&&this.mask[j]&&!labels[j]){labels[j]=id;queue[tail++]=j;}
+    }
+   }
+  }
+  this.components=labels;this.componentVersion=this.version;
+ }
+ return this.components[this.index(a.x,a.z)]===this.components[this.index(b.x,b.z)];
+}
 route(from,to,{preferRoads=true}={}){this.refresh();const a=this.nearest(from),b=this.nearest(to);if(!a||!b)return null;const start=this.index(a.x,a.z),goal=this.index(b.x,b.z);if(start===goal)return [b];const costs=new Float32Array(this.n);costs.fill(Infinity);const prev=new Int32Array(this.n);prev.fill(-1);const closed=new Uint8Array(this.n),heap=[];const push=(id,cost)=>{heap.push([id,cost]);for(let i=heap.length-1;i>0;){let p=(i-1)>>1;if(heap[p][1]<=heap[i][1])break;[heap[p],heap[i]]=[heap[i],heap[p]];i=p}};const pop=()=>{const result=heap[0],last=heap.pop();if(heap.length){heap[0]=last;for(let i=0;;){let l=i*2+1,r=l+1,j=i;if(l<heap.length&&heap[l][1]<heap[j][1])j=l;if(r<heap.length&&heap[r][1]<heap[j][1])j=r;if(j===i)break;[heap[i],heap[j]]=[heap[j],heap[i]];i=j}}return result[0]};costs[start]=0;push(start,0);while(heap.length){const k=pop();if(closed[k])continue;if(k===goal){let out=[],v=k;while(v!==start){out.push(this.point(v));v=prev[v]}out.push(a);return out.reverse()}closed[k]=1;const x=k%this.w,z=Math.floor(k/this.w);for(const[dx,dz]of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){let xx=x+dx,zz=z+dz;if(xx<0||xx>=this.w||zz<0||zz>=this.h)continue;const j=zz*this.w+xx;if(!this.mask[j]||closed[j]||(dx&&dz&&(!this.mask[z*this.w+xx]||!this.mask[zz*this.w+x])))continue;const score=costs[k]+Math.hypot(dx,dz)*(preferRoads?this.weight(j):1);if(score<costs[j]){costs[j]=score;prev[j]=k;push(j,score+.45*Math.hypot(xx-(goal%this.w),zz-Math.floor(goal/this.w)))}}}return null}
 move(agent,target,dt,speed=3){this.refresh();agent.moving=false;if(!target||dt<=0)return false;if(!this.open(agent.x,agent.z)){const p=this.nearest(agent);if(!p)return false;agent.x=p.x;agent.z=p.z;this.cache.delete(agent)}const goal=this.nearest(target);if(!goal)return false;let memo=this.cache.get(agent),key=goal.x+':'+goal.z;if(!memo||memo.key!==key||memo.version!==this.version){const path=length(agent,goal)<3&&this.clear(agent,goal)?[goal]:this.route(agent,goal);memo={key,path:path||[],version:this.version,failedTime:0};this.cache.set(agent,memo)}if(!memo.path.length&&length(agent,goal)>.18){memo.failedTime=(memo.failedTime||0)+dt;if(memo.failedTime>4){this.cache.delete(agent);agent.pathFailure=(agent.pathFailure||0)+1}return false}let remaining=dt;while(memo.path.length&&remaining>0&&speed>0){const p=memo.path[0],d=length(agent,p);if(d<.015){memo.path.shift();continue}const k0=this.index(agent.x,agent.z),boost=k0>=0?this.roadBoost(k0):1,step=Math.min(d,speed*remaining*boost),next={x:agent.x+(p.x-agent.x)/d*step,z:agent.z+(p.z-agent.z)/d*step};if(!this.clear(agent,next)){this.cache.delete(agent);break}this.recordTraffic(agent,next);agent.heading=Math.atan2(p.x-agent.x,p.z-agent.z);agent.x=next.x;agent.z=next.z;remaining-=step/(speed*boost);agent.moving=true;if(step>=d-.001)memo.path.shift()}return length(agent,goal)<.18}
 }

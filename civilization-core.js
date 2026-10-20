@@ -476,9 +476,9 @@ const science=this.s.research[team];if(!science.active&&this.s.cities.some(c=>c.
   for(const p of spots.slice(0,96)){
    if(this.previewBuild(city,next,p).error)continue;
    const nav=this.nav(city),home=nav.nearest(door({...p,type:next}),4),depot=nav.nearest(door(h),4);
-   if(!home||!depot||!nav.route(depot,home))continue;
+   if(!home||!depot||!nav.reachable(depot,home))continue;
    if(kind&&next!=='fisher'){
-    if(!home||!deposits.some(r=>{if(distance(r,p)>=55)return false;const goal=nav.nearest({x:r.x+1.8,z:r.z},4);return goal&&nav.route(home,goal)}))continue;
+    if(!home||!deposits.some(r=>{if(distance(r,p)>=55)return false;const goal=nav.nearest({x:r.x+1.8,z:r.z},4);return goal&&nav.reachable(home,goal)}))continue;
    }
    if(this.build(city,next,p).building){built=true;break;}
   }

@@ -1,3 +1,4 @@
+import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 // V48 geometry loader: renderer uses exactly the quad-authored geometry in models-v48/*.glb.
 // This direct Three.js BufferGeometry representation avoids a network decoder and can be instanced.
 import * as T from './vendor/three.module.js';
@@ -27,5 +28,5 @@ export function addV48Instances(group,name,placements,opts={}){
  if(!placements.length)return null;
  const mesh=new T.InstancedMesh(getV48Geometry(name,opts.lod||'high'),MATERIAL,placements.length),dummy=new T.Object3D();
  placements.forEach((p,i)=>{const s=p.scale||1;dummy.position.set(p.x,p.y,p.z);dummy.rotation.set(0,p.rot||0,0);dummy.scale.set(p.sx??s,p.sy??s,p.sz??s);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);if(p.tint)mesh.setColorAt(i,new T.Color(p.tint))});
- mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=!!opts.castShadow;mesh.receiveShadow=false;mesh.userData.v48Model=name;group.add(mesh);return mesh;
+ mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=!!opts.castShadow;mesh.receiveShadow=false;mesh.userData.v48Model=name;const result=opts.spatialChunks?spatialInstances(mesh):mesh;group.add(result);return result;
 }

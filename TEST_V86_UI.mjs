@@ -7,6 +7,7 @@ const dir='artifacts-v86';mkdirSync(dir,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
 const page=await ctx.newPage(),errors=[],report=[];
+let failurePage=page;
 page.on('pageerror',e=>errors.push(e.message));
 async function capture(label){
  const state=await page.evaluate(()=>{const d=window.gameDebug,c=d.state.cities.find(c=>c.team===0);return {time:d.state.time,view:d.view(),ownCity:c&&{name:c.name,pop:c.economy.realms[0].pop,stock:c.economy.realms[0].resources,buildings:c.economy.buildings.filter(b=>!b.virtual).map(b=>({type:b.type,ready:b.ready,status:b.status}))},research:d.state.research[0],perf:d.perfStats(),toast:document.getElementById('toast').textContent}});
@@ -36,7 +37,7 @@ try{
  await page.locator('#menulanguage').selectOption('et');
  await page.locator('#menu-world summary').click();await page.locator('#seed').fill('V83-playtest');await page.locator('#newgame').click();
  await page.waitForFunction(()=>window.gameDebug&&document.getElementById('startmenu').hidden,null,{timeout:90000});
- await capture('01-world');
+ await capture('01-world');assert.ok(report.at(-1).perf.triangles<3000000,'near overview culls distant foliage rather than drawing the entire map');
  await page.locator('#hud-explore').click();await page.locator('#hud-explore-auto').click();await page.locator('#hud-explore-close').click();
  await page.locator('#hud-city').click();await page.waitForFunction(()=>window.gameDebug.view()==='local');
  await page.waitForTimeout(1200);
@@ -66,6 +67,12 @@ try{
  assert.equal(hiddenMutations,0,'closed research tree is not rebuilt during gameplay');
  await capture('06-quiet-background-ui');
  assert.deepEqual(errors,[]);writeFileSync(`${dir}/play-results.json`,JSON.stringify(report,null,2));
+ await ctx.close();
+ const desktop=await browser.newContext({viewport:{width:1280,height:800}});
+ await desktop.addInitScript(()=>{localStorage.setItem('kingdoms-language','et');localStorage.setItem('kingdoms-quality','medium')});
+ const q=await desktop.newPage();failurePage=q;q.on('pageerror',e=>errors.push(e.message));await q.goto('http://127.0.0.1:8765/');await q.waitForFunction(()=>!!window.gameDebug,null,{timeout:90000});await q.locator('#continue').click();await q.waitForTimeout(1500);
+ const desktopPerf=await q.evaluate(()=>window.gameDebug.perfStats());console.log('V86 DESKTOP PERF '+JSON.stringify(desktopPerf));assert.ok(desktopPerf.triangles<3000000,'desktop overview also culls distant foliage');
+ console.log('V86 IMAGE desktop-world '+(await q.screenshot({type:'jpeg',quality:55})).toString('base64'));assert.deepEqual(errors,[]);await desktop.close();
  console.log('V86 PLAY PASS: real controls, auto-scout, walking settler, city founding, research, construction and map return');
-}catch(e){console.log('V86 PLAY FAILURE '+e.message);await page.screenshot({path:`${dir}/play-failure.png`});console.log('V86 IMAGE failure '+(await page.screenshot({type:'jpeg',quality:55})).toString('base64'));throw e}
+}catch(e){console.log('V86 PLAY FAILURE '+e.message);await failurePage.screenshot({path:`${dir}/play-failure.png`});console.log('V86 IMAGE failure '+(await failurePage.screenshot({type:'jpeg',quality:55})).toString('base64'));throw e}
 finally{await browser.close()}

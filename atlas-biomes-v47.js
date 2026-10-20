@@ -24,7 +24,7 @@ const palette={
  boulders:['#92968d','#858b83','#a9a99a'],sand:['#c5b487','#bfa975']
 };
 function color(arr,idx){return arr[idx%arr.length]}
-import {addV48Instances} from './model-runtime-v48.js';
+import {addV48Instances} from './model-runtime-v48.js?v=86a';
 
 // V48: single batched draw per authored asset. Farther and mobile quality modes
 // retain a lower object density; mesh topology is shared between all instances.
@@ -59,7 +59,7 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
   }
  }
  const defs=[['oak_1000_3',oak],['pine_1000_3',pine],['palm_1000_3',palm],['cactus_1000_3',cactus],['rock_1000_3',rock]];
- defs.forEach(([kind,points])=>addV48Instances(group,kind,points,{castShadow:false,lod:quality}));
+ defs.forEach(([kind,points])=>addV48Instances(group,kind,points,{castShadow:false,lod:quality,spatialChunks:true}));
  group.userData.visualBiomes=biomes;
  group.userData.natureInstances=defs.reduce((sum,[,a])=>sum+a.length,0);
  group.userData.v48Models=defs.filter(([,a])=>a.length).map(([k])=>k);
