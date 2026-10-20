@@ -1,8 +1,13 @@
-# Kuningriigid V74
+# Kuningriigid V75
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
-**Mängi:** https://orogdor.github.io/Kuningriigid/?v=74-20261020
+**Mängi:** https://orogdor.github.io/Kuningriigid/?v=75-20261020
+
+## V75 – maailmakaardi objektid detailkaardil
+- Külad, varemed, metsad, kaljud ja sillad paiknevad nüüd ka detailkaartidel samade maailmakaardi ruutude juures.
+- Kasutatakse samu GLB 3D-mudeleid ja külade/varemete salvestatud olekut, ilma mänguseisu lähtestamiseta.
+- Üksikasjad: [MUUDATUSED_V75.md](MUUDATUSED_V75.md).
 
 ## V74 – mobiililiides
 - Kaardikeskne vaade: suuremad alumise menüü nupud ja vaikimisi peidetud minikaart.
