@@ -73,8 +73,8 @@ async function scenario(era,width,height,isMobile,label){
   assert.equal(selected.type,location.type);
   assert.ok(selected.open,'tapping roof opens inspector');
   console.log('V82 INSPECT TAP '+label+' '+JSON.stringify({selected,location}));
-  assert.ok(selected.visible&&selected.title.length>3&&selected.inputs.includes('Töölised'));
-  assert.ok(selected.inputs.includes('Toodang')&&selected.inputs.includes('Seisukord'));
+  assert.ok(selected.visible&&selected.title.length>3&&/(Töölised|Workers)/.test(selected.inputs));
+  assert.ok(/(Toodang|Production)/.test(selected.inputs)&&/(Seisukord|Condition|Health)/.test(selected.inputs));
   assert.ok(selected.box.width<width+2&&selected.box.height<height+2);
   assert.ok(selected.box.x>=0&&selected.box.y>=0);
   await page.screenshot({path:'artifacts-v82/screenshots/'+label+'-selected.png'});
