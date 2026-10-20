@@ -1,8 +1,14 @@
-# Kuningriigid V78
+# Kuningriigid V79
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
-**Mängi:** https://orogdor.github.io/Kuningriigid/?v=78-20261020
+**Mängi:** https://orogdor.github.io/Kuningriigid/?v=79-20261020
+
+## V79 – pronksiaja majad ja parem teede teke
+- **30 uut pronksiaja 3D-hoonemudelit**, eristatavad katuse, savi-/kiviseinte ja tootmisrekvisiitide järgi. Kiviaja mudelid säilivad.
+- **[Ava Vaskoru pronksilinn](https://orogdor.github.io/Kuningriigid/?v=79-20261020&demo=bronze)** – 32 valmis hoonet, vanade salvestuste suhtes kirjutuskaitstud näidismäng, päriselt sisse tallatud teerajad, eksport JSON-i.
+- Jalgrada tekib nüüd mõõdukama korduva liikluse järel, kestab kauem ja ei jookse läbi hoonete. Ühekordsest sammumisest rada ei teki.
+- Loe [MUUDATUSED_V79.md](MUUDATUSED_V79.md).
 
 ## V78 – turulkäijate liikumine ja teerajad
 - Turul toitu toovad elanikud liiguvad nüüd igal 0,1-sekundilisel mängusammul, mitte hüpetena kord sekundis.
