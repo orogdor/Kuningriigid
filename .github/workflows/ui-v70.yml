@@ -6,6 +6,8 @@ on:
       - 'index.html'
       - 'civilization.js'
       - 'hud-v70.css'
+      - 'hud-v74.css'
+      - 'hud-v74.js'
       - 'TEST_V70_UI.mjs'
       - '.github/workflows/ui-v70.yml'
   workflow_dispatch:
