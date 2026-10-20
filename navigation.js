@@ -14,7 +14,13 @@ const FOOTPRINTS=Object.freeze({
  bronze_foundry:[5.3,6],road_depot:[5.2,5],scriptorium:[5,5],
  keep:[5.7,5.3],gatehouse:[5.4,5.1],guildhall:[5.3,5.0],
  chapel:[5.3,5.1],monastery:[5.4,5.1],watchtower:[4.7,4.6],
- stonetower:[5.2,5.0],stonewall:[4.8,4.5],palisade:[4.8,4.5]
+ stonetower:[5.2,5.0],stonewall:[4.8,4.5],palisade:[4.8,4.5],
+ steelworks:[5.7,7.1],engineworks:[5.7,7.1],polytechnic:[5.8,6.1],
+ railstation:[6.2,8.4],printer:[5.7,7.0],powdermill:[5.7,7.1],
+ nitrate:[5.7,7.1],university:[5.9,6.0],warehouse:[5.6,6.2],
+ market:[5.5,6.5],trade_yard:[5.5,6.5],smelter:[5.7,6.9],
+ bakery:[5.5,6.8],mason:[5.5,6.8],smith:[5.5,6.8],
+ laboratory:[5.7,6.2],observatory:[5.7,6.5]
 });
 export function buildingClearance(b){
  if(!b||b.type==='bridge')return null;
