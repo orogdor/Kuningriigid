@@ -1,8 +1,15 @@
-# Kuningriigid V80
+# Kuningriigid V81
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
-**Mängi:** https://orogdor.github.io/Kuningriigid/?v=80-20261020
+**Mängi:** https://orogdor.github.io/Kuningriigid/?v=81-20261020
+
+## V81 – renessansiaja uued kvaliteetsed 3D-hooned
+- 51 toetatud hooneliigi jaoks uus renessansiaegne arhitektuur: krohvitud kivimajad, terrakota- ja vaskkatused, sammaskäigud, klaasaknad, tornid, kuplid ja töökohtade erivarustus.
+- Raekoda kellatorniga, kupliga ülikool, teleskoobiga tähetorn, trükipressiga trükikoda, kloostri siseõu, kõrtsi silt, vesiveski, tuuleveski ja vankrimeistri vanker.
+- Kujutamiseks kasutatakse ühist tekstuuridega geomeetriat ja materjalide kaupa liidetud 3D-pindu, et hoida telefoni GPU koormust kontrolli all.
+- **[Ava Päikeselinna renessansiaegne näidislinn](https://orogdor.github.io/Kuningriigid/?v=81-20261020&demo=renaissance)** – 37 hoonet, 35 eri hoonetüüpi, tänavavõrgustik, JSON-i eksport. Näidislinn ei kirjuta sinu päris mängu salvestust üle.
+- Kivi-, pronksi- ja keskaegne arhitektuur, V80 teed ja vanad V4 salvestused säilivad. [Muudatused ja testid](MUUDATUSED_V81.md).
 
 ## V80 – turvaline tänavavõrgustik ja keskaja näidislinn
 - Parandatud V79 probleem: teed ei lähe enam läbi hoonete, treppide ega varikatuste. Sissepääsud ja teeribad järgivad täpsemaid hoone kaitsealasid.
