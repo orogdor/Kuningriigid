@@ -7,6 +7,8 @@ on:
       - 'civilization.js'
       - 'hud-v69.css'
       - 'hud-v69.js'
+      - 'hud-v74.css'
+      - 'hud-v74.js'
       - 'continuous-landscape.js'
       - 'TEST_V69_UI.mjs'
       - '.github/workflows/ui-v69.yml'
