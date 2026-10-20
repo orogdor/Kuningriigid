@@ -1,0 +1,56 @@
+name: V75 world/detail object parity
+on:
+  push:
+    branches: [dev/v75-world-detail-objects, main]
+    paths:
+      - 'world-object-catalog.js'
+      - 'world-props.js'
+      - 'detail-world-objects.js'
+      - 'civilization.js'
+      - 'index.html'
+      - 'TEST_V75.mjs'
+      - 'TEST_V75_UI.mjs'
+      - '.github/workflows/v75.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  world-detail-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate game and exact atlas/detail site catalogs
+        run: |
+          node --check world-object-catalog.js
+          node --check world-props.js
+          node --check detail-world-objects.js
+          node --check civilization.js
+          node TEST_V55.mjs
+          node TEST_V58.mjs
+          node TEST_V65.mjs
+          node TEST_V72.mjs
+          node TEST_V73.mjs
+          node TEST_V75.mjs
+      - name: Install Chromium and Playwright
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Verify real browser on phone and desktop
+        run: |
+          python3 -m http.server 8765 >/tmp/v75-http.log 2>&1 &
+          node TEST_V75_UI.mjs
+      - name: Upload 3D site screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v75-detail-landmark-browser-screenshots
+          path: ui-screenshots-v75/*.png
+          if-no-files-found: ignore
