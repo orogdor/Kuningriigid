@@ -1,0 +1,234 @@
+/* V74: mobile-first layout; desktop V72/V73 CSS stays unchanged.
+ * In the default phone view, gameplay canvas takes priority over persistent cards.
+ * One bottom-sheet action at a time; all controls retain their original DOM ids.
+ */
+#hud-minimap-toggle,#hud-command-toggle{display:none}
+@media (max-width:900px), (max-height:580px){
+ :root{--hud-top:44px;--hud-bottom:70px}
+ html,body{overscroll-behavior:none}
+ header{height:var(--hud-top)!important;min-height:var(--hud-top)!important;align-items:center}
+ #resources{min-width:0!important;flex:1 1 auto!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;touch-action:pan-x;overscroll-behavior-x:contain}
+ #resources::-webkit-scrollbar{display:none}
+ #resources span{flex-shrink:0}
+ header .time{flex-shrink:0}
+ /* Seven genuine touch targets with icon and short label, without text clipping. */
+ body.atlas #tools,body:not(.atlas) #tools{
+  position:fixed!important;left:max(4px,env(safe-area-inset-left))!important;
+  right:max(4px,env(safe-area-inset-right))!important;
+  bottom:max(3px,env(safe-area-inset-bottom))!important;
+  width:auto!important;max-width:none!important;
+  height:62px!important;min-height:62px!important;
+  padding:4px!important;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:2px!important;align-items:stretch!important;
+  overflow:visible!important;z-index:24;
+  background:#102b2cf2;border:1px solid #a9976d8c;border-radius:12px;
+ }
+ #tools button:not([hidden]){
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  gap:2px!important;flex:unset!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:52px!important;min-height:52px!important;
+  padding:2px 0!important;font-size:0!important;
+  line-height:1!important;white-space:nowrap!important;
+  overflow:visible!important;touch-action:manipulation;
+  border:1px solid transparent!important;border-radius:9px!important;
+  background:transparent!important;color:#f0ddae!important;
+ }
+ /* Override historical mobile display/flex declarations. Only these seven
+    actions belong to the primary bar; hidden utility buttons must not create a new grid row. */
+ #tools button[data-tab="help"],#tools button#journal,#tools button#home,#tools button#zin,#tools button#zout{display:none!important}
+ #tools #menubtn{display:flex!important;flex:unset!important;width:100%!important;min-width:0!important;max-width:none!important}
+ #tools button:not([hidden])::before{display:block;font-size:21px;line-height:25px}
+ #tools button:not([hidden])::after{display:block;font:600 10px/13px Inter,Arial,sans-serif}
+ #tools #maptoggle::before{content:"🌍"} #tools #maptoggle::after{content:"Kaart"}
+ #tools #hud-city::before{content:"⌂"} #tools #hud-city::after{content:"Linn"}
+ #tools #hud-explore::before{content:"🧭"} #tools #hud-explore::after{content:"Avasta"}
+ #tools #techtoggle::before{content:"⚗"} #tools #techtoggle::after{content:"Teadus"}
+ #tools #hud-army::before{content:"⚔"} #tools #hud-army::after{content:"Väed"}
+ #tools #hud-build::before{content:"⚒"} #tools #hud-build::after{content:"Ehita"}
+ #tools #menubtn::before{content:"☰"} #tools #menubtn::after{content:"Menüü"}
+ /* Localization changes documentElement.lang at runtime; labels follow immediately. */
+ html:lang(en) #tools #maptoggle::after{content:"World"}
+ html:lang(en) #tools #hud-city::after{content:"City"}
+ html:lang(en) #tools #hud-explore::after{content:"Explore"}
+ html:lang(en) #tools #techtoggle::after{content:"Research"}
+ html:lang(en) #tools #hud-army::after{content:"Troops"}
+ html:lang(en) #tools #hud-build::after{content:"Build"}
+ html:lang(en) #tools #menubtn::after{content:"Menu"}
+ body.atlas #tools #maptoggle,body.hud-city-open #tools #hud-city,
+ body.hud-explore-open #tools #hud-explore,
+ body.hud-city-open.hud-building-tab #tools #hud-build,
+ body.hud-city-open.hud-army-tab #tools #hud-army,
+ body:has(#researchpanel:not([hidden])) #tools #techtoggle{
+  background:#47694e!important;border-color:#dbc491a8!important;color:#fff5d6!important;
+ }
+ #tools button:focus-visible{outline:2px solid #f6d79d!important;outline-offset:1px!important}
+ /* Remove always-on clutter; popups are explicit user actions. */
+ #v51insights,#v51cities,#researchstatus,#camerahelp{display:none!important}
+ #hud-minimap-toggle{
+  display:flex;position:fixed;right:max(7px,env(safe-area-inset-right));
+  top:calc(var(--hud-top) + 7px);z-index:18;
+  align-items:center;justify-content:center;width:45px;height:45px;
+  border-radius:11px;border:1px solid #ddc18c;background:#173631eb;
+  color:#f1dea8;font-size:23px;touch-action:manipulation;box-shadow:0 4px 12px #0007
+ }
+ body:not(.atlas) #hud-minimap-toggle{display:none!important}
+ body.atlas #atlasoverview{display:none!important}
+ body.atlas.hud-mini-open #atlasoverview{
+  display:block!important;top:calc(var(--hud-top) + 59px)!important;
+  right:max(7px,env(safe-area-inset-right))!important;
+  width:180px!important;max-height:200px!important;height:auto!important;
+  z-index:18;padding:6px!important
+ }
+ body.atlas.hud-mini-open #atlasoverview canvas{height:127px!important;max-height:127px!important}
+ body.atlas.hud-mini-open #hud-minimap-toggle{background:#66784b;border-color:#fff0b9}
+ /* Resource icon is a lightweight toggle; selected settlers still force the resource layer on. */
+ body.atlas #hud-resource-toggle,body:not(.atlas) #hud-resource-toggle{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  top:calc(var(--hud-top) + 60px)!important;right:max(7px,env(safe-area-inset-right))!important;
+  left:auto!important;width:45px!important;min-width:45px!important;max-width:45px!important;
+  height:44px!important;min-height:44px!important;padding:0!important;
+  font-size:0!important;line-height:0!important;touch-action:manipulation;
+ }
+ #hud-resource-toggle::before{content:"🧺";font-size:20px;line-height:1}
+ body.hud-mini-open #hud-resource-toggle{display:none!important}
+ body.hud-mini-open #hud-tile-resources{display:none!important}
+ body.atlas #hud-tile-resources,body:not(.atlas) #hud-tile-resources{
+  top:calc(var(--hud-top) + 109px)!important;
+  right:max(7px,env(safe-area-inset-right))!important;
+  width:min(254px,68vw)!important;max-width:68vw!important;
+  max-height:min(35dvh,215px)!important;overflow-y:auto!important;z-index:19!important;
+ }
+ /* Zoom lives near the right thumb rather than obstructing the center of the world. */
+ body.atlas #hud-zoom-controls,body:not(.atlas) #hud-zoom-controls{
+  display:flex!important;position:fixed!important;
+  left:auto!important;right:max(8px,env(safe-area-inset-right))!important;
+  top:auto!important;bottom:calc(var(--hud-bottom) + 13px)!important;
+  transform:none!important;flex-direction:column!important;gap:4px!important;
+  padding:3px!important;z-index:16!important;
+ }
+ #hud-zoom-controls button{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important}
+ /* A single short selection chip; full command options expand on demand. */
+ #commandhud,body:not(.atlas) #commandhud,body:not(.atlas):not(.settling):not(.battle) #commandhud,
+ .battle #commandhud,.settling #commandhud{
+  position:fixed!important;top:auto!important;left:max(7px,env(safe-area-inset-left))!important;
+  right:auto!important;bottom:calc(var(--hud-bottom) + 13px)!important;
+  width:min(258px,calc(100vw - 86px))!important;
+  max-width:calc(100vw - 86px)!important;
+  min-height:57px!important;max-height:57px!important;
+  padding:6px 40px 5px 8px!important;overflow:hidden!important;
+  border-radius:11px!important;z-index:15!important;
+ }
+ #hud-command-toggle{display:flex!important;position:absolute;top:8px;right:5px;
+  align-items:center;justify-content:center;width:34px;height:37px;
+  border:1px solid #b49b6c;background:#2e4c40;border-radius:8px;font-size:18px;color:#f5e0b4}
+ #commandhud .command-heading{display:block;min-width:0}
+ #commandhud #commandname{font-size:13px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #commandhud #commandmode{font-size:8px!important}
+ #commandhud #commandstate{display:none!important}
+ /* Movement is a primary RTS action: keep it one tap away, not in a nested menu. */
+ #commandhud .command-heading{padding-right:50px}
+ #commandhud .command-buttons{display:flex!important;position:absolute!important;
+  top:6px;right:43px;width:44px;height:45px;align-items:center;justify-content:center;gap:0!important}
+ #commandhud .command-buttons button:not(#commandmove){display:none!important}
+ #commandhud .command-buttons #commandmove{display:flex!important;align-items:center!important;justify-content:center!important;
+  width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;
+  padding:0!important;font-size:0!important;border:1px solid #c1a674!important;border-radius:9px!important}
+ #commandhud .command-buttons #commandmove::before{content:"➜";font-size:23px;line-height:1}
+ #commandhud #commandhint{display:none!important}
+ body.hud-command-open #commandhud,body.hud-command-open:not(.atlas) #commandhud{
+  max-height:190px!important;min-height:0!important;height:auto!important;
+  width:min(310px,calc(100vw - 86px))!important;padding:8px!important
+ }
+ body.hud-command-open #commandhud .command-heading{padding-right:35px}
+ body.hud-command-open #commandhud #commandstate{display:block!important;max-height:45px!important}
+ body.hud-command-open #commandhud .command-buttons{display:flex!important;position:static!important;
+  width:100%!important;height:auto!important;flex-wrap:wrap!important;margin-top:6px;gap:4px!important}
+ body.hud-command-open #commandhud .command-buttons button:not(#commandmove){display:flex!important}
+ body.hud-command-open #commandhud .command-buttons #commandmove{font-size:11px!important;
+  flex:1 1 0!important;width:0!important;min-width:0!important}
+ body.hud-command-open #commandhud .command-buttons #commandmove::before{display:none!important}
+ body.hud-command-open #commandhud .command-buttons button{min-height:44px!important;font-size:11px!important}
+ /* Single-action bottom sheets. Close them and the world is interactive again. */
+ body.hud-city-open #citypanel:not([hidden]){
+  bottom:calc(var(--hud-bottom) + 5px)!important;top:auto!important;
+  left:max(6px,env(safe-area-inset-left))!important;
+  width:calc(100vw - 12px)!important;max-width:calc(100vw - 12px)!important;
+  max-height:min(56dvh,430px)!important;padding:10px!important;
+  border-radius:15px!important;z-index:19!important
+ }
+ body.hud-city-open #citypanel .city-panel-heading{min-height:36px;max-height:none}
+ #citypanel .city-panel-heading h2{font-size:16px!important}
+ body.hud-city-open #citypanel .city-tabs button{min-height:40px!important;font-size:12px!important}
+ #citypane-build #tray{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:7px!important;overflow-y:auto!important;overflow-x:hidden!important;
+  max-height:none!important;min-height:0!important;scroll-snap-type:none!important;
+  align-content:start!important
+ }
+ #citypane-build #tray>button{
+  width:100%!important;min-width:0!important;max-width:none!important;flex:unset!important;
+  height:auto!important;min-height:80px!important;max-height:none!important;
+  text-align:left!important;padding:9px!important;font-size:11px!important;
+  overflow-wrap:anywhere!important;white-space:normal!important;line-height:1.3!important;
+ }
+ #citypane-build .city-build-tabs button{min-height:41px!important;font-size:12px!important}
+ #citypanel .hud-city-controls button{min-height:40px!important;min-width:40px!important}
+ body.hud-explore-open #hud-explore-panel{
+  position:fixed!important;top:auto!important;bottom:calc(var(--hud-bottom) + 5px)!important;
+  left:max(6px,env(safe-area-inset-left))!important;
+  right:max(6px,env(safe-area-inset-right))!important;
+  width:auto!important;max-width:none!important;
+  max-height:min(53dvh,340px)!important;padding:12px!important;z-index:20!important;
+  border-radius:15px!important
+ }
+ body.hud-explore-open #hud-explore-panel button{min-height:45px!important;font-size:12px!important}
+ body.hud-explore-open #hud-explore-close{min-width:44px!important;width:44px!important}
+ body.atlas.hud-map-open #atlaspanel{
+  position:fixed!important;left:max(6px,env(safe-area-inset-left))!important;
+  right:max(6px,env(safe-area-inset-right))!important;top:auto!important;
+  bottom:calc(var(--hud-bottom) + 5px)!important;
+  width:auto!important;max-width:none!important;
+  max-height:min(63dvh,430px)!important;padding:12px!important;z-index:20!important;
+  border-radius:15px!important
+ }
+ body.hud-map-open #atlaspanel button{min-height:44px!important}
+ /* Expanded resource details temporarily replace nearby camera controls. */
+ body.hud-resource-open #hud-zoom-controls,body.hud-resource-open #commandhud{display:none!important}
+ /* Full-screen dialogs stay above every mobile control. */
+ body:has(#startmenu:not([hidden])) #tools,
+ body:has(#researchpanel:not([hidden])) #tools,
+ body:has(#journalpanel:not([hidden])) #tools,
+ body:has(#help:not([hidden])) #tools{display:none!important}
+ body:has(#startmenu:not([hidden])) #hud-resource-toggle,
+ body:has(#startmenu:not([hidden])) #hud-zoom-controls,
+ body:has(#startmenu:not([hidden])) #commandhud,
+ body:has(#researchpanel:not([hidden])) #hud-resource-toggle,
+ body:has(#journalpanel:not([hidden])) #hud-resource-toggle{display:none!important}
+ body.hud-city-open #hud-zoom-controls,body.hud-explore-open #hud-zoom-controls,
+ body.hud-map-open #hud-zoom-controls,body.hud-city-open #hud-resource-toggle,
+ body.hud-explore-open #hud-resource-toggle,body.hud-map-open #hud-resource-toggle,
+ body.hud-city-open #commandhud,body.hud-explore-open #commandhud,
+ body.hud-map-open #commandhud,body.hud-city-open #hud-minimap-toggle,
+ body.hud-explore-open #hud-minimap-toggle,body.hud-map-open #hud-minimap-toggle{
+  display:none!important
+ }
+ body.hud-city-open #hud-tile-resources,body.hud-explore-open #hud-tile-resources,
+ body.hud-map-open #hud-tile-resources{display:none!important}
+ body:has(#startmenu:not([hidden])) #hud-minimap-toggle,body:has(#researchpanel:not([hidden])) #hud-minimap-toggle,
+ body:has(#researchpanel:not([hidden])) #hud-zoom-controls{display:none!important}
+ #hud-build-status{bottom:calc(var(--hud-bottom) + 11px)!important;max-width:calc(100vw - 95px)!important;left:7px!important;transform:none!important}
+ body.hud-build-placing #commandhud{display:none!important}
+ #toast{top:calc(var(--hud-top) + 6px)!important;left:7px!important;right:auto!important;transform:none!important;max-width:calc(100vw - 120px)!important}
+}
+@media(max-width:900px) and (orientation:landscape) and (max-height:520px){
+ :root{--hud-bottom:67px}
+ body.hud-city-open #citypanel:not([hidden]){max-height:min(50dvh,205px)!important}
+ body.hud-explore-open #hud-explore-panel{max-height:min(48dvh,185px)!important}
+ body.atlas.hud-map-open #atlaspanel{max-height:min(53dvh,215px)!important}
+ #hud-zoom-controls{bottom:calc(var(--hud-bottom) + 8px)!important}
+ #commandhud,body:not(.atlas) #commandhud{bottom:calc(var(--hud-bottom) + 8px)!important}
+ body.atlas.hud-mini-open #atlasoverview{max-height:145px!important}
+ body.atlas.hud-mini-open #atlasoverview canvas{height:90px!important;max-height:90px!important}
+}

@@ -1,0 +1,50 @@
+name: V74 mobile-first UX regression
+on:
+  push:
+    branches: [dev/v74-mobile-first]
+    paths:
+      - 'hud-v74.css'
+      - 'hud-v74.js'
+      - 'index.html'
+      - 'TEST_V74_UI.mjs'
+      - '.github/workflows/v74.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  touch-and-desktop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate unchanged game rules and saves
+        run: |
+          node --check hud-v74.js
+          node --check civilization.js
+          node TEST_V72.mjs
+          node TEST_V73.mjs
+      - name: Install Chromium and Playwright
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Test existing touch gestures and redesigned mobile controls
+        run: |
+          python3 -m http.server 8765 >/tmp/v74-http.log 2>&1 &
+          node TEST_V74_UI.mjs
+          node TEST_V71_UI.mjs
+      - name: Upload before-and-after reference screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v74-phone-desktop-ux-screenshots
+          path: |
+            ui-screenshots-v71/*.png
+            ui-screenshots-v74/*.png
+          if-no-files-found: ignore
