@@ -1,0 +1,51 @@
+name: V73 safe saves and responsive UI
+on:
+  push:
+    branches: [dev/v73-save-reliability]
+    paths:
+      - 'save-safety-v73.js'
+      - 'civilization.js'
+      - 'index.html'
+      - 'TEST_V73.mjs'
+      - 'TEST_V73_UI.mjs'
+      - '.github/workflows/v73.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v73-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JS and compatible saves
+        run: |
+          node --check civilization.js
+          node --check save-safety-v73.js
+          node TEST_V68.mjs
+          node TEST_V69.mjs
+          node TEST_V72.mjs
+          node TEST_V73.mjs
+      - name: Install browser for phone and desktop emulation
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Test existing HUD and V73 transfers
+        run: |
+          python3 -m http.server 8765 >/tmp/v73-http.log 2>&1 &
+          node TEST_V71_UI.mjs
+          node TEST_V73_UI.mjs
+      - name: Upload responsive screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v73-mobile-desktop-screenshots
+          path: ui-screenshots-v71/*.png
+          if-no-files-found: ignore
