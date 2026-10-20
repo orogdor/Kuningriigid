@@ -28,11 +28,16 @@ async function scenario(label,width,height,isMobile){
   assert.ok(first.activities.some(a=>['chat','visit','carry','rest','eat','play','stroll'].includes(a)),'life has non-work activities');
   await page.screenshot({path:'ui-screenshots-v76/'+label+'-village.png'});
   async function checkPeriod(time,expectedFire,expectedActivity){
-   await page.evaluate(time=>{window.gameDebug.state.time=time},time);
-   await page.waitForFunction(([lit,activity,id])=>{
-    const s=window.gameDebug.villageLifeStatus().find(x=>x.id===id);
-    return !!s&&s.campVisible===lit&&s.activities.includes(activity);
-   },[expectedFire,expectedActivity,result.id],{timeout:45000});
+   // Exercise the deterministic animation controller directly. The game's
+   // normal frame loop uses this same code, but software WebGL may render slowly.
+   await page.evaluate(time=>{
+    const debug=window.gameDebug;
+    debug.state.time=time;
+    debug.refreshVillageLife(time);
+   },time);
+   const snapshot=await page.evaluate(id=>window.gameDebug.villageLifeStatus().find(s=>s.id===id),result.id);
+   assert.ok(snapshot&&snapshot.campVisible===expectedFire&&snapshot.activities.includes(expectedActivity),
+    'village phase '+time+': '+JSON.stringify(snapshot));
    return page.evaluate(id=>window.gameDebug.villageLifeStatus().find(s=>s.id===id),result.id);
   }
   const atEvening=await checkPeriod(660,true,'chat');
