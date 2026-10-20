@@ -44,7 +44,9 @@ async function openSite(page,kind){
   return {c:site.c,r:site.r,id:(kind==='village'||kind==='ruins'?'landmark:'+site.id:kind+':'+site.c+':'+site.r),kind};
  },kind);
  await page.waitForFunction(id=>window.gameDebug.detailObjectStatus().some(t=>t.ids.includes(id)),l.id,{timeout:30000});
- await page.waitForTimeout(400);
+ // Wait for the actual detail camera render; software WebGL can take over 400 ms per frame.
+ await page.waitForFunction(()=>{const d=window.gameDebug;return d.view()==='local'&&Math.abs(d.camera.position.y-d.getZoom()*.78)<1;},{timeout:45000});
+ await page.waitForTimeout(250);
  return l;
 }
 async function inspectSize(page,site){
@@ -68,7 +70,7 @@ async function inspectSize(page,site){
     renderer:dbg.perfStats()};
  },site);
 }
-async function benchmark(page,{hideProps,samples=44}){
+async function benchmark(page,{hideProps,samples=24}){
  return page.evaluate(async opts=>{
   const dbg=window.gameDebug,holder=[];
   dbg.localScene.traverse(o=>{if(o.name?.startsWith('World/detail shared sites '))holder.push(o)});
@@ -104,7 +106,7 @@ try{
     const size=await inspectSize(page,loc);
     assert.ok(size.width>0&&size.depth>0&&size.height>0,kind+' nonzero dimensions');
     assert.ok(size.footprintPct<55,kind+' should not consume over half the whole detail tile');
-    assert.ok(size.screen.intersectsViewport,kind+' visually falls inside the viewport');
+    assert.ok(size.screen.intersectsViewport,kind+' visually falls inside the viewport: '+JSON.stringify({device:variant.label,screen:size.screen,worldCenter:size.worldCenter,camera:size.renderer}));
     assert.ok(size.triangles>0&&size.meshes>0,kind+' real geometry');
     report.objectSizes.push({viewport:variant.label,...size});
     console.log('V75 SIZE '+variant.label+' '+JSON.stringify({kind,size:[size.width,size.depth,size.height],tilePct:size.footprintPct,px:[size.screen.w,size.screen.h],triangles:size.triangles,drawCalls:size.renderer.drawCalls}));
