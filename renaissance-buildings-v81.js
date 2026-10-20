@@ -105,6 +105,24 @@ function barrel(g,x,z){
  cylinder(g,x,.55,z,.39,.43,1.10,'wood',10);
  for(const y of [.25,.83])cylinder(g,x,y,z,.43,.43,.07,'iron',10);
 }
+function wagon(g,x,z){
+ block(g,x,.85,z,2.0,.35,1.3,'wood');
+ for(const xx of [-.84,.84])for(const zz of [-.54,.54]){
+  const wh=piece(g,new T.TorusGeometry(.50,.13,6,12),'beam',x+xx,.52,z+zz);
+  wh.rotation.y=Math.PI/2;
+ }
+ for(const zz of [-.55,.55])pole(g,[x+1,.8,z+zz],[x+2.05,.5,z+zz],.08,'wood');
+}
+function logstack(g,x,z){
+ for(let i=0;i<5;i++){
+  const dx=(i%3)*.43,dy=Math.floor(i/3)*.42;
+  const log=cylinder(g,x+dx,.40+dy,z,.21,.23,1.75,'wood',8);
+  log.rotation.x=Math.PI/2;
+ }
+}
+function barrelstack(g,x,z,n=3){
+ for(let i=0;i<n;i++)barrel(g,x+(i%3)*.92,z);
+}
 function laneCanopy(g,x,z,w=2.3,d=1.5,height=3,c='cloth'){
  for(const dx of [-w/2,w/2])for(const dz of [-d/2,d/2])
   pole(g,[x+dx,0,z+dz],[x+dx,height,z+dz],.11,'wood');
@@ -257,10 +275,19 @@ function central(g,type,team){
    dome(g,0,0,r.height+.30,type==='university'?2.1:1.5);
    for(const x of [-3.3,3.3])piece(g,new T.ConeGeometry(.56,1.9,4),'copper',x,r.height+1.4,0);
   }
-  if(type==='scriptorium'||type==='study'){
+  if(type==='scriptorium'){
    block(g,-3.0,1.1,4.2,2.0,.15,1.0,'wood');
    for(let i=0;i<4;i++)block(g,-3.65+i*.47,1.29,4.2,.26,.06,.60,'paper');
-   crates(g,2.8,4.0,3);
+   // Monks' manuscript presses and standing illuminated reading board.
+   pole(g,[2.5,0,3.5],[2.5,3.2,3.5],.12,'beam');
+   block(g,2.5,2.5,3.5,2.3,1.5,.20,'paper');
+   block(g,2.5,2.5,3.65,.12,1.55,.11,'gold');
+   for(let i=0;i<3;i++)barrel(g,-1.6+i*.8,4.0);
+  }else if(type==='study'){
+   block(g,-3.0,1.1,4.2,2.8,.17,1.1,'wood');
+   for(let i=0;i<5;i++)block(g,-3.9+i*.53,1.3,4.2,.24,.06,.63,'paper');
+   block(g,2.7,1.1,4.1,2.3,.28,1.1,'cutstone');
+   for(let i=0;i<3;i++)cylinder(g,1.9+i*.72,1.6,4.0,.18,.22,.9,'wood',8);
   }
  }else if(type==='observatory'){
   cylinder(g,0,.45,0,3.2,3.4,.9,'stone',12);
@@ -284,13 +311,33 @@ function central(g,type,team){
   block(g,0,r.height+.9,3.2,.35,2.1,.26,'gold');
   block(g,0,r.height+1.5,3.2,1.45,.35,.26,'gold');
   for(const x of [-2.25,2.25])windowAt(g,x,4.5,3.2,'large');
+  if(type==='chapel'){
+   // Coloured chapel rose-window and carved cross visible above the door.
+   piece(g,new T.TorusGeometry(.65,.16,6,14),'gold',0,5.5,3.44);
+   sphere(g,0,5.5,3.50,.32,'azure',10,6);
+  }else{
+   // Monastery cloister, herbs and long stone bench.
+   for(let i=0;i<4;i++){
+    cylinder(g,-3.6+i*2.0,1.55,4.2,.12,.13,3.1,'cutstone',9);
+   }
+   block(g,-.8,3.18,4.2,6.5,.27,.43,'stone');
+   for(let i=0;i<4;i++)planter(g,-3.35+i*2.0,4.45,.31);
+  }
  }else if(type==='keep'||type==='gatehouse'){
   baseHouse(g,{w:8.1,d:6.2,floors:3,roofType:'flat',chim:false,wall:'stone'});
   for(const x of [-3.3,3.3])for(const z of [-2.4,2.4]){
    cylinder(g,x,7.0,z,.95,1.1,13.4,'cutstone',10);
    piece(g,new T.ConeGeometry(1.3,2.6,9),'slate',x,15.0,z);
   }
-  if(type==='gatehouse')archDoor(g,0,3.35,.4,1.8);
+  if(type==='gatehouse'){
+   archDoor(g,0,3.35,.4,1.8);
+   block(g,0,1.4,3.60,2.5,2.1,.18,'beam');
+   for(let i=0;i<4;i++)block(g,-1.0+i*.65,1.4,3.72,.09,1.95,.10,'iron');
+  }else{
+   // Keep's copper watch cupola differs from defensive gatehouse.
+   dome(g,0,-.1,8.8,1.45);
+   columns(g,0,3.3,3.7,3.1,4);
+  }
   pennant(g,0,-.2,13.0,team);
  }else if(type==='market'||type==='trade_yard'){
   // A covered Renaissance loggia and two colourful awning stalls.
@@ -305,6 +352,9 @@ function central(g,type,team){
    laneCanopy(g,x,3.4,2.5,1.6,2.7,x<0?'azure':'cloth');
    block(g,x,.87,3.2,2.7,.25,1,'wood');barrel(g,x+.6,3.7);
   }
+  if(type==='trade_yard'){
+   wagon(g,-1.75,4.5);crates(g,2.55,4.7,3);
+  }else for(let i=0;i<5;i++)sphere(g,-2.4+i*1.2,1.2,3.0,.24,i%2?'green':'straw',8,5);
  }else if(type==='warehouse'||type==='cellar'){
   if(type==='cellar'){
    block(g,0,.4,0,7.8,.8,6,'stone');
@@ -391,17 +441,43 @@ function central(g,type,team){
   baseHouse(g,{w:tall?7.5:6.5,d:5.0,floors:tall?2:1,roofType:'gable',
    windows:tall,chim:type==='saw'||type==='mason'||type==='mill'});
   if(['saw','lumber','forester','cartwright','road_depot'].includes(type)){
-   crates(g,-2.6,4.0,4);
-   for(let i=0;i<3;i++)pole(g,[-2.0+i*.72,.45,3.8],[-2.0+i*.72,.45,5.2],.19,'wood');
+   if(type==='cartwright'){
+    wagon(g,-1.35,4.0);
+    for(let i=0;i<3;i++)barrel(g,1.45+i*.75,4.1);
+   }else if(type==='road_depot'){
+    crates(g,-2.4,4.0,4);
+    for(let i=0;i<5;i++)block(g,-3.2+i*1.3,.25,4.3,.85,.36,.65,'cutstone');
+   }else if(type==='forester'){
+    for(let i=0;i<5;i++){
+     pole(g,[-2.8+i*1.3,0,4],[-2.8+i*1.3,1.8,4],.10,'wood');
+     sphere(g,-2.8+i*1.3,1.9,4,.44,'green',8,5);
+    }
+   }else if(type==='saw'){
+    logstack(g,-2.7,4.0);
+    piece(g,new T.TorusGeometry(.77,.14,6,12),'iron',2.3,1.3,4.05);
+    block(g,2.3,1.3,4.25,1.3,.16,.15,'iron');
+   }else{
+    logstack(g,-2.7,4.0);logstack(g,1.1,4.0);
+    crates(g,2.7,3.6,2);
+   }
   }else if(['quarry','mason','mine','coal','coppermine','tinmine'].includes(type)){
-   for(let i=0;i<6;i++)block(g,-2.65+(i%3)*1.1,.45+Math.floor(i/3)*.75,4,.95,.72,.9,'stone');
+   for(let i=0;i<6;i++)block(g,-2.65+(i%3)*1.1,.45+Math.floor(i/3)*.75,4,.95,.72,.9,
+    type==='coal'?'black':type==='coppermine'?'brick':type==='tinmine'?'chalk':'stone');
    if(type==='mason')columns(g,2.1,4.0,2.1,2.3,3);
+   if(['mine','coal','coppermine','tinmine'].includes(type))wagon(g,2.5,4.25);
   }else if(['barracks','archery','armor_workshop','crossbow_range','siegeworkshop'].includes(type)){
    for(let i=0;i<4;i++)pole(g,[-2.3+i*1.4,0,4.1],[-2.3+i*1.4,3.1,4.1],.065,'iron');
    block(g,1.9,1.0,4.1,1.8,1.8,.18,'azure');
    if(type==='siegeworkshop')for(let i=0;i<2;i++){
     piece(g,new T.TorusGeometry(.57,.14,5,10),'wood',-2.0+i*2,1.0,4.5).rotation.y=Math.PI/2;
    }
+   if(type==='armor_workshop'){
+    block(g,-2.3,1.7,4.2,1.05,1.8,.2,'iron');
+    sphere(g,-2.3,2.7,4.2,.57,'iron',9,5);
+   }else if(type==='archery'||type==='crossbow_range'){
+    cylinder(g,-2.35,2.0,4.55,.65,.65,.2,'straw',12).rotation.x=Math.PI/2;
+    piece(g,new T.TorusGeometry(.39,.07,5,12),'red',-2.35,2.0,4.70);
+   }else if(type==='barracks')pennant(g,-3.35,3.7,5.0,team);
   }else if(type==='fisher'){
    for(let x of [-2.6,2.6])pole(g,[x,0,4],[x,3,4],.11,'wood');
    for(let i=0;i<6;i++)pole(g,[-2.5+i*.88,1.0,4],[(-2.5+i*.88),2.6,4],.025,'canvas');
