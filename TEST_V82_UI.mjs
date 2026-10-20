@@ -67,12 +67,13 @@ async function scenario(era,width,height,isMobile,label){
    const b=window.gameDebug.buildingInfoStatus(),node=document.getElementById('building-inspector');
    const rect=node.getBoundingClientRect();
    return {type:b.type,open:b.open,status:b.data?.status,age:b.data?.age,
-    inputs:node.innerText,role:node.getAttribute('role'),title:node.querySelector('h3')?.textContent,
+    inputs:node.textContent,role:node.getAttribute('role'),title:node.querySelector('h3')?.textContent,visible:getComputedStyle(node).display!=='none',
     box:{x:rect.x,y:rect.y,width:rect.width,height:rect.height},window:{w:innerWidth,h:innerHeight}};
   });
   assert.equal(selected.type,location.type);
   assert.ok(selected.open,'tapping roof opens inspector');
-  assert.ok(selected.title.length>3&&selected.inputs.includes('Töölised'));
+  console.log('V82 INSPECT TAP '+label+' '+JSON.stringify({selected,location}));
+  assert.ok(selected.visible&&selected.title.length>3&&selected.inputs.includes('Töölised'));
   assert.ok(selected.inputs.includes('Toodang')&&selected.inputs.includes('Seisukord'));
   assert.ok(selected.box.width<width+2&&selected.box.height<height+2);
   assert.ok(selected.box.x>=0&&selected.box.y>=0);
