@@ -1,0 +1,70 @@
+name: V86 Gameplay Flow Audit
+on:
+  push:
+    branches: [feature/v86-gameplay, main]
+    paths: ['gameplay-flow-v86.js', 'labor.js', 'ai-strategy.js', 'civilization-core.js', 'civilization.js', 'labor-ui.js', 'TEST_V86*.mjs', '.github/workflows/v86.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  logic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Economy, labour, research, naval, combat, save and map regressions
+        run: |
+          node --check civilization.js
+          node --check civilization-core.js
+          node TEST_V86.mjs
+          node TEST_V73.mjs
+          node TEST_V60.mjs
+          node TEST_V61.mjs
+          node TEST_V68.mjs
+          node TEST_V72.mjs
+          node TEST_V75.mjs
+  comparison:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Baseline V85, two legal 15-minute openings
+        run: |
+          mkdir baseline
+          git archive 79916e9c7f6a2367f53411dfca739745308bd490 | tar -x -C baseline
+          cp TEST_V86_SOAK.mjs baseline/
+          cd baseline
+          node TEST_V86_SOAK.mjs
+      - name: V86, same maps and commands
+        run: node TEST_V86_SOAK.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V86-economy-comparison
+          path: |
+            baseline/v86-soak.json
+            v86-soak.json
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Play through phone controls and verify focused inputs
+        run: |
+          python3 -m http.server 8765 >/tmp/v86-server.log 2>&1 &
+          node TEST_V86_UI.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V86-playtest-screenshots
+          path: artifacts-v86/

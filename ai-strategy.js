@@ -35,7 +35,7 @@ export function aiResourcePriorities(game,team,city){
  return values.sort((a,b)=>b.pressure-a.pressure);
 }
 function eligible(game,city,type){return !!BUILDINGS[type]&&!game.buildRule(city,type)&&game.canBuildNow(city,type)}
-export function selectAIBuild(game,team,city){
+export function selectAIBuild(game,team,city,excluded=new Set()){
  const r=city.economy.realms[team],stock=r.resources,age=game.s.ages[team],science=game.s.research[team];
  const buildings=game.allBuildings(city);
  // Do not bankrupt a city by stacking construction orders with zero usable builders.
@@ -47,6 +47,7 @@ export function selectAIBuild(game,team,city){
  const capacity=4+housing*3;
  const possibilities=[];
  const add=(type,priority,reason)=>{
+  if(excluded.has(type))return;
   if(type==='house'){if(buildings.some(b=>b.type==='house'&&!b.ready&&b.hp>0))return;}
   else if(hasWorkingSource(buildings,type))return;
   // Prevent the AI from wasting a whole town's labour on repeated quarries.
