@@ -1,0 +1,50 @@
+name: V78 Market walkers and footpaths
+on:
+  push:
+    branches: [fix/v78-market-walk-and-footpaths, main]
+    paths:
+      - 'civilization-core.js'
+      - 'navigation.js'
+      - 'TEST_V78.mjs'
+      - 'TEST_V78_UI.mjs'
+      - '.github/workflows/v78.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  navigation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Smooth market workers, local traffic, world road regression
+        run: |
+          node --check navigation.js
+          node --check civilization-core.js
+          node TEST_V78.mjs
+          node TEST_V77.mjs
+          node TEST_V76.mjs
+          node TEST_V73.mjs
+          node TEST_V75.mjs
+      - name: Install Chromium Playwright
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Real browser mobile and desktop movement and trail rendering
+        run: |
+          python3 -m http.server 8765 >/tmp/v78-server.log 2>&1 &
+          node TEST_V78_UI.mjs
+      - name: Capture mobile/desktop screens
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v78-market-roads-regression
+          path: ui-screenshots-v78/
+          if-no-files-found: ignore
