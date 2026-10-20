@@ -32,25 +32,25 @@ async function screenSite(kind){
  },kind);
 }
 try{
- await page.goto('http://127.0.0.1:8765/');await page.waitForFunction(()=>!!window.gameDebug,{timeout:90000});
+ await page.goto('http://127.0.0.1:8765/');await page.waitForFunction(()=>!!window.gameDebug,null,{timeout:90000});
  await page.locator('#menulanguage').selectOption('et');
  await page.locator('#menu-world summary').click();await page.locator('#seed').fill('V83-playtest');await page.locator('#newgame').click();
- await page.waitForFunction(()=>window.gameDebug&&document.getElementById('startmenu').hidden,{timeout:90000});
+ await page.waitForFunction(()=>window.gameDebug&&document.getElementById('startmenu').hidden,null,{timeout:90000});
  await capture('01-world');
  await page.locator('#hud-explore').click();await page.locator('#hud-explore-auto').click();await page.locator('#hud-explore-close').click();
  await page.locator('#hud-city').click();await page.waitForFunction(()=>window.gameDebug.view()==='local');
  await page.waitForTimeout(1200);
  const site=await screenSite('settle');assert.ok(site,'reachable dry founding place in exposed playfield');
  await page.locator('#commandmove').click();await page.touchscreen.tap(site.x,site.y);
- await page.waitForFunction(()=>!window.gameDebug.state.settlers.find(a=>a.team===0)?.localTarget,{timeout:60000});
- await page.locator('#foundcity').click();await page.waitForFunction(()=>window.gameDebug.state.cities.some(c=>c.team===0),{timeout:15000});
+ await page.waitForFunction(()=>!window.gameDebug.state.settlers.find(a=>a.team===0)?.localTarget,null,{timeout:60000});
+ await page.locator('#foundcity').click();await page.waitForFunction(()=>window.gameDebug.state.cities.some(c=>c.team===0),null,{timeout:15000});
  await capture('02-founded');
  await page.locator('#techtoggle').click();await page.locator('.tech-card').filter({hasText:'Jahipidamine'}).click();await page.locator('#closeresearch').click();
  await page.locator('#hud-build').click();await page.locator('#tray > button').filter({hasText:'Metsamaja'}).click();
  const build=await screenSite('lumber');assert.ok(build,'legal lumber site in exposed playfield');await page.touchscreen.tap(build.x,build.y);
- await page.waitForFunction(()=>window.gameDebug.state.cities.find(c=>c.team===0).economy.buildings.some(b=>b.type==='lumber'),{timeout:15000});
+ await page.waitForFunction(()=>window.gameDebug.state.cities.find(c=>c.team===0).economy.buildings.some(b=>b.type==='lumber'),null,{timeout:15000});
  await capture('03-construction');
- await page.waitForFunction(()=>window.gameDebug.state.cities.find(c=>c.team===0).economy.buildings.some(b=>b.type==='lumber'&&b.ready),{timeout:150000});
+ await page.waitForFunction(()=>window.gameDebug.state.cities.find(c=>c.team===0).economy.buildings.some(b=>b.type==='lumber'&&b.ready),null,{timeout:150000});
  await capture('04-working');
  await page.locator('#maptoggle').click();await page.waitForFunction(()=>window.gameDebug.view()==='world');
  await page.locator('#hud-city').click();await page.waitForFunction(()=>window.gameDebug.view()==='local');

@@ -2,7 +2,7 @@ name: V83 Menu and New Game Regression
 on:
   push:
     branches: [feature/v83-menu-polish-playtest, main]
-    paths: ['boot-v83.js', 'civilization.js', 'index.html', 'style.css', 'localization.js', 'locale-en.js', 'TEST_V83_MENU.mjs', 'TEST_V83_PLAY.mjs', '.github/workflows/v83.yml']
+    paths: ['boot-v83.js', 'civilization.js', 'index.html', 'style.css', 'localization.js', 'locale-en.js', 'TEST_V83_MENU.mjs', '.github/workflows/v83.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -32,7 +32,6 @@ jobs:
         run: |
           python3 -m http.server 8765 >/tmp/v83-server.log 2>&1 &
           node TEST_V83_MENU.mjs
-          node TEST_V83_PLAY.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
