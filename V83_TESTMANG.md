@@ -26,10 +26,27 @@
 3. Ühe vastase kivimurd ei pääsenud toorainele ligi; uus kivimurd jäi ehitusjärjekorda. Pronksiaeg ootas 15 kivi ka 60. minutil.
 4. Uuritud pronksiaeg jäi mängijapoolel seitsme toiduühiku taha. Materjalide kogumist ja ajastuvahetuse põhjust peab UI arusaadavamalt näitama.
 
-## Veel kontrollimata
+## Brauseris kontrollitud
 
-- Arvuti ning telefoni 390×844 / 844×390 menüü tegelik renderdus ja puutetöövoog.
-- Uue maailma loomine, menüüst jätkamine, eksport ja laadimine päris brauseris pärast muudatust.
-- Käsitsi mängimine, lahingud, visuaalsed teed ning päris Androidi jõudlus.
+- GitHubi Chromiumi test läbis arvutivaate (1366×900), telefoni püstvaate (390×844) ja rõhtvaate (844×390).
+- Kõigis vaadetes oli jätkamisnupp ilma kerimata nähtav ja leht ei ulatunud horisontaalselt ekraanilt välja.
+- Eesti/inglise keele vahetamine, uue maailma loomine, menüü ajal paus, JSON-eksport ja taaslaadimine töötasid.
+- Puuduv mängumoodul kuvab käivitusvea ning jätab mängutegevused blokeerituks.
+- Telefonivaates päris juhtnuppudega: automaatne avastaja, asuniku kõndimine, linna rajamine, jahipidamise uurimise valik ja metsamaja ehituse alustamine õnnestusid.
+- Esimene ehituse valmimise kontroll peatus testi 30-sekundilise vaikimisi ajapiirangu tõttu. Parandatud test kasutas õiget 150-sekundilist ooteaega ja läbis kontrolli: metsamaja valmis umbes 59. mängusekundil ning tööline alustas metsa minekut.
 
-Brauseritest TEST_V83_MENU.mjs ja GitHubi töövoog on ette valmistatud. Kohalik Chromium ei käivitunud keskkonna socket-piirangu tõttu. GitHubi saatmise lükkas automaatne kinnituskontroll tagasi; muudatused pole avaldatud.
+![V83 menüü telefonivaates](docs/v83-menu-phone.jpg)
+
+### Pildilt leitud viimistlusvajadused
+
+- Linna nimesildi tekst lõikub telefonivaates sildi servadega.
+- Ressursside ülariba on liiga tihe; ressursid ja käiguinfo konkureerivad ruumi pärast.
+- Päris Samsung S24 jõudlust pole mõõdetud. Test kasutab tarkvaralist WebGL-i; selle dünaamiliselt vähendatud renderdusresolutsioon ei ole telefoni GPU jõudlusmõõtmine.
+
+## Testmängu ulatus
+
+- Lühike algus läbis ka valmis metsamaja ja maailmakaardilt linna tagasipöördumise kontrolli. Kontroll kestis umbes 63 mängusekundit ning ei asenda täispikka läbimängu.
+- Täispikk käsitsi läbimäng ja lahingud.
+- Päris Androidi jõudlus.
+
+Parandus on GitHubi harus `feature/v83-menu-polish-playtest`, PR #14. Avaliku mängu peaharu pole selle raporti kirjutamise hetkel muudetud.
