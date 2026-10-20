@@ -4,14 +4,14 @@ const length=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 // exterior props, not only the small collision boxes used by old V78 agents.
 // Width/depth are HALF extents; enough clearance remains for paved ribbons.
 const FOOTPRINTS=Object.freeze({
- hall:[5.6,5.0],house:[3.9,3.6],warehouse:[5.6,4.5],cellar:[4.8,4.4],
- market:[5.5,5.1],study:[4.7,4.6],lumber:[4.8,4.2],quarry:[4.6,4.4],
- hunter:[4.6,4.0],fisher:[4.9,4.6],farm:[4.8,4.2],well:[3.2,3.2],
- barracks:[5.0,4.6],harbor:[5.3,8.3],saw:[5.0,4.4],mill:[4.8,4.4],
- bakery:[4.8,4.4],archery:[5.0,4.5],forester:[4.8,4.5],claypit:[4.7,4.4],
- pottery_kiln:[4.7,4.6],pasture:[4.8,4.8],mason:[4.8,4.7],
- cartwright:[5.0,4.5],coppermine:[5.0,4.8],tinmine:[5.0,4.8],
- bronze_foundry:[5.3,4.9],road_depot:[5.2,4.5],scriptorium:[5.0,4.5],
+ inn:[6,5], trade_yard:[5,6], siegeworkshop:[5,6], smelter:[5,6], smith:[5,6], coal:[5,6], mine:[5,6], watermill:[6,5], hall:[5.6,5.0],house:[4,3.6],warehouse:[5.6,5],cellar:[5,4.4],
+ market:[5.5,5.1],study:[5,5],lumber:[4.8,5],quarry:[4.6,5],
+ hunter:[4.6,5],fisher:[4.9,4.6],farm:[4.8,5],well:[3.2,3.2],
+ barracks:[5,5],harbor:[5.3,8.3],saw:[5,5],mill:[4.8,5],
+ bakery:[5,5],archery:[5,5],forester:[4.8,5],claypit:[4.7,4.4],
+ pottery_kiln:[4.7,4.6],pasture:[4.8,4.8],mason:[4.8,5],
+ cartwright:[5,6],coppermine:[5,6],tinmine:[5,6],
+ bronze_foundry:[5.3,6],road_depot:[5.2,5],scriptorium:[5,5],
  keep:[5.7,5.3],gatehouse:[5.4,5.1],guildhall:[5.3,5.0],
  chapel:[5.3,5.1],monastery:[5.4,5.1],watchtower:[4.7,4.6],
  stonetower:[5.2,5.0],stonewall:[4.8,4.5],palisade:[4.8,4.5]
@@ -27,7 +27,8 @@ export function buildingClearance(b){
   return {rx:b.navWidth??(vertical?1.1:3.6),
           rz:b.navDepth??(vertical?3.6:1.1)};
  }
- const v=FOOTPRINTS[b.type]||[4.8,4.5];
+ // Include a full walking-grid cell's road-ribbon margin for tall Renaissance façades.
+ const v=FOOTPRINTS[b.type]||[5.0,5.0];
  return {rx:Math.max(v[0],b.navWidth||0),rz:Math.max(v[1],b.navDepth||0)};
 }
 export const door=b=>{
