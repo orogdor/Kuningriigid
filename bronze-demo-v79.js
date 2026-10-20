@@ -1,7 +1,7 @@
 // V79 Bronze Age showcase built from the working, save-compatible V77 city.
 // Available via ?demo=bronze; produces ordinary V4 JSON on export.
 // Never touches the user's browser autosave.
-import {createStoneDemoState} from './stone-demo-v77.js?v=77a';
+import {createStoneDemoState} from './stone-demo-v77.js?v=80c';
 import {Civilization,BUILDINGS} from './civilization-core.js?v=80c';
 import {BRONZE_BUILDING_TYPES} from './bronze-buildings-v79.js?v=79a';
 import {grantTech} from './research.js';
