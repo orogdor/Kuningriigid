@@ -1,8 +1,14 @@
-# Kuningriigid V81
+# Kuningriigid V82
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
-**Mängi:** https://orogdor.github.io/Kuningriigid/?v=81-20261020
+**Mängi:** https://orogdor.github.io/Kuningriigid/?v=82-20261020
+
+## V82 – tööstusajastu 3D-hooned ja hooneinfo kõigil ajastutel
+- Tööstusajastu (ajastu 5) sai 65 erineva hooneliigiga tekstureeritud 3D-paketi: kõrge korstnaga kõrgahjud, aurumasinatöökojad, raudteejaam, tehnikaülikool, telliskivimajad ja tehasehooned.
+- **Puuduta detailkaardil ükskõik millise ajastu maja katust või seina**: avaneb eraldi väike infokaart nime, ajastu, toodangu, sisendite, töötajate, HP ja ehitusprotsendiga. Oma majadel saab sealt töö peatada ja jätkata.
+- **[Ava Aurulinna tööstusajastu näidislinn](https://orogdor.github.io/Kuningriigid/?v=82-20261020&demo=industrial)** – 41 valmisehitatud hoonet, kõndimisega tekkinud tänavad ja JSON-salvestuse eksport.
+- V80 teed ei lõiku hoonetega, varasemad arhitektuurid ja salvestused jäävad alles. [MUUDATUSED_V82.md](MUUDATUSED_V82.md).
 
 ## V81 – renessansiaja uued kvaliteetsed 3D-hooned
 - 51 toetatud hooneliigi jaoks uus renessansiaegne arhitektuur: krohvitud kivimajad, terrakota- ja vaskkatused, sammaskäigud, klaasaknad, tornid, kuplid ja töökohtade erivarustus.

@@ -95,3 +95,41 @@ header{backdrop-filter:blur(10px);box-shadow:0 8px 26px #0005}
 #tileresources strong{width:100%;font-size:11px;color:#d6c89d}
 #tileresources .tile-resource{font-size:10px;padding:4px 7px;background:#24463c;border:1px solid #8ea89e66;border-radius:5px;white-space:nowrap}
 @media(max-width:760px){#tileresources .tile-resource{font-size:9px;padding:3px 5px}}
+
+/* V82 building inspection – genuinely tap-friendly on touch, non-modal and
+   hidden unless a building is selected. Styling is independent of era. */
+#building-inspector[hidden]{display:none!important}
+#building-inspector.binfo{position:fixed;right:14px;bottom:14px;z-index:18;
+ width:min(342px,calc(100vw - 24px));max-height:min(580px,70dvh);overflow:auto;
+ background:linear-gradient(150deg,rgba(29,47,49,.98),rgba(15,31,36,.98));
+ color:#f3ead8;border:1px solid #d0af6a;border-radius:14px;
+ box-shadow:0 16px 50px #0009;padding:14px 15px;
+ font:13px/1.4 system-ui,-apple-system,Arial,sans-serif;overscroll-behavior:contain}
+#building-inspector .binfo-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+#building-inspector .binfo-heading h3{font-size:19px;line-height:1.22;
+ margin:0;color:#f1d795;font-weight:720}
+#building-inspector .binfo-close{width:40px;min-width:40px;height:40px;
+ background:#283f41;border:1px solid #c5aa735c;border-radius:9px;
+ color:#fff;font-size:21px;padding:0;touch-action:manipulation}
+#building-inspector .binfo-caption{font-size:11px;opacity:.84;margin:3px 0 10px;line-height:1.45}
+#building-inspector .binfo-values{display:grid;gap:0;border-top:1px solid #d5bc8055}
+#building-inspector .binfo-row{display:flex;justify-content:space-between;align-items:flex-start;
+ gap:14px;padding:6px 0;border-bottom:1px solid #d5bc8022;line-height:1.3}
+#building-inspector .binfo-row span{flex:1;opacity:.8}
+#building-inspector .binfo-row strong{flex:1.15;text-align:right;font-size:12.5px;
+ font-weight:620;overflow-wrap:anywhere;color:#fff1c7}
+#building-inspector .binfo-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+#building-inspector .binfo-actions button{flex:1 1 100px;min-height:43px;padding:7px;
+ background:#334c49;color:#fff;border:1px solid #c9b47699;border-radius:9px;
+ font-size:12px;touch-action:manipulation;white-space:normal}
+@media(max-width:740px){
+ #building-inspector.binfo{left:8px;right:8px;bottom:calc(9px + env(safe-area-inset-bottom,0px));
+ width:auto;max-width:none;max-height:min(47dvh,350px);padding:11px 13px;z-index:24}
+ #building-inspector .binfo-row{padding:4px 0}
+ #building-inspector .binfo-heading h3{font-size:17px}
+ #building-inspector .binfo-caption{margin:1px 0 7px}
+ #building-inspector .binfo-actions{margin-top:8px}
+}
+@media(max-height:480px){
+ #building-inspector.binfo{max-height:64dvh;max-width:330px;left:auto;right:8px}
+}

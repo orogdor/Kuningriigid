@@ -4,6 +4,8 @@ const length=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 // exterior props, not only the small collision boxes used by old V78 agents.
 // Width/depth are HALF extents; enough clearance remains for paved ribbons.
 const FOOTPRINTS=Object.freeze({
+ steelworks:[5.4,5.3],engineworks:[5.4,5.3],polytechnic:[5.4,5.3],
+ railstation:[5.6,6.0],printer:[5.5,5.3],powdermill:[5.5,5.3],
  inn:[6,5], trade_yard:[5,6], siegeworkshop:[5,6], smelter:[5,6], smith:[5,6], coal:[5,6], mine:[5,6], watermill:[6,5], hall:[5.6,5.0],house:[4,3.6],warehouse:[5.6,5],cellar:[5,4.4],
  market:[5.5,5.1],study:[5,5],lumber:[4.8,5],quarry:[4.6,5],
  hunter:[4.6,5],fisher:[4.9,4.6],farm:[4.8,5],well:[3.2,3.2],
