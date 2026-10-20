@@ -1,0 +1,53 @@
+name: V76 lively villages and save compatibility
+on:
+  push:
+    branches: [dev/v76-village-life, main]
+    paths:
+      - 'village-life-v76.js'
+      - 'civilization.js'
+      - 'index.html'
+      - 'localization.js'
+      - 'TEST_V76.mjs'
+      - 'TEST_V76_UI.mjs'
+      - '.github/workflows/v76.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  village-life:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax, deterministic village life and existing campaign/save tests
+        run: |
+          node --check village-life-v76.js
+          node --check civilization.js
+          node --check TEST_V76_UI.mjs
+          node TEST_V76.mjs
+          node TEST_V75.mjs
+          node TEST_V73.mjs
+          node TEST_V72.mjs
+          node TEST_V55.mjs
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Phone portrait, phone landscape and desktop village behaviour
+        run: |
+          python3 -m http.server 8765 >/tmp/v76-server.log 2>&1 &
+          node TEST_V76_UI.mjs
+      - name: Preserve village scene screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v76-living-village-mobile-desktop
+          path: ui-screenshots-v76/
+          if-no-files-found: ignore
