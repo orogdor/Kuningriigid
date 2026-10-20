@@ -53,7 +53,9 @@ export function createDetailWorldRoads(game,tile,nav,height){
 }
 export function createDetailTrailLinks(spots,nav,height){
  const vertices=[],colors=[];
- const levels=new Map(spots.map(({key})=>[key,nav.roadLevel(key)]).filter(([,level])=>level>0));
+ // Do not paint legacy traffic that lies beneath newly sized building footprints.
+ const levels=new Map(spots.map(({key})=>[key,nav.roadLevel(key)])
+  .filter(([key,level])=>level>0&&nav.open(nav.point(key).x,nav.point(key).z)));
  for(const [key,level] of levels){
   const a={x:key%145-72,z:Math.floor(key/145)-62};
   for(const [dx,dz] of [[1,0],[0,1],[1,1],[-1,1]]){
@@ -62,7 +64,8 @@ export function createDetailTrailLinks(spots,nav,height){
    const other=nav.index(x,z),otherLevel=levels.get(other);
    if(!otherLevel||!nav.clear(a,{x,z}))continue;
    const useLevel=Math.min(level,otherLevel);
-   const width=1.1+useLevel*.65;
+   // Leave room beside the building walls and exterior props.
+   const width=.65+useLevel*.27;
    appendRibbon(vertices,colors,a,{x,z},width,new T.Color(COLORS[useLevel]),height);
   }
  }
