@@ -1,8 +1,14 @@
-# Kuningriigid V76
+# Kuningriigid V77
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
-**Mängi:** https://orogdor.github.io/Kuningriigid/?v=76-20261020
+**Mängi:** https://orogdor.github.io/Kuningriigid/?v=77-20261020
+
+## V77 – kiviaja uued 3D-majad
+- 13 selgelt erinevat kiviaja ehitist: peamaja, elamu, ladu, kelder, turg, õpikoda, puuraidur, kivimurd, jahimees, kalur, talu, kaev, sõdalaste laager.
+- Kõrgema kvaliteediga 3D-kujud, rookatused, puidu-/kivitekstuurid ja erialased rekvisiidid; geomeetria koondatud mobiili jõudluseks.
+- **[Ava Kivimetsa kiviaja testlinn](https://orogdor.github.io/Kuningriigid/?v=77-20261020&demo=stone)** otse detailkaardil. Demo ei asenda olemasolevat automaatsalvestust. Salvestuse JSON-i saad mängus menüüst eksportida.
+- Muudatused: [MUUDATUSED_V77.md](MUUDATUSED_V77.md).
 
 ## V76 – elavad külad ja linnad
 - Külaelanikud suhtlevad, käivad külas, istuvad, söövad, puhkavad, kannavad korve ning lapsed mängivad.
