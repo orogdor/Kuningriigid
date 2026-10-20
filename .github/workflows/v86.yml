@@ -33,7 +33,7 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: 22}
-      - name: Baseline V85, two legal 15-minute openings
+      - name: Baseline V85, two legal 60-minute openings
         run: |
           mkdir baseline
           git archive 79916e9c7f6a2367f53411dfca739745308bd490 | tar -x -C baseline

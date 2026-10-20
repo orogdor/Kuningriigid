@@ -21,4 +21,7 @@ f.city.basicJobs.berries=0;allocateCity(f.game,f.city);assert.equal(f.city.basic
 const g=new Civilization(createGame(8417)),a=g.s.settlers.find(a=>a.team===0);assert.equal(g.land(a.id),'');let city;
 for(let x=-30;x<=30&&!city;x+=3)for(let z=-24;z<=24&&!city;z+=3)if(!g.siteRule(a,{x,z})){a.x=x;a.z=z;city=g.found(a.id).city;}
 assert.ok(city);const first=selectAIBuild(g,0,city);assert.ok(first);const second=selectAIBuild(g,0,city,new Set([first.type]));assert.ok(!second||second.type!==first.type,'unplaceable top candidate does not block the entire build plan');
+g.s.research[0].known.push('hunting');city.economy.realms[0].pop=6;city.economy.realms[0].resources.bread=0;
+city.economy.buildings.push({type:'hunter',ready:true,hp:100,team:0,x:12,z:12});
+assert.equal(selectAIBuild(g,0,city).type,'hunter','a growing food-starved city may add a second food source');
 console.log('V86 REGRESSION PASS: shortage recovery, survival labour, input constraints, placement fallback and focused UI');
