@@ -15,7 +15,7 @@ async function scenario(era,width,height,isMobile,label){
   await page.goto('http://127.0.0.1:8765/?v=82-ci&demo='+era,
    {waitUntil:'domcontentloaded',timeout:80000});
   await page.waitForFunction(()=>window.gameDebug?.view()==='local',{timeout:110000});
-  await page.waitForFunction(()=>window.gameDebug?.localRoadStatus?.().spots>0,{timeout:35000});
+  if(era!=='stone')await page.waitForFunction(()=>window.gameDebug?.localRoadStatus?.().spots>0,{timeout:35000});
   const overview=await page.evaluate(async()=>{
    const d=window.gameDebug,city=d.state.cities.find(c=>c.team===0);
    const nav=d.game.nav(city),all=city.economy.buildings;
@@ -28,7 +28,7 @@ async function scenario(era,width,height,isMobile,label){
   const expAge={stone:0,bronze:1,medieval:3,renaissance:4,industrial:5}[era];
   assert.equal(overview.age,expAge);
   assert.ok(overview.count>=14);
-  assert.ok(overview.visibleRoads>=25);
+  if(era!=='stone')assert.ok(overview.visibleRoads>=25,'roads pre-seeded for bronze and later cities');
   assert.equal(overview.info.open,false,'inspector starts closed');
   if(era==='industrial'){
    assert.ok(overview.industrial>=35,'every industrial demo building has a new 3D model');
