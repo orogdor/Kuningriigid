@@ -43,6 +43,7 @@ assert.equal(demo.ages[0],0,'sample city really Stone Age');
 assert.equal(demo.cities.length,1,'one complete player city');
 assert.equal(demo.cities[0].name,DEMO_CITY_NAME);
 assert.equal(demo.cities[0].economy.buildings.length,DEMO_BUILDINGS.length+1);
+assert.ok(demo.cities[0].economy.buildings.slice(1).every(b=>b.previewAge===0),'sample visual era survives V4 save export/import');
 assert.ok(demo.cities[0].economy.buildings.every(b=>b.ready&&b.hp>0),'all models immediately inspectable');
 assert.equal(new Set(demo.cities[0].economy.buildings.map(b=>b.type)).size,STONE_BUILDING_TYPES.length,
  'the demo demonstrates all supported stone building categories');
