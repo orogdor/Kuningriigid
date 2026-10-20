@@ -55,8 +55,10 @@ async function scenario(label,demo,viewport,isMobile){
   });
   assert.equal(info.info?.type,target);
   assert.ok(info.title.length>2&&info.aria==='region'&&info.visible);
-  for(const k of ['HP','Töötajad','Tootmine','Ehitus','Ajastu'])
-   assert.ok(info.details.includes(k),'missing building data label '+k);
+  for(const choices of [['HP'],['Töötajad','Workers'],['Tootmine','Production'],
+   ['Ehitus','Construction'],['Ajastu','Era']])
+   assert.ok(choices.some(k=>info.details.includes(k)),
+    'missing building detail (ET/EN): '+choices.join('/'));
   assert.ok(info.bodyWidth<=info.viewportWidth+4,'inspector must not create horizontal scrolling');
   if(target==='steelworks'){
    assert.ok(info.info?.production?.output,'factory production output should be described');
