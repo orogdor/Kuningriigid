@@ -1,8 +1,16 @@
-# Kuningriigid V79
+# Kuningriigid V80
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
-**Mängi:** https://orogdor.github.io/Kuningriigid/?v=79-20261020
+**Mängi:** https://orogdor.github.io/Kuningriigid/?v=80-20261020
+
+## V80 – keskaja uued hooned ja ohutu tänavavõrk
+- Teed ei tohi enam minna läbi majade, katusealuste või treppide: navigeerimine ja teede laiused arvestavad nähtavate 3D-hoonete jalajälgi.
+- Elanikud ja tööga seotud käigud kasvatavad aja jooksul võrku kogu linnas, mitte ainult mõne elamu ja turu vahel.
+- 30 eristatavat keskaegset 3D-hoonetüüpi ja näidislinna paigutatud 33 valmis hoonet; ajastu on päriselt **keskaeg (3)**, mitte rauaaeg.
+- **[Ava parandatud pronksiaja näidislinn](https://orogdor.github.io/Kuningriigid/?v=80-20261020&demo=bronze)** – 692 kulunud teeruutu.
+- **[Ava keskaja Kivilinna näidislinn](https://orogdor.github.io/Kuningriigid/?v=80-20261020&demo=medieval)** – 686 kulunud teeruutu, 3D-majad ja ristuvad tänavad.
+- Need eraldi demo-URL-id ei kirjuta sinu päris mängusalvestusi üle; kummagi saad JSON-failina eksportida. Vaata [MUUDATUSED_V80.md](MUUDATUSED_V80.md).
 
 ## V79 – pronksiaja majad ja parem teede teke
 - **30 uut pronksiaja 3D-hoonemudelit**, eristatavad katuse, savi-/kiviseinte ja tootmisrekvisiitide järgi. Kiviaja mudelid säilivad.
