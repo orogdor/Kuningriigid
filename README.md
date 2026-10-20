@@ -1,8 +1,14 @@
-# Kuningriigid V75
+# Kuningriigid V76
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
-**Mängi:** https://orogdor.github.io/Kuningriigid/?v=75-20261020
+**Mängi:** https://orogdor.github.io/Kuningriigid/?v=76-20261020
+
+## V76 – elavad külad ja linnad
+- Külaelanikud suhtlevad, käivad külas, istuvad, söövad, puhkavad, kannavad korve ning lapsed mängivad.
+- Õhtul süttib lõke, öösel lähevad elanikud koju ja valvurid jäävad patrullima.
+- Ohu korral elanikud põgenevad; telefonis piiratakse tegelaste hulka kvaliteediseade järgi.
+- Vanad salvestused ja tööliste arvestus ei muutu. [MUUDATUSED_V76.md](MUUDATUSED_V76.md)
 
 ## V75 – maailmakaardi objektid detailkaardil
 - Külad, varemed, metsad, kaljud ja sillad paiknevad nüüd ka detailkaartidel samade maailmakaardi ruutude juures.
