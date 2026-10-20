@@ -24,6 +24,9 @@ const meshCounts=[];
 for(const type of MEDIEVAL_TYPES){
  const mesh=createAgeBuilding(type,0,3);
  assert.equal(mesh.userData.medievalAgeModel,true,'medieval mesh in real building render pipeline '+type);
+ assert.ok(mesh.children.length<=8,'medieval assets are batched for mobile: '+type+' '+mesh.children.length);
+ const copy=createAgeBuilding(type,0,3);
+ assert.ok(copy.children.every((child,i)=>child.geometry===mesh.children[i].geometry),'medieval meshes share GPU geometry '+type);
  const bounds=new T.Box3().setFromObject(mesh).getSize(new T.Vector3());
  assert.ok(bounds.x>2&&bounds.y>2&&bounds.z>2,'model has real 3D geometry '+type);
  meshCounts.push({type,width:bounds.x,height:bounds.y,depth:bounds.z});
