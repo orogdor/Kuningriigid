@@ -1,5 +1,5 @@
 import {CommandVisuals} from './command-visuals.js';
-import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=77a';
+import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=78a';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
