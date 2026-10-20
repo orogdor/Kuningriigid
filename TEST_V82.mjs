@@ -8,7 +8,7 @@ import {describeBuilding,INSPECTION_AGES} from './building-info-v82.js';
 import {Civilization,BUILDINGS,BUILD_AGE,AGES} from './civilization-core.js?v=80c';
 import {buildingClearance} from './navigation.js';
 
-const metrics=[];
+const metrics=[],footprintViolations=[];
 for(const type of INDUSTRIAL_BUILDING_TYPES){
  const a=createAgeBuilding(type,0,5),b=createIndustrialBuilding(type,0);
  assert.equal(a?.userData.industrialAgeModel,true,'industrial age 5 model '+type);
@@ -24,13 +24,14 @@ for(const type of INDUSTRIAL_BUILDING_TYPES){
  assert.ok(size.x>1&&size.y>1&&size.z>1,'visible industrial geometry '+type);
  const clearance=buildingClearance({type});
  if(clearance&&!['bridge','stonewall','palisade','reinforced_wall','harbor'].includes(type)){
-  assert.ok(size.x/2<=clearance.rx+1.0&&Math.max(Math.abs(bound.min.z),Math.abs(bound.max.z))<=clearance.rz+1.0,
-   'industrial props must fit V82 traffic exclusion zone '+type+
-   ' '+JSON.stringify({width:size.x,depth:[bound.min.z,bound.max.z],clearance}));
+  if(!(size.x/2<=clearance.rx+1.0&&
+    Math.max(Math.abs(bound.min.z),Math.abs(bound.max.z))<=clearance.rz+1.0))
+    footprintViolations.push({type,width:+size.x.toFixed(2),zMin:+bound.min.z.toFixed(2),zMax:+bound.max.z.toFixed(2),clearance});
  }
  metrics.push({type,triangles:Math.round(triangles),drawCalls:a.children.length,
   width:+size.x.toFixed(2),depth:+size.z.toFixed(2),height:+size.y.toFixed(2)});
 }
+assert.deepEqual(footprintViolations,[],'industrial building footprint overlaps need extra road clearance');
 assert.equal(createIndustrialBuilding('not-a-building'),null);
 for(const age of [0,1,2,3,4,6]){
  const hall=createAgeBuilding('hall',0,age);
