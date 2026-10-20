@@ -1,6 +1,6 @@
 // V77: reproducible V4 game-save fixture with an entire Stone Age
 // architectural exhibition. Never change the player's own autosave.
-import {Civilization,createGame,BUILDINGS} from './civilization-core.js?v=79a';
+import {Civilization,createGame,BUILDINGS} from './civilization-core.js?v=80c';
 
 export const DEMO_CITY_NAME='Kivimetsa küla';
 export const DEMO_BUILDINGS=[
