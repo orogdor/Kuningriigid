@@ -3,7 +3,7 @@ import {createMedievalDemoState,MEDIEVAL_DEMO_NAME} from './medieval-demo-v80.js
 import {MEDIEVAL_TYPES,createMedievalBuilding} from './medieval-buildings-v80.js';
 import {Civilization} from './civilization-core.js';
 const s=createMedievalDemoState(),g=new Civilization(s),city=s.cities.find(c=>c.team===0);
-assert.equal(city.name,MEDIEVAL_DEMO_NAME);assert.equal(s.ages[0],2);
+assert.equal(city.name,MEDIEVAL_DEMO_NAME);assert.equal(s.ages[0],3);
 const buildings=city.economy.buildings.filter(b=>MEDIEVAL_TYPES.includes(b.type));
 assert.ok(buildings.length>=24);
 for(const b of buildings){const model=createMedievalBuilding(b.type,0);assert.ok(model?.userData.medievalAgeModel,b.type)}
