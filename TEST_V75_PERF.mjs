@@ -129,7 +129,7 @@ try{
  const maxFootprint=Math.max(...report.objectSizes.map(o=>o.footprintPct));
  const maxTriangles=Math.max(...report.objectSizes.map(o=>o.triangles));
  console.log('V75 BENCHMARK PASS '+JSON.stringify({assets:report.assets,measurements:report.objectSizes.length,benchmarks:report.benchmarks.length,
-   maxFootprintPct:maxFootprint,maxModelTriangles,maxTriangles,drawCallDelta:report.benchmarks.map(b=>b.impact.extraDrawCalls)}));
+   maxFootprintPct:maxFootprint,maxModelTriangles:maxTriangles,drawCallDelta:report.benchmarks.map(b=>b.impact.extraDrawCalls)}));
 }finally{
  writeFileSync(DIR+'/results.json',JSON.stringify(report,null,2));
  await browser.close();
