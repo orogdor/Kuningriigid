@@ -38,6 +38,14 @@ See on päris **V4 mänguseis**. Näidislinna avamine **ei kirjuta olemasolevat 
 - `TEST_V81_UI.mjs`: päris Chromiumiga telefon püstiselt 390×844, rõhtsalt 844×390 ja arvuti 1440×900. Kontrollitakse ajastut, 3D-hoonete tegelikku kuvamist, rollipõhiste mudelite olemasolu, suurt tänavavõrgustikku, JSON-eksporti, vanade salvestuste turvalisust ja ekraanipilte.
 - Varasemad `TEST_V80.mjs`, `TEST_V79.mjs`, `TEST_V78.mjs`, `TEST_V77.mjs` ja `TEST_V73.mjs` töötavad muutmata. V4 formaati ei muudeta.
 
+## Mõõdetud tulemused (GitHub Actions)
+
+V81 lõplik test hõlmab 51 hooneliigi geomeetriat ja päris 3D-näidislinnas 37 hoonet / 35 eri tüüpi. 37 kuvatava hoone mudelid kasutavad kokku 46 100 kolmnurka ning 374 materjalipõhist draw call'i (sellele lisandub eraldi maastiku, inimeste ja teede renderdamine).
+
+Päikeselinnas tekkis 1095 nähtavat teeruudukest ja 2906 nähtava teeriba kolmnurka. **Rangem kontroll võrdles kõiki 8718 teeriba tippu 37 hoone tegeliku 3D-ruumilise ulatusega; tulemuseks 0 lõikumist hoonete ja katusealustega.**
+
+Telefon püstiselt 390×844, rõhtsalt 844×390 ja arvuti 1440×900: kõik kolm brauseritesti läbitud ning JSON-salvestuse allalaadimine kinnitatud. Kõik V80, V79, V78, V77 ja V73 regressioonitestid ning kaitsemüüride orientatsioonitestid läbitud.
+
 ## Ülevaate lingid
 
 - [Renessansiaegne Päikeselinn](https://orogdor.github.io/Kuningriigid/?v=81-20261020&demo=renaissance)
