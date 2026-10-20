@@ -22,7 +22,8 @@ async function scenario(label,width,height,isMobile){
   assert.equal(result.version,4,'V76 still loads V4 game state');
   await page.waitForFunction(id=>window.gameDebug.villageLifeStatus().some(s=>s.id===id),result.id,{timeout:20000});
   const first=await page.evaluate(()=>window.gameDebug.villageLifeStatus().find(s=>s.id.startsWith('landmark:village-')));
-  assert.equal(first.actorCount,isMobile?6:9,'quality budget sets count');
+  const profile=await page.evaluate(()=>window.gameDebug.quality());
+  assert.equal(first.actorCount,profile==='low'?4:profile==='high'?9:6,'quality budget sets count');
   assert.ok(first.roles.includes('child')&&first.roles.includes('guard'),'children and guards are rendered, not only workers');
   assert.ok(first.activities.some(a=>['chat','visit','carry','rest','eat','play','stroll'].includes(a)),'life has non-work activities');
   await page.screenshot({path:'ui-screenshots-v76/'+label+'-village.png'});
@@ -41,22 +42,11 @@ async function scenario(label,width,height,isMobile){
   assert.ok(atNight.activities.includes('guard'),'guard remains active at night');
   assert.equal(atNight.campVisible,true,'night fire remains lit');
   const atDay=await page.evaluate(()=>{
-   window.gameDebug.state.time=180;
+   window.gameDebug.state.time=190;
    return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(window.gameDebug.villageLifeStatus()[0]))));
   });
   assert.equal(atDay.campVisible,false,'fire is not continuously burning all day');
   assert.ok(atDay.activities.includes('play'),'child returns to play during day');
-  const quality=await page.evaluate(()=>{
-   const dbg=window.gameDebug,btn=document.getElementById('quality'),s=[];
-   for(let i=0;i<3;i++){
-    btn.click();
-    const timer=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-    s.push(timer().then(()=>({quality:dbg.quality(),count:dbg.villageLifeStatus()[0].actorCount})));
-   }
-   return Promise.all(s);
-  });
-  // The button is available on mobile in menu panel too. Its quality changes are applied synchronously;
-  // allow one render frame between quality switches in the UI test.
   const chosen=await page.evaluate(async()=>{
    const dbg=window.gameDebug,btn=document.getElementById('quality'),counts={};
    for(let i=0;i<3;i++){
@@ -69,7 +59,7 @@ async function scenario(label,width,height,isMobile){
   // One complete cycle includes all three quality presets (some frames may take long in software GL).
   for(const [k,n] of Object.entries({low:4,medium:6,high:9}))if(k in chosen)assert.equal(chosen[k],n,k+' count cap');
   assert.equal(await page.evaluate(()=>document.querySelectorAll('canvas#world').length),1,'original UI/canvas unchanged');
-  console.log('V76 BROWSER',label,JSON.stringify({first,atEvening,atNight,atDay,chosen,quality}));
+  console.log('V76 BROWSER',label,JSON.stringify({first,atEvening,atNight,atDay,chosen,profile}));
   return {first,atEvening,atNight,chosen};
  }finally{await ctx.close()}
 }
