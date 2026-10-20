@@ -48,6 +48,14 @@
  #tools #hud-army::before{content:"⚔"} #tools #hud-army::after{content:"Väed"}
  #tools #hud-build::before{content:"⚒"} #tools #hud-build::after{content:"Ehita"}
  #tools #menubtn::before{content:"☰"} #tools #menubtn::after{content:"Menüü"}
+ /* Localization changes documentElement.lang at runtime; labels follow immediately. */
+ html:lang(en) #tools #maptoggle::after{content:"World"}
+ html:lang(en) #tools #hud-city::after{content:"City"}
+ html:lang(en) #tools #hud-explore::after{content:"Explore"}
+ html:lang(en) #tools #techtoggle::after{content:"Research"}
+ html:lang(en) #tools #hud-army::after{content:"Troops"}
+ html:lang(en) #tools #hud-build::after{content:"Build"}
+ html:lang(en) #tools #menubtn::after{content:"Menu"}
  body.atlas #tools #maptoggle,body.hud-city-open #tools #hud-city,
  body.hud-explore-open #tools #hud-explore,
  body.hud-city-open.hud-building-tab #tools #hud-build,
