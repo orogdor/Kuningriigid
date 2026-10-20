@@ -41,6 +41,7 @@ assert.ok(entry&&scene.children.includes(entry.group));
 assert.equal(life.stats()[0].actorCount,6);
 life.update(190,.1);
 assert.equal(entry.actors[3].activity,'play');
+assert.equal(life.stats()[0].campVisible,false,'daytime fire must be unlit');
 assert.ok(entry.actors.some(a=>a.activity==='chat'),'a real village has conversation');
 assert.ok(entry.actors.every(a=>Number.isFinite(a.person.position.y)),'figures sit on actual terrain');
 assert.ok(entry.actors.every(a=>a.figure.userData.rig),'reuses V50 animated character rig');
