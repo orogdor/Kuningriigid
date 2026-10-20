@@ -98,7 +98,7 @@ function renderAll(){
  if(document.body)visit(document.body);
  updateSpecialCopy();
  document.documentElement.lang=language;
- document.title=language==='en'?'Kingdoms V79 – Real-Time Strategy':'Kuningriigid V79 – reaalajastrateegia';
+ document.title=language==='en'?'Kingdoms V80 – Real-Time Strategy':'Kuningriigid V80 – reaalajastrateegia';
  for(const id of ['language','menulanguage']){const c=document.getElementById(id);if(c)c.value=language}
 }
 export function changeLanguage(next,{notify=true}={}){
