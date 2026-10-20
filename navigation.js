@@ -22,7 +22,7 @@ weight(i){return 1/this.roadBoost(i)}
  recordTraffic(from,to){
   const lengthWalked=length(from,to);
   if(lengthWalked<=0)return;
-  const samples=Math.max(1,Math.ceil(lengthWalked/.38));
+  const samples=Math.max(1,Math.ceil(lengthWalked/.25));
   const contribution=lengthWalked/samples;
   for(let j=0;j<samples;j++){
    const f=(j+.5)/samples,k=this.index(from.x+(to.x-from.x)*f,from.z+(to.z-from.z)*f);
