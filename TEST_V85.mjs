@@ -3,12 +3,15 @@ import {Civilization,createGame} from './civilization-core.js';
 import {createRiverNetwork,disposeNetwork} from './continuous-landscape-visual.js';
 import {createMountainOutcrops} from './landscape-polish-v84.js';
 import {createDetailBorders} from './detail-borders-v85.js';
-import {getRivers,worldToLocal,projectHeight} from './continuous-landscape.js';
+import {getRivers,worldToLocal,projectHeight,surface,riverNear} from './continuous-landscape.js';
 for(const seed of [8417,17]){
  const g=new Civilization(createGame(seed)),tile=getRivers(g).find(e=>e.c.land).c;
  const state=JSON.stringify(g.s),river=createRiverNetwork(g,'detail',tile);
  const water=river.getObjectByName('continuous water surface'),pos=water.geometry.attributes.position;
- assert.ok(pos.count>100);for(const v of pos.array)assert.ok(Number.isFinite(v));
+ assert.ok(pos.count>100);
+ for(let i=0;i<pos.count;i++){const x=tile.x+pos.getX(i)/3,z=tile.z+pos.getZ(i)/2.6;assert.ok(surface(g,x,z,'detail')<pos.getY(i)+.1,'actual terrain stays below the river water');}for(const v of pos.array)assert.ok(Number.isFinite(v));
+ const ix=water.geometry.index.array;
+ for(let j=0;j<ix.length;j+=3){const a=ix[j],b=ix[j+1],c=ix[j+2],x=tile.x+(pos.getX(a)+pos.getX(b)+pos.getX(c))/9,z=tile.z+(pos.getZ(a)+pos.getZ(b)+pos.getZ(c))/(3*2.6),y=(pos.getY(a)+pos.getY(b)+pos.getY(c))/3;assert.ok(surface(g,x,z,'detail')<y+.15,'no terrain pierces the middle of a water triangle');}
  // A shared x/z position may never have two water heights at a confluence.
  const heights=new Map();for(let i=0;i<pos.count;i++){const k=pos.getX(i).toFixed(3)+':'+pos.getZ(i).toFixed(3),y=pos.getY(i);if(heights.has(k))assert.ok(Math.abs(heights.get(k)-y)<.003);heights.set(k,y)}
  const mountain=g.cells.find(c=>c.mountain),rocks=createMountainOutcrops(g,'detail',mountain);

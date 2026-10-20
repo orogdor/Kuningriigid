@@ -88,7 +88,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  };
  const emit=(polygon,array,isWater)=>{
   const points=polygon.map(p=>{
-   const y=isWater?Math.max(.86,baseHeight(game,p.x,p.z)-(2.4+Math.min(2.1,p.width*.20))):surface(game,p.x,p.z)+.10;
+   const y=isWater?riverNear(game,p.x,p.z).waterHeight||.86:surface(game,p.x,p.z)+.10;
    return {...field(game,p.x,p.z,scope,tile),y:projectHeight(y,scope)};
   });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
  };

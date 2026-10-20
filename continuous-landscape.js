@@ -33,6 +33,8 @@ function prep(game){
    const p=cellAt(minX,minZ),q=cellAt(maxX,maxZ);
    const cc0=p?.c??clamp(Math.floor((minX+650)/50),0,COLS-1),cc1=q?.c??clamp(Math.floor((maxX+650)/50),0,COLS-1);
    const rr0=p?.r??clamp(Math.floor((minZ+550)/50),0,ROWS-1),rr1=q?.r??clamp(Math.floor((maxZ+550)/50),0,ROWS-1);
+   a.waterHeight??=Math.max(.86,game.atlasHeight(a.x,a.z)-(2.4+Math.min(2.1,a.width*.20)));
+   b.waterHeight??=Math.max(.86,game.atlasHeight(b.x,b.z)-(2.4+Math.min(2.1,b.width*.20)));
    const seg={a,b};
    for(let r=rr0;r<=rr1;r++)for(let c=cc0;c<=cc1;c++){
     const k=r*COLS+c,arr=bucket.get(k)||[];arr.push(seg);bucket.set(k,arr);
@@ -77,13 +79,13 @@ export const getRivers=game=>prep(game).edges;
 export function riverNear(game,x,z){
  const pos=cellAt(x,z);if(!pos)return {distance:Infinity,width:0};
  const bucket=prep(game).bucket.get(idx(pos));if(!bucket)return {distance:Infinity,width:0};
- let nearest=Infinity,width=0;
+ let nearest=Infinity,width=0,waterHeight=.86;
  for(const {a,b}of bucket){
   const dx=b.x-a.x,dz=b.z-a.z,len=dx*dx+dz*dz||1;
   const t=clamp(((x-a.x)*dx+(z-a.z)*dz)/len,0,1),px=a.x+t*dx,pz=a.z+t*dz;
-  const d=Math.hypot(px-x,pz-z);if(d<nearest){nearest=d;width=a.width+(b.width-a.width)*t}
+  const d=Math.hypot(px-x,pz-z);const w=a.width+(b.width-a.width)*t;if(d-w<nearest-width){nearest=d;width=w;waterHeight=a.waterHeight+(b.waterHeight-a.waterHeight)*t}
  }
- return {distance:nearest,width};
+ return {distance:nearest,width,waterHeight};
 }
 export function baseHeight(game,x,z){
  const h=game.atlasHeight(x,z);
@@ -115,12 +117,16 @@ const coastal=(smooth((h-3.2)/4)*(1-smooth((h-15)/6)))*4.5*
  return h+ridge+scarp+fractured+coastal-oceanFloor;
 }
 export function worldElevation(game,x,z){
- const base=baseHeight(game,x,z),{distance:d,width:w}=riverNear(game,x,z);
+ const base=baseHeight(game,x,z),{distance:d,width:w,waterHeight}=riverNear(game,x,z);
  if(!Number.isFinite(d))return base;
- const inner=w*.92,outer=Math.max(inner+2.8,w*1.65+3);
- const incise=3.8+Math.min(3,w*.31);
- const depth=d<inner?incise:d<outer?incise*(1-smooth((d-inner)/(outer-inner))):0;
- return base-depth;
+ const inner=w*1.04,outer=Math.max(inner+3.5,w*1.8+3);
+ // Incise the SAME water elevation into the terrain, even where a mountain
+ // ridge crosses the river. Subtracting depth from the ridge left dry spikes.
+ const bed=waterHeight-2.2-Math.max(0,1-d/inner)*1.4;
+ if(d<=inner)return Math.min(base,bed);
+ if(d>=outer)return base;
+ return Math.min(base,bed+(base-bed)*smooth((d-inner)/(outer-inner)));
+
 }
 export function projectHeight(y,view){return view==='detail'?(y-.7)*DETAIL_Y:y}
 export function surface(game,x,z,view='world'){return projectHeight(worldElevation(game,x,z),view)}
