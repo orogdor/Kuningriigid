@@ -35,6 +35,16 @@ try{
    await page.screenshot({path:'ui-screenshots-v75/'+loc.kind+'-mobile.png'});
   console.log('V75 DETAIL PASS',loc.kind,loc.id);
  }
+ // The same landmark must remain visible while looking at an adjacent detail tile.
+ const beside=await page.evaluate(loc=>{
+  const dbg=window.gameDebug,g=dbg.game;
+  const c=loc.c<219?loc.c+1:loc.c-1,r=loc.r;
+  g.reveal(0,{c,r},1);g.reveal(0,{c:loc.c,r:loc.r},1);
+  dbg.openTile(g.cell({c,r}));
+  return dbg.detailObjectStatus().filter(t=>t.c===loc.c&&t.r===loc.r).flatMap(t=>t.ids);
+ },locations[0]);
+ assert.ok(beside.includes(locations[0].id),'visible adjacent village appears in the correct neighbouring terrain');
+ console.log('V75 NEIGHBOR PASS',locations[0].id);
  const claimed=await page.evaluate(loc=>{
   const dbg=window.gameDebug,g=dbg.game,l=dbg.state.landmarks.find(a=>a.c===loc.c&&a.r===loc.r);
   // Simulate the standard explored-POI reward (without changing site coordinates).
