@@ -84,7 +84,7 @@ async function scenario(era,width,height,isMobile,label){
    assert.ok(await page.evaluate(()=>window.gameDebug.selectBuildingType('steelworks')));
    await page.waitForFunction(()=>window.gameDebug.buildingInfoStatus().type==='steelworks');
    const before=await page.evaluate(()=>window.gameDebug.buildingInfoStatus().data.disabled);
-   const toggle=page.locator('#building-inspector .binfo-actions button').filter({hasText:/Peata töö|Jätka tööd/});
+   const toggle=page.locator('#building-inspector .binfo-actions button').nth(1);
    await toggle.click();
    const after=await page.evaluate(()=>window.gameDebug.buildingInfoStatus().data.disabled);
    assert.notEqual(after,before,'real building pause/resume controls must work');
