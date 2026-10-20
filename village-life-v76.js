@@ -147,7 +147,7 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
   if(!site){if(sites.has(key)){sites.get(key).group.removeFromParent();sites.delete(key)}return null}
   const targetCount=villageVisualLimit(quality(),nearby);
   let entry=sites.get(key);
-  if(entry&&entry.id===site.id&&entry.count===targetCount&&entry.parent===parent)return entry;
+  if(entry&&entry.id===site.id&&entry.count===targetCount&&entry.parent===parent){entry.site=site;return entry;}
   if(entry){entry.group.removeFromParent();sites.delete(key)}
   const group=new T.Group();group.name='V76 civilian life '+site.id;
   group.userData.villageLife=true;parent.add(group);
@@ -176,7 +176,7 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
     const travel=Math.min(d,Math.min(.2,Math.max(0,dt))*speed);
     if(d>.22&&travel>0){actor.x+=dx/d*travel;actor.z+=dz/d*travel;}
     actor.moving=d>.35;
-    actor.person.visible=activity!=='sleep'&&!(!threat&&activity==='home'&&d<.8);
+    actor.person.visible=!(activity==='sleep'&&d<.8);
     actor.person.position.set(actor.x,ground(actor.x,actor.z),actor.z);
     if(d>.1)actor.person.rotation.y=Math.atan2(dx,dz);
     if(activity==='chat'&&d<=.4)actor.person.rotation.y=actor.index%2?Math.PI/2:-Math.PI/2;
