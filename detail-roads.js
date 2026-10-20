@@ -60,7 +60,7 @@ export function createDetailTrailLinks(spots,nav,height){
    const x=a.x+dx,z=a.z+dz;
    if(x< -72||x>72||z< -62||z>62)continue;
    const other=nav.index(x,z),otherLevel=levels.get(other);
-   if(!otherLevel)continue;
+   if(!otherLevel||!nav.clear(a,{x,z}))continue;
    const useLevel=Math.min(level,otherLevel);
    const width=1.1+useLevel*.65;
    appendRibbon(vertices,colors,a,{x,z},width,new T.Color(COLORS[useLevel]),height);
