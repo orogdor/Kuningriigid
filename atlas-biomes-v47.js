@@ -1,7 +1,7 @@
 // World-scale foliage and geological landmarks, light-weight instanced geometry.
 // This module affects only the presentation. No gameplay pathfinding or yield changes.
 import * as T from './vendor/three.module.js';
-import {surface,riverNear} from './continuous-landscape.js?v=68d';
+import {surface,riverNear} from './continuous-landscape.js?v=85a';
 
 function instanceGroup(group, kind, entries, geometry, color, castShadow=false){
  if(!entries.length)return null;

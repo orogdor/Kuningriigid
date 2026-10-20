@@ -2,9 +2,10 @@
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
 import * as T from './vendor/three.module.js';
-import {createCrossingNetwork} from './landscape-polish-v84.js?v=84a';
-import {riverNear,localToWorld} from './continuous-landscape.js?v=69a';
-import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=69a';
+import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
+import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
+import {riverNear,localToWorld} from './continuous-landscape.js?v=85a';
+import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=85a';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
@@ -60,59 +61,44 @@ function buffers(vertices,color,{standard=false,opacity=1,shade=null}={}){
 function visible(tile,path,radius=90){if(!tile)return true;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
- const water=[],banks=[],bed=[];
+ const water=[],banks=[];
  let riverCount=0,sections=0;
+ // A single clipped scalar-field mesh unions ALL tributaries. Every shared
+ // grid coordinate has one height; overlapping ribbons and junction fans vanish.
+ const step=2.5,cells=new Set(),nodes=new Map();
  for(const edge of getRivers(game)){
-  if(!visible(tile,edge.points))continue;
-  riverCount++;
-  // A river must taper into the sea surface, not continue as a rectangular
-  // blue strip across the ocean floor. Trim it at the actual coastal isobath.
-  let points=edge.points;
-  const outlet=game.cell(edge.c.riverTo);
-  if(outlet&&!outlet.land){
-   const clipped=[];
-   for(let i=0;i<points.length;i++){
-    const p=points[i],h=game.atlasHeight(p.x,p.z);
-    if(h>1.15){clipped.push(p);continue}
-    if(clipped.length){
-     const prev=clipped.at(-1),high=game.atlasHeight(prev.x,prev.z);
-     const t=Math.max(0,Math.min(1,(high-1.15)/(high-h||1)));
-     clipped.push({x:prev.x+(p.x-prev.x)*t,z:prev.z+(p.z-prev.z)*t,width:(prev.width+(p.width-prev.width)*t)*1.38,mouth:true});
-    }
-    break;
-   }
-   points=clipped;
+  if(!visible(tile,edge.points))continue;riverCount++;
+  for(const p of edge.points){
+   const radius=p.width*1.55+step*2;
+   for(let gz=Math.floor((p.z-radius)/step);gz<=Math.ceil((p.z+radius)/step);gz++)for(let gx=Math.floor((p.x-radius)/step);gx<=Math.ceil((p.x+radius)/step);gx++)cells.add(gx+','+gz);
   }
-  if(points.length<2)continue;
-  const cross=join(points,game,scope,tile,'river');
-  for(let i=1;i<cross.length;i++){
-   const a=cross[i-1],b=cross[i];
-   strip(water,a.l,a.m,b.l,b.m);strip(water,a.m,a.r,b.m,b.r);
-   strip(banks,a.ol,a.l,b.ol,b.l);
-   strip(banks,a.r,a.or,b.r,b.or);
+ }
+ const node=(gx,gz)=>{
+  const key=gx+','+gz;if(nodes.has(key))return nodes.get(key);
+  const x=gx*step,z=gz*step,near=riverNear(game,x,z),w=near.width||1;
+  const distance=Math.min(100,near.distance);
+  const p={x,z,d:distance-w,outer:distance-w*1.40,shore:1.12-game.atlasHeight(x,z),width:w};nodes.set(key,p);return p;
+ };
+ const clip=(polygon,key,invert=false)=>{
+  const result=[];for(let i=0;i<polygon.length;i++){
+   const a=polygon[i],b=polygon[(i+1)%polygon.length],va=(invert?-1:1)*a[key],vb=(invert?-1:1)*b[key];
+   if(va<=0)result.push(a);
+   if((va<=0)!==(vb<=0)){const t=va/(va-vb),p={};for(const k of ['x','z','d','outer','shore','width'])p[k]=a[k]+(b[k]-a[k])*t;result.push(p)}
+  }return result;
+ };
+ const emit=(polygon,array,isWater)=>{
+  const points=polygon.map(p=>{
+   const y=isWater?riverNear(game,p.x,p.z).waterHeight||.86:surface(game,p.x,p.z)+.10;
+   return {...field(game,p.x,p.z,scope,tile),y:projectHeight(y,scope)};
+  });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
+ };
+ for(const key of cells){
+  const [x,z]=key.split(',').map(Number),a=node(x,z),b=node(x+1,z),c=node(x,z+1),d=node(x+1,z+1);
+  for(const triangle of [[a,c,b],[b,c,d]]){
+   const land=clip(triangle,'shore');if(land.length<3)continue;
+   emit(clip(land,'d'),water,true);
+   emit(clip(clip(land,'outer'),'d',true),banks,false);
    sections++;
-  }
- }
- // The river junction is not the exposed sharp intersection of two
- // separate ribbons. Build a smooth, shared-water pool over the confluence.
- const inflow=new Map();
- for(const edge of getRivers(game)){
-  const target=game.cell(edge.c.riverTo);
-  if(!target?.river)continue;
-  const k=target.r*game.cols+target.c,arr=inflow.get(k)||[];
-  arr.push(edge);inflow.set(k,arr);
- }
- for(const inputs of inflow.values()){
-  if(inputs.length<2)continue;
-  const c=game.cell(inputs[0].c.riverTo);
-  if(!c||tile&&!visible(tile,[c]))continue;
-  const r=Math.max(3.5,(c.riverWidth||3)*1.12);
-  const height=Math.max(.86,baseHeight(game,c.x,c.z)-(2.4+Math.min(2.1,(c.riverWidth||3)*.20)));
-  const center={...field(game,c.x,c.z,scope,tile),y:projectHeight(height,scope)};
-  for(let i=0;i<16;i++){
-   const a=2*Math.PI*i/16,b=2*Math.PI*(i+1)/16;
-   tri(water,center,{...field(game,c.x+r*Math.cos(a),c.z+r*Math.sin(a),scope,tile),y:center.y},
-                   {...field(game,c.x+r*Math.cos(b),c.z+r*Math.sin(b),scope,tile),y:center.y});
   }
  }
  const bankMesh=buffers(banks,'#b2a68a',{standard:true}),waterMesh=buffers(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
@@ -120,7 +106,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   const shallow=Math.min(1,near.distance/Math.max(1,near.width));
   return new T.Color('#245d73').lerp(new T.Color('#76b6ae'),Math.pow(shallow,2)*.68).multiplyScalar(.96+.04*Math.sin(p.x*.11+p.z*.07));
  }});
- if(waterMesh){waterMesh.material.roughness=.27;waterMesh.material.metalness=.13;}
+ if(waterMesh){waterMesh.material.dispose();waterMesh.material=landscapeMaterial('water',scope,tile);}
  if(bankMesh){bankMesh.name='continuous river banks';group.add(bankMesh)}
  if(waterMesh){waterMesh.name='continuous water surface';waterMesh.renderOrder=9;group.add(waterMesh)}
  group.userData.riverEdges=riverCount;

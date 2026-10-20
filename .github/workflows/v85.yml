@@ -1,0 +1,38 @@
+name: V85 Terrain and City Borders
+on:
+  push:
+    branches: [feature/v85-terrain, main]
+    paths: ['landscape-*.js', 'detail-borders-v85.js', 'civilization.js', 'continuous-landscape-visual.js', 'continuous-landscape.js', 'TEST_V85*.mjs', '.github/workflows/v85.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  landscape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify projections, bridge banks, rivers and save compatibility
+        run: |
+          node --check civilization.js
+          node TEST_V85.mjs
+          node TEST_V84.mjs
+          node TEST_V67.mjs
+          node TEST_V75.mjs
+          node TEST_V73.mjs
+      - run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Render world and detail scenes on desktop and phone
+        run: |
+          python3 -m http.server 8765 >/tmp/v84-server.log 2>&1 &
+          node TEST_V85_UI.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V85-landscape-screenshots
+          path: artifacts-v85/
+          if-no-files-found: ignore

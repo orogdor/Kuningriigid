@@ -1,6 +1,6 @@
 // English localization strings for the originally Estonian game interface.
 export const ENGLISH_PAIRS=[
-["REAALAJA STRATEEGIA · V84", "REAL-TIME STRATEGY · V84"],
+["REAALAJA STRATEEGIA · V85", "REAL-TIME STRATEGY · V85"],
 ["Sinu järgmine peatükk", "Your next chapter"],
 ["Raja linn, avasta maailm ja juhi oma rahvas läbi seitsme ajastu.", "Found a city, explore the world and lead your people through seven eras."],
 ["Mängu laadimine…", "Loading game…"],
