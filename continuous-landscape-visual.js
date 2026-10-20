@@ -138,6 +138,7 @@ export function createRiverNetwork(game,scope='world',tile=null){
 export function createUnifiedRoadNetwork(game,scope='world',tile=null){
  const group=new T.Group();group.name='V67 continuous road graph';group.userData.roadNetwork=true;
  const beds=[],verges=[],ruts=[];
+ const cityNav=scope==='detail'&&tile&&game.contextAt(tile,false)?game.nav(tile):null;
  let roads=0;
  for(const edge of roadNetwork(game)){
   if(!visible(tile,edge.points))continue;
@@ -146,6 +147,17 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null){
   const scalePt=p=>p; // vertices already in the same world-to-detail projection
   for(let i=1;i<xs.length;i++){
    const a=xs[i-1],b=xs[i];
+   if(cityNav){
+    const A={x:(a.l.x+a.r.x)*.5,z:(a.l.z+a.r.z)*.5};
+    const B={x:(b.l.x+b.r.x)*.5,z:(b.l.z+b.r.z)*.5};
+    const width=cityNav.roadSurfaceWidth(A,B,2.7+edge.level*.5);
+    if(width<.7)continue;
+    const len=Math.hypot(B.x-A.x,B.z-A.z)||1;
+    const nx=-(B.z-A.z)/len*width*.5,nz=(B.x-A.x)/len*width*.5;
+    const ay=(a.l.y+a.r.y)*.5,by=(b.l.y+b.r.y)*.5;
+    strip(beds,{x:A.x+nx,y:ay,z:A.z+nz},{x:A.x-nx,y:ay,z:A.z-nz},{x:B.x+nx,y:by,z:B.z+nz},{x:B.x-nx,y:by,z:B.z-nz});
+    continue;
+   }
    strip(beds,a.l,a.r,b.l,b.r);
    strip(verges,a.ol,a.l,b.ol,b.l);strip(verges,a.r,a.or,b.r,b.or);
   }
