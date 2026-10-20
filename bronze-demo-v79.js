@@ -36,6 +36,20 @@ export function createBronzeDemoState(seed=20261020){
   water:430,clay:140,pottery:70,copper:100,tin:75,bronze:80,gold:120});
  g.s.time=185;g.s.events??=[];
  g.s.events.push({time:g.s.time,text:'V79 näidislinn: pronksiaja 30 hoonemudelit ja teeradade kontroll.'});
+ // The test city includes roads formed from eight actual traversals between
+ // houses and the market. Each walk uses the same Navigation traffic mechanism
+ // as live residents; there are no magic or prebuilt-road overrides.
+ const market=city.economy.buildings.find(b=>b.type==='market');
+ const nav=g.nav(city),doors=city.economy.buildings.filter(b=>b.type==='house').slice(0,3);
+ for(const home of doors){
+  const from=nav.nearest({x:home.x,z:home.z+3.4},12);
+  const to=nav.nearest({x:market.x,z:market.z+3.4},12);
+  if(!from||!to)continue;
+  const path=nav.route(from,to);
+  if(!path?.length)continue;
+  for(let journey=0;journey<8;journey++)for(let j=1;j<path.length;j++)
+   nav.recordTraffic(path[j-1],path[j]);
+ }
  const out=JSON.parse(JSON.stringify(g.s));
  return out;
 }
