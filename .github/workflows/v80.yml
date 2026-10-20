@@ -42,6 +42,11 @@ jobs:
           node TEST_V76.mjs
           node TEST_V75.mjs
           node TEST_V73.mjs
+          node TEST_V61.mjs
+          node TEST_V60.mjs
+          node TEST_V59.mjs
+          node TEST_V67.mjs
+          node TEST_V68.mjs
       - name: Install Chromium
         run: |
           npm install --no-save playwright
