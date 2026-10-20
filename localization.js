@@ -1,4 +1,4 @@
-import {ENGLISH_PAIRS} from './locale-en.js?v=83a';
+import {ENGLISH_PAIRS} from './locale-en.js?v=84a';
 
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
@@ -95,7 +95,7 @@ function renderAll(){
  if(document.body)visit(document.body);
  updateSpecialCopy();
  document.documentElement.lang=language;
- document.title=language==='en'?'Kingdoms V83 – Real-Time Strategy':'Kuningriigid V83 – reaalajastrateegia';
+ document.title=language==='en'?'Kingdoms V84 – Real-Time Strategy':'Kuningriigid V84 – reaalajastrateegia';
  for(const id of ['language','menulanguage']){const c=document.getElementById(id);if(c)c.value=language}
 }
 export function changeLanguage(next,{notify=true}={}){

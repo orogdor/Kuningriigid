@@ -1,8 +1,12 @@
-# Kuningriigid V83
+# Kuningriigid V84
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
 **Mängi:** https://orogdor.github.io/Kuningriigid/?v=82-20261020
+
+## V84 – mäed, jõed ja kaldast kaldani sillad
+
+Ühised tahulised mäeharjad, madala vee värvid ja uued sillad/koolmekohad mõlemal kaardil. Salvestuste V4 vorming säilib. [Muudatused](MUUDATUSED_V84.md).
 
 ## V83 – menüü viimistlus
 
