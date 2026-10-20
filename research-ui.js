@@ -6,7 +6,7 @@ import {tempoName} from './tempo.js';
 const pretty=n=>Number(n||0).toLocaleString('et-EE',{maximumFractionDigits:1});
 export const remaining=(s,id,team=0)=>Math.max(0,researchCost(s,TECHS[id])-(s.research[team].progress[id]||0));
 export const clock=seconds=>!Number.isFinite(seconds)?'Ootab':Math.floor(Math.ceil(seconds)/60)+':'+String(Math.ceil(seconds)%60).padStart(2,'0');
-export function renderResearchUI(game,{choose,queue,remove}){
+export function renderResearchUI(game,{choose,queue,remove,details=true}){
  const s=game.s,r=s.research[0],active=r.active,hasCity=s.cities.some(c=>c.team===0),rate=scienceRate(s,0),
  title=document.getElementById('researchsummary'),tree=document.getElementById('researchtree'),status=document.getElementById('researchstatus');
  const eta=active&&rate>0?remaining(s,active)/rate*60:Infinity,
@@ -15,11 +15,23 @@ export function renderResearchUI(game,{choose,queue,remove}){
  const summary=active?(r.paused?'Pausil · ':'')+TECHS[active].name+' · '+(waiting?'Ootab materjale: '+waiting:r.paused?'Peatatud':clock(eta)):
   allDone?'Kõik tehnoloogiad uuritud':r.queue?.length?'Järjekorras: '+(techBlock(r,r.queue[0])||TECHS[r.queue[0]]?.name):hasCity?'Vali uurimisteema':'Raja esmalt linn';
  status.textContent='⚗ '+pretty(rate)+' teadust/min · '+summary;
+ if(!details)return;
  title.textContent=summary+' · '+pretty(rate)+' teaduspunkti/min · tempo: '+tempoName(s)+'. Teadus sõltub elanikest ja õpetlastest.';
  const pause=document.getElementById('pauseresearch');pause.disabled=!active&&!r.queue?.length;pause.textContent=r.paused?'Jätka uurimist':'Peata uurimine · edenemine säilib';
+ if(document.getElementById('researchpanel').hidden)return;
+ const stamp=JSON.stringify([r.known,active,r.queue,r.boosted,hasCity,s.ages[0],r.paused,Object.values(TECHS).map(t=>researchCost(s,t))]);
+ if(tree.dataset.renderKey===stamp){
+  for(const card of tree.querySelectorAll('.tech-card[data-tech]')){
+   const id=card.dataset.tech,cost=researchCost(s,TECHS[id]),value=r.progress[id]||0,known=r.known.includes(id);
+   card.querySelector('.tech-time').textContent=known?'Uuritud':pretty(cost)+' teaduspunkti · '+(rate>0?clock((cost-value)/rate*60):'Ootab teadust');
+   const progress=card.querySelector('progress');progress.max=cost;progress.value=known?cost:value;
+   const detail=card.querySelector('.tech-progress-detail');if(detail){detail.hidden=!value;detail.textContent='Tehtud '+pretty(value)+' / '+pretty(cost)+' · '+Math.floor(100*Math.min(1,value/cost))+'%';}
+  }
+  return;
+ }
+ tree.dataset.renderKey=stamp;
  const queued=document.getElementById('researchqueue');queued.innerHTML='';
  for(const id of r.queue||[]){const item=document.createElement('button');item.textContent=TECHS[id].name+' ✕';item.onclick=()=>remove(id);queued.append(item)}
- if(document.getElementById('researchpanel').hidden)return;
  tree.innerHTML='';const ages=ERA_NAMES;
  for(let age=0;age<ages.length;age++){
   const visibleTechs=Object.entries(TECHS).filter(([id,t])=>t.age===age).filter(([id])=>{
@@ -32,6 +44,7 @@ export function renderResearchUI(game,{choose,queue,remove}){
   for(const[id,t]of visibleTechs){
    const known=r.known.includes(id),blocked=techBlock(r,id),cost=researchCost(s,t),progressValue=r.progress[id]||0,
     boosted=r.boosted?.includes(id),card=document.createElement('button');
+   card.dataset.tech=id;
    card.className='tech-card '+(known?'known':id===active?'researching':blocked?'locked':'available');
    card.disabled=known||!!blocked||!hasCity||id===active;
    card.setAttribute('aria-label',t.name+'; '+(known?'Uuritud':blocked||pretty(cost)+' teaduspunkti'));
@@ -46,7 +59,7 @@ export function renderResearchUI(game,{choose,queue,remove}){
    if(ERA_MATERIALS[id]){const era=document.createElement('small');era.textContent='Ajastuvahetuse materjalid: '+Object.entries(ERA_MATERIALS[id]).map(([k,n])=>n+' '+(RESOURCE_NAMES[k]||k)).join(', ');card.append(era)}
    const progress=document.createElement('progress');progress.max=cost;progress.value=known?cost:progressValue;card.append(progress);
    if(EUREKAS[id]){const d=document.createElement('small');d.className=boosted?'eureka-earned':'eureka-available';d.textContent=boosted?'⚡ Avastamisboonus saadud (+35%)':'⚡ Avastamisboonus: '+EUREKAS[id]+' (+35%)';card.append(d)}
-   if(!known&&progressValue){const detail=document.createElement('small');detail.textContent='Tehtud '+pretty(progressValue)+' / '+pretty(cost)+' · '+Math.floor(100*Math.min(1,progressValue/cost))+'%';card.append(detail)}
+   if(!known){const detail=document.createElement('small');detail.className='tech-progress-detail';detail.hidden=!progressValue;detail.textContent='Tehtud '+pretty(progressValue)+' / '+pretty(cost)+' · '+Math.floor(100*Math.min(1,progressValue/cost))+'%';card.append(detail)}
    card.onclick=()=>choose(id);column.append(card);
    if(!known&&id!==active){const isQueued=(r.queue||[]).includes(id),plan={known:[...r.known,...(active?[active]:[]),...(r.queue||[])]},q=document.createElement('button');q.className='tech-queue-button';q.textContent=isQueued?'✓ Järjekorras':'＋ Lisa järjekorda';q.disabled=isQueued||!hasCity||!!techBlock(plan,id)||(r.queue?.length||0)>=4;q.onclick=()=>queue(id);column.append(q)}
   }

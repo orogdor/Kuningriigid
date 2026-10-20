@@ -12,11 +12,16 @@ Võrdluse lähteversioon: V85, commit 79916e9c7f6a2367f53411dfca739745308bd490. 
 | Esimese AI ehitusvaliku paigutus ebaõnnestus | Kogu ehitusplaan jäi sama valiku juurde | Kontrollitakse ehitaja ja tooraine ligipääsu ning proovitakse teisi kasulikke ehitisi |
 | Ligipääsu kontroll arvutas iga kord kaalutud täispika tee | Tarbetu CPU koormus | Takistuste muutumiseni kehtivad ühendatud maastikupiirkondade vahemälud |
 | Suured taimestiku instantsid hõlmasid kogu maailmakaarti | Kaamerast väljas olev mets koormas GPU-d | Staatilised instantsid jagatakse ruumilisteks rühmadeks; kaugvaates kasutatakse taas suuremat partiid |
+| Avatud uurimispuu nupud eemaldati iga värskendusega | Klõps või puudutus võis kaduma minna | Nupud säilivad; edenemist ja ETA-d muudetakse kohapeal |
 | Peidetud uurimispuu ja tööjõukontrollid uuendati mängimise ajal | Liigne DOM töö ja juhtnuppude uuendamine | Automaatvärskendused koondatakse, aktiivset sisestust hoitakse ning peidetud kontrollide ümberehitamist välditakse |
 
 ## Tunnipikkuse võrdluse esimene tulemus
 
 V85 jõudis pronksiaega 6 osapoolt 8-st; kaardil 20261020 jäid kaks osapoolt kiviaega. V86 jõudsid mõlema kaardi kõik 8 osapoolt pronksiaega. Esimese linna toiduvarud paranesid mitmel osapoolel märgatavalt, linnad kasvasid ja laienesid. Kõik üksikud tooraine- ja ehitusummikud pole kadunud; rauaajale ülemineku lauatootmine vajab pikemat tasakaalutesti.
+
+## Renderduskoormuse esimene mõõtmine
+
+Sama telefonivaate avakaadris vähenes renderdatud kolmnurkade arv 4 377 626-lt 1 580 688-ni (umbes 64%). See mõõdab GPU-le antavat geomeetriat, mitte füüsilise telefoni FPS-i. Mudelite kuju ega paigutust selleks ei lihtsustatud.
 
 ## Kontrolli ulatus
 

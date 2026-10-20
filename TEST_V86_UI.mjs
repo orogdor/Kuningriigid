@@ -46,7 +46,7 @@ try{
  await page.waitForFunction(()=>!window.gameDebug.state.settlers.find(a=>a.team===0)?.localTarget,null,{timeout:60000});
  await page.locator('#foundcity').click();await page.waitForFunction(()=>window.gameDebug.state.cities.some(c=>c.team===0),null,{timeout:15000});
  await capture('02-founded');
- await page.locator('#techtoggle').click();await page.locator('.tech-card').filter({hasText:'Jahipidamine'}).click();await page.locator('#closeresearch').click();
+ await page.locator('#techtoggle').click();const stableCard=await page.locator('.tech-card').filter({hasText:'Jahipidamine'}).elementHandle();await page.waitForTimeout(1200);assert.equal(await stableCard.evaluate(el=>el.isConnected),true,'research buttons stay attached during automatic progress updates');await page.locator('.tech-card').filter({hasText:'Jahipidamine'}).click();await page.locator('#closeresearch').click();
  await page.locator('#hud-build').click();await page.locator('#tray > button').filter({hasText:'Metsamaja'}).click();
  const build=await screenSite('lumber');assert.ok(build,'legal lumber site in exposed playfield');await page.touchscreen.tap(build.x,build.y);
  await page.waitForFunction(()=>window.gameDebug.state.cities.find(c=>c.team===0).economy.buildings.some(b=>b.type==='lumber'),null,{timeout:15000});
@@ -65,6 +65,7 @@ try{
   await new Promise(resolve=>setTimeout(resolve,1900));observer.disconnect();return count;
  });
  assert.equal(hiddenMutations,0,'closed research tree is not rebuilt during gameplay');
+ const researchHeader=await page.locator('#researchstatus').textContent();assert.ok(researchHeader.includes('teadust/min'),'lightweight research header keeps updating outside the closed tree');
  await capture('06-quiet-background-ui');
  assert.deepEqual(errors,[]);writeFileSync(`${dir}/play-results.json`,JSON.stringify(report,null,2));
  await ctx.close();
