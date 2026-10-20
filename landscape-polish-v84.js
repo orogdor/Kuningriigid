@@ -104,8 +104,15 @@ export function createMountainOutcrops(game,scope='world',tile=null){
  const sites=all.filter(c=>!tile||Math.abs(c.x-tile.x)<85&&Math.abs(c.z-tile.z)<85);
  if(!sites.length)return group;
  const geo=cragGeometry(),mat=new T.MeshStandardMaterial({vertexColors:true,roughness:1,flatShading:true}),mesh=new T.InstancedMesh(geo,mat,sites.length),o=new T.Object3D();
- sites.forEach((c,i)=>{const x=c.x+(game.noise(c.c+71,c.r)-.5)*20,z=c.z+(game.noise(c.c,c.r+18)-.5)*20,y=surface(game,x,z),p=scope==='world'?{x,z}:worldToLocal(tile,x,z),size=12+game.noise(c.c+9,c.r+7)*14;
-  o.position.set(p.x,projectHeight(y-.7,scope),p.z);o.rotation.set(0,game.noise(c.c,c.r)*Math.PI*2,0);o.scale.set(size,20+size*1.25,size*.72);o.updateMatrix();
-  if(scope!=='world'){const m=new T.Matrix4().makeScale(3,.30,2.6).multiply(o.matrix);m.setPosition(p.x,projectHeight(y-.7,scope),p.z);mesh.setMatrixAt(i,m)}else mesh.setMatrixAt(i,o.matrix);
+ sites.forEach((c,i)=>{
+  const x=c.x+(game.noise(c.c+71,c.r)-.5)*20,z=c.z+(game.noise(c.c,c.r+18)-.5)*20;
+  const y=surface(game,x,z),size=12+game.noise(c.c+9,c.r+7)*14;
+  // Embed the entire foot of the crag, not only its centre on a steep ridge.
+  let base=y;
+  for(let k=0;k<12;k++){const angle=k*Math.PI/6;base=Math.min(base,surface(game,x+Math.cos(angle)*size*1.15,z+Math.sin(angle)*size*1.15))}
+  base-=1.4;
+  const p=scope==='world'?{x,z}:worldToLocal(tile,x,z),height=20+size*1.25+(y-base)*.65;
+  o.position.set(p.x,projectHeight(base,scope),p.z);o.rotation.set(0,game.noise(c.c,c.r)*Math.PI*2,0);o.scale.set(size,height,size*.72);o.updateMatrix();
+  if(scope!=='world'){const m=new T.Matrix4().makeScale(3,.30,2.6).multiply(o.matrix);m.setPosition(p.x,projectHeight(base,scope),p.z);mesh.setMatrixAt(i,m)}else mesh.setMatrixAt(i,o.matrix);
  });mesh.receiveShadow=true;mesh.castShadow=false;mesh.name='angular ridge rock';group.add(mesh);group.userData.outcropCount=sites.length;return group;
 }

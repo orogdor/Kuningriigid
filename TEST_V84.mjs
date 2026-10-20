@@ -25,6 +25,8 @@ for(const seed of [17,12345,20261018]){
  assert.ok(new Set(Array.from(colors).map(n=>n.toFixed(3))).size>12,'shallow edges and deep mid-channel have distinct colors');
  const rocks=createMountainOutcrops(g);assert.ok(rocks.userData.outcropCount>20);
  const crags=rocks.children[0];assert.ok(crags.geometry.attributes.position.count<300,'batched low-poly crests');
+ const position=crags.geometry.attributes.position,matrix=new T.Matrix4(),vertex=new T.Vector3();
+ for(let i=0;i<Math.min(12,crags.count);i++){crags.getMatrixAt(i,matrix);for(let j=0;j<position.count;j++)if(position.getY(j)===0){vertex.fromBufferAttribute(position,j).applyMatrix4(matrix);assert.ok(vertex.y<=surface(g,vertex.x,vertex.z)+.1,'every sampled cliff foot is buried in the actual ground')}}
  assert.equal(JSON.stringify(g.s),before,'landscape rendering does not alter saved geography, resources or visibility');
  const newSite=getRivers(g).find(e=>e.c.land&&!e.c.ford&&!e.c.bridge).c;
  const oldCrossings=createCrossingNetwork(g);newSite.bridge=true;const newCrossings=createCrossingNetwork(g);
