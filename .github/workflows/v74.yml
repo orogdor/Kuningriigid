@@ -1,7 +1,7 @@
 name: V74 mobile-first UX regression
 on:
   push:
-    branches: [dev/v74-mobile-first]
+    branches: [dev/v74-mobile-first, main]
     paths:
       - 'hud-v74.css'
       - 'hud-v74.js'
