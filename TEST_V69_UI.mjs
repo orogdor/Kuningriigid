@@ -49,6 +49,12 @@ try{
   await page.screenshot({path:'ui-screenshots-v69/'+layout.label+'.png'});
  }
  await page.setViewportSize({width:844,height:390});
+ // V74 keeps the overview collapsed for map visibility; the legacy V69 action is
+ // still accessible after explicitly opening the minimap.
+ if(await page.locator('#hud-minimap-toggle').isVisible()){
+  await page.locator('#hud-minimap-toggle').click();
+  assert.equal(await page.locator('#atlasoverview').isVisible(),true,'V74 overview opens on demand');
+ }
  await page.locator('#hud-map-details').click();
  assert.equal(await page.locator('body').evaluate(n=>n.classList.contains('hud-map-open')),true,'map drawer opens');
  await page.locator('#hud-close-map').click();
