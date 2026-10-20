@@ -18,6 +18,15 @@ const FOOTPRINTS=Object.freeze({
 });
 export function buildingClearance(b){
  if(!b||b.type==='bridge')return null;
+ // Fortification walls are thin *oriented segments*, not wide buildings.
+ // The fortification controller supplies these half-extents according to
+ // wallAxis. Preserve them exactly so a 90-degree rotated wall keeps free
+ // lateral ground open for soldiers and pedestrians.
+ if(['palisade','stonewall','reinforced_wall'].includes(b.type)){
+  const vertical=!!b.wallAxis;
+  return {rx:b.navWidth??(vertical?1.1:3.6),
+          rz:b.navDepth??(vertical?3.6:1.1)};
+ }
  const v=FOOTPRINTS[b.type]||[4.8,4.5];
  return {rx:Math.max(v[0],b.navWidth||0),rz:Math.max(v[1],b.navDepth||0)};
 }
