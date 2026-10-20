@@ -52,7 +52,7 @@ assert.ok(entry.actors.some(a=>a.activity==='eat'||a.activity==='chat'||a.activi
 life.update(900,.1);
 assert.equal(entry.actors[4].activity,'sleep');
 assert.equal(entry.actors[0].activity,'guard');
-assert.ok(!life.stats()[0].campVisible===false,'fire remains lit at night');
+assert.equal(life.stats()[0].campVisible,true,'fire remains lit at night');
 assert.equal(JSON.stringify(g.s),grown,'all NPC movement is visual-only and does not touch saves/economy');
 const hostile={team:1,c:cell.c,r:cell.r,hp:100};
 g.s.armies.push(hostile);
