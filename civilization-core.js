@@ -20,7 +20,7 @@ import {chooseCoastalStarts} from './coastal-starts.js?v=62';
 import {BASIC_JOBS,allocateCity,housingCapacity,HALL_CAPACITY,HOUSE_CAPACITY,FOOD_PER_RESIDENT,WATER_PER_RESIDENT} from './labor.js';
 import {TECHS,BUILD_TECH,UNIT_TECH,newResearch,initResearch,startResearch,tickResearch,techBlock,queueResearch} from './research.js';
 import {BUILDINGS,RESOURCE_NAMES,START,RESOURCE_PRODUCTION_MULTIPLIER,FOOD_KEYS,storageLimit,takeFood,recordDelivery,realm as freshRealm,initialState,migrateEconomy,buildRule as placementRule,placeBuilding,tickEconomy,ready,canAfford} from './economy.js';
-import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js?v=79a';
+import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
