@@ -258,7 +258,16 @@ function craft(g,type){
   for(let x=-2.6;x<=2.7;x+=1.3)box(g,x,8.6,0,.85,1.0,5.5,'iron');
  }else if(type==='bridge'){
   box(g,0,1,0,8.5,.8,5.0,'stone');
-  for(const x of [-3.5,3.5])box(g,x,2,0,.22,1.5,5.0,'iron');
+  for(const z of [-2.35,2.35]){
+   for(const x of [-3.7,-2.2,-.7,.8,2.3,3.8]){
+    pole(g,[x,1.38,z],[x,2.6,z],.12,'iron');
+    cyl(g,x,2.61,z,.16,.16,.11,'gold',8);
+   }
+   pole(g,[-4,2.48,z],[4,2.48,z],.14,'steel');
+   pole(g,[-4,1.72,z],[4,1.72,z],.1,'steel');
+  }
+  for(let x=-3.6;x<=3.7;x+=.85)
+   box(g,x,1.46,0,.21,.08,4.6,'sand');
  }else{
   industrialHouse(g);
  }
