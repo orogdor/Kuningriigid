@@ -34,7 +34,7 @@ for(const device of [{label:'desktop',width:1280,height:800},{label:'phone',widt
  await capture('world-river-mountains');
  await page.evaluate(p=>{const d=window.gameDebug;d.openTile(d.game.cell(p))},sites.crossing);
  await capture('detail-bridge');
- const crossing=await page.evaluate(()=>{const d=window.gameDebug;let mesh=0;d.localScene.traverse(o=>{if(o.isMesh&&o.parent?.userData.crossingStyle==='bridge')mesh++});return mesh});
+ const crossing=await page.evaluate(()=>{const d=window.gameDebug;let mesh=0;d.localScene.traverse(o=>{if(o.isMesh&&(o.parent?.userData.crossingStyle==='bridge'||o.name==='timber bridge with abutments'))mesh++});return mesh});
  assert.ok(crossing>0,'actual 3D bridge geometry is rendered');
  await page.evaluate(p=>{const d=window.gameDebug;d.openTile(d.game.cell(p))},sites.mountain);
  await capture('detail-mountain');
