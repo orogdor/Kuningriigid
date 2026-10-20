@@ -65,7 +65,9 @@ for(const key of roadCells){
 }
 
 const ironDemo=createBronzeDemoState();ironDemo.ages[0]=2;
+if(!ironDemo.research[0].known.includes('iron_crafts'))ironDemo.research[0].known.push('iron_crafts');
 const modernDemo=structuredClone(demo);modernDemo.ages[0]=6;
+if(!modernDemo.research[0].known.includes('modernity'))modernDemo.research[0].known.push('modernity');
 const demos=[
  createStoneDemoState(),createBronzeDemoState(),ironDemo,createMedievalDemoState(),
  createRenaissanceDemoState(),demo,modernDemo
