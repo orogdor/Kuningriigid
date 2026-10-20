@@ -10,7 +10,7 @@ import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=79a';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=85a';
-import {surface,localSurface,riverNear} from './continuous-landscape.js?v=85a';
+import {surface,localSurface,riverNear,overviewSurface} from './continuous-landscape.js?v=85a';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=72a';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js';
@@ -83,12 +83,8 @@ function updateBuildingInfo(){
 }
 // The overview mesh has a coarse vertex spacing. Conservatively open the
 // channel at neighbouring vertices so it cannot roof over a narrow river.
-function atlasTerrainHeight(x,z){
- const h=surface(game,x,z),near=riverNear(game,x,z),spacing=50/(quality==='low'?2:3);
- if(!Number.isFinite(near.distance))return h;
- const reach=near.width+spacing*1.25,t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(1,reach-near.width)));
- return Math.min(h,(near.waterHeight-2.3)+(h-near.waterHeight+2.3)*t*t);
-}
+function atlasTerrainHeight(x,z){return overviewSurface(game,x,z,50/(quality==='low'?2:3))}
+
 function terrain(scene,cell=null){const world=!cell,geo=new T.PlaneGeometry(world?WORLD_WIDTH:450,world?WORLD_DEPTH:390,world?COLS*(quality==='low'?2:3):(quality==='high'?450:quality==='low'?180:300),world?ROWS*(quality==='low'?2:3):(quality==='high'?390:quality==='low'?156:260));geo.rotateX(-Math.PI/2);if(world)geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=world?atlasTerrainHeight(x,z):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/3,cell.z+z/2.6),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
  const color=world?atlasColor(game,x,z,h):new T.Color(
   h<-.15?'#8b9c91':h<.65?'#dbcba0':

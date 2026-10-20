@@ -169,3 +169,12 @@ export function roadNetwork(game){
  for(const edge of edges)edge.points=roadSpline(game,edge.a,edge.b,12,connection);
  return edges;
 }
+
+// Conservative overview LOD: a whole neighbouring vertex ring is cut below
+// the water, preventing a coarse terrain triangle from roofing over a river.
+export function overviewSurface(game,x,z,spacing){
+ const h=surface(game,x,z),near=riverNear(game,x,z);
+ if(!Number.isFinite(near.distance))return h;
+ const t=Math.max(0,Math.min(1,(near.distance-near.width-spacing)/(spacing*.75)));
+ return Math.min(h,near.waterHeight-2.3+(h-near.waterHeight+2.3)*t*t);
+}
