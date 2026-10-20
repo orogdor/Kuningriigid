@@ -679,7 +679,7 @@ slotUI();
 const demoLink=document.createElement('a');
 demoLink.className='model-gallery-link';
 demoLink.href='?v=79-20261020&demo=stone';
-demoLink.textContent='🪨 V77: ava kiviaja näidislinn ja vaata uusi majamudeleid';
+demoLink.textContent='🪨 V79: ava kiviaja näidislinn ja vaata uusi majamudeleid';
 $('continue').parentNode.insertBefore(demoLink,$('continue'));
 const bronzeLink=document.createElement('a');
 bronzeLink.className='model-gallery-link';bronzeLink.href='?v=79-20261020&demo=bronze';
