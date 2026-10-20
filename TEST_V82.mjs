@@ -88,6 +88,10 @@ for(let age=0;age<demos.length;age++){
 // Iron Age (2) and Modern Age (6), which have no separate sample town.
 for(const [age,base] of [[2,createBronzeDemoState()],[6,createIndustrialDemoState()]]){
  base.ages[0]=age;
+ // Visual building eras depend on the researched builder tier, not only the
+ // empire's age label. Build realistic test states for Iron and Modern.
+ const needed=age===2?'iron_crafts':'modernity';
+ if(!base.research[0].known.includes(needed))base.research[0].known.push(needed);
  const g=new Civilization(base),ctx=g.s.cities.find(c=>c.team===0),
   house=ctx.economy.buildings.find(b=>b.type==='house');
  const info=describeBuilding(g,ctx,house,AGES,RESOURCE_NAMES,BUILDINGS,BUILD_TECH);
