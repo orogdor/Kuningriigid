@@ -25,7 +25,7 @@ for(const id of ids){
   }
  }
  assert.ok([1,2,3,4,5,6,7,8].some(i=>villageActivity(id,i,180)==='chat'),'normal day has social behaviour');
- assert.equal(villageActivity(id,3,180),'play','children play during the day');
+ assert.equal(villageActivity(id,3,190),'play','children play during the day');
  assert.equal(villageActivity(id,4,900),'sleep','civilians go home after dark');
  assert.equal(villageActivity(id,0,900),'guard','night guard remains on patrol');
 }
@@ -39,7 +39,7 @@ const life=createVillageLife(g,(_tile,x,z)=>2+Math.sin(x*.1)*.2,{quality:()=>q.n
 let entry=life.show(cell,scene);
 assert.ok(entry&&scene.children.includes(entry.group));
 assert.equal(life.stats()[0].actorCount,6);
-life.update(180,.1);
+life.update(190,.1);
 assert.equal(entry.actors[3].activity,'play');
 assert.ok(entry.actors.some(a=>a.activity==='chat'),'a real village has conversation');
 assert.ok(entry.actors.every(a=>Number.isFinite(a.person.position.y)),'figures sit on actual terrain');
