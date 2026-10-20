@@ -730,14 +730,14 @@ slotUI();
 // The example city is opt-in. It opens separately and never replaces autosaves.
 const demoLink=document.createElement('a');
 demoLink.className='model-gallery-link';
-demoLink.href='?v=81-20261020&demo=stone';
+demoLink.href='?v=82-20261020&demo=stone';
 demoLink.textContent='🪨 V79: ava kiviaja näidislinn ja vaata uusi majamudeleid';
 $('continue').parentNode.insertBefore(demoLink,$('continue'));
 const bronzeLink=document.createElement('a');
-bronzeLink.className='model-gallery-link';bronzeLink.href='?v=81-20261020&demo=bronze';
+bronzeLink.className='model-gallery-link';bronzeLink.href='?v=82-20261020&demo=bronze';
 bronzeLink.textContent='⚒️ V79: ava pronksiaja näidislinn ja võrdle uusi hooneid';
 $('continue').parentNode.insertBefore(bronzeLink,$('continue'));
-const medievalLink=document.createElement('a');medievalLink.className='model-gallery-link';medievalLink.href='?v=81-20261020&demo=medieval';medievalLink.textContent='🏰 V80: ava keskaja näidislinn ja vaata teeradu';$('continue').parentNode.insertBefore(medievalLink,$('continue'));
+const medievalLink=document.createElement('a');medievalLink.className='model-gallery-link';medievalLink.href='?v=82-20261020&demo=medieval';medievalLink.textContent='🏰 V80: ava keskaja näidislinn ja vaata teeradu';$('continue').parentNode.insertBefore(medievalLink,$('continue'));
 const renaissanceLink=document.createElement('a');renaissanceLink.className='model-gallery-link';renaissanceLink.href='?v=82-20261020&demo=renaissance';renaissanceLink.textContent='🏛️ V81: ava renessansi näidislinn ja uued 3D-majad';$('continue').parentNode.insertBefore(renaissanceLink,$('continue'));
 const industrialLink=document.createElement('a');industrialLink.className='model-gallery-link';
 industrialLink.href='?v=82-20261020&demo=industrial';
