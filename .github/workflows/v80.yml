@@ -1,0 +1,24 @@
+name: V80 Medieval city and roads
+on:
+  push:
+    branches: [feature/v80-medieval-demo-roads, main]
+    paths: ['medieval-*.js','navigation.js','civilization.js','buildings.js','index.html','TEST_V80.mjs','.github/workflows/v80.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          node --check medieval-buildings-v80.js
+          node --check medieval-demo-v80.js
+          node --check civilization.js
+          node TEST_V80.mjs
+          node TEST_V79.mjs
+          node TEST_V78.mjs
+          node TEST_V73.mjs
