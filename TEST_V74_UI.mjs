@@ -13,16 +13,17 @@ async function navGeometry(label){
  const layout=await page.evaluate(()=>{
   const names=['maptoggle','hud-city','hud-explore','techtoggle','hud-army','hud-build','menubtn'];
   const tools=document.getElementById('tools'),r=tools.getBoundingClientRect();
-  const rects=names.map(id=>{const b=document.getElementById(id),x=b.getBoundingClientRect(),css=getComputedStyle(b);return {id,w:x.width,h:x.height,x:x.x,right:x.right,bottom:x.bottom,display:css.display}});
+  const rects=names.map(id=>{const b=document.getElementById(id),x=b.getBoundingClientRect(),css=getComputedStyle(b);return {id,w:x.width,h:x.height,x:x.x,y:x.y,right:x.right,bottom:x.bottom,display:css.display}});
   const middle=document.elementFromPoint(innerWidth/2,Math.min(innerHeight*.42,310));
-  return {w:innerWidth,h:innerHeight,nav:{w:r.width,x:r.x,right:r.right,bottom:r.bottom,overflow:tools.scrollWidth>tools.clientWidth+2},rects,middle:middle?.id||middle?.tagName,mini:getComputedStyle(document.getElementById('atlasoverview')).display,objective:getComputedStyle(document.getElementById('v51insights')).display};
+  return {w:innerWidth,h:innerHeight,nav:{w:r.width,x:r.x,y:r.y,right:r.right,bottom:r.bottom,overflow:tools.scrollWidth>tools.clientWidth+2},visibleActions:[...tools.querySelectorAll('button')].filter(el=>getComputedStyle(el).display!=='none').map(el=>el.id||el.dataset.tab),rects,middle:middle?.id||middle?.tagName,mini:getComputedStyle(document.getElementById('atlasoverview')).display,objective:getComputedStyle(document.getElementById('v51insights')).display};
  });
+ assert.deepEqual(layout.visibleActions,['maptoggle','hud-city','hud-explore','techtoggle','hud-army','hud-build','menubtn'],label+' exactly seven mobile actions');
  assert.equal(layout.nav.overflow,false,label+' nav must not clip horizontally');
  assert.ok(layout.nav.x>=-2&&layout.nav.right<=layout.w+2,label+' nav fits');
  assert.ok(layout.nav.bottom<=layout.h+2,label+' nav fits vertically');
  for(const button of layout.rects){
   assert.ok(button.w>=44&&button.h>=44,label+' touch target '+button.id+' '+JSON.stringify(button));
-  assert.ok(button.x>=-2&&button.right<=layout.w+2,label+' nav target on screen '+button.id);
+  assert.ok(button.x>=layout.nav.x-2&&button.right<=layout.nav.right+2&&button.y>=layout.nav.y-2&&button.bottom<=layout.nav.bottom+2,label+' nav target completely inside bar '+button.id+' '+JSON.stringify(button));
  }
  assert.equal(layout.mini,'none',label+' overview defaults closed');
  assert.equal(layout.objective,'none',label+' no always-on objective card');
