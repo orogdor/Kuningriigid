@@ -12,7 +12,7 @@ export const INDUSTRIAL_DEMO_TYPES=Object.freeze([
  'coal','mine','smelter','smith','saw','mill','bakery',
  'lumber','forester','quarry','mason','cartwright','road_depot','harbor',
  'barracks','stable','farm','well','chapel','monastery','watermill',
- 'windmill','pottery_kiln','bronze_foundry','laboratory','powerplant','oilwell'
+ 'windmill','pottery_kiln','bronze_foundry','academy','observatory','scriptorium'
 ].filter(type=>type!=='hall-placeholder'));
 export function createIndustrialDemoState(seed=20261020){
  const g=new Civilization(createRenaissanceDemoState(seed));
