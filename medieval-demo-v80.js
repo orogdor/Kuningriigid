@@ -22,6 +22,7 @@ export function createMedievalDemoState(seed=20261020){
  const realm=city.economy.realms[0];realm.pop=22;
  Object.assign(realm.resources,{wood:650,stone:600,plank:250,bread:500,water:500,
   bronze:120,iron:150,gold:250});
+ city.world.revision=(city.world.revision||0)+1; // invalidate the Bronze navigation footprint cache
  // The Bronze preview has a different street layout. Start a real medieval
  // traffic history from scratch so old roads cannot run under new buildings.
  city.world.heat={};city.world.heatLast={};city.world.trailChanges=0;
