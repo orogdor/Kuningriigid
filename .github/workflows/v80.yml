@@ -1,24 +1,63 @@
-name: V80 Medieval city and roads
+name: V80 Cities, building-safe streets and saves
 on:
   push:
-    branches: [feature/v80-medieval-demo-roads, main]
-    paths: ['medieval-*.js','navigation.js','civilization.js','buildings.js','index.html','TEST_V80.mjs','.github/workflows/v80.yml']
+    branches: [feature/v80-medieval-demo-roads, fix/v80-safe-street-network, main]
+    paths:
+      - 'medieval-*.js'
+      - 'bronze-demo-v79.js'
+      - 'stone-demo-v77.js'
+      - 'town-streets-v80.js'
+      - 'navigation.js'
+      - 'detail-roads.js'
+      - 'civilization-core.js'
+      - 'civilization.js'
+      - 'buildings.js'
+      - 'index.html'
+      - 'TEST_V80*.mjs'
+      - '.github/workflows/v80.yml'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: |
-          node --check medieval-buildings-v80.js
-          node --check medieval-demo-v80.js
+      - name: Verify safe pathfinding, Bronze/Medieval era and V4 saves
+        run: |
+          node --check navigation.js
+          node --check town-streets-v80.js
+          node --check detail-roads.js
           node --check civilization.js
+          node --check medieval-demo-v80.js
+          node --check bronze-demo-v79.js
           node TEST_V80.mjs
           node TEST_V79.mjs
           node TEST_V78.mjs
+          node TEST_V77.mjs
+          node TEST_V76.mjs
+          node TEST_V75.mjs
           node TEST_V73.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium --with-deps
+          fi
+      - name: Check road geometry and screenshot both city ages
+        run: |
+          python3 -m http.server 8765 >/tmp/v80-server.log 2>&1 &
+          node TEST_V80_UI.mjs
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v80-linked-city-streets
+          path: ui-screenshots-v80/
+          if-no-files-found: ignore
