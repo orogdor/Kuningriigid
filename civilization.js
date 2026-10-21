@@ -392,12 +392,12 @@ for(const key of ['info','build','workers'])$('citytab-'+key).onclick=()=>setCit
 function hasSelectedSettler(){return selectedMover!=null&&s.settlers.some(a=>a.team===0&&a.id===selectedMover)}
 function syncResourceLayer(){const active=manualResourceOverlay||hasSelectedSettler();if(active!==showResourceOverlay){showResourceOverlay=active;resourceArea='';refreshResourceArea()}}
 function renderTileResourceHUD(){
- const auto=hasSelectedSettler(),button=$('hud-resource-toggle'),panel=$('hud-tile-resources');
+ const auto=hasSelectedSettler(),button=$('hud-resource-toggle'),panel=$('hud-tile-resources');button.hidden=!!s.battle;if(s.battle)button.style.setProperty('display','none','important');else button.style.removeProperty('display');
  button.setAttribute('aria-pressed',String(showResourceOverlay));button.setAttribute('aria-disabled','false');button.setAttribute('aria-expanded',String(resourceDetailsOpen&&showResourceOverlay));
  button.textContent=auto?'🧺 Asuniku ressursid':showResourceOverlay?'🧺 Ressursid ✓':'🧺 Ressursid';
  button.title=auto?'Ressursiikoonid jäävad asunikuga aktiivseks. Puuduta ruudu andmete näitamiseks või peitmiseks.':'Näita või peida maailmakaardi ressursid ja valitud ruudu andmed';
  const cell=view==='local'?activeTile:chosen,known=!!cell&&game.seen(0,cell);
- panel.hidden=!showResourceOverlay||!known||!resourceDetailsOpen;
+ panel.hidden=!!s.battle||!showResourceOverlay||!known||!resourceDetailsOpen;
  if(!panel.hidden){
   $('hud-tile-title').textContent='Ruut '+(cell.c+1)+':'+(cell.r+1)+' · ressursid';
   const existing=Object.keys(cell.deposits||{}).filter(k=>cell.deposits[k]&&(k!=='oil'||s.research[0].known.includes('oil_drilling')));
