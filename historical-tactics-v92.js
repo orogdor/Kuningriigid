@@ -1,3 +1,4 @@
+import {BATTLE_FRONT_DEPTH,BATTLE_EMPTY_HALF_WIDTH} from './battle-pacing-v93.js';
 import {troopRole,rangedTroop} from './military-v88.js';
 import {unitStats} from './army-experience-v88.js';
 export const usesArrows=u=>['slinger','archer','bronze_archer','iron_archer','crossbowman','chariot','javelinman'].includes(u.kind);
@@ -8,10 +9,10 @@ export function tacticalStats(def,u){const a=unitStats(def,u);if(u.kind==='chari
 export function deployHistoricalBattle(b){
  const teams=[...new Set(b.squads.map(u=>u.team))];for(let t=0;t<teams.length;t++){const team=teams[t],side=t%2?-1:1,list=b.squads.filter(u=>u.team===team&&!u.guardPost),front=list.filter(u=>troopRole(u.kind)==='melee'&&!/axeman/.test(u.kind)),reserve=list.filter(u=>/axeman/.test(u.kind)),bows=list.filter(u=>isBow(u)&&u.kind!=='chariot'),mounted=list.filter(u=>troopRole(u.kind)==='cavalry'||troopRole(u.kind)==='vehicle'),other=list.filter(u=>![...front,...reserve,...bows,...mounted].includes(u));
   const line=(units,depth,spacing,role)=>units.forEach((u,i)=>{u.x=-side*(depth+Math.floor(i/10)*7);u.z=(i%10-(Math.min(10,units.length)-1)/2)*spacing;u.heading=side*Math.PI/2;u.tacticalRole=role;u.battleSide=side;u.deployment={x:u.x,z:u.z};u.releaseAt=role==='support'?16:0;});
-  line(front,56,6,'line');line(bows,72,6,'missile');line(reserve,86,7,'support');line(other,78,8,'support');
-  mounted.forEach((u,i)=>{const flank=i%2?1:-1;u.x=-side*54;u.z=flank*(Math.max(38,front.length*3.2+16)+Math.floor(i/2)*16);u.heading=side*Math.PI/2;u.tacticalRole=u.kind==='chariot'?'mobile-missile':'flank';u.flank=flank;u.battleSide=side;u.deployment={x:u.x,z:u.z};});
+  line(front,BATTLE_FRONT_DEPTH,6,'line');line(bows,BATTLE_FRONT_DEPTH+16,6,'missile');line(reserve,BATTLE_FRONT_DEPTH+30,7,'support');line(other,BATTLE_FRONT_DEPTH+22,8,'support');
+  mounted.forEach((u,i)=>{const flank=i%2?1:-1;u.x=-side*(BATTLE_FRONT_DEPTH-2);u.z=flank*(Math.max(38,front.length*3.2+16)+Math.floor(i/2)*16);u.heading=side*Math.PI/2;u.tacticalRole=u.kind==='chariot'?'mobile-missile':'flank';u.flank=flank;u.battleSide=side;u.deployment={x:u.x,z:u.z};});
  }
- b.doctrineVersion=1;b.doctrine='Rivi, laskurite toetus, tiivamanööver ja moraal';return b;
+ b.deploymentGap={minX:-BATTLE_EMPTY_HALF_WIDTH,maxX:BATTLE_EMPTY_HALF_WIDTH};b.doctrineVersion=1;b.doctrine='Rivi, laskurite toetus, tiivamanööver ja moraal';return b;
 }
 export function initializeTactics(b){
  for(const u of b.squads){u.battleSide??=u.team? -1:1;u.tacticalRole??=u.kind==='chariot'?'mobile-missile':isBow(u)?'missile':troopRole(u.kind)==='cavalry'?'flank':'line';u.deployment??={x:u.x,z:u.z};u.startMen??=u.men?.filter(m=>m.hp>0).length||0;

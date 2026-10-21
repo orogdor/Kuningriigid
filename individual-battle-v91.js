@@ -1,3 +1,4 @@
+import {allowedDeployment} from './battle-pacing-v93.js';
 import {isBow,tacticalStats,initializeTactics,updateMorale,tacticalGoal,tacticalDamage,shotHits} from './historical-tactics-v92.js';
 import {soldierCount,constrainStep} from './soldier-collision-v90.js';
 import {troopRole,rangedTroop} from './military-v88.js';
@@ -26,7 +27,7 @@ export function initializeMen(b,nav=null){
   const count=u.guardPost?1:u.menCount||soldierCount(u),max=(u.maxHp||u.hp)/(u.guardPost?1:soldierCount(u)),old=u.soldiers,ratio=Math.min(1,u.hp/(u.maxHp||u.hp)),alive=old?old.filter(m=>m.hp>0).length:Math.min(count,Math.ceil(u.hp/max-1e-9)),mounted=['cavalry','vehicle'].includes(troopRole(u.kind)),spacing=mounted?4.1:1.05,c=Math.cos(u.heading||0),sn=Math.sin(u.heading||0);
   u.men=Array.from({length:count},(_,i)=>{let hp=old?(old[i]?.hp||0):i<alive?Math.min(max,Math.max(0,u.hp-i*max)):0;const ox=count===1?0:(i%4-1.5)*spacing,oz=count===1?0:(Math.floor(i/4)-1)*spacing,goal={x:u.x+c*ox+sn*oz,z:u.z-sn*ox+c*oz},m={id:u.source+':'+i,index:i,x:goal.x,z:goal.z,hp,maxHp:max,cool:(i%4)*.08,radius:mounted?2:.34,heading:u.heading||0,kills:0,damageDealt:0};
    if(old&&hp>0){const sum=old.reduce((n,p)=>n+p.hp,0)||1;hp=Math.min(max,u.hp*hp/sum);m.hp=hp;}
-   if(hp>0&&!u.guardPost){let found=false;for(let ring=0;ring<100&&!found;ring++)for(let k=0;k<Math.max(1,ring*8);k++){const a=k/Math.max(1,ring*8)*Math.PI*2;m.x=goal.x+Math.cos(a)*ring*.5;m.z=goal.z+Math.sin(a)*ring*.5;if(!outsideBattlefield(m)&&open(m.x,m.z)&&placed.every(p=>dist(p,m)>=p.radius+m.radius+.025)){found=true;break;}}if(!found)throw Error('Lahingus ei leitud mehele vaba kohta');placed.push(m);}return m;});
+   if(hp>0&&!u.guardPost){let found=false;for(let ring=0;ring<100&&!found;ring++)for(let k=0;k<Math.max(1,ring*8);k++){const a=k/Math.max(1,ring*8)*Math.PI*2;m.x=goal.x+Math.cos(a)*ring*.5;m.z=goal.z+Math.sin(a)*ring*.5;if(allowedDeployment(u,m,b)&&!outsideBattlefield(m)&&open(m.x,m.z)&&placed.every(p=>dist(p,m)>=p.radius+m.radius+.025)){found=true;break;}}if(!found)throw Error('Lahingus ei leitud mehele vaba kohta');placed.push(m);}return m;});
   u.menCount=count;u.maxHp=max*count;aggregate(u);u.anchor={x:u.x,z:u.z};
  }
  b.individualVersion=1;initializeTactics(b);b.initialMen??=battleManCount(b);b.casualties??={};

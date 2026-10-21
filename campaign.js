@@ -1,3 +1,4 @@
+import {battleDelta} from './battle-pacing-v93.js';
 import {deployHistoricalBattle} from './historical-tactics-v92.js';
 import {tickIndividualBattle} from './individual-battle-v91.js';
 import {moveSquad,squadRadius} from './soldier-collision-v90.js';
@@ -20,7 +21,7 @@ export function createBattle(cell,units,state=null){const ranks={};return deploy
 function experienceBonusFor(state,u){const army=armyForUnit(state,u);return army?1+2*(Math.min(10,1+Math.floor(Math.sqrt((army.xp||0)/100)))-1)/9:1;}
 function distance(a,b){return Math.hypot(a.x-b.x,a.z-b.z)}
 export function frontLines(b){const result={};for(const team of [...new Set(b.squads.map(u=>u.team))]){const own=b.squads.filter(u=>u.team===team&&u.hp>0&&!u.retreated),foes=[...b.squads.filter(u=>u.team!==team&&u.hp>0&&!u.retreated),...(b.fortress&&b.fortress.team!==team&&b.fortress.hp>0?[b.fortress]:[])],infantry=own.filter(u=>troopRole(u.kind)==='melee');if(!infantry.length||!foes.length)continue;const mean=(list,k)=>list.reduce((n,u)=>n+u[k],0)/list.length;let dx=mean(foes,'x')-mean(own,'x'),dz=mean(foes,'z')-mean(own,'z'),d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;result[team]={dx,dz,limit:Math.max(...infantry.map(u=>u.x*dx+u.z*dz))-6}}return result}
-export function tickBattle(b,dt,stats,tech=0,navigation=null){return tickIndividualBattle(b,dt,stats,tech,navigation);}
+export function tickBattle(b,dt,stats,tech=0,navigation=null){return tickIndividualBattle(b,battleDelta(dt),stats,tech,navigation);}
 
 // Local orders live in campaign state, separately for each tile and squad.
 export function deploymentFor(camp,cell,source,unit,index=0){camp.deployments??={};const tile=camp.deployments[cell.c+':'+cell.r]??={};if(!tile[source])tile[source]={x:(unit.team?1:-1)*((rangedTroop(unit.kind)?24:12)+(index%2)*3),z:Math.floor(index/2)*7-4,heading:unit.team?-Math.PI/2:Math.PI/2,target:null};return tile[source]}
