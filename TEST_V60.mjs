@@ -59,10 +59,10 @@ const factories=['claypit','pottery_kiln','pasture','mason','coppermine','tinmin
 for(let i=0;i<factories.length;i++)e.buildings.push({type:factories[i],team:0,x:i*4+6,z:0,parent:0,hp:350,ready:true,timer:0});
 const env={skipDemographics:true,workerBudget:()=>100,assigned:b=>BUILDINGS[b.type].workers||0,productionBonus:()=>1,canOperate:()=>true,
  storageCap:()=>5000,storageUsed:(_team,k,st)=>st[k]||0,spawnPoint:b=>b,moveCargo:()=>true,operateWork:(_b,dt)=>dt};
-const foodBefore=r.resources.bread;
+const foodBefore=r.resources.meat||0;
 for(let i=0;i<650;i++)tickEconomy(e,1,env);
 for(const resource of ['clay','copper','tin','pottery','cutstone','bronze','carts'])assert.ok(r.resources[resource]>0,'factory must actually deliver '+resource);
-assert.ok(r.resources.bread>foodBefore,'pasture must produce edible food');
+assert.ok(r.resources.meat>foodBefore,'pasture must produce meat');
 const potFood=storageLimit(e.buildings,'bread');
 assert.equal(potFood,160,'pottery kiln adds food storage to hall');
 const traffic={time:5,worldRoads:{},roadRevision:0},a={c:1,r:1},b={c:2,r:1};

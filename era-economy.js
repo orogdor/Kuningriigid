@@ -1,3 +1,4 @@
+import {GOODS} from './city-needs-v87.js';
 // Era transitions are paid by the civilisation as a whole. Food is a shared
 // strategic supply: bread, flour and grain contribute different nutrition.
 // Material payments are atomic; partial payments are never deducted.
@@ -10,9 +11,9 @@ export const ERA_MATERIALS={
  industrialization:{iron:100,plank:190,gunpowder:25},
  modernity:{steel:70,machines:35}
 };
-export const FOOD_EQUIVALENCE={bread:1,flour:.85,grain:.70};
+export const FOOD_EQUIVALENCE={bread:1,flour:.85,grain:.70,...Object.fromEntries(Object.entries(GOODS).filter(([k,d])=>d.food).map(([k])=>[k,1]))};
 const cityStocks=(state,team)=>state.cities.filter(c=>c.team===team).map(c=>c.economy.realms[team].resources);
-export function edibleSupply(stock){return Object.entries(FOOD_EQUIVALENCE).reduce((n,[k,v])=>n+Math.max(0,stock[k]||0)*v,0)}
+export function edibleSupply(stock){return Object.entries({...FOOD_EQUIVALENCE,...Object.fromEntries(Object.entries(GOODS).filter(([k,d])=>d.food).map(([k])=>[k,1]))}).reduce((n,[k,v])=>n+Math.max(0,stock[k]||0)*v,0)}
 export function ageDeficit(state,team,id){
  const cost=ERA_MATERIALS[id];if(!cost)return {};
  const stocks=cityStocks(state,team);

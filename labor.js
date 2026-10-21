@@ -1,6 +1,7 @@
+import {foodTotal} from './city-needs-v87.js';
 import {availableLabor} from './gameplay-flow-v86.js?v=86a';
 // Fractional workers are shared across every district of a city.
-export const BASIC_JOBS={berries:{name:'Marjakorjajad',type:'berries',kind:'berry',out:'bread',rate:6,cycle:8},wood:{name:'Puidukorjajad',type:'lumber',kind:'tree',out:'wood',rate:8,cycle:6},stone:{name:'Kivikorjajad',type:'quarry',kind:'stone',out:'stone',rate:6,cycle:6}};
+export const BASIC_JOBS={berries:{name:'Marjakorjajad',type:'berries',kind:'berry',out:'berries',rate:6,cycle:8},wood:{name:'Puidukorjajad',type:'lumber',kind:'tree',out:'wood',rate:8,cycle:6},stone:{name:'Kivikorjajad',type:'quarry',kind:'stone',out:'stone',rate:6,cycle:6}};
 // V36: A worker represents a small household work team. Houses add 3 places.
 // Partially staffed workplaces can still function, but never exceed full production
 // without a technological bonus. Idle builders do not consume workforce.
@@ -76,7 +77,7 @@ export function allocateCity(game,city){
  const r=city.economy.realms[city.team],mobilized=game.s.battle?.civilianCityId===city.id?game.s.battle.squads.filter(u=>u.civilian).length:0;
  const budget=availableLabor(r.pop,r.housingShortage,mobilized);
  city.builderCount??=1;const all=game.allBuildings(city);
- const foodCritical=((r.resources.bread||0)+.85*(r.resources.flour||0)+.7*(r.resources.grain||0))<r.pop*2.5,waterCritical=(r.resources.water||0)<r.pop*2;
+ const foodCritical=foodTotal(r.resources)<r.pop*2.5,waterCritical=(r.resources.water||0)<r.pop*2;
  const wait=city.team>0?game.s?.research?.[city.team]?.ageWait:null;
  const shortages=wait?wait.missing||{}:{};
  const laborScarce=(r.resources.wood||0)<(shortages.plank>0?30:12);

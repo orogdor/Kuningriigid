@@ -1,3 +1,4 @@
+import {atWar} from './diplomacy-v87.js';
 import {tempoMultiplier} from './tempo.js';
 import {COLS,ROWS} from './campaign.js';
 import {armyUnits,activeArmies} from './v51-systems.js';
@@ -72,7 +73,7 @@ export function tickShips(game,dt){
    const passenger=a.cargo.kind==='army'?cargoArmy(game,a):game.s.settlers.find(p=>p.id===a.cargo.id);
    if(passenger){passenger.c=a.c;passenger.r=a.r;}
   }
-  const foe=game.s.ships.find(b=>b.team!==a.team&&b.hp>0&&near(a,b));
+  const foe=game.s.ships.find(b=>atWar(game.s,b.team,a.team)&&b.hp>0&&near(a,b));
   if(foe&&a.cool===0){
    foe.hp=Math.max(0,foe.hp-SHIPS[a.kind].damage*(1+level*.2));
    a.cool=2;a.attackAt=game.s.time;foe.hitAt=game.s.time;
@@ -157,7 +158,7 @@ export function navyExpedition(game,ship,army,target=null){
    }
    return !e;
   }
-  const possibilities=(target?[target]:[...game.s.cities,...game.s.settlers].filter(c=>c.team!==ship.team&&game.seen(ship.team,c)))
+  const possibilities=(target?[target]:[...game.s.cities,...game.s.settlers].filter(c=>atWar(game.s,c.team,ship.team)&&game.seen(ship.team,c)))
     .filter(c=>c?.team!==ship.team);
   let best=null;
   for(const c of possibilities){
@@ -235,7 +236,7 @@ export function aiNavy(game,team){
  }
  for(const ship of owned){
   if(ship.kind==='warship'){
-   const foe=ships.find(s=>s.team!==team&&s.hp>0&&game.seen(team,s));
+   const foe=ships.find(s=>atWar(game.s,s.team,team)&&s.hp>0&&game.seen(team,s));
    if(foe&&!ship.path.length)ship.path=seaPath(game,ship,foe)||[];
    continue;
   }
@@ -247,7 +248,7 @@ export function aiNavy(game,team){
     .sort((a,b)=>armyUnits(game.s,b).length-armyUnits(game.s,a).length)[0];
   const passenger=cargoArmy(game,ship);
   if(passenger||ship.cargo){navyExpedition(game,ship,passenger);continue;}
-  const enemyKnown=[...game.s.cities,...game.s.settlers].some(c=>c.team!==team&&game.seen(team,c));
+  const enemyKnown=[...game.s.cities,...game.s.settlers].some(c=>atWar(game.s,c.team,team)&&game.seen(team,c));
   if(!enemyKnown){
    // A scout must survey inland after the first landfall. Put one aboard when possible.
    const scout=activeArmies(game.s,team).find(a=>armyUnits(game.s,a).some(u=>u.kind==='scout')&&armyUnits(game.s,a).length<=SHIPS.transport.capacity);

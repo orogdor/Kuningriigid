@@ -1,0 +1,82 @@
+// A short real-time opening played through the rendered controls and canvas.
+// Debug access is read-only: locate legal places and inspect the result.
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright';
+import {mkdirSync,writeFileSync} from 'node:fs';
+const dir='artifacts-v87';mkdirSync(dir,{recursive:true});
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+const page=await ctx.newPage(),errors=[],report=[];
+let failurePage=page;
+page.on('pageerror',e=>errors.push(e.message));
+async function capture(label){
+ const state=await page.evaluate(()=>{const d=window.gameDebug,c=d.state.cities.find(c=>c.team===0);return {time:d.state.time,view:d.view(),ownCity:c&&{name:c.name,pop:c.economy.realms[0].pop,stock:c.economy.realms[0].resources,buildings:c.economy.buildings.filter(b=>!b.virtual).map(b=>({type:b.type,ready:b.ready,status:b.status}))},research:d.state.research[0],perf:d.perfStats(),toast:document.getElementById('toast').textContent}});
+ report.push({label,...state});console.log('V87 PLAY '+JSON.stringify(report.at(-1)));
+ await page.screenshot({path:`${dir}/play-${label}.png`});
+ console.log('V87 IMAGE '+label+' '+(await page.screenshot({type:'jpeg',quality:55})).toString('base64'));
+}
+async function screenSite(kind){
+ return page.evaluate(kind=>{
+  const d=window.gameDebug,g=d.game,a=d.state.settlers.find(a=>a.team===0),city=d.activeCity();
+  const candidates=[];
+  for(let y=160;y<innerHeight-180;y+=12)for(let x=25;x<innerWidth-20;x+=12){
+   if(document.elementFromPoint(x,y)?.id!=='world')continue;
+   const p=d.pick({clientX:x,clientY:y});if(!p)continue;
+   const q={x:Math.round(p.x/2)*2,z:Math.round(p.z/2)*2};
+   const blocked=kind==='settle'?g.siteRule(a,q):g.previewInArea(city,kind,q).error;
+   if(blocked)continue;
+   if(kind==='settle'&&!g.nav(a).route(a,q))continue;
+   const home=kind==='settle'?a:city.economy.buildings[0];
+   candidates.push({x,y,world:q,distance:Math.hypot(home.x-q.x,home.z-q.z)});
+  }
+  return candidates.sort((a,b)=>a.distance-b.distance)[0];
+ },kind);
+}
+try{
+ await page.goto('http://127.0.0.1:8765/');await page.waitForFunction(()=>!!window.gameDebug,null,{timeout:90000});
+ await page.locator('#menulanguage').selectOption('et');
+ await page.locator('#menu-world summary').click();await page.locator('#seed').fill('V83-playtest');await page.locator('#newgame').click();
+ await page.waitForFunction(()=>window.gameDebug&&document.getElementById('startmenu').hidden,null,{timeout:90000});
+ await capture('01-world');assert.ok(report.at(-1).perf.triangles<3000000,'near overview culls distant foliage rather than drawing the entire map');
+ await page.locator('#hud-explore').click();await page.locator('#hud-explore-auto').click();await page.locator('#hud-explore-close').click();
+ await page.locator('#hud-city').click();await page.waitForFunction(()=>window.gameDebug.view()==='local');
+ await page.waitForTimeout(1200);
+ const site=await screenSite('settle');assert.ok(site,'reachable dry founding place in exposed playfield');
+ await page.locator('#commandmove').click();await page.touchscreen.tap(site.x,site.y);
+ await page.waitForFunction(()=>!window.gameDebug.state.settlers.find(a=>a.team===0)?.localTarget,null,{timeout:60000});
+ await page.locator('#foundcity').click();await page.waitForFunction(()=>window.gameDebug.state.cities.some(c=>c.team===0),null,{timeout:15000});
+ await capture('02-founded');
+ const totals=await page.locator('#resources [data-resource=wood]').textContent();assert.match(totals,/\(\d+\)/,'national stocks follow local stocks in parentheses');
+ await page.locator('#resources [data-resource=bread]').click();await page.waitForFunction(()=>document.getElementById('food-stocks-v87')?.open);assert.ok((await page.locator('#food-stocks-v87').textContent()).includes('Liha'));await capture('02-food-breakdown');await page.locator('#food-stocks-v87 button').click();
+
+ await page.locator('#techtoggle').click();const stableCard=await page.locator('.tech-card').filter({hasText:'Jahipidamine'}).elementHandle();await page.waitForTimeout(1200);assert.equal(await stableCard.evaluate(el=>el.isConnected),true,'research buttons stay attached during automatic progress updates');await page.locator('.tech-card').filter({hasText:'Jahipidamine'}).click();await page.locator('#closeresearch').click();
+ await page.locator('#hud-build').click();await page.locator('#tray > button').filter({hasText:'Metsamaja'}).click();
+ const build=await screenSite('lumber');assert.ok(build,'legal lumber site in exposed playfield');await page.touchscreen.tap(build.x,build.y);
+ await page.waitForFunction(()=>window.gameDebug.state.cities.find(c=>c.team===0).economy.buildings.some(b=>b.type==='lumber'),null,{timeout:15000});
+ await capture('03-construction');
+ await page.waitForFunction(()=>window.gameDebug.state.cities.find(c=>c.team===0).economy.buildings.some(b=>b.type==='lumber'&&b.ready),null,{timeout:150000});
+ await capture('04-working');
+ await page.locator('#maptoggle').click();await page.waitForFunction(()=>window.gameDebug.view()==='world');
+ await page.locator('#hud-city').click();await page.waitForFunction(()=>window.gameDebug.view()==='local');
+ await capture('05-return-city');
+ await page.evaluate(()=>window.gameDebug.setCityTab('workers'));
+ const slider=page.locator('#laborrows input').first();await slider.focus();await page.waitForTimeout(1200);
+ assert.equal(await slider.evaluate(el=>el===document.activeElement),true,'automatic repaint preserves active labour input');
+ await slider.evaluate(el=>el.blur());await page.locator('#maptoggle').click();
+ const hiddenMutations=await page.evaluate(async()=>{
+  const root=document.getElementById('researchpanel');let count=0;const observer=new MutationObserver(ms=>count+=ms.length);observer.observe(root,{childList:true,subtree:true});
+  await new Promise(resolve=>setTimeout(resolve,1900));observer.disconnect();return count;
+ });
+ assert.equal(hiddenMutations,0,'closed research tree is not rebuilt during gameplay');
+ const researchHeader=await page.locator('#researchstatus').textContent();assert.ok(researchHeader.includes('teadust/min'),'lightweight research header keeps updating outside the closed tree');
+ await capture('06-quiet-background-ui');
+ assert.deepEqual(errors,[]);writeFileSync(`${dir}/play-results.json`,JSON.stringify(report,null,2));
+ await ctx.close();
+ const desktop=await browser.newContext({viewport:{width:1280,height:800}});
+ await desktop.addInitScript(()=>{localStorage.setItem('kingdoms-language','et');localStorage.setItem('kingdoms-quality','medium')});
+ const q=await desktop.newPage();failurePage=q;q.on('pageerror',e=>errors.push(e.message));await q.goto('http://127.0.0.1:8765/');await q.waitForFunction(()=>!!window.gameDebug,null,{timeout:90000});await q.locator('#continue').click();await q.waitForTimeout(1500);
+ const desktopPerf=await q.evaluate(()=>window.gameDebug.perfStats());console.log('V87 DESKTOP PERF '+JSON.stringify(desktopPerf));assert.ok(desktopPerf.triangles<3000000,'desktop overview also culls distant foliage');
+ console.log('V87 IMAGE desktop-world '+(await q.screenshot({type:'jpeg',quality:55})).toString('base64'));assert.deepEqual(errors,[]);await desktop.close();
+ console.log('V87 PLAY PASS: real controls, auto-scout, walking settler, city founding, research, construction and map return');
+}catch(e){console.log('V87 PLAY FAILURE '+e.message);await failurePage.screenshot({path:`${dir}/play-failure.png`});console.log('V87 IMAGE failure '+(await failurePage.screenshot({type:'jpeg',quality:55})).toString('base64'));throw e}
+finally{await browser.close()}

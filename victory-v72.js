@@ -1,3 +1,4 @@
+import {atWar} from './diplomacy-v87.js';
 // The winner is based on remaining viable factions, not military headcount.
 // A faction without a city OR settler collapses; its scattered units cannot
 // indefinitely block a conquest. A living settler can still found a new city.
@@ -23,7 +24,7 @@ export function captureEnemySettlers(game){
  const s=game.s;let taken=0;
  for(const settler of [...s.settlers]){
   if(settler.embarked!=null)continue;
-  const captor=s.armies.find(a=>a.team!==settler.team&&a.embarked==null&&a.c===settler.c&&a.r===settler.r&&armyUnits(s,a).length);
+  const captor=s.armies.find(a=>atWar(s,a.team,settler.team)&&a.embarked==null&&a.c===settler.c&&a.r===settler.r&&armyUnits(s,a).length);
   if(!captor)continue;
   s.settlers.splice(s.settlers.indexOf(settler),1);
   s.events??=[];s.events.push({time:s.time,text:'Asunik tabatud: '+settler.team+' → '+captor.team});
