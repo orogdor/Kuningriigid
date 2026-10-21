@@ -1,0 +1,31 @@
+name: V89 Roads, Unit Context and Bronze Battle
+on:
+  push:
+    branches: [main]
+    paths: ['*v89*', 'civilization.js', 'index.html', 'continuous-landscape-visual.js', 'detail-roads.js', 'TEST_V89*', '.github/workflows/v89.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  context-and-battle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: |
+          node --check civilization.js
+          node TEST_V89_CONTEXT.mjs
+          node TEST_V59.mjs
+          node TEST_V88_BATTLEFIELD.mjs
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - run: |
+          python3 -m http.server 8765 >/tmp/v89-server.log 2>&1 &
+          node TEST_V89_UI.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V89-context-and-bronze-battle
+          path: artifacts-v89/
