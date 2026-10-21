@@ -3,7 +3,7 @@
 const status=document.getElementById('menu-status');
 const english=()=>document.getElementById('menulanguage')?.value!=='et';
 try{
- await import('./civilization.js?v=90a');
+ await import('./civilization.js?v=91a');
  if(!window.gameDebug)throw new Error('Game initialization did not finish');
  for(const id of ['continue','newgame','quality','v51export','v51import'])document.getElementById(id).disabled=false;
  status.hidden=true;

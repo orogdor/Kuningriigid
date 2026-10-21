@@ -1,9 +1,9 @@
-import {moveSquad,separateSquads,squadRadius} from './soldier-collision-v90.js';
-import {BATTLEFIELD,checkBattleRetreats} from './battlefield-v88.js';
+import {tickIndividualBattle} from './individual-battle-v91.js';
+import {moveSquad,squadRadius} from './soldier-collision-v90.js';
+import {BATTLEFIELD} from './battlefield-v88.js';
 import {rangedTroop,troopRole} from './military-v88.js';
 import {unitStats,armyForUnit} from './army-experience-v88.js';
 import {detailHeight} from './world-details.js';
-import {isSiegeUnit,siegeDamage} from './medieval-v62.js';
 export const COLS=220,ROWS=165,TILE=50,ORIGIN_X=-650,ORIGIN_Z=-550,WORLD_WIDTH=COLS*TILE,WORLD_DEPTH=ROWS*TILE,WORLD_CENTER_X=ORIGIN_X+WORLD_WIDTH/2,WORLD_CENTER_Z=ORIGIN_Z+WORLD_DEPTH/2;
 export function center(c,r){return {x:ORIGIN_X+(c+.5)*TILE,z:ORIGIN_Z+(r+.5)*TILE}}
 export function cellAt(x,z){const c=Math.floor((x-ORIGIN_X)/TILE),r=Math.floor((z-ORIGIN_Z)/TILE);return c>=0&&c<COLS&&r>=0&&r<ROWS?{c,r}:null}
@@ -13,33 +13,13 @@ export function newCampaign(){return {armies:[{team:0,c:10,r:11,path:[]},{team:1
 export function localHeight(cell,x,z,seed){return detailHeight(cell,x,z)}
 export function createBattle(cell,units,state=null){const ranks={};return {cell:{...cell},field:{...BATTLEFIELD},elapsed:0,result:null,squads:units.map((u,source)=>({u,source})).filter(({u})=>u.hp>0&&!u.retreated).map(({u,source})=>{
  const role=troopRole(u.kind),key=u.team+':'+(rangedTroop(u.kind)?'ranged':'front'),n=ranks[key]||0;ranks[key]=n+1;
- return {source,team:u.team,armyId:u.armyId||0,kind:u.kind,grade:u.grade||'standard',experienceMultiplier:state?experienceBonusFor(state,u):(u.experienceMultiplier||1),hp:u.hp,maxHp:u.maxHp||u.hp,morale:u.morale??100,
+ return {source,team:u.team,armyId:u.armyId||0,kind:u.kind,grade:u.grade||'standard',experienceMultiplier:state?experienceBonusFor(state,u):(u.experienceMultiplier||1),hp:u.hp,maxHp:u.maxHp||u.hp,menCount:u.menCount,soldiers:u.soldiers?structuredClone(u.soldiers):undefined,morale:u.morale??100,
  x:(u.team?1:-1)*((rangedTroop(u.kind)?49:34)+Math.floor(n/8)*4),z:(n%8-3.5)*5+(role==='cavalry'?23:0),heading:u.team?-Math.PI/2:Math.PI/2,target:null,cool:0,damageDealt:0,kills:0};
  })};}
 function experienceBonusFor(state,u){const army=armyForUnit(state,u);return army?1+2*(Math.min(10,1+Math.floor(Math.sqrt((army.xp||0)/100)))-1)/9:1;}
 function distance(a,b){return Math.hypot(a.x-b.x,a.z-b.z)}
 export function frontLines(b){const result={};for(const team of [...new Set(b.squads.map(u=>u.team))]){const own=b.squads.filter(u=>u.team===team&&u.hp>0&&!u.retreated),foes=[...b.squads.filter(u=>u.team!==team&&u.hp>0&&!u.retreated),...(b.fortress&&b.fortress.team!==team&&b.fortress.hp>0?[b.fortress]:[])],infantry=own.filter(u=>troopRole(u.kind)==='melee');if(!infantry.length||!foes.length)continue;const mean=(list,k)=>list.reduce((n,u)=>n+u[k],0)/list.length;let dx=mean(foes,'x')-mean(own,'x'),dz=mean(foes,'z')-mean(own,'z'),d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;result[team]={dx,dz,limit:Math.max(...infantry.map(u=>u.x*dx+u.z*dz))-6}}return result}
-function behindFront(p,line){if(!line)return {...p};const extra=p.x*line.dx+p.z*line.dz-line.limit;return extra>0?{x:p.x-extra*line.dx,z:p.z-extra*line.dz}:{...p}}
-export function tickBattle(b,dt,stats,tech=0,navigation=null){if(b.result||dt<=0)return;b.elapsed+=dt;separateSquads(b.squads,navigation);checkBattleRetreats(b);const fronts=frontLines(b);for(const u of b.squads){u.moving=false;if(u.hp<=0)continue;const base=stats[u.kind];if(!base)continue;const a=unitStats(base,u);if(u.retreated)continue;if(u.manualOrder&&u.target&&!u.guardPost){if(moveSquad(u,u.target,dt,a.speed,navigation,b.squads)){u.target=null;u.manualOrder=false;}checkBattleRetreats(b);continue;}u.cool=Math.max(0,u.cool-dt);const enemies=b.squads.filter(v=>v.team!==u.team&&v.hp>0&&!v.retreated);const fort=b.fortress;
-const liveSections=(fort&&fort.team!==u.team&&!b.siegeBreached)?(b.siegeSections||[]).filter(v=>v.hp>0&&!v.retreated).sort((v,w)=>distance(u,v)-distance(u,w)):[];
-const nearestEnemy=enemies.sort((v,w)=>distance(u,v)-distance(u,w))[0];
-const enemy=isSiegeUnit(u.kind)&&liveSections.length?liveSections[0]:nearestEnemy||(liveSections[0]||(fort&&fort.team!==u.team&&fort.hp>0?fort:null));if(!enemy)continue;const d=distance(u,enemy),line=u.guardPost?null:rangedTroop(u.kind)?fronts[u.team]:null,behind=behindFront(u,line),mustFallBack=!u.guardPost&&distance(u,behind)>.15;u.heading=Math.atan2(enemy.x-u.x,enemy.z-u.z);
-if(d<=a.range+(enemy===b.fortress?6:squadRadius(u)+squadRadius(enemy))+(u.guardPost?5:0)&&!mustFallBack){if(u.cool===0){const cavalry=troopRole(enemy.kind)==='cavalry';const antiCavalry=['halberdier','pikeman'].includes(u.kind)&&cavalry?1.7:u.kind==='rocket_team'&&troopRole(enemy.kind)==='vehicle'?1.8:1;
-const armorReduction=enemy.kind==='heavy_cavalry'?.75:enemy.kind==='knight'?.80:enemy.kind==='man_at_arms'?.83:enemy.kind==='halberdier'?.92:1;
-const armorPierce=u.kind==='crossbowman'?.5:0;
-const damage=a.dmg*(u.guardPost?1.3:1)*antiCavalry*(armorReduction+(1-armorReduction)*armorPierce)*(1+(Array.isArray(tech)?tech[u.team]:(u.team?0:tech))*.3);const beforeHp=enemy.hp;if((b.siegeSections||[]).includes(enemy)){siegeDamage(u,enemy,damage);if(enemy.breached){b.siegeBreached=true;b.breachAt={x:enemy.x,z:enemy.z};}}else enemy.hp=Math.max(0,enemy.hp-damage);u.damageDealt=(u.damageDealt||0)+Math.max(0,beforeHp-enemy.hp);if(beforeHp>0&&enemy.hp<=0)u.kills=(u.kills||0)+1;if(enemy.morale!=null)enemy.morale=Math.max(0,enemy.morale-damage*.25);enemy.hitTime=b.elapsed;if(enemy.hp<=0)enemy.deathTime=b.elapsed;u.cool=u.kind==='crossbowman'?1.9:isSiegeUnit(u.kind)?2.8:u.kind==='heavy_cavalry'?1.45:1.2;u.cool/=a.attackSpeed;u.attackTime=b.elapsed;u.shot={x:u.x,z:u.z,toX:enemy.x,toZ:enemy.z};}}else{if(u.guardPost)continue;let target=mustFallBack?behind:(u.civilian||u.team||u.advance||isSiegeUnit(u.kind)||d<13?enemy:u.target);if(target&&line)target=behindFront(target,line);if(target){const length=distance(u,target);if(length>.15){moveSquad(u,target,dt,a.speed,navigation,b.squads)}else if(!mustFallBack)u.target=null}}}const fort=b.fortress;if(fort&&fort.hp>0){fort.cool=Math.max(0,(fort.cool||0)-dt);const target=b.squads.filter(u=>u.team!==fort.team&&u.hp>0&&!u.retreated&&distance(u,fort)<22).sort((a,b)=>distance(a,fort)-distance(b,fort))[0];if(target&&fort.cool===0){target.hp=Math.max(0,target.hp-8);target.hitTime=b.elapsed;if(target.hp<=0)target.deathTime=b.elapsed;fort.cool=2.5}}
-// Towers are manned civilian workplaces, not newly spawned soldiers.
-for(const post of b.defensePosts||[]){
- if(post.active===false)continue;
- post.cool=Math.max(0,(post.cool||0)-dt);
- if(post.cool>0)continue;
- const target=b.squads.filter(u=>u.team!==post.team&&u.hp>0&&!u.retreated&&distance(post,u)<=post.range).sort((a,b)=>distance(post,a)-distance(post,b))[0];
- if(!target)continue;
- target.hp=Math.max(0,target.hp-post.damage);target.hitTime=b.elapsed;
- if(target.hp<=0)target.deathTime=b.elapsed;
- post.cool=2.2;
-}
-checkBattleRetreats(b);const surviving=[...new Set([...b.squads.filter(u=>u.hp>0&&!u.retreated).map(u=>u.team),...(fort?.hp>0?[fort.team]:[])])];if(fort&&fort.hp<=0){b.winnerTeam=b.squads.filter(u=>u.hp>0&&!u.retreated&&u.team!==fort.team).sort((a,b)=>b.hp-a.hp)[0]?.team??b.attackerTeam;b.result=b.winnerTeam===0?'victory':'defeat'}else if(surviving.length<=1){b.winnerTeam=surviving[0]??null;b.result=b.retreatedArmies?.some(a=>a.team===0)&&!b.squads.some(u=>u.team===0&&u.hp>0&&!u.retreated)?'retreat':b.winnerTeam===0?'victory':'defeat'}}
+export function tickBattle(b,dt,stats,tech=0,navigation=null){return tickIndividualBattle(b,dt,stats,tech,navigation);}
 
 // Local orders live in campaign state, separately for each tile and squad.
 export function deploymentFor(camp,cell,source,unit,index=0){camp.deployments??={};const tile=camp.deployments[cell.c+':'+cell.r]??={};if(!tile[source])tile[source]={x:(unit.team?1:-1)*((rangedTroop(unit.kind)?24:12)+(index%2)*3),z:Math.floor(index/2)*7-4,heading:unit.team?-Math.PI/2:Math.PI/2,target:null};return tile[source]}
