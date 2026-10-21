@@ -1,7 +1,8 @@
-// Six real detail tiles per side, plus one visible retreat tile on every edge.
-export const BATTLEFIELD=Object.freeze({columns:6,rows:6,ring:1,tileWidth:150,tileDepth:130,minX:-375,maxX:525,minZ:-325,maxZ:455,outerMinX:-525,outerMaxX:675,outerMinZ:-455,outerMaxZ:585,centerX:75,centerZ:65});
+// Three real detail tiles per side, plus one visible retreat tile on every edge.
+export const BATTLEFIELD=Object.freeze({columns:3,rows:3,ring:1,tileWidth:150,tileDepth:130,minX:-225,maxX:225,minZ:-195,maxZ:195,outerMinX:-375,outerMaxX:375,outerMinZ:-325,outerMaxZ:325,centerX:0,centerZ:0});
 export const outsideBattlefield=p=>p.x<BATTLEFIELD.minX||p.x>BATTLEFIELD.maxX||p.z<BATTLEFIELD.minZ||p.z>BATTLEFIELD.maxZ;
-export function battlefieldTiles(cell){const out=[];for(let dr=-3;dr<=4;dr++)for(let dc=-3;dc<=4;dc++)out.push({c:cell.c+dc,r:cell.r+dr,dc,dr,retreat:dc===-3||dc===4||dr===-3||dr===4});return out;}
+export function battlefieldTiles(cell){const out=[];for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++)out.push({c:cell.c+dc,r:cell.r+dr,dc,dr,retreat:Math.abs(dc)===2||Math.abs(dr)===2});return out;}
+
 const identity=u=>u.team+':'+(u.armyId||0);
 export function checkBattleRetreats(b){
  if(!b.field)return;
