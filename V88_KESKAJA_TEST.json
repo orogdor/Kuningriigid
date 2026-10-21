@@ -1,0 +1,1960 @@
+{
+  "seed": 8417,
+  "outcome": "STOP_100_TURNS",
+  "stopTurn": 133.317,
+  "failed": [
+    1
+  ],
+  "transitions": [
+    {
+      "team": 1,
+      "from": 0,
+      "to": 1,
+      "turn": 33.317,
+      "duration": 33.317
+    },
+    {
+      "team": 3,
+      "from": 0,
+      "to": 1,
+      "turn": 33.608,
+      "duration": 33.608
+    },
+    {
+      "team": 0,
+      "from": 0,
+      "to": 1,
+      "turn": 35.117,
+      "duration": 35.117
+    },
+    {
+      "team": 2,
+      "from": 0,
+      "to": 1,
+      "turn": 37.892,
+      "duration": 37.892
+    },
+    {
+      "team": 3,
+      "from": 1,
+      "to": 2,
+      "turn": 113.85,
+      "duration": 80.242
+    },
+    {
+      "team": 0,
+      "from": 1,
+      "to": 2,
+      "turn": 120.633,
+      "duration": 85.517
+    }
+  ],
+  "nations": [
+    {
+      "team": 0,
+      "age": "Rauaaeg",
+      "turnsInAge": 12.683,
+      "research": "iron_crafts",
+      "researchName": "Raudriistad ja töökojad",
+      "progress": 16.956225165912183,
+      "cost": 40,
+      "science": 18.497700180995118,
+      "ageWait": null,
+      "eraDeficit": {},
+      "known": [
+        "stone_tools",
+        "antler_picks",
+        "stone_wedges",
+        "learning",
+        "hunting",
+        "nets_traps",
+        "water",
+        "agriculture",
+        "stone_sickles",
+        "bronze",
+        "canal_irrigation",
+        "manure_fertilization",
+        "bronze_chisels",
+        "ore_baskets",
+        "pottery",
+        "animal_husbandry",
+        "masonry",
+        "warfare",
+        "fortifications",
+        "archery",
+        "settlement",
+        "stone_crafts",
+        "woodworking",
+        "wheel",
+        "copper_tin",
+        "stone_fortifications",
+        "road_construction",
+        "forestry",
+        "storage",
+        "cellaring",
+        "commerce",
+        "writing",
+        "bronze_crafts",
+        "milling",
+        "bridges",
+        "fishing",
+        "shipbuilding",
+        "iron",
+        "iron_ploughshare",
+        "iron_scythes",
+        "iron_pickaxes",
+        "drainage_adits",
+        "smelting",
+        "smithing",
+        "horsemanship",
+        "philosophy"
+      ],
+      "cities": [
+        {
+          "name": "Kadakaküla 1",
+          "pop": 3,
+          "stock": {
+            "wood": 49.15000000000002,
+            "plank": 0,
+            "stone": 27.55,
+            "grain": 7.257142857142861,
+            "flour": 0,
+            "water": 0,
+            "bread": 0,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 953,
+            "clay": 8.649999999999997,
+            "pottery": 2.196333333333048,
+            "cutstone": 5.05,
+            "copper": 15.2,
+            "tin": 15.2,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 3.1500000000000186,
+            "fish": 0,
+            "berries": 0,
+            "vegetables": 2.4499999999999904,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 3.650000000000002,
+            "gems": 0,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 1.5030000000002348,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "well",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Vesi"
+            },
+            {
+              "type": "lumber",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Puit"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "quarry",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Kivi"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "study",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "farm",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Vili"
+            },
+            {
+              "type": "vegetable_garden",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Köögiviljad"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "weaver",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Toodab · 31%"
+            },
+            {
+              "type": "claypit",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "pottery_kiln",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "pasture",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "mason",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "barracks",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "watchtower",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Valmis"
+            },
+            {
+              "type": "palisade",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "saw",
+              "ready": false,
+              "assigned": 0.25,
+              "status": "Ehitab · 31% tööjõud"
+            }
+          ],
+          "districts": 0,
+          "imports": {
+            "copper": 16,
+            "tin": 16
+          }
+        },
+        {
+          "name": "Kadakaküla 2",
+          "pop": 3,
+          "stock": {
+            "wood": 295,
+            "plank": 18,
+            "stone": 225.74999999999991,
+            "grain": 9.5,
+            "flour": 0,
+            "water": 0,
+            "bread": 0,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 387,
+            "clay": 7.6,
+            "pottery": 2.458999999999738,
+            "cutstone": 2.1999999999999993,
+            "copper": 24.049999999999997,
+            "tin": 8,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 184.14999999999986,
+            "fish": 0,
+            "berries": 0,
+            "vegetables": 4.2,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 76.74999999999997,
+            "gems": 0,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 1.6710000000000944,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "flax_farm",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "lumber",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Raiub puud"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "study",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Jahib ulukeid"
+            },
+            {
+              "type": "quarry",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Kaevandab"
+            },
+            {
+              "type": "coppermine",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "palisade",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "tinmine",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "forester",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Naaseb istutamast"
+            },
+            {
+              "type": "mason",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "saw",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Toodab · 12%"
+            },
+            {
+              "type": "warehouse",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Valmis"
+            },
+            {
+              "type": "scriptorium",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Õpetlased liiguvad töökohale"
+            },
+            {
+              "type": "watchtower",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Valmis"
+            },
+            {
+              "type": "cellar",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Toob saaki"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Läheb jahile"
+            },
+            {
+              "type": "weaver",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "jeweler",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab: Vääriskivid"
+            },
+            {
+              "type": "barracks",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "stonewall",
+              "ready": false,
+              "assigned": 0.25,
+              "status": "Ehitab · 31% tööjõud"
+            },
+            {
+              "type": "market",
+              "ready": false,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            }
+          ],
+          "districts": 0,
+          "imports": {}
+        },
+        {
+          "name": "Kadakaküla 3",
+          "pop": 3,
+          "stock": {
+            "wood": 213.85000000000002,
+            "plank": 20.000000000000014,
+            "stone": 25.799999999999997,
+            "grain": 19.057142857142857,
+            "flour": 0,
+            "water": 0,
+            "bread": 0,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 339,
+            "clay": 190.75,
+            "pottery": 11.35299999999855,
+            "cutstone": 4.75,
+            "copper": 4.75,
+            "tin": 3.8,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 50.70000000000006,
+            "fish": 0,
+            "berries": 0,
+            "vegetables": 4.75,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 3.700000000000001,
+            "gems": 0,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 37.942499999999605,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "lumber",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Raiub puud"
+            },
+            {
+              "type": "well",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Ladu täis: Vesi"
+            },
+            {
+              "type": "study",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "claypit",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Kaevandab"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Jahib ulukeid"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "palisade",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "weaver",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Toodab · 31%"
+            },
+            {
+              "type": "pottery_kiln",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "forester",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Viib istikut metsa"
+            },
+            {
+              "type": "warehouse",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Valmis"
+            },
+            {
+              "type": "farm",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Toodab · 9%"
+            },
+            {
+              "type": "pasture",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "scriptorium",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "saw",
+              "ready": true,
+              "assigned": 0.25,
+              "status": "Toodab · 12%"
+            },
+            {
+              "type": "gem_mine",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            },
+            {
+              "type": "jeweler",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab: Vääriskivid"
+            },
+            {
+              "type": "cellar",
+              "ready": false,
+              "assigned": 0.25,
+              "status": "Ehitab · 31% tööjõud"
+            },
+            {
+              "type": "market",
+              "ready": false,
+              "assigned": 0,
+              "status": "Ootab tööjõudu"
+            }
+          ],
+          "districts": 0
+        }
+      ],
+      "shipments": [
+        {
+          "goods": {
+            "flax": 1.9,
+            "stone": 1.9
+          },
+          "status": "Teel",
+          "from": 4,
+          "to": 5
+        },
+        {
+          "goods": {
+            "grain": 1.9
+          },
+          "status": "Teel",
+          "from": 5,
+          "to": 3
+        }
+      ]
+    },
+    {
+      "team": 1,
+      "age": "Pronksiaeg",
+      "turnsInAge": 100,
+      "research": "iron",
+      "researchName": "Rauatöö",
+      "progress": 40,
+      "cost": 40,
+      "science": 8.797522526773653,
+      "ageWait": {
+        "id": "iron",
+        "missing": {
+          "plank": 88,
+          "stone": 38.00000000000001,
+          "bread": 1.8500000000001648
+        }
+      },
+      "eraDeficit": {
+        "plank": 88,
+        "stone": 38.00000000000001,
+        "bread": 1.8500000000001648
+      },
+      "known": [
+        "stone_tools",
+        "antler_picks",
+        "stone_wedges",
+        "learning",
+        "hunting",
+        "nets_traps",
+        "water",
+        "agriculture",
+        "stone_sickles",
+        "bronze",
+        "canal_irrigation",
+        "manure_fertilization",
+        "bronze_chisels",
+        "ore_baskets",
+        "pottery",
+        "animal_husbandry",
+        "masonry",
+        "warfare",
+        "fortifications",
+        "archery",
+        "settlement",
+        "stone_crafts",
+        "woodworking",
+        "wheel",
+        "copper_tin",
+        "stone_fortifications",
+        "road_construction",
+        "forestry",
+        "storage",
+        "cellaring",
+        "commerce",
+        "writing",
+        "bronze_crafts",
+        "milling",
+        "bridges",
+        "fishing",
+        "shipbuilding"
+      ],
+      "cities": [
+        {
+          "name": "Idaküla 1",
+          "pop": 4,
+          "stock": {
+            "wood": 2,
+            "plank": 12,
+            "stone": 34.099999999999994,
+            "grain": 2.7857142857142856,
+            "flour": 0,
+            "water": 0,
+            "bread": 1.9,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 817,
+            "clay": 79.4,
+            "pottery": 0,
+            "cutstone": 7.249999999999999,
+            "copper": 0,
+            "tin": 0,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 2.8499999999999237,
+            "fish": 0,
+            "berries": 1.8000000000000003,
+            "vegetables": 1.7500000000000022,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 5.050000000000005,
+            "gems": 0,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 0,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "well",
+              "ready": true,
+              "assigned": 1,
+              "status": "Ladu täis: Vesi"
+            },
+            {
+              "type": "lumber",
+              "ready": true,
+              "assigned": 0.39999999999999836,
+              "status": "Ladu täis: Puit"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "quarry",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Kivi"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "study",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "farm",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Vili"
+            },
+            {
+              "type": "vegetable_garden",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Köögiviljad"
+            },
+            {
+              "type": "weaver",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 14%"
+            },
+            {
+              "type": "claypit",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Savi"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "pottery_kiln",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "pasture",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "mason",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "barracks",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "palisade",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "watchtower",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Valmis"
+            },
+            {
+              "type": "saw",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab: Puit"
+            },
+            {
+              "type": "coppermine",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Kaevandab"
+            },
+            {
+              "type": "tinmine",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Kaevandab"
+            },
+            {
+              "type": "forester",
+              "ready": false,
+              "assigned": 0.1,
+              "status": "Ehitab · 14% tööjõud"
+            }
+          ],
+          "districts": 0,
+          "imports": {
+            "ore": 16
+          }
+        },
+        {
+          "name": "Idaküla 2",
+          "pop": 3,
+          "stock": {
+            "wood": 1,
+            "plank": 0,
+            "stone": 27.9,
+            "grain": 9.5,
+            "flour": 0,
+            "water": 0,
+            "bread": 9.899999999999999,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 176,
+            "clay": 120,
+            "pottery": 0,
+            "cutstone": 4.75,
+            "copper": 0,
+            "tin": 0,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 4.75,
+            "fish": 0,
+            "berries": 0,
+            "vegetables": 26.599999999999913,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 120,
+            "gems": 0,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 0,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "flax_farm",
+              "ready": true,
+              "assigned": 1,
+              "status": "Ladu täis: Lina"
+            },
+            {
+              "type": "claypit",
+              "ready": true,
+              "assigned": 1.9,
+              "status": "Ladu täis: Savi"
+            }
+          ],
+          "districts": 1
+        }
+      ],
+      "shipments": [
+        {
+          "goods": {
+            "vegetables": 2.85
+          },
+          "status": "Teel",
+          "from": 7,
+          "to": 0
+        }
+      ]
+    },
+    {
+      "team": 2,
+      "age": "Pronksiaeg",
+      "turnsInAge": 95.425,
+      "research": "iron",
+      "researchName": "Rauatöö",
+      "progress": 40,
+      "cost": 40,
+      "science": 4.597522526773653,
+      "ageWait": {
+        "id": "iron",
+        "missing": {
+          "plank": 100,
+          "bread": 47.1999999999998
+        }
+      },
+      "eraDeficit": {
+        "plank": 100,
+        "bread": 47.1999999999998
+      },
+      "known": [
+        "stone_tools",
+        "antler_picks",
+        "stone_wedges",
+        "learning",
+        "hunting",
+        "nets_traps",
+        "water",
+        "agriculture",
+        "stone_sickles",
+        "bronze",
+        "canal_irrigation",
+        "manure_fertilization",
+        "bronze_chisels",
+        "ore_baskets",
+        "pottery",
+        "animal_husbandry",
+        "masonry",
+        "warfare",
+        "fortifications",
+        "archery",
+        "settlement",
+        "stone_crafts",
+        "woodworking",
+        "wheel",
+        "copper_tin",
+        "stone_fortifications",
+        "road_construction",
+        "forestry",
+        "storage",
+        "cellaring",
+        "commerce",
+        "writing",
+        "bronze_crafts",
+        "milling",
+        "bridges",
+        "fishing",
+        "shipbuilding"
+      ],
+      "cities": [
+        {
+          "name": "Põhjaküla 1",
+          "pop": 3,
+          "stock": {
+            "wood": 0,
+            "plank": 0,
+            "stone": 120,
+            "grain": 4.000000000000007,
+            "flour": 0,
+            "water": 0,
+            "bread": 0,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 824,
+            "clay": 6,
+            "pottery": 5.9086666666671315,
+            "cutstone": 33,
+            "copper": 0,
+            "tin": 0,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 4.600000000000199,
+            "fish": 0,
+            "berries": 0,
+            "vegetables": 5.399999999999999,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 0,
+            "gems": 0,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 0,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "well",
+              "ready": true,
+              "assigned": 1,
+              "status": "Ladu täis: Vesi"
+            },
+            {
+              "type": "lumber",
+              "ready": true,
+              "assigned": 0.8999999999999988,
+              "status": "Toob saaki"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "quarry",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Kivi"
+            },
+            {
+              "type": "study",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Jahib ulukeid"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Jahib ulukeid"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Jahib ulukeid"
+            },
+            {
+              "type": "farm",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Vili"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "vegetable_garden",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 14%"
+            },
+            {
+              "type": "weaver",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab: Lina"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "claypit",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Savi"
+            },
+            {
+              "type": "pottery_kiln",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab: Puit"
+            },
+            {
+              "type": "pasture",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "mason",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "barracks",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "palisade",
+              "ready": false,
+              "assigned": 0.1,
+              "status": "Ehitab · 14% tööjõud"
+            }
+          ],
+          "districts": 0
+        }
+      ],
+      "shipments": []
+    },
+    {
+      "team": 3,
+      "age": "Rauaaeg",
+      "turnsInAge": 19.467,
+      "research": "civics",
+      "researchName": "Feodaalkorraldus",
+      "progress": 40,
+      "cost": 40,
+      "science": 29.295045053547305,
+      "ageWait": {
+        "id": "civics",
+        "missing": {
+          "iron": 40,
+          "plank": 90.99999999999997
+        }
+      },
+      "eraDeficit": {
+        "iron": 40,
+        "plank": 90.99999999999997
+      },
+      "known": [
+        "stone_tools",
+        "antler_picks",
+        "stone_wedges",
+        "learning",
+        "hunting",
+        "nets_traps",
+        "water",
+        "agriculture",
+        "stone_sickles",
+        "bronze",
+        "canal_irrigation",
+        "manure_fertilization",
+        "bronze_chisels",
+        "ore_baskets",
+        "pottery",
+        "animal_husbandry",
+        "masonry",
+        "warfare",
+        "fortifications",
+        "archery",
+        "settlement",
+        "stone_crafts",
+        "woodworking",
+        "wheel",
+        "copper_tin",
+        "stone_fortifications",
+        "road_construction",
+        "forestry",
+        "storage",
+        "cellaring",
+        "commerce",
+        "writing",
+        "bronze_crafts",
+        "milling",
+        "bridges",
+        "fishing",
+        "shipbuilding",
+        "iron",
+        "iron_ploughshare",
+        "iron_scythes",
+        "iron_pickaxes",
+        "drainage_adits",
+        "smelting",
+        "smithing",
+        "horsemanship",
+        "philosophy",
+        "iron_crafts",
+        "navigation"
+      ],
+      "cities": [
+        {
+          "name": "Lõunaküla 1",
+          "pop": 8,
+          "stock": {
+            "wood": 0.2499999999999929,
+            "plank": 19.95,
+            "stone": 27.95,
+            "grain": 8.907142857142851,
+            "flour": 9.605882352941174,
+            "water": 17.00000000000036,
+            "bread": 0,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 817,
+            "clay": 71.80000000000001,
+            "pottery": 2.2855000000000434,
+            "cutstone": 8.500000000000002,
+            "copper": 5.15,
+            "tin": 3,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 5.599999999999987,
+            "fish": 0,
+            "berries": 5.099999999999998,
+            "vegetables": 9.499999999999993,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 5.800000000000006,
+            "gems": 3.8,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 2.25733333333371,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "well",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Vesi"
+            },
+            {
+              "type": "lumber",
+              "ready": true,
+              "assigned": 2,
+              "status": "Ladu täis: Puit"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "quarry",
+              "ready": true,
+              "assigned": 3,
+              "status": "Ladu täis: Kivi"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "study",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "hunter",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "farm",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Vili"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "vegetable_garden",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Köögiviljad"
+            },
+            {
+              "type": "weaver",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 14%"
+            },
+            {
+              "type": "claypit",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Savi"
+            },
+            {
+              "type": "pottery_kiln",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab: Puit"
+            },
+            {
+              "type": "pasture",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Ladu täis: Liha"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "mason",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "barracks",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "palisade",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "watchtower",
+              "ready": true,
+              "assigned": 0.6000000000000062,
+              "status": "Valmis"
+            },
+            {
+              "type": "saw",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab: Puit"
+            },
+            {
+              "type": "coppermine",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Kaevandab"
+            },
+            {
+              "type": "tinmine",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Kaevandab"
+            },
+            {
+              "type": "forester",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Naaseb istutamast"
+            },
+            {
+              "type": "warehouse",
+              "ready": false,
+              "assigned": 1,
+              "status": "Ehitab · 100% tööjõud"
+            }
+          ],
+          "districts": 0,
+          "imports": {
+            "ore": 16
+          }
+        },
+        {
+          "name": "Lõunaküla 2",
+          "pop": 12,
+          "stock": {
+            "wood": 16,
+            "plank": 19.95,
+            "stone": 358.54999999999995,
+            "grain": 9.5,
+            "flour": 9.5,
+            "water": 17.79999999999996,
+            "bread": 0,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 375,
+            "clay": 7.6,
+            "pottery": 1.1039999999999992,
+            "cutstone": 16.75,
+            "copper": 2.85,
+            "tin": 0,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 7.6000000000000005,
+            "fish": 0,
+            "berries": 9.549999999999983,
+            "vegetables": 8.750000000000096,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 147.09999999999988,
+            "gems": 4.1,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 52.88449999999832,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "flax_farm",
+              "ready": true,
+              "assigned": 1,
+              "status": "Toodab · 100%"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "lumber",
+              "ready": true,
+              "assigned": 2,
+              "status": "Toob saaki"
+            },
+            {
+              "type": "forester",
+              "ready": true,
+              "assigned": 2,
+              "status": "Istutab puud"
+            },
+            {
+              "type": "quarry",
+              "ready": true,
+              "assigned": 3,
+              "status": "Kaevandab"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "study",
+              "ready": true,
+              "assigned": 1,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "weaver",
+              "ready": true,
+              "assigned": 1,
+              "status": "Toodab · 100%"
+            },
+            {
+              "type": "mason",
+              "ready": true,
+              "assigned": 0.6000000000000034,
+              "status": "Toodab · 36%"
+            },
+            {
+              "type": "jeweler",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 14%"
+            },
+            {
+              "type": "palisade",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "warehouse",
+              "ready": true,
+              "assigned": 1,
+              "status": "Valmis"
+            },
+            {
+              "type": "cellar",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "saw",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 6%"
+            }
+          ],
+          "districts": 2,
+          "imports": {}
+        },
+        {
+          "name": "Lõunaküla 3",
+          "pop": 12,
+          "stock": {
+            "wood": 32.74999999999999,
+            "plank": 19.100000000000023,
+            "stone": 27.49999999999999,
+            "grain": 60.35714285714287,
+            "flour": 51.12941176470588,
+            "water": 100,
+            "bread": 0,
+            "ore": 0,
+            "coal": 0,
+            "iron": 0,
+            "weapons": 0,
+            "paper": 0,
+            "saltpeter": 0,
+            "gunpowder": 0,
+            "steel": 0,
+            "machines": 0,
+            "oil": 0,
+            "fuel": 0,
+            "power": 0,
+            "vehicles": 0,
+            "gold": 297,
+            "clay": 109.6,
+            "pottery": 6.324166666666754,
+            "cutstone": 4.75,
+            "copper": 0,
+            "tin": 0,
+            "bronze": 0,
+            "carts": 0,
+            "meat": 2.8000000000000003,
+            "fish": 0,
+            "berries": 9,
+            "vegetables": 27.349999999999994,
+            "fruit": 0,
+            "cheese": 0,
+            "spices": 0,
+            "coffee": 0,
+            "flax": 5.100000000000002,
+            "gems": 4.1,
+            "silk": 0,
+            "dyes": 0,
+            "cocoa": 0,
+            "rubber": 0,
+            "cloth": 13.265666666666139,
+            "jewelry": 0,
+            "silkcloth": 0,
+            "perfume": 0,
+            "chocolate": 0,
+            "electronics": 0
+          },
+          "buildings": [
+            {
+              "type": "hall",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "lumber",
+              "ready": true,
+              "assigned": 2,
+              "status": "Raiub puud"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "study",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Õpetlased uurivad"
+            },
+            {
+              "type": "claypit",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Kaevandab"
+            },
+            {
+              "type": "well",
+              "ready": true,
+              "assigned": 1,
+              "status": "Ladu täis: Vesi"
+            },
+            {
+              "type": "forester",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Viib istikut metsa"
+            },
+            {
+              "type": "palisade",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "pottery_kiln",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "saw",
+              "ready": true,
+              "assigned": 3,
+              "status": "Toodab · 100%"
+            },
+            {
+              "type": "farm",
+              "ready": true,
+              "assigned": 3.000000000000005,
+              "status": "Ladu täis: Vili"
+            },
+            {
+              "type": "house",
+              "ready": true,
+              "assigned": 0,
+              "status": "Valmis"
+            },
+            {
+              "type": "weaver",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 14%"
+            },
+            {
+              "type": "jeweler",
+              "ready": true,
+              "assigned": 0,
+              "status": "Ootab: Vask"
+            },
+            {
+              "type": "pasture",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "mill",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Toodab · 8%"
+            },
+            {
+              "type": "warehouse",
+              "ready": true,
+              "assigned": 0.1,
+              "status": "Valmis"
+            },
+            {
+              "type": "coal",
+              "ready": true,
+              "assigned": 2,
+              "status": "Toodab · 100%"
+            }
+          ],
+          "districts": 2
+        }
+      ],
+      "shipments": [
+        {
+          "goods": {
+            "grain": 0.95
+          },
+          "status": "Teel",
+          "from": 8,
+          "to": 1
+        }
+      ]
+    }
+  ]
+}

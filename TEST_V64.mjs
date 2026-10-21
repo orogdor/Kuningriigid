@@ -1,3 +1,4 @@
+import {coastalSites} from './resource-sites-v88.js';
 import assert from 'node:assert/strict';
 import {Civilization,createGame,BUILDINGS} from './civilization-core.js';
 import {initialState,buildRule as economicBuildRule} from './economy.js';
@@ -14,7 +15,7 @@ for(const seed of seeds){
  assert.ok(offshore>100,'fish farther offshore');
  assert.ok(all>1000,'populated ocean fish stocks');
  assert.deepEqual([0,1,2,3,4,5,6].map(fishingRange),[1,2,4,7,11,17,28]);
- const start=state.coastalStartPositions[0],beach=g.cell(start);
+ const start=state.coastalStartPositions.find(p=>coastalSites(g,g.cell(p),'fisher').length),beach=g.cell(start);
  assert.equal(isShore(g,beach),true,'every new capital is beside the sea');
  const nearBanks=fishingBanks(g,beach,0),bronzeBanks=fishingBanks(g,beach,1),ironBanks=fishingBanks(g,beach,2);
  assert.ok(nearBanks.length,'Stone Age catches close to shore');
@@ -34,8 +35,7 @@ for(const seed of seeds){
  g.s.research[0].known.push('fishing');econ.realms[0].resources.wood=10000;econ.realms[0].resources.stone=10000;
  assert.equal(g.buildRule(city,'fisher'),'','coastal fish hut allowed');
  let testSite=null;
- for(let x=-62;x<=62&&!testSite;x+=4)for(let z=-52;z<=52&&!testSite;z+=4)
-  if(Math.hypot(x,z)>18&&!g.previewBuild(city,'fisher',{x,z}).error)testSite={x,z};
+ for(const p of g.buildingSites(city,'fisher'))if(!g.previewBuild(city,'fisher',p).error){testSite=p;break;}
  assert.ok(testSite,'coast fishing hut buildable beyond old 13-step distance limit');
  const fisher=g.build(city,'fisher',testSite);
  assert.ok(fisher.building,'remote fisher actually placed');

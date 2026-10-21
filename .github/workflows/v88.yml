@@ -1,0 +1,52 @@
+name: V88 Resource Sites and National Expansion
+on:
+  push:
+    branches: [feature/v88-resource-sites, main]
+    paths-ignore:
+      - "**.md"
+      - "V88_*TEST.json"
+      - "V88_*TEST.jsonl.gz"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  logic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: |
+          node --check civilization.js
+          node TEST_V88_SITES.mjs
+          node TEST_V88_PRODUCTIVITY.mjs
+          node TEST_V88_ERA_COST.mjs
+          node TEST_V88_CAMPAIGN_LOG.mjs
+          node TEST_V64.mjs
+          node TEST_V87.mjs
+          node TEST_V86.mjs
+          node TEST_V73.mjs
+          node TEST_V61.mjs
+          node TEST_V60.mjs
+          node TEST_V59.mjs
+          node TEST_V67.mjs
+          node TEST_V68.mjs
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - run: |
+          python3 -m http.server 8765 >/tmp/v88-server.log 2>&1 &
+          node TEST_V88_UI.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V88-model-playtest
+          path: artifacts-v88/

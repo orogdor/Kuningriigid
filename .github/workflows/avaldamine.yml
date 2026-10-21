@@ -2,6 +2,10 @@ name: Kuningriigid latest GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "V88_*TEST.json"
+      - "V88_*TEST.jsonl.gz"
   workflow_dispatch:
 
 permissions:

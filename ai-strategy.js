@@ -1,3 +1,5 @@
+import {MINERAL_BUILDINGS} from './resource-sites-v88.js';
+import {RESOURCE_BUILDINGS} from './settlement-ai-v88.js';
 import {GOOD_BUILDINGS,cityNeeds} from './city-needs-v87.js';
 // V45: needs-led AI. Decisions are pure so the reasoning can be tested without a renderer.
 import {ERA_MATERIALS,ageDeficit,edibleSupply} from './era-economy.js';
@@ -12,6 +14,7 @@ export const RESOURCE_CHAINS={
 };
 export const RESOURCE_SITES={claypit:'clay',pasture:'grain',coppermine:'copper',tinmine:'tin',lumber:'wood',quarry:'stone',hunter:'game',fisher:'coast',well:'water',farm:'grain',mine:'ore',oilwell:'oil'};
 export const CRITICAL_BUILDINGS=new Set(['lumber','quarry','well','hunter','fisher','farm','saw','mill','bakery','mine','coal','smelter','nitrate','powdermill','steelworks','engineworks','oilwell','refinery','house','warehouse','cellar','forester','claypit','pottery_kiln','pasture','mason','coppermine','tinmine','bronze_foundry','cartwright']);
+for(const type of Object.keys(MINERAL_BUILDINGS))CRITICAL_BUILDINGS.add(type);
 function healthy(b){return b.hp>0&&!b.disabled}
 export function hasWorkingSource(buildings,type){return buildings.some(b=>b.type===type&&healthy(b)&&!(b.ready&&/pole ligipääsetavat|maardla puudub/.test(b.status||'')))}
 export function aiResourcePriorities(game,team,city){
@@ -63,6 +66,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   if(missing&&!CRITICAL_BUILDINGS.has(type))return;
   possibilities.push({type,priority,reason});
  };
+ for(const resource of city.resourceSpecialization||[])add(RESOURCE_BUILDINGS[resource],139,'Puuduva riigiressursi tootmine');
  const happiness=cityNeeds(city,age);if(happiness.missing)for(const [type,d] of Object.entries(GOOD_BUILDINGS)){if(d.age<=age&&(stock[d.out]||0)<happiness.threshold*3)add(type,101,'Linna mitmekesisus');}
  // Maintain an early, diverse economy. The first source is important even
  // when current stores are high; dependence on initial stocks is not viable.

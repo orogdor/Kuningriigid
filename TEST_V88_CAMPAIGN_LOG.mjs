@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {CampaignLog} from './campaign-log-v88.mjs';
+const prefix='/tmp/v88-log-unit-'+process.pid;
+const research=Array.from({length:4},()=>({known:[],completed:[],active:null}));
+const game={s:{seed:1,time:0,cities:[{id:1,team:0},{id:2,team:1}],research,shipments:[]},contexts:()=>[]};
+const log=new CampaignLog(game,prefix,'unit-fixture');log.observe();
+const cargo={id:1,team:1,from:1,to:2,goods:{stone:9.5},fees:[{city:1,time:0,goods:{stone:.5}}],status:'Teel'};
+game.s.shipments.push(cargo);log.observe();
+cargo.fees.push({city:2,time:3,goods:{stone:.475}});cargo.goods={};game.s.shipments=[];game.s.time=3;log.observe();
+assert.equal(log.events.filter(e=>e.kind==='trade_departed').length,1);
+assert.equal(log.events.find(e=>e.kind==='trade_fee').goods.stone,.475);
+assert.equal(log.events.find(e=>e.kind==='trade_delivered').goods.stone,9.025,'fees are excluded from goods actually delivered');
+assert.equal(log.events.filter(e=>e.kind==='trade_finished').length,1);
+research[0].ageWait={id:'iron',missing:{plank:4}};log.observe();game.s.time=63;research[0].ageWait=null;log.observe();
+assert.equal(log.waitHistory[0].duration,1,'material wait duration in turns');
+fs.closeSync(log.fd);fs.unlinkSync(prefix+'.jsonl');
+console.log('V88 CAMPAIGN LOG PASS: removed shipments, 5% fees, delivered quantity and wait duration');

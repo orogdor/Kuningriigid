@@ -57,10 +57,10 @@ export function createDetailTrailLinks(spots,nav,height){
  const levels=new Map(spots.map(({key})=>[key,nav.roadLevel(key)])
   .filter(([key,level])=>level>0&&nav.open(nav.point(key).x,nav.point(key).z)));
  for(const [key,level] of levels){
-  const a={x:key%145-72,z:Math.floor(key/145)-62};
+  const a=nav.point(key);
   for(const [dx,dz] of [[1,0],[0,1],[1,1],[-1,1]]){
    const x=a.x+dx,z=a.z+dz;
-   if(x< -72||x>72||z< -62||z>62)continue;
+   if(nav.index(x,z)<0)continue;
    const other=nav.index(x,z),otherLevel=levels.get(other);
    if(!otherLevel||!nav.clear(a,{x,z}))continue;
    const useLevel=Math.min(level,otherLevel);

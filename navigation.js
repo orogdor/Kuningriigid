@@ -31,15 +31,22 @@ export function buildingClearance(b){
  }
  // Include a full walking-grid cell's road-ribbon margin for tall Renaissance façades.
  const v=FOOTPRINTS[b.type]||[5.0,5.0];
- return {rx:Math.max(v[0],b.navWidth||0),rz:Math.max(v[1],b.navDepth||0)};
+ const rx=Math.max(v[0],b.navWidth||0),rz=Math.max(v[1],b.navDepth||0);if(b.shoreAngle!=null){const c=Math.abs(Math.cos(b.shoreAngle)),s=Math.abs(Math.sin(b.shoreAngle));return {rx:c*rx+s*rz,rz:s*rx+c*rz};}return {rx,rz};
 }
 export const door=b=>{
+ if(b.landEntry)return {...b.landEntry};
  const size=buildingClearance(b);
  return {x:b.x,z:b.z+(size?.rz||2.5)+1.15};
 };
 export function clearFootprint(world,b){let changed=false;for(const r of world.resources)if(['tree','berry'].includes(r.kind)&&!r.removed&&Math.abs(r.x-b.x)<Math.max(3.6,b.navWidth||0)+.5&&Math.abs(r.z-b.z)<Math.max(3.5,b.navDepth||0)+.5){r.removed=true;r.cleared=true;r.amount=0;changed=true}if(changed)world.revision=(world.revision||0)+1;return changed}
 export class Navigation{
-constructor(world,passable,buildings=()=>[]){this.world=world;world.heat??={};world.heatLast??={};world.trailTime??=0;world.revision??=0;this.passable=passable;this.buildings=buildings;this.minX=-72;this.minZ=-62;this.w=145;this.h=125;this.n=this.w*this.h;this.base=new Uint8Array(this.n);for(let z=0;z<this.h;z++)for(let x=0;x<this.w;x++)this.base[z*this.w+x]=passable(x+this.minX,z+this.minZ)?1:0;this.cache=new WeakMap();this.version=0;this.signature='';this.rebuild()}
+constructor(world,passable,buildings=()=>[],bounds={}){this.world=world;world.heat??={};world.heatLast??={};world.trailTime??=0;world.revision??=0;this.passable=passable;this.buildings=buildings;this.minX=bounds.minX??-72;this.minZ=bounds.minZ??-62;this.w=bounds.w??145;this.h=bounds.h??125;this.n=this.w*this.h;
+const previous=world.navBounds||{minX:-72,minZ:-62,w:145,h:125};
+if(previous.minX!==this.minX||previous.minZ!==this.minZ||previous.w!==this.w||previous.h!==this.h){
+ for(const field of ['heat','heatLast']){const mapped={};for(const [key,value]of Object.entries(world[field]||{})){const i=Number(key),x=i%previous.w+previous.minX,z=Math.floor(i/previous.w)+previous.minZ,j=this.index(x,z);if(j>=0)mapped[j]=value;}world[field]=mapped;}
+ world.trailChanges=(world.trailChanges||0)+1;
+}
+world.navBounds={minX:this.minX,minZ:this.minZ,w:this.w,h:this.h};this.base=new Uint8Array(this.n);for(let z=0;z<this.h;z++)for(let x=0;x<this.w;x++)this.base[z*this.w+x]=passable(x+this.minX,z+this.minZ)?1:0;this.cache=new WeakMap();this.version=0;this.signature='';this.rebuild()}
 index(x,z){const xx=Math.round(x)-this.minX,zz=Math.round(z)-this.minZ;return xx>=0&&xx<this.w&&zz>=0&&zz<this.h?zz*this.w+xx:-1}
 point(i){return {x:i%this.w+this.minX,z:Math.floor(i/this.w)+this.minZ}}
 rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings()){const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);// When a settlement grows or moves buildings over earlier footpaths,
@@ -58,7 +65,7 @@ currentSignature(){
  // Buildings of equal count can be moved/destroyed; stale nav masks previously
  // caused footsteps to be drawn through a different building at the same index.
  return (this.world.revision||0)+':'+this.buildings().map(b=>
-  b.type+':'+Math.round(b.x*10)+':'+Math.round(b.z*10)+':'+(b.navWidth||0)+':'+(b.navDepth||0)
+  b.type+':'+Math.round(b.x*10)+':'+Math.round(b.z*10)+':'+(b.navWidth||0)+':'+(b.navDepth||0)+':'+(b.shoreAngle||0)
  ).join('|');
 }
 refresh(){if(this.signature!==this.currentSignature())this.rebuild()}
