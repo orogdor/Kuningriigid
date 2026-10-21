@@ -1,0 +1,13 @@
+/* A single contextual card, anchored above the bottom toolbar. */
+body #commandhud{left:12px!important;right:auto!important;bottom:88px!important;width:340px;max-width:calc(100vw - 24px);max-height:260px;overflow:auto}
+body #commandhud #commandstate{display:block!important;white-space:pre-line;font-size:12px!important;line-height:1.4;margin:6px 0!important}
+body #commandhud #commandhint{margin:5px 0 0}
+#commandexplore{width:100%;min-height:36px;margin-top:7px}
+#commandhud.readonly .command-buttons{display:none}
+@media(max-width:760px){
+ body #commandhud,body:not(.atlas) #commandhud{left:8px!important;right:auto!important;bottom:86px!important;width:252px!important;max-width:calc(100vw - 74px)!important;max-height:248px!important;padding:8px!important}
+ body #commandhud #commandname{display:block!important;font-size:14px!important;line-height:1.15}
+ body #commandhud #commandstate{font-size:10px!important;line-height:1.35}
+ body #commandhud #commandhint,body #commandhud #commandmode{display:none!important}
+ #commandexplore{font-size:11px;padding:7px;min-height:34px}
+}

@@ -1,3 +1,4 @@
+import {detailWorldRoadWidth} from './road-width-v89.js';
 // V67: one topology for each river system and each road network. The atlas
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
@@ -16,7 +17,7 @@ function join(pts,game,scope,tile,kind,level=1){
  for(let i=0;i<pts.length;i++){
   const p=pts[i],before=pts[Math.max(0,i-1)],after=pts[Math.min(pts.length-1,i+1)];
   const tX=after.x-before.x,tZ=after.z-before.z,d=Math.hypot(tX,tZ)||1;
-  const nx=-tZ/d,nz=tX/d,width=isRiver?p.width:wBase;
+  const nx=-tZ/d,nz=tX/d,width=isRiver?p.width:scope==='detail'?detailWorldRoadWidth(level)/2/Math.hypot(nx*3,nz*2.6):wBase;
   const left={x:p.x+nx*width,z:p.z+nz*width},right={x:p.x-nx*width,z:p.z-nz*width};
   const outer=isRiver?width+Math.max(1.4,width*.32)*(1+.24*Math.sin(p.x*.17+p.z*.13)):width*1.23;
   const outerL={x:p.x+nx*outer,z:p.z+nz*outer},outerR={x:p.x-nx*outer,z:p.z-nz*outer};
@@ -124,9 +125,7 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null){
  for(const edge of roadNetwork(game)){
   if(!visible(tile,edge.points))continue;
   const xs=join(edge.points,game,scope,tile,'road',edge.level);
-  const m=scope==='world'?1:2.8; // detail projection is physically 3x wider
-  const scalePt=p=>p; // vertices already in the same world-to-detail projection
-  for(let i=1;i<xs.length;i++){
+   for(let i=1;i<xs.length;i++){
    const a=xs[i-1],b=xs[i];
    strip(beds,a.l,a.r,b.l,b.r);
    strip(verges,a.ol,a.l,b.ol,b.l);strip(verges,a.r,a.or,b.r,b.or);
@@ -136,7 +135,7 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null){
  const verge=buffers(verges,'#675d4d',{opacity:.87}),road=buffers(beds,'#b7a080',{opacity:.98});
  if(verge){verge.name='continuous road verge';group.add(verge)}
  if(road){road.name='continuous road pavement';road.renderOrder=10;group.add(road)}
- group.userData.roadEdges=roads;group.userData.roadVertexCount=beds.length/3;
+ group.userData.detailWidthRatio=scope==='detail'?2:null;group.userData.roadEdges=roads;group.userData.roadVertexCount=beds.length/3;
  return group;
 }
 export function disposeNetwork(group){

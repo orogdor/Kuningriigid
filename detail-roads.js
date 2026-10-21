@@ -1,3 +1,4 @@
+import {detailTrailWidth} from './road-width-v89.js';
 // V59: Shared terrain-following road ribbons on detail maps.
 // World edges are projected through the local walkable navigation mesh;
 // local footpaths connect adjacent cells that have accumulated enough traffic.
@@ -65,7 +66,7 @@ export function createDetailTrailLinks(spots,nav,height){
    if(!otherLevel||!nav.clear(a,{x,z}))continue;
    const useLevel=Math.min(level,otherLevel);
    // Leave room beside the building walls and exterior props.
-   const width=.65+useLevel*.27;
+   const width=detailTrailWidth(useLevel);
    appendRibbon(vertices,colors,a,{x,z},width,new T.Color(COLORS[useLevel]),height);
   }
  }
