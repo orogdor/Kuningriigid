@@ -60,7 +60,8 @@ const quarterCity={...city,economy:{...econ,buildings:[hall,{...tower,assigned:.
 const quarter={squads:[],fortress:{team:0,hp:600,maxHp:600}};
 fortifyBattle(game,quarterCity,quarter);
 assert.equal(quarter.defensePosts.length,0,'A fractional worker is not a complete tower guard');
-const inactive={cell:position,squads:[{...attacker,hp:120}],fortress:{team:0,x:0,z:0,hp:600,maxHp:600,cool:10},
+// Independent scenario: do not reuse the already wounded individual men above.
+const inactive={cell:position,squads:[{source:98,team:1,kind:'slinger',hp:120,maxHp:120,morale:100,x:-18,z:0,cool:0,target:null}],fortress:{team:0,x:0,z:0,hp:600,maxHp:600,cool:10},
  defensePosts:[{team:0,x:-9,z:0,damage:9,range:25,cool:0,active:false}],elapsed:0,result:null};
 tickBattle(inactive,.1,{slinger:{hp:120,dmg:0,range:10,speed:2}},0);
 assert.equal(inactive.squads[0].hp,120,'A tower with removed guard must not shoot');

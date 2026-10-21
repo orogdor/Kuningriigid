@@ -1,3 +1,4 @@
+import {FORMATIONS,formationDamage,missileExposure} from './formations-v94.js';
 import {BATTLE_FRONT_DEPTH,BATTLE_EMPTY_HALF_WIDTH} from './battle-pacing-v93.js';
 import {troopRole,rangedTroop} from './military-v88.js';
 import {unitStats} from './army-experience-v88.js';
@@ -5,11 +6,11 @@ export const usesArrows=u=>['slinger','archer','bronze_archer','iron_archer','cr
 export const isBow=u=>rangedTroop(u.kind)||u.kind==='chariot';
 export const isSpear=u=>['spearman','bronze_spearman','halberdier','pikeman','javelinman'].includes(u.kind);
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
-export function tacticalStats(def,u){const a=unitStats(def,u);if(u.kind==='chariot'){a.range=18*(u.experienceMultiplier||1);a.dmg=18*(u.experienceMultiplier||1)*({mobilized:.4,elite:1.4}[u.grade]||1);}return a;}
+export function tacticalStats(def,u){const a=unitStats(def,u);a.speed*=(FORMATIONS[u.formation]||FORMATIONS.line).speed;if(u.kind==='cuirassier')a.range=2.7;if(u.kind==='chariot'){a.range=18*(u.experienceMultiplier||1);a.dmg=18*(u.experienceMultiplier||1)*({mobilized:.4,elite:1.4}[u.grade]||1);}return a;}
 export function deployHistoricalBattle(b){
- const teams=[...new Set(b.squads.map(u=>u.team))];for(let t=0;t<teams.length;t++){const team=teams[t],side=t%2?-1:1,list=b.squads.filter(u=>u.team===team&&!u.guardPost),front=list.filter(u=>troopRole(u.kind)==='melee'&&!/axeman/.test(u.kind)),reserve=list.filter(u=>/axeman/.test(u.kind)),bows=list.filter(u=>isBow(u)&&u.kind!=='chariot'),mounted=list.filter(u=>troopRole(u.kind)==='cavalry'||troopRole(u.kind)==='vehicle'),other=list.filter(u=>![...front,...reserve,...bows,...mounted].includes(u));
+ const teams=[...new Set(b.squads.map(u=>u.team))];for(let t=0;t<teams.length;t++){const team=teams[t],side=t%2?-1:1,list=b.squads.filter(u=>u.team===team&&!u.guardPost),front=list.filter(u=>troopRole(u.kind)==='melee'&&!/axeman/.test(u.kind)),reserve=list.filter(u=>/axeman/.test(u.kind)),guns=list.filter(u=>['musketeer','arquebusier','line_infantry','rifleman'].includes(u.kind)),bows=list.filter(u=>isBow(u)&&u.kind!=='chariot'&&!guns.includes(u)),mounted=list.filter(u=>troopRole(u.kind)==='cavalry'||troopRole(u.kind)==='vehicle'),other=list.filter(u=>![...front,...reserve,...bows,...guns,...mounted].includes(u));
   const line=(units,depth,spacing,role)=>units.forEach((u,i)=>{u.x=-side*(depth+Math.floor(i/10)*7);u.z=(i%10-(Math.min(10,units.length)-1)/2)*spacing;u.heading=side*Math.PI/2;u.tacticalRole=role;u.battleSide=side;u.deployment={x:u.x,z:u.z};u.releaseAt=role==='support'?16:0;});
-  line(front,BATTLE_FRONT_DEPTH,6,'line');line(bows,BATTLE_FRONT_DEPTH+16,6,'missile');line(reserve,BATTLE_FRONT_DEPTH+30,7,'support');line(other,BATTLE_FRONT_DEPTH+22,8,'support');
+  line(front,BATTLE_FRONT_DEPTH,5.1,'line');guns.forEach((u,i)=>{const wing=i%2?1:-1;u.x=-side*(BATTLE_FRONT_DEPTH+Math.floor(i/8)*7);u.z=wing*(Math.max(12,Math.min(10,front.length)*2.55+5)+Math.floor(i/2)%4*6);u.heading=side*Math.PI/2;u.tacticalRole='shot';u.battleSide=side;u.deployment={x:u.x,z:u.z};});line(bows,BATTLE_FRONT_DEPTH+16,6,'missile');line(reserve,BATTLE_FRONT_DEPTH+30,7,'support');line(other,BATTLE_FRONT_DEPTH+22,8,'support');
   mounted.forEach((u,i)=>{const flank=i%2?1:-1;u.x=-side*(BATTLE_FRONT_DEPTH-2);u.z=flank*(Math.max(38,front.length*3.2+16)+Math.floor(i/2)*16);u.heading=side*Math.PI/2;u.tacticalRole=u.kind==='chariot'?'mobile-missile':'flank';u.flank=flank;u.battleSide=side;u.deployment={x:u.x,z:u.z};});
  }
  b.deploymentGap={minX:-BATTLE_EMPTY_HALF_WIDTH,maxX:BATTLE_EMPTY_HALF_WIDTH};b.doctrineVersion=1;b.doctrine='Rivi, laskurite toetus, tiivamanööver ja moraal';return b;
@@ -29,7 +30,7 @@ export function updateMorale(b,dt){
  }
 }
 export function tacticalGoal(u,nearest,squads,b,a){
- if(u.routing)return {x:-u.battleSide*250,z:u.z};if((u.releaseAt||0)>b.elapsed&&distance(u,nearest)>26)return u.deployment;
+ if(u.routing)return {x:-u.battleSide*250,z:u.z};if((FORMATIONS[u.formation]||{}).hold)return u.anchor||u;if((u.releaseAt||0)>b.elapsed&&distance(u,nearest)>26)return u.deployment;
  if(u.tacticalRole==='support'&&b.elapsed<(u.releaseAt||16)&&distance(u,nearest)>16)return u.deployment;
  if(u.tacticalRole==='flank'||u.kind==='chariot'){
   const enemies=squads.filter(q=>q.team!==u.team&&!q.routing),edge=Math.max(28,...enemies.filter(q=>troopRole(q.kind)==='melee').map(q=>Math.abs(q.z)))+12,flank=u.flank||(u.source%2?1:-1),z=flank*Math.min(130,edge);
@@ -38,6 +39,7 @@ export function tacticalGoal(u,nearest,squads,b,a){
   if(u.kind==='chariot'&&u.ammoRemaining!==0&&distance(u,nearest)<a.range*.65)return {x:u.x-u.battleSide*10,z:u.z+flank*5};
   return {x:nearest.x-u.battleSide*(u.kind==='chariot'&&u.ammoRemaining!==0?a.range*.7:0),z};
  }
+ if(u.tacticalRole==='shot'&&u.ammoRemaining!==0){return distance(u,nearest)>a.range*.8?{x:nearest.x-u.battleSide*a.range*.7,z:u.deployment?.z??u.z}:null;}
  if(isBow(u)&&u.ammoRemaining!==0){const front=squads.filter(q=>q.team===u.team&&q.tacticalRole==='line'&&!q.routing),closest=front.reduce((p,q)=>!p||distance(q,nearest)<distance(p,nearest)?q:p,null);if(closest)return {x:closest.x-u.battleSide*8,z:u.deployment?.z??u.z};if(distance(u,nearest)<a.range*.45)return {x:u.x-u.battleSide*6,z:u.z};}
  return distance(u,nearest)>a.range+2?nearest:null;
 }
@@ -48,6 +50,6 @@ export function tacticalDamage(attacker,target,amount){
  else if(braced&&usesArrows(u))amount*=.7;
  if(braced&&troopRole(u.kind)==='cavalry'&&!isBow(u))amount*=.55;
  if(isSpear(u)&&troopRole(v.kind)==='cavalry'&&!m.moving&&(u.cohesion??1)>.45)amount*=1.6;
- return amount*(1-m.fatigue*.002);
+ return formationDamage(attacker,target,amount,usesArrows(u)?'arrow':isBow(u)?'bullet':null)*(1-m.fatigue*.002);
 }
-export function shotHits(m,u,d,range){const shot=m.shotsFired=(m.shotsFired||0)+1;let seed=(u.source+1)*73856093+(m.index+1)*19349663+shot*83492791;seed=Math.imul(seed^(seed>>>16),0x45d9f3b);const roll=(seed>>>0)/4294967296,chance=Math.max(.3,Math.min(.88,.91-.4*d/Math.max(1,range)-(m.wasMoving?.13:0)));return roll<chance;}
+export function shotHits(m,u,d,range,target=null){const shot=m.shotsFired=(m.shotsFired||0)+1;let seed=(u.source+1)*73856093+(m.index+1)*19349663+shot*83492791;seed=Math.imul(seed^(seed>>>16),0x45d9f3b);const roll=(seed>>>0)/4294967296,chance=Math.max(.3,Math.min(.88,.91-.4*d/Math.max(1,range)-(m.wasMoving?.13:0)+(u.formation==='volley'?.08:0)))*(target?missileExposure(target):1);return roll<chance;}

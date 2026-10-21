@@ -24,3 +24,5 @@ body #commandhud.readonly .command-buttons{display:none!important}
 @media(max-width:760px){
  body #commandhud,body:not(.atlas) #commandhud,body:not(.atlas):not(.settling):not(.battle) #commandhud,body.battle #commandhud,body.settling #commandhud,body.hud-command-open #commandhud,body.hud-command-open:not(.atlas) #commandhud{width:252px!important;max-width:calc(100vw - 74px)!important;max-height:248px!important;padding:8px!important;left:8px!important;bottom:86px!important}
 }
+
+#commandtactics{margin-top:6px;border-top:1px solid #80967b55;padding-top:5px}#commandtactics[hidden]{display:none!important}#commandtactics>label{display:block;font-size:11px;margin-bottom:3px}#commandtactics .tactic-row{display:flex;gap:4px;align-items:stretch}#commandtactics select{flex:1;min-width:0;width:0;font-size:12px;min-height:34px;border:1px solid #9aab86;border-radius:6px;background:#263f36;color:#f0e4bd;padding:4px}#commandtactics .tactic-row button{flex:0 0 32px;min-height:34px;margin:0;padding:3px}#formation-help{display:block;font-size:10px;line-height:1.25;margin-top:4px;color:#d1d5ba}

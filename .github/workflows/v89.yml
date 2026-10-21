@@ -2,7 +2,7 @@ name: V89 Roads, Unit Context and Bronze Battle
 on:
   push:
     branches: [main]
-    paths: ['*v93*', '*v92*', '*v91*', '*v90*', '*v89*', 'civilization.js', 'campaign.js', 'battlefield-v88.js', 'battle-navigation-v88.js', 'battle-scene-v88.js', 'index.html', 'continuous-landscape-visual.js', 'detail-roads.js', 'TEST_V89*', '.github/workflows/v89.yml']
+    paths: ['*v94*', '*v93*', '*v92*', '*v91*', '*v90*', '*v89*', 'civilization.js', 'campaign.js', 'battlefield-v88.js', 'battle-navigation-v88.js', 'battle-scene-v88.js', 'index.html', 'continuous-landscape-visual.js', 'detail-roads.js', 'TEST_V89*', '.github/workflows/v89.yml']
   workflow_dispatch:
 concurrency:
   group: v89-context-${{ github.ref }}
@@ -19,6 +19,7 @@ jobs:
         with: {node-version: 22}
       - run: |
           node --check civilization.js
+          node TEST_V94.mjs
           node TEST_V93.mjs
           node TEST_V92.mjs
           node TEST_V91.mjs
@@ -32,6 +33,7 @@ jobs:
           python3 -m http.server 8765 >/tmp/v89-server.log 2>&1 &
           node TEST_V89_UI.mjs
           node TEST_V93_UI.mjs
+          node TEST_V94_UI.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
