@@ -58,7 +58,7 @@ function buffers(vertices,color,{standard=false,opacity=1,shade=null}={}){
  const mat=standard?new T.MeshStandardMaterial({vertexColors:true,roughness:.55,metalness:.10,transparent:opacity!==1,opacity,side:T.DoubleSide,depthWrite:opacity===1}):new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  return new T.Mesh(geo,mat);
 }
-function visible(tile,path,radius=90){if(!tile)return true;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
+function visible(tile,path,radius=90){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
  const water=[],banks=[];

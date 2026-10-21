@@ -1,4 +1,4 @@
-# V88e – sõjavägi
+# V88f – sõjavägi ja lahinguväli
 
 Kõigis ajastutes vähemalt neli uut oma ajastu lahinguüksust. Varasemaid saab edasi värvata.
 
@@ -28,12 +28,18 @@ Armee saab XP-d osalemise, tekitatud kahju, hävitatud üksuste ja võidu eest. 
 
 Maailmakaardi armeede nimekirjas vali armee ja „Koonda oma armeed siia“. Teised oma armeed liiguvad füüsiliselt kohale ja ühinevad saabudes. „Ühenda siin olevad armeed“ ühendab juba samas ruudus olevad salgad. Ühendatud väe kogemus on üksuste arvuga kaalutud keskmine; jagamine ei loo juurde kogemust. Maailmakaardil liigub kogu armee aeglaseima salgatüübi kiirusega.
 
-Detailkaardil ja lahingus vali oma salk, „Vali kogu armee“, seejärel „Liigu“ ning sihtpunkt. Iga salk saab samast sihtpunktist lähtuva formatsioonikoha. Maastiku läbipääsetavust kontrollitakse enne käsu andmist. „Peatu“ peatab valitud armee. Lahingusse lähevad kõik kohal olevad salgad.
+Maailmakaardil liiguvad ühendatud armee kõik salgad koos. Detailkaardil ja lahingus saab liikumiskäsu anda ainult ühele valitud salgale: vali salk, „Liigu“ ja sihtpunkt. „Peatu“ peatab ainult valitud salga. Grupivalik ja ühine rünnakukäsk on eemaldatud.
+
+Lahing laeb 6 × 6 detailruudu suuruse ala ning ühe ruudu laiuse põgenemisvööndi igast küljest: kokku 8 × 8 ehk 64 ruutu. Võitlusala eraldab põgenemisvööndist punane joon. Kui elus välisalk ületab joone, põgeneb kogu tema armee; teised samal poolel võitlevad armeed võivad jätkata. Põgenemine ei tapa üksusi. Armee paigutatakse maailma kaardil läbitavasse ja vastaste poolt hõivamata põgenemissuuna ruutu; kui sellist ruutu ei leidu, välditakse 30 sekundit uut kohtumist. Põgenemisnupp selgitab joone ületamist ega vii armeed enam koheselt kodulinna. Lahinguala kaamerat saab liigutada ja suumida kogu 8 × 8 ulatuses. Salvestatud lahingu ala taastatakse mängu jätkamisel.
 
 ## Kontrollimine
 
 `TEST_V88_MILITARY.mjs`: kõigi ajastute koosseisud, uurimuste ja hoonete nõuded, kõigi üksuste mudelid kolmes varustusastmes, tegelik värbamiskulu ja valmimine, kuue näitaja 3× kasv, haavade ja salvestuse säilimine, XP ühekordne arvestus, liitmise kaalutud XP, formatsioon, liikumine, lahing, kolme armee tegelik koondumine 15-salgaseks väeks ja jagamine.
 
-`TEST_V88_MILITARY_UI.mjs`: mängu käivitus, mobiliseeritud jalaväe ja eliittanki ostmine kasutajaliidesest, kolmele salgale ühine liikumiskäsk, arvuti ja telefoni ekraanipildid, brauserivigade kontroll.
+`TEST_V88_MILITARY_UI.mjs`: mängu käivitus, mobiliseeritud jalaväe ja eliittanki ostmine kasutajaliidesest, ainult ühele salgale antud liikumiskäsk, arvuti ja telefoni ekraanipildid, brauserivigade kontroll.
 
 Varasemad V88 ressursside, tootlikkuse, ajastuhinna, raporti ja kinnijäämise kontrollid ning V59/60/61/64/67/68/72/73/86/87 regressioonid läbisid kohaliku kontrolli.
+
+`TEST_V88_BATTLEFIELD.mjs`: 36 võitlusruutu ja 28 põgenemisruutu, kõik neli punast serva, terve armee põgenemine, teiste armeede jätkamine, elusate üksuste säilimine, päris mitme ruudu liikumistee, maailmakaardile taandumine, vana salvestuse taastamine.
+
+`TEST_V88_BATTLE_UI.mjs`: kahe armee tegelik kokkupõrge, terve 8 × 8 maastiku laadimine, individuaalne liikumiskäsk, tegelik liikumine üle joone, armee põgenemine ning arvuti ja telefoni ekraanipildid.
