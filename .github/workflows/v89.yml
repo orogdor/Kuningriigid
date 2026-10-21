@@ -31,6 +31,7 @@ jobs:
       - run: |
           python3 -m http.server 8765 >/tmp/v89-server.log 2>&1 &
           node TEST_V89_UI.mjs
+          node TEST_V93_UI.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

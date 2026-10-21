@@ -4,6 +4,7 @@
 - Eesliin alustab x = −94 / +94 juures, vibukütid 16 ühikut ja toetav jalavägi 30 ühikut tagapool. Maastikule paigutamine säilitab vaba keskmise sektori.
 - Lahingu ühine ajaskaala on 0,5. Kõnd, rünnakute vahed, mürsud, moraal, väsimus, laskemoona kulumise tempo ning toetusvägede viivitus kulgevad kaks korda aeglasemalt.
 - Sõdurite kõnni- ja võitlusanimatsioonid kasutavad sama lahingukella; need peatuvad pausil ja sobivad aeglasema liikumisega kokku.
+- Testlahingu algkaamera on kaugemal, et mõlemad armeed mahuksid ka telefonivaates ekraanile.
 - Maailmakaardi ja majanduse ajaskaala jääb samaks. Kiiruse valikut ei lisatud.
 - Linnapiiramistel võivad kaitsjad endiselt alustada oma ehitiste juures. Juba käimasoleva lahingu salvestust ei paigutata uuesti ümber.
 
