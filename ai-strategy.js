@@ -1,3 +1,4 @@
+import {foundationNeeds,reservesFoundation} from './ai-foundation-v88.js';
 import {MINERAL_BUILDINGS} from './resource-sites-v88.js';
 import {RESOURCE_BUILDINGS} from './settlement-ai-v88.js';
 import {GOOD_BUILDINGS,cityNeeds} from './city-needs-v87.js';
@@ -6,7 +7,7 @@ import {ERA_MATERIALS,ageDeficit,edibleSupply} from './era-economy.js';
 import {BUILDINGS} from './economy.js';
 export const RESOURCE_CHAINS={
  wood:['lumber'],stone:['quarry'],bread:['hunter','fisher','farm','mill','bakery'],
- water:['well'],grain:['farm'],plank:['saw'],ore:['mine'],coal:['coal'],
+ water:['well'],grain:['farm'],plank:['lumber','saw'],ore:['mine'],coal:['coal'],
  iron:['mine','coal','smelter'],weapons:['smith'],paper:['printer'],
  saltpeter:['nitrate'],gunpowder:['nitrate','coal','powdermill'],
  steel:['mine','coal','smelter','steelworks'],
@@ -32,7 +33,7 @@ export function aiResourcePriorities(game,team,city){
   const actual=resource==='bread'?edibleSupply(stock):(stock[resource]||0),shortfall=Math.max(0,target-actual);
   const ageMissing=needs[resource]||0;
   if(shortfall<=0&&ageMissing<=0)continue;
-  const pressure=(resource==='bread'&&actual<pop*3?140:0)+(resource==='water'&&actual<pop*2?130:0)
+  const pressure=(resource==='bread'&&actual<pop*3?260:0)+(resource==='water'&&actual<pop*2?250:0)
    +(ageMissing>0?105:0)+Math.min(25,20*shortfall/Math.max(1,target));
   values.push({resource,target,actual,shortfall,ageMissing,pressure});
  }
@@ -44,7 +45,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  const buildings=game.allBuildings(city);
  // Do not bankrupt a city by stacking construction orders with zero usable builders.
  const waiting=buildings.filter(b=>!b.ready&&b.hp>0&&!b.disabled);
- if(waiting.length>=3&&game.s.ages[team]>0)return null;
+ if(waiting.length>=3&&game.s.ages[team]>0&&!foundationNeeds(game,city).length)return null;
  const gaps=science.ageWait?ageDeficit(game.s,team,science.ageWait.id):{};
  const missing=Object.keys(gaps).length>0;
  const housing=game.allBuildings(city).filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
@@ -61,11 +62,13 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   if(['quarry','lumber','hunter','fisher','well','farm'].includes(type)&&buildings.filter(b=>b.type===type&&b.hp>0).length>=(['hunter','fisher'].includes(type)?3:2))return;
   if(type==='harbor'&&buildings.some(b=>b.type==='harbor'&&b.hp>0))return;
   if(!eligible(game,city,type))return;
+  if(reservesFoundation(game,city,type))return;
   // While saving for an era, build only a resource-producing dependency,
   // storage, or indispensable housing. No military or cosmetic construction.
   if(missing&&!CRITICAL_BUILDINGS.has(type))return;
   possibilities.push({type,priority,reason});
  };
+ for(const [i,type] of foundationNeeds(game,city).entries())add(type,220-i,'Linna põhiehitis');
  for(const resource of city.resourceSpecialization||[])add(RESOURCE_BUILDINGS[resource],139,'Puuduva riigiressursi tootmine');
  const happiness=cityNeeds(city,age);if(happiness.missing)for(const [type,d] of Object.entries(GOOD_BUILDINGS)){if(d.age<=age&&(stock[d.out]||0)<happiness.threshold*3)add(type,101,'Linna mitmekesisus');}
  // Maintain an early, diverse economy. The first source is important even

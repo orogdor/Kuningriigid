@@ -1,3 +1,4 @@
+import {FOUNDATION_TYPES} from './ai-foundation-v88.js';
 import {foodTotal} from './city-needs-v87.js';
 import {availableLabor} from './gameplay-flow-v86.js?v=86a';
 // Fractional workers are shared across every district of a city.
@@ -69,7 +70,7 @@ function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,st
  if(['keep','gatehouse','infirmary'].includes(b.type))return foodCritical?22:72;
  if(['guildhall','trade_yard','inn','monastery','chapel','siegeworkshop'].includes(b.type))return foodCritical?20:56;
  if(b.type==='forester')return 35;
- if(b.type==='saw')return 65;
+ if(b.type==='saw')return low('plank',50)?86:65;
  if(['mine','coal','smelter','smith','printer','nitrate','powdermill','steelworks','engineworks','oilwell','refinery','powerplant','autofactory'].includes(b.type))return 55;
  return 28;
 }
@@ -85,8 +86,10 @@ export function allocateCity(game,city){
  const entries=all.filter(b=>b.ready).map(b=>{
   const need=demand(b,game.buildingDefinitions),definition=game.buildingDefinitions[b.type];
   const inputsReady=!definition?.input||Object.entries(definition.input).every(([key,n])=>(r.resources[key]||0)>=n);
-  const want=inputsReady?Math.max(0,Math.min(need,b.workerLimit??need)):0;
+  const outputFull=definition?.out&&game.storageCap&&game.storageUsed&&game.storageUsed(city,definition.out,r.resources)>=game.storageCap(city,definition.out);
+  const want=inputsReady&&!outputFull?Math.max(0,Math.min(need,b.workerLimit??need)):0;
   let priority=jobPriority(b,foodCritical,waterCritical,shortages,laborScarce,r.resources);
+  if(city.team>0&&FOUNDATION_TYPES.has(b.type))priority+=60;
   if(b.status?.includes('pole ligipääsetavat')||b.status?.includes('maardla puudub'))priority=9;
   return {b,need,want,priority};
  }).filter(e=>e.want>0);
@@ -100,7 +103,8 @@ export function allocateCity(game,city){
  const foodSource=entries.some(e=>e.want>0&&['hunter','fisher','bakery'].includes(e.b.type)&&!/pole ligipääsetavat|maardla puudub/.test(e.b.status||''));
  const emergencyBerries=foodCritical&&!foodSource?Math.min(1,budget*.4,Math.max(0,city.basicJobs?.berries??1)):0;
  let remaining=budget-emergencyBerries;
- for(const e of entries){const seed=Math.min(e.want,wait?.1:.25,remaining);e.b.assigned=seed;remaining-=seed}
+ const aiFoundation=city.team>0;
+ for(const e of entries){const essential=FOUNDATION_TYPES.has(e.b.type)||e.b===builders;const seed=Math.min(e.want,aiFoundation?(essential?.25:0):(wait?.1:.25),remaining);e.b.assigned=seed;remaining-=seed}
  for(const e of entries){const extra=Math.min(e.want-e.b.assigned,remaining);e.b.assigned+=extra;remaining-=extra}
  for(const e of entries)e.b.efficiency=workerEfficiency(e.b.assigned,e.need);
  for(const b of all.filter(b=>b.ready&&!entries.some(e=>e.b===b))) {b.assigned=0;b.efficiency=0}

@@ -4,7 +4,7 @@ import {CampaignLog} from './campaign-log-v88.mjs';
 const seed=8417,game=new Civilization(createGame(seed));
 const revision=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
 const entered=[0,0,0,0],previous=[...game.s.ages],transitions=[];
-const turn=time=>+(time/60).toFixed(4),log=new CampaignLog(game,'V88_POOLHIND_TEST',revision);
+const turn=time=>+(time/60).toFixed(4),log=new CampaignLog(game,process.env.V88_REPORT_PREFIX||'V88_POOLHIND_TEST',revision);
 let outcome,failed=[];
 log.observe();log.snapshot(entered);
 for(let tick=0;!outcome;tick++){

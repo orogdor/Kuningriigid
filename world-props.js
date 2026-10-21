@@ -24,22 +24,22 @@ export function createWorldAtlasProps(game,scene,quality='medium'){
     for(const src of template.children){if(!src.isMesh)continue;
      const mesh=new T.InstancedMesh(src.geometry,src.material,sites.length);
      mesh.name='atlas1000_'+kind+'_'+src.name;mesh.frustumCulled=false;mesh.userData.worldProp=kind;group.add(mesh);
-     instanced.push({kind,mesh,sites});
+     instanced.push({kind,mesh,sites,visibility:[]});
     }
    }
   }
  }
  let crossingRevision=-1;
  function update(force=false){if(!ready)return;const bridges=game.s.crossingRevision||0;if(bridges!==crossingRevision){crossingRevision=bridges;materialize();force=true}const rev=game.s.visionRevision||0;if(!force&&rev===lastRevision)return;lastRevision=rev;
-  for(const {kind,mesh,sites} of instanced){sites.forEach((cell,i)=>{
-   const visible=game.seen(0,cell);
+  for(const {kind,mesh,sites,visibility} of instanced){let changed=false;sites.forEach((cell,i)=>{
+   const visible=game.seen(0,cell);if(!force&&visibility[i]===visible)return;visibility[i]=visible;changed=true;
    if(kind==='bridge'){
     applyCrossingTransform(obj,crossingFrame(game,cell));
     if(!visible)obj.matrix.makeScale(0,0,0);mesh.setMatrixAt(i,obj.matrix);obj.matrixAutoUpdate=true;return;
    }
    obj.position.set(cell.x,game.atlasHeight(cell.x,cell.z)+.45,cell.z);obj.scale.setScalar(visible?multipliers[kind]:0);
    obj.rotation.set(0,game.noise(cell.c,cell.r+16)*Math.PI*2,0);obj.updateMatrix();mesh.setMatrixAt(i,obj.matrix);
-  });mesh.instanceMatrix.needsUpdate=true;}
+  });if(changed)mesh.instanceMatrix.needsUpdate=true;}
  }
  function landmark(kind){const src=templates.get(kind);if(!src)return null;const copy=src.clone(true);copy.scale.setScalar(kind==='village'?2.15:2.05);copy.name='World Atlas 1000 '+kind;return copy}
  const initialized=Promise.allSettled(Object.entries(FILES).map(async ([kind,name])=>{

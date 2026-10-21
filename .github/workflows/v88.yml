@@ -23,6 +23,7 @@ jobs:
           node TEST_V88_PRODUCTIVITY.mjs
           node TEST_V88_ERA_COST.mjs
           node TEST_V88_CAMPAIGN_LOG.mjs
+          node TEST_V88_RECOVERY.mjs
           node TEST_V64.mjs
           node TEST_V87.mjs
           node TEST_V86.mjs
@@ -45,6 +46,7 @@ jobs:
       - run: |
           python3 -m http.server 8765 >/tmp/v88-server.log 2>&1 &
           node TEST_V88_UI.mjs
+          node TEST_V88_EXPLORATION_UI.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

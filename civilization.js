@@ -1,3 +1,4 @@
+import {VisionDelta} from './fog-delta-v88.js';
 import {createDepositPile} from './site-models-v88.js';
 import {atWar,setRelation,relation,blockMerchants} from './diplomacy-v87.js';
 import {cityNeeds,nationalStock,foodTotal,GOODS} from './city-needs-v87.js';
@@ -7,16 +8,16 @@ import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
 import {createDetailBorders} from './detail-borders-v85.js?v=85a';
 import {mountainTint,createMountainOutcrops,createBridgeBuilding,crossingFrame} from './landscape-polish-v84.js?v=85a';
 import {CommandVisuals} from './command-visuals.js';
-import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=88a';
+import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=88c';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
-import {createDetailTrailLinks} from './detail-roads.js?v=88a';
+import {createDetailTrailLinks} from './detail-roads.js?v=88c';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=85a';
 import {surface,localSurface,riverNear,overviewSurface} from './continuous-landscape.js?v=85a';
-import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=88a';
+import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=88c';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js?v=86a';
 import {housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT,BASIC_JOBS} from './labor.js';
@@ -26,17 +27,17 @@ import {persistSiegeDamage} from './medieval-v62.js';
 import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock,ERA_NAMES} from './research.js';
 import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
-import {renderResearchUI} from './research-ui.js?v=88a';
+import {renderResearchUI} from './research-ui.js?v=88c';
 import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=86a';
-import {createWorldAtlasProps} from './world-props.js?v=85a';
+import {createWorldAtlasProps} from './world-props.js?v=88c';
 import {buildDetailWorldObjects} from './detail-world-objects.js?v=85a';
 import {createVillageLife} from './village-life-v76.js?v=76a';
 import * as T from './vendor/three.module.js';
-import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=88a';
+import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=88c';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js';
 import {detailHeight,featureNames} from './world-details.js';
-import {createAgeBuilding,animateBuilding} from './buildings.js?v=88a';
+import {createAgeBuilding,animateBuilding} from './buildings.js?v=88c';
 import {createStoneDemoState,DEMO_CITY_NAME} from './stone-demo-v77.js?v=80c';
 import {createBronzeDemoState,BRONZE_DEMO_NAME} from './bronze-demo-v79.js?v=80c';
 import {createMedievalDemoState,MEDIEVAL_DEMO_NAME} from './medieval-demo-v80.js?v=80c';
@@ -134,60 +135,65 @@ if(quality!=='low'){
 if(grid.length)worldScene.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(grid,3)),new T.LineBasicMaterial({color:'#d5e2c2',transparent:true,opacity:.13})));
 
 function parchmentColor(x,z){const n=game.smooth(x/40+17,z/40+61),grain=game.smooth(x/12+91,z/12+35),c=new T.Color('#c7b488');c.lerp(new T.Color('#dcc7a1'),n*.45);c.lerp(new T.Color('#af9a73'),Math.max(0,grain-.55)*.33);return c}
-function refreshAtlasFog(){if(!atlasLand?.geometry)return;const pos=atlasLand.geometry.attributes.position,col=atlasLand.geometry.attributes.color;for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i),at=cellAt(x,z),h=pos.getY(i);let color;if(at&&!game.seen(0,at)){color=parchmentColor(x,z);const ink=Math.max(0,game.smooth(x/23+11,z/23+97)-.72);if(ink>.001)color.lerp(new T.Color('#8b7753'),ink*.35)}else color=atlasColor(game,x,z,h);color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.18);col.setXYZ(i,color.r,color.g,color.b)}col.needsUpdate=true;}
+const visionDelta=new VisionDelta(s),atlasVisibleColors=atlasLand.geometry.attributes.color.array.slice();
+let atlasVertexCells=null,atlasFogSerial=-1;
+function refreshAtlasFog(){
+ const delta=visionDelta.update(),pos=atlasLand.geometry.attributes.position,col=atlasLand.geometry.attributes.color;
+ if(!atlasVertexCells){
+  atlasVertexCells=new Map();
+  for(let i=0;i<pos.count;i++){
+   const x=pos.getX(i),z=pos.getZ(i),at=cellAt(x,z);if(!at)continue;
+   const key=at.c+':'+at.r;if(!atlasVertexCells.has(key))atlasVertexCells.set(key,[]);atlasVertexCells.get(key).push(i);
+   if(!game.seen(0,at)){const color=parchmentColor(x,z),ink=Math.max(0,game.smooth(x/23+11,z/23+97)-.72);if(ink>.001)color.lerp(new T.Color('#8b7753'),ink*.35);color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.18);col.setXYZ(i,color.r,color.g,color.b);}
+  }
+  col.needsUpdate=true;atlasFogSerial=delta.serial;return;
+ }
+ if(atlasFogSerial===delta.serial)return;atlasFogSerial=delta.serial;
+ for(const at of delta.changed)for(const i of atlasVertexCells.get(at.key)||[]){
+  if(delta.known.has(at.key))col.setXYZ(i,atlasVisibleColors[i*3],atlasVisibleColors[i*3+1],atlasVisibleColors[i*3+2]);
+  else {const x=pos.getX(i),z=pos.getZ(i),color=parchmentColor(x,z);color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.18);col.setXYZ(i,color.r,color.g,color.b);}
+  col.addUpdateRange?.(i*3,3);
+ }
+ if(delta.changed.length)col.needsUpdate=true;
+}
 const fogSketchGroup=new T.Group();worldScene.add(fogSketchGroup);let fogSketchStamp='';const fogTextures=new Map();
 const fogCoverGroup=new T.Group();worldScene.add(fogCoverGroup);let fogCoverStamp='';
 function sketchTexture(kind){if(fogTextures.has(kind))return fogTextures.get(kind);const canvas=document.createElement('canvas');canvas.width=canvas.height=128;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,128,128);ctx.strokeStyle='rgba(76,55,27,.72)';ctx.fillStyle='rgba(76,55,27,.25)';ctx.lineWidth=4;ctx.lineCap='round';ctx.lineJoin='round';if(kind==='sea'){ctx.beginPath();ctx.moveTo(16,78);ctx.bezierCurveTo(36,50,54,52,67,77);ctx.bezierCurveTo(80,101,92,91,110,66);ctx.stroke();for(const y of [92,101]){ctx.beginPath();ctx.moveTo(20,y);ctx.quadraticCurveTo(34,y-6,48,y);ctx.quadraticCurveTo(62,y+6,76,y);ctx.quadraticCurveTo(90,y-6,108,y);ctx.stroke();}}else if(kind==='mountain'){ctx.beginPath();ctx.moveTo(18,96);ctx.lineTo(46,48);ctx.lineTo(72,96);ctx.moveTo(56,96);ctx.lineTo(86,38);ctx.lineTo(111,96);ctx.stroke();ctx.beginPath();ctx.moveTo(41,57);ctx.lineTo(47,50);ctx.lineTo(54,60);ctx.moveTo(81,51);ctx.lineTo(87,42);ctx.lineTo(95,58);ctx.stroke();}else if(kind==='forest'){for(const x of [34,64,94]){ctx.beginPath();ctx.moveTo(x,98);ctx.lineTo(x,82);ctx.stroke();ctx.beginPath();ctx.moveTo(x,50);ctx.lineTo(x-16,82);ctx.lineTo(x+16,82);ctx.closePath();ctx.stroke();}}else{ctx.beginPath();ctx.arc(64,64,26,0,Math.PI*2);ctx.stroke();for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(64+Math.cos(a)*30,64+Math.sin(a)*30);ctx.lineTo(64+Math.cos(a)*46,64+Math.sin(a)*46);ctx.stroke();}}const tx=new T.CanvasTexture(canvas);fogTextures.set(kind,tx);return tx}
 function fogCoverTexture(){if(fogTextures.has('cover'))return fogTextures.get('cover');const canvas=document.createElement('canvas');canvas.width=canvas.height=128;const ctx=canvas.getContext('2d');ctx.fillStyle='#d7c195';ctx.fillRect(0,0,128,128);ctx.strokeStyle='rgba(121,96,57,.22)';ctx.lineWidth=2;for(let i=-20;i<140;i+=18){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+30,128);ctx.stroke()}ctx.fillStyle='rgba(255,255,255,.08)';for(let i=0;i<10;i++){ctx.beginPath();ctx.arc(14+i*12,(i*17)%128,10,0,Math.PI*2);ctx.fill()}const tx=new T.CanvasTexture(canvas);fogTextures.set('cover',tx);return tx}
+let fogCoverMesh=null,fogCoverSerial=-1;
 function refreshFogCover(){
- const stamp=(s.visionRevision||0)+':'+COLS+':'+ROWS;
- if(stamp===fogCoverStamp)return;
- fogCoverStamp=stamp;
- for(const child of [...fogCoverGroup.children]){child.geometry?.dispose();child.material?.dispose();fogCoverGroup.remove(child)}
- // A single draw call replaces up to 36,300 individual fog sprites.
- // The parchment sheet is above every decorative terrain object, so unexplored
- // mountains, forests, coastlines and other environmental props stay hidden.
- const positions=[],uvs=[],indices=[];let quads=0;
- for(const cell of game.cells){
-  if(game.seen(0,cell))continue;
-  const x=cell.x,z=cell.z,y=120,half=25.4,offset=quads*4;
-  positions.push(x-half,y,z-half,x+half,y,z-half,x+half,y,z+half,x-half,y,z+half);
-  // Repeat a parchment tile rather than stretching one texture over the world.
-  uvs.push(0,0,1,0,1,1,0,1);
-  indices.push(offset,offset+1,offset+2,offset,offset+2,offset+3);
-  quads++;
+ const delta=visionDelta.update();
+ if(!fogCoverMesh){
+  const positions=[],uvs=[],indices=[];
+  for(const [i,cell] of game.cells.entries()){
+   const x=cell.x,z=cell.z,y=120,half=25.4,o=i*4;
+   positions.push(x-half,y,z-half,x+half,y,z-half,x+half,y,z+half,x-half,y,z+half);uvs.push(0,0,1,0,1,1,0,1);
+   indices.push(...(game.seen(0,cell)?[o,o,o,o,o,o]:[o,o+1,o+2,o,o+2,o+3]));
+  }
+  const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));geometry.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geometry.setIndex(indices);geometry.computeBoundingSphere();
+  fogCoverMesh=new T.Mesh(geometry,new T.MeshBasicMaterial({map:fogCoverTexture(),side:T.DoubleSide,depthTest:false,depthWrite:false,toneMapped:false}));fogCoverMesh.renderOrder=900;fogCoverGroup.add(fogCoverMesh);fogCoverSerial=delta.serial;return;
  }
- if(!quads)return;
- const geometry=new T.BufferGeometry();
- geometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));
- geometry.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));
- geometry.setIndex(indices);geometry.computeBoundingSphere();
- const mesh=new T.Mesh(geometry,new T.MeshBasicMaterial({map:fogCoverTexture(),transparent:false,side:T.DoubleSide,depthTest:false,depthWrite:false,toneMapped:false}));
- mesh.frustumCulled=true;mesh.renderOrder=900;fogCoverGroup.add(mesh);
+ if(fogCoverSerial===delta.serial)return;fogCoverSerial=delta.serial;
+ const index=fogCoverMesh.geometry.index;
+ for(const at of delta.changed){const i=at.r*COLS+at.c,o=i*4;index.array.set(delta.known.has(at.key)?[o,o,o,o,o,o]:[o,o+1,o+2,o,o+2,o+3],i*6);index.addUpdateRange?.(i*6,6);}
+ if(delta.changed.length)index.needsUpdate=true;
 }
+let fogSketchReady=false,fogSketchSerial=-1;const fogSketchCells=new Map();
 function refreshFogSketches(){
- const stamp=(s.visionRevision||0)+':'+COLS+':'+ROWS;
- if(stamp===fogSketchStamp)return;
- fogSketchStamp=stamp;
- for(const child of [...fogSketchGroup.children]){child.geometry?.dispose();child.material?.dispose();fogSketchGroup.remove(child)}
- // Group pictograms into four instanced draw calls instead of thousands of sprites.
- const symbols={sea:[],mountain:[],forest:[],compass:[]};
- for(const cell of game.cells){
-  if(game.seen(0,cell)||game.noise(cell.c*13+7,cell.r*17+5)<.925)continue;
-  const kind=!cell.land?'sea':cell.mountain?'mountain':cell.biome==='forest'?'forest':'compass';
-  symbols[kind].push(cell);
+ const delta=visionDelta.update(),dummy=new T.Object3D();
+ if(!fogSketchReady){
+  const symbols={sea:[],mountain:[],forest:[],compass:[]};
+  for(const cell of game.cells){if(game.noise(cell.c*13+7,cell.r*17+5)<.925)continue;const kind=!cell.land?'sea':cell.mountain?'mountain':cell.biome==='forest'?'forest':'compass';symbols[kind].push(cell);}
+  for(const [kind,cells]of Object.entries(symbols)){
+   if(!cells.length)continue;const geometry=new T.PlaneGeometry(42,42);geometry.rotateX(-Math.PI/2);
+   const mesh=new T.InstancedMesh(geometry,new T.MeshBasicMaterial({map:sketchTexture(kind),transparent:true,opacity:.8,depthTest:false,depthWrite:false,side:T.DoubleSide,toneMapped:false}),cells.length);
+   cells.forEach((cell,i)=>{dummy.position.set(cell.x,122,cell.z);dummy.scale.setScalar(game.seen(0,cell)?0:1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);fogSketchCells.set(cell.c+':'+cell.r,{mesh,index:i,cell});});
+   mesh.instanceMatrix.needsUpdate=true;mesh.frustumCulled=false;mesh.renderOrder=901;fogSketchGroup.add(mesh);
+  }
+  fogSketchReady=true;fogSketchSerial=delta.serial;return;
  }
- const dummy=new T.Object3D();
- for(const [kind,cells] of Object.entries(symbols)){
-  if(!cells.length)continue;
-  const geometry=new T.PlaneGeometry(42,42);
-  geometry.rotateX(-Math.PI/2);
-  const material=new T.MeshBasicMaterial({map:sketchTexture(kind),transparent:true,opacity:.8,depthTest:false,depthWrite:false,side:T.DoubleSide,toneMapped:false});
-  const mesh=new T.InstancedMesh(geometry,material,cells.length);
-  cells.forEach((cell,i)=>{dummy.position.set(cell.x,122,cell.z);dummy.rotation.set(0,0,0);dummy.scale.set(1,1,1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix)});
-  mesh.instanceMatrix.needsUpdate=true;
-  mesh.frustumCulled=false;mesh.renderOrder=901;fogSketchGroup.add(mesh);
- }
+ if(fogSketchSerial===delta.serial)return;fogSketchSerial=delta.serial;
+ for(const at of delta.changed){const entry=fogSketchCells.get(at.key);if(!entry)continue;const{mesh,index,cell}=entry;dummy.position.set(cell.x,122,cell.z);dummy.scale.setScalar(delta.known.has(at.key)?0:1);dummy.updateMatrix();mesh.setMatrixAt(index,dummy.matrix);mesh.instanceMatrix.addUpdateRange?.(index*16,16);mesh.instanceMatrix.needsUpdate=true;}
 }
 refreshAtlasFog();refreshFogCover();refreshFogSketches();
 const icons=new Map();function icon(text,color='#fff'){const key=text+color;if(!icons.has(key)){const canvas=document.createElement('canvas');canvas.width=canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(20,43,37,.8)';ctx.beginPath();ctx.arc(32,32,28,0,Math.PI*2);ctx.fill();ctx.fillStyle=color;ctx.font='bold 38px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,32,34);const tx=new T.CanvasTexture(canvas),material=new T.SpriteMaterial({map:tx,depthTest:false});icons.set(key,material)}const sprite=new T.Sprite(icons.get(key));sprite.scale.set(12,12,1);return sprite}
@@ -772,7 +778,7 @@ function sampleV51FPS(dt){if(menuOpen||document.hidden)return;fpsFrames++;fpsSec
  if(highFpsSeconds>=12&&v51Resolution<1){v51Resolution=1;renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?.85:quality==='medium'?1.15:1.6));highFpsSeconds=0}
 }
 
-$('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();openWorld();worldSync();if(sampleDemo){menuOpen=false;$('startmenu').hidden=true;const city=s.cities.find(c=>c.team===0);if(city)openTile(game.cell(city));}if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={camera,localScene,stoneDemo,bronzeDemo,medievalDemo,renaissanceDemo,industrialDemo,
+$('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();openWorld();worldSync();if(sampleDemo){menuOpen=false;$('startmenu').hidden=true;const city=s.cities.find(c=>c.team===0);if(city)openTile(game.cell(city));}if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={fogStatus:()=>({coverGeometry:fogCoverMesh?.geometry.uuid,sketchGeometries:fogSketchGroup.children.map(m=>m.geometry.uuid),changedCells:visionDelta.changed.length,terrainVertices:atlasLand.geometry.attributes.position.count}),camera,localScene,stoneDemo,bronzeDemo,medievalDemo,renaissanceDemo,industrialDemo,
  buildingInfoStatus:()=>({open:!!buildingInspector?.isOpen(),type:selectedBuilding?.type||null,
   data:selectedBuilding&&activeCity()?describeBuilding(game,activeCity(),selectedBuilding,AGES,RESOURCE_NAMES,BUILDINGS,BUILD_TECH):null}),
  selectBuildingType:(type,index=0)=>{const c=activeCity();return inspectBuilding(c?.economy.buildings.filter(b=>b.type===type)[index])},

@@ -35,6 +35,7 @@ export function buildingClearance(b){
 }
 export const door=b=>{
  if(b.landEntry)return {...b.landEntry};
+ if(b.accessEntry)return {...b.accessEntry};
  const size=buildingClearance(b);
  return {x:b.x,z:b.z+(size?.rz||2.5)+1.15};
 };
@@ -60,7 +61,7 @@ rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let z
   }
  }
  if(buried)this.world.trailChanges=(this.world.trailChanges||0)+buried;
- this.version++;this.signature=this.currentSignature()}
+ this.version++;this.signature=this.currentSignature();this.repairEntrances()}
 currentSignature(){
  // Buildings of equal count can be moved/destroyed; stale nav masks previously
  // caused footsteps to be drawn through a different building at the same index.
@@ -99,23 +100,49 @@ weight(i){return 1/this.roadBoost(i)}
 // Reachability queries do not need a weighted A* route. Cache connected
 // regions until the obstacle mask changes; diagonal moves cannot bridge
 // separate four-connected regions because corner cutting is forbidden.
-reachable(from,to){
- this.refresh();const a=this.nearest(from),b=this.nearest(to);if(!a||!b)return false;
- if(this.componentVersion!==this.version){
-  const labels=new Int32Array(this.n),queue=new Int32Array(this.n);let id=0;
-  for(let start=0;start<this.n;start++){
-   if(!this.mask[start]||labels[start])continue;id++;let head=0,tail=0;queue[tail++]=start;labels[start]=id;
-   while(head<tail){const k=queue[head++],x=k%this.w,z=Math.floor(k/this.w);
-    for(const j of [x>0?k-1:-1,x+1<this.w?k+1:-1,z>0?k-this.w:-1,z+1<this.h?k+this.w:-1]){
-     if(j>=0&&this.mask[j]&&!labels[j]){labels[j]=id;queue[tail++]=j;}
-    }
-   }
-  }
-  this.components=labels;this.componentVersion=this.version;
+ensureComponents(){
+ if(this.componentVersion===this.version)return;
+ const labels=new Int32Array(this.n),queue=new Int32Array(this.n),sizes=[0];let id=0;
+ for(let start=0;start<this.n;start++){
+  if(!this.mask[start]||labels[start])continue;id++;let head=0,tail=0;queue[tail++]=start;labels[start]=id;
+  while(head<tail){const k=queue[head++],x=k%this.w,z=Math.floor(k/this.w);
+   for(const j of [x>0?k-1:-1,x+1<this.w?k+1:-1,z>0?k-this.w:-1,z+1<this.h?k+this.w:-1])if(j>=0&&this.mask[j]&&!labels[j]){labels[j]=id;queue[tail++]=j;}
+  }sizes[id]=tail;
  }
- return this.components[this.index(a.x,a.z)]===this.components[this.index(b.x,b.z)];
+ this.components=labels;this.componentSizes=sizes;this.componentVersion=this.version;
 }
-route(from,to,{preferRoads=true}={}){this.refresh();const a=this.nearest(from),b=this.nearest(to);if(!a||!b)return null;const start=this.index(a.x,a.z),goal=this.index(b.x,b.z);if(start===goal)return [b];const costs=new Float32Array(this.n);costs.fill(Infinity);const prev=new Int32Array(this.n);prev.fill(-1);const closed=new Uint8Array(this.n),heap=[];const push=(id,cost)=>{heap.push([id,cost]);for(let i=heap.length-1;i>0;){let p=(i-1)>>1;if(heap[p][1]<=heap[i][1])break;[heap[p],heap[i]]=[heap[i],heap[p]];i=p}};const pop=()=>{const result=heap[0],last=heap.pop();if(heap.length){heap[0]=last;for(let i=0;;){let l=i*2+1,r=l+1,j=i;if(l<heap.length&&heap[l][1]<heap[j][1])j=l;if(r<heap.length&&heap[r][1]<heap[j][1])j=r;if(j===i)break;[heap[i],heap[j]]=[heap[j],heap[i]];i=j}}return result[0]};costs[start]=0;push(start,0);while(heap.length){const k=pop();if(closed[k])continue;if(k===goal){let out=[],v=k;while(v!==start){out.push(this.point(v));v=prev[v]}out.push(a);return out.reverse()}closed[k]=1;const x=k%this.w,z=Math.floor(k/this.w);for(const[dx,dz]of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){let xx=x+dx,zz=z+dz;if(xx<0||xx>=this.w||zz<0||zz>=this.h)continue;const j=zz*this.w+xx;if(!this.mask[j]||closed[j]||(dx&&dz&&(!this.mask[z*this.w+xx]||!this.mask[zz*this.w+x])))continue;const score=costs[k]+Math.hypot(dx,dz)*(preferRoads?this.weight(j):1);if(score<costs[j]){costs[j]=score;prev[j]=k;push(j,score+.45*Math.hypot(xx-(goal%this.w),zz-Math.floor(goal/this.w)))}}}return null}
+reachable(from,to){this.refresh();const a=this.nearest(from),b=this.nearest(to);if(!a||!b)return false;this.ensureComponents();return this.components[this.index(a.x,a.z)]===this.components[this.index(b.x,b.z)];}
+repairEntrances(){
+ // Old saves can have adjacent collision boxes covering a front door. Select
+ // an accessible outside service entrance; never move a worker or its cargo.
+ this.ensureComponents();let main=0;
+ for(let i=1;i<this.componentSizes.length;i++)if(this.componentSizes[i]>this.componentSizes[main])main=i;
+ for(const b of this.buildings()){
+  if(b.landEntry||!buildingClearance(b))continue;delete b.accessEntry;
+  const front=door(b),at=this.index(front.x,front.z);
+  if(at>=0&&this.mask[at]&&this.components[at]===main)continue;
+  const {rx,rz}=buildingClearance(b),candidates=[];
+  for(let dx=-rx;dx<=rx;dx+=1){candidates.push({x:b.x+dx,z:b.z-rz-1.15},{x:b.x+dx,z:b.z+rz+1.15});}
+  for(let dz=-rz;dz<=rz;dz+=1){candidates.push({x:b.x-rx-1.15,z:b.z+dz},{x:b.x+rx+1.15,z:b.z+dz});}
+  const valid=candidates.filter(p=>{const i=this.index(p.x,p.z);return i>=0&&this.mask[i]&&this.components[i]===main;}).sort((a,b)=>length(a,front)-length(b,front));
+  if(valid.length)b.accessEntry=this.point(this.index(valid[0].x,valid[0].z));
+ }
+}
+preservesAccess(building,cargo=[]){
+ this.refresh();const size=buildingClearance(building);if(!size)return true;
+ const existing=this.buildings().filter(b=>b.hp>0&&buildingClearance(b));
+ for(const b of existing){const other=buildingClearance(b);if(Math.abs(b.x-building.x)<other.rx+size.rx+.75&&Math.abs(b.z-building.z)<other.rz+size.rz+.75)return false;}
+ const hall=existing.find(b=>b.type==='hall');if(!hall)return true;
+ const from=this.nearest(door(hall));if(!from)return false;
+ const anchors=[...existing.map(door),...Object.values(this.world.workers||{}).filter(w=>(w.carried||0)>0),...cargo];
+ const protectedPoints=anchors.map(p=>this.nearest(p)).filter(p=>p&&this.reachable(from,p));
+ const mask=this.mask.slice();
+ for(let z=Math.floor(building.z-size.rz);z<=Math.ceil(building.z+size.rz);z++)for(let x=Math.floor(building.x-size.rx);x<=Math.ceil(building.x+size.rx);x++)if(Math.abs(x-building.x)<=size.rx&&Math.abs(z-building.z)<=size.rz){const i=this.index(x,z);if(i>=0)mask[i]=0;}
+ const seen=new Uint8Array(this.n),queue=new Int32Array(this.n);let head=0,tail=0;const start=this.index(from.x,from.z);if(!mask[start])return false;queue[tail++]=start;seen[start]=1;
+ while(head<tail){const k=queue[head++],x=k%this.w,z=Math.floor(k/this.w);for(const j of [x>0?k-1:-1,x+1<this.w?k+1:-1,z>0?k-this.w:-1,z+1<this.h?k+this.w:-1])if(j>=0&&mask[j]&&!seen[j]){seen[j]=1;queue[tail++]=j;}}
+ return protectedPoints.every(p=>seen[this.index(p.x,p.z)]);
+}
+route(from,to,{preferRoads=true}={}){this.refresh();const a=this.nearest(from),b=this.nearest(to);if(!a||!b||!this.reachable(a,b))return null;const start=this.index(a.x,a.z),goal=this.index(b.x,b.z);if(start===goal)return [b];const costs=new Float32Array(this.n);costs.fill(Infinity);const prev=new Int32Array(this.n);prev.fill(-1);const closed=new Uint8Array(this.n),heap=[];const push=(id,cost)=>{heap.push([id,cost]);for(let i=heap.length-1;i>0;){let p=(i-1)>>1;if(heap[p][1]<=heap[i][1])break;[heap[p],heap[i]]=[heap[i],heap[p]];i=p}};const pop=()=>{const result=heap[0],last=heap.pop();if(heap.length){heap[0]=last;for(let i=0;;){let l=i*2+1,r=l+1,j=i;if(l<heap.length&&heap[l][1]<heap[j][1])j=l;if(r<heap.length&&heap[r][1]<heap[j][1])j=r;if(j===i)break;[heap[i],heap[j]]=[heap[j],heap[i]];i=j}}return result[0]};costs[start]=0;push(start,0);while(heap.length){const k=pop();if(closed[k])continue;if(k===goal){let out=[],v=k;while(v!==start){out.push(this.point(v));v=prev[v]}out.push(a);return out.reverse()}closed[k]=1;const x=k%this.w,z=Math.floor(k/this.w);for(const[dx,dz]of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){let xx=x+dx,zz=z+dz;if(xx<0||xx>=this.w||zz<0||zz>=this.h)continue;const j=zz*this.w+xx;if(!this.mask[j]||closed[j]||(dx&&dz&&(!this.mask[z*this.w+xx]||!this.mask[zz*this.w+x])))continue;const score=costs[k]+Math.hypot(dx,dz)*(preferRoads?this.weight(j):1);if(score<costs[j]){costs[j]=score;prev[j]=k;push(j,score+.45*Math.hypot(xx-(goal%this.w),zz-Math.floor(goal/this.w)))}}}return null}
 move(agent,target,dt,speed=3){this.refresh();agent.moving=false;if(!target||dt<=0)return false;if(!this.open(agent.x,agent.z)){const p=this.nearest(agent);if(!p)return false;agent.x=p.x;agent.z=p.z;this.cache.delete(agent)}const goal=this.nearest(target);if(!goal)return false;let memo=this.cache.get(agent),key=goal.x+':'+goal.z;if(!memo||memo.key!==key||memo.version!==this.version){const path=length(agent,goal)<3&&this.clear(agent,goal)?[goal]:this.route(agent,goal);memo={key,path:path||[],version:this.version,failedTime:0};this.cache.set(agent,memo)}if(!memo.path.length&&length(agent,goal)>.18){memo.failedTime=(memo.failedTime||0)+dt;if(memo.failedTime>4){this.cache.delete(agent);agent.pathFailure=(agent.pathFailure||0)+1}return false}let remaining=dt;while(memo.path.length&&remaining>0&&speed>0){const p=memo.path[0],d=length(agent,p);if(d<.015){memo.path.shift();continue}const k0=this.index(agent.x,agent.z),boost=k0>=0?this.roadBoost(k0):1,step=Math.min(d,speed*remaining*boost),next={x:agent.x+(p.x-agent.x)/d*step,z:agent.z+(p.z-agent.z)/d*step};if(!this.clear(agent,next)){this.cache.delete(agent);break}this.recordTraffic(agent,next);agent.heading=Math.atan2(p.x-agent.x,p.z-agent.z);agent.x=next.x;agent.z=next.z;remaining-=step/(speed*boost);agent.moving=true;if(step>=d-.001)memo.path.shift()}return length(agent,goal)<.18}
 }
 export function cityWorld(seed,passable,buildings){const resources=[],noise=(a,b)=>{const n=Math.sin(a*127.1+b*311.7+seed*.017)*43758.5453;return n-Math.floor(n)};const add=(kind,x,z,amount)=>{if(!passable(x,z)||buildings.some(b=>Math.abs(b.x-x)<4&&Math.abs(b.z-z)<4))return;resources.push({id:resources.length,kind,x,z,amount,removed:false})};for(let i=0;i<420;i++){const x=noise(i,3)*140-70,z=noise(i,9)*120-60;if(noise(i,17)>.3)add('tree',x,z,24)}

@@ -75,3 +75,13 @@ Kõigi kuue ajastuvahetuse materjalikulu vähendati täpselt poole võrra. Teadu
 Uue, sama seemnega katse raport: `V88_POOLHIND_TEST.md`. Täpne sündmuslogi ja lõppseis: `V88_POOLHIND_TEST.json`; iga käigu täielikum olekulogi: `V88_POOLHIND_TEST.jsonl.gz`. 100 käigu peatumisreegel ja keskaja eesmärk säilivad. Eelmine aruanne `V88_KESKAJA_TEST.md` säilib võrdluseks.
 
 Uus katse lõppes käigul 137,15: riik 3 veetis pronksiajas 100 käiku ja jäi 50 laua puudumise taha. Kolm ülejäänud riiki jõudsid rauaaega, keskaega ei jõudnud ükski. Täpne logi tuvastas vähemalt 65. käigust seisva, 12 puitu kandva puuraiuja tagasitee tõrke ja saekoja puudumise. Katse peatati ja seda ei korratud; tootmis- ega liikumisloogikat pärast katset ei muudetud.
+
+## V88c: avastaja jõnksumine ja AI põhiehitus
+
+- Avastaja nähtavuse muutus uuendab ainult muutunud ruutude maastikuvärve. Esialgsed maastikuvärvid salvestatakse üks kord; iga sammu järel ei arvutata enam terve kaardi sadu tuhandeid värve uuesti. Udukatte ja kaardivisandite geomeetria püsib sama; muutuvad üksikute ruutude indeksid ja nähtavus. Maailma dekoratsioonide maatrikseid muudetakse ainult nähtavuse tegelikul muutumisel.
+- AI põhikava: kaev, metsamaja, sobiv toiduallikas, kohalik kivimurd, esimene elamu, avatud puusepatöökoda/saekaatriks nimetatud lauatootja ning õpikoda. Rauaajal lisandub raua tootmisahel vastavalt toorainele ja tehnoloogiale. Elupäästev lisatoit ja vesi on endiselt kõige tähtsamad.
+- Puusepatöö uuritakse varakult pärast pronksitööd. Esimese saekoja ja teiste puuduvate põhiehitiste jaoks hoitakse materjale; kõrvalharu või kaitseehitis ei või seda varu ära kulutada. Saekoja puiduvajadus arvestab nüüd ka metsamaja.
+- Põhiehitised saavad AI tööjõu ja ehitajate järjekorras eelise. Valmis kõrvalehitised saavad ainult ülejäänud tööjõudu, täis laoga tootmishooned ei hõiva töölisi. AI saab vältimatu peatatud tootmise uuesti käivitada.
+- Paigutuskontroll kasutab ehitiste tegelikke liikumistakistuse mõõtmeid, jätab majade vahele läbipääsu ning kaitseb olemasolevaid sissepääse ja kandjate tagasiteed. Vanas salvestuses kaetud välisuksega hoone saab ligipääsetava välimise teenindussissepääsu. Töölisi ja nende kandamit ei telepordita.
+- `TEST_V88_RECOVERY.mjs` taastab eelmise testi kinni jäänud 12 puitu kandva puuraiuja, kontrollib tema päriselt kõndides tagasijõudmist ning kontrollib kõigi nelja riigi saekoja prioriteeti, materjalivaru, tööjõudu ja avastaja tegelikku liikumist.
+- `TEST_V88_EXPLORATION_UI.mjs` kontrollib arvuti- ja telefonivaates 40 tegelikku avastaja liikumissammu, püsivaid udugeomeetriaid, muudetud ruutude arvu, veateateid ja nähtavuse uuendamise ajakulu.
