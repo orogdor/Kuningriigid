@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths: ['*v89*', 'civilization.js', 'index.html', 'continuous-landscape-visual.js', 'detail-roads.js', 'TEST_V89*', '.github/workflows/v89.yml']
   workflow_dispatch:
+concurrency:
+  group: v89-context-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
