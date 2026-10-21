@@ -10,6 +10,8 @@ V87 pealt alustatud arendusharu: rannajoonele paigutatavad kalameheonnid ja sada
 
 V88b: kõigi ajastuvahetuste materjalikulu on poole väiksem. [Uue 100 käigu reegliga katse aruanne](V88_POOLHIND_TEST.md) ja [täielik käigulogi](V88_POOLHIND_TEST.jsonl.gz).
 
+V88d: avastaja nähtavus uuendatakse osaliselt, AI põhiehitistel ja saekojal on eelis, läbipääsud ning kaevandaja toidukulu on parandatud. [Kontrolli aruanne](V88_PARANDUSED_TEST.md).
+
 ## V87 – linnade varud, kaupmehed ja vajadused
 
 Linnapõhised varud koos riigi kogusega, ajakuluga maa- ja meretransport, piiratud reisijalad, 5% peatumistasu ning neutraalsed suhted ja kaubanduspinged. Ajastupõhised toidu- ja luksusvajadused, 17 tootmishoonet ja uued piirkondlikud ressursid. [Reeglid ja testide ulatus](MAJANDUS_V87.md).

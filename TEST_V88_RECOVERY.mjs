@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {Civilization,createGame,BUILDINGS} from './civilization-core.js';
-import {initialState} from './economy.js';
+import {initialState,tickEconomy} from './economy.js';
 import {selectAIBuild} from './ai-strategy.js';
 import {allocateCity} from './labor.js';
 import {VisionDelta} from './fog-delta-v88.js';
@@ -34,6 +34,19 @@ const realm={pop:3,resources:{wood:20,plank:0,bread:100,water:100,stone:0}},c={i
 allocateCity({s:{research:[{},{}]},allBuildings:()=>buildings,buildingDefinitions:BUILDINGS},c);
 assert.ok(buildings.find(b=>b.type==='saw').assigned>0);
 assert.ok(buildings.filter(b=>b.type==='watchtower').every(b=>b.assigned===0),'optional buildings receive only surplus labour');
+// The mine's one-food input uses exactly the economy's food substitution:
+// berries/meat/grain can feed miners even when the literal bread stock is zero.
+const mine={type:'mine',ready:true,hp:350},miningRealm={pop:8,resources:{bread:0,berries:30,water:100,wood:100}};
+const miningCity={id:5,team:1,economy:{realms:[{},miningRealm]}};
+allocateCity({s:{research:[{},{ageWait:{missing:{iron:20}}}]},allBuildings:()=>[mine],buildingDefinitions:BUILDINGS},miningCity);
+assert.ok(mine.assigned>0,'miners receive workers when other edible food covers bread input');
+miningRealm.resources.berries=0;allocateCity({s:{research:[{},{}]},allBuildings:()=>[mine],buildingDefinitions:BUILDINGS},miningCity);
+assert.equal(mine.assigned,0,'without any food miners correctly wait');
+const miningEconomy=initialState(1),minerStock=miningEconomy.realms[1].resources;
+for(const key of Object.keys(minerStock))minerStock[key]=0;minerStock.berries=5;
+miningEconomy.buildings=[{type:'hall',team:1,x:0,z:0,hp:350,ready:true},{type:'mine',team:1,x:15,z:0,hp:350,ready:true}];
+tickEconomy(miningEconomy,1,{skipDemographics:true,assigned:b=>b.type==='mine'?1:0,harvest:()=>6,spawnPoint:b=>b,moveCargo:()=>true});
+assert.equal(minerStock.ore,6);assert.ok(minerStock.berries<5,'actual mining consumes substitute food');
 const state={visionRevision:1,explored:[{'0:0':1}]},delta=new VisionDelta(state);
 assert.equal(delta.update().changed.length,1);const serial=delta.serial;delta.update();assert.equal(delta.serial,serial);
 state.explored[0]['1:0']=1;state.visionRevision++;assert.deepEqual(delta.update().changed.map(p=>p.key),['1:0']);

@@ -85,3 +85,9 @@ Uus katse lõppes käigul 137,15: riik 3 veetis pronksiajas 100 käiku ja jäi 5
 - Paigutuskontroll kasutab ehitiste tegelikke liikumistakistuse mõõtmeid, jätab majade vahele läbipääsu ning kaitseb olemasolevaid sissepääse ja kandjate tagasiteed. Vanas salvestuses kaetud välisuksega hoone saab ligipääsetava välimise teenindussissepääsu. Töölisi ja nende kandamit ei telepordita.
 - `TEST_V88_RECOVERY.mjs` taastab eelmise testi kinni jäänud 12 puitu kandva puuraiuja, kontrollib tema päriselt kõndides tagasijõudmist ning kontrollib kõigi nelja riigi saekoja prioriteeti, materjalivaru, tööjõudu ja avastaja tegelikku liikumist.
 - `TEST_V88_EXPLORATION_UI.mjs` kontrollib arvuti- ja telefonivaates 40 tegelikku avastaja liikumissammu, püsivaid udugeomeetriaid, muudetud ruutude arvu, veateateid ja nähtavuse uuendamise ajakulu.
+
+### Kaevandaja toidukulu kontroll (V88d)
+
+Pikema kontrolli käigus leiti, et tööjõujaotus nõudis kaevandajale sõna-sõnalt leiba, kuigi majanduse maksmisreegel lubab toidukulu katta teiste toitudega. Tööjõujaotus kasutab nüüd sama `canAfford` reeglit nagu päris tootmine: muu toit saab kaevandajat toita ja tootmisel võetakse see ka laost maha. Täis lao tõttu tööjõuta tootja näitab olekus lao täitumist. Taastamiskontroll katab nii töötajate määramise kui toidu tegeliku kulumise ja maagi saabumise.
+
+Kampaania `V88_PARANDUSED_TEST` käivitati enne seda viimast toidukulu parandust. Kõigil 17 linnal oli katse lõpus valmis saekoda; kõik riigid jõudsid rauaaega ning kolm keskaega. Riik 3 täitis rauaajas 100 käigu piiri ja test peatus käigul 189,6583, puudu 20 rauda. See paljastaski toidukulu kontrolli vea. Viimane parandus läbis eraldi taastamis- ja majanduskontrollid; kampaaniat pärast stoppi uuesti ei käivitatud.

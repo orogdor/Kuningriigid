@@ -1,3 +1,4 @@
+import {canAfford} from './economy.js';
 import {FOUNDATION_TYPES} from './ai-foundation-v88.js';
 import {foodTotal} from './city-needs-v87.js';
 import {availableLabor} from './gameplay-flow-v86.js?v=86a';
@@ -85,7 +86,7 @@ export function allocateCity(game,city){
  const pending=all.some(b=>!b.ready&&!b.disabled&&b.workerLimit!==0);
  const entries=all.filter(b=>b.ready).map(b=>{
   const need=demand(b,game.buildingDefinitions),definition=game.buildingDefinitions[b.type];
-  const inputsReady=!definition?.input||Object.entries(definition.input).every(([key,n])=>(r.resources[key]||0)>=n);
+  const inputsReady=!definition?.input||canAfford(r.resources,definition.input);
   const outputFull=definition?.out&&game.storageCap&&game.storageUsed&&game.storageUsed(city,definition.out,r.resources)>=game.storageCap(city,definition.out);
   const want=inputsReady&&!outputFull?Math.max(0,Math.min(need,b.workerLimit??need)):0;
   let priority=jobPriority(b,foodCritical,waterCritical,shortages,laborScarce,r.resources);
