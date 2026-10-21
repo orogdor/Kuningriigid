@@ -1,5 +1,6 @@
 import {ENGLISH_PAIRS} from './locale-en.js?v=88a';
 
+const buildVersion=typeof document!=='undefined'?(document.title.match(/V(\d+)/)?.[1]||'96'):'96';
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
 const english=new Map(ENGLISH_PAIRS);
@@ -95,7 +96,7 @@ function renderAll(){
  if(document.body)visit(document.body);
  updateSpecialCopy();
  document.documentElement.lang=language;
- document.title=language==='en'?'Kingdoms V88 – Real-Time Strategy':'Kuningriigid V88 – reaalajastrateegia';
+ document.title=language==='en'?'Kingdoms V'+buildVersion+' – Real-Time Strategy':'Kuningriigid V'+buildVersion+' – reaalajastrateegia';
  for(const id of ['language','menulanguage']){const c=document.getElementById(id);if(c)c.value=language}
 }
 export function changeLanguage(next,{notify=true}={}){

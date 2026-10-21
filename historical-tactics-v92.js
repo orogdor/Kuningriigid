@@ -1,3 +1,4 @@
+import {squadContactGoal} from './combat-contact-v96.js';
 import {FORMATIONS,formationDamage,missileExposure} from './formations-v94.js';
 import {BATTLE_FRONT_DEPTH,BATTLE_EMPTY_HALF_WIDTH} from './battle-pacing-v93.js';
 import {troopRole,rangedTroop} from './military-v88.js';
@@ -23,7 +24,7 @@ export function initializeTactics(b){
 export function updateMorale(b,dt){
  for(const u of b.squads){if(!u.men||u.reserve||u.retreated)continue;const men=u.men.filter(m=>m.hp>0),loss=1-men.length/Math.max(1,u.startMen),friends=b.squads.filter(q=>q!==u&&q.team===u.team&&q.hp>0&&!q.routing&&!q.retreated&&!q.reserve&&distance(q,u)<16),panic=b.squads.some(q=>q!==u&&q.team===u.team&&q.routing&&distance(q,u)<18);
   u.ammoRemaining=men.reduce((n,m)=>n+(m.ammo||0),0);u.cohesion=men.length?Math.max(0,1-men.reduce((n,m)=>n+Math.max(0,distance(m,u)-4),0)/men.length/12):0;
-  for(const m of men){const base=u.grade==='mobilized'?64:u.grade==='elite'?94:82,target=base-loss*90+(friends.length?7:0)-(panic?18:0)-(u.moraleShock||0)-m.fatigue*.12-(1-u.cohesion)*10;
+  for(const m of men){const base=u.grade==='mobilized'?64:u.grade==='elite'?94:82,target=base-loss*70+(friends.length?7:0)-(panic?9:0)-(u.moraleShock||0)-m.fatigue*.07-(1-u.cohesion)*10;
    m.morale=Math.max(0,Math.min(100,m.morale+(target-m.morale)*Math.min(1,dt*.5)));if(m.morale<24)m.routing=true;else if(m.morale>46&&!u.routing)m.routing=false;
   }u.morale=men.length?men.reduce((n,m)=>n+m.morale,0)/men.length:0;u.moraleShock=Math.max(0,(u.moraleShock||0)-dt*.5);
   if(men.length&&(men.filter(m=>m.routing).length>men.length*.45||(loss>.6&&u.morale<38))){if(!u.routing){u.routing=true;u.routAt=b.elapsed;b.moraleRouts=(b.moraleRouts||0)+1;}for(const m of men)m.routing=true;u.manualOrder=false;u.target=null;}
@@ -34,22 +35,22 @@ export function tacticalGoal(u,nearest,squads,b,a){
  if(u.tacticalRole==='support'&&b.elapsed<(u.releaseAt||16)&&distance(u,nearest)>16)return u.deployment;
  if(u.tacticalRole==='flank'||u.kind==='chariot'){
   const enemies=squads.filter(q=>q.team!==u.team&&!q.routing),edge=Math.max(28,...enemies.filter(q=>troopRole(q.kind)==='melee').map(q=>Math.abs(q.z)))+12,flank=u.flank||(u.source%2?1:-1),z=flank*Math.min(130,edge);
-  if(!isBow(u)&&Math.abs(u.x-nearest.x)<10)u.flankReady=true;if(u.flankReady&&!isBow(u))return nearest;
+  if(!isBow(u)&&Math.abs(u.x-nearest.x)<10)u.flankReady=true;if(u.flankReady&&!isBow(u))return squadContactGoal(u,nearest);
   if(Math.abs(u.z-z)>12&&Math.abs(u.x-nearest.x)>14)return {x:u.x,z};
   if(u.kind==='chariot'&&u.ammoRemaining!==0&&distance(u,nearest)<a.range*.65)return {x:u.x-u.battleSide*10,z:u.z+flank*5};
   return {x:nearest.x-u.battleSide*(u.kind==='chariot'&&u.ammoRemaining!==0?a.range*.7:0),z};
  }
  if(u.tacticalRole==='shot'&&u.ammoRemaining!==0){return distance(u,nearest)>a.range*.8?{x:nearest.x-u.battleSide*a.range*.7,z:u.deployment?.z??u.z}:null;}
  if(isBow(u)&&u.ammoRemaining!==0){const front=squads.filter(q=>q.team===u.team&&q.tacticalRole==='line'&&!q.routing),closest=front.reduce((p,q)=>!p||distance(q,nearest)<distance(p,nearest)?q:p,null);if(closest)return {x:closest.x-u.battleSide*8,z:u.deployment?.z??u.z};if(distance(u,nearest)<a.range*.45)return {x:u.x-u.battleSide*6,z:u.z};}
- return distance(u,nearest)>a.range+2?nearest:null;
+ return squadContactGoal(u,nearest);
 }
-export function tacticalDamage(attacker,target,amount){
+export function tacticalDamage(attacker,target,amount,projectile=usesArrows(attacker.u)?'arrow':isBow(attacker.u)?'bullet':null){
  const {m,u}=attacker,v=target.u,n=target.m,dx=m.x-n.x,dz=m.z-n.z,d=Math.hypot(dx,dz)||1,front=(dx*Math.sin(n.heading??v.heading??0)+dz*Math.cos(n.heading??v.heading??0))/d,flanked=front<.15;
  const braced=isSpear(v)&&!n.moving&&(v.cohesion??1)>.45;
- if(flanked){amount*=front<-.4?1.35:1.15;v.moraleShock=Math.min(26,(v.moraleShock||0)+.35);}
- else if(braced&&usesArrows(u))amount*=.7;
+ if(flanked){amount*=front<-.4?1.35:1.15;v.moraleShock=Math.min(18,(v.moraleShock||0)+.25);}
+ else if(braced&&projectile==='arrow')amount*=.7;
  if(braced&&troopRole(u.kind)==='cavalry'&&!isBow(u))amount*=.55;
  if(isSpear(u)&&troopRole(v.kind)==='cavalry'&&!m.moving&&(u.cohesion??1)>.45)amount*=1.6;
- return formationDamage(attacker,target,amount,usesArrows(u)?'arrow':isBow(u)?'bullet':null)*(1-m.fatigue*.002);
+ return formationDamage(attacker,target,amount,projectile)*(1-m.fatigue*.002);
 }
 export function shotHits(m,u,d,range,target=null){const shot=m.shotsFired=(m.shotsFired||0)+1;let seed=(u.source+1)*73856093+(m.index+1)*19349663+shot*83492791;seed=Math.imul(seed^(seed>>>16),0x45d9f3b);const roll=(seed>>>0)/4294967296,chance=Math.max(.3,Math.min(.88,.91-.4*d/Math.max(1,range)-(m.wasMoving?.13:0)+(u.formation==='volley'?.08:0)))*(target?missileExposure(target):1);return roll<chance;}
