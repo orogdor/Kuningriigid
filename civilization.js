@@ -1,3 +1,4 @@
+import {ARMY_COLORS,ARMY_COLOR_NAMES} from './bronze-soldiers-v95.js';
 import {FORMATIONS,formationOptions,formationName,setFormation} from './formations-v94.js';
 import {deployHistoricalBattle} from './historical-tactics-v92.js';
 import {battleManCount,livingMen,initializeMen,persistIndividualMen} from './individual-battle-v91.js';
@@ -21,36 +22,36 @@ import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
 import {createDetailBorders} from './detail-borders-v85.js?v=85a';
 import {mountainTint,createMountainOutcrops,createBridgeBuilding,crossingFrame} from './landscape-polish-v84.js?v=85a';
 import {CommandVisuals} from './command-visuals.js';
-import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=94a';
+import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=95a';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
-import {createDetailTrailLinks} from './detail-roads.js?v=94a';
-import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=94a';
+import {createDetailTrailLinks} from './detail-roads.js?v=95a';
+import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=95a';
 import {surface,localSurface,riverNear,overviewSurface} from './continuous-landscape.js?v=85a';
-import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=94a';
+import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=95a';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js?v=86a';
 import {housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT,BASIC_JOBS} from './labor.js';
 import {BattleFeedback} from './battle-feedback.js';
-import {WALL_TYPES,TOWER_TYPES,wallHeight,fortifyBattle,configureWallFootprint,towerManned,wallCapacity} from './fortifications.js?v=94a';
+import {WALL_TYPES,TOWER_TYPES,wallHeight,fortifyBattle,configureWallFootprint,towerManned,wallCapacity} from './fortifications.js?v=95a';
 import {persistSiegeDamage} from './medieval-v62.js';
 import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock,ERA_NAMES} from './research.js';
 import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
-import {renderResearchUI} from './research-ui.js?v=94a';
+import {renderResearchUI} from './research-ui.js?v=95a';
 import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=86a';
-import {createWorldAtlasProps} from './world-props.js?v=94a';
+import {createWorldAtlasProps} from './world-props.js?v=95a';
 import {buildDetailWorldObjects} from './detail-world-objects.js?v=85a';
 import {createVillageLife} from './village-life-v76.js?v=76a';
 import * as T from './vendor/three.module.js';
-import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=94a';
+import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=95a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js';
 import {detailHeight,featureNames} from './world-details.js';
-import {createAgeBuilding,animateBuilding} from './buildings.js?v=94a';
+import {createAgeBuilding,animateBuilding} from './buildings.js?v=95a';
 import {createStoneDemoState,DEMO_CITY_NAME} from './stone-demo-v77.js?v=80c';
 import {createBronzeDemoState,BRONZE_DEMO_NAME} from './bronze-demo-v79.js?v=80c';
 import {createMedievalDemoState,MEDIEVAL_DEMO_NAME} from './medieval-demo-v80.js?v=80c';
@@ -270,7 +271,7 @@ function followDetail(){if(view!=='local'||s.battle||!activeTile)return;const dc
 function insideCrossing(frame,x,z){if(!frame)return false;const dx=x-frame.x,dz=z-frame.z;return Math.abs(dx*frame.normal.x+dz*frame.normal.z)<frame.halfSpan*1.5&&Math.abs(-dx*frame.normal.z+dz*frame.normal.x)<4.5;}
 function resourceView(r){const g=new T.Group();if(['game','fish','berry'].includes(r.kind))g.add(createWildlife(r.kind));else if(r.kind==='tree')addTree(g,0,0,0,r.id,.9);else if(r.depositSite)g.add(createDepositPile(r.kind));else for(let i=0;i<3;i++){const rock=new T.Mesh(new T.DodecahedronGeometry(.8+i*.2,0),mat(r.kind==='ore'?'#9e7356':'#a4a68e'));rock.position.set((i-1)*.65,.6,i%2*.5);rock.castShadow=true;g.add(rock)}g.position.set(r.x,r.kind==='fish'?.18:ground(activeTile,r.x,r.z),r.z);environment.add(g);return g}
 let soldierBatch;
-function troopView(u){const group=new T.Group(),count=u.men?.length||u.menCount||(['scout','militia'].includes(u.kind)?1:SQUAD_SIZE);group.userData.squadFormation=true;for(let i=0;i<count;i++)createSoldier(group,(i%4-1.5)*.7,Math.floor(i/4)*.8,['#9d9875','#ac7059','#8d78b5','#b9a158'][u.team],u.kind,u.grade);people.add(group);return group}
+function troopView(u){const group=new T.Group(),count=u.men?.length||u.menCount||(['scout','militia'].includes(u.kind)?1:SQUAD_SIZE);group.userData.squadFormation=true;for(let i=0;i<count;i++)createSoldier(group,(i%4-1.5)*.7,Math.floor(i/4)*.8,ARMY_COLORS[u.team%ARMY_COLORS.length],u.kind,u.grade);people.add(group);return group}
 function workerProfession(w,age){if(w.kind==='market_woman')return 'market_woman';const prefix=age===1?'bronze_':age>=3?'master_':'';if(w.kind==='builder')return ['stone_builder','bronze_builder','iron_builder','medieval_builder','renaissance_builder','industrial_builder','modern_builder'][Math.max(0,Math.min(6,age))];if(['shipwright','trainer'].includes(w.kind))return prefix+w.kind;if(w.kind==='fisher')return prefix+'stone_fisher';if(w.kind==='berries')return 'gatherer';if(w.kind==='well')return 'watercarrier';if(w.kind==='farm')return prefix+'farmer';if(['saw','mill','bakery','coal','smelter','smith','study','scriptorium','academy','university','observatory','polytechnic','laboratory','printer','nitrate','powdermill','steelworks','engineworks','railstation','oilwell','refinery','powerplant','autofactory','airfield'].includes(w.kind))return 'artisan';if(w.kind==='hunter')return age?'archer':'spearman';if(w.kind==='forester')return age?prefix+'forester':'stone_forester';return age?prefix+(w.kind==='lumber'?'lumberjack':'miner'):(w.kind==='lumber'?'stone_lumber':'stone_miner')}
 function workerIsVisible(ctx,w,id){if(w.kind==='market_woman')return w.visible!==false;if(w.kind==='builder')return w.visible!==false;if(String(id).startsWith('trainer:'))return (game.parentCity(ctx).training?.[0]?.assigned||0)>0;if(String(id).startsWith('basic:'))return (game.parentCity(ctx).basicAssigned?.[String(id).slice(6)]||0)>0;const b=ctx.economy.buildings[w.building];return !!b&&b.ready&&!b.disabled&&(b.assigned||0)>0}
 function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory();const borderStamp=game.territoryStamp+':'+(s.visionRevision||0);if(localBorderStamp!==borderStamp){if(localBorders){environment.remove(localBorders);disposeNetwork(localBorders)}localBorders=createDetailBorders(game,activeTile);environment.add(localBorders);localBorderStamp=borderStamp;}if(localCrossingRevision!==(s.crossingRevision||0)){localCrossingRevision=s.crossingRevision||0;if(localRivers){environment.remove(localRivers);disposeNetwork(localRivers)}localRivers=createRiverNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:230}:activeTile,quality);environment.add(localRivers);for(const {holder} of detailObjectHolders.values())holder.userData.siteStamp=null;}syncDetailWorldObjects();const city=activeCity(),age=city?game.upgrade(city.team):0,world=game.localWorld(activeTile),nav=detailNav(),vegetationCrossing=activeTile.river&&(activeTile.bridge||activeTile.ford)?crossingFrame(game,activeTile):null;const roadStamp=tileKey(activeTile)+':'+(s.roadRevision||0)+':'+(s.visionRevision||0);if(detailRoadStamp!==roadStamp){if(detailWorldRoads){environment.remove(detailWorldRoads);disposeNetwork(detailWorldRoads)}detailWorldRoads=createUnifiedRoadNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:230}:activeTile);environment.add(detailWorldRoads);detailRoadStamp=roadStamp}for(const r of world.resources){let v=resourceModels.get(r.id);if(!v){v=resourceView(r);resourceModels.set(r.id,v)}v.position.set(r.x,r.kind==='fish'?.18:ground(activeTile,r.x,r.z),r.z);v.visible=!r.removed&&r.amount>0&&!(r.depositSite&&city?.economy.buildings.some(b=>b.depositId===r.id&&b.hp>0));if(['tree','berry','game'].includes(r.kind)){const water=riverNear(game,activeTile.x+r.x/3,activeTile.z+r.z/2.6);v.visible&&=!activeTile.mountain&&water.distance>=water.width*1.55&&!insideCrossing(vegetationCrossing,activeTile.x+r.x/3,activeTile.z+r.z/2.6);}if(r.kind==='game')v.rotation.y=Math.sin(s.time*.18+r.id)*.4;if(r.kind==='fish')v.position.y+=Math.sin(s.time*2+r.id)*.04;if(r.plantedAt!=null)v.scale.setScalar(.25+.75*Math.min(1,(s.time-r.plantedAt)/20))}
@@ -812,7 +813,7 @@ function sampleV51FPS(dt){if(menuOpen||document.hidden)return;fpsFrames++;fpsSec
  if(highFpsSeconds>=12&&v51Resolution<1){v51Resolution=1;renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?.85:quality==='medium'?1.15:1.6));highFpsSeconds=0}
 }
 
-$('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();if(s.battle)initializeMen(s.battle,game.battleNavigation(s.battle));if(s.battle)openTile(game.cell(s.battle.cell));else openWorld();worldSync();if(sampleDemo){menuOpen=false;$('startmenu').hidden=true;const city=s.cities.find(c=>c.team===0);if(city)openTile(game.cell(city));if(battleDemo){paused=true;$('pause').textContent='▶';zoom=Math.min(700,280/Math.min(1,camera.aspect));focus.set(0,0,0);selectedUnit=s.battle.squads.find(u=>u.team===0);const reset=document.createElement('button');reset.id='battle-demo-restart';reset.textContent='Taasta testlahingu algseis';reset.onclick=()=>location.reload();$('battlepanel').append(reset);say('250 vs 250 pronksiaja meest. Lahing on pausil: vali salk, anna käsk ja vajuta ▶.');renderUI();}}if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={fogStatus:()=>({coverGeometry:fogCoverMesh?.geometry.uuid,sketchGeometries:fogSketchGroup.children.map(m=>m.geometry.uuid),changedCells:visionDelta.changed.length,terrainVertices:atlasLand.geometry.attributes.position.count}),camera,localScene,battleDemo,stoneDemo,bronzeDemo,medievalDemo,renaissanceDemo,industrialDemo,
+$('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();if(s.battle)initializeMen(s.battle,game.battleNavigation(s.battle));if(s.battle)openTile(game.cell(s.battle.cell));else openWorld();worldSync();if(sampleDemo){menuOpen=false;$('startmenu').hidden=true;const city=s.cities.find(c=>c.team===0);if(city)openTile(game.cell(city));if(battleDemo){paused=true;$('pause').textContent='▶';zoom=Math.min(700,280/Math.min(1,camera.aspect));focus.set(0,0,0);selectedUnit=s.battle.squads.find(u=>u.team===0);const legend=document.createElement('p');legend.id='battle-factions';legend.style.fontSize='11px';for(const team of [0,1]){const chip=document.createElement('b');chip.textContent=ARMY_COLOR_NAMES[team]+' · 250';chip.style.color='#eee6cc';chip.style.borderLeft='4px solid '+ARMY_COLORS[team];chip.style.padding='2px 5px';chip.style.marginRight='10px';legend.append(chip);}const types=document.createElement('small');types.textContent='Odamehed · kirvemehed · vibukütid · sõjavankrid';types.style.display='block';legend.append(types);$('battlepanel').append(legend);const reset=document.createElement('button');reset.id='battle-demo-restart';reset.textContent='Taasta testlahingu algseis';reset.onclick=()=>location.reload();$('battlepanel').append(reset);say('250 vs 250 pronksiaja meest. Lahing on pausil: vali salk, anna käsk ja vajuta ▶.');renderUI();}}if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={fogStatus:()=>({coverGeometry:fogCoverMesh?.geometry.uuid,sketchGeometries:fogSketchGroup.children.map(m=>m.geometry.uuid),changedCells:visionDelta.changed.length,terrainVertices:atlasLand.geometry.attributes.position.count}),camera,localScene,battleDemo,stoneDemo,bronzeDemo,medievalDemo,renaissanceDemo,industrialDemo,
  buildingInfoStatus:()=>({open:!!buildingInspector?.isOpen(),type:selectedBuilding?.type||null,
   data:selectedBuilding&&activeCity()?describeBuilding(game,activeCity(),selectedBuilding,AGES,RESOURCE_NAMES,BUILDINGS,BUILD_TECH):null}),
  selectBuildingType:(type,index=0)=>{const c=activeCity();return inspectBuilding(c?.economy.buildings.filter(b=>b.type===type)[index])},

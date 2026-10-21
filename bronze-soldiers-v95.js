@@ -1,0 +1,44 @@
+import * as T from './vendor/three.module.js';
+
+export const BRONZE_KINDS=Object.freeze(['bronze_spearman','bronze_axeman','bronze_archer','chariot']);
+export const ARMY_COLORS=Object.freeze(['#276bd1','#c43d43','#9271ce','#d2a12e']);
+export const ARMY_COLOR_NAMES=Object.freeze(['Sinine','Punane','Violetne','Ooker']);
+const prototypes=new Map(),shapes=new Map();
+const cloth=new T.MeshStandardMaterial({vertexColors:true,roughness:.87});
+const metal=new T.MeshStandardMaterial({vertexColors:true,roughness:.46,metalness:.55});
+const bronze='#b98b43',dark='#503b27',skin='#bf916a',linen='#ded1a6';
+function shape(name){if(name==='axe'&&!shapes.has(name)){const s=new T.Shape();s.moveTo(0,-.35);s.lineTo(.65,-1);s.quadraticCurveTo(1.4,0,.65,1);s.lineTo(0,.35);s.closePath();shapes.set(name,new T.ExtrudeGeometry(s,{depth:1,bevelEnabled:false,curveSegments:4}));}if(!shapes.has(name))shapes.set(name,name==='head'?new T.SphereGeometry(1,10,8):name==='rod'?new T.CylinderGeometry(1,1,1,8):name==='point'?new T.ConeGeometry(1,1,6):name==='wheel'?new T.TorusGeometry(1,.1,5,12):name==='bow'?new T.TorusGeometry(1,.055,5,14,Math.PI):new T.BoxGeometry(1,1,1));return shapes.get(name);}
+function piece(parent,name,color,x,y,z,sx,sy,sz,metallic=false,rotation=null){const mesh=new T.Mesh(shape(name),metallic?metal:cloth);mesh.userData.tint=color;mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);if(rotation)mesh.rotation.set(...rotation);parent.add(mesh);return mesh;}
+function profile(parent,color,points,depth=1,metallic=false){const geo=new T.LatheGeometry(points.map(([r,y])=>new T.Vector2(r,y)),10);const m=new T.Mesh(geo,metallic?metal:cloth);m.userData.tint=color;m.scale.z=depth;parent.add(m);return m;}
+function joint(parent,name,x=0,y=0,z=0){const g=new T.Group();g.name=name;g.position.set(x,y,z);parent.add(g);return g;}
+function shield(parent,color,large){const g=joint(parent,'shield',-.07,-.22,.25);if(large){
+ // A hide-covered figure-of-eight silhouette, rather than a Classical aspis.
+ for(const y of [-.22,.22]){piece(g,'head',dark,0,y,0,.43,.37,.07);piece(g,'head',color,0,y,.043,.39,.33,.045);}piece(g,'box',linen,0,0,.09,.075,1.05,.025);
+ }else{piece(g,'rod',dark,0,-.06,0,.37,.09,.37,false,[Math.PI/2,0,0]);piece(g,'rod',color,0,-.06,.055,.33,.025,.33,false,[Math.PI/2,0,0]);piece(g,'head',bronze,0,-.06,.09,.09,.09,.04,true);}
+}
+function horse(root,side,color){const x=side*.68;piece(root,'head',side<0?'#76513a':'#ad8660',x,.9,.95,.32,.36,.72);piece(root,'head','#76513a',x,1.23,1.5,.19,.4,.24,false,[-.35,0,0]);piece(root,'head','#9e7951',x,1.5,1.7,.18,.19,.35);for(const e of [-1,1])piece(root,'point',dark,x+e*.1,1.77,1.62,.06,.25,.07);piece(root,'box',color,x,1.2,.8,.57,.05,.65);piece(root,'box',dark,x,1.22,1.16,.62,.07,.12);piece(root,'box',dark,x,1.53,1.89,.35,.045,.06);piece(root,'box','#59452e',x,.9,-.18,.07,.07,1.75);
+ for(const zz of [.5,1.38])for(const legSide of [-1,1]){const leg=joint(root,'horseLeg'+side+zz+legSide,x+legSide*.21,.8,zz);piece(leg,'rod','#735339',0,-.31,0,.067,.62,.067);piece(leg,'box','#302a23',0,-.67,.04,.15,.13,.21);}
+ piece(root,'box',dark,x,.88,-.3,.06,.5,.06,false,[.35,0,0]);
+}
+// Static pieces are baked per articulated section, keeping each man to a small
+// number of draw calls. Geometry and materials are shared by cloned soldiers.
+function bake(group){for(const child of [...group.children])if(child.isGroup)bake(child);for(const mat of [cloth,metal]){const list=group.children.filter(m=>m.isMesh&&m.material===mat);if(!list.length)continue;const positions=[],normals=[],colors=[];for(const m of list){m.updateMatrix();const copy=m.geometry.clone().applyMatrix4(m.matrix),g=copy.index?copy.toNonIndexed():copy;if(g!==copy)copy.dispose();const p=g.attributes.position,n=g.attributes.normal,c=new T.Color(m.userData.tint);for(let i=0;i<p.count;i++){positions.push(p.getX(i),p.getY(i),p.getZ(i));normals.push(n.getX(i),n.getY(i),n.getZ(i));colors.push(c.r,c.g,c.b);}g.dispose();group.remove(m);}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setAttribute('normal',new T.Float32BufferAttribute(normals,3));g.setAttribute('color',new T.Float32BufferAttribute(colors,3));g.computeBoundingSphere();g.userData.shared=true;const m=new T.Mesh(g,mat);m.castShadow=true;m.receiveShadow=true;group.add(m);}}
+function prototype(kind,color,grade){const root=new T.Group(),body=joint(root,'body'),head=joint(body,'head',0,1.4,0),arms=[joint(body,'leftArm',-.28,1.19,0),joint(body,'rightArm',.28,1.19,0)],legs=[joint(body,'leftLeg',-.135,.74,0),joint(body,'rightLeg',.135,.74,0)];const archer=kind==='bronze_archer',cart=kind==='chariot',poor=grade==='mobilized',elite=grade==='elite';
+ profile(body,linen,[[.25,.71],[.23,.91],[.24,1.17],[.19,1.3]],.7);profile(body,color,[[.32,.58],[.28,.79],[.235,.88]],.75);profile(body,dark,[[.245,.82],[.245,.89]],.74);
+ // Broad shoulder cloth and a coloured hem remain visible above shields.
+ piece(body,'box',color,-.12,1.18,.18,.14,.29,.045);piece(body,'box',color,0,1.12,-.19,.43,.3,.035);
+ if(!archer&&!poor){profile(body,bronze,[[.25,.9],[.265,1.12],[.23,1.26]],.75,true);piece(body,'box',color,-.13,1.18,.205,.13,.26,.026);if(elite||cart)for(const y of [.77,.85])profile(body,bronze,[[.29,y],[.29,y+.055]],.8,true);}
+ piece(body,'rod',skin,0,1.32,0,.083,.15,.083);piece(head,'head',skin,0,.09,0,.175,.23,.16);piece(head,'head',skin,0,.07,.17,.047,.072,.066);for(const side of [-1,1]){piece(head,'head',skin,side*.17,.08,0,.038,.07,.035);piece(head,'box','#30261d',side*.067,.14,.148,.032,.018,.018);}
+ // Conical Bronze Age helmets with open faces and separate cheek guards.
+ profile(head,poor||archer?dark:bronze,[[.19,.2],[.195,.29],[.14,.43],[.015,.53]],.92,!poor&&!archer);
+ if(elite){for(const y of [.28,.35,.42])for(let i=0;i<10;i++){const a=i*Math.PI/5,r=.19-(y-.28)*.38;piece(head,'box','#e4d4ad',Math.cos(a)*r,y,Math.sin(a)*r*.92,.078,.058,.024,false,[0,-a+Math.PI/2,0]);}}
+ if(!archer&&!poor)for(const side of [-1,1])piece(head,'box',bronze,side*.17,.14,.05,.05,.22,.13,true);
+ if(!archer){for(let i=0;i<5;i++)piece(head,'box',color,0,.49+Math.sin(i*Math.PI/4)*.06,(i-2)*.085,.075,.13,.09);}
+ arms.forEach(arm=>{piece(arm,'rod',skin,0,-.2,0,.082,.39,.082);piece(arm,'head',skin,0,-.43,.015,.085,.13,.085);});legs.forEach(leg=>{piece(leg,'rod',skin,0,-.29,0,.087,.58,.087);piece(leg,'box',dark,0,-.65,.055,.18,.065,.3);for(const y of [-.56,-.49])piece(leg,'box',dark,0,y,.06,.17,.035,.2);if(!archer&&!poor)piece(leg,'box',bronze,0,-.39,.077,.14,.28,.05,true);});
+ if(kind==='bronze_spearman'){shield(arms[0],color,true);piece(arms[1],'rod','#805a31',0,.04,.13,.026,2.35,.026);piece(arms[1],'point',bronze,0,1.3,.13,.075,.27,.035,true);}
+ if(kind==='bronze_axeman'){shield(arms[0],color,false);piece(arms[1],'rod','#805a31',0,-.07,.14,.033,1.07,.033);piece(arms[1],'axe',bronze,0,.38,.11,.25,.16,.055,true);}
+ if(archer||cart){piece(arms[0],'bow','#79572f',0,-.3,.19,.42,.53,.42,false,[0,0,-Math.PI/2]);piece(arms[0],'rod',linen,0,-.3,.19,.008,1,.008);piece(body,'rod',dark,.23,1.03,-.27,.085,.53,.085);for(const x of [.19,.24,.29])piece(body,'rod','#bca97d',x,1.29,-.27,.013,.33,.013);}
+ if(cart){body.position.z=-1.13;body.position.y=.85;piece(root,'box','#9e7749',0,.89,-1.1,1.65,.14,1.35);piece(root,'box',color,0,1.24,-.48,1.62,.62,.09);for(const side of [-1,1]){piece(root,'box',bronze,side*.78,1.23,-1.08,.08,.65,1.22,true);piece(root,'wheel',dark,side*.94,.58,-1.1,.51,.51,.51,false,[0,Math.PI/2,0]);for(let i=0;i<4;i++)piece(root,'box',bronze,side*.94,.58,-1.1,.075,1,.045,true,[i*Math.PI/4,0,0]);horse(root,side,color);}piece(root,'box',dark,0,.6,-1.1,2.02,.09,.09);}
+ bake(root);return root;
+}
+export function createBronzeSoldier(parent,x,z,color,kind,grade='standard'){const key=[kind,color,grade].join(':');if(!prototypes.has(key))prototypes.set(key,prototype(kind,color,grade));const root=prototypes.get(key).clone(true),body=root.getObjectByName('body'),head=root.getObjectByName('head'),arms=['leftArm','rightArm'].map(n=>root.getObjectByName(n)),legs=['leftLeg','rightLeg'].map(n=>root.getObjectByName(n)),horseLegs=[];root.traverse(o=>{if(o.name.startsWith('horseLeg'))horseLegs.push(o);});root.userData={unitKind:kind,grade,bronzeGreek:true,factionColor:color,rig:{body,head,arms,legs,horseLegs,riding:kind==='chariot',kind:kind==='bronze_spearman'?'spearman':kind==='bronze_axeman'?'axeman':'archer',rangedChariot:kind==='chariot',phase:x*2+z,archetype:'mycenaean'}};root.position.set(x,0,z);parent.add(root);return root;}

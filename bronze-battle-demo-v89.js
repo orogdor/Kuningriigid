@@ -6,8 +6,8 @@ import {createBattle} from './campaign.js';
 import {battlefieldTiles} from './battlefield-v88.js';
 import {initArmyExperience} from './army-experience-v88.js';
 import {setRelation} from './diplomacy-v87.js';
-export const BRONZE_BATTLE_NAME='Pronksiaja testlahing · 250 vs 250 meest';
-export function createBronzeBattleState(seed=8417){
+export const BRONZE_BATTLE_NAME='Mükeene pronksiaja testlahing · 250 vs 250 meest';
+export function createBronzeBattleState(seed=9517){
  const g=new Civilization(createGame(seed)),s=g.s;
  const cell=g.cells.find(p=>p.c>4&&p.r>4&&p.c<215&&p.r<160&&battlefieldTiles(p).every(t=>g.canTraverse(0,t)))||g.cell(s.armies[0]);
  s.cities=[];s.settlers=[];s.units=[];s.ships=[];s.shipments=[];s.time=0;s.winner=null;s.demo='bronze-battle';
