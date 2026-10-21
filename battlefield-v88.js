@@ -15,7 +15,7 @@ export function applyArmyRetreats(game,b){
  for(const record of b.retreatedArmies||[]){if(record.applied)continue;
   const army=game.s.armies.find(a=>a.team===record.team&&(a.id||0)===record.armyId);if(!army){record.applied=true;continue;}
   const dc=Math.floor((record.exit.x+75)/150),dr=Math.floor((record.exit.z+65)/130),preferred={c:b.cell.c+dc,r:b.cell.r+dr};
-  const safe=p=>game.canTraverse(record.team,p)&&!game.s.armies.some(a=>a.team!==record.team&&a.embarked==null&&a.c===p.c&&a.r===p.r&&game.s.units.some(u=>u.hp>0&&u.team===a.team&&(u.armyId||0)===(a.id||0)))&&(!game.cityAt(p)||game.cityAt(p).team===record.team);
+  const safe=p=>p.c>=0&&p.r>=0&&p.c<(game.cols||220)&&p.r<(game.rows||165)&&game.canTraverse(record.team,p)&&!game.s.armies.some(a=>a.team!==record.team&&a.embarked==null&&a.c===p.c&&a.r===p.r&&game.s.units.some(u=>u.hp>0&&u.team===a.team&&(u.armyId||0)===(a.id||0)))&&(!game.cityAt(p)||game.cityAt(p).team===record.team);
   const routeSafe=p=>{const path=game.landPath(b.cell,p,record.team);return path!==null;};
   const candidates=[preferred];for(let r=-4;r<=4;r++)for(let c=-4;c<=4;c++)if(c||r)candidates.push({c:b.cell.c+c,r:b.cell.r+r});
   candidates.sort((a,b)=>Math.hypot(a.c-preferred.c,a.r-preferred.r)-Math.hypot(b.c-preferred.c,b.r-preferred.r));
