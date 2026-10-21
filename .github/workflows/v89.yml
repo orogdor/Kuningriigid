@@ -2,7 +2,7 @@ name: V89 Roads, Unit Context and Bronze Battle
 on:
   push:
     branches: [main]
-    paths: ['*v97*', '*v96*', '*v95*', '*v94*', '*v93*', '*v92*', '*v91*', '*v90*', '*v89*', 'civilization.js', 'campaign.js', 'battlefield-v88.js', 'battle-navigation-v88.js', 'battle-scene-v88.js', 'index.html', 'continuous-landscape-visual.js', 'detail-roads.js', 'TEST_V89*', '.github/workflows/v89.yml']
+    paths: ['*v98*', '*v97*', '*v96*', '*v95*', '*v94*', '*v93*', '*v92*', '*v91*', '*v90*', '*v89*', 'civilization.js', 'campaign.js', 'battlefield-v88.js', 'battle-navigation-v88.js', 'battle-scene-v88.js', 'index.html', 'continuous-landscape-visual.js', 'detail-roads.js', 'TEST_V89*', '.github/workflows/v89.yml']
   workflow_dispatch:
 concurrency:
   group: v89-context-${{ github.ref }}
@@ -19,6 +19,7 @@ jobs:
         with: {node-version: 22}
       - run: |
           node --check civilization.js
+          node TEST_V98.mjs
           node TEST_V97.mjs
           node TEST_V96.mjs
           node TEST_V95.mjs

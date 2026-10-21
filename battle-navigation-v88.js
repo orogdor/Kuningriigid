@@ -15,7 +15,10 @@ export function createBattleNavigation(game,battle){
  const nav=new Navigation(world,(x,z)=>passable(x*scale,z*scale),()=>[],{minX:Math.ceil((BATTLEFIELD.outerMinX+3)/scale),minZ:Math.ceil((BATTLEFIELD.outerMinZ+3)/scale),w:Math.floor((BATTLEFIELD.outerMaxX-BATTLEFIELD.outerMinX-6)/scale)+1,h:Math.floor((BATTLEFIELD.outerMaxZ-BATTLEFIELD.outerMinZ-6)/scale)+1});
  // Do not spawn soldiers in tiny sealed pockets between overlapping shrubs.
  nav.ensureComponents();let main=1;for(let i=2;i<nav.componentSizes.length;i++)if(nav.componentSizes[i]>nav.componentSizes[main])main=i;for(let i=0;i<nav.n;i++)if(nav.components[i]!==main){nav.mask[i]=0;nav.base[i]=0;}nav.version++;nav.componentVersion=-1;
- const down=p=>({x:p.x/scale,z:p.z/scale}),up=p=>p&&({x:p.x*scale,z:p.z*scale}),agents=new WeakMap();
+ const down=p=>({x:p.x/scale,z:p.z/scale}),up=p=>p&&({x:p.x*scale,z:p.z*scale});
+// Reuse a persistent tactical path. Worker navigation re-rounds a moving
+ // destination and restarts at the previous grid center, making whole ranks
+ // walk backwards whenever the enemy crosses a 3m cell boundary.
  const result={world,passable,grid:nav,cellSize:scale,reachable:(a,b)=>nav.reachable(down(a),down(b)),open:(x,z)=>nav.open(x/scale,z/scale),nearest:(p,max=9)=>up(nav.nearest(down(p),Math.ceil(max/scale))),route:(a,b)=>nav.route(down(a),down(b),{preferRoads:false})?.map(up)||null,
-  move(agent,target,dt,speed){let scaled=agents.get(agent);if(!scaled){scaled={};agents.set(agent,scaled);}scaled.x=agent.x/scale;scaled.z=agent.z/scale;const done=nav.move(scaled,down(target),dt,speed/scale);agent.x=scaled.x*scale;agent.z=scaled.z*scale;agent.heading=scaled.heading??agent.heading;agent.moving=scaled.moving;return done;}};Object.assign(result,createBattleSteering(result));return result;
+  move(agent,target,dt,speed){agent.moving=false;if(!target||dt<=0)return false;const goal=result.waypoint(agent,target,battle.elapsed||0),dx=goal.x-agent.x,dz=goal.z-agent.z,d=Math.hypot(dx,dz),step=Math.min(d,speed*dt);if(d>.01&&step>0){const x=agent.x+dx/d*step,z=agent.z+dz/d*step;if(result.open(x,z)){agent.x=x;agent.z=z;agent.moving=true;}}return Math.hypot(agent.x-target.x,agent.z-target.z)<.3;}};Object.assign(result,createBattleSteering(result));return result;
 }
