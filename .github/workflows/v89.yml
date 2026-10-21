@@ -21,6 +21,7 @@ jobs:
           node --check civilization.js
           node TEST_V89_CONTEXT.mjs
           node TEST_V59.mjs
+          node TEST_V67.mjs
           node TEST_V88_BATTLEFIELD.mjs
           npm install --no-save playwright
           echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
