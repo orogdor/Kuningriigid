@@ -61,7 +61,7 @@ export function attachSiegeSections(city,battle){
 }
 export function siegeDamage(attacker,section,damage){
  const mode=isSiegeUnit(attacker.kind);
- const multiplier=mode?({catapult:2.9,battering_ram:3.4,siege_tower:1.6}[attacker.kind]||1):.16;
+ const multiplier=mode?({catapult:2.9,battering_ram:3.4,siege_tower:1.6,field_cannon:4,industrial_artillery:5}[attacker.kind]||1):.16;
  const armor=section.type==='reinforced_wall'?.72:section.type==='gatehouse'?.86:1;
  const dealt=Math.max(.5,damage*multiplier*armor);
  section.hp=Math.max(0,section.hp-dealt);
@@ -89,8 +89,8 @@ export function healMedievalArmies(game,city,dt){
  const stock=city.economy.realms[city.team].resources;
  for(const u of game.s.units){
   if(u.team!==city.team||u.hp<=0||u.garrison||!armies.some(a=>(a.id||0)===(u.armyId||0)))continue;
-  const stats=game.troopDefinitions?.[u.kind];if(!stats||u.hp>=stats.hp||stock.bread<1)continue;
-  const gained=Math.min(stats.hp-u.hp,dt*.25*workers);
+  const stats=game.troopDefinitions?.[u.kind];const maximum=u.maxHp||stats?.hp;if(!stats||u.hp>=maximum||stock.bread<1)continue;
+  const gained=Math.min(maximum-u.hp,dt*.25*workers);
   u.hp+=gained;u.medievalHealSupply=(u.medievalHealSupply||0)+gained;
   if(u.medievalHealSupply>=12){const meals=Math.min(Math.floor(u.medievalHealSupply/12),Math.floor(stock.bread||0));stock.bread-=meals;u.medievalHealSupply-=12*meals;}
  }
