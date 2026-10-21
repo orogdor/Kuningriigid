@@ -1,3 +1,4 @@
+import {foodTotal} from './city-needs-v87.js';
 // V51: side-effect-free rules shared by UI, fog-of-war, and AI diagnosis.
 import {TECHS,techBlock,BUILD_TECH} from './research.js';
 import {BUILDINGS} from './economy.js';
@@ -37,7 +38,7 @@ export function constructionForecast(game,city,building){
 export function cityProblems(game,city){
  const r=city.economy.realms[city.team],stock=r.resources,issues=[];
  const active=game.allBuildings(city).filter(b=>b.hp>0);
- if((stock.bread||0)<r.pop*2)issues.push({level:3,text:'Toiduvaru lõppemas',action:'Ehita või käivita jahimehe onn, kalamehe onn või talu'});
+ if(foodTotal(stock)<r.pop*2)issues.push({level:3,text:'Toiduvaru lõppemas',action:'Ehita või käivita jahimehe onn, kalamehe onn või talu'});
  if((stock.water||0)<r.pop*1.5)issues.push({level:3,text:'Vett napib',action:'Ehita või käivita kaev'});
  if(active.some(b=>!b.ready&&b.workerLimit!==0&&b.efficiency===0))issues.push({level:2,text:'Ehitusel puudub tööjõud',action:'Määra tööjõu menüüst ehitajaid'});
  if(active.some(b=>/pole ligipääsetavat|maardla puudub|puudub tee/i.test(b.status||'')))issues.push({level:2,text:'Tooraine või tee on blokeeritud',action:'Raja tootmine uude maardlaruutu või kontrolli ühendust'});
