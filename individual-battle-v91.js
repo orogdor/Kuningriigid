@@ -45,7 +45,7 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
  const open=nav?((x,z)=>nav.open(x,z)):()=>true;
  // A squad anchor supplies marching waypoints only; it neither attacks nor
  // owns health. Close combat is resolved independently at each man's position.
- for(const u of squads){const foes=squads.filter(v=>v.team!==u.team),nearest=foes.reduce((a,v)=>!a||dist(u,v)<dist(u,a)?v:a,null),a=tacticalStats(stats[u.kind],u),anchor=u.anchor??={x:u.x,z:u.z};u.moving=false;
+ for(const u of squads){const foes=squads.filter(v=>v.team!==u.team),nearest=foes.reduce((a,v)=>!a||dist(u,v)<dist(u,a)?v:a,null)||(b.fortress?.hp>0&&b.fortress.team!==u.team?b.fortress:null),a=tacticalStats(stats[u.kind],u),anchor=u.anchor??={x:u.x,z:u.z};u.moving=false;
   let goal=u.manualOrder&&u.target?u.target:null;
   if(!goal&&nearest&&(u.routing||u.team!==0||u.advance||u.civilian||dist(u,nearest)<30))goal=tacticalGoal(u,nearest,squads,b,a);
   if(goal&&!u.guardPost){if(nav)nav.move(anchor,goal,dt,a.speed*(1-(u.men.reduce((n,m)=>n+m.fatigue,0)/u.men.length)*.0025));else{const d=dist(anchor,goal),f=d?Math.min(1,a.speed*dt/d):0;anchor.x+=(goal.x-anchor.x)*f;anchor.z+=(goal.z-anchor.z)*f;}u.heading=Math.atan2(goal.x-u.x,goal.z-u.z);}
