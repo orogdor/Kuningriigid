@@ -1,3 +1,4 @@
+import {deployHistoricalBattle} from './historical-tactics-v92.js';
 import {tickIndividualBattle} from './individual-battle-v91.js';
 import {moveSquad,squadRadius} from './soldier-collision-v90.js';
 import {BATTLEFIELD} from './battlefield-v88.js';
@@ -11,11 +12,11 @@ export function makeGrid(height,noise,preserveStarts=true){let cells=[];for(let 
 export function findPath(grid,a,b,passable=(cell)=>cell.land&&!cell.mountain){const key=p=>p.r*COLS+p.c,start=key(a),goal=key(b);if(!grid[goal]||!passable(grid[goal],b))return null;let q=[start],prev=new Map([[start,null]]);for(let i=0;i<q.length;i++){const k=q[i];if(k===goal){let out=[],v=k;while(v!==start){out.push({c:v%COLS,r:Math.floor(v/COLS)});v=prev.get(v)}return out.reverse()}let c=k%COLS,r=Math.floor(k/COLS);for(const[dx,dz]of [[1,0],[-1,0],[0,1],[0,-1]]){let x=c+dx,z=r+dz,n=z*COLS+x;if(x<0||x>=COLS||z<0||z>=ROWS||prev.has(n)||!passable(grid[n],{c:x,r:z}))continue;prev.set(n,k);q.push(n)}}return null}
 export function newCampaign(){return {armies:[{team:0,c:10,r:11,path:[]},{team:1,c:17,r:9,path:[]}],clock:0,elapsed:0,battle:null}}
 export function localHeight(cell,x,z,seed){return detailHeight(cell,x,z)}
-export function createBattle(cell,units,state=null){const ranks={};return {cell:{...cell},field:{...BATTLEFIELD},elapsed:0,result:null,squads:units.map((u,source)=>({u,source})).filter(({u})=>u.hp>0&&!u.retreated).map(({u,source})=>{
+export function createBattle(cell,units,state=null){const ranks={};return deployHistoricalBattle({cell:{...cell},field:{...BATTLEFIELD},elapsed:0,result:null,squads:units.map((u,source)=>({u,source})).filter(({u})=>u.hp>0&&!u.retreated).map(({u,source})=>{
  const role=troopRole(u.kind),key=u.team+':'+(rangedTroop(u.kind)?'ranged':'front'),n=ranks[key]||0;ranks[key]=n+1;
  return {source,team:u.team,armyId:u.armyId||0,kind:u.kind,grade:u.grade||'standard',experienceMultiplier:state?experienceBonusFor(state,u):(u.experienceMultiplier||1),hp:u.hp,maxHp:u.maxHp||u.hp,menCount:u.menCount,soldiers:u.soldiers?structuredClone(u.soldiers):undefined,morale:u.morale??100,
  x:(u.team?1:-1)*((rangedTroop(u.kind)?49:34)+Math.floor(n/8)*4),z:(n%8-3.5)*5+(role==='cavalry'?23:0),heading:u.team?-Math.PI/2:Math.PI/2,target:null,cool:0,damageDealt:0,kills:0};
- })};}
+ })});}
 function experienceBonusFor(state,u){const army=armyForUnit(state,u);return army?1+2*(Math.min(10,1+Math.floor(Math.sqrt((army.xp||0)/100)))-1)/9:1;}
 function distance(a,b){return Math.hypot(a.x-b.x,a.z-b.z)}
 export function frontLines(b){const result={};for(const team of [...new Set(b.squads.map(u=>u.team))]){const own=b.squads.filter(u=>u.team===team&&u.hp>0&&!u.retreated),foes=[...b.squads.filter(u=>u.team!==team&&u.hp>0&&!u.retreated),...(b.fortress&&b.fortress.team!==team&&b.fortress.hp>0?[b.fortress]:[])],infantry=own.filter(u=>troopRole(u.kind)==='melee');if(!infantry.length||!foes.length)continue;const mean=(list,k)=>list.reduce((n,u)=>n+u[k],0)/list.length;let dx=mean(foes,'x')-mean(own,'x'),dz=mean(foes,'z')-mean(own,'z'),d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;result[team]={dx,dz,limit:Math.max(...infantry.map(u=>u.x*dx+u.z*dz))-6}}return result}

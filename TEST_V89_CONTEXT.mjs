@@ -6,7 +6,7 @@ import {selectionDetails} from './selection-info-v89.js';
 import {createUnifiedRoadNetwork} from './continuous-landscape-visual.js';
 import {recordWorldStep} from './roads.js';
 const s=createBronzeBattleState(),g=new Civilization(s);assert.equal(s.battle.squads.length,42);for(const team of [0,1]){const u=s.battle.squads.filter(q=>q.team===team);assert.equal(u.length,21);assert.equal(new Set(u.map(q=>q.kind)).size,4);assert.ok(u.every(q=>TROOPS[q.kind].age===1));assert.equal(s.ages[team],1);assert.equal(s.armies[team].level,3);}
-const unit=s.battle.squads[0],info=selectionDetails(g,{entity:unit,kind:'unit',local:true},TROOPS,{});assert.match(info,/HP/);assert.match(info,/LVL 3/);assert.match(info,/Mobiliseeritud/);
+const unit=s.battle.squads[0],info=selectionDetails(g,{entity:unit,kind:'unit',local:true},TROOPS,{});assert.match(info,/HP/);assert.match(info,/LVL 3/);assert.match(info,/Eliit/);
 const armyInfo=selectionDetails(g,{entity:s.armies[0],kind:'army'},TROOPS,{});assert.match(armyInfo,/21 salka/);assert.match(armyInfo,/XP/);
 for(let level=1;level<=4;level++)assert.equal(detailWorldRoadWidth(level),2*detailTrailWidth(level));
 const cell=g.cell(s.armies[0]),other=g.cell({c:cell.c+1,r:cell.r});for(let i=0;i<5;i++)recordWorldStep(s,cell,other,'army',0);const road=createUnifiedRoadNetwork(g,'detail',cell);assert.equal(road.userData.detailWidthRatio,2);const mesh=road.children.find(x=>x.name==='continuous road pavement');assert.ok(mesh);const pos=mesh.geometry.attributes.position,indices=mesh.geometry.index;const a=indices.getX(0),b=indices.getX(1),width=Math.hypot(pos.getX(a)-pos.getX(b),pos.getZ(a)-pos.getZ(b));assert.ok(Math.abs(width-detailWorldRoadWidth(1))<.001,`actual projected width ${width}`);
