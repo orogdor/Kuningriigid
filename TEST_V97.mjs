@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {createBattle,tickBattle} from './campaign.js';
+import {TROOPS} from './civilization-core.js';
+import {initializeMen,livingMen,battleManCount,escapedMen} from './individual-battle-v91.js';
+import {BATTLEFIELD as F,checkBattleRetreats} from './battlefield-v88.js';
+import {createBattleSteering,retreatPoint} from './battle-movement-v97.js';
+import {formationSlot} from './formations-v94.js';
+import {Navigation} from './navigation.js';
+const wedge=Array.from({length:12},(_,i)=>formationSlot({kind:'knight',formation:'charge'},i,12));assert.ok(Math.abs(wedge.reduce((s,p)=>s+p.x,0))<1e-6&&Math.abs(wedge.reduce((s,p)=>s+p.z,0))<1e-6,'cavalry wedge center matches marching anchor');
+const safeExit=retreatPoint({x:-10,z:0},-1,{x:0,z:0});assert.ok(safeExit.x<=-10,'flee away from enemy rather than through their line');
+// A lone panicked soldier leaving cannot erase the rest of an army.
+const b=createBattle({c:50,r:50},[{team:0,kind:'spearman',hp:125,maxHp:125},{team:0,kind:'axeman',hp:140,maxHp:140},{team:1,kind:'spearman',hp:125,maxHp:125}]);initializeMen(b);const m=b.squads[0].men[0];m.routing=true;m.x=F.minX-1;checkBattleRetreats(b);assert.ok(m.escaped);assert.equal(b.squads[0].retreated,undefined);assert.equal(b.retreatedArmies.length,0);assert.equal(escapedMen(b),1);assert.equal(battleManCount(b),35);assert.ok(b.squads[0].men.slice(1).every(m=>!m.escaped));
+// Explicit withdrawal orders all members, but hides them only after crossing.
+b.squads[0].manualOrder=true;const second=b.squads[0].men[1];second.x=F.minX-1;checkBattleRetreats(b);assert.ok(b.squads[1].routing);assert.equal(b.retreatedArmies.length,0);assert.ok(b.squads[1].men.every(m=>!m.escaped));
+// Isolated losing side physically runs to safety, including its slow last man.
+const run=createBattle({c:50,r:50},[{team:0,kind:'spearman',hp:125,maxHp:125},{team:1,kind:'spearman',hp:125,maxHp:125}]);initializeMen(run);for(const u of run.squads){u.men.forEach((m,i)=>{m.x=u.team?180+i*.8:-100+i*.8;m.z=(i%3)*2;m.heading=u.team?Math.PI/2:0;});u.anchor={x:u.team?180:-100,z:0};u.x=u.anchor.x;u.z=0;}run.squads[1].routing=true;run.squads[1].men.forEach(m=>m.routing=true);for(let i=0;i<100;i++)tickBattle(run,.1,TROOPS);assert.equal(run.result,null);assert.equal(escapedMen(run),0);const before=run.squads[1].men[0].x;for(let i=0;i<3000&&!run.result;i++)tickBattle(run,.1,TROOPS);assert.ok(run.result);assert.equal(escapedMen(run),12);assert.ok(run.squads[1].men.every(m=>m.x>F.maxX&&m.escaped));assert.ok(before<run.squads[1].men[0].x);assert.equal(livingMen(run.squads[1]),12,'flight preserves men, not deaths');
+// Actual path steering takes a detour around an obstacle, not a random wiggle.
+const grid=new Navigation({resources:[]},(x,z)=>!(x>=-2&&x<=2&&z>=-8&&z<=8),()=>[],{minX:-30,minZ:-30,w:61,h:61}),nav={open:(x,z)=>grid.open(x,z),nearest:(p,r)=>grid.nearest(p,r),route:(a,b)=>grid.route(a,b,{preferRoads:false})};const steering=createBattleSteering(nav),agent={x:-12,z:0},target={x:12,z:0};let detour=0;for(let i=0;i<1500&&Math.hypot(agent.x-target.x,agent.z-target.z)>.2;i++){const goal=steering.waypoint(agent,target,i*.05),d=Math.hypot(goal.x-agent.x,goal.z-agent.z),f=d?Math.min(1,.15/d):0;agent.x+=(goal.x-agent.x)*f;agent.z+=(goal.z-agent.z)*f;assert.ok(nav.open(agent.x,agent.z));detour=Math.max(detour,Math.abs(agent.z));}assert.ok(Math.hypot(agent.x-target.x,agent.z-target.z)<.2);assert.ok(detour>8);console.log(JSON.stringify({passed:true,escaped:escapedMen(run),elapsed:run.elapsed,result:run.result,detour,checks:'no army disappearance; explicit withdrawal waits for each man; routed men run without enemies; victory waits; no teleport; obstacle detour'}));

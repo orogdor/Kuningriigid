@@ -1,5 +1,9 @@
 // English localization strings for the originally Estonian game interface.
 export const ENGLISH_PAIRS=[
+["Tagane armeega","Withdraw army"],
+["Põgenemine üle punase joone.","Escape across the red line."],
+["Põgenejad jooksevad punase joone taha.","Retreating men are running beyond the red line."],
+["Armee taandub. Mehed lahkuvad alles punase joone taha jõudes.","The army is withdrawing. Each man leaves only after crossing the red line."],
 ["REAALAJA STRATEEGIA · V87", "REAL-TIME STRATEGY · V87"],
 ["Sinu järgmine peatükk", "Your next chapter"],
 ["Raja linn, avasta maailm ja juhi oma rahvas läbi seitsme ajastu.", "Found a city, explore the world and lead your people through seven eras."],

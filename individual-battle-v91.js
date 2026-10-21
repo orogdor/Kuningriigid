@@ -1,3 +1,4 @@
+import {retreatPoint} from './battle-movement-v97.js';
 import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
 import {FORMATIONS,updateFormations,worldSlot,turnTowards,formationAttackReady,clearShot} from './formations-v94.js';
 import {allowedDeployment} from './battle-pacing-v93.js';
@@ -8,10 +9,11 @@ import {unitStats} from './army-experience-v88.js';
 import {isSiegeUnit,siegeDamage} from './medieval-v62.js';
 import {BATTLEFIELD,outsideBattlefield,checkBattleRetreats} from './battlefield-v88.js';
 export const MAX_BATTLE_MEN=500;
+export const escapedMen=b=>b.squads.reduce((n,u)=>n+(u.men||[]).filter(m=>m.hp>0&&m.escaped).length,0);
 const live=u=>u.hp>0&&!u.retreated&&!u.reserve;
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export const livingMen=u=>u.men?u.men.filter(m=>m.hp>0).length:u.soldiers?u.soldiers.filter(m=>m.hp>0).length:Math.ceil((u.guardPost?1:u.menCount||soldierCount(u))*Math.min(1,u.hp/(u.maxHp||u.hp)));
-export function battleManCount(b,team=null){return b.squads.filter(u=>!u.reserve&&!u.retreated&&(team==null||u.team===team)).reduce((n,u)=>n+livingMen(u),0);}
+export function battleManCount(b,team=null){return b.squads.filter(u=>!u.reserve&&!u.retreated&&(team==null||u.team===team)).reduce((n,u)=>n+(u.men?u.men.filter(m=>m.hp>0&&!m.escaped).length:livingMen(u)),0);}
 // Admit whole squads, alternating countries. Over-cap units are retained in
 // reserve, with their original health and campaign identity intact.
 export function admitBattle(b){
@@ -41,23 +43,25 @@ function damageMan(b,attacker,target,amount){
 }
 export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
  if(b.result||dt<=0)return;initializeMen(b,nav);initializeTactics(b);b.elapsed+=dt;updateMorale(b,dt);updateFormations(b,dt,stats);checkBattleRetreats(b);
- const squads=b.squads.filter(live),agents=[];for(const u of squads){for(const m of u.men||[])if(m.hp>0)agents.push({m,u});}
+ if(b.fortress&&b.fortress.hp<=0&&!b.fortressFallen){b.fortressFallen=true;for(const u of b.squads.filter(u=>u.team===b.fortress.team&&live(u))){u.routing=true;u.manualOrder=false;u.target=null;for(const m of u.men||[])if(m.hp>0&&!m.escaped)m.routing=true;}}
+ const fighting=[...new Set(b.squads.filter(u=>live(u)&&!u.routing&&(u.men||[]).some(m=>m.hp>0&&!m.escaped&&!m.routing)).map(u=>u.team))];b.pursuitStoppedTeam=fighting.length===1&&(!b.fortress||b.fortress.hp<=0||b.fortress.team===fighting[0])?fighting[0]:null;
+ const squads=b.squads.filter(live),agents=[];for(const u of squads){for(const m of u.men||[])if(m.hp>0&&!m.escaped)agents.push({m,u});}
  const enemies=new Map([...new Set(squads.map(u=>u.team))].map(t=>[t,agents.filter(p=>p.u.team!==t)])),bins=new Map(),key=(x,z)=>Math.floor(x/8)+':'+Math.floor(z/8);
  const insert=m=>{const k=key(m.x,m.z),list=bins.get(k)||[];list.push(m);bins.set(k,list);};for(const p of agents)if(!p.u.guardPost)insert(p.m);
- const nearby=m=>{const list=[],x=Math.floor(m.x/8),z=Math.floor(m.z/8);for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++)list.push(...(bins.get((x+dx)+':'+(z+dz))||[]).filter(p=>p.hp>0));return list;};
+ const nearby=m=>{const list=[],x=Math.floor(m.x/8),z=Math.floor(m.z/8);for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++)list.push(...(bins.get((x+dx)+':'+(z+dz))||[]).filter(p=>p.hp>0&&!p.escaped));return list;};
  const open=nav?((x,z)=>nav.open(x,z)):()=>true;
  // A squad anchor supplies marching waypoints only; it neither attacks nor
  // owns health. Close combat is resolved independently at each man's position.
- for(const u of squads){const foes=squads.filter(v=>v.team!==u.team),nearest=foes.reduce((a,v)=>!a||dist(u,v)<dist(u,a)?v:a,null)||(b.fortress?.hp>0&&b.fortress.team!==u.team?b.fortress:null),a=tacticalStats(stats[u.kind],u),anchor=u.anchor??={x:u.x,z:u.z};u.moving=false;
+ for(const u of squads){const foes=squads.filter(v=>v.team!==u.team),nearest=foes.reduce((a,v)=>!a||dist(u,v)<dist(u,a)?v:a,null)||(b.fortress?.hp>0&&b.fortress.team!==u.team?b.fortress:null),a=tacticalStats(stats[u.kind],u),anchor=u.anchor??={x:u.x,z:u.z};u.moving=false;if(b.pursuitStoppedTeam===u.team&&!u.routing){u.anchor={x:u.x,z:u.z};continue;}
   let goal=u.manualOrder&&u.target?u.target:null;
   if(!goal&&nearest&&(u.routing||u.team!==0||u.advance||u.civilian||dist(u,nearest)<30))goal=tacticalGoal(u,nearest,squads,b,a);
-  if(goal&&!u.guardPost){const marchDistance=dist(anchor,goal),marchHeading=Math.atan2(goal.x-anchor.x,goal.z-anchor.z);if(nav)nav.move(anchor,goal,dt,a.speed*(1-(u.men.reduce((n,m)=>n+m.fatigue,0)/u.men.length)*.0025));else{const d=dist(anchor,goal),f=d?Math.min(1,a.speed*dt/d):0;anchor.x+=(goal.x-anchor.x)*f;anchor.z+=(goal.z-anchor.z)*f;}if(marchDistance>.1)u.heading=u.fixedFacing??turnTowards(u.heading||0,marchHeading,dt,(FORMATIONS[u.formation]||FORMATIONS.line).turn);}
+  if(goal&&(!u.guardPost||u.routing)){const lead=dist(anchor,u),maxLead=['cavalry','vehicle'].includes(troopRole(u.kind))?7:3;if(lead>maxLead){anchor.x=u.x+(anchor.x-u.x)*maxLead/lead;anchor.z=u.z+(anchor.z-u.z)*maxLead/lead;}const marchDistance=dist(anchor,goal),marchHeading=Math.atan2(goal.x-anchor.x,goal.z-anchor.z);if(nav)nav.move(anchor,goal,dt,a.speed*(1-(u.men.reduce((n,m)=>n+m.fatigue,0)/u.men.length)*.0025));else{const d=dist(anchor,goal),f=d?Math.min(1,a.speed*dt/d):0;anchor.x+=(goal.x-anchor.x)*f;anchor.z+=(goal.z-anchor.z)*f;}if(marchDistance>.1)u.heading=u.fixedFacing??turnTowards(u.heading||0,(!u.manualOrder&&!u.routing&&nearest?Math.atan2(nearest.x-u.x,nearest.z-u.z):marchHeading),dt,(FORMATIONS[u.formation]||FORMATIONS.line).turn);}
   if(u.manualOrder&&u.target&&dist(u,u.target)<2){u.manualOrder=false;u.target=null;}
  }
- for(const actor of agents){const {m,u}=actor;if(m.hp<=0||u.retreated)continue;const a=tacticalStats(stats[u.kind],u),count=u.menCount||soldierCount(u);m.cool=Math.max(0,m.cool-dt);m.wasMoving=!!m.moving;m.moving=false;
-  let enemy=null,best=Infinity;for(const p of enemies.get(u.team)||[]){if(p.m.hp<=0||p.u.retreated)continue;const d=dist(m,p.m),score=d+(m.targetId===p.m.id?-1.2:0)+Math.abs(p.m.z-m.z)*.15;if(score<best){best=score;enemy=p;}}m.targetId=enemy?.m.id??null;
+ for(const actor of agents){const {m,u}=actor;if(m.hp<=0||m.escaped||u.retreated)continue;const a=tacticalStats(stats[u.kind],u),count=u.menCount||soldierCount(u);if(m.routing&&!u.routing)a.speed/=(FORMATIONS[u.formation]||FORMATIONS.line).speed;m.cool=Math.max(0,m.cool-dt);m.wasMoving=!!m.moving;m.moving=false;
+  let enemy=null,best=Infinity,threat=null,threatDistance=Infinity;for(const p of enemies.get(u.team)||[]){if(p.m.hp<=0||p.m.escaped||p.u.retreated)continue;const d=dist(m,p.m),score=d+(m.targetId===p.m.id?-1.2:0)+Math.abs(p.m.z-m.z)*.15;if(!p.u.routing&&!p.m.routing&&d<threatDistance){threat=p.m;threatDistance=d;}if(score<best){best=score;enemy=p;}}m.targetId=enemy?.m.id??null;
   const sections=(b.siegeSections||[]).filter(p=>p.hp>0&&p.team!==u.team&&!b.siegeBreached),fort=b.fortress?.hp>0&&b.fortress.team!==u.team?b.fortress:null,wall=isSiegeUnit(u.kind)&&sections.length?sections.reduce((p,v)=>dist(m,v)<dist(m,p)?v:p):null,structure=wall||(!enemy?(sections[0]||fort):null);
-  const target=structure||enemy?.m;if(!target)continue;const d=dist(m,target),desiredHeading=Math.atan2(target.x-m.x,target.z-m.z),defensive=(FORMATIONS[u.formation]||{}).defensive;m.heading=turnTowards(m.heading||0,defensive?(u.formationFacing??u.heading):desiredHeading,dt,defensive?.7:2);const facing=Math.abs(Math.atan2(Math.sin(desiredHeading-m.heading),Math.cos(desiredHeading-m.heading)));const rangedShot=isBow(u)&&m.ammo>0,range=(rangedShot?a.range:meleeReach(u,m,enemy?.m))+(u.guardPost&&rangedShot?5:0)+(structure?6:0),canAttack=formationAttackReady(u,m,b,!u.manualOrder&&!m.routing&&!u.routing&&d<=range&&facing<(defensive?1.2:1.65)&&(!rangedShot||!['musketeer','arquebusier','line_infantry','rifleman','machinegun_team','modern_infantry'].includes(u.kind)||clearShot(actor,enemy,agents)));
+  const target=structure||enemy?.m||((m.routing||u.routing)?{x:-u.battleSide*250,z:m.z}:null);if(!target)continue;const d=dist(m,target),desiredHeading=Math.atan2(target.x-m.x,target.z-m.z),defensive=!!(FORMATIONS[u.formation]||{}).defensive&&!m.routing&&!u.routing&&b.pursuitStoppedTeam!==u.team;m.heading=turnTowards(m.heading||0,defensive?(u.formationFacing??u.heading):desiredHeading,dt,defensive?.7:2);const facing=Math.abs(Math.atan2(Math.sin(desiredHeading-m.heading),Math.cos(desiredHeading-m.heading)));const rangedShot=isBow(u)&&m.ammo>0,range=(rangedShot?a.range:meleeReach(u,m,enemy?.m))+(u.guardPost&&rangedShot?5:0)+(structure?6:0),canAttack=formationAttackReady(u,m,b,!u.manualOrder&&!m.routing&&!u.routing&&d<=range&&facing<(defensive?1.2:1.65)&&(!rangedShot||!['musketeer','arquebusier','line_infantry','rifleman','machinegun_team','modern_infantry'].includes(u.kind)||clearShot(actor,enemy,agents)));
   m.fatigue=Math.max(0,Math.min(100,m.fatigue+(canAttack?.22:-.3)*dt));if(canAttack){if(m.cool===0){if(!rangedShot&&!structure){m.lastMeleeDistance=d;m.lastMeleeReach=range;}if(u.formation==='volley')m.lastVolley=u.volleyNumber;let amount=a.dmg/(u.guardPost?1:soldierCount(u))*(u.guardPost?1.3:1)*(1+(Array.isArray(tech)?tech[u.team]||0:u.team?0:tech)*.3);
     if(isBow(u)&&m.ammo>0){m.ammo--;if(!shotHits(m,u,d,range,enemy?.u)){m.attackTime=b.elapsed;m.shot={x:m.x,z:m.z,toX:target.x+2,toZ:target.z+2};m.cool=1.8/a.attackSpeed;continue;}}else if(isBow(u))amount*=.35;
     if(enemy&&!structure){amount=tacticalDamage(actor,enemy,amount,rangedShot?(usesArrows(u)?'arrow':'bullet'):null);const role=troopRole(enemy.u.kind),reduction={heavy_cavalry:.75,knight:.8,man_at_arms:.83,halberdier:.92}[enemy.u.kind]||1,pierce=u.kind==='crossbowman'?.5:0;amount*=reduction+(1-reduction)*pierce;if(['halberdier','pikeman'].includes(u.kind)&&role==='cavalry')amount*=1.7;if(u.kind==='rocket_team'&&role==='vehicle')amount*=1.8;damageMan(b,actor,enemy,amount);}
@@ -65,21 +69,22 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
     m.cool=(u.kind==='crossbowman'?1.9:isSiegeUnit(u.kind)?2.8:u.kind==='heavy_cavalry'?1.45:1.2)*(1+m.fatigue*.003)/a.attackSpeed;
    }continue;
   }
-  if(u.guardPost)continue;
+  if(b.pursuitStoppedTeam===u.team&&!u.routing&&!m.routing){m.moving=false;continue;}if(u.guardPost&&!u.routing&&!m.routing)continue;
   const anchor=u.anchor||u;
-  let goal=worldSlot(u,m,u.men.filter(n=>n.hp>0).length);
-  if(m.routing||u.routing)goal={x:-u.battleSide*250,z:m.z};
-  else if(!u.manualOrder){const form=FORMATIONS[u.formation]||FORMATIONS.line;if(u.formation==='skirmish'&&m.ammo>0&&d<range*.68)goal={x:m.x-u.battleSide*7,z:m.z};else if(!form.defensive&&!form.hold){if(isBow(u)&&m.ammo>0){if(d<range*.45)goal={x:m.x-u.battleSide*6,z:m.z};}else if(d<9&&dist(m,anchor)<10)goal=target;}}
-  const old={x:m.x,z:m.z},bin=bins.get(key(m.x,m.z));if(bin)bin.splice(bin.indexOf(m),1);const peers=nearby(m),length=dist(m,goal),step=Math.min(length,a.speed*(m.routing?1.1:1)*(1-m.fatigue*.0025)*dt),f=length?step/length:0,dx=(goal.x-m.x)*f,dz=(goal.z-m.z)*f;
-  m.moving=constrainStep(m,{x:m.x+dx,z:m.z+dz},peers,open);
+  let goal=worldSlot(u,m,u.men.filter(n=>n.hp>0&&!n.escaped).length);
+  if(m.routing||u.routing)goal=nav?.escapeGoal?nav.escapeGoal(m,u.battleSide,threat):retreatPoint(m,u.battleSide,threat);
+  else if(!u.manualOrder){const form=FORMATIONS[u.formation]||FORMATIONS.line;if(u.formationManual&&u.formation==='skirmish'&&m.ammo>0&&d<range*.35)goal={x:m.x-u.battleSide*7,z:m.z};else if(!form.hold){if(isBow(u)&&m.ammo>0){if(u.formationManual&&u.formation==='skirmish'&&d<range*.3)goal={x:m.x-u.battleSide*3,z:m.z};}else if(d<9&&dist(m,anchor)<10)goal=target;}}
+  if(m.yieldGoal&&m.yieldUntil>b.elapsed&&dist(m,m.yieldGoal)>.3)goal=m.yieldGoal;if(nav?.waypoint)goal=nav.waypoint(m,goal,b.elapsed);const old={x:m.x,z:m.z},bin=bins.get(key(m.x,m.z));if(bin)bin.splice(bin.indexOf(m),1);const peers=nearby(m),length=dist(m,goal),step=Math.min(length,a.speed*(m.routing?1.1:1)*(1-m.fatigue*.0025)*dt),f=length?step/length:0,dx=(goal.x-m.x)*f,dz=(goal.z-m.z)*f;
+  const walkOpen=(u.guardPost&&u.routing&&!open(m.x,m.z))?()=>true:open;m.moving=constrainStep(m,{x:m.x+dx,z:m.z+dz},peers,walkOpen);
   if(dist(old,m)<step*.2&&length>.2){for(const angle of [.7,-.7,1.3,-1.3]){const co=Math.cos(angle),si=Math.sin(angle);if(constrainStep(m,{x:m.x+dx*co-dz*si,z:m.z+dx*si+dz*co},peers,open)&&dist(old,m)>step*.2){m.moving=true;break;}}}
+  if(length>.3&&dist(old,m)<step*.2){m.blockedFor=(m.blockedFor||0)+dt;if(m.blockedFor>.6){const vectors=[{x:0,z:step},{x:0,z:-step},{x:step,z:0},{x:-step,z:0},...[2.1,-2.1,Math.PI].map(a=>({x:dx*Math.cos(a)-dz*Math.sin(a),z:dx*Math.sin(a)+dz*Math.cos(a)}))];for(const v of vectors){if(constrainStep(m,{x:m.x+v.x,z:m.z+v.z},peers,walkOpen)&&dist(old,m)>step*.2){const d=Math.hypot(v.x,v.z)||1,space=m.radius>1?7:3;m.yieldGoal={x:m.x+v.x/d*space,z:m.z+v.z/d*space};m.yieldUntil=b.elapsed+2;m.moving=true;m.blockedFor=0;break;}}}}else m.blockedFor=0;
   if(m.moving){m.fatigue=Math.min(100,m.fatigue+dt*(u.formation==='charge'?1.5:.85));if(u.formation==='charge'&&!m.routing)m.chargeDistance=(m.chargeDistance||0)+dist(old,m);if(!defensive)m.heading=turnTowards(m.heading||0,Math.atan2(m.x-old.x,m.z-old.z),dt,2);u.moving=true;}insert(m);
   if(outsideBattlefield(m)){u.x=m.x;u.z=m.z;checkBattleRetreats(b);}
  }
  // Fort and tower projectiles hit one living individual, never a pooled bar.
- for(const post of [...(b.defensePosts||[]),...(b.fortress?.hp>0?[{...b.fortress,fortShot:true,range:22,damage:8}]:[])]){if(post.active===false)continue;const owner=post.fortShot?b.fortress:post;owner.cool=Math.max(0,(owner.cool||0)-dt);if(owner.cool>0)continue;const target=agents.filter(p=>p.m.hp>0&&!p.u.retreated&&p.u.team!==post.team&&dist(post,p.m)<=post.range).reduce((a,p)=>!a||dist(post,p.m)<dist(post,a.m)?p:a,null);if(target){damageMan(b,null,target,post.damage);owner.cool=post.fortShot?2.5:2.2;}}
- for(const u of squads){aggregate(u);const men=u.men.filter(m=>m.hp>0);if(men.length&&!u.guardPost&&!u.retreated){u.x=men.reduce((n,m)=>n+m.x,0)/men.length;u.z=men.reduce((n,m)=>n+m.z,0)/men.length;}if(!u.hp)u.deathTime=b.elapsed;}
+ for(const post of [...(b.defensePosts||[]),...(b.fortress?.hp>0?[{...b.fortress,fortShot:true,range:22,damage:8}]:[])]){if(post.active===false||(b.fortressFallen&&post.team===b.fortress?.team))continue;const owner=post.fortShot?b.fortress:post;owner.cool=Math.max(0,(owner.cool||0)-dt);if(owner.cool>0)continue;const target=agents.filter(p=>p.m.hp>0&&!p.m.escaped&&!p.u.retreated&&p.u.team!==post.team&&dist(post,p.m)<=post.range).reduce((a,p)=>!a||dist(post,p.m)<dist(post,a.m)?p:a,null);if(target){damageMan(b,null,target,post.damage);owner.cool=post.fortShot?2.5:2.2;}}
+ for(const u of squads){aggregate(u);const men=u.men.filter(m=>m.hp>0&&!m.escaped);if(men.length&&!u.guardPost&&!u.retreated){u.x=men.reduce((n,m)=>n+m.x,0)/men.length;u.z=men.reduce((n,m)=>n+m.z,0)/men.length;}if(!u.hp)u.deathTime=b.elapsed;}
  checkBattleRetreats(b);const fort=b.fortress,surviving=[...new Set([...b.squads.filter(live).map(u=>u.team),...(fort?.hp>0?[fort.team]:[])])];
- if(fort&&fort.hp<=0){b.winnerTeam=b.squads.filter(u=>live(u)&&u.team!==fort.team).sort((a,b)=>b.hp-a.hp)[0]?.team??b.attackerTeam;b.result=b.winnerTeam===0?'victory':'defeat';}else if(surviving.length<=1){b.winnerTeam=surviving[0]??null;b.result=b.retreatedArmies?.some(p=>p.team===0)&&!b.squads.some(u=>live(u)&&u.team===0)?'retreat':b.winnerTeam===0?'victory':'defeat';}
+ if(surviving.length===1){for(const u of b.squads.filter(u=>live(u)&&u.team===surviving[0]&&!u.withdrawing)){u.routing=false;for(const m of u.men||[])if(!m.escaped)m.routing=false;}}const escaping=b.squads.some(u=>u.hp>0&&!u.reserve&&!u.retreated&&(u.routing||(u.men||[]).some(m=>m.routing&&m.hp>0&&!m.escaped)));if(fort&&fort.hp<=0&&!escaping&&!b.squads.some(u=>live(u)&&u.team===fort.team)){b.winnerTeam=b.squads.filter(u=>live(u)&&u.team!==fort.team).sort((a,b)=>b.hp-a.hp)[0]?.team??b.attackerTeam;b.result=b.winnerTeam===0?'victory':'defeat';}else if(surviving.length<=1&&!escaping){b.winnerTeam=surviving[0]??null;b.result=b.retreatedArmies?.some(p=>p.team===0)&&!b.squads.some(u=>live(u)&&u.team===0)?'retreat':b.winnerTeam===0?'victory':'defeat';}
 }
 export function persistIndividualMen(state,b){for(const u of b.squads){if(u.reserve||u.source<0||!state.units[u.source]||!u.men)continue;const source=state.units[u.source];source.hp=u.hp;source.menCount=u.menCount;source.soldiers=u.men.map(m=>({id:m.id,hp:m.hp,maxHp:m.maxHp}));}}

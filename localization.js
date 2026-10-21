@@ -1,4 +1,4 @@
-import {ENGLISH_PAIRS} from './locale-en.js?v=88a';
+import {ENGLISH_PAIRS} from './locale-en.js?v=97a';
 
 const buildVersion=typeof document!=='undefined'?(document.title.match(/V(\d+)/)?.[1]||'96'):'96';
 // V63: The save file stores gameplay, not language. Language is a separate,

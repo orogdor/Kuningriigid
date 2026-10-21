@@ -4,13 +4,13 @@ export const outsideBattlefield=p=>p.x<BATTLEFIELD.minX||p.x>BATTLEFIELD.maxX||p
 export function battlefieldTiles(cell){const out=[];for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++)out.push({c:cell.c+dc,r:cell.r+dr,dc,dr,retreat:Math.abs(dc)===2||Math.abs(dr)===2});return out;}
 
 const identity=u=>u.team+':'+(u.armyId||0);
+export function orderArmyWithdrawal(b,u){for(const q of b.squads)if(identity(q)===identity(u)&&q.hp>0&&!q.retreated){q.routing=true;q.withdrawing=true;q.manualOrder=false;q.target=null;for(const m of q.men||[])if(m.hp>0&&!m.escaped)m.routing=true;}}
 export function checkBattleRetreats(b){
- if(!b.field)return;
- b.retreatedArmies??=[];
- for(const u of b.squads){if(u.hp<=0||u.retreated||u.civilian||u.guardPost||!outsideBattlefield(u))continue;
-  const key=identity(u);b.retreatedArmies.push({team:u.team,armyId:u.armyId||0,exit:{x:u.x,z:u.z},at:b.elapsed});
-  for(const q of b.squads)if(!q.civilian&&!q.guardPost&&identity(q)===key){q.retreated=true;q.target=null;q.advance=false;q.moving=false;}
- }
+ if(!b.field)return;b.retreatedArmies??=[];
+ // Compatibility for pre-individual API callers; live battles initialize men first.
+ if(!b.individualVersion){for(const u of b.squads){if(u.hp<=0||u.retreated||u.civilian||u.guardPost||!outsideBattlefield(u))continue;const key=identity(u);if(!b.retreatedArmies.some(r=>r.team+':'+r.armyId===key))b.retreatedArmies.push({team:u.team,armyId:u.armyId||0,exit:{x:u.x,z:u.z},at:b.elapsed});for(const q of b.squads)if(!q.civilian&&!q.guardPost&&identity(q)===key){q.retreated=true;q.target=null;q.advance=false;q.moving=false;}}return;}
+ for(const u of b.squads){if(!u.men||u.retreated||u.reserve||(u.guardPost&&!u.routing))continue;for(const m of u.men)if(m.hp>0&&!m.escaped&&outsideBattlefield(m)){if(u.manualOrder&&!u.routing)orderArmyWithdrawal(b,u);m.escaped=true;m.escapedAt=b.elapsed;m.moving=false;u.lastExit={x:m.x,z:m.z};}const alive=u.men.filter(m=>m.hp>0);if(alive.length&&alive.every(m=>m.escaped)){u.retreated=true;u.target=null;u.moving=false;}}
+ for(const u of b.squads){if(!u.retreated||u.civilian||u.guardPost)continue;const key=identity(u),own=b.squads.filter(q=>identity(q)===key&&!q.civilian&&!q.guardPost&&!q.reserve&&q.hp>0);if(own.length&&own.every(q=>q.retreated)&&!b.retreatedArmies.some(r=>r.team+':'+r.armyId===key))b.retreatedArmies.push({team:u.team,armyId:u.armyId||0,exit:u.lastExit||{x:u.x,z:u.z},at:b.elapsed});}
 }
 export function applyArmyRetreats(game,b){
  for(const record of b.retreatedArmies||[]){if(record.applied)continue;
