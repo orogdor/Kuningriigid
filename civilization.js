@@ -6,7 +6,7 @@ import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
 import {createDetailBorders} from './detail-borders-v85.js?v=85a';
 import {mountainTint,createMountainOutcrops,createBridgeBuilding,crossingFrame} from './landscape-polish-v84.js?v=85a';
 import {CommandVisuals} from './command-visuals.js';
-import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=86a';
+import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=87a';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
