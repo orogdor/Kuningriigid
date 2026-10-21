@@ -8,6 +8,8 @@ Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis üh
 
 V87 pealt alustatud arendusharu: rannajoonele paigutatavad kalameheonnid ja sadamad, konkreetsed kaevanduskohad, ajastuga muutuvad kaevandusmudelid ning riigi puuduvate ressursside järgi valitud uued AI linnad. [Muudatused ja kontrollid](MUUDATUSED_V88.md).
 
+V88b: kõigi ajastuvahetuste materjalikulu on poole väiksem. [Uue 100 käigu reegliga katse aruanne](V88_POOLHIND_TEST.md) ja [täielik käigulogi](V88_POOLHIND_TEST.jsonl.gz).
+
 ## V87 – linnade varud, kaupmehed ja vajadused
 
 Linnapõhised varud koos riigi kogusega, ajakuluga maa- ja meretransport, piiratud reisijalad, 5% peatumistasu ning neutraalsed suhted ja kaubanduspinged. Ajastupõhised toidu- ja luksusvajadused, 17 tootmishoonet ja uued piirkondlikud ressursid. [Reeglid ja testide ulatus](MAJANDUS_V87.md).

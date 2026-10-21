@@ -73,3 +73,5 @@ Kõigi kuue ajastuvahetuse materjalikulu vähendati täpselt poole võrra. Teadu
 `TEST_V88_ERA_COST.mjs` kontrollib kõigi hindade täpset poolitamist, murdarvudega maksmist ja ebaõnnestunud makse terviklikkust. `TEST_V88_CAMPAIGN_LOG.mjs` kontrollib, et kaubaveo logi eristaks 5% peatumistasu tegelikult kohale toimetatud kaubast ka siis, kui veos samal sammul eemaldatakse.
 
 Uue, sama seemnega katse raport: `V88_POOLHIND_TEST.md`. Täpne sündmuslogi ja lõppseis: `V88_POOLHIND_TEST.json`; iga käigu täielikum olekulogi: `V88_POOLHIND_TEST.jsonl.gz`. 100 käigu peatumisreegel ja keskaja eesmärk säilivad. Eelmine aruanne `V88_KESKAJA_TEST.md` säilib võrdluseks.
+
+Uus katse lõppes käigul 137,15: riik 3 veetis pronksiajas 100 käiku ja jäi 50 laua puudumise taha. Kolm ülejäänud riiki jõudsid rauaaega, keskaega ei jõudnud ükski. Täpne logi tuvastas vähemalt 65. käigust seisva, 12 puitu kandva puuraiuja tagasitee tõrke ja saekoja puudumise. Katse peatati ja seda ei korratud; tootmis- ega liikumisloogikat pärast katset ei muudetud.
