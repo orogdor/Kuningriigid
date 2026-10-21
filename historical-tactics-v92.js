@@ -1,3 +1,4 @@
+import {prepareAmmunition} from './combat-equipment-v100.js';
 import {BOW_DAMAGE_MULTIPLIER} from './unit-balance-v99.js';
 import {squadContactGoal} from './combat-contact-v96.js';
 import {FORMATIONS,formationDamage,missileExposure} from './formations-v94.js';
@@ -19,7 +20,7 @@ export function deployHistoricalBattle(b){
 }
 export function initializeTactics(b){
  for(const u of b.squads){u.battleSide??=u.team? -1:1;u.tacticalRole??=u.kind==='chariot'?'mobile-missile':isBow(u)?'missile':troopRole(u.kind)==='cavalry'?'flank':'line';u.deployment??={x:u.x,z:u.z};u.startMen??=u.men?.filter(m=>m.hp>0).length||0;
-  for(const m of u.men||[]){m.morale??=u.grade==='mobilized'?64:u.grade==='elite'?94:82;m.fatigue??=0;m.ammo??=isBow(u)?usesArrows(u)?u.kind==='chariot'?24:20:troopRole(u.kind)==='siege'?12:60:null;}
+  for(const m of u.men||[]){m.morale??=u.grade==='mobilized'?64:u.grade==='elite'?94:82;m.fatigue??=0;if(isBow(u))prepareAmmunition(m,u);else m.ammo??=null;}
  }
 }
 export function updateMorale(b,dt){
@@ -41,6 +42,7 @@ export function tacticalGoal(u,nearest,squads,b,a){
   if(u.kind==='chariot'&&u.ammoRemaining!==0&&distance(u,nearest)<4)return {x:u.x,z:u.z+flank*8};
   const x=nearest.x-u.battleSide*(u.kind==='chariot'&&u.ammoRemaining!==0?a.range*.7:0);return {x:u.kind==='chariot'&&u.ammoRemaining!==0?(u.battleSide>0?Math.max(u.x,x):Math.min(u.x,x)):x,z};
  }
+ if(troopRole(u.kind)==='siege'&&u.ammoRemaining!==0){const x=nearest.x-u.battleSide*a.range*.8;return distance(u,nearest)>a.range*.9?{x:u.battleSide>0?Math.max(u.x,x):Math.min(u.x,x),z:u.deployment?.z??u.z}:null;}
  if(u.tacticalRole==='shot'&&u.ammoRemaining!==0){return distance(u,nearest)>a.range*.8?{x:nearest.x-u.battleSide*a.range*.7,z:u.deployment?.z??u.z}:null;}
  if(isBow(u)&&u.ammoRemaining!==0){const front=squads.filter(q=>q.team===u.team&&q.tacticalRole==='line'&&!q.routing),closest=front.reduce((p,q)=>!p||distance(q,nearest)<distance(p,nearest)?q:p,null);if(closest&&distance(u,nearest)>a.range*.85){const x=closest.x-u.battleSide*5;return {x:u.battleSide>0?Math.max(u.x,x):Math.min(u.x,x),z:u.deployment?.z??u.z};}return null;}
  return squadContactGoal(u,nearest);

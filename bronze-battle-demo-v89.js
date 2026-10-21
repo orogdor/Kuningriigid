@@ -11,7 +11,7 @@ export function createBronzeBattleState(seed=9517){
  const g=new Civilization(createGame(seed)),s=g.s;
  const cell=g.cells.find(p=>p.c>4&&p.r>4&&p.c<215&&p.r<160&&battlefieldTiles(p).every(t=>g.canTraverse(0,t)))||g.cell(s.armies[0]);
  s.cities=[];s.settlers=[];s.units=[];s.ships=[];s.shipments=[];s.time=0;s.winner=null;s.demo='bronze-battle';
- const roster=[...Array(10).fill('bronze_spearman'),...Array(4).fill('bronze_axeman'),...Array(5).fill('bronze_archer'),...Array(2).fill('chariot')];
+ const roster=[...Array(8).fill('bronze_spearman'),...Array(3).fill('bronze_axeman'),...Array(4).fill('bronze_archer'),...Array(2).fill('chariot'),...Array(3).fill('bronze_cavalry'),'bronze_catapult'];
  for(const team of [0,1]){s.ages[team]=1;s.research[team].known=Object.keys(TECHS).filter(k=>TECHS[k].age<=1);s.research[team].active=null;s.research[team].queue=[];Object.assign(s.armies[team],{c:cell.c,r:cell.r,path:[],xp:400,autoExplore:false});
   roster.forEach((kind,i)=>s.units.push({team,armyId:0,kind,grade:i===0||kind==='chariot'?'elite':i>=12&&i<14?'mobilized':'standard',hp:TROOPS[kind].hp*(i===0||kind==='chariot'?1.4:i>=12&&i<14?.4:1)*(i===20?10/12:1),menCount:i===20?10:12,morale:100}));
  }

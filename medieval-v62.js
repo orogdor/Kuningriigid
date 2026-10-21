@@ -44,7 +44,7 @@ export const MEDIEVAL_UNITS={
  siege_tower:{name:'Piiramistorn',age:3,cost:{plank:75,iron:16},requires:['siegeworkshop'],hp:300,dmg:9,range:4,speed:1.35,time:115,siege:3.3}
 };
 export const MEDIEVAL_UNIT_TECH={crossbowman:'crossbows',halberdier:'knighthood',knight:'knighthood',heavy_cavalry:'knighthood',man_at_arms:'armor_craft',catapult:'siege_engineering',battering_ram:'siege_engineering',siege_tower:'siege_engineering'};
-export const SIEGE_KINDS=new Set(['catapult','battering_ram','siege_tower','field_cannon','industrial_artillery']);
+export const SIEGE_KINDS=new Set(['bronze_catapult','catapult','battering_ram','siege_tower','field_cannon','industrial_artillery']);
 export const isSiegeUnit=kind=>SIEGE_KINDS.has(kind);
 export function hasReady(city,type){return city?.economy?.buildings?.some(b=>b.type===type&&b.ready&&b.hp>0&&!b.disabled)}
 export const siegeSection=(building,index)=>({
@@ -61,7 +61,7 @@ export function attachSiegeSections(city,battle){
 }
 export function siegeDamage(attacker,section,damage){
  const mode=isSiegeUnit(attacker.kind);
- const multiplier=mode?({catapult:2.9,battering_ram:3.4,siege_tower:1.6,field_cannon:4,industrial_artillery:5}[attacker.kind]||1):.16;
+ const multiplier=mode?({bronze_catapult:2.1,catapult:2.9,battering_ram:3.4,siege_tower:1.6,field_cannon:4,industrial_artillery:5}[attacker.kind]||1):.16;
  const armor=section.type==='reinforced_wall'?.72:section.type==='gatehouse'?.86:1;
  const dealt=Math.max(.5,damage*multiplier*armor);
  section.hp=Math.max(0,section.hp-dealt);

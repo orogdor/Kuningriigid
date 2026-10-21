@@ -1,3 +1,4 @@
+import {migrateBattleAmmunition} from './combat-equipment-v100.js';
 import {balanceUnitDefinitions,migrateUnitHealth,UNIT_BALANCE_VERSION} from './unit-balance-v99.js';
 import {createBattleNavigation} from './battle-navigation-v88.js';
 import {BATTLEFIELD} from './battlefield-v88.js';
@@ -16,10 +17,10 @@ import {buildDrainage,openStartingPassages} from './world-geography.js?v=65c';
 import {createLandmarks,collectLandmark,findExplorationPath} from './world-discoveries.js';
 import {buildRailNetworks} from './infrastructure.js';
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js';
-import {selectAIBuild,usefulDistrictTypes} from './ai-strategy.js?v=99a';
-import {tickBuilders,tickMarketHouseholds,operateWorker,trainingWorker} from './builders.js?v=99a';
+import {selectAIBuild,usefulDistrictTypes} from './ai-strategy.js?v=100a';
+import {tickBuilders,tickMarketHouseholds,operateWorker,trainingWorker} from './builders.js?v=100a';
 import {tickTownStreets} from './town-streets-v80.js?v=80c';
-import {SHIPS,seaAllowed,seaPath,harborExit,buildShip,finishShip,tickShips,embark,disembark,aiNavy,autoExploreNavy} from './naval.js?v=99a';
+import {SHIPS,seaAllowed,seaPath,harborExit,buildShip,finishShip,tickShips,embark,disembark,aiNavy,autoExploreNavy} from './naval.js?v=100a';
 import {reconcileVictory,captureEnemySettlers} from './victory-v72.js';
 import {initializeFisheries,isShore,fishingHarvest} from './fishery.js?v=64b';
 import {upgradeLevel,productionBonus,upgradedName} from './upgrades.js';
@@ -37,7 +38,7 @@ import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js'
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
-import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=99a';
+import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=100a';
 import {MEDIEVAL_BUILDINGS,MEDIEVAL_UNITS,medievalBonus,healMedievalArmies} from './medieval-v62.js';
 export {BUILDINGS,RESOURCE_NAMES};
 RESOURCE_NAMES.bread='Teraviljatoit';BUILDINGS.harbor={name:'Sadam ja laevatehas',icon:'⚓',cost:{wood:60,plank:25,stone:25},requires:['lumber','quarry'],workers:0,time:40};BUILDINGS.hall.name='Algusmaja · 3 töölist';
@@ -167,6 +168,7 @@ s.units=copy(old.units||[]).map(u=>({...u,cityId:s.cities.find(c=>c.team===u.tea
 export class Civilization{
  constructor(state){
  migrateUnitHealth(state);
+ migrateBattleAmmunition(state.battle);
  // Keep the percentage already completed for construction started in V32.
  if(state.constructionBalanceVersion!==1){
   for(const parent of state.cities||[])for(const ctx of [parent,...Object.values(parent.districts||{})])
@@ -345,10 +347,10 @@ export class Civilization{
  embark(ship,kind,armyId=0){return embark(this,ship,kind,armyId)}
  disembark(ship,p){return disembark(this,ship,p)}
  radius(city){const pop=city.economy.realms[city.team].pop;return city.radius=Math.min(4,Math.max(city.radius||1,pop>=64?4:pop>=48?3:pop>=32?2:1))}
- refreshTerritory(){const stamp=this.s.cities.map(c=>[c.id,c.team,c.c,c.r,this.radius(c),Object.entries(c.districts||{}).filter(([,d])=>d.economy.buildings.some(b=>!b.virtual)).map(([k])=>k).join(',')].join(':')).join('|');if(stamp===this.territoryStamp)return;this.territoryStamp=stamp;const candidates=new Map();for(const city of this.s.cities){const radius=this.radius(city),queue=[{c:city.c,r:city.r}],seen=new Set();for(let i=0;i<queue.length;i++){const p=queue[i],key=tileKey(p);if(seen.has(key)||p.c<0||p.c>=COLS||p.r<0||p.r>=ROWS||Math.max(Math.abs(p.c-city.c),Math.abs(p.r-city.r))>radius||!this.cell(p).land)continue;seen.add(key);if(!candidates.has(key))candidates.set(key,[]);candidates.get(key).push(city);for(const[dc,dr]of [[1,0],[-1,0],[0,1],[0,-1]])queue.push({c:p.c+dc,r:p.r+dr})}}
+ refreshTerritory(){const stamp=this.s.cities.map(c=>[c.id,c.team,c.c,c.r,this.radius(c),Object.entries(c.districts||{}).filter(([,d])=>d.economy.buildings.some(b=>!b.virtual)).map(([k])=>k).join(',')].join(':')).join('|');if(stamp===this.territoryStamp)return;this.territoryStamp=stamp;const candidates=new Map();for(const city of this.s.cities){const radius=this.radius(city),queue=[{c:city.c,r:city.r}],seen=new Set();for(let i=0;i<queue.length;i++){const p=queue[i],key=tileKey(p);if(seen.has(key)||p.c<0||p.c>=COLS||p.r<0||p.r>=ROWS||Math.max(Math.abs(p.c-city.c),Math.abs(p.r-city.r))>radius)continue;seen.add(key);if(!candidates.has(key))candidates.set(key,[]);candidates.get(key).push(city);if(!this.cell(p).land)continue;for(const[dc,dr]of [[1,0],[-1,0],[0,1],[0,-1]])queue.push({c:p.c+dc,r:p.r+dr})}}
  this.territory=new Map();for(const[key,cities]of candidates){const[c,r]=key.split(':').map(Number),exact=this.cityAt({c,r}),built=cities.find(t=>t.districts?.[key]?.economy.buildings.some(b=>!b.virtual));if(exact||built){this.territory.set(key,exact||built);continue}const sorted=cities.map(city=>({city,d:(city.c-c)**2+(city.r-r)**2})).sort((a,b)=>a.d-b.d||a.city.id-b.city.id);if(sorted.length===1||sorted[0].d<sorted[1].d||sorted[0].city.team===sorted[1].city.team)this.territory.set(key,sorted[0].city)}
  }
- territoryOwner(p){if(!this.cell(p)?.land)return null;this.refreshTerritory();return this.territory.get(tileKey(p))||null}
+ territoryOwner(p){if(!this.cell(p))return null;this.refreshTerritory();return this.territory.get(tileKey(p))||null}
  parentCity(ctx){return ctx.districtOf==null?ctx:this.s.cities.find(c=>c.id===ctx.districtOf)}
  contexts(city){const parent=this.parentCity(city);return [parent,...Object.values(parent.districts||{})]}
  allBuildings(city){return this.contexts(city).flatMap(c=>c.economy.buildings.filter(b=>!b.virtual))}

@@ -4,7 +4,7 @@ const SHIELDS=new Set(['bronze_spearman','infantry','man_at_arms']);
 const SPEARS=new Set(['spearman','bronze_spearman','halberdier','pikeman']);
 const LIGHT=new Set(['slinger','archer','bronze_archer','iron_archer','javelinman']);
 const GUNS=new Set(['musketeer','arquebusier','line_infantry','rifleman']);
-const HORSE=new Set(['cavalry','knight','heavy_cavalry','cuirassier']);
+const HORSE=new Set(['cavalry','knight','heavy_cavalry','cuirassier','bronze_cavalry']);
 export const FORMATIONS=Object.freeze({
  line:{name:'Tavarivi',speed:1,columns:4,width:1.05,depth:1.05,formTime:0,turn:1.5,help:'Tavaline liikumine ja lähivõitlus.'},
  hold:{name:'Hoia positsiooni',speed:.8,columns:4,width:1.05,depth:1.05,formTime:2,turn:.9,hold:true,help:'Hoia kohta ja suunda; ära jälita vastast.'},
@@ -15,11 +15,11 @@ export const FORMATIONS=Object.freeze({
  volley:{name:'Kogupauk',speed:.75,columns:6,width:1,depth:1.1,formTime:4,turn:.8,help:'Tulirelvade koondatud lask iga 3 sekundi järel. Rivi ees peab olema vaba tuleväli.'},
  charge:{name:'Koondunud ratsarünnak',speed:1.15,columns:4,width:4.1,depth:4.1,formTime:4,turn:.7,help:'Hoovõtt annab esimesele tabamusele mõju. Odarivi peatab laupkokkupõrke.'}
 });
-export function formationOptions(u,definitions){const age=definitions[u.kind]?.age??0,list=['line','hold'];if(SHIELDS.has(u.kind)&&age>=1&&age<=3)list.push('shield_wall');if(SPEARS.has(u.kind)&&age<=4)list.push('spear_wall');if(LIGHT.has(u.kind)||GUNS.has(u.kind))list.push('loose');if(LIGHT.has(u.kind))list.push('skirmish');if(GUNS.has(u.kind)&&age>=4&&age<=5)list.push('volley');if(HORSE.has(u.kind)&&age>=2&&age<=4)list.push('charge');return list;}
+export function formationOptions(u,definitions){const age=definitions[u.kind]?.age??0,list=['line','hold'];if(SHIELDS.has(u.kind)&&age>=1&&age<=3)list.push('shield_wall');if(SPEARS.has(u.kind)&&age<=4)list.push('spear_wall');if(LIGHT.has(u.kind)||GUNS.has(u.kind))list.push('loose');if(LIGHT.has(u.kind))list.push('skirmish');if(GUNS.has(u.kind)&&age>=4&&age<=5)list.push('volley');if(HORSE.has(u.kind)&&age>=1&&age<=4)list.push('charge');return list;}
 export function formationName(u,definitions){const p=FORMATIONS[u.formation]||FORMATIONS.line;return u.formation==='shield_wall'&&definitions[u.kind]?.age===1?p.bronzeName:p.name;}
 export function setFormation(u,id,definitions,time=0,manual=true){if(!formationOptions(u,definitions).includes(id)||u.routing)return false;u.formation=id;u.formationManual=manual;u.formationProgress=0;u.formationStrength=0;u.formationChangedAt=time;u.anchor={x:u.x,z:u.z};u.formationFacing=u.heading||0;delete u.slotStamp;u.volleyAt=time+4;u.volleyNumber=0;u.volleyWindow=false;return true;}
 export function turnTowards(current,target,dt,rate){const delta=Math.atan2(Math.sin(target-current),Math.cos(target-current));return current+Math.max(-rate*dt,Math.min(rate*dt,delta));}
-export function formationSlot(u,index,count){const p=FORMATIONS[u.formation]||FORMATIONS.line,mounted=['cavalry','vehicle'].includes(troopRole(u.kind)),width=mounted?4.1:p.width,depth=mounted?4.1:p.depth;
+export function formationSlot(u,index,count){const p=FORMATIONS[u.formation]||FORMATIONS.line,mounted=['cavalry','vehicle'].includes(troopRole(u.kind)),width=u.kind==='bronze_catapult'?3:mounted?4.1:p.width,depth=u.kind==='bronze_catapult'?3:mounted?4.1:p.depth;
  if(u.formation==='charge'){let row=0,start=0,total=0;for(let r=0,n=0;n<count;r++){const take=Math.min(r+1,count-n);total+=r*take;n+=take;}while(index>=start+row+1){start+=row+1;row++;}const members=Math.min(row+1,count-start);return {x:(index-start-(members-1)/2)*width,z:(total/count-row)*depth};}
  const columns=Math.min(count,p.columns),rows=Math.ceil(count/columns);return {x:(index%columns-(columns-1)/2)*width,z:(Math.floor(index/columns)-(rows-1)/2)*depth};}
 export function worldSlot(u,m,count){const off=formationSlot(u,m.slotIndex??m.index,count),heading=u.formationFacing??u.heading??0,c=Math.cos(heading),s=Math.sin(heading),a=u.anchor||u;return {x:a.x+c*off.x+s*off.z,z:a.z-s*off.x+c*off.z};}
