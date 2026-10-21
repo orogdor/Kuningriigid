@@ -1,6 +1,6 @@
 # V87: linnade varud, kaupmehed ja vajadused
 
-HUD: **kohalik varu (kõigi oma linnade varu) / kohalik mahutavus**. Riigi kogus on ülevaade; ehitus kasutab kohalikku ladu. Toidunäitu vajutades avaneb liikide ja luksuste loetelu. Vili, jahu ja leib moodustavad ühe teraviljatoidu liigi. Liha, kala ja marjad on eraldi.
+HUD: **kohalik varu (kõigi oma linnade varu) / kohalik mahutavus**. Riigi kogus on ülevaade; ehitus kasutab kohalikku ladu. Toidunäitu vajutades avaneb liikide ja luksuste loetelu. Toitu nõudvad värbamised ja laevad kasutavad kõiki söödavaid liike. Vili, jahu ja leib moodustavad ühe teraviljatoidu liigi. Liha, kala ja marjad on eraldi.
 
 | Ajastu | Toiduliike | Luksusliike |
 |---|---:|---:|

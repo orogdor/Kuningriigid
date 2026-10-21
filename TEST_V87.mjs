@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {cityNeeds,NEEDS,GOODS,GOOD_BUILDINGS,seedGoods,nationalStock} from './city-needs-v87.js';
 import {relation,setRelation,atWar,blockMerchants,tickDiplomacy} from './diplomacy-v87.js';
 import {merchantRoute,planMerchants,advanceMerchant,receiveMerchant,MERCHANT_RANGE} from './merchant-v87.js';
-import {takeFood,BUILDINGS,START,initialState,tickEconomy} from './economy.js';
+import {takeFood,BUILDINGS,START,initialState,tickEconomy,canAfford,spendResources} from './economy.js';
 import {Civilization,createGame} from './civilization-core.js?v=87a';
 const city=(id,c,team=0,resources={})=>({id,c,r:0,team,economy:{realms:Array.from({length:4},()=>({pop:3,resources:{...START,wood:0,stone:0,bread:0,water:0,...resources}})),buildings:[{type:'hall',ready:true,hp:100,team}]}});
 const a=city(0,0),b=city(1,20),stop=city(2,40),end=city(3,60);
@@ -14,6 +14,8 @@ assert.equal(relation(s,0,1),'neutral');assert.equal(atWar(s,0,1),false);
 assert.equal(cityNeeds(a,0).productivity,.9);Object.assign(a.economy.realms[0].resources,{meat:10,fish:10});assert.equal(cityNeeds(a,0).productivity,1);
 a.economy.realms[0].resources.berries=10;assert.equal(cityNeeds(a,0).productivity,1.02);
 for(let age=0;age<7;age++){assert.ok(Object.values(GOODS).filter(d=>d.food&&d.age<=age).length+1>=NEEDS[age].food);assert.ok(Object.values(GOODS).filter(d=>d.luxury&&d.age<=age).length+(age>=1?1:0)>=NEEDS[age].luxury);}
+assert.equal(canAfford({grain:6},{grain:5,bread:4}),false,'explicit raw food and generic meals cannot spend the same stock twice');
+const armyFood={meat:10,fish:10,bread:0};assert.ok(canAfford(armyFood,{bread:15}));spendResources(armyFood,{bread:15});assert.equal(armyFood.meat+armyFood.fish,5);assert.equal(armyFood.bread,0,'generic food cost never makes bread negative');
 const r={meat:3,fish:2};assert.equal(takeFood(r,4),4);assert.equal(r.meat+r.fish,1);
 let route=merchantRoute(g,a,end,0);assert.equal(route.length,3);assert.ok(route.every(l=>l.path.length<=MERCHANT_RANGE.road));s.cities=[a,end];assert.equal(merchantRoute(g,a,end,0),null,'range cannot be bypassed');
 s.cities=[a,b];Object.assign(a.economy.realms[0].resources,{wood:0,meat:40});assert.equal(planMerchants(g),1);let cargo=s.shipments[0];assert.equal(b.economy.realms[0].resources.meat,0,'no teleport at dispatch');assert.equal(cargo.fees.length,1);const sent=cargo.goods.meat;advanceMerchant(g,cargo,4);assert.equal(cargo.c,1);assert.equal(b.economy.realms[0].resources.meat,0);advanceMerchant(g,cargo,100);receiveMerchant(g,cargo);assert.ok(Math.abs(b.economy.realms[0].resources.meat-sent)<1e-6,'destination fee and delivery together conserve arriving cargo');assert.equal(cargo.fees.length,2);

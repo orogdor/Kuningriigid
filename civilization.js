@@ -25,7 +25,7 @@ import {persistSiegeDamage} from './medieval-v62.js';
 import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock,ERA_NAMES} from './research.js';
 import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
-import {renderResearchUI} from './research-ui.js?v=86a';
+import {renderResearchUI} from './research-ui.js?v=87a';
 import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=86a';
 import {createWorldAtlasProps} from './world-props.js?v=85a';
