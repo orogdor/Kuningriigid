@@ -1,0 +1,29 @@
+name: V88 Tactical Battlefield QA
+on:
+  push:
+    branches: [main]
+    paths: ['battlefield-v88.js', 'battle-navigation-v88.js', 'battle-scene-v88.js', 'civilization.js', 'campaign.js', 'command-visuals.js', 'index.html', 'TEST_V88_BATTLE*.mjs', '.github/workflows/v88-battle.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  battlefield:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: |
+          node --check civilization.js
+          node TEST_V88_BATTLEFIELD.mjs
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - run: |
+          python3 -m http.server 8765 >/tmp/battle-server.log 2>&1 &
+          node TEST_V88_BATTLE_UI.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V88-battlefield-playtest
+          path: artifacts-v88/
