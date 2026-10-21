@@ -1,16 +1,17 @@
+import {GOODS,installGoods} from './city-needs-v87.js';
 import {demand,workerEfficiency,HALL_CAPACITY,HOUSE_CAPACITY,housingCapacity,FOOD_PER_RESIDENT,WATER_PER_RESIDENT} from './labor.js';
 // Resource harvesting and workshop output require three times more working time.
 // Movement, building construction, troop training and food consumption are unchanged.
 export const RESOURCE_PRODUCTION_MULTIPLIER=1/4.5;
 export const RESOURCE_NAMES={wood:'Puit',plank:'Lauad',stone:'Kivi',grain:'Vili',flour:'Jahu',water:'Vesi',bread:'Leib',ore:'Maak',coal:'Süsi',iron:'Raud',weapons:'Relvad',gold:'Kuld',paper:'Paber',saltpeter:'Salpeeter',gunpowder:'Püssirohi',steel:'Teras',machines:'Masinad',oil:'Nafta',fuel:'Kütus',power:'Elektrienergia',vehicles:'Sõidukid',clay:'Savi',pottery:'Keraamika',cutstone:'Tahutud kivi',copper:'Vask',tin:'Tina',bronze:'Pronks',carts:'Vankrid'};
 export const MATERIAL_KEYS=new Set(["wood","stone","plank","ore","coal","iron","weapons","paper","saltpeter","gunpowder","steel","machines","oil","fuel","vehicles","clay","pottery","cutstone","copper","tin","bronze","carts"]);
-export const FOOD_KEYS=new Set(["bread","grain","flour"]);
+export const FOOD_KEYS=new Set(["bread","grain","flour",...Object.keys(GOODS).filter(k=>GOODS[k].food)]);
 // The town eats prepared food first. Grain is edible as porridge in emergencies;
 // flour needs extra preparation. Returned quantity is edible meal equivalents.
-export const FOOD_NUTRITION={bread:1,flour:.85,grain:.70};
+export const FOOD_NUTRITION={bread:1,flour:.85,grain:.70,...Object.fromEntries(Object.keys(GOODS).filter(k=>GOODS[k].food).map(k=>[k,1]))};
 export function takeFood(stock,meals){
  let need=Math.max(0,meals),served=0;
- for(const key of ['bread','flour','grain']){
+ for(const key of [...FOOD_KEYS].sort((a,b)=>(stock[b]||0)-(stock[a]||0))){
   if(need<=1e-7)break;
   const nutrition=FOOD_NUTRITION[key],available=Math.max(0,stock[key]||0),units=Math.min(available,need/nutrition);
   stock[key]=Math.max(0,available-units);served+=units*nutrition;need-=units*nutrition;
@@ -65,6 +66,7 @@ barracks:{name:'Kasarm',icon:'⚑',cost:{plank:35,stone:25},requires:['smith','b
 archery:{name:'Lasketiir',icon:'➶',cost:{plank:30,stone:15},requires:['barracks'],workers:1,time:20},
 stable:{name:'Tall',icon:'♞',cost:{plank:45,stone:30},requires:['barracks','house'],workers:2,time:25}
 };
+installGoods(BUILDINGS,RESOURCE_NAMES,START,MATERIAL_KEYS);
 export const RECRUITS={infantry:{requires:['barracks'],cost:{gold:40,bread:8,weapons:2},pop:3},archer:{requires:['barracks','archery'],cost:{gold:45,bread:8,weapons:2},pop:3},cavalry:{requires:['barracks','stable'],cost:{gold:70,bread:12,weapons:3},pop:3}};
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export function realm(){return {resources:{...START},pop:3,tech:0,aiClock:0,log:[]}}
@@ -72,8 +74,9 @@ export function initialState(seed,type='continents'){return {economyVersion:2,ti
 export function migrateEconomy(s){s.settlers??=[0,1].map(team=>{const hall=s.buildings.find(b=>b.team===team&&b.type==='hall');return {team,x:hall?.x??-8,z:hall?.z??0,target:null,founded:!!hall}});if(!s.realms){s.realms=Array.from({length:4},()=>realm());s.realms[0].resources={...START,...s.resources};s.realms[0].pop=s.pop??3;s.realms[0].tech=s.tech||0}while(s.realms.length<4)s.realms.push(realm());for(const r of s.realms){for(const k of Object.keys(START))r.resources[k]??=0;r.log??=[];r.aiClock??=0}for(const b of s.buildings)if(b.type==='mine'&&s.economyVersion!==2)b.type='quarry';s.economyVersion=2;s.resources=s.realms[0].resources;s.pop=s.realms[0].pop;s.tech=s.realms[0].tech;return s}
 export function ready(s,team,type){return s.buildings.some(b=>b.team===team&&b.type===type&&b.ready&&b.hp>0)}
 export function requirement(s,team,type){const missing=(BUILDINGS[type]?.requires||[]).filter(k=>!ready(s,team,k));return missing.length?'Vaja: '+missing.map(k=>BUILDINGS[k].name).join(', '):''}
-export function canAfford(resources,cost){return Object.entries(cost).every(([k,v])=>(resources[k]||0)>=v)}
-function spend(r,cost){for(const[k,v]of Object.entries(cost))r[k]-=v}
+export function canAfford(resources,cost){const available={...resources};for(const[k,v]of Object.entries(cost)){if(k==='bread')continue;if((available[k]||0)<v)return false;available[k]-=v;}return !cost.bread||Object.entries(FOOD_NUTRITION).reduce((n,[key,nutrition])=>n+Math.max(0,available[key]||0)*nutrition,0)>=cost.bread}
+export function spendResources(r,cost){for(const[k,v]of Object.entries(cost))if(k!=='bread')r[k]-=v;if(cost.bread)takeFood(r,cost.bread);}
+const spend=spendResources;
 function log(s,team,text){const list=s.realms[team].log;list.push({time:Math.floor(s.time),text});if(list.length>80)list.shift()}
 export function buildRule(s,team,type,at,env){const d=BUILDINGS[type],r=s.realms[team];if(!d||type==='hall')return {error:'Seda hoonet ei saa ehitada.'};const locked=env.requirement?env.requirement(type,team):requirement(s,team,type);if(locked)return {error:locked};if(!canAfford(r.resources,d.cost))return {error:'Ehitusmaterjale ei jätku.'};if(s.buildings.filter(b=>b.team===team&&!b.ready).length>=12)return {error:'Ehitusjärjekord on täis (12).'};if(!env.passable(at.x,at.z,team))return {error:'Ehitada saab ainult kuival maal.'};if(s.buildings.some(b=>b.team===team&&!b.virtual&&distance(b,at)<6))return {error:'Teine hoone on liiga lähedal.'};const links=s.buildings.map((b,i)=>({b,i})).filter(({b})=>b.team===team&&b.ready&&(env.unlimitedBuildingRange||distance(b,at)<=13)&&(!env.segmentDry||env.unlimitedBuildingRange||env.segmentDry(b,at,team))).sort((a,b)=>distance(a.b,at)-distance(b.b,at));if(env.canBuild&&!env.canBuild(at,type,team))return {error:'Ehituskoht või maardla ligipääs on blokeeritud.'};return links.length?{parent:links[0].i}:{error:'Puudub teeühendus oma valmis hoonega (kuni 13 sammu).'}}
 export function placeBuilding(s,team,type,at,env){const check=buildRule(s,team,type,at,env);if(check.error)return check;const d=BUILDINGS[type];spend(s.realms[team].resources,d.cost);const b={type,x:at.x,z:at.z,team,hp:350,ready:false,progress:0,parent:check.parent,timer:0,materialsRemaining:Object.values(d.cost).reduce((a,n)=>a+n,0),materialsTotal:Object.values(d.cost).reduce((a,n)=>a+n,0)};s.buildings.push(b);log(s,team,'Ehitus: '+d.name);env.onPlaced?.(b);return {building:b}}

@@ -1,3 +1,4 @@
+import {setRelation} from './diplomacy-v87.js';
 
 import assert from 'node:assert/strict';
 import {Civilization,createGame,TROOPS} from './civilization-core.js';
@@ -135,7 +136,7 @@ console.log('V72 BATTLE CONQUEST PASS',JSON.stringify({elapsed:Math.round(b.elap
 for(const team of [2,3]){
  const target=s.settlers.find(a=>a.team===team);
  assert.ok(target);
- fightArmy.c=target.c;fightArmy.r=target.r;
+ setRelation(s,0,team,'war');fightArmy.c=target.c;fightArmy.r=target.r;
  assert.equal(captureEnemySettlers(g),1,'army captures hostile settler');
 }
 assert.equal(s.winner,0,'last remaining faction actually wins');

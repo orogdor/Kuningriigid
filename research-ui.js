@@ -19,12 +19,13 @@ export function renderResearchUI(game,{choose,queue,remove,details=true}){
  title.textContent=summary+' · '+pretty(rate)+' teaduspunkti/min · tempo: '+tempoName(s)+'. Teadus sõltub elanikest ja õpetlastest.';
  const pause=document.getElementById('pauseresearch');pause.disabled=!active&&!r.queue?.length;pause.textContent=r.paused?'Jätka uurimist':'Peata uurimine · edenemine säilib';
  if(document.getElementById('researchpanel').hidden)return;
- const stamp=JSON.stringify([r.known,active,r.queue,r.boosted,hasCity,s.ages[0],r.paused,Object.values(TECHS).map(t=>researchCost(s,t))]);
+ const stamp=JSON.stringify([r.known,active,r.queue,hasCity,s.ages[0],r.paused,Object.values(TECHS).map(t=>researchCost(s,t))]);
  if(tree.dataset.renderKey===stamp){
   for(const card of tree.querySelectorAll('.tech-card[data-tech]')){
    const id=card.dataset.tech,cost=researchCost(s,TECHS[id]),value=r.progress[id]||0,known=r.known.includes(id);
    card.querySelector('.tech-time').textContent=known?'Uuritud':pretty(cost)+' teaduspunkti · '+(rate>0?clock((cost-value)/rate*60):'Ootab teadust');
    const progress=card.querySelector('progress');progress.max=cost;progress.value=known?cost:value;
+   const eureka=card.querySelector('.eureka-earned,.eureka-available');if(eureka){const earned=r.boosted?.includes(id);eureka.className=earned?'eureka-earned':'eureka-available';eureka.textContent=earned?'⚡ Avastamisboonus saadud (+35%)':'⚡ Avastamisboonus: '+EUREKAS[id]+' (+35%)';}
    const detail=card.querySelector('.tech-progress-detail');if(detail){detail.hidden=!value;detail.textContent='Tehtud '+pretty(value)+' / '+pretty(cost)+' · '+Math.floor(100*Math.min(1,value/cost))+'%';}
   }
   return;

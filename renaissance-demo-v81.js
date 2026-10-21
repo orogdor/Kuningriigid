@@ -1,7 +1,7 @@
 // V81 Renaissance demo city. Read-only if opened via ?demo=renaissance.
 // Returns normal V4 JSON, leaves autosave and V80/V79 example cities unchanged.
 import {createMedievalDemoState} from './medieval-demo-v80.js?v=80c';
-import {Civilization,BUILDINGS} from './civilization-core.js?v=80c';
+import {Civilization,BUILDINGS} from './civilization-core.js?v=87a';
 import {grantTech} from './research.js';
 import {seedCityStreetNetwork} from './town-streets-v80.js?v=80c';
 import {RENAISSANCE_BUILDING_TYPES} from './renaissance-buildings-v81.js?v=81a';

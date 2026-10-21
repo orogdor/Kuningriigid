@@ -1,3 +1,5 @@
+import {canAfford,spendResources} from './economy.js';
+import {atWar} from './diplomacy-v87.js';
 import {tempoMultiplier} from './tempo.js';
 import {COLS,ROWS} from './campaign.js';
 import {armyUnits,activeArmies} from './v51-systems.js';
@@ -7,7 +9,7 @@ export function seaDistances(game){if(game.seaDistance)return game.seaDistance;c
 export function seaAllowed(game,team,p){const cell=game.cell(p);if(!cell||p.c<0||p.c>=COLS||p.r<0||p.r>=ROWS||cell.land)return false;const known=game.s.research[team].known;return known.includes('shipbuilding')&&(known.includes('ocean_sailing')||seaDistances(game)[p.r*COLS+p.c]<=(known.includes('navigation')?2:1))}
 export function seaPath(game,ship,to){const key=p=>p.r*COLS+p.c,start=key(ship),goal=key(to);if(!seaAllowed(game,ship.team,to))return null;const q=[start],prev=new Map([[start,null]]);for(let i=0;i<q.length;i++){const k=q[i];if(k===goal){const path=[];let n=k;while(n!==start){path.push({c:n%COLS,r:Math.floor(n/COLS)});n=prev.get(n)}return path.reverse()}const c=k%COLS,r=Math.floor(k/COLS);for(const[dc,dr]of [[1,0],[-1,0],[0,1],[0,-1]]){const p={c:c+dc,r:r+dr},n=key(p);if(prev.has(n)||!seaAllowed(game,ship.team,p))continue;prev.set(n,k);q.push(n)}}return null}
 export function harborExit(game,p){for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const v={c:p.c+dc,r:p.r+dr};if(seaAllowed(game,p.team,v))return v}return null}
-export function buildShip(game,ctx,kind){const city=game.parentCity(ctx),d=SHIPS[kind],stock=city.economy.realms[city.team].resources;if(!d)return {error:'Tundmatu laev.'};if(!game.s.research[city.team].known.includes('shipbuilding'))return {error:'Uuri laevaehitust.'};const harbor=game.contexts(city).find(c=>c.economy.buildings.some(b=>b.type==='harbor'&&b.ready&&!b.disabled)&&harborExit(game,c));if(!harbor)return {error:'Vaja valmis rannikusadamat.'};city.training??=[];if(city.training.length>=4)return {error:'Tööjärjekord on täis.'};if(!Object.entries(d.cost).every(([k,n])=>stock[k]>=n))return {error:'Laeva jaoks napib materjale.'};for(const[k,n]of Object.entries(d.cost))stock[k]-=n;const job={kind,ship:true,team:city.team,harbor:{c:harbor.c,r:harbor.r},total:d.time*tempoMultiplier(game.s),progress:0,assigned:0,efficiency:0};city.training.push(job);return {queued:job}}
+export function buildShip(game,ctx,kind){const city=game.parentCity(ctx),d=SHIPS[kind],stock=city.economy.realms[city.team].resources;if(!d)return {error:'Tundmatu laev.'};if(!game.s.research[city.team].known.includes('shipbuilding'))return {error:'Uuri laevaehitust.'};const harbor=game.contexts(city).find(c=>c.economy.buildings.some(b=>b.type==='harbor'&&b.ready&&!b.disabled)&&harborExit(game,c));if(!harbor)return {error:'Vaja valmis rannikusadamat.'};city.training??=[];if(city.training.length>=4)return {error:'Tööjärjekord on täis.'};if(!canAfford(stock,d.cost))return {error:'Laeva jaoks napib materjale.'};spendResources(stock,d.cost);const job={kind,ship:true,team:city.team,harbor:{c:harbor.c,r:harbor.r},total:d.time*tempoMultiplier(game.s),progress:0,assigned:0,efficiency:0};city.training.push(job);return {queued:job}}
 export function finishShip(game,city,job){const p=harborExit(game,{...job.harbor,team:city.team});if(!p){job.status='Sadama väljapääs puudub';return false}game.s.ships??=[];game.s.nextShip??=0;game.s.ships.push({id:game.s.nextShip++,kind:job.kind,team:city.team,...p,hp:SHIPS[job.kind].hp,path:[],clock:0,cool:0,cargo:null});return true}
 // V72: A transport owns a *particular* detachment, not the faction's entire army.
 // Legacy saves without armyId continue to resolve to the original main army (id 0).
@@ -72,7 +74,7 @@ export function tickShips(game,dt){
    const passenger=a.cargo.kind==='army'?cargoArmy(game,a):game.s.settlers.find(p=>p.id===a.cargo.id);
    if(passenger){passenger.c=a.c;passenger.r=a.r;}
   }
-  const foe=game.s.ships.find(b=>b.team!==a.team&&b.hp>0&&near(a,b));
+  const foe=game.s.ships.find(b=>atWar(game.s,b.team,a.team)&&b.hp>0&&near(a,b));
   if(foe&&a.cool===0){
    foe.hp=Math.max(0,foe.hp-SHIPS[a.kind].damage*(1+level*.2));
    a.cool=2;a.attackAt=game.s.time;foe.hitAt=game.s.time;
@@ -157,7 +159,7 @@ export function navyExpedition(game,ship,army,target=null){
    }
    return !e;
   }
-  const possibilities=(target?[target]:[...game.s.cities,...game.s.settlers].filter(c=>c.team!==ship.team&&game.seen(ship.team,c)))
+  const possibilities=(target?[target]:[...game.s.cities,...game.s.settlers].filter(c=>atWar(game.s,c.team,ship.team)&&game.seen(ship.team,c)))
     .filter(c=>c?.team!==ship.team);
   let best=null;
   for(const c of possibilities){
@@ -235,7 +237,7 @@ export function aiNavy(game,team){
  }
  for(const ship of owned){
   if(ship.kind==='warship'){
-   const foe=ships.find(s=>s.team!==team&&s.hp>0&&game.seen(team,s));
+   const foe=ships.find(s=>atWar(game.s,s.team,team)&&s.hp>0&&game.seen(team,s));
    if(foe&&!ship.path.length)ship.path=seaPath(game,ship,foe)||[];
    continue;
   }
@@ -247,7 +249,7 @@ export function aiNavy(game,team){
     .sort((a,b)=>armyUnits(game.s,b).length-armyUnits(game.s,a).length)[0];
   const passenger=cargoArmy(game,ship);
   if(passenger||ship.cargo){navyExpedition(game,ship,passenger);continue;}
-  const enemyKnown=[...game.s.cities,...game.s.settlers].some(c=>c.team!==team&&game.seen(team,c));
+  const enemyKnown=[...game.s.cities,...game.s.settlers].some(c=>atWar(game.s,c.team,team)&&game.seen(team,c));
   if(!enemyKnown){
    // A scout must survey inland after the first landfall. Put one aboard when possible.
    const scout=activeArmies(game.s,team).find(a=>armyUnits(game.s,a).some(u=>u.kind==='scout')&&armyUnits(game.s,a).length<=SHIPS.transport.capacity);

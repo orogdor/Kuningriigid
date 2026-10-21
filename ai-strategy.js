@@ -1,3 +1,4 @@
+import {GOOD_BUILDINGS,cityNeeds} from './city-needs-v87.js';
 // V45: needs-led AI. Decisions are pure so the reasoning can be tested without a renderer.
 import {ERA_MATERIALS,ageDeficit,edibleSupply} from './era-economy.js';
 import {BUILDINGS} from './economy.js';
@@ -62,6 +63,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   if(missing&&!CRITICAL_BUILDINGS.has(type))return;
   possibilities.push({type,priority,reason});
  };
+ const happiness=cityNeeds(city,age);if(happiness.missing)for(const [type,d] of Object.entries(GOOD_BUILDINGS)){if(d.age<=age&&(stock[d.out]||0)<happiness.threshold*3)add(type,101,'Linna mitmekesisus');}
  // Maintain an early, diverse economy. The first source is important even
  // when current stores are high; dependence on initial stocks is not viable.
  for(const [type,priority] of [['lumber',125],['well',118],['hunter',115],['fisher',109],['farm',105],['quarry',103],['study',98]])add(type,priority,'Algmajandus');
@@ -132,5 +134,6 @@ export function usefulDistrictTypes(game,team){
  if(game.s.ages[team]>=2&&totals.ore<15)deficits.add('mine');
  if(game.s.ages[team]>=6&&totals.oil<20)deficits.add('oilwell');
  if(research?.known.includes('shipbuilding')&&!cities.some(c=>game.allBuildings(c).some(b=>b.type==='harbor'&&b.hp>0)))deficits.add('harbor');
+ for(const [type,d] of Object.entries(GOOD_BUILDINGS))if(d.deposit&&d.age<=game.s.ages[team]&&cities.some(c=>cityNeeds(c,game.s.ages[team]).missing))deficits.add(type);
  return deficits;
 }
