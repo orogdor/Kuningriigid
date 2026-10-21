@@ -1,3 +1,4 @@
+import {detailWorldRoadWidth} from './road-width-v89.js';
 import assert from 'node:assert/strict';
 import {Civilization,createGame} from './civilization-core.js';
 import {getRivers,sampleRiver,roadSpline,baseHeight,worldElevation,surface,localSurface,worldToLocal,roadNetwork} from './continuous-landscape.js';
@@ -60,9 +61,12 @@ for(const seed of [17,12345,20261018]){
   const localRoad=local.children.find(c=>c.name==='continuous road pavement').geometry;
   assert.ok(worldRoad.index&&localRoad.index,'roads have welded vertices across adjacent segments');
   const W=worldRoad.attributes.position,L=localRoad.attributes.position;
-  assert.ok(Math.abs(L.getX(0)-(W.getX(0)-orig.x)*3)<.002);
-  assert.ok(Math.abs(L.getY(0)-(W.getY(0)-.7)*.30)<.002);
-  assert.ok(Math.abs(L.getZ(0)-(W.getZ(0)-orig.z)*2.6)<.002);
+  const wa=worldRoad.index.getX(0),wb=worldRoad.index.getX(1),la=localRoad.index.getX(0),lb=localRoad.index.getX(1);
+  // Centerlines retain the world projection; tactical road widths intentionally do not scale 3x.
+  assert.ok(Math.abs((L.getX(la)+L.getX(lb))/2-((W.getX(wa)+W.getX(wb))/2-orig.x)*3)<.002);
+  assert.ok(Math.abs(L.getY(la)-(W.getY(wa)-.7)*.30)<.002);
+  assert.ok(Math.abs((L.getZ(la)+L.getZ(lb))/2-((W.getZ(wa)+W.getZ(wb))/2-orig.z)*2.6)<.002);
+  assert.ok(Math.abs(Math.hypot(L.getX(la)-L.getX(lb),L.getZ(la)-L.getZ(lb))-detailWorldRoadWidth(edges[0].level))<.002);
   disposeNetwork(network);disposeNetwork(local);
  }
  console.log('V67',seed,{watersheds:edges.length,detailRiverTriangles:detail.userData.riverVertexCount/3,fullRiverTriangles:world.userData.riverVertexCount/3});
