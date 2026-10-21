@@ -1,3 +1,4 @@
+import {balanceUnitDefinitions} from './unit-balance-v99.js';
 import {UNIT_GRADES,troopCost} from './military-v88.js';
 import {canAfford,spendResources} from './economy.js';
 import {atWar} from './diplomacy-v87.js';
@@ -5,6 +6,7 @@ import {tempoMultiplier} from './tempo.js';
 import {COLS,ROWS} from './campaign.js';
 import {armyUnits,activeArmies} from './v51-systems.js';
 export const SHIPS={transport:{name:'Transpordilaev',time:45,cost:{wood:70,plank:30,bread:10},hp:180,damage:2,capacity:6},warship:{name:'Sõjalaev',time:60,cost:{wood:90,plank:45,stone:20,bread:15},hp:280,damage:18,capacity:0}};
+balanceUnitDefinitions(SHIPS);
 const near=(a,b)=>Math.max(Math.abs(a.c-b.c),Math.abs(a.r-b.r))<=1;
 export function seaDistances(game){if(game.seaDistance)return game.seaDistance;const d=new Uint16Array(game.cells.length);d.fill(65535);const q=[];for(const p of game.cells)if(p.land){const k=p.r*COLS+p.c;d[k]=0;q.push(k)}for(let i=0;i<q.length;i++){const k=q[i],c=k%COLS,r=Math.floor(k/COLS);for(const[dx,dz]of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const x=c+dx,z=r+dz,n=z*COLS+x;if(x<0||x>=COLS||z<0||z>=ROWS||d[n]<=d[k]+1)continue;d[n]=d[k]+1;q.push(n)}}return game.seaDistance=d}
 export function seaAllowed(game,team,p){const cell=game.cell(p);if(!cell||p.c<0||p.c>=COLS||p.r<0||p.r>=ROWS||cell.land)return false;const known=game.s.research[team].known;return known.includes('shipbuilding')&&(known.includes('ocean_sailing')||seaDistances(game)[p.r*COLS+p.c]<=(known.includes('navigation')?2:1))}
