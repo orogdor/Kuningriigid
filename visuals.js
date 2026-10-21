@@ -1,3 +1,4 @@
+import {visualKind as militaryVisualKind} from './military-v88.js';
 import * as T from './vendor/three.module.js';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {createV50CharacterRig} from './model-runtime-v50.js';
@@ -19,7 +20,8 @@ function humanArchetype(kind){
  if(['lumberjack','miner','forester','stone_lumber','stone_miner','stone_forester','stone_fisher','stone_worker','farmer','watercarrier','gatherer','trainer'].includes(kind))return 'worker';
  return 'villager';
 }
-export function createSoldier(parent,x,z,color,kind){
+export function createSoldier(parent,x,z,color,kind,grade='standard'){
+ const originalKind=kind;kind=militaryVisualKind(kind);
  const visualKind=kind;
  const toolColor=kind.startsWith('stone_')?'#8f9185':kind.startsWith('bronze_')?'#b98a48':kind.startsWith('iron_')?'#8c959d':kind.startsWith('renaissance_')||kind.startsWith('industrial_')?'#a8afb5':kind.startsWith('modern_')?'#cfb95a':kind.startsWith('master_')?'#d0c6a2':'#a2aaa2';
  const archetype=humanArchetype(visualKind);
@@ -62,6 +64,20 @@ if(kind==='motorized'){
  for(const xx of [-.43,.43])part(root,'box','#f2e9b6',xx,.74,1.31,.20,.13,.06);
  body.scale.setScalar(.68);
 }
+// Distinct equipment for the new era rosters.
+if(originalKind==='chariot'){
+ part(root,'box','#9a7543',0,.55,-1,1.8,.2,1.6);part(root,'box','#ad864d',0,1,-1.7,1.8,.9,.12);
+ for(const side of [-1,1]){part(root,'cylinder','#60452d',side,.5,-1,.6,.15,.6).rotation.z=Math.PI/2;part(root,'box','#8e7047',side*.65,.65,.2,.09,.09,2.6);}
+}
+if(['field_cannon','industrial_artillery','machinegun_team','rocket_team','tank'].includes(originalKind)){
+ const tank=originalKind==='tank',gun=originalKind==='machinegun_team',rocket=originalKind==='rocket_team';
+ if(tank){part(root,'box','#4e624a',0,.85,0,2.2,.65,3.3,true);for(const side of [-1,1])part(root,'box','#333a32',side*1.1,.42,0,.45,.6,3.5);part(root,'cylinder','#66775a',0,1.5,0,.8,.55,.8,true);body.visible=false;}
+ else if(!rocket){part(root,'box','#665d45',0,.5,.5,gun?.7:1.6,.15,1.8);for(const side of [-1,1])part(root,'cylinder','#433d32',side*(gun?.4:.9),.5,0,.5,.15,.5).rotation.z=Math.PI/2;body.position.x=-1;}
+ const barrel=part(rocket?arms[1]:root,'cylinder',rocket?'#62714e':'#434c42',0,rocket?-.2:tank?1.55:1.1,rocket?.4:1,rocket?.15:gun?.07:.2,rocket?1.2:gun?1.3:2.8,rocket?.15:gun?.07:.2,true);barrel.rotation.x=Math.PI/2;
+}
+root.userData.unitKind=originalKind;root.userData.grade=grade;
+if(grade==='elite'){part(head,'box','#d6b558',0,.46,0,.25,.15,.26,true);part(body,'box','#d6b558',-.16,.86,.2,.12,.15,.04,true);}
+if(grade==='mobilized')part(body,'box','#84745d',0,.72,.22,.46,.55,.04);
 root.position.set(x,0,z);root.userData.rig={body,head,legs,arms,horseLegs,riding,kind,phase:x*2+z,archetype:rig.archetype};parent.add(root);return root}
 export function animateSoldier(root,time,moving=false,attack=false){const r=root.userData.rig;if(!r)return;const p=time*8+r.phase,step=(moving&&r.kind!=='motorized')?Math.sin(p)*.48:0,phase=typeof attack==='object'?attack.phase:(attack?.4:-1),active=phase>=0&&phase<=1;r.legs.forEach((v,i)=>v.rotation.x=step*(i?1:-1));r.arms.forEach((v,i)=>{v.rotation.set(-step*(i?1:-1),0,0);v.position.z=0});r.body.rotation.set(0,0,0);if(r.head)r.head.rotation.set(.035*Math.sin(time*1.4+r.phase),.055*Math.sin(time*.82+r.phase),0);
 if(active){if(['musketeer','rifleman','motorized'].includes(r.kind)){r.arms[0].rotation.x=-1.25;r.arms[1].rotation.x=-1.35;r.body.rotation.y=-.04*Math.sin(phase*Math.PI);r.body.rotation.x=phase>.65?-.07:0}else if(['archer','crossbowman'].includes(r.kind)){const draw=phase<.65?phase/.65:Math.max(0,(1-phase)/.35);r.arms[0].rotation.x=-1.55;r.arms[0].rotation.z=.12;r.arms[1].rotation.x=-1.4;r.arms[1].rotation.z=-.65*draw;r.arms[1].position.z=-.22*draw;r.body.rotation.y=-.2*draw}else{const swing=Math.sin(phase*Math.PI);r.arms[1].rotation.x=-2.3+phase*2.8;r.arms[1].rotation.z=.65*swing;r.arms[0].rotation.x=-.5;r.body.rotation.y=-.3+.7*phase;r.body.rotation.x=.1*swing}}

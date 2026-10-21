@@ -19,6 +19,7 @@ jobs:
         with: {node-version: 22}
       - run: |
           node --check civilization.js
+          node TEST_V88_MILITARY.mjs
           node TEST_V88_SITES.mjs
           node TEST_V88_PRODUCTIVITY.mjs
           node TEST_V88_ERA_COST.mjs
@@ -45,6 +46,7 @@ jobs:
           echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
       - run: |
           python3 -m http.server 8765 >/tmp/v88-server.log 2>&1 &
+          node TEST_V88_MILITARY_UI.mjs
           node TEST_V88_UI.mjs
           node TEST_V88_EXPLORATION_UI.mjs
       - uses: actions/upload-artifact@v4

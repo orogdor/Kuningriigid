@@ -62,10 +62,19 @@ export function actionTips(game,team=0){
 export function armyUnits(s,army){return s.units.filter(u=>u.team===army.team&&u.hp>0&&!u.garrison&&(u.armyId||0)===(army.id||0))}
 export function activeArmies(s,team){return s.armies.filter(a=>a.team===team&&armyUnits(s,a).length>0)}
 export function splitArmy(s,army){const units=armyUnits(s,army);if(units.length<2)return {error:'Armee jagamiseks on vaja vähemalt kahte elusat sõdalast.'};
- s.nextArmyId??=1;const id=s.nextArmyId++;const group={team:army.team,id,c:army.c,r:army.r,path:[],stance:'defend'};
+ s.nextArmyId??=1;const id=s.nextArmyId++;const group={team:army.team,id,c:army.c,r:army.r,path:[],stance:'defend',xp:army.xp||0,level:army.level||1};
  const half=Math.floor(units.length/2);units.slice(-half).forEach(u=>u.armyId=id);s.armies.push(group);return {army:group,count:half};
 }
-export function mergeArmies(s,selected){if(!selected?.id)return {error:'Vali ühendamiseks eraldi armee.'};const main=s.armies[selected.team];if(!main||main.c!==selected.c||main.r!==selected.r)return {error:'Tooge eraldi armee peaarmeega samasse ruutu.'};
- for(const u of s.units)if(u.team===selected.team&&u.armyId===selected.id)u.armyId=0;
- s.armies=s.armies.filter(a=>a!==selected);return {ok:true};
+export function mergeArmies(s,selected){
+ if(!selected||selected.embarked!=null||s.battle)return {error:'Ühendamiseks peavad armeed olema maal ja väljaspool lahingut.'};
+ const groups=s.armies.filter(a=>a.team===selected.team&&a.embarked==null&&a.c===selected.c&&a.r===selected.r&&armyUnits(s,a).length);
+ if(groups.length<2)return {error:'Too vähemalt kaks oma armeed samasse ruutu.'};
+ const target=groups.find(a=>!(a.id||0))||selected;
+ const counts=groups.map(a=>({army:a,count:armyUnits(s,a).length})),total=counts.reduce((n,c)=>n+c.count,0);
+ target.xp=counts.reduce((n,c)=>n+(c.army.xp||0)*c.count,0)/total;
+ for(const {army}of counts)for(const u of armyUnits(s,army))u.armyId=target.id||0;
+ target.path=[];target.autoExplore=false;delete target.rallyTarget;
+ s.armies=s.armies.filter(a=>a===target||!groups.includes(a)||!(a.id||0));
+ for(const a of groups)if(a!==target&&!(a.id||0)){a.xp=0;a.level=1;a.path=[];}
+ return {ok:true,army:target,count:total,merged:groups.length};
 }

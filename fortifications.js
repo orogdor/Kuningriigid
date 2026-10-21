@@ -69,7 +69,7 @@ export function fortifyBattle(game,city,battle){
   for(const {unit,source} of wallGuards(game.s,city,wall)){
    if(battle.squads.some(q=>q.source===source))continue;
    const slot=wallGuards(game.s,city,wall).findIndex(q=>q.source===source);
-   battle.squads.push({source,team:unit.team,kind:unit.kind,hp:unit.hp,maxHp:unit.hp,morale:unit.morale??100,
+   battle.squads.push({source,team:unit.team,kind:unit.kind,grade:unit.grade,experienceMultiplier:unit.experienceMultiplier,hp:unit.hp,maxHp:unit.maxHp||unit.hp,morale:unit.morale??100,
     x:wall.x+(wall.wallAxis?0:(slot-0.5)*1.6),z:wall.z+(wall.wallAxis?(slot-0.5)*1.6:0),heading:wall.wallAxis?Math.PI/2:0,target:null,cool:0,guardPost:true,wallType:wall.type,advance:false});
   }
  }
