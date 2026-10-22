@@ -25,6 +25,7 @@ try{
   assert.ok(initial.panel.x>=-2&&initial.panel.right<=size.width+2);
   assert.ok(initial.tray.y>=initial.search.bottom&&initial.tray.bottom<=initial.panel.bottom+2,'Building list is below filters and inside panel');
   assert.ok(initial.cardRects.every(r=>r.x>=initial.tray.x-2&&r.right<=initial.tray.right+2&&r.height>=75),'Building cards are full width and visible');
+  for(let i=1;i<initial.cardRects.length;i++)assert.ok(initial.cardRects[i-1].bottom<=initial.cardRects[i].y+2,'Building cards overlap vertically at index '+i);
   assert.equal(initial.queueClosed,true);
   await page.screenshot({path:'artifacts-v121/construction-'+size.width+'x'+size.height+'.png',timeout:120000});
   const originalCount=await page.locator('.v121-build-card').count();
