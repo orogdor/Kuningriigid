@@ -52,7 +52,7 @@ import {createSiegeWorkModel} from './siege-work-visual-v108.js?v=117a';
 import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock,ERA_NAMES} from './research.js?v=118a';
 import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
-import {renderResearchUI} from './research-ui.js?v=118a';
+import {renderResearchUI} from './research-ui.js?v=119a';
 import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=86a';
 import {createWorldAtlasProps} from './world-props.js?v=100a';
