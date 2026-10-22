@@ -3,6 +3,7 @@ import {ERA_TECHS,ERA_MATERIALS,ageDeficit,payEraCost} from './era-economy.js';
 import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-v62.js?v=117a';
 import {researchCost,scienceRate,discoveryUnlocked,EUREKAS,EUREKA_FRACTION} from './science.js';
 import {tempoMultiplier} from './tempo.js';
+import {applyTechTreeV118,V118_ERA_IDS,V118_NEW_IDS} from './tech-tree-data-v118.js?v=118a';
 export const TURN_SECONDS=60;
 export const TECHS={
  hunting:{name:'Jahipidamine',age:0,turns:1,requires:[],unlocks:'Jahimehe onn'},
@@ -76,16 +77,34 @@ Object.assign(TECHS,{
  stone_fortifications:{name:'Kivist kindlustused',age:1,turns:4,requires:['bronze','fortifications','masonry'],unlocks:'Madal ja kõrge kivivall ning kivist kaitsetorn'}
 });
 Object.assign(TECHS,MEDIEVAL_TECHS,PRODUCTIVITY_TECHS);
+applyTechTreeV118(TECHS);
 export const ERA_NAMES=['Kiviaeg','Pronksiaeg','Rauaaeg','Keskaeg','Renessanss','Tööstusajastu','Moodne ajastu'];
 
 export const BUILD_TECH={palisade:'fortifications',watchtower:'fortifications',stonewall:'stone_fortifications',stonetower:'stone_fortifications',claypit:'pottery',pottery_kiln:'pottery',pasture:'animal_husbandry',mason:'masonry',cartwright:'wheel',coppermine:'copper_tin',tinmine:'copper_tin',bronze_foundry:'copper_tin',road_depot:'road_construction',study:'learning',printer:'printing',observatory:'astronomy',nitrate:'gunpowder',powdermill:'gunpowder',steelworks:'steelmaking',engineworks:'steam_engine',polytechnic:'industrial_education',railstation:'railways',oilwell:'oil_drilling',refinery:'petroleum',powerplant:'electricity',autofactory:'combustion',laboratory:'modern_science',airfield:'aviation',scriptorium:'writing',academy:'philosophy',university:'scholasticism',warehouse:'storage',cellar:'cellaring',market:'commerce',harbor:'shipbuilding',bridge:'bridges',quarry:'stone_tools',hunter:'hunting',fisher:'fishing',barracks:'warfare',forester:'forestry',farm:'agriculture',saw:'woodworking',mill:'milling',bakery:'milling',archery:'archery',mine:'iron',coal:'iron',smelter:'smelting',smith:'smithing',stable:'horsemanship'};
 export const UNIT_TECH={musketeer:'gunpowder',rifleman:'rifles',motorized:'combustion',slinger:'warfare',spearman:'warfare',axeman:'warfare',archer:'archery',infantry:'smithing',cavalry:'horsemanship'};
 Object.assign(BUILD_TECH,MEDIEVAL_BUILD_TECH);
 Object.assign(UNIT_TECH,MEDIEVAL_UNIT_TECH);
+// Historical separation: gunpowder production no longer directly unlocks firearms.
+Object.assign(UNIT_TECH,{musketeer:'firearms',arquebusier:'firearms',field_cannon:'field_artillery',bronze_catapult:'ancient_artillery'});
 export const newResearch=()=>({known:[],active:null,progress:{},completed:[],queue:[],paused:false,boosted:[],rate:0});
-export function techBlock(research,id){const tech=TECHS[id];if(!tech)return 'Tundmatu tehnoloogia.';if(research.known.includes(id))return 'Juba uuritud.';const missing=tech.requires.filter(t=>!research.known.includes(t));if(missing.length)return 'Eeldab: '+missing.map(t=>TECHS[t].name).join(', ');if(tech.oneOf&&!tech.oneOf.some(t=>research.known.includes(t)))return 'Eeldab üht: '+tech.oneOf.map(t=>TECHS[t].name).join(' või ');return ''}
+export function techBlock(research,id){const tech=TECHS[id];if(!tech)return 'Tundmatu tehnoloogia.';if(research.known.includes(id))return 'Juba uuritud.';if(research.v118LegacyActive===id)return '';if(tech.age>0&&V118_ERA_IDS[tech.age]!==id&&!research.known.includes(V118_ERA_IDS[tech.age]))return 'Vajab ajastut: '+ERA_NAMES[tech.age];const missing=tech.requires.filter(t=>!research.known.includes(t));if(missing.length)return 'Eeldab: '+missing.map(t=>TECHS[t].name).join(', ');if(tech.oneOf&&!tech.oneOf.some(t=>research.known.includes(t)))return 'Eeldab üht: '+tech.oneOf.map(t=>TECHS[t].name).join(' või ');return ''}
 export function grantTech(research,id){if(!TECHS[id]||research.known.includes(id))return;for(const parent of TECHS[id].requires)grantTech(research,parent);if(TECHS[id].oneOf&&!TECHS[id].oneOf.some(t=>research.known.includes(t)))grantTech(research,TECHS[id].oneOf[0]);research.known.push(id)}
-export function initResearch(state){if(state.research){for(const r of state.research){r.queue??=[];r.paused??=false;r.boosted??=[];r.rate??=0}for(const city of state.cities||[]){const hasStudy=city.economy?.buildings?.some(b=>b.type==='study')||Object.values(city.districts||{}).some(d=>d.economy?.buildings?.some(b=>b.type==='study'));if(hasStudy)grantTech(state.research[city.team],'learning')}return;}state.research=Array.from({length:state.armies.length},()=>newResearch());for(const team of state.armies.map(a=>a.team)){const r=state.research[team];for(const c of state.cities.filter(c=>c.team===team))for(const b of c.economy.buildings)grantTech(r,BUILD_TECH[b.type]);for(const u of state.units.filter(u=>u.team===team))grantTech(r,UNIT_TECH[u.kind]);if(state.cities.filter(c=>c.team===team).length>1||state.settlers.filter(a=>a.team===team).length>1)grantTech(r,'settlement');if(state.ages[team]>=1)grantTech(r,'bronze');if(state.ages[team]>=2)grantTech(r,'iron');if(state.ages[team]>=3)grantTech(r,'civics');if(state.ages[team]>=4)grantTech(r,'renaissance');if(state.ages[team]>=5)grantTech(r,'industrialization');if(state.ages[team]>=6)grantTech(r,'modernity');state.ages[team]=Math.max(state.ages[team],r.known.includes('modernity')?6:r.known.includes('industrialization')?5:r.known.includes('renaissance')?4:r.known.includes('civics')?3:r.known.includes('iron')?2:r.known.includes('bronze')?1:0)}}
+export function initResearch(state){if(state.research){for(const r of state.research){r.queue??=[];r.paused??=false;r.boosted??=[];r.rate??=0;
+  if(r.researchGraphVersion!==118){
+   // Grandfather an ongoing research and its progress; do not silently discard existing queues.
+   if(r.active&&TECHS[r.active])r.v118LegacyActive=r.active;
+   const previous=new Set(r.known), bridges=new Set();
+   const seen=new Set();function bridgeAncestors(id){if(seen.has(id)||!TECHS[id])return;seen.add(id);const t=TECHS[id];
+    for(const parent of [...t.requires,...(t.oneOf||[]).filter(p=>previous.has(p))]){
+     if(V118_NEW_IDS.includes(parent))bridges.add(parent);
+     bridgeAncestors(parent);
+    }
+   }
+   for(const id of [...previous,...(r.active?[r.active]:[])])bridgeAncestors(id);
+   for(const id of bridges)if(!previous.has(id))r.known.push(id);
+   r.researchGraphVersion=118;
+  }
+ }for(const city of state.cities||[]){const hasStudy=city.economy?.buildings?.some(b=>b.type==='study')||Object.values(city.districts||{}).some(d=>d.economy?.buildings?.some(b=>b.type==='study'));if(hasStudy)grantTech(state.research[city.team],'learning')}return;}state.research=Array.from({length:state.armies.length},()=>newResearch());for(const team of state.armies.map(a=>a.team)){const r=state.research[team];for(const c of state.cities.filter(c=>c.team===team))for(const b of c.economy.buildings)grantTech(r,BUILD_TECH[b.type]);for(const u of state.units.filter(u=>u.team===team))grantTech(r,UNIT_TECH[u.kind]);if(state.cities.filter(c=>c.team===team).length>1||state.settlers.filter(a=>a.team===team).length>1)grantTech(r,'settlement');if(state.ages[team]>=1)grantTech(r,'bronze');if(state.ages[team]>=2)grantTech(r,'iron');if(state.ages[team]>=3)grantTech(r,'civics');if(state.ages[team]>=4)grantTech(r,'renaissance');if(state.ages[team]>=5)grantTech(r,'industrialization');if(state.ages[team]>=6)grantTech(r,'modernity');state.ages[team]=Math.max(state.ages[team],r.known.includes('modernity')?6:r.known.includes('industrialization')?5:r.known.includes('renaissance')?4:r.known.includes('civics')?3:r.known.includes('iron')?2:r.known.includes('bronze')?1:0)}}
 export function startResearch(state,team,id){const r=state.research[team],error=techBlock(r,id);if(error)return {error};if(!state.cities.some(c=>c.team===team))return {error:'Raja esmalt vähemalt üks linn. Avastused kehtivad kogu riigis.'};r.active=id;r.paused=false;r.queue=(r.queue||[]).filter(t=>t!==id);r.progress[id]??=0;return {ok:true}}
 export function queueResearch(state,team,id){const r=state.research[team];r.queue??=[];if(r.known.includes(id)||r.active===id||r.queue.includes(id))return {error:'See teema on juba uuritud või järjekorras.'};if(r.queue.length>=4)return {error:'Järjekorda mahub kuni neli teemat.'};if(!r.active&&!r.paused&&!r.queue.length)return startResearch(state,team,id);const planned={known:[...r.known,...(r.active?[r.active]:[]),...r.queue]};const error=techBlock(planned,id);if(error)return {error};r.queue.push(id);return {ok:true}}
 export function tickResearch(state,dt){
@@ -119,7 +138,7 @@ export function tickResearch(state,dt){
     const payment=payEraCost(state,team,id);
     if(!payment.paid){r.ageWait={id,missing:payment.missing};r.progress[id]=total;budget=0;break}
    }
-   r.ageWait=null;r.progress[id]=total;r.known.push(id);r.active=null;
+   r.ageWait=null;r.progress[id]=total;r.known.push(id);r.active=null;if(r.v118LegacyActive===id)r.v118LegacyActive=null;
    const time=state.time-(budget/(r.rate/60));
    r.completed.push({id,time});
    if(id==='bronze')state.ages[team]=Math.max(state.ages[team],1);
