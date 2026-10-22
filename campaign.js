@@ -15,7 +15,7 @@ export function newCampaign(){return {armies:[{team:0,c:10,r:11,path:[]},{team:1
 export function localHeight(cell,x,z,seed){return detailHeight(cell,x,z)}
 export function createBattle(cell,units,state=null){const ranks={};return deployHistoricalBattle({cell:{...cell},field:{...BATTLEFIELD},elapsed:0,result:null,squads:units.map((u,source)=>({u,source})).filter(({u})=>u.hp>0&&!u.retreated).map(({u,source})=>{
  const role=troopRole(u.kind),key=u.team+':'+(rangedTroop(u.kind)?'ranged':'front'),n=ranks[key]||0;ranks[key]=n+1;
- return {source,team:u.team,armyId:u.armyId||0,kind:u.kind,grade:u.grade||'standard',experienceMultiplier:state?experienceBonusFor(state,u):(u.experienceMultiplier||1),hp:u.hp,maxHp:u.maxHp||u.hp,menCount:u.menCount,soldiers:u.soldiers?structuredClone(u.soldiers):undefined,morale:u.morale??100,
+ return {source,team:u.team,armyId:u.armyId||0,kind:u.kind,armyLevel:u.armyLevel??1,grade:u.grade||'standard',experienceMultiplier:state?experienceBonusFor(state,u):(u.experienceMultiplier||1),hp:u.hp,maxHp:u.maxHp||u.hp,menCount:u.menCount,soldiers:u.soldiers?structuredClone(u.soldiers):undefined,morale:u.morale??100,
  x:(u.team?1:-1)*((rangedTroop(u.kind)?49:34)+Math.floor(n/8)*4),z:(n%8-3.5)*5+(role==='cavalry'?23:0),heading:u.team?-Math.PI/2:Math.PI/2,target:null,cool:0,damageDealt:0,kills:0};
  })});}
 function experienceBonusFor(state,u){const army=armyForUnit(state,u);return army?1+2*(Math.min(10,1+Math.floor(Math.sqrt((army.xp||0)/100)))-1)/9:1;}
