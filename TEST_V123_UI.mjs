@@ -10,7 +10,7 @@ try{
   await page.goto('http://127.0.0.1:8765/?demo=stone&v=123',{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForFunction(()=>window.gameDebug&&gameDebug.view()==='local',{timeout:120000});
   const initial=await page.evaluate(()=>{
-   const g=gameDebug,t=g.localScene.children.find(e=>e.userData?.terrain);
+   const g=gameDebug;let t=null;g.localScene.traverse(e=>{if(e.userData?.terrain&&!t)t=e});
    const nav=g.game.nav(g.game.cell(g.state.cities[0]));
    return {view:g.view(),terrainWidth:t?.geometry?.parameters?.width,terrainDepth:t?.geometry?.parameters?.height,navWidth:nav.w,navDepth:nav.h};
   });
