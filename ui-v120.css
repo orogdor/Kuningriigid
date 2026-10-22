@@ -1,0 +1,73 @@
+
+/* V120: viewport-safe research workspace, readable on phones and desktops. */
+#researchpanel:not([hidden]){
+ display:flex;justify-content:center;align-items:center;
+ padding:clamp(7px,1.2vw,18px);
+ overflow:hidden;overscroll-behavior:contain;
+}
+#researchpanel .research-window{
+ display:flex;flex-direction:column;gap:7px;
+ width:min(1450px,100%);height:calc(100dvh - clamp(14px,2.4vw,36px));
+ max-height:100%;min-height:0;margin:0;overflow:hidden;
+ padding:clamp(10px,1.7vw,22px);
+}
+#researchpanel .research-heading{flex:0 0 auto;gap:10px;margin:0}
+#researchpanel .research-heading h2{font-size:clamp(22px,2.5vw,32px);margin:2px 0 5px}
+#researchpanel #closeresearch{
+ flex:0 0 auto;width:44px;height:44px;min-width:44px;min-height:44px;
+ display:grid;place-items:center;font-size:22px;line-height:1;padding:0;
+}
+#researchpanel #researchsummary{flex:0 0 auto;margin:2px 0;line-height:1.35;font-size:clamp(11px,1.5vw,13px)}
+#researchpanel .research-guide{flex:0 0 auto;max-height:110px;overflow:auto}
+#researchpanel .research-guide summary{font-size:12px;cursor:pointer;padding:3px 2px;color:#dfc990}
+#researchpanel .research-guide .research-explanation{max-width:100%;padding:6px 8px;font-size:12px;line-height:1.5;margin:0}
+#researchpanel #pauseresearch{align-self:flex-start;flex:0 0 auto;min-height:34px;margin:0;padding:7px 13px}
+#researchpanel #researchqueue{flex:0 0 auto;display:flex;gap:6px;flex-wrap:wrap;max-height:54px;overflow:auto}
+#researchpanel #researchqueue button{font-size:11px;min-height:30px}
+#researchpanel #researchtree{
+ display:flex;flex-direction:column;flex:1 1 0;min-height:0;
+ overflow:hidden;margin:0;gap:5px;
+}
+#researchpanel .tech-tree-controls{flex:0 0 auto;margin:0;padding:5px 0;gap:7px}
+#researchpanel .tech-tree-subtitle{font-size:clamp(12px,1.4vw,16px)}
+#researchpanel .tech-control{height:38px;min-height:38px;min-width:38px;padding:3px 8px}
+#researchpanel .tech-ages{flex:0 0 auto;padding:3px 0 6px;gap:5px}
+#researchpanel .tech-age-jump{font-size:11px;min-height:30px;padding:5px 8px}
+#researchpanel .tech-inspector{
+ flex:0 0 auto;min-height:0;max-height:min(180px,23dvh);
+ overflow:auto;grid-template-columns:minmax(135px,.75fr) minmax(200px,2fr) auto;
+ padding:8px 10px;margin:0;gap:8px;
+}
+#researchpanel .tech-info-intro,.tech-info-relations{min-width:0}
+#researchpanel .tech-info-intro p{margin:4px 0}
+#researchpanel .tech-info-name{font-size:clamp(14px,1.55vw,17px)}
+#researchpanel .tech-info-relations{max-height:none;overflow:visible}
+#researchpanel .tech-info-actions{flex:0 0 auto;gap:6px}
+#researchpanel .tech-info-actions button{min-height:35px;min-width:120px;padding:7px 8px}
+#researchpanel .tech-legend{flex:0 0 auto;margin:0;font-size:10px;line-height:1.3}
+#researchpanel .tech-map-viewport{
+ flex:1 1 0;height:auto;min-height:150px;max-height:none;
+ margin:0;width:100%;overscroll-behavior:contain;
+}
+@media(max-width:700px){
+ #researchpanel:not([hidden]){padding:max(5px,env(safe-area-inset-top)) 6px max(5px,env(safe-area-inset-bottom))}
+ #researchpanel .research-window{height:calc(100dvh - 12px);padding:8px;gap:5px}
+ #researchpanel .research-heading h2{font-size:22px}
+ #researchpanel .research-heading .eyebrow{font-size:9px}
+ #researchpanel #researchsummary{font-size:11px}
+ #researchpanel .tech-inspector{display:flex;flex-direction:column;align-items:stretch;max-height:23dvh;gap:4px;padding:6px 8px}
+ #researchpanel .tech-info-relations{max-height:65px;overflow:auto}
+ #researchpanel .tech-info-actions{display:flex;flex-direction:row;gap:5px}
+ #researchpanel .tech-info-actions button{flex:1;min-width:0;min-height:38px}
+ #researchpanel .tech-tree-controls{flex-wrap:nowrap}
+ #researchpanel .tech-tree-subtitle{min-width:0;font-size:12px;line-height:1.2}
+ #researchpanel .tech-legend{font-size:9px}
+ #researchpanel .tech-map-viewport{min-height:140px}
+}
+@media(max-width:380px),(max-height:590px){
+ #researchpanel .tech-inspector{max-height:20dvh}
+ #researchpanel .tech-info-relations{max-height:48px}
+ #researchpanel #pauseresearch{min-height:30px;padding:5px 10px}
+ #researchpanel .research-guide:not([open]){font-size:10px}
+ #researchpanel .tech-map-viewport{min-height:125px}
+}
