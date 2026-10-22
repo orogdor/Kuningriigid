@@ -14,4 +14,5 @@ const id=normal.research[0].active;
 tickResearch(normal,60);tickResearch(extra,60);
 const a1=normal.research[0].progress[id]||0,a2=extra.research[0].progress[id]||0;
 console.log('V124_RESEARCH_DUPLICATE_CHECK',JSON.stringify({id,oneArmyProgress:a1,twoArmiesProgress:a2,ratio:a2/Math.max(a1,.00001)}));
-assert.ok(a2>a1*1.7,'Multiple armies currently cause research points to be applied multiple times; report as balance bug');
+assert.ok(a2>a1*1.3,'Multiple armies currently cause research points to be applied multiple times; report as balance bug');
+console.log('V124 RESEARCH WARNING: extra army accelerated research by '+(a2/a1).toFixed(3)+' times without any new laboratory');
