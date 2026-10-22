@@ -31,7 +31,7 @@ import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
 import {createDetailBorders} from './detail-borders-v85.js?v=85a';
 import {mountainTint,createMountainOutcrops,createBridgeBuilding,crossingFrame} from './landscape-polish-v84.js?v=85a';
 import {CommandVisuals} from './command-visuals.js';
-import {initializeLocalization,currentLanguage,changeLanguage} from './localization.js?v=100a';
+import {initializeLocalization,currentLanguage,changeLanguage,translateEstonian} from './localization.js?v=121a';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
 import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
@@ -513,7 +513,7 @@ function renderUI(){updateBuildingInfo();syncResourceLayer();const resourceContr
    const error=game.buildRule(localCity,type),missing=missingMaterials(localCity.economy.realms[0].resources,d.cost);
    const wrapper=document.createDocumentFragment(),action=original.onclick;
    const card=appendBuildingCard(wrapper,{type,name,icon:d.icon,cost:price(d.cost),time:timeLabel(game.constructionTime(type)),
-    builder:game.builderLabel(localCity.team),missing,error,active:mode===type,
+    builder:translateEstonian(game.builderLabel(localCity.team)),missing,error,active:mode===type,
     extra:type==='fisher'?'Fishing range: '+fishingRange(s.ages[localCity.team])+' sea tiles':'',
     onChoose:()=>action?.call(original),onRequest:()=>action?.call(original)});
    original.replaceWith(card);visibleCount++;
