@@ -19,7 +19,7 @@ export function startSiegeCraft(b,u,kind,state){
  if(!sections.length)return {error:'Linnal pole tervet müüri, millele piiramisvahendit asetada.'};
  const wall=sections.reduce((a,w)=>!a||len(w,u)<len(a,u)?w:a,null);
  const cities=(state?.cities||[]).filter(c=>c.team===u.team&&c.economy?.realms?.[u.team]?.resources?.wood>=spec.wood)
-  .sort((a,b)=>Math.hypot(a.c-(b?.cell?.c??a.c),a.r-(b?.cell?.r??a.r))-Math.hypot(b.c-(b?.cell?.c??b.c),b.r-(b?.cell?.r??b.r)));
+  .sort((a,c)=>Math.hypot(a.c-b.cell.c,a.r-b.cell.r)-Math.hypot(c.c-b.cell.c,c.r-b.cell.r));
  const city=cities[0];if(!city)return {error:'Vaja '+spec.wood+' puitu mõne ründaja linna laost. Praegu kokku: '+availableSiegeWood(state,u.team)+'.'};
  const stock=city.economy.realms[u.team].resources;stock.wood-=spec.wood;
  b.siegeWorks??=[];const id=(b.nextSiegeWorkId??0)+1;b.nextSiegeWorkId=id;
