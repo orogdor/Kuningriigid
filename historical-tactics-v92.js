@@ -33,9 +33,40 @@ export function updateMorale(b,dt){
   if(men.length&&(men.filter(m=>m.routing).length>men.length*.45||(loss>.6&&u.morale<38))){if(!u.routing){u.routing=true;u.routAt=b.elapsed;b.moraleRouts=(b.moraleRouts||0)+1;}for(const m of men)m.routing=true;u.manualOrder=false;u.target=null;}
  }
 }
-export function tacticalGoal(u,nearest,squads,b,a){
+// Egyptian-style two-horse chariots are fast but vulnerable missile platforms.
+// Each group alternates an approach, a short bow volley, and a turning retreat.
+const chariotClamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+export function chariotGoal(u,target,squads,b,a,nav=null){
+ const now=b.elapsed,range=Math.max(9,a.range),foes=squads.filter(v=>v.team!==u.team&&v.hp>0&&!v.retreated&&!v.routing);
+ const closest=foes.reduce((q,v)=>!q||distance(u,v)<distance(u,q)?v:q,null)||target;
+ const protectedSpears=foes.filter(v=>isSpear(v)&&(v.formation==='spear_wall'||(v.cohesion??1)>.5));
+ const spear=protectedSpears.reduce((q,v)=>!q||distance(u,v)<distance(u,q)?v:q,null);
+ const danger=spear&&distance(u,spear)<22?spear:closest;
+ const near=distance(u,closest)<12||distance(u,danger)<11,guarded=!!spear&&distance(u,spear)<21;
+ const flank=u.flank||1,elapsed=now-(u.chariotPhaseAt??now);
+ const phase=name=>{if(u.chariotPhase!==name){u.chariotPhase=name;u.chariotPhaseAt=now;}};
+ if(!u.chariotPhase)phase('approach');
+ if(near||guarded)phase('withdraw');
+ else if(u.chariotPhase==='shoot'&&elapsed>=3.2)phase('withdraw');
+ else if(u.chariotPhase==='withdraw'&&((distance(u,closest)>range*1.2&&elapsed>1.8)||elapsed>6))phase('approach');
+ else if(u.chariotPhase==='approach'&&distance(u,target)<range*.92&&distance(u,target)>11&&distance(u,closest)>12)phase('shoot');
+ if(u.chariotPhase==='shoot')return u.anchor||u;
+ const d=Math.max(1,distance(u,danger));
+ const goal=u.chariotPhase==='withdraw'
+   ?{x:u.x+(u.x-danger.x)/d*28,z:u.z+(u.z-danger.z)/d*28+flank*7}
+   :{x:target.x-(u.battleSide||1)*range*.78,z:target.z+flank*10};
+ const safe={x:chariotClamp(goal.x,-210,210),z:chariotClamp(goal.z,-180,180)};
+ // Avoid trying to put the cart and its horses into trees/buildings or water.
+ if(nav&&!(nav.open(safe.x,safe.z)&&nav.open(safe.x-1.5,safe.z)&&nav.open(safe.x+1.5,safe.z))){
+  const open=nav.nearest(safe,21);
+  return open&&nav.open(open.x,open.z)?open:(u.anchor||u);
+ }
+ return safe;
+}
+export function tacticalGoal(u,nearest,squads,b,a,nav=null){
  if(u.routing)return {x:-u.battleSide*250,z:u.z};if(isBow(u)&&u.ammoRemaining===0)return squadContactGoal(u,nearest);if((FORMATIONS[u.formation]||{}).hold)return u.anchor||u;if((u.releaseAt||0)>b.elapsed&&distance(u,nearest)>26)return u.deployment;
  if(u.tacticalRole==='support'&&b.elapsed<(u.releaseAt||16)&&distance(u,nearest)>16)return u.deployment;
+ if(u.kind==='chariot')return chariotGoal(u,nearest,squads,b,a,nav);
  if(horseKind(u)){
   const enemies=squads.filter(q=>q.team!==u.team&&q.hp>0&&!q.routing&&!q.retreated);
   const guarded=enemies.filter(q=>isSpear(q)&&(q.formation==='spear_wall'||q.formation==='shield_wall'||(q.cohesion??1)>.55));
@@ -49,7 +80,7 @@ export function tacticalGoal(u,nearest,squads,b,a){
    const threat=hazard?nearestGuard:nearest,dx=u.x-threat.x,dz=u.z-threat.z,len=Math.hypot(dx,dz)||1;
    return {x:u.x+dx/len*22,z:u.z+dz/len*22+flank*5};
   }
-  if(u.kind==='chariot'||u.kind==='dragoon'||u.kind==='cuirassier'){
+  if(u.kind==='dragoon'||u.kind==='cuirassier'){
    const range=a.range*(u.kind==='chariot'?.77:.8),d=distance(u,nearest);
    if(u.ammoRemaining!==0&&d<=range*1.12)return u.anchor||u;
    if(u.ammoRemaining!==0)return {x:nearest.x-u.battleSide*range,z:nearest.z+flank*4};
