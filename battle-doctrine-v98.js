@@ -1,4 +1,4 @@
-import {isBow,horseKind,isSpear} from './historical-tactics-v92.js?v=107a';
+import {isBow,horseKind,isSpear} from './historical-tactics-v92.js?v=108a';
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 // Squads keep an opponent and a marching lane. Small changes in enemy
 // centroids must not turn an advancing battle line into a series of U-turns.
