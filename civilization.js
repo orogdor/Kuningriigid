@@ -649,6 +649,15 @@ $('world').onpointerup=e=>{if(e.pointerType==='touch'){touchPointers.delete(e.po
   const b=pickBuilding(e);if(b&&inspectBuilding(b))return;
  }
  const p=pick(e);if(!p)return;if(view==='world'){const at=cellAt(p.x,p.z);if(!at)return;let hit=null;const hits=ray.intersectObjects([...worldMarkers.values()].filter(m=>m.visible&&m.userData.type),true);if(hits.length){let root=hits[0].object;while(root&&!root.userData.type)root=root.parent;if(root)hit=root.userData}const tile=game.cell(at),selectTap=e.button!==2&&commandMode==='select';if(selectTap&&tileDoubleTap.push({tile:tileKey(tile),x:e.clientX,y:e.clientY,time:e.timeStamp,pointerType:e.pointerType})){if(game.seen(0,tile)){chosen=tile;openTile(tile)}else say('Explore this tile before opening it.');return}if(!selectTap)tileDoubleTap.reset();worldClick(tile,hit,e.button===2)}else{tileDoubleTap.reset();localClick(p,e.button===2)}};
+$('world').ondblclick=e=>{
+ if(view!=='world'||inputBlocked()||commandMode!=='select'||e.button!==0)return;
+ e.preventDefault();
+ const hit=pick(e),at=hit&&cellAt(hit.x,hit.z);
+ if(!at)return;
+ const cell=game.cell(at);
+ if(game.seen(0,cell)){tileDoubleTap.reset();chosen=cell;openTile(cell)}
+ else say('Explore this tile before opening it.');
+};
 $('world').oncontextmenu=e=>e.preventDefault();$('world').onpointercancel=e=>{tileDoubleTap.reset();touchPointers.delete(e.pointerId);if(touchPointers.size<2)pinch=null;drag=null;if(!touchPointers.size)pinchConsumed=false};
 function applyZoom(next){zoom=Math.max(view==='world'?150:22,Math.min(view==='world'?9000:s.battle?2800:300,next))}
 $('world').onwheel=e=>{e.preventDefault();if(inputBlocked())return;const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);const step=detailWheelTransition({view,zoom,deltaY:delta,isBattle:!!s.battle});if(step.exitToWorld){tileDoubleTap.reset();openWorld();return}applyZoom(step.zoom)};
