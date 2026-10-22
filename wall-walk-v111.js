@@ -2,6 +2,9 @@
 // wall walks and enter via interior stairs or a completed assault ladder/tower.
 import {troopRole} from './military-v88.js';
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
+// Two ranks fit on a 2.8m-wide wall walk. A sixteen-man detachment no
+// longer compresses every man beyond the eighth into the same end point.
+export function wallRankPoint(w,i,count){const columns=Math.min(8,count),rows=Math.ceil(count/columns),along=(i%columns-(columns-1)/2)*.82,across=(Math.floor(i/columns)-(rows-1)/2)*.85;return {x:w.x+(w.wallAxis?across:along),z:w.z+(w.wallAxis?along:across)};}
 export function wallNodes(b){return (b.siegeSections||[]).filter(w=>w.hp>0&&!w.breached&&w.walkable);}
 export function nearestWall(b,p){return wallNodes(b).reduce((a,w)=>!a||distance(w,p)<distance(a,p)?w:a,null);}
 export function wallPath(b,a,z){const nodes=wallNodes(b),start=nearestWall(b,a),end=nearestWall(b,z);if(!start||!end)return null;const queue=[start],prev=new Map([[start,null]]);for(const n of queue){if(n===end)break;for(const v of nodes)if(!prev.has(v)&&distance(n,v)<=7.2){prev.set(v,n);queue.push(v);}}if(!prev.has(end))return null;const route=[];for(let n=end;n;n=prev.get(n))route.unshift({x:n.x,z:n.z,index:n.index});return route;}
@@ -12,8 +15,10 @@ export function orderWallMove(b,u,p,nav){if(!b?.wallWalkEnabled||!['melee','rang
  for(const m of u.men||[]){delete m.siegeClimbed;delete m.siegeClimbing;delete m.siegeClimbFrom;}u.wallClimb={entry:{...entry},destination:{x:wall.x,z:wall.z},progress:0};u.target={x:entry.groundX,z:entry.groundZ};u.manualOrder=true;u.attackTargetSource=null;return {ok:true};
 }
 export function tickWallWalk(b,dt,nav){if(!b.wallWalkEnabled)return;
+ const occupied=new Set(),placed=new Map();
+ const reserve=(preferred,man)=>{if(placed.has(man))return placed.get(man);const nodes=wallNodes(b).sort((a,c)=>distance(a,preferred)-distance(c,preferred));for(const w of nodes){let best=null;for(let i=0;i<16;i++){const key=w.index+':'+i;if(occupied.has(key))continue;const p=wallRankPoint(w,i,16),d=distance(p,preferred);if(!best||d<best.d)best={p,key,d};}if(best){occupied.add(best.key);placed.set(man,best.p);return best.p;}}return preferred;};
  for(const u of b.squads){if(u.hp<=0||u.reserve||u.retreated)continue;
- const work=(b.siegeWorks||[]).filter(w=>w.team===u.team&&w.ready&&w.arrived&&!w.destroyed&&(w.ownerSource===u.source||((u.combatMode??'auto')==='auto'&&!u.manualOrder&&distance(u,w)<45))).sort((a,c)=>distance(a,u)-distance(c,u))[0];if(work&&!u.guardPost&&!u.wallClimb&&!u.wallAssaulted&&nav){const q=orderWallMove(b,u,{x:work.wallX,z:work.wallZ},nav);if(q?.ok)u.wallAssaulted=true;}
+ const work=(b.siegeWorks||[]).filter(w=>w.team===u.team&&w.ready&&w.arrived&&!w.destroyed&&(w.ownerSource===u.source||((u.combatMode??'auto')==='auto'&&!u.manualOrder&&distance(u,w)<220))).sort((a,c)=>distance(a,u)-distance(c,u))[0];if(work&&!u.guardPost&&!u.wallClimb&&!u.wallAssaulted&&nav){const q=orderWallMove(b,u,{x:work.wallX,z:work.wallZ},nav);if(q?.ok)u.wallAssaulted=true;}
  if(u.wallExit&&u.guardPost&&distance(u,u.wallExit)<1){const e=u.wallExit;e.progress+=dt/3;u.wallElevation=3.8*(1-Math.min(1,e.progress));for(const m of u.men||[])m.moving=true;if(e.progress>=1){u.guardPost=false;u.wallWalk=false;u.wallElevation=0;u.x=e.groundX;u.z=e.groundZ;u.anchor={x:u.x,z:u.z};for(const [i,m]of(u.men||[]).entries()){m.x=u.x+(i%4-1.5)*.75;m.z=u.z+Math.floor(i/4)*.75;m.elevation=0;}u.target=nav?.nearest(e.destination,12)||e.destination;u.manualOrder=true;delete u.wallExit;}continue;}
 
  if(u.wallClimb&&!u.guardPost){const q=u.wallClimb,e=q.entry,dx=e.x-e.groundX,dz=e.z-e.groundZ,length=Math.hypot(dx,dz)||1,nx=dx/length,nz=dz/length,alive=(u.men||[]).filter(m=>m.hp>0&&!m.escaped),waiting=alive.filter(m=>!m.siegeClimbed),active=waiting.filter(m=>m.siegeClimbing!=null);let slots=Math.max(0,2-active.length);
@@ -23,7 +28,7 @@ export function tickWallWalk(b,dt,nav){if(!b.wallWalkEnabled)return;
    if(m.siegeClimbing!=null){m.siegeClimbing=Math.min(1,m.siegeClimbing+dt/3);const t=m.siegeClimbing;m.x=m.siegeClimbFrom.x+(e.x-m.siegeClimbFrom.x)*t;m.z=m.siegeClimbFrom.z+(e.z-m.siegeClimbFrom.z)*t;m.elevation=t*3.8;m.moving=true;m.heading=Math.atan2(nx,nz);if(t>=1){m.siegeClimbed=true;delete m.siegeClimbing;}}
   }
   // Men who have reached the parapet spread along connected wall sections.
-  const boarded=alive.filter(m=>m.siegeClimbed),wall=nearestWall(b,e),axis=wall?.wallAxis?{x:0,z:1}:{x:1,z:0};for(const [i,m]of boarded.entries()){const target={x:e.x+axis.x*(i-(alive.length-1)/2)*.72,z:e.z+axis.z*(i-(alive.length-1)/2)*.72},w=nearestWall(b,target)||wall;if(w){const t=Math.max(-3.2,Math.min(3.2,(target.x-w.x)*axis.x+(target.z-w.z)*axis.z));m.x=w.x+axis.x*t;m.z=w.z+axis.z*t;}m.elevation=3.8;}
+  const boarded=alive.filter(m=>m.siegeClimbed),wall=nearestWall(b,e),axis=wall?.wallAxis?{x:0,z:1}:{x:1,z:0};for(const [i,m]of boarded.entries()){const target=wallRankPoint({...wall,x:e.x,z:e.z},i,alive.length),w=nearestWall(b,target)||wall;if(w){const p=reserve(wallRankPoint(w,i,alive.length),m);m.x=p.x;m.z=p.z;}m.elevation=3.8;}
   if(alive.length){u.x=alive.reduce((n,m)=>n+m.x,0)/alive.length;u.z=alive.reduce((n,m)=>n+m.z,0)/alive.length;u.anchor={x:u.x,z:u.z};}u.moving=waiting.some(m=>m.moving);q.progress=alive.length?boarded.length/alive.length:0;
   if(waiting.length)continue;
   u.guardPost=true;u.wallType='stonewall';u.wallWalk=true;u.x=e.x;u.z=e.z;u.anchor={x:u.x,z:u.z};u.manualOrder=false;u.target=null;u.wallRoute=wallPath(b,u,q.destination)||[];u.wallManual=false;delete u.wallClimb;
@@ -40,7 +45,7 @@ export function tickWallWalk(b,dt,nav){if(!b.wallWalkEnabled)return;
  if(next){const d=distance(u,next),step=Math.min(d,2*dt);u.heading=Math.atan2(next.x-u.x,next.z-u.z);u.x+=(next.x-u.x)/d*step;u.z+=(next.z-u.z)/d*step;u.moving=step>0;}
  u.anchor={x:u.x,z:u.z};u.wallElevation=3.8;
  const nodes=wallNodes(b),at=nearestWall(b,u),axis=at?.wallAxis?{x:0,z:1}:{x:1,z:0};
- for(const [i,m]of(u.men||[]).entries()){if(m.hp<=0)continue;const offset=(i-(u.men.length-1)/2)*.72,target={x:u.x+axis.x*offset,z:u.z+axis.z*offset},w=nearestWall(b,target)||at;if(!w)continue;const along=Math.max(-3.3,Math.min(3.3,(target.x-w.x)*axis.x+(target.z-w.z)*axis.z));m.x=w.x+axis.x*along;m.z=w.z+axis.z*along;m.moving=u.moving;m.elevation=3.8;}
+ for(const [i,m]of(u.men||[]).entries()){if(m.hp<=0)continue;const target=wallRankPoint({...at,x:u.x,z:u.z},i,u.men.length),w=nearestWall(b,target)||at;if(!w)continue;const point=reserve(wallRankPoint(w,i,u.men.length),m);m.x=point.x;m.z=point.z;m.moving=u.moving;m.elevation=3.8;}
  }
 }
 export const fighterElevation=(u,m=null)=>m?.elevation??(u?.guardPost?u.wallElevation??3.8:u?.wallElevation||0);

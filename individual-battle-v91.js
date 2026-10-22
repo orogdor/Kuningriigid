@@ -1,12 +1,12 @@
 import {tickWallWalk,fighterElevation} from './wall-walk-v111.js';
-import {carriesSword,stoneThrower} from './combat-equipment-v100.js?v=112a';
+import {carriesSword,stoneThrower} from './combat-equipment-v100.js?v=113a';
 import {rockLandingPoint} from './catapult-accuracy-v105.js';
-import {committedOpponent,marchingGoal,keepAdvance} from './battle-doctrine-v98.js?v=112a';
+import {committedOpponent,marchingGoal,keepAdvance} from './battle-doctrine-v98.js?v=113a';
 import {retreatPoint} from './battle-movement-v97.js';
 import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
-import {FORMATIONS,updateFormations,worldSlot,turnTowards,formationAttackReady,clearShot} from './formations-v94.js?v=112a';
+import {FORMATIONS,updateFormations,worldSlot,turnTowards,formationAttackReady,clearShot} from './formations-v94.js?v=113a';
 import {allowedDeployment} from './battle-pacing-v93.js';
-import {horseKind,isBow,usesArrows,tacticalStats,initializeTactics,updateMorale,tacticalGoal,tacticalDamage,shotHits} from './historical-tactics-v92.js?v=112a';
+import {horseKind,isBow,usesArrows,tacticalStats,initializeTactics,updateMorale,tacticalGoal,tacticalDamage,shotHits} from './historical-tactics-v92.js?v=113a';
 import {soldierCount,constrainStep} from './soldier-collision-v90.js?v=101a';
 import {troopRole,rangedTroop} from './military-v88.js';
 import {unitStats} from './army-experience-v88.js';
@@ -49,7 +49,7 @@ function damageMan(b,attacker,target,amount,splash=false){
  u.hitTime=b.elapsed;u.hp=Math.max(0,u.hp-hit);if(before>0&&m.hp<=0){m.deathTime=b.elapsed;b.casualties[u.team]=(b.casualties[u.team]||0)+1;if(attacker&&attacker.m!==m){attacker.m.kills++;attacker.u.kills=(attacker.u.kills||0)+1;}}return hit;
 }
 // An impact hits all living figures in the circle, irrespective of faction.
-function resolveStoneLandings(b){
+function resolveStoneLandings(b,nav=null){
  b.rockShots??=[];b.rockImpacts??=[];
  // Convert projectiles already airborne in a saved V104 battle exactly once.
  for(const shot of b.rockShots)if(shot.balanceVersion!==105){shot.radius*=.75;shot.damage*=1.25;shot.balanceVersion=105;}
@@ -77,7 +77,7 @@ function resolveStoneLandings(b){
  b.rockImpacts=b.rockImpacts.filter(hit=>b.elapsed-hit.at<1.15);
 }
 export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
- if(b.result||dt<=0)return;initializeMen(b,nav);initializeTactics(b);b.elapsed+=dt;resolveStoneLandings(b);updateMorale(b,dt);tickSiegeCraft(b,dt,nav);tickWallWalk(b,dt,nav);updateFormations(b,dt,stats);checkBattleRetreats(b);
+ if(b.result||dt<=0)return;initializeMen(b,nav);initializeTactics(b);b.elapsed+=dt;resolveStoneLandings(b,nav);updateMorale(b,dt);tickSiegeCraft(b,dt,nav);tickWallWalk(b,dt,nav);updateFormations(b,dt,stats);checkBattleRetreats(b);
  if(b.fortress&&b.fortress.hp<=0&&!b.fortressFallen){b.fortressFallen=true;for(const u of b.squads.filter(u=>u.team===b.fortress.team&&live(u))){u.routing=true;u.manualOrder=false;u.target=null;for(const m of u.men||[])if(m.hp>0&&!m.escaped)m.routing=true;}}
  const fighting=[...new Set(b.squads.filter(u=>live(u)&&!u.routing&&(u.men||[]).some(m=>m.hp>0&&!m.escaped&&!m.routing)).map(u=>u.team))];b.pursuitStoppedTeam=fighting.length===1&&(!b.fortress||b.fortress.hp<=0||b.fortress.team===fighting[0])?fighting[0]:null;
  // Clear completed explicit targets; manual units then wait for the next order.

@@ -70,7 +70,7 @@ export function siegeDamage(attacker,section,damage){
 }
 export function persistSiegeDamage(city,battle){
  if(!city||!battle?.siegeSections)return;
- for(const sec of battle.siegeSections){const b=city.economy.buildings[sec.index];if(!b||b.type!==sec.type)continue;b.hp=Math.max(0,Math.min(b.hp,sec.hp));if(b.hp<=0)b.disabled=true}
+ for(const sec of battle.siegeSections){const b=city.economy.buildings[sec.index];if(!b||b.type!==sec.type)continue;b.damageMaxHp=sec.maxHp;b.hp=Math.max(0,Math.min(b.hp,sec.hp));if(b.hp<=0)b.disabled=true}
 }
 export function medievalBonus(game,city,b){
  // Only ready, active workplaces provide bonuses; districts are shared with the parent.

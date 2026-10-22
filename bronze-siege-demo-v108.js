@@ -2,7 +2,7 @@
 // ?demo=bronze-siege creates one attacker supply city and one defended town.
 import {createStoneDemoState} from './stone-demo-v77.js?v=80c';
 import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js';
-import {createBattle} from './campaign.js?v=112a';
+import {createBattle} from './campaign.js?v=113a';
 import {fortifyBattle} from './fortifications.js';
 import {soldierCount} from './soldier-collision-v90.js';
 import {battlefieldTiles} from './battlefield-v88.js';
@@ -39,11 +39,11 @@ export function createBronzeSiegeState(seed=20261020){
  }
  // Kadesh-inspired personnel balance: Egypt-like 192 foot + 24 two-man
  // chariots = 80% foot / 20% crew. Weapon splits are a game approximation.
- const roster0=[...Array(4).fill('bronze_spearman'),...Array(2).fill('bronze_axeman'),...Array(2).fill('bronze_archer'),'chariot','chariot'];
+ const roster0=[...Array(4).fill('bronze_spearman'),...Array(2).fill('bronze_axeman'),...Array(2).fill('bronze_archer'),'chariot','chariot','bronze_catapult','bronze_catapult'];
  const roster1=['bronze_spearman','bronze_spearman','bronze_spearman','bronze_axeman','chariot'];
  for(const team of [0,1])for(const kind of (team?roster1:roster0))s.units.push({team,armyId:0,kind,grade:'standard',hp:TROOPS[kind].hp,menCount:soldierCount({kind}),morale:100,combatMode:'auto'});
  for(const wall of walls.filter(w=>w.type==='stonewall'&&w.x===-28&&Math.abs(w.z)<=21).concat(walls.filter(w=>w.type==='stonewall'&&w.z===-28&&[-21,-14].includes(w.x)))){
-  const kind='bronze_archer';s.units.push({team:1,armyId:0,kind,grade:'standard',hp:TROOPS[kind].hp/3,menCount:8,morale:100,garrison:{c:city.c,r:city.r,x:wall.x,z:wall.z,wallType:'stonewall',wallAxis:wall.wallAxis,slot:0}});
+  const kind='bronze_archer';s.units.push({team:1,armyId:0,kind,grade:'standard',hp:TROOPS[kind].hp*2/3,menCount:16,morale:100,garrison:{c:city.c,r:city.r,x:wall.x,z:wall.z,wallType:'stonewall',wallAxis:wall.wallAxis,slot:0}});
  }
  s.visionRevision=(s.visionRevision||0)+1;
  setRelation(s,0,1,'war');
@@ -56,8 +56,8 @@ export function createBronzeSiegeState(seed=20261020){
  b.attackerTeam=0;b.fortress={team:1,cityId:city.id,x:hall.x,z:hall.z,hp:city.hp,maxHp:city.hp,cool:0};
  b.wallWalkEnabled=true;b.wallStairs=[{x:-28,z:-14,groundX:-21,groundZ:-14},{x:-14,z:-28,groundX:-14,groundZ:-21},{x:42,z:14,groundX:35,groundZ:14},{x:28,z:28,groundX:28,groundZ:21}];
  fortifyBattle(g,defender,b);
- let attack=0,defend=0;for(const u of b.squads){if(u.guardPost)continue;if(u.team===0){const i=attack++;u.x=u.kind==='chariot'?-66:-51-Math.floor(i/4)*10;u.z=u.kind==='chariot'?(i%2?43:-43):(i%4-1.5)*10;}else{const i=defend++;u.x=u.kind==='chariot'?65:0+(i%2)*16;u.z=u.kind==='chariot'?38:-9+Math.floor(i/2)*22;}u.deployment={x:u.x,z:u.z};u.anchor={x:u.x,z:u.z};}
- b.historicalRoster={basis:'Kadeš u 1274 eKr; relvaliikide jaotus on mänguline lähendus',attack:{spearmen:96,axemen:48,archers:48,chariots:24,crew:48},defense:{spearmen:72,axemen:24,archers:64,chariots:12,crew:36}};
+ let attack=0,defend=0;for(const u of b.squads){if(u.guardPost)continue;if(u.team===0){const i=attack++;u.x=u.kind==='chariot'?-143:u.kind==='bronze_catapult'?-172:-132-Math.floor(i/4)*10;u.z=u.kind==='chariot'?(i%2?43:-43):(i%4-1.5)*10;}else{const i=defend++;u.x=u.kind==='chariot'?65:0+(i%2)*16;u.z=u.kind==='chariot'?38:-9+Math.floor(i/2)*22;}u.deployment={x:u.x,z:u.z};u.anchor={x:u.x,z:u.z};}
+ b.historicalRoster={basis:'Kadeš u 1274 eKr; relvaliikide jaotus on mänguline lähendus',attack:{spearmen:96,axemen:48,archers:48,chariots:24,crew:48,catapults:2},defense:{spearmen:72,axemen:24,archers:128,chariots:12,crew:36}};
  for(const u of b.squads)if(u.team===0)u.advance=true;
  s.battle=b;
  for(const tile of battlefieldTiles(field))if(tile.c>=0&&tile.r>=0&&tile.c<220&&tile.r<165)g.reveal(0,g.cell(tile),0);

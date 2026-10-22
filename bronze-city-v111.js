@@ -1,3 +1,4 @@
+import {createDestructionModel} from './destruction-v113.js';
 // Late Bronze Age fortified town, inspired by Hattusa; game-scale, not a site reconstruction.
 import * as T from './vendor/three.module.js';
 const cache=new Map(),mats=new Map();
@@ -9,7 +10,8 @@ function parapet(g,w,d,y,closed=false){if(closed)for(const x of [-w/2,w/2]){box(
 // Merge static blocks by material once per cached template, keeping phones at
 // a handful of draw calls per building instead of one per masonry stone.
 function compile(g){g.updateMatrixWorld(true);const groups=new Map();g.traverse(o=>{if(!o.isMesh)return;const geo=o.geometry.toNonIndexed();geo.applyMatrix4(o.matrixWorld);const key=o.material.uuid;if(!groups.has(key))groups.set(key,{material:o.material,list:[]});groups.get(key).list.push(geo);});const out=new T.Group();out.userData={...g.userData};for(const {material,list}of groups.values()){const total=list.reduce((n,a)=>n+a.attributes.position.count,0),geo=new T.BufferGeometry();for(const [key,size]of [['position',3],['normal',3],['uv',2]]){const data=new Float32Array(total*size);let offset=0;for(const a of list){if(a.attributes[key])data.set(a.attributes[key].array,offset*size);offset+=a.attributes.position.count;}geo.setAttribute(key,new T.BufferAttribute(data,size));}geo.computeBoundingSphere();geo.userData.shared=true;const m=new T.Mesh(geo,material);m.castShadow=m.receiveShadow=true;out.add(m);for(const a of list)a.dispose();}g.traverse(o=>o.geometry?.dispose());return out;}
-export function createBronzeCityModel(type,team=1){
+export function createBronzeCityModel(type,team=1,stage=0){
+ if(stage&&['stonewall','stonetower','gatehouse'].includes(type))return createDestructionModel(type,stage);
  if(!['stonewall','stonetower','gatehouse'].includes(type))return null;
  const key=type+team;if(cache.has(key))return cache.get(key).clone(true);const g=new T.Group();g.userData.bronzeFortification=true;
  if(type==='stonewall'){masonry(g,7,3.8,2.8);box(g,0,3.72,0,7,.16,3,stone);parapet(g,7,2.8,3.8);}
