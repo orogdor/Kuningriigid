@@ -15,6 +15,7 @@ import {SoldierBatch} from './soldier-batch-v90.js';
 import {formationMen,soldierCount} from './soldier-collision-v90.js?v=117a';
 import {selectionDetails} from './selection-info-v89.js?v=117a';
 import {createBronzeBattleState,BRONZE_BATTLE_NAME} from './bronze-battle-demo-v89.js?v=117a';
+import {createV124ReplayState,BATTLE_SPECS_V124} from './battle-replays-v124.js?v=124a';
 import {createBronzeSiegeState,createIronSiegeState,createBronzePatrolState,BRONZE_SIEGE_NAME} from './bronze-siege-demo-v108.js?v=117a';
 import {BATTLEFIELD,applyArmyRetreats,checkBattleRetreats,orderArmyWithdrawal} from './battlefield-v88.js';
 import {createBattleBoundary,batchBattleDecoration} from './battle-scene-v88.js';
@@ -79,13 +80,15 @@ import {loadProtectedGame,writeAutosave,replaceProtectedGame} from './save-safet
 const $=id=>document.getElementById(id),dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),copy=x=>JSON.parse(JSON.stringify(x));
 initializeLocalization({BUILDINGS,TECHS,TROOPS,AGES,RESOURCE_NAMES,SHIPS,BASIC_JOBS,ERA_NAMES,onChange:()=>{renderUI();if(typeof slotUI==='function')slotUI()}});
 const demoParam=new URLSearchParams(location.search).get('demo');
+const replayMatch=/^v124-(10|[1-9])$/.exec(demoParam||'');
+const replayDemo=replayMatch?Number(replayMatch[1]):null;
 const patrolDemo=demoParam==='bronze-patrol';
 const battleDemo=demoParam==='bronze-battle',siegeDemo=['bronze-siege','iron-siege'].includes(demoParam);
 if(siegeDemo)document.body.classList.add('bronze-siege-demo');
-const stoneDemo=demoParam==='stone',bronzeDemo=demoParam==='bronze',medievalDemo=demoParam==='medieval',renaissanceDemo=demoParam==='renaissance',industrialDemo=demoParam==='industrial',sampleDemo=patrolDemo||siegeDemo||battleDemo||stoneDemo||bronzeDemo||medievalDemo||renaissanceDemo||industrialDemo;
+const stoneDemo=demoParam==='stone',bronzeDemo=demoParam==='bronze',medievalDemo=demoParam==='medieval',renaissanceDemo=demoParam==='renaissance',industrialDemo=demoParam==='industrial',sampleDemo=!!replayDemo||patrolDemo||siegeDemo||battleDemo||stoneDemo||bronzeDemo||medievalDemo||renaissanceDemo||industrialDemo;
 let recovered=false,state;
 const validState=v=>v?.version===4&&Number.isFinite(v.seed)&&Array.isArray(v.cities)&&Array.isArray(v.settlers)&&Array.isArray(v.units)&&Array.isArray(v.armies);
-const loadedV73=sampleDemo?{state:patrolDemo?createBronzePatrolState():siegeDemo?(demoParam==='iron-siege'?createIronSiegeState():createBronzeSiegeState()):battleDemo?createBronzeBattleState():stoneDemo?createStoneDemoState():bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
+const loadedV73=sampleDemo?{state:replayDemo?createV124ReplayState(replayDemo):patrolDemo?createBronzePatrolState():siegeDemo?(demoParam==='iron-siege'?createIronSiegeState():createBronzeSiegeState()):battleDemo?createBronzeBattleState():stoneDemo?createStoneDemoState():bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
 if(!state)try{state=migrateGame(JSON.parse(localStorage.getItem('kingdoms-v1')))}catch{}
 state??=createGame(Math.floor(Math.random()*2147483647));
 let buildCategory='all',buildSearch='';const tileDoubleTap=new TileDoubleTap();
@@ -865,7 +868,7 @@ function slotUI(){const root=$('v51slots');root.replaceChildren();for(let i=1;i<
  const saveButton=document.createElement('button');saveButton.textContent='Salvesta';saveButton.disabled=sampleDemo;saveButton.onclick=()=>{try{localStorage.setItem(V51_SLOT_PREFIX+i,snapshotV51());slotUI();say('Salvestatud kohta '+i)}catch{say('Salvestusruum on täis')}};row.append(saveButton);
  const load=document.createElement('button');load.textContent='Laadi';load.disabled=sampleDemo||!stored;load.onclick=()=>{if(!confirm('Laadin salvestuskoha '+i+'. Praegune automaatsalvestus asendatakse.'))return;try{const obj=JSON.parse(localStorage.getItem(V51_SLOT_PREFIX+i));if(!validState(obj))throw Error('Vigane salvestus');replaceProtectedGame(localStorage,JSON.stringify(obj),validState);restarting=true;location.reload()}catch{restarting=false;say('Salvestus on vigane')}};row.append(load);root.append(row)
  }}
-$('v51export').onclick=()=>{const blob=new Blob([snapshotV51()],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=siegeDemo?(s.demo==='iron-siege'?'Kuningriigid_V116_Rauaeg.json':'Kuningriigid_V116_Pronksiaeg.json'):battleDemo?'Kuningriigid_V89_Pronksilahing.json':stoneDemo?'Kuningriigid_V77_Kivimetsa_testlinn.json':bronzeDemo?'Kuningriigid_V79_Pronksilinn.json':medievalDemo?'Kuningriigid_V80_Keskaeg.json':renaissanceDemo?'Kuningriigid_V81_Renessanss_Paikeselinn.json':industrialDemo?'Kuningriigid_V82_Aurulinn.json':'Kuningriigid_V82_kaik_'+(Math.floor(s.time/60)+1)+'.json';document.body.append(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},30000)};
+$('v51export').onclick=()=>{const blob=new Blob([snapshotV51()],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=replayDemo?'Kuningriigid_V124_Lahing_'+String(replayDemo).padStart(2,'0')+'.json':siegeDemo?(s.demo==='iron-siege'?'Kuningriigid_V116_Rauaeg.json':'Kuningriigid_V116_Pronksiaeg.json'):battleDemo?'Kuningriigid_V89_Pronksilahing.json':stoneDemo?'Kuningriigid_V77_Kivimetsa_testlinn.json':bronzeDemo?'Kuningriigid_V79_Pronksilinn.json':medievalDemo?'Kuningriigid_V80_Keskaeg.json':renaissanceDemo?'Kuningriigid_V81_Renessanss_Paikeselinn.json':industrialDemo?'Kuningriigid_V82_Aurulinn.json':'Kuningriigid_V82_kaik_'+(Math.floor(s.time/60)+1)+'.json';document.body.append(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},30000)};
 $('v51import').onclick=()=>{if(sampleDemo){say('Impordi testsalvestus tavalisel mängulehel ilma demo parameetrita.');return;}$('v51importfile').click()};
 $('v51importfile').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{if(file.size>15e6)throw Error('Fail on liiga suur');const data=JSON.parse(await file.text());if(!validState(data))throw Error('Vigane mänguseis');if(!confirm('Impordin selle mänguseisu ja asendan automaatsalvestuse?'))return;replaceProtectedGame(localStorage,JSON.stringify(data),validState);restarting=true;location.reload()}catch(error){restarting=false;say('Import ebaõnnestus: '+error.message)}finally{e.target.value=''}};
 slotUI();
@@ -884,10 +887,15 @@ const renaissanceLink=document.createElement('a');renaissanceLink.className='mod
 const industrialLink=document.createElement('a');industrialLink.className='model-gallery-link';
 industrialLink.href='?v=82-20261020&demo=industrial';
 industrialLink.textContent='Tööstusajastu näidislinn';
-$('menu-demo-links').append(industrialLink);const battleLink=document.createElement('a');battleLink.id='bronze-battle-demo';battleLink.href='?demo=bronze-battle';battleLink.textContent=BRONZE_BATTLE_NAME;$('menu-demo-links').append(battleLink);for(const [demo,name]of [['bronze-patrol','Rahuaja tornivalvurite patrull'],['bronze-siege','Pronksiaja linnapiiramine'],['iron-siege','Rauaaja linnapiiramine · katapuldid ja ballistad']]){const link=document.createElement('a');link.href='?demo='+demo;link.textContent=name;$('menu-demo-links').append(link);}
+$('menu-demo-links').append(industrialLink);const battleLink=document.createElement('a');battleLink.id='bronze-battle-demo';battleLink.href='?demo=bronze-battle';battleLink.textContent=BRONZE_BATTLE_NAME;$('menu-demo-links').append(battleLink);for(const battle of BATTLE_SPECS_V124){
+ const link=document.createElement('a');link.href='?v=124-20261023&demo=v124-'+battle.id;
+ link.textContent='V124 · #'+String(battle.id).padStart(2,'0')+' · '+battle.title;
+ link.className='model-gallery-link';$('menu-demo-links').append(link);
+}
+for(const [demo,name]of [['bronze-patrol','Rahuaja tornivalvurite patrull'],['bronze-siege','Pronksiaja linnapiiramine'],['iron-siege','Rauaaja linnapiiramine · katapuldid ja ballistad']]){const link=document.createElement('a');link.href='?demo='+demo;link.textContent=name;$('menu-demo-links').append(link);}
 if(sampleDemo){
- $('menutitle').textContent=(patrolDemo?'Rahuaja tornivalvurite patrull':siegeDemo?(s.demo==='iron-siege'?'Rauaaja linnapiiramine':BRONZE_SIEGE_NAME):battleDemo?BRONZE_BATTLE_NAME:stoneDemo?'Kiviaja näidislinn – '+DEMO_CITY_NAME:bronzeDemo?'Pronksiaja näidislinn – '+BRONZE_DEMO_NAME:medievalDemo?'Keskaja näidislinn – '+MEDIEVAL_DEMO_NAME:renaissanceDemo?'Renessansi näidislinn – '+RENAISSANCE_DEMO_NAME:'Tööstusajastu näidislinn – '+INDUSTRIAL_DEMO_NAME);
- $('v51export').textContent=battleDemo||siegeDemo?'↓ Laadi testlahingu salvestus (.json)':'↓ Laadi näidislinna salvestus (.json)';
+ $('menutitle').textContent=(replayDemo?'V124 — '+BATTLE_SPECS_V124.find(x=>x.id===replayDemo)?.title:patrolDemo?'Rahuaja tornivalvurite patrull':siegeDemo?(s.demo==='iron-siege'?'Rauaaja linnapiiramine':BRONZE_SIEGE_NAME):battleDemo?BRONZE_BATTLE_NAME:stoneDemo?'Kiviaja näidislinn – '+DEMO_CITY_NAME:bronzeDemo?'Pronksiaja näidislinn – '+BRONZE_DEMO_NAME:medievalDemo?'Keskaja näidislinn – '+MEDIEVAL_DEMO_NAME:renaissanceDemo?'Renessansi näidislinn – '+RENAISSANCE_DEMO_NAME:'Tööstusajastu näidislinn – '+INDUSTRIAL_DEMO_NAME);
+ $('v51export').textContent=replayDemo||battleDemo||siegeDemo?'↓ Download replay start (.json)':'↓ Laadi näidislinna salvestus (.json)';
  $('savestatus').textContent='Teststsenaarium ei muuda sinu olemasolevaid mängusalvestusi.';
 }
 // Dynamic pixel ratio reduction under sustained FPS pressure, without altering user's chosen profile.
