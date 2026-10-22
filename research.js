@@ -88,6 +88,22 @@ Object.assign(UNIT_TECH,MEDIEVAL_UNIT_TECH);
 Object.assign(UNIT_TECH,{musketeer:'firearms',arquebusier:'firearms',field_cannon:'field_artillery',bronze_catapult:'ancient_artillery'});
 export const newResearch=()=>({known:[],active:null,progress:{},completed:[],queue:[],paused:false,boosted:[],rate:0});
 export function techBlock(research,id){const tech=TECHS[id];if(!tech)return 'Tundmatu tehnoloogia.';if(research.known.includes(id))return 'Juba uuritud.';if(research.v118LegacyActive===id)return '';if(tech.age>0&&V118_ERA_IDS[tech.age]!==id&&!research.known.includes(V118_ERA_IDS[tech.age]))return 'Vajab ajastut: '+ERA_NAMES[tech.age];const missing=tech.requires.filter(t=>!research.known.includes(t));if(missing.length)return 'Eeldab: '+missing.map(t=>TECHS[t].name).join(', ');if(tech.oneOf&&!tech.oneOf.some(t=>research.known.includes(t)))return 'Eeldab üht: '+tech.oneOf.map(t=>TECHS[t].name).join(' või ');return ''}
+// Find an achievable prerequisite for an AI research objective, including JA/VÕI bridges.
+export function nextResearchForGoals(research,goals){
+ const known=new Set(research.known), seen=new Set();
+ const find=id=>{
+  if(known.has(id)||!TECHS[id]||seen.has(id))return null;seen.add(id);
+  const tech=TECHS[id],gate=V118_ERA_IDS[tech.age];
+  if(tech.age>0&&gate!==id&&!known.has(gate)){const first=find(gate);if(first)return first;}
+  for(const parent of tech.requires)if(!known.has(parent)){const first=find(parent);if(first)return first;}
+  if(tech.oneOf&&!tech.oneOf.some(p=>known.has(p))){
+   for(const parent of tech.oneOf){const first=find(parent);if(first)return first;}
+  }
+  return techBlock(research,id)===''?id:null;
+ };
+ for(const goal of goals){seen.clear();const found=find(goal);if(found)return found;}
+ return null;
+}
 export function grantTech(research,id){if(!TECHS[id]||research.known.includes(id))return;for(const parent of TECHS[id].requires)grantTech(research,parent);if(TECHS[id].oneOf&&!TECHS[id].oneOf.some(t=>research.known.includes(t)))grantTech(research,TECHS[id].oneOf[0]);research.known.push(id)}
 export function initResearch(state){if(state.research){for(const r of state.research){r.queue??=[];r.paused??=false;r.boosted??=[];r.rate??=0;
   if(r.researchGraphVersion!==118){
