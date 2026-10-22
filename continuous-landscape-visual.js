@@ -5,8 +5,8 @@ import {detailWorldRoadWidth} from './road-width-v89.js';
 import * as T from './vendor/three.module.js';
 import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
-import {riverNear,localToWorld} from './continuous-landscape.js?v=85a';
-import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=85a';
+import {riverNear,localToWorld} from './continuous-landscape.js?v=122a';
+import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=122a';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
@@ -62,7 +62,8 @@ function buffers(vertices,color,{standard=false,opacity=1,shade=null}={}){
 function visible(tile,path,radius=90){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
- const water=[],banks=[];
+ const water=[],banks=[],fordShoals=[];
+ let shallowCrossings=0;
  let riverCount=0,sections=0;
  // A single clipped scalar-field mesh unions ALL tributaries. Every shared
  // grid coordinate has one height; overlapping ribbons and junction fans vanish.
@@ -102,15 +103,37 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
    sections++;
   }
  }
+ // Submerged pale gravel shoals highlight truly walkable low-water passages.
+ // Geometry and water depth come from the same centreline in both projections.
+ for(const edge of getRivers(game)){
+  if(!edge.c.ford||edge.c.bridge||!visible(tile,edge.points))continue;
+  const first=edge.points[0],second=edge.points[1]||edge.points[0],len=Math.hypot(second.x-first.x,second.z-first.z)||1;
+  const tx=(second.x-first.x)/len,tz=(second.z-first.z)/len,nx=-tz,nz=tx;
+  const width=Math.max(1.5,Math.min(first.width*.83,first.width-.35));
+  let last=null;
+  for(const at of [-9,-5,0,5,9]){
+   const size=width*(Math.abs(at)>=9?.48:Math.abs(at)>=5?.85:1);
+   const pts=[-size,size].map(offset=>{
+    const x=edge.c.x+tx*at+nx*offset,z=edge.c.z+tz*at+nz*offset;
+    return {...field(game,x,z,scope,tile),y:projectHeight((riverNear(game,x,z).waterHeight||.86)+.065,scope)};
+   });
+   if(last)strip(fordShoals,last[0],last[1],pts[0],pts[1]);
+   last=pts;
+  }
+  shallowCrossings++;
+ }
  const bankMesh=buffers(banks,'#b2a68a',{standard:true}),waterMesh=buffers(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
   const p=scope==='world'?{x,z}:localToWorld(tile,x,z),near=riverNear(game,p.x,p.z);
   const shallow=Math.min(1,near.distance/Math.max(1,near.width));
   return new T.Color('#245d73').lerp(new T.Color('#76b6ae'),Math.pow(shallow,2)*.68).multiplyScalar(.96+.04*Math.sin(p.x*.11+p.z*.07));
  }});
  if(waterMesh){waterMesh.material.dispose();waterMesh.material=landscapeMaterial('water',scope,tile);}
+ const shallowMesh=buffers(fordShoals,'#aaa47e',{standard:false,opacity:.40});
+ if(shallowMesh){shallowMesh.name='shallow walkable ford shoals';shallowMesh.renderOrder=11;group.add(shallowMesh)}
  if(bankMesh){bankMesh.name='continuous river banks';group.add(bankMesh)}
  if(waterMesh){waterMesh.name='continuous water surface';waterMesh.renderOrder=9;group.add(waterMesh)}
  group.userData.riverEdges=riverCount;
+ group.userData.shallowFordCount=shallowCrossings;
  group.userData.riverVertexCount=water.length/3;
  group.userData.sections=sections;
  // Crossings remain independent STRUCTURES, but share river coordinates and
