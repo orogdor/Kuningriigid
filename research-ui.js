@@ -1,8 +1,9 @@
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js';
 import {RESOURCE_NAMES} from './economy.js';
-import {TECHS,techBlock,ERA_NAMES} from './research.js?v=117a';
+import {TECHS,techBlock,ERA_NAMES} from './research.js?v=118a';
 import {researchCost,EUREKAS,scienceRate} from './science.js';
 import {tempoName} from './tempo.js';
+import {renderTechTreeV118} from './research-tree-v118.js?v=118a';
 const pretty=n=>Number(n||0).toLocaleString('et-EE',{maximumFractionDigits:1});
 export const remaining=(s,id,team=0)=>Math.max(0,researchCost(s,TECHS[id])-(s.research[team].progress[id]||0));
 export const clock=seconds=>!Number.isFinite(seconds)?'Ootab':Math.floor(Math.ceil(seconds)/60)+':'+String(Math.ceil(seconds)%60).padStart(2,'0');
@@ -33,37 +34,6 @@ export function renderResearchUI(game,{choose,queue,remove,details=true}){
  tree.dataset.renderKey=stamp;
  const queued=document.getElementById('researchqueue');queued.innerHTML='';
  for(const id of r.queue||[]){const item=document.createElement('button');item.textContent=TECHS[id].name+' ✕';item.onclick=()=>remove(id);queued.append(item)}
- tree.innerHTML='';const ages=ERA_NAMES;
- for(let age=0;age<ages.length;age++){
-  const visibleTechs=Object.entries(TECHS).filter(([id,t])=>t.age===age).filter(([id])=>{
-   if(r.known.includes(id)||id===active||(r.queue||[]).includes(id))return true;
-   return !techBlock(r,id);
-  });
-  if(!visibleTechs.length)continue;
-  const column=document.createElement('section');column.className='tech-column';
-  const heading=document.createElement('h3');heading.textContent=ages[age];column.append(heading);
-  for(const[id,t]of visibleTechs){
-   const known=r.known.includes(id),blocked=techBlock(r,id),cost=researchCost(s,t),progressValue=r.progress[id]||0,
-    boosted=r.boosted?.includes(id),card=document.createElement('button');
-   card.dataset.tech=id;
-   card.className='tech-card '+(known?'known':id===active?'researching':blocked?'locked':'available');
-   card.disabled=known||!!blocked||!hasCity||id===active;
-   card.setAttribute('aria-label',t.name+'; '+(known?'Uuritud':blocked||pretty(cost)+' teaduspunkti'));
-   const label=document.createElement('strong');label.textContent=(known?'✓ ':active===id?'▶ ':'')+t.name;
-   const time=document.createElement('span');time.className='tech-time';
-   time.textContent=known?'Uuritud':pretty(cost)+' teaduspunkti · '+(rate>0?clock((cost-progressValue)/rate*60):'Ootab teadust');
-   const unlock=document.createElement('span');unlock.textContent='Avab: '+t.unlocks;
-   const prerequisites=document.createElement('small');
-   prerequisites.textContent=t.requires.length?'← '+t.requires.map(p=>TECHS[p].name).join(' + '):'Algtehnoloogia';
-   if(t.oneOf)prerequisites.textContent+=' + ('+t.oneOf.map(p=>TECHS[p].name).join(' või ')+')';
-   card.append(label,time,unlock,prerequisites);
-   if(ERA_MATERIALS[id]){const era=document.createElement('small');era.textContent='Ajastuvahetuse materjalid: '+Object.entries(ERA_MATERIALS[id]).map(([k,n])=>n+' '+(RESOURCE_NAMES[k]||k)).join(', ');card.append(era)}
-   const progress=document.createElement('progress');progress.max=cost;progress.value=known?cost:progressValue;card.append(progress);
-   if(EUREKAS[id]){const d=document.createElement('small');d.className=boosted?'eureka-earned':'eureka-available';d.textContent=boosted?'⚡ Avastamisboonus saadud (+35%)':'⚡ Avastamisboonus: '+EUREKAS[id]+' (+35%)';card.append(d)}
-   if(!known){const detail=document.createElement('small');detail.className='tech-progress-detail';detail.hidden=!progressValue;detail.textContent='Tehtud '+pretty(progressValue)+' / '+pretty(cost)+' · '+Math.floor(100*Math.min(1,progressValue/cost))+'%';card.append(detail)}
-   card.onclick=()=>choose(id);column.append(card);
-   if(!known&&id!==active){const isQueued=(r.queue||[]).includes(id),plan={known:[...r.known,...(active?[active]:[]),...(r.queue||[])]},q=document.createElement('button');q.className='tech-queue-button';q.textContent=isQueued?'✓ Järjekorras':'＋ Lisa järjekorda';q.disabled=isQueued||!hasCity||!!techBlock(plan,id)||(r.queue?.length||0)>=4;q.onclick=()=>queue(id);column.append(q)}
-  }
-  tree.append(column);
- }
+ tree.innerHTML='';
+ renderTechTreeV118(tree,game,{choose,queue,remove,rate});
 }
