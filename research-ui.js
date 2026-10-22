@@ -3,7 +3,7 @@ import {RESOURCE_NAMES} from './economy.js';
 import {TECHS,techBlock,ERA_NAMES} from './research.js?v=118a';
 import {researchCost,EUREKAS,scienceRate} from './science.js';
 import {tempoName} from './tempo.js';
-import {renderTechTreeV119} from './research-tree-v119.js?v=119a';
+import {renderTechTreeV119} from './research-tree-v119.js?v=123a';
 const pretty=n=>Number(n||0).toLocaleString('et-EE',{maximumFractionDigits:1});
 export const remaining=(s,id,team=0)=>Math.max(0,researchCost(s,TECHS[id])-(s.research[team].progress[id]||0));
 export const clock=seconds=>!Number.isFinite(seconds)?'Ootab':Math.floor(Math.ceil(seconds)/60)+':'+String(Math.ceil(seconds)%60).padStart(2,'0');
