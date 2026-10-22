@@ -2,11 +2,12 @@
 // Generated from the exact same world coordinates as the atlas. Geometry is
 // clipped at each tile border so adjacent city/detail maps join seamlessly.
 import * as T from './vendor/three.module.js';
-import {riverSegmentsNear,lineToDetail,rockSites,worldToDetail} from './landscape-shared.js?v=65c';
+import {DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
+import {riverSegmentsNear,lineToDetail,rockSites,worldToDetail} from './landscape-shared.js?v=123a';
 
 const clip=(a,b)=>{
  let u0=0,u1=1;const dx=b.x-a.x,dz=b.z-a.z;
- for(const [p,q] of [[-dx,a.x+75],[dx,75-a.x],[-dz,a.z+65],[dz,65-a.z]]){
+ for(const [p,q] of [[-dx,a.x+DETAIL_HALF_X],[dx,DETAIL_HALF_X-a.x],[-dz,a.z+DETAIL_HALF_Z],[dz,DETAIL_HALF_Z-a.z]]){
   if(Math.abs(p)<1e-9){if(q<0)return null;continue}
   const t=q/p;
   if(p<0)u0=Math.max(u0,t);else u1=Math.min(u1,t);
@@ -36,7 +37,7 @@ export function createDetailLandscape(game,tile,height){
   const cell=source.cell;
   if(cell.bridge||cell.ford){
    const start=worldToDetail(tile,cell.x,cell.z);
-   if(Math.abs(start.x)<75&&Math.abs(start.z)<65)passages.push({p:start,cell,pts});
+   if(Math.abs(start.x)<DETAIL_HALF_X&&Math.abs(start.z)<DETAIL_HALF_Z)passages.push({p:start,cell,pts});
   }
  }
  if(rivers.length){
