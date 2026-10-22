@@ -38,7 +38,7 @@ import {TECHS,BUILD_TECH,UNIT_TECH,newResearch,initResearch,startResearch,tickRe
 import {BUILDINGS,RESOURCE_NAMES,START,RESOURCE_PRODUCTION_MULTIPLIER,FOOD_KEYS,storageLimit,takeFood,recordDelivery,realm as freshRealm,initialState,migrateEconomy,buildRule as placementRule,placeBuilding,tickEconomy,ready,canAfford,spendResources} from './economy.js';
 import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
-import {bakeDetails,detailHeight} from './world-details.js';
+import {bakeDetails,detailHeight} from './world-details.js?v=123a';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
 import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=117a';
 import {MEDIEVAL_BUILDINGS,MEDIEVAL_UNITS,medievalBonus,healMedievalArmies} from './medieval-v62.js?v=117a';
