@@ -1,10 +1,10 @@
 import {carriesSword,stoneThrower} from './combat-equipment-v100.js';
-import {committedOpponent,marchingGoal,keepAdvance} from './battle-doctrine-v98.js';
+import {committedOpponent,marchingGoal,keepAdvance} from './battle-doctrine-v98.js?v=102a';
 import {retreatPoint} from './battle-movement-v97.js';
 import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
-import {FORMATIONS,updateFormations,worldSlot,turnTowards,formationAttackReady,clearShot} from './formations-v94.js';
+import {FORMATIONS,updateFormations,worldSlot,turnTowards,formationAttackReady,clearShot} from './formations-v94.js?v=102a';
 import {allowedDeployment} from './battle-pacing-v93.js';
-import {isBow,usesArrows,tacticalStats,initializeTactics,updateMorale,tacticalGoal,tacticalDamage,shotHits} from './historical-tactics-v92.js?v=101a';
+import {isBow,usesArrows,tacticalStats,initializeTactics,updateMorale,tacticalGoal,tacticalDamage,shotHits} from './historical-tactics-v92.js?v=102a';
 import {soldierCount,constrainStep} from './soldier-collision-v90.js?v=101a';
 import {troopRole,rangedTroop} from './military-v88.js';
 import {unitStats} from './army-experience-v88.js';
@@ -40,9 +40,9 @@ export function initializeMen(b,nav=null){
  }
  b.individualVersion=1;b.contactVersion=96;initializeTactics(b);b.initialMen??=battleManCount(b);b.casualties??={};
 }
-function damageMan(b,attacker,target,amount){
+function damageMan(b,attacker,target,amount,splash=false){
  const m=target.m,u=target.u,before=m.hp;m.hp=Math.max(0,m.hp-amount);m.hitTime=b.elapsed;const hit=before-m.hp;
- if(attacker){attacker.m.damageDealt+=hit;attacker.u.damageDealt=(attacker.u.damageDealt||0)+hit;attacker.m.attackTime=b.elapsed;attacker.u.attackTime=b.elapsed;attacker.m.shot={x:attacker.m.x,z:attacker.m.z,toX:m.x,toZ:m.z};attacker.u.shot=attacker.m.shot;}
+ if(attacker){attacker.m.damageDealt+=hit;attacker.u.damageDealt=(attacker.u.damageDealt||0)+hit;if(!splash){attacker.m.attackTime=b.elapsed;attacker.u.attackTime=b.elapsed;attacker.m.shot={x:attacker.m.x,z:attacker.m.z,toX:m.x,toZ:m.z};attacker.u.shot=attacker.m.shot;}}
  u.hitTime=b.elapsed;u.hp=Math.max(0,u.hp-hit);if(before>0&&m.hp<=0){m.deathTime=b.elapsed;b.casualties[u.team]=(b.casualties[u.team]||0)+1;if(attacker){attacker.m.kills++;attacker.u.kills=(attacker.u.kills||0)+1;}}return hit;
 }
 // An impact hits all living figures in the circle, irrespective of faction.
@@ -60,7 +60,7 @@ function resolveStoneLandings(b){
    const d=Math.max(0,Math.hypot(m.x-shot.x,m.z-shot.z)-(m.radius||.34)*.25);
    if(d>shot.radius)continue;
    const damage=shot.damage*(.25+.75*(1-d/shot.radius));
-   if(damageMan(b,attacker,{u,m},damage)>0){injured++;if(u.team===shot.team)friendlies++;}
+   if(damageMan(b,attacker,{u,m},damage,true)>0){injured++;if(u.team===shot.team)friendlies++;}
   }
   for(const structure of [...(b.siegeSections||[]),...(b.fortress?[b.fortress]:[])]){
    if(structure.hp<=0||dist(structure,shot)>shot.radius+2)continue;
@@ -91,7 +91,7 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
  for(const actor of agents){const {m,u}=actor;if(m.hp<=0||m.escaped||u.retreated)continue;const a=tacticalStats(stats[u.kind],u),count=u.menCount||soldierCount(u);if(m.routing&&!u.routing)a.speed/=(FORMATIONS[u.formation]||FORMATIONS.line).speed;m.cool=Math.max(0,m.cool-dt);m.wasMoving=!!m.moving;m.moving=false;
   let enemy=null,best=Infinity,threat=null,threatDistance=Infinity;for(const p of enemies.get(u.team)||[]){if(p.m.hp<=0||p.m.escaped||p.u.retreated)continue;const d=dist(m,p.m),score=d+(m.targetId===p.m.id?-1.2:0)+Math.abs(p.m.z-m.z)*.15;if(!p.u.routing&&!p.m.routing&&d<threatDistance){threat=p.m;threatDistance=d;}if(score<best){best=score;enemy=p;}}m.targetId=enemy?.m.id??null;
   const sections=(b.siegeSections||[]).filter(p=>p.hp>0&&p.team!==u.team&&!b.siegeBreached),fort=b.fortress?.hp>0&&b.fortress.team!==u.team?b.fortress:null,wall=isSiegeUnit(u.kind)&&sections.length?sections.reduce((p,v)=>dist(m,v)<dist(m,p)?v:p):null,structure=wall||(!enemy?(sections[0]||fort):null);
-  const target=structure||enemy?.m||((m.routing||u.routing)?{x:-u.battleSide*250,z:m.z}:null);if(!target)continue;const d=dist(m,target),desiredHeading=Math.atan2(target.x-m.x,target.z-m.z),defensive=!!(FORMATIONS[u.formation]||{}).defensive&&!m.routing&&!u.routing&&b.pursuitStoppedTeam!==u.team;m.heading=turnTowards(m.heading||0,defensive?(u.formationFacing??u.heading):desiredHeading,dt,defensive?.7:2);const facing=Math.abs(Math.atan2(Math.sin(desiredHeading-m.heading),Math.cos(desiredHeading-m.heading)));const rangedShot=isBow(u)&&m.ammo>0&&(!carriesSword(u)||d>=3);m.weapon=carriesSword(u)?rangedShot?'bow':'sword':stoneThrower(u)?rangedShot?'stone':'melee':null;const range=(rangedShot?a.range:meleeReach(u,m,enemy?.m))+(u.guardPost&&rangedShot?5:0)+(structure?6:0),canAttack=formationAttackReady(u,m,b,!u.manualOrder&&!m.routing&&!u.routing&&d<=range&&facing<(defensive?1.2:1.65)&&(!rangedShot||!['musketeer','arquebusier','line_infantry','rifleman','machinegun_team','modern_infantry'].includes(u.kind)||clearShot(actor,enemy,agents)));
+  const target=structure||enemy?.m||((m.routing||u.routing)?{x:-u.battleSide*250,z:m.z}:null);if(!target)continue;const d=dist(m,target),desiredHeading=Math.atan2(target.x-m.x,target.z-m.z),defensive=!!(FORMATIONS[u.formation]||{}).defensive&&!m.routing&&!u.routing&&b.pursuitStoppedTeam!==u.team;m.heading=turnTowards(m.heading||0,defensive?(u.formationFacing??u.heading):desiredHeading,dt,defensive?.7:u.kind==='chariot'?.7:troopRole(u.kind)==='cavalry'?1.1:2);const facing=Math.abs(Math.atan2(Math.sin(desiredHeading-m.heading),Math.cos(desiredHeading-m.heading)));const rangedShot=isBow(u)&&m.ammo>0&&(!carriesSword(u)||d>=3);m.weapon=carriesSword(u)?rangedShot?'bow':'sword':stoneThrower(u)?rangedShot?'stone':'melee':null;const range=(rangedShot?a.range:meleeReach(u,m,enemy?.m))+(u.guardPost&&rangedShot?5:0)+(structure?6:0),canAttack=formationAttackReady(u,m,b,!u.manualOrder&&!m.routing&&!u.routing&&d<=range&&facing<(defensive?1.2:1.65)&&(!rangedShot||!['musketeer','arquebusier','line_infantry','rifleman','machinegun_team','modern_infantry'].includes(u.kind)||clearShot(actor,enemy,agents)));
   m.fatigue=Math.max(0,Math.min(100,m.fatigue+(canAttack?.22:-.3)*dt));if(canAttack){if(m.cool===0){if(!rangedShot&&!structure){m.lastMeleeDistance=d;m.lastMeleeReach=range;}if(u.formation==='volley')m.lastVolley=u.volleyNumber;let amount=a.dmg/(u.guardPost?1:soldierCount(u))*(u.guardPost?1.3:1)*(1+(Array.isArray(tech)?tech[u.team]||0:u.team?0:tech)*.3);
     u.projectile=rangedShot?(stoneThrower(u)?'stone':usesArrows(u)?'arrow':'bullet'):null;m.projectile=u.projectile;if(rangedShot){m.ammo--;const accurate=shotHits(m,u,d,range,enemy?.u);if(stoneThrower(u)){
      const angle=(m.shotsFired*2.399963+u.source*1.7)%(Math.PI*2),error=accurate?0:4+(m.shotsFired%4)*2.2,tx=target.x+Math.cos(angle)*error,tz=target.z+Math.sin(angle)*error;
@@ -101,7 +101,7 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
     }if(!accurate){m.attackTime=b.elapsed;m.shot={x:m.x,z:m.z,toX:target.x+2,toZ:target.z+2};u.shot=m.shot;u.attackTime=b.elapsed;m.cool=(isSiegeUnit(u.kind)?2.8:1.8)/a.attackSpeed;continue;}}else if(isBow(u))amount*=carriesSword(u)?.6:.35;
     if(enemy&&!structure){amount=tacticalDamage(actor,enemy,amount,u.projectile);const role=troopRole(enemy.u.kind),reduction={heavy_cavalry:.75,knight:.8,man_at_arms:.83,halberdier:.92}[enemy.u.kind]||1,pierce=u.kind==='crossbowman'?.5:0;amount*=reduction+(1-reduction)*pierce;if(['halberdier','pikeman'].includes(u.kind)&&role==='cavalry')amount*=1.7;if(u.kind==='rocket_team'&&role==='vehicle')amount*=1.8;damageMan(b,actor,enemy,amount);}
     else{const before=structure.hp;if(wall||sections.includes(structure)){siegeDamage(u,structure,amount);if(structure.breached){b.siegeBreached=true;b.breachAt={x:structure.x,z:structure.z};}}else structure.hp=Math.max(0,structure.hp-amount);const hit=before-structure.hp;u.damageDealt=(u.damageDealt||0)+hit;m.damageDealt+=hit;m.attackTime=b.elapsed;u.attackTime=b.elapsed;}
-    m.cool=(u.kind==='crossbowman'?1.9:isSiegeUnit(u.kind)?2.8:u.kind==='heavy_cavalry'?1.45:1.2)*(1+m.fatigue*.003)/a.attackSpeed;
+    m.cool=(u.kind==='dragoon'?2.4:u.kind==='cuirassier'?2.1:u.kind==='crossbowman'?1.9:isSiegeUnit(u.kind)?2.8:u.kind==='heavy_cavalry'?1.45:1.2)*(1+m.fatigue*.003)/a.attackSpeed;
    }continue;
   }
   if(b.pursuitStoppedTeam===u.team&&!u.routing&&!m.routing){m.moving=false;continue;}if(u.guardPost&&!u.routing&&!m.routing)continue;
