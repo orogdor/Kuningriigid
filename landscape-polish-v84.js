@@ -1,6 +1,6 @@
 // V84 visual dressing shares the exact atlas/detail projection and saved rivers.
 import * as T from './vendor/three.module.js';
-import {getRivers,riverNear,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=122a';
+import {getRivers,riverNear,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
 const templates=new Map(),crossingMaps=new WeakMap(),crossingCatalogs=new WeakMap();
@@ -83,7 +83,7 @@ export function createBridgeBuilding(game,tile,height){
 export function createCrossingNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V84 bank-to-bank crossings';group.userData.landscape=true;
  let existing=crossingCatalogs.get(game);if(!existing){existing=new Set(createWorldObjectCatalog(game,quality).candidates.bridge.map(c=>c.c+':'+c.r));crossingCatalogs.set(game,existing);}
- const sites=getRivers(game).map(e=>e.c).filter(c=>(scope==='world'||!game.contextAt(c,false)?.economy.buildings.some(b=>b.type==='bridge'&&b.ready))&&(c.bridge||c.ford)&&!existing.has(c.c+':'+c.r)&&(!tile||Math.abs(c.x-tile.x)<90&&Math.abs(c.z-tile.z)<90));
+ const sites=getRivers(game).map(e=>e.c).filter(c=>(scope==='world'||!game.contextAt(c,false)?.economy.buildings.some(b=>b.type==='bridge'&&b.ready))&&(c.bridge||c.ford)&&!existing.has(c.c+':'+c.r)&&(!tile||Math.abs(c.x-tile.x)<115&&Math.abs(c.z-tile.z)<115));
  for(const ford of [false,true]){
   const cells=sites.filter(c=>!c.bridge===ford),template=crossingTemplate(ford);if(!cells.length)continue;
   for(const src of template.children){const mesh=new T.InstancedMesh(src.geometry,src.material,cells.length),o=new T.Object3D();
@@ -95,6 +95,6 @@ export function createCrossingNetwork(game,scope='world',tile=null,quality='medi
 // No detached cone/cap geometry can hover over the detail map any longer.
 export function createMountainOutcrops(game,scope='world',tile=null){
  const group=new T.Group();group.name='V84 stratified mountain crests';group.userData.landscape=true;
- group.userData.outcropCount=game.cells.filter(c=>c.mountain&&(!tile||Math.abs(c.x-tile.x)<90&&Math.abs(c.z-tile.z)<90)).length;
+ group.userData.outcropCount=game.cells.filter(c=>c.mountain&&(!tile||Math.abs(c.x-tile.x)<115&&Math.abs(c.z-tile.z)<115)).length;
  group.userData.continuousRelief=true;return group;
 }
