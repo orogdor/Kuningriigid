@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict';
 import * as T from './vendor/three.module.js';
-import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=116a';
-import {Civilization,TROOPS} from './civilization-core.js?v=116a';
-import {initializeMen,tickIndividualBattle,battleManCount} from './individual-battle-v91.js?v=116a';
-import {wallRankPoint,tickWallWalk} from './wall-walk-v111.js?v=116a';
-import {createBronzeCityModel} from './bronze-city-v111.js?v=116a';
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=117a';
+import {Civilization,TROOPS} from './civilization-core.js?v=117a';
+import {initializeMen,tickIndividualBattle,battleManCount} from './individual-battle-v91.js?v=117a';
+import {wallRankPoint,tickWallWalk} from './wall-walk-v111.js?v=117a';
+import {createBronzeCityModel} from './bronze-city-v111.js?v=117a';
 import {damageStage,updateCatapultDamage} from './destruction-v113.js';
 import {createSoldier} from './visuals.js';
-import {persistSiegeDamage} from './medieval-v62.js?v=116a';
+import {persistSiegeDamage} from './medieval-v62.js?v=117a';
 const s=createBronzeSiegeState(undefined,2),g=new Civilization(s),b=s.battle,nav=g.battleNavigation(b);initializeMen(b,nav);
-assert.equal(battleManCount(b,0),218);assert.equal(battleManCount(b,1),236);assert.equal(b.squads.filter(u=>u.guardPost).reduce((n,u)=>n+u.men.length,0),128);assert.equal(b.squads.filter(u=>u.kind==='bronze_catapult').length,2);assert.ok(b.squads.filter(u=>u.team===0).flatMap(u=>u.men).every(m=>m.x< -110),'whole army starts far outside the city');
+assert.equal(battleManCount(b,0),218);assert.equal(battleManCount(b,1),270);assert.equal(b.squads.filter(u=>u.guardPost).reduce((n,u)=>n+u.men.length,0),162);assert.equal(b.squads.filter(u=>u.kind==='bronze_catapult').length,2);assert.ok(b.squads.filter(u=>u.team===0).flatMap(u=>u.men).every(m=>m.x< -110),'whole army starts far outside the city');
 for(const wallAxis of [0,1]){const points=Array.from({length:16},(_,i)=>wallRankPoint({x:0,z:0,wallAxis},i,16));for(let i=0;i<16;i++)for(let j=0;j<i;j++)assert.ok(Math.hypot(points[i].x-points[j].x,points[i].z-points[j].z)>.75);assert.ok(points.every(p=>Math.abs(wallAxis?p.x:p.z)<1),'two ranks stay on the wall walk');}
 for(let i=0;i<100;i++)tickWallWalk(b,.1,nav);const guards=b.squads.filter(u=>u.guardPost).flatMap(u=>u.men.filter(m=>m.hp>0));for(let i=0;i<guards.length;i++)for(let j=0;j<i;j++)assert.ok(Math.hypot(guards[i].x-guards[j].x,guards[i].z-guards[j].z)>.69,'guard slots remain separate when squads converge');
 const walking=b.squads.find(u=>u.guardPost),before=walking.men.map(m=>({x:m.x,z:m.z}));tickWallWalk(b,.1,nav);assert.ok(walking.men.some((m,i)=>Math.hypot(m.x-before[i].x,m.z-before[i].z)>.01),'men physically walk with their squad');assert.ok(walking.men.every((m,i)=>Math.hypot(m.x-before[i].x,m.z-before[i].z)<.3),'straight wall walking stays continuous, not 7m slot jumps');
@@ -17,4 +17,4 @@ const heights=[];for(const stage of [1,2,3]){const model=createBronzeCityModel('
 const root=createSoldier(new T.Group(),0,0,'#276bd1','bronze_catapult'),other=createSoldier(new T.Group(),0,0,'#276bd1','bronze_catapult');updateCatapultDamage(root,60,100);assert.equal(root.getObjectByName('catapultArm').visible,false);assert.equal(other.getObjectByName('catapultArm').visible,true,'damage never changes another engine');updateCatapultDamage(root,0,100);assert.equal(root.userData.damageStage,3);assert.ok(root.userData.damageVisual.original.every(o=>!o.visible));assert.ok(root.userData.damageVisual.debris.visible);assert.equal(damageStage(80,100),0);
 // Real projectile resolution must open exactly the destroyed wall's nav cells.
 const wall=b.siegeSections.find(w=>w.type==='stonewall'&&w.x===-28&&w.z===-14),cat=b.squads.find(u=>u.kind==='bronze_catapult');assert.equal(nav.passable(wall.x,wall.z),false);b.rockShots=[{id:'test-impact',source:cat.source,team:0,kind:cat.kind,manId:cat.men[0].id,x:wall.x,z:wall.z,landsAt:0,damage:2000,radius:2,balanceVersion:105}];tickIndividualBattle(b,.1,TROOPS,0,nav);assert.equal(wall.hp,0);assert.ok(wall.breached);assert.equal(nav.passable(wall.x,wall.z),true);assert.equal(nav.passable(42,-14),false);persistSiegeDamage(s.cities[0],b);assert.equal(s.cities[0].economy.buildings[wall.index].hp,0);assert.equal(s.cities[0].economy.buildings[wall.index].damageMaxHp,900);
-console.log(JSON.stringify({passed:true,attackers:218,defenders:236,wallGuards:128,catapults:2,rubbleHeights:heights,checks:'far deployment; two physical wall ranks; damaged and destroyed geometry; independent engine wrecks; real stone impact; local navigable breach; saved damage'}));
+console.log(JSON.stringify({passed:true,attackers:218,defenders:270,wallGuards:162,catapults:2,rubbleHeights:heights,checks:'far deployment; two physical wall ranks; damaged and destroyed geometry; independent engine wrecks; real stone impact; local navigable breach; saved damage'}));

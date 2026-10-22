@@ -1,9 +1,9 @@
 import {battleDelta} from './battle-pacing-v93.js';
-import {deployHistoricalBattle} from './historical-tactics-v92.js?v=116a';
-import {tickIndividualBattle} from './individual-battle-v91.js?v=116a';
+import {deployHistoricalBattle} from './historical-tactics-v92.js?v=117a';
+import {tickIndividualBattle} from './individual-battle-v91.js?v=117a';
 import {moveSquad,squadRadius} from './soldier-collision-v90.js?v=110a';
 import {BATTLEFIELD} from './battlefield-v88.js';
-import {rangedTroop,troopRole} from './military-v88.js?v=116a';
+import {rangedTroop,troopRole} from './military-v88.js?v=117a';
 import {unitStats,armyForUnit} from './army-experience-v88.js';
 import {detailHeight} from './world-details.js';
 export const COLS=220,ROWS=165,TILE=50,ORIGIN_X=-650,ORIGIN_Z=-550,WORLD_WIDTH=COLS*TILE,WORLD_DEPTH=ROWS*TILE,WORLD_CENTER_X=ORIGIN_X+WORLD_WIDTH/2,WORLD_CENTER_Z=ORIGIN_Z+WORLD_DEPTH/2;

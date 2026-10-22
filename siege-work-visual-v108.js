@@ -1,5 +1,5 @@
 // Lightweight siege carpentry meshes. Each work is a single saved battle object.
-import {createSiegeCamp} from './siege-support-visual-v115.js?v=116a';
+import {createSiegeCamp} from './siege-support-visual-v115.js?v=117a';
 import * as T from './vendor/three.module.js';
 const WOOD=new T.MeshStandardMaterial({color:'#866139',roughness:.95,metalness:0});
 const EDGE=new T.MeshStandardMaterial({color:'#493822',roughness:1});

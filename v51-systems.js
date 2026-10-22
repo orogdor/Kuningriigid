@@ -1,6 +1,6 @@
 import {foodTotal} from './city-needs-v87.js';
 // V51: side-effect-free rules shared by UI, fog-of-war, and AI diagnosis.
-import {TECHS,techBlock,BUILD_TECH} from './research.js?v=116a';
+import {TECHS,techBlock,BUILD_TECH} from './research.js?v=117a';
 import {BUILDINGS} from './economy.js';
 import {ageDeficit} from './era-economy.js';
 

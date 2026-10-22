@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import {tickSiegeSupply,tickTowerBallistas} from './siege-support-v115.js?v=116a';
-import {parapetCover} from './siege-rules-v114.js?v=116a';
-import {startSiegeCraft,planSiegeAI} from './siege-assault-v108.js?v=116a';
-import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=116a';
-import {Civilization,TROOPS} from './civilization-core.js?v=116a';
-import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=116a';
-import {createBallista,createSiegeCamp} from './siege-support-visual-v115.js?v=116a';
+import {tickSiegeSupply,tickTowerBallistas} from './siege-support-v115.js?v=117a';
+import {parapetCover} from './siege-rules-v114.js?v=117a';
+import {startSiegeCraft,planSiegeAI} from './siege-assault-v108.js?v=117a';
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=117a';
+import {Civilization,TROOPS} from './civilization-core.js?v=117a';
+import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=117a';
+import {createBallista,createSiegeCamp} from './siege-support-visual-v115.js?v=117a';
 const camp=()=>({id:1,kind:'camp',team:0,x:0,z:0,ready:true,arrived:true,hp:600,stones:0});
 const b={siegeWorks:[camp()],squads:[]};for(let i=0;i<300;i++)tickSiegeSupply(b,.1);assert.equal(b.siegeWorks[0].stones,4);assert.equal(b.siegeWorks[0].produced,4);tickSiegeSupply(b,0);assert.equal(b.siegeWorks[0].stones,4);
 const cat={source:1,kind:'bronze_catapult',team:0,hp:100,morale:80,x:0,z:0,combatMode:'manual',men:[{hp:100,x:0,z:0,ammo:0}]};b.squads=[cat];tickSiegeSupply(b,0);assert.equal(cat.men[0].ammo,4);assert.equal(b.siegeWorks[0].stones,0);assert.ok(cat.hasSiegeSupply);

@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=117a';
+import {Civilization,TROOPS} from './civilization-core.js?v=117a';
+import {initializeMen,battleManCount,tickIndividualBattle,persistIndividualMen} from './individual-battle-v91.js?v=117a';
+import {splitGuards,planTowerGuards,tickTowerGuards,addTowerGuards,persistTowerGuards} from './tower-garrison-v117.js?v=117a';
+import {wallPath} from './wall-walk-v111.js?v=117a';
+assert.deepEqual(splitGuards({north:4,east:1}),{north:4,east:1});
+const s=createBronzeSiegeState(),g=new Civilization(s),b=s.battle,city=s.cities[0],nav=g.battleNavigation(b);initializeMen(b,nav);
+const guards=b.squads.filter(u=>u.towerGuard);assert.equal(guards.length,50);assert.ok(guards.every(u=>u.men.length===1&&!u.reserve));assert.equal(battleManCount(b),486);addTowerGuards(city,s,b);assert.equal(b.squads.filter(u=>u.towerGuard).length,50);
+// Threats can move between the northern and eastern approaches; every tower contributes 4 + 1.
+for(const u of b.squads)if(!u.towerGuard&&u.team===0)u.hp=0;
+const foes=Array.from({length:5},(_,i)=>({source:900+i,team:0,hp:100,x:i<4?i*6:100,z:i<4?-100:0}));b.squads.push(...foes);planTowerGuards(b);
+for(const id of new Set(guards.map(u=>u.homeTower))){const own=guards.filter(u=>u.homeTower===id);assert.equal(own.filter(u=>u.guardSector==='north').length,4);assert.equal(own.filter(u=>u.guardSector==='east').length,1);}
+for(const u of guards){assert.ok(u.wallRoute.length);assert.ok(wallPath(b,u,u.guardGoal));}
+// Peace patrols are continuous individual movement, never a position reset.
+for(const f of foes)f.hp=0;for(const u of b.squads)if(!u.towerGuard)u.hp=0;
+for(const u of guards){u.wallRoute=[];u.guardGoal=null;}planTowerGuards(b);
+const start=guards.map(u=>({x:u.x,z:u.z}));let maxStep=0;const everMoved=new Set();for(let i=0;i<600;i++){b.elapsed+=.1;const old=guards.map(u=>({x:u.x,z:u.z,y:u.wallElevation}));tickTowerGuards(b,.1);guards.forEach((u,j)=>{if(Math.hypot(u.x-start[j].x,u.z-start[j].z)>1)everMoved.add(u.source);maxStep=Math.max(maxStep,Math.hypot(u.x-old[j].x,u.z-old[j].z,u.wallElevation-old[j].y));});}
+const moved=guards.filter((u,i)=>Math.hypot(u.x-start[i].x,u.z-start[i].z)>1).length;console.log({moved,everMoved:everMoved.size,maxStep});assert.ok(everMoved.size>=40,'individual sentries actually patrol');assert.ok(maxStep<=.201,'no teleport or collision sidestep jump');
+// Losses and arrow stores persist, including across JSON save/load; no replenishment by reopening.
+guards[0].hp=guards[0].men[0].hp=0;guards[1].men[0].ammo=7;persistIndividualMen(s,b);const restored=JSON.parse(JSON.stringify(city)),fresh={squads:[],siegeSections:b.siegeSections,fortress:b.fortress,wallWalkEnabled:true};addTowerGuards(restored,s,fresh);assert.equal(fresh.squads.find(u=>u.source===guards[0].source).hp,0);assert.equal(fresh.squads.find(u=>u.source===guards[1].source).men[0].ammo,7);
+// Real combat uses arrows at range and switches to a sword against a boarder.
+const duel=createBronzeSiegeState(),dg=new Civilization(duel),db=duel.battle;initializeMen(db,dg.battleNavigation(db));const archer=db.squads.find(u=>u.towerGuard);for(const u of db.squads)if(u!==archer){u.hp=0;for(const m of u.men||[])m.hp=0;}const m=archer.men[0];archer.x=m.x=-21;archer.z=m.z=-28;archer.wallElevation=m.elevation=3.8;archer.wallManual=true;archer.wallRoute=[];archer.formationManual=true;archer.formation='line';archer.heading=m.heading=Math.PI/2;
+const foe={source:999,team:0,kind:'bronze_axeman',menCount:1,hp:100,maxHp:100,x:archer.x+12,z:archer.z,guardPost:true,wallWalk:true,wallElevation:archer.wallElevation,wallType:'stonewall',wallManual:true,combatMode:'manual',men:[{id:'foe',index:0,x:archer.x+12,z:archer.z,hp:100,maxHp:100,elevation:archer.wallElevation,radius:.34,heading:0,kills:0,damageDealt:0}]};db.squads.push(foe);db.result=null;for(let i=0;i<25;i++)tickIndividualBattle(db,.1,TROOPS,0);assert.equal(m.weapon,'bow');assert.ok(m.ammo<40);foe.x=foe.men[0].x=m.x+.9;foe.z=foe.men[0].z=m.z;foe.guardPost=false;foe.men[0].elevation=foe.wallElevation=0;for(let i=0;i<5;i++)tickIndividualBattle(db,.1,TROOPS,0);assert.equal(m.weapon,'bow','shoot down rather than swing sword at enemies below');foe.guardPost=true;foe.men[0].elevation=foe.wallElevation=m.elevation;m.cool=0;const hp=foe.hp;for(let i=0;i<10;i++)tickIndividualBattle(db,.1,TROOPS,0);assert.equal(m.weapon,'sword');assert.ok(foe.hp<hp);for(const f of foes)f.hp=100;planTowerGuards(b);assert.ok(guards.filter(u=>u.hp>0).every(u=>u.guardDuty==='defend'&&u.wallRoute?.length),'renewed threat interrupts peaceful patrol');console.log('V117 PASS: 50 separate guards, 486 figures, exact 4:1 allocation at every tower, connected routes, physical patrol, persistent casualties/ammo, bow + sword combat.');

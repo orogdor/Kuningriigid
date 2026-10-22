@@ -1,4 +1,4 @@
-import {UNIT_GRADES} from './military-v88.js?v=116a';
+import {UNIT_GRADES} from './military-v88.js?v=117a';
 export const MAX_ARMY_LEVEL=10;
 export const xpForLevel=level=>100*(Math.max(1,Math.min(10,level))-1)**2;
 export const armyLevel=army=>Math.min(10,1+Math.floor(Math.sqrt(Math.max(0,army?.xp||0)/100)));

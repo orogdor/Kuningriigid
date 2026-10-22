@@ -1,5 +1,5 @@
 import {bracingThreat} from './combat-contact-v96.js';
-import {troopRole} from './military-v88.js?v=116a';
+import {troopRole} from './military-v88.js?v=117a';
 const SHIELDS=new Set(['bronze_spearman','infantry','man_at_arms']);
 const SPEARS=new Set(['spearman','bronze_spearman','halberdier','pikeman']);
 const LIGHT=new Set(['slinger','archer','bronze_archer','iron_archer','javelinman']);

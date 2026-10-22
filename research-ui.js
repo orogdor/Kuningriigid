@@ -1,6 +1,6 @@
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js';
 import {RESOURCE_NAMES} from './economy.js';
-import {TECHS,techBlock,ERA_NAMES} from './research.js?v=116a';
+import {TECHS,techBlock,ERA_NAMES} from './research.js?v=117a';
 import {researchCost,EUREKAS,scienceRate} from './science.js';
 import {tempoName} from './tempo.js';
 const pretty=n=>Number(n||0).toLocaleString('et-EE',{maximumFractionDigits:1});

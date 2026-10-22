@@ -2,7 +2,7 @@ import {createBattleSteering} from './battle-movement-v97.js';
 import {Navigation,buildingClearance} from './navigation.js';
 import {localSurface} from './continuous-landscape.js';
 import {BATTLEFIELD,battlefieldTiles} from './battlefield-v88.js';
-import {assaultLaneAt} from './siege-assault-v108.js?v=116a';
+import {assaultLaneAt} from './siege-assault-v108.js?v=117a';
 // A 3m tactical grid keeps an 5x5 map small enough for a phone. Normal city
 // workers retain their independent 1m grids and saved roads.
 export function createBattleNavigation(game,battle){

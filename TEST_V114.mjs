@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import * as T from './vendor/three.module.js';
-import {WALL_PROFILES,prepareWall,wallBlocksShot,parapetCover} from './siege-rules-v114.js?v=116a';
-import {BUILD_AGE,BUILDINGS,Civilization,TROOPS} from './civilization-core.js?v=116a';
-import {BUILD_TECH} from './research.js?v=116a';
-import {siegeDamage,siegeSection,persistSiegeDamage} from './medieval-v62.js?v=116a';
-import {createBronzeCityModel} from './bronze-city-v111.js?v=116a';
-import {startSiegeCraft,tickSiegeCraft} from './siege-assault-v108.js?v=116a';
-import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=116a';
-import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=116a';
+import {WALL_PROFILES,prepareWall,wallBlocksShot,parapetCover} from './siege-rules-v114.js?v=117a';
+import {BUILD_AGE,BUILDINGS,Civilization,TROOPS} from './civilization-core.js?v=117a';
+import {BUILD_TECH} from './research.js?v=117a';
+import {siegeDamage,siegeSection,persistSiegeDamage} from './medieval-v62.js?v=117a';
+import {createBronzeCityModel} from './bronze-city-v111.js?v=117a';
+import {startSiegeCraft,tickSiegeCraft} from './siege-assault-v108.js?v=117a';
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=117a';
+import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=117a';
 for(const type of ['palisade','stonewall','reinforced_wall']){
  const profile=WALL_PROFILES[type];assert.equal(BUILD_AGE[type],type==='palisade'?0:1);
  assert.equal(BUILD_TECH[type],type==='palisade'?'fortifications':'stone_fortifications');

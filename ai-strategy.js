@@ -1,4 +1,4 @@
-import {foundationNeeds,reservesFoundation} from './ai-foundation-v88.js?v=116a';
+import {foundationNeeds,reservesFoundation} from './ai-foundation-v88.js?v=117a';
 import {MINERAL_BUILDINGS} from './resource-sites-v88.js';
 import {RESOURCE_BUILDINGS} from './settlement-ai-v88.js';
 import {GOOD_BUILDINGS,cityNeeds} from './city-needs-v87.js';

@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import {Civilization,TROOPS,BUILD_AGE,BUILDINGS} from './civilization-core.js?v=116a';
-import {TECHS,UNIT_TECH,BUILD_TECH} from './research.js?v=116a';
-import {unitSuccessor,buildingSuccessor,suppliesBuilding,ballistaUnlocked,craftError} from './era-availability-v116.js?v=116a';
-import {createBronzeSiegeState,createIronSiegeState} from './bronze-siege-demo-v108.js?v=116a';
-import {createBronzeBattleState} from './bronze-battle-demo-v89.js?v=116a';
-import {startSiegeCraft,planSiegeAI} from './siege-assault-v108.js?v=116a';
+import {Civilization,TROOPS,BUILD_AGE,BUILDINGS} from './civilization-core.js?v=117a';
+import {TECHS,UNIT_TECH,BUILD_TECH} from './research.js?v=117a';
+import {unitSuccessor,buildingSuccessor,suppliesBuilding,ballistaUnlocked,craftError} from './era-availability-v116.js?v=117a';
+import {createBronzeSiegeState,createIronSiegeState} from './bronze-siege-demo-v108.js?v=117a';
+import {createBronzeBattleState} from './bronze-battle-demo-v89.js?v=117a';
+import {startSiegeCraft,planSiegeAI} from './siege-assault-v108.js?v=117a';
 const s=createBronzeSiegeState(),g=new Civilization(s),city=s.cities.find(c=>c.team===0),known=s.research[0].known;
 assert.ok(s.units.every(u=>TROOPS[u.kind].age<=1));assert.ok(s.battle.defensePosts.every(p=>!p.ballista));assert.ok(!ballistaUnlocked(s,1));assert.ok(craftError(s,0,'tower'));assert.ok(craftError(s,0,'ram'));assert.equal(craftError(s,0,'ladder'),'');
 const open=createBronzeBattleState();assert.ok(open.units.every(u=>TROOPS[u.kind].age<=1));assert.ok(!open.units.some(u=>['bronze_cavalry','bronze_catapult'].includes(u.kind)));

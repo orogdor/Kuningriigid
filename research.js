@@ -1,6 +1,6 @@
 import {PRODUCTIVITY_TECHS} from './productivity-techs-v88.js';
 import {ERA_TECHS,ERA_MATERIALS,ageDeficit,payEraCost} from './era-economy.js';
-import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-v62.js?v=116a';
+import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-v62.js?v=117a';
 import {researchCost,scienceRate,discoveryUnlocked,EUREKAS,EUREKA_FRACTION} from './science.js';
 import {tempoMultiplier} from './tempo.js';
 export const TURN_SECONDS=60;

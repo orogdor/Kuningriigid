@@ -1,5 +1,5 @@
 import {bakeDetails,featureNames} from './world-details.js';
-import {createBuildingModel,animateBuilding} from './buildings.js?v=116a';
+import {createBuildingModel,animateBuilding} from './buildings.js?v=117a';
 import {Navigation,door,clearFootprint,cityWorld as makeCityWorld,gather,plantTrees} from './navigation.js';
 import {foundCity,foundationRule,BUILDINGS,RESOURCE_NAMES,RECRUITS,initialState,migrateEconomy,ready,requirement,recruitRule,placeBuilding,recruitUnit,tickEconomy,tickAI,phase,canAfford,researchSteel} from './economy.js';
 import {createSoldier,animateSoldier,addTree} from './visuals.js';

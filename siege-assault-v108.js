@@ -1,8 +1,8 @@
-import {craftError} from './era-availability-v116.js?v=116a';
-import {siegeDamage} from './medieval-v62.js?v=116a';
+import {craftError} from './era-availability-v116.js?v=117a';
+import {siegeDamage} from './medieval-v62.js?v=117a';
 // V108: battlefield carpentry, wall-scaling access, and occupation-based capture.
 // Durations are wall-clock seconds (battle simulation runs at half speed).
-import {troopRole} from './military-v88.js?v=116a';
+import {troopRole} from './military-v88.js?v=117a';
 export const SIEGE_CRAFT=Object.freeze({
  ladder:Object.freeze({name:'Redel',wood:18,duration:30,speed:2.6,lane:2.8}),
  tower:Object.freeze({name:'Lükatav piiramistorn',wood:75,duration:120,speed:1.15,lane:5.8}),

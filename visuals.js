@@ -1,5 +1,5 @@
 import {BRONZE_KINDS,createBronzeSoldier} from './bronze-soldiers-v95.js';
-import {visualKind as militaryVisualKind} from './military-v88.js?v=116a';
+import {visualKind as militaryVisualKind} from './military-v88.js?v=117a';
 import * as T from './vendor/three.module.js';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {createV50CharacterRig} from './model-runtime-v50.js';

@@ -1,4 +1,4 @@
-import {FOUNDATION_TYPES} from './ai-foundation-v88.js?v=116a';
+import {FOUNDATION_TYPES} from './ai-foundation-v88.js?v=117a';
 import {takeFood} from './economy.js';
 import {door} from './navigation.js';
 import {recordWorldStep} from './roads.js';

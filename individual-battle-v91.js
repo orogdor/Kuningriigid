@@ -1,19 +1,20 @@
-import {tickSiegeSupply,siegeSupplyGoal,tickTowerBallistas} from './siege-support-v115.js?v=116a';
-import {parapetCover,wallBlocksShot} from './siege-rules-v114.js?v=116a';
-import {tickWallWalk,fighterElevation} from './wall-walk-v111.js?v=116a';
-import {carriesSword,stoneThrower} from './combat-equipment-v100.js?v=116a';
+import {tickTowerGuards,persistTowerGuards} from './tower-garrison-v117.js?v=117a';
+import {tickSiegeSupply,siegeSupplyGoal,tickTowerBallistas} from './siege-support-v115.js?v=117a';
+import {parapetCover,wallBlocksShot} from './siege-rules-v114.js?v=117a';
+import {tickWallWalk,fighterElevation} from './wall-walk-v111.js?v=117a';
+import {carriesSword,stoneThrower} from './combat-equipment-v100.js?v=117a';
 import {rockLandingPoint} from './catapult-accuracy-v105.js';
-import {committedOpponent,marchingGoal,keepAdvance} from './battle-doctrine-v98.js?v=116a';
+import {committedOpponent,marchingGoal,keepAdvance} from './battle-doctrine-v98.js?v=117a';
 import {retreatPoint} from './battle-movement-v97.js';
 import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
-import {FORMATIONS,updateFormations,worldSlot,turnTowards,formationAttackReady,clearShot} from './formations-v94.js?v=116a';
+import {FORMATIONS,updateFormations,worldSlot,turnTowards,formationAttackReady,clearShot} from './formations-v94.js?v=117a';
 import {allowedDeployment} from './battle-pacing-v93.js';
-import {horseKind,isBow,usesArrows,tacticalStats,initializeTactics,updateMorale,tacticalGoal,tacticalDamage,shotHits} from './historical-tactics-v92.js?v=116a';
+import {horseKind,isBow,usesArrows,tacticalStats,initializeTactics,updateMorale,tacticalGoal,tacticalDamage,shotHits} from './historical-tactics-v92.js?v=117a';
 import {soldierCount,constrainStep} from './soldier-collision-v90.js?v=101a';
-import {troopRole,rangedTroop} from './military-v88.js?v=116a';
+import {troopRole,rangedTroop} from './military-v88.js?v=117a';
 import {unitStats} from './army-experience-v88.js';
-import {isSiegeUnit,siegeDamage} from './medieval-v62.js?v=116a';
-import {tickSiegeCraft,siegeAssaultGoal,siegeOccupation} from './siege-assault-v108.js?v=116a';
+import {isSiegeUnit,siegeDamage} from './medieval-v62.js?v=117a';
+import {tickSiegeCraft,siegeAssaultGoal,siegeOccupation} from './siege-assault-v108.js?v=117a';
 import {BATTLEFIELD,outsideBattlefield,checkBattleRetreats} from './battlefield-v88.js';
 export const MAX_BATTLE_MEN=500;
 // Stones have physical flight time. Damage is resolved on landing, not when fired.
@@ -33,6 +34,7 @@ export function admitBattle(b){
 }
 function aggregate(u){u.hp=Math.round(u.men.reduce((n,m)=>n+Math.max(0,m.hp),0)*1e9)/1e9;u.menAlive=u.men.filter(m=>m.hp>0).length;}
 export function initializeMen(b,nav=null){
+ if(b.towerGarrisonVersion===117&&!b.towerGuardsAdmitted){admitBattle(b);b.towerGuardsAdmitted=true;}
  if(b.individualVersion===1&&b.squads.every(u=>u.reserve||u.hp<=0||u.men)){if(b.contactVersion!==96){for(const u of b.squads)for(const m of u.men||[])m.radius=soldierBodyRadius(u);b.contactVersion=96;}return;}
  if(!b.individualVersion)admitBattle(b);
  const placed=[],open=nav?((x,z)=>nav.open(x,z)):()=>true;
@@ -80,7 +82,7 @@ function resolveStoneLandings(b,nav=null){
  b.rockImpacts=b.rockImpacts.filter(hit=>b.elapsed-hit.at<1.15);
 }
 export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
- if(b.result||dt<=0)return;initializeMen(b,nav);initializeTactics(b);b.elapsed+=dt;resolveStoneLandings(b,nav);tickSiegeCraft(b,dt,nav);tickSiegeSupply(b,dt,nav);updateMorale(b,dt);tickWallWalk(b,dt,nav);updateFormations(b,dt,stats);checkBattleRetreats(b);
+ if(b.result||dt<=0)return;initializeMen(b,nav);initializeTactics(b);b.elapsed+=dt;resolveStoneLandings(b,nav);tickSiegeCraft(b,dt,nav);tickSiegeSupply(b,dt,nav);updateMorale(b,dt);tickWallWalk(b,dt,nav);tickTowerGuards(b,dt);updateFormations(b,dt,stats);checkBattleRetreats(b);
  if(b.fortress&&b.fortress.hp<=0&&!b.fortressFallen){b.fortressFallen=true;for(const u of b.squads.filter(u=>u.team===b.fortress.team&&live(u))){u.routing=true;u.manualOrder=false;u.target=null;for(const m of u.men||[])if(m.hp>0&&!m.escaped)m.routing=true;}}
  const fighting=[...new Set(b.squads.filter(u=>live(u)&&!u.routing&&(u.men||[]).some(m=>m.hp>0&&!m.escaped&&!m.routing)).map(u=>u.team))];b.pursuitStoppedTeam=fighting.length===1&&(!b.fortress||b.fortress.hp<=0||b.fortress.team===fighting[0])?fighting[0]:null;
  // Clear completed explicit targets; manual units then wait for the next order.
@@ -103,7 +105,7 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
    if((u.combatMode??'auto')==='manual'&&u.attackTargetSource==null)continue;
    const d=dist(m,p.m),score=d+(m.targetId===p.m.id?-1.2:0)+Math.abs(p.m.z-m.z)*.15;if(!p.u.routing&&!p.m.routing&&d<threatDistance){threat=p.m;threatDistance=d;}if(score<best){best=score;enemy=p;}}m.targetId=enemy?.m.id??null;if(u.kind==='dragoon'&&!u.routing&&!m.routing)m.dismounted=!!enemy&&!u.manualOrder&&best<a.range*1.15&&threatDistance>5;else if(u.kind==='dragoon')m.dismounted=false;
   const sections=(b.siegeSections||[]).filter(p=>p.hp>0&&p.team!==u.team),fort=b.fortress?.hp>0&&b.fortress.team!==u.team?b.fortress:null,wall=isSiegeUnit(u.kind)&&sections.length?sections.reduce((p,v)=>dist(m,v)<dist(m,p)?v:p):null,closestWall=sections.reduce((p,v)=>!p||dist(m,v)<dist(m,p)?v:p,null),blockedWall=closestWall&&!u.guardPost&&!isBow(u)&&dist(m,closestWall)<10&&(!enemy||fighterElevation(enemy.u)>0||dist(m,closestWall)<dist(m,enemy.m))?closestWall:null,structure=wall||blockedWall||(!enemy?(closestWall||fort):null);
-  const target=structure||enemy?.m||(u.manualOrder&&u.target?u.target:null)||((m.routing||u.routing)?{x:-u.battleSide*250,z:m.z}:null);if(!target)continue;const d=dist(m,target),desiredHeading=Math.atan2(target.x-m.x,target.z-m.z),defensive=!!(FORMATIONS[u.formation]||{}).defensive&&!m.routing&&!u.routing&&b.pursuitStoppedTeam!==u.team;m.heading=turnTowards(m.heading||0,defensive?(u.formationFacing??u.heading):desiredHeading,dt,defensive?.7:u.kind==='chariot'?.7:troopRole(u.kind)==='cavalry'?1.1:2);const facing=Math.abs(Math.atan2(Math.sin(desiredHeading-m.heading),Math.cos(desiredHeading-m.heading)));const rangedShot=isBow(u)&&m.ammo>0&&(!carriesSword(u)||d>=3);m.weapon=u.kind==='chariot'?(rangedShot?'bow':null):carriesSword(u)?rangedShot?'bow':'sword':stoneThrower(u)?rangedShot?'stone':'melee':['dragoon','cuirassier'].includes(u.kind)?rangedShot?'gun':'sabre':null;const range=(rangedShot?a.range:meleeReach(u,m,enemy?.m))+(u.guardPost&&rangedShot&&!['archer','bronze_archer','iron_archer','crossbowman'].includes(u.kind)?5:0)+(structure?1.5:0),chariotReady=u.kind!=='chariot'||(rangedShot&&(u.chariotPhase==='shoot'||u.chariotPhase==='approach'||u.formation==='hold')),canAttack=formationAttackReady(u,m,b,u.siegeBuildingId==null&&!u.resupplyCamp&&(!structure||!isBow(u)||stoneThrower(u))&&chariotReady&&((u.combatMode??'auto')!=='manual'||u.attackTargetSource!=null)&&(u.kind!=='dragoon'||!rangedShot||(m.dismounted&&!m.wasMoving))&&!u.manualOrder&&!m.routing&&!u.routing&&(rangedShot||structure||Math.abs(fighterElevation(u,m)-fighterElevation(enemy?.u,enemy?.m))<1.5)&&(structure||stoneThrower(u)||!wallBlocksShot(b,m,target,fighterElevation(u,m),structure?0:fighterElevation(enemy?.u,enemy?.m)))&&d<=range&&facing<(defensive?1.2:1.65)&&(!rangedShot||!['musketeer','arquebusier','line_infantry','rifleman','machinegun_team','modern_infantry','dragoon','cuirassier','chariot'].includes(u.kind)||clearShot(actor,enemy,agents)));
+  const target=structure||enemy?.m||(u.manualOrder&&u.target?u.target:null)||((m.routing||u.routing)?{x:-u.battleSide*250,z:m.z}:null);if(!target)continue;const d=dist(m,target),desiredHeading=Math.atan2(target.x-m.x,target.z-m.z),defensive=!!(FORMATIONS[u.formation]||{}).defensive&&!m.routing&&!u.routing&&b.pursuitStoppedTeam!==u.team;m.heading=turnTowards(m.heading||0,defensive?(u.formationFacing??u.heading):desiredHeading,dt,defensive?.7:u.kind==='chariot'?.7:troopRole(u.kind)==='cavalry'?1.1:2);const facing=Math.abs(Math.atan2(Math.sin(desiredHeading-m.heading),Math.cos(desiredHeading-m.heading)));const rangedShot=isBow(u)&&m.ammo>0&&(!carriesSword(u)||d>=3||Math.abs(fighterElevation(u,m)-fighterElevation(enemy?.u,enemy?.m))>=1.5);m.weapon=u.kind==='chariot'?(rangedShot?'bow':null):carriesSword(u)?rangedShot?'bow':'sword':stoneThrower(u)?rangedShot?'stone':'melee':['dragoon','cuirassier'].includes(u.kind)?rangedShot?'gun':'sabre':null;const range=(rangedShot?a.range:meleeReach(u,m,enemy?.m))+(u.guardPost&&rangedShot&&!['archer','bronze_archer','iron_archer','crossbowman'].includes(u.kind)?5:0)+(structure?1.5:0),chariotReady=u.kind!=='chariot'||(rangedShot&&(u.chariotPhase==='shoot'||u.chariotPhase==='approach'||u.formation==='hold')),canAttack=formationAttackReady(u,m,b,u.siegeBuildingId==null&&!u.resupplyCamp&&(!structure||!isBow(u)||stoneThrower(u))&&chariotReady&&((u.combatMode??'auto')!=='manual'||u.attackTargetSource!=null)&&(u.kind!=='dragoon'||!rangedShot||(m.dismounted&&!m.wasMoving))&&!u.manualOrder&&!m.routing&&!u.routing&&(rangedShot||structure||Math.abs(fighterElevation(u,m)-fighterElevation(enemy?.u,enemy?.m))<1.5)&&(structure||stoneThrower(u)||!wallBlocksShot(b,m,target,fighterElevation(u,m),structure?0:fighterElevation(enemy?.u,enemy?.m)))&&d<=range&&facing<(defensive?1.2:1.65)&&(!rangedShot||!['musketeer','arquebusier','line_infantry','rifleman','machinegun_team','modern_infantry','dragoon','cuirassier','chariot'].includes(u.kind)||clearShot(actor,enemy,agents)));
   m.fatigue=Math.max(0,Math.min(100,m.fatigue+(canAttack?.22:-.3)*dt));if(canAttack){if(m.cool===0){if(!rangedShot&&!structure){m.lastMeleeDistance=d;m.lastMeleeReach=range;}if(u.formation==='volley')m.lastVolley=u.volleyNumber;let amount=a.dmg/((u.guardPost&&!u.wallWalk)?1:soldierCount(u))*(u.guardPost?1.3:1)*(1+(Array.isArray(tech)?tech[u.team]||0:u.team?0:tech)*.3);
     u.projectile=rangedShot?(stoneThrower(u)?'stone':usesArrows(u)?'arrow':'bullet'):null;m.projectile=u.projectile;if(rangedShot){m.ammo--;const accurate=stoneThrower(u)?null:shotHits(m,u,d,range,enemy?.u);if(stoneThrower(u)){
      m.shotsFired=(m.shotsFired||0)+1;
@@ -117,7 +119,7 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
     m.cool=(u.kind==='dragoon'?2.4:u.kind==='cuirassier'?2.1:u.kind==='crossbowman'?1.9:isSiegeUnit(u.kind)?2.8:u.kind==='heavy_cavalry'?1.45:1.2)*(1+m.fatigue*.003)/a.attackSpeed;
    }continue;
   }
-  if(u.siegeBuildingId!=null&&!u.routing&&!(b.siegeWorks||[]).some(w=>w.id===u.siegeBuildingId&&(w.ready||w.kind==='camp'))){m.moving=false;continue;}if(b.pursuitStoppedTeam===u.team&&!u.routing&&!m.routing&&!(horseKind(u)&&enemy?.u.routing&&Math.abs(enemy.m.x)<185&&Math.abs(enemy.m.z)<158&&d<50)){m.moving=false;continue;}if(u.guardPost&&!u.routing&&!m.routing)continue;
+  if(u.siegeBuildingId!=null&&!u.routing&&!(b.siegeWorks||[]).some(w=>w.id===u.siegeBuildingId&&(w.ready||w.kind==='camp'))){m.moving=false;continue;}if(b.pursuitStoppedTeam===u.team&&!u.routing&&!m.routing&&!(horseKind(u)&&enemy?.u.routing&&Math.abs(enemy.m.x)<185&&Math.abs(enemy.m.z)<158&&d<50)){m.moving=false;continue;}if(u.guardPost&&!u.routing&&!m.routing){if(u.towerGuard)m.moving=!!u.guardMoving;continue;}
   const anchor=u.anchor||u;
   let goal=worldSlot(u,m,u.men.filter(n=>n.hp>0&&!n.escaped).length);
   if(m.routing||u.routing)goal=nav?.escapeGoal?nav.escapeGoal(m,u.battleSide,threat):(m.escapeTarget??=retreatPoint(m,u.battleSide,threat));
@@ -132,9 +134,9 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
  }
  tickTowerBallistas(b,dt,agents,(target,damage)=>damageMan(b,null,target,damage,false,'ballista'));
  // Fort and tower projectiles hit one living individual, never a pooled bar.
- for(const post of [...(b.defensePosts||[]),...(b.fortress?.hp>0&&!b.wallWalkEnabled?[{...b.fortress,fortShot:true,range:22,damage:8}]:[])]){if(post.active===false||(b.fortressFallen&&post.team===b.fortress?.team))continue;const owner=post.fortShot?b.fortress:post;owner.cool=Math.max(0,(owner.cool||0)-dt);if(owner.cool>0)continue;const target=agents.filter(p=>p.m.hp>0&&!p.m.escaped&&!p.u.retreated&&p.u.team!==post.team&&dist(post,p.m)<=post.range).reduce((a,p)=>!a||dist(post,p.m)<dist(post,a.m)?p:a,null);if(target){damageMan(b,null,target,post.damage,false,'arrow');owner.cool=post.fortShot?2.5:2.2;}}
+ for(const post of [...(b.defensePosts||[]),...(b.fortress?.hp>0&&!b.wallWalkEnabled?[{...b.fortress,fortShot:true,range:22,damage:8}]:[])]){if(post.individualGuards||post.active===false||(b.fortressFallen&&post.team===b.fortress?.team))continue;const owner=post.fortShot?b.fortress:post;owner.cool=Math.max(0,(owner.cool||0)-dt);if(owner.cool>0)continue;const target=agents.filter(p=>p.m.hp>0&&!p.m.escaped&&!p.u.retreated&&p.u.team!==post.team&&dist(post,p.m)<=post.range).reduce((a,p)=>!a||dist(post,p.m)<dist(post,a.m)?p:a,null);if(target){damageMan(b,null,target,post.damage,false,'arrow');owner.cool=post.fortShot?2.5:2.2;}}
  for(const u of squads){aggregate(u);const men=u.men.filter(m=>m.hp>0&&!m.escaped);if(men.length&&!u.guardPost&&!u.retreated){u.x=men.reduce((n,m)=>n+m.x,0)/men.length;u.z=men.reduce((n,m)=>n+m.z,0)/men.length;}if(!u.hp)u.deathTime=b.elapsed;}
  checkBattleRetreats(b);siegeOccupation(b,dt);const fort=b.fortress,surviving=[...new Set([...b.squads.filter(live).map(u=>u.team),...(fort?.hp>0?[fort.team]:[])])];
  if(surviving.length===1){for(const u of b.squads.filter(u=>live(u)&&u.team===surviving[0]&&!u.withdrawing)){u.routing=false;for(const m of u.men||[])if(!m.escaped)m.routing=false;}}const escaping=b.squads.some(u=>u.hp>0&&!u.reserve&&!u.retreated&&(u.routing||(u.men||[]).some(m=>m.routing&&m.hp>0&&!m.escaped)));if(fort&&fort.hp<=0&&!escaping&&!b.squads.some(u=>live(u)&&u.team===fort.team)){b.winnerTeam=b.squads.filter(u=>live(u)&&u.team!==fort.team).sort((a,b)=>b.hp-a.hp)[0]?.team??b.attackerTeam;b.result=b.winnerTeam===0?'victory':'defeat';}else if(surviving.length<=1&&!escaping){b.winnerTeam=surviving[0]??null;b.result=b.retreatedArmies?.some(p=>p.team===0)&&!b.squads.some(u=>live(u)&&u.team===0)?'retreat':b.winnerTeam===0?'victory':'defeat';}
 }
-export function persistIndividualMen(state,b){for(const u of b.squads){if(u.reserve||u.source<0||!state.units[u.source]||!u.men)continue;const source=state.units[u.source];source.hp=u.hp;source.menCount=u.menCount;source.soldiers=u.men.map(m=>({id:m.id,hp:m.hp,maxHp:m.maxHp}));}}
+export function persistIndividualMen(state,b){persistTowerGuards(state.cities?.find(c=>c.id===b.fortress?.cityId),b);for(const u of b.squads){if(u.reserve||u.source<0||!state.units[u.source]||!u.men)continue;const source=state.units[u.source];source.hp=u.hp;source.menCount=u.menCount;source.soldiers=u.men.map(m=>({id:m.id,hp:m.hp,maxHp:m.maxHp}));}}

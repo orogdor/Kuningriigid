@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import {TECHS,BUILD_TECH,techBlock} from './research.js?v=116a';
-import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization-core.js?v=116a';
+import {TECHS,BUILD_TECH,techBlock} from './research.js?v=117a';
+import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization-core.js?v=117a';
 import {initialState} from './economy.js';
-import {armyUnits} from './v51-systems.js?v=116a';
-import {createBattle,tickBattle} from './campaign.js?v=116a';
-import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=116a';
-import {createAgeBuilding} from './buildings.js?v=116a';
+import {armyUnits} from './v51-systems.js?v=117a';
+import {createBattle,tickBattle} from './campaign.js?v=117a';
+import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=117a';
+import {createAgeBuilding} from './buildings.js?v=117a';
 
 assert.equal(TECHS.fortifications.age,0);
 assert.equal(TECHS.stone_fortifications.age,1);
@@ -42,7 +42,7 @@ assert.match(game.stationWall(city,wall).error,/rohkem/,'Capacity enforced');
 const b=createBattle(position,game.s.units);
 b.squads=[];b.fortress={team:0,cityId:0,x:0,z:0,hp:600,maxHp:600,cool:0};
 fortifyBattle(game,city,b);
-assert.equal(b.squads.filter(x=>x.guardPost).length,2);
+assert.equal(b.squads.filter(x=>x.guardPost&&!x.towerGuard).length,2);
 assert.equal(b.defensePosts.length,1);
 assert.equal(b.defensePosts[0].team,0);
 assert.equal(b.fortress.hp,600,'Wall HP is resolved separately from city control');assert.ok(b.fortress.defenseBonus>0);assert.ok(b.siegeSections.some(w=>w.hp>0));

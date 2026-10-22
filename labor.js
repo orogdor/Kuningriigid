@@ -1,5 +1,5 @@
 import {canAfford} from './economy.js';
-import {FOUNDATION_TYPES} from './ai-foundation-v88.js?v=116a';
+import {FOUNDATION_TYPES} from './ai-foundation-v88.js?v=117a';
 import {foodTotal} from './city-needs-v87.js';
 import {availableLabor} from './gameplay-flow-v86.js?v=86a';
 // Fractional workers are shared across every district of a city.

@@ -1,9 +1,9 @@
 // Reproducible Bronze Age fortified-city assault; isolated from normal saves.
 // ?demo=bronze-siege creates one attacker supply city and one defended town.
 import {createStoneDemoState} from './stone-demo-v77.js?v=80c';
-import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js?v=116a';
-import {createBattle} from './campaign.js?v=116a';
-import {fortifyBattle} from './fortifications.js?v=116a';
+import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js?v=117a';
+import {createBattle} from './campaign.js?v=117a';
+import {fortifyBattle} from './fortifications.js?v=117a';
 import {soldierCount} from './soldier-collision-v90.js';
 import {battlefieldTiles} from './battlefield-v88.js';
 import {initArmyExperience} from './army-experience-v88.js';
@@ -42,7 +42,7 @@ export function createBronzeSiegeState(seed=20261020,age=1){
  const roster0=[...Array(4).fill('bronze_spearman'),...Array(2).fill('bronze_axeman'),...Array(2).fill('bronze_archer'),'chariot','chariot',...(age>=2?['bronze_catapult','bronze_catapult']:[])];
  const roster1=['bronze_spearman','bronze_spearman','bronze_spearman','bronze_axeman','chariot'];
  for(const team of [0,1])for(const kind of (team?roster1:roster0))s.units.push({team,armyId:0,kind,grade:'standard',hp:TROOPS[kind].hp,menCount:soldierCount({kind}),morale:100,combatMode:'auto'});
- for(const wall of walls.filter(w=>w.type==='stonewall'&&w.x===-28&&Math.abs(w.z)<=21).concat(walls.filter(w=>w.type==='stonewall'&&w.z===-28&&[-21,-14].includes(w.x)))){
+ for(const wall of walls.filter(w=>w.type==='stonewall'&&w.x===-28&&Math.abs(w.z)<=21).concat(walls.filter(w=>w.type==='stonewall'&&w.z===-28&&[-21].includes(w.x)))){
   const kind='bronze_archer';s.units.push({team:1,armyId:0,kind,grade:'standard',hp:TROOPS[kind].hp*2/3,menCount:16,morale:100,garrison:{c:city.c,r:city.r,x:wall.x,z:wall.z,wallType:'stonewall',wallAxis:wall.wallAxis,slot:0}});
  }
  s.visionRevision=(s.visionRevision||0)+1;
@@ -68,3 +68,6 @@ export function createBronzeSiegeState(seed=20261020,age=1){
 }
 
 export function createIronSiegeState(seed=20261020){const s=createBronzeSiegeState(seed,2);s.demo='iron-siege';s.cities[0].name='Rauaaja kindluslinna piiramine';const map={bronze_spearman:'infantry',bronze_axeman:'infantry',bronze_archer:'iron_archer',chariot:'cavalry'};for(const list of [s.units,s.battle.squads])for(const u of list){const kind=map[u.kind];if(!kind)continue;const ratio=TROOPS[kind].hp/TROOPS[u.kind].hp;u.kind=kind;u.hp*=ratio;if(u.maxHp)u.maxHp*=ratio;}s.battle.historicalRoster.basis='Rauaaja kombineeritud vägi; mänguline lähendus';return s;}
+
+// A peaceful copy of the same town for watching individual tower patrols.
+export function createBronzePatrolState(seed=20261020){const s=createBronzeSiegeState(seed);s.battle=null;s.demo='bronze-patrol';const supply=s.cities.find(c=>c.team===0);for(const a of s.armies)if(a.team===0){a.c=supply.c;a.r=supply.r;a.path=[];}setRelation(s,0,1,'peace');return s;}

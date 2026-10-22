@@ -1,6 +1,6 @@
-import {orderWallMove} from './wall-walk-v111.js?v=116a';
-import {ammunitionLoad,carriesSword,stoneThrower} from './combat-equipment-v100.js?v=116a';
-import {wallBlocksShot} from './siege-rules-v114.js?v=116a';
+import {orderWallMove} from './wall-walk-v111.js?v=117a';
+import {ammunitionLoad,carriesSword,stoneThrower} from './combat-equipment-v100.js?v=117a';
+import {wallBlocksShot} from './siege-rules-v114.js?v=117a';
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export const towerBallista=b=>({range:50,damage:24,reload:6,cool:0,height:(b?.bronzeWall?6.4:b?.type==='stonetower'?7.55:7.25)+.65});
 export const CAMP_STONE_INTERVAL=15; // real seconds: exactly four stones per minute per camp
