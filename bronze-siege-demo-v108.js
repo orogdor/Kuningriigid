@@ -41,13 +41,16 @@ export function createBronzeSiegeState(seed=20261020){
  s.visionRevision=(s.visionRevision||0)+1;
  setRelation(s,0,1,'war');
  initArmyExperience(s,TROOPS);
- const field=city,b=createBattle(field,s.units,s),defender=city;
+ // Keep only the cell coordinates in battle state: copying an entire city there
+ // multiplies world data and has caused fragile starts on memory-limited phones.
+ const field={c:city.c,r:city.r},b=createBattle(field,s.units,s),defender=city;
  b.squads=b.squads.filter(u=>!s.units[u.source]?.garrison);
  b.attackerTeam=0;b.fortress={team:1,cityId:city.id,x:hall.x,z:hall.z,hp:city.hp,maxHp:city.hp,cool:0};
  mobilizeCity(b,defender);fortifyBattle(g,defender,b);
  for(const u of b.squads)if(u.team===0)u.advance=true;
  s.battle=b;
  for(const tile of battlefieldTiles(field))if(tile.c>=0&&tile.r>=0&&tile.c<220&&tile.r<165)g.reveal(0,g.cell(tile),0);
- initializeMen(b,g.battleNavigation(b));
+ // The main game initializes men and navigation once after loading this save.
+ // Constructing two 3×3 navigation maps during demo creation can exhaust mobile memory.
  return copy(s);
 }
