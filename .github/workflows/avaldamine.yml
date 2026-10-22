@@ -40,6 +40,9 @@ jobs:
           node --check research-tree-v118.js
           node --check tech-tree-layout-v119.js
           node --check research-tree-v119.js
+          node --check build-catalog-v121.js
+          node --check map-gestures-v121.js
+          node --check civilization.js
           node --check research-ui.js
           node --check localization.js
           node --check locale-en-v120.js
@@ -47,6 +50,7 @@ jobs:
           node --check era-availability-v116.js
           node --check campaign.js
           node --check fortifications.js
+          node TEST_V121.mjs
           node TEST_V120_LOCALE.mjs
           node TEST_V119.mjs
           node TEST_V118.mjs
