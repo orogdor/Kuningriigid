@@ -1,9 +1,10 @@
 import {ENGLISH_PAIRS} from './locale-en.js?v=97a';
+import {ENGLISH_V120_PAIRS} from './locale-en-v120.js?v=120a';
 
 const buildVersion=typeof document!=='undefined'?(document.title.match(/V(\d+)/)?.[1]||'96'):'96';
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
-const english=new Map(ENGLISH_PAIRS);
+const english=new Map([...ENGLISH_PAIRS,...ENGLISH_V120_PAIRS]);
 const sorted=[...english].filter(([s])=>s.length>=3).sort((a,b)=>b[0].length-a[0].length)
  .map(([source,target])=>({source,target,re:new RegExp('(?<![\\p{L}])'+[...source].map(c=>'.*+?^${}()|[]\\\\'.includes(c)?'\\\\'+c:c).join('')+'(?![\\p{L}])','gu')}));
 let language='en',binding=[],observer=null;
@@ -100,7 +101,7 @@ function renderAll(){
  for(const id of ['language','menulanguage']){const c=document.getElementById(id);if(c)c.value=language}
 }
 export function changeLanguage(next,{notify=true}={}){
- if(next!=='en'&&next!=='et')return;
+ if(next!=='en')next='en';
  language=next;try{localStorage.setItem('kingdoms-language',next)}catch{}
  updateDefinitions();renderAll();
  if(notify&&typeof notifyChange==='function')notifyChange();
@@ -112,8 +113,8 @@ export function initializeLocalization({BUILDINGS,TECHS,TROOPS,AGES,RESOURCE_NAM
  captureCollection(AGES);captureCollection(SHIPS);captureCollection(BASIC_JOBS);
  if(Array.isArray(ERA_NAMES))for(let i=0;i<ERA_NAMES.length;i++){const ref=ERA_NAMES,field=i;binding.push({o:ref,field,et:ref[i]})}
  for(const key of Object.keys(RESOURCE_NAMES||{}))binding.push({o:RESOURCE_NAMES,field:key,et:RESOURCE_NAMES[key]});
- let saved='en';try{saved=localStorage.getItem('kingdoms-language')||'en'}catch{}
- changeLanguage(saved==='et'?'et':'en',{notify:false});
+ // V120 English-only release. Previously saved Estonian UI preferences do not override it.
+ changeLanguage('en',{notify:false});
  for(const id of ['language','menulanguage']){
   const select=document.getElementById(id);
   if(!select)continue;
