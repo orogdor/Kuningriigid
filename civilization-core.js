@@ -210,6 +210,8 @@ export class Civilization{
  const arc=.46+.11*Math.sin(u*8+seed*.0001)+.025*Math.sin(u*23),distance=Math.abs(v-arc);
  const ridge=state.hydrologyVersion===1&&state.type==='inland'?Math.exp(-Math.pow(distance/.056,2))*Math.max(0,1-Math.abs(u-.5)*1.4)*(11+this.smooth(u*45+9,v*45+19)*28):0;
  return e*95+ridge},this.noise,!state.geographyVersion);if(state.geographyVersion>=4||state.hydrologyVersion===1){buildDrainage(this.cells,this.noise,this.startLocations,state.hydrologyVersion>=2);state.hydrologyVersion=state.hydrologyVersion>=2?2:1;}else generateRivers(this.cells,this.noise,this.startLocations);
+ // Legacy drainage also avoids claiming an unwalkable mountainous river as a ford.
+ for(const riverCell of this.cells)if(riverCell.river&&riverCell.mountain)riverCell.ford=false;
  // Capital passes join the starting plateau to a larger walkable land region.
  this.startPassages=openStartingPassages(this.cells,this.startLocations);
  state.landmarks??=createLandmarks(this.cells,seed,this.startLocations);
