@@ -1,9 +1,9 @@
 // Reproducible Bronze Age fortified-city assault; isolated from normal saves.
 // ?demo=bronze-siege creates one attacker supply city and one defended town.
 import {createStoneDemoState} from './stone-demo-v77.js?v=80c';
-import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js?v=114a';
-import {createBattle} from './campaign.js?v=114a';
-import {fortifyBattle} from './fortifications.js?v=114a';
+import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js?v=115a';
+import {createBattle} from './campaign.js?v=115a';
+import {fortifyBattle} from './fortifications.js?v=115a';
 import {soldierCount} from './soldier-collision-v90.js';
 import {battlefieldTiles} from './battlefield-v88.js';
 import {initArmyExperience} from './army-experience-v88.js';

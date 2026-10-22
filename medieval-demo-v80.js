@@ -1,8 +1,8 @@
 // V80: medieval demonstration is a disposable ordinary V4 state.
 import {createBronzeDemoState} from './bronze-demo-v79.js?v=80c';
-import {Civilization,BUILDINGS} from './civilization-core.js?v=114a';
+import {Civilization,BUILDINGS} from './civilization-core.js?v=115a';
 import {MEDIEVAL_TYPES} from './medieval-buildings-v80.js?v=80a';
-import {grantTech} from './research.js?v=114a';
+import {grantTech} from './research.js?v=115a';
 import {seedCityStreetNetwork} from './town-streets-v80.js?v=80c';
 export const MEDIEVAL_DEMO_NAME='Kivilinna keskaegne linn';
 export function createMedievalDemoState(seed=20261020){

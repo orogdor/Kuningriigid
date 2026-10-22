@@ -22,9 +22,11 @@ export function structuralMultiplier(kind,type){
  return /axe|axeman/.test(kind)?.35:.07;
 }
 export function parapetCover(attacker,target,projectile){
- if(!projectile||projectile==='stone'||!target.u.guardPost)return 1;
+ if(!target.u.guardPost)return 1;
+ if(!projectile||projectile==='stone')return .85;
+ if(projectile==='ballista')return .65;
  const ay=attacker.m.elevation??attacker.u.wallElevation??0,ty=target.m.elevation??target.u.wallElevation??3.8;
- return ay<ty-1?(wallProfile(target.u.wallType)?.cover??.45):1;
+ return ay<ty-1?(wallProfile(target.u.wallType)?.cover??.45):.85;
 }
 
 // Straight small-arms shots cannot pass through an intact curtain wall.

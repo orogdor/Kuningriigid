@@ -1,8 +1,8 @@
 // V82 Industrial Revolution sample, ordinary read-only-compatible V4 game state.
 // Generates a dense town with factories, research, railways and natural footpaths.
 import {createRenaissanceDemoState} from './renaissance-demo-v81.js?v=81a';
-import {Civilization,BUILDINGS} from './civilization-core.js?v=114a';
-import {grantTech} from './research.js?v=114a';
+import {Civilization,BUILDINGS} from './civilization-core.js?v=115a';
+import {grantTech} from './research.js?v=115a';
 import {seedCityStreetNetwork} from './town-streets-v80.js?v=80c';
 import {INDUSTRIAL_BUILDING_TYPES} from './industrial-buildings-v82.js?v=82a';
 

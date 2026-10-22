@@ -1,4 +1,4 @@
-import {siegeDamage} from './medieval-v62.js?v=114a';
+import {siegeDamage} from './medieval-v62.js?v=115a';
 // V108: battlefield carpentry, wall-scaling access, and occupation-based capture.
 // Durations are wall-clock seconds (battle simulation runs at half speed).
 import {troopRole} from './military-v88.js';
@@ -6,7 +6,8 @@ export const SIEGE_CRAFT=Object.freeze({
  ladder:Object.freeze({name:'Redel',wood:18,duration:30,speed:2.6,lane:2.8}),
  tower:Object.freeze({name:'Lükatav piiramistorn',wood:75,duration:120,speed:1.15,lane:5.8}),
  ram:Object.freeze({name:'Kaetud müürilõhkuja',wood:55,duration:90,speed:1,lane:0}),
- sap:Object.freeze({name:'Müüri õõnestamine',wood:30,duration:60,speed:1.5,lane:0})
+ sap:Object.freeze({name:'Müüri õõnestamine',wood:30,duration:60,speed:1.5,lane:0}),
+ camp:Object.freeze({name:'Piiramislaager',wood:80,duration:60,speed:0,lane:0})
 });
 const len=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export const siegeBuilder=u=>!!u&&u.hp>0&&!u.retreated&&!u.reserve&&!u.guardPost&&!u.routing&&!u.civilian&&
@@ -14,17 +15,19 @@ export const siegeBuilder=u=>!!u&&u.hp>0&&!u.retreated&&!u.reserve&&!u.guardPost
 export function availableSiegeWood(state,team){
  return (state?.cities||[]).filter(c=>c.team===team).reduce((total,c)=>total+Math.max(0,c.economy?.realms?.[team]?.resources?.wood||0),0);
 }
-export function startSiegeCraft(b,u,kind,state){
+export function startSiegeCraft(b,u,kind,state,nav=null){
  const spec=SIEGE_CRAFT[kind];if(!spec)return {error:'Tundmatu piiramisvahend.'};
  if(!b?.fortress||b.fortress.hp<=0||b.result)return {error:'Piiramisvahendit saab ehitada ainult vaenlase kindlustatud linna piiramisel.'};
  if(!siegeBuilder(u)||u.team===b.fortress.team)return {error:'Vali elus jalaväe- või vibuküttide salk.'};
  if(u.siegeBuildingId!=null&&(b.siegeWorks||[]).some(w=>w.id===u.siegeBuildingId&&!w.destroyed))return {error:'Salk ehitab juba piiramisvahendit.'};
  const sections=(b.siegeSections||[]).filter(w=>w.hp>0&&!w.breached&&w.team!==u.team&&(kind!=='ram'||['gatehouse','palisade'].includes(w.type)));
- if(!sections.length)return {error:'Linnal pole tervet müüri, millele piiramisvahendit asetada.'};
- const wall=sections.reduce((a,w)=>!a||len(w,u)<len(a,u)?w:a,null);
+ if(!sections.length&&kind!=='camp')return {error:'Linnal pole tervet müüri, millele piiramisvahendit asetada.'};
+ const wall=sections.reduce((a,w)=>!a||len(w,u)<len(a,u)?w:a,null)||b.fortress;
  const cities=(state?.cities||[]).filter(c=>c.team===u.team&&c.economy?.realms?.[u.team]?.resources?.wood>=spec.wood)
   .sort((a,c)=>Math.hypot(a.c-b.cell.c,a.r-b.cell.r)-Math.hypot(c.c-b.cell.c,c.r-b.cell.r));
  const city=cities[0];if(!city)return {error:'Vaja '+spec.wood+' puitu mõne ründaja linna laost. Praegu kokku: '+availableSiegeWood(state,u.team)+'.'};
+ if(kind==='camp'&&(b.siegeWorks||[]).some(w=>w.kind==='camp'&&w.team===u.team&&!w.destroyed))return {error:'Sinu armeel on siin piiramislaager juba olemas.'};
+ let campPoint=null;if(kind==='camp'){const dx=u.x-b.fortress.x,dz=u.z-b.fortress.z,d=Math.hypot(dx,dz)||1;const back={x:u.x+dx/d*14,z:u.z+dz/d*14};campPoint=nav?.nearest(back,12)||back;if(len(campPoint,b.fortress)<35)return {error:'Piiramislaager tuleb ehitada väljapoole linnasüdant.'};}
  const stock=city.economy.realms[u.team].resources;stock.wood-=spec.wood;
  b.siegeWorks??=[];const id=(b.nextSiegeWorkId??0)+1;b.nextSiegeWorkId=id;
  const dx=u.x-wall.x,dz=u.z-wall.z,d=Math.hypot(dx,dz)||1;
@@ -32,6 +35,9 @@ export function startSiegeCraft(b,u,kind,state){
   duration:spec.duration,progress:0,ready:false,arrived:false,
   x:u.x,z:u.z,wallX:wall.x,wallZ:wall.z,supplyCityId:city.id,
   inwardX:-dx/d,inwardZ:-dz/d,startedAt:b.elapsed||0};
+ if(kind==='camp'){
+  w.x=campPoint.x;w.z=campPoint.z;w.hp=w.maxHp=600;w.stones=0;w.produced=0;w.productionSeconds=0;
+ }
  b.siegeWorks.push(w);u.siegeBuildingId=id;u.attackTargetSource=null;u.manualOrder=false;u.target=null;u.anchor={x:u.x,z:u.z};
  return {ok:true,work:w,woodRemaining:stock.wood};
 }
@@ -50,6 +56,15 @@ export function tickSiegeCraft(b,dt,nav=null){
  if(!b?.siegeWorks?.length||b.result)return;
  for(const work of b.siegeWorks){
   if(work.destroyed)continue;
+  if(work.kind==='camp'){
+   if(work.ready)continue;
+   const actor=b.squads.find(u=>u.source===work.ownerSource&&u.team===work.team);
+   if(!actor||actor.hp<=0||actor.retreated||actor.routing){work.destroyed=true;if(actor)actor.siegeBuildingId=null;continue;}
+   actor.anchor={x:work.x,z:work.z};
+   if((actor.men||[]).some(m=>m.hp>0&&!m.escaped&&len(m,work)<10))work.progress=Math.min(work.duration,work.progress+dt*2);
+   if(work.progress>=work.duration-1e-6){work.progress=work.duration;work.ready=true;work.arrived=true;actor.siegeBuildingId=null;}
+   continue;
+  }
   const wall=b.siegeSections?.find(w=>w.index===work.wallIndex);if(!wall||wall.breached||wall.hp<=0){work.destroyed=true;const owner=b.squads.find(u=>u.source===work.ownerSource);if(owner)owner.siegeBuildingId=null;continue;}
   const actor=b.squads.find(u=>u.source===work.ownerSource&&u.team===work.team);
   const spec=SIEGE_CRAFT[work.kind];
@@ -95,15 +110,26 @@ export function siegeOccupation(b,dt){
 }
 export const fortifiedBowRange=(kind,guardPost,base)=>guardPost&&['archer','bronze_archer','iron_archer','crossbowman'].includes(kind)?base*1.25:base;
 
-export function planSiegeAI(b,state){
+export function planSiegeAI(b,state,nav=null){
  if(!b?.fortress||b.result||!state)return;
  if((b.elapsed||0)<(b.nextSiegePlan||5))return;b.nextSiegePlan=(b.elapsed||0)+12;
  for(const team of [...new Set(b.squads.map(u=>u.team))]){
-  if(team===0||team===b.fortress.team)continue;
-  const busy=(b.siegeWorks||[]).filter(w=>w.team===team&&!w.destroyed);
-  if(busy.length>=3)continue;
-  const u=b.squads.filter(u=>u.team===team&&siegeBuilder(u)&&u.siegeBuildingId==null&&!u.wallClimb&&!u.manualOrder).sort((a,c)=>len(a,b.fortress)-len(c,b.fortress))[0];
-  if(!u)continue;const kind=busy.some(w=>w.kind==='ladder')?'ram':'ladder';
-  const made=startSiegeCraft(b,u,kind,state);if(made.error&&kind==='ram')startSiegeCraft(b,u,'sap',state);
+  if(team===b.fortress.team)continue;
+  const works=(b.siegeWorks||[]).filter(w=>w.team===team&&!w.destroyed);
+  if(works.filter(w=>!w.arrived).length>=2)continue;
+  const builders=b.squads.filter(u=>u.team===team&&siegeBuilder(u)&&(u.combatMode??'auto')==='auto'&&u.siegeBuildingId==null&&!u.resupplyCamp&&!u.wallClimb&&!u.manualOrder&&u.attackTargetSource==null);
+  // Keep archers supporting the assault when available infantry can build.
+  let u=builders.sort((a,c)=>(troopRole(a.kind)==='ranged')-(troopRole(c.kind)==='ranged')||len(a,b.fortress)-len(c,b.fortress))[0];if(!u)continue;
+  const ranged=b.squads.some(u=>u.team===team&&u.hp>0&&['ranged','siege'].includes(troopRole(u.kind)));
+  const sections=(b.siegeSections||[]).filter(w=>w.hp>0&&!w.breached&&w.team!==team);
+  const wanted=[];
+  if(ranged&&!works.some(w=>w.kind==='camp'))wanted.push('camp');
+  if(sections.length&&!works.some(w=>w.kind==='ladder'))wanted.push('ladder');
+  if(sections.some(w=>['gatehouse','palisade'].includes(w.type))&&!works.some(w=>w.kind==='ram'))wanted.push('ram');
+  if(sections.some(w=>(w.height||0)>4)&&!works.some(w=>w.kind==='tower'))wanted.push('tower');
+  if(sections.length&&!works.some(w=>w.kind==='sap'))wanted.push('sap');
+  const kind=wanted.find(kind=>(state.cities||[]).some(c=>c.team===team&&(c.economy?.realms?.[team]?.resources?.wood||0)>=SIEGE_CRAFT[kind].wood));
+  if(kind==='camp')u=builders.sort((a,c)=>(troopRole(a.kind)==='ranged')-(troopRole(c.kind)==='ranged')||len(c,b.fortress)-len(a,b.fortress))[0];
+  if(kind)startSiegeCraft(b,u,kind,state,nav);
  }
 }

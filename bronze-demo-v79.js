@@ -2,9 +2,9 @@
 // Available via ?demo=bronze; produces ordinary V4 JSON on export.
 // Never touches the user's browser autosave.
 import {createStoneDemoState} from './stone-demo-v77.js?v=80c';
-import {Civilization,BUILDINGS} from './civilization-core.js?v=114a';
+import {Civilization,BUILDINGS} from './civilization-core.js?v=115a';
 import {BRONZE_BUILDING_TYPES} from './bronze-buildings-v79.js?v=79a';
-import {grantTech} from './research.js?v=114a';
+import {grantTech} from './research.js?v=115a';
 import {seedCityStreetNetwork} from './town-streets-v80.js?v=80c';
 export const BRONZE_DEMO_NAME='Vaskoru pronksilinn';
 export const BRONZE_DEMO_TYPES=Object.freeze([

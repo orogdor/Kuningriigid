@@ -1,4 +1,5 @@
 // Lightweight siege carpentry meshes. Each work is a single saved battle object.
+import {createSiegeCamp} from './siege-support-visual-v115.js?v=115a';
 import * as T from './vendor/three.module.js';
 const WOOD=new T.MeshStandardMaterial({color:'#866139',roughness:.95,metalness:0});
 const EDGE=new T.MeshStandardMaterial({color:'#493822',roughness:1});
@@ -6,7 +7,8 @@ const REED=new T.MeshStandardMaterial({color:'#9d8954',roughness:.98});
 function beam(parent,x,y,z,w,h,d,material=WOOD){
  const mesh=new T.Mesh(new T.BoxGeometry(w,h,d),material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
 }
-export function createSiegeWorkModel(kind,height=3.8){
+export function createSiegeWorkModel(kind,height=3.8,team=0){
+ if(kind==='camp')return createSiegeCamp(team);
  const root=new T.Group();root.name='Siege work '+kind;root.userData.siegeWork=kind;
  if(kind==='ladder'){
   for(const x of [-.65,.65])beam(root,x,3.14,0,.22,6.28,.22);

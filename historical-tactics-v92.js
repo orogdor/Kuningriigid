@@ -5,7 +5,7 @@ import {FORMATIONS,formationDamage,missileExposure} from './formations-v94.js?v=
 import {BATTLE_FRONT_DEPTH,BATTLE_EMPTY_HALF_WIDTH} from './battle-pacing-v93.js';
 import {troopRole,rangedTroop} from './military-v88.js';
 import {unitStats} from './army-experience-v88.js';
-import {fortifiedBowRange} from './siege-assault-v108.js?v=114a';
+import {fortifiedBowRange} from './siege-assault-v108.js?v=115a';
 export const usesArrows=u=>['slinger','archer','bronze_archer','iron_archer','crossbowman','chariot','javelinman'].includes(u.kind);
 export const horseKind=u=>troopRole(u.kind)==='cavalry'||u.kind==='chariot';
 export const isBow=u=>rangedTroop(u.kind)||['chariot','dragoon','cuirassier'].includes(u.kind);
@@ -27,7 +27,7 @@ export function initializeTactics(b){
 }
 export function updateMorale(b,dt){
  for(const u of b.squads){if(!u.men||u.reserve||u.retreated)continue;const men=u.men.filter(m=>m.hp>0&&!m.escaped),loss=1-men.length/Math.max(1,u.startMen),friends=b.squads.filter(q=>q!==u&&q.team===u.team&&q.hp>0&&!q.routing&&!q.retreated&&!q.reserve&&distance(q,u)<16),panic=b.squads.some(q=>q!==u&&q.team===u.team&&q.routing&&distance(q,u)<18);
-  u.ammoRemaining=men.reduce((n,m)=>n+(m.ammo||0),0);if((stoneThrower(u)||u.kind==='chariot')&&men.length&&u.ammoRemaining===0){u.routing=true;u.ammoDepleted=true;u.manualOrder=false;u.target=null;for(const m of men)m.routing=true;}u.cohesion=men.length?Math.max(0,1-men.reduce((n,m)=>n+Math.max(0,distance(m,u)-4),0)/men.length/12):0;
+  u.ammoRemaining=men.reduce((n,m)=>n+(m.ammo||0),0);if((stoneThrower(u)||u.kind==='chariot')&&men.length&&u.ammoRemaining===0&&!u.hasSiegeSupply){u.routing=true;u.ammoDepleted=true;u.manualOrder=false;u.target=null;for(const m of men)m.routing=true;}u.cohesion=men.length?Math.max(0,1-men.reduce((n,m)=>n+Math.max(0,distance(m,u)-4),0)/men.length/12):0;
   for(const m of men){const base=u.grade==='mobilized'?64:u.grade==='elite'?94:82,target=base-loss*70+(friends.length?7:0)-(panic?9:0)-(u.moraleShock||0)-m.fatigue*.07-(1-u.cohesion)*10;
    m.morale=Math.max(0,Math.min(100,m.morale+(target-m.morale)*Math.min(1,dt*.5)));if(m.morale<24)m.routing=true;else if(m.morale>46&&!u.routing)m.routing=false;
   }u.morale=men.length?men.reduce((n,m)=>n+m.morale,0)/men.length:0;u.moraleShock=Math.max(0,(u.moraleShock||0)-dt*.5);

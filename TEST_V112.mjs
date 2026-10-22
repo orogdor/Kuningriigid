@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=114a';
-import {Civilization,TROOPS} from './civilization-core.js?v=114a';
-import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=114a';
-import {startSiegeCraft,tickSiegeCraft} from './siege-assault-v108.js?v=114a';
-import {createBronzeCityModel} from './bronze-city-v111.js?v=114a';
-import {createSiegeWorkModel} from './siege-work-visual-v108.js?v=114a';
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=115a';
+import {Civilization,TROOPS} from './civilization-core.js?v=115a';
+import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=115a';
+import {startSiegeCraft,tickSiegeCraft} from './siege-assault-v108.js?v=115a';
+import {createBronzeCityModel} from './bronze-city-v111.js?v=115a';
+import {createSiegeWorkModel} from './siege-work-visual-v108.js?v=115a';
 for(const kind of ['ladder','tower']){
  const s=createBronzeSiegeState(),g=new Civilization(s),b=s.battle,nav=g.battleNavigation(b);initializeMen(b,nav);
  const infantry=b.squads.filter(u=>u.team===0&&u.kind==='bronze_spearman').slice(0,2),u=infantry[0];

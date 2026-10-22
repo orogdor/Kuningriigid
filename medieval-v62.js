@@ -1,4 +1,4 @@
-import {wallProfile,prepareWall,structuralMultiplier} from './siege-rules-v114.js?v=114a';
+import {wallProfile,prepareWall,structuralMultiplier} from './siege-rules-v114.js?v=115a';
 // V62: optional medieval expansion. Definitions are data; older V4 saves retain their schema.
 export const MEDIEVAL_TECHS={
  armor_craft:{name:'Soomusevalmistamine',age:3,turns:4,requires:['civics','smithing'],unlocks:'Soomustöökoda ja raskerelvastus'},
