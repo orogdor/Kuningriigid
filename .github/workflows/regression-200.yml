@@ -1,0 +1,43 @@
+name: Kuningriigid 200-turn regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'regression/**'
+      - '.github/workflows/regression-200.yml'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'civilization-core.js'
+      - 'economy.js'
+      - 'research.js'
+      - 'navigation.js'
+      - 'ai-strategy.js'
+      - 'regression/**'
+      - '.github/workflows/regression-200.yml'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify runner and metrics
+        run: |
+          node --check regression/run.mjs
+          node --check regression/compare.mjs
+          node --check regression/compat.mjs
+          node regression/selftest.mjs
+      - name: Compare last working revision and current code (200 turns)
+        run: node regression/compare.mjs --candidate . --base-ref auto --turns 200 --seed 8417 --output artifacts/regression-200
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kuningriigid-regression-200
+          path: artifacts/regression-200/
