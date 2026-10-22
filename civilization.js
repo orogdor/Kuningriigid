@@ -52,7 +52,7 @@ import {createSiegeWorkModel} from './siege-work-visual-v108.js?v=117a';
 import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock,ERA_NAMES} from './research.js?v=118a';
 import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
-import {renderResearchUI} from './research-ui.js?v=119a';
+import {renderResearchUI} from './research-ui.js?v=123a';
 import {BUILD_CATEGORIES,buildingCategory,matchesBuilding,appendBuildingCard,renderBuildingCategories} from './build-catalog-v121.js?v=121a';
 import {TileDoubleTap,detailWheelTransition} from './map-gestures-v121.js?v=121a';
 import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
@@ -660,7 +660,7 @@ $('world').ondblclick=e=>{
  else say('Explore this tile before opening it.');
 };
 $('world').oncontextmenu=e=>e.preventDefault();$('world').onpointercancel=e=>{tileDoubleTap.reset();touchPointers.delete(e.pointerId);if(touchPointers.size<2)pinch=null;drag=null;if(!touchPointers.size)pinchConsumed=false};
-function applyZoom(next){zoom=Math.max(view==='world'?150:22,Math.min(view==='world'?9000:s.battle?2800:300,next))}
+function applyZoom(next){zoom=Math.max(view==='world'?150:22,Math.min(view==='world'?9000:s.battle?2800:450,next))}
 $('world').onwheel=e=>{e.preventDefault();if(inputBlocked())return;const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);const step=detailWheelTransition({view,zoom,deltaY:delta,isBattle:!!s.battle});if(step.exitToWorld){tileDoubleTap.reset();openWorld();return}applyZoom(step.zoom)};
 $('hud-zoom-in').onclick=()=>{if(!inputBlocked())applyZoom(zoom/1.15)};
 $('hud-zoom-out').onclick=()=>{if(!inputBlocked())applyZoom(zoom*1.15)};
