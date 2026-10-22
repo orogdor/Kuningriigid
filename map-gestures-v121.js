@@ -1,6 +1,6 @@
 // V121: distinguish choosing a world tile from explicitly opening its detail on a double-tap.
 export class TileDoubleTap {
- constructor({mouseMs=340,touchMs=460,tolerance=26}={}){this.mouseMs=mouseMs;this.touchMs=touchMs;this.tolerance=tolerance;this.last=null}
+ constructor({mouseMs=520,touchMs=460,tolerance=26}={}){this.mouseMs=mouseMs;this.touchMs=touchMs;this.tolerance=tolerance;this.last=null}
  reset(){this.last=null}
  push({tile,x,y,time,pointerType='mouse'}){
   const last=this.last,maxAge=pointerType==='touch'?this.touchMs:this.mouseMs;
