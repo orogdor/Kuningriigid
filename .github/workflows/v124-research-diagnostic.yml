@@ -1,0 +1,15 @@
+name: V124 Research Economy Consistency Diagnostic
+on:
+  push:
+    branches: [main]
+    paths: ['TEST_V124_RESEARCH_DUPLICATE.mjs', '.github/workflows/v124-research-diagnostic.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node TEST_V124_RESEARCH_DUPLICATE.mjs
