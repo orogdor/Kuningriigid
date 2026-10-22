@@ -1,7 +1,7 @@
 // V119: downward, progressive research tree. Only researched and currently researchable nodes exist in the DOM.
 import {TECHS,techBlock,ERA_NAMES} from './research.js?v=118a';
 import {V118_ERA_IDS} from './tech-tree-data-v118.js?v=118a';
-import {VERTICAL_TREE,verticalResearchLayout} from './tech-tree-layout-v119.js?v=119a';
+import {VERTICAL_TREE,verticalResearchLayout} from './tech-tree-layout-v119.js?v=123a';
 import {progressiveResearchIds} from './research-preview-v123.js?v=123a';
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js?v=118a';
 import {RESOURCE_NAMES} from './economy.js?v=117a';
