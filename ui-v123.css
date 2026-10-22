@@ -1,0 +1,23 @@
+/* V123: a one-step peek into the next discoveries, without revealing the full future tree. */
+#researchpanel .tech-tree-node.v123-preview{
+ background:linear-gradient(145deg,#32403d,#283532)!important;
+ border-color:#85938b!important;opacity:.78;
+ filter:saturate(.45);cursor:pointer!important;
+}
+#researchpanel .tech-tree-node.v123-preview:hover,
+#researchpanel .tech-tree-node.v123-preview.is-selected{
+ opacity:1;border-color:#c2c2b3!important;filter:saturate(.65);
+}
+#researchpanel .tech-tree-node.v123-preview .tech-node-name{color:#dee2dd}
+#researchpanel .tech-tree-node.v123-preview .tech-time,
+#researchpanel .tech-tree-node.v123-preview .tech-parents{color:#c3c8c2}
+#researchpanel .v123-preview-unlocks{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ overflow:hidden;line-height:1.3;margin-top:3px;font-size:10px;
+ color:#c5d0c4;overflow-wrap:anywhere;
+}
+#researchpanel .v123-preview-requires{color:#e6cc92;font-size:11px}
+#researchpanel .tech-tree-node.v123-preview progress{display:none!important}
+@media(max-width:480px){
+ #researchpanel .v123-preview-unlocks{font-size:10px}
+}
