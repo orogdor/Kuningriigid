@@ -14,9 +14,9 @@ assert.equal(tap('2:2',1750,102,106,'touch'),false,'Touch cannot share a mouse d
 assert.equal(tap('2:2',1950,105,106,'touch'),true,'Touch double-tap opens detail');
 d.reset();assert.equal(tap('1:1',2300),false);d.reset();assert.equal(tap('1:1',2350),false,'Dragging resets tapping');
 assert.equal(detailWheelTransition({view:'local',zoom:150,deltaY:100}).exitToWorld,false);
-assert.equal(detailWheelTransition({view:'local',zoom:299,deltaY:100}).exitToWorld,true);
-assert.equal(detailWheelTransition({view:'local',zoom:299,deltaY:-100}).exitToWorld,false);
-assert.equal(detailWheelTransition({view:'local',zoom:299,deltaY:500,isBattle:true}).exitToWorld,false,'Cannot leave battle through scroll');
+assert.equal(detailWheelTransition({view:'local',zoom:449,deltaY:100}).exitToWorld,true);
+assert.equal(detailWheelTransition({view:'local',zoom:449,deltaY:-100}).exitToWorld,false);
+assert.equal(detailWheelTransition({view:'local',zoom:449,deltaY:500,isBattle:true}).exitToWorld,false,'Cannot leave battle through scroll');
 assert.equal(detailWheelTransition({view:'world',zoom:950,deltaY:2000}).exitToWorld,false);
 assert.equal(buildingCategory('house'),'housing');
 assert.equal(buildingCategory('farm'),'food');
