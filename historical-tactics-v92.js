@@ -44,7 +44,7 @@ export function chariotGoal(u,target,squads,b,a,nav=null){
  const danger=spear&&distance(u,spear)<22?spear:closest;
  const near=distance(u,closest)<12||distance(u,danger)<11,guarded=!!spear&&distance(u,spear)<21;
  const flank=u.flank||1,elapsed=now-(u.chariotPhaseAt??now);
- const phase=name=>{if(u.chariotPhase!==name){u.chariotPhase=name;u.chariotPhaseAt=now;}};
+ const phase=name=>{if(u.chariotPhase!==name){u.chariotPhase=name;u.chariotPhaseAt=now;if(name==='shoot')u.anchor={x:u.x,z:u.z};}};
  if(!u.chariotPhase)phase('approach');
  if(near||guarded)phase('withdraw');
  else if(u.chariotPhase==='shoot'&&elapsed>=3.2)phase('withdraw');
