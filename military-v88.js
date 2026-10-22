@@ -7,7 +7,7 @@ export const troopCost=(definition,grade='standard')=>Object.fromEntries(Object.
 const unit=(name,age,tech,visual,role,cost,requires,hp,dmg,range,speed,time=55)=>({name,age,tech,visual,role,cost,requires,hp,dmg,range,speed,time});
 export const ERA_UNITS={
  bronze_cavalry:unit('Pronksiaja ratsavägi',1,'bronze','cavalry','cavalry',{bronze:6,bread:16,wood:16},['barracks','pasture'],200,20,3,4.4,65),
- bronze_catapult:unit('Pronksiaja katapult',1,'wheel','catapult','siege',{plank:45,bronze:4,stone:15},['barracks','cartwright'],180,28,30,1.3,100),
+ bronze_catapult:unit('Pronksiaja katapult',1,'wheel','catapult','siege',{plank:45,bronze:4,stone:15},['barracks','cartwright'],180,8,30,1.3,100),
  bronze_spearman:unit('Pronksodamees',1,'bronze','spearman','melee',{wood:18,bronze:3,bread:6},['barracks'],150,14,3.3,2.8,38),
  bronze_axeman:unit('Pronkskirvemees',1,'bronze','axeman','melee',{wood:12,bronze:4,bread:6},['barracks'],155,17,2.6,2.7,40),
  bronze_archer:unit('Pronksiaja vibukütt',1,'bronze','archer','ranged',{wood:22,bronze:2,bread:6},['archery'],115,16,15,2.9,38),
