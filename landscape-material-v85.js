@@ -1,4 +1,5 @@
 import * as T from './vendor/three.module.js';
+import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 // Continuous world-space grain: no repeated square tiles and no image downloads.
 export function landscapeMaterial(kind='terrain',scope='world',tile=null){
  const water=kind==='water';
@@ -11,7 +12,7 @@ export function landscapeMaterial(kind='terrain',scope='world',tile=null){
  float landscapeHash(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
  float landscapeNoise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(mix(landscapeHash(i),landscapeHash(i+vec3(1,0,0)),f.x),mix(landscapeHash(i+vec3(0,1,0)),landscapeHash(i+vec3(1,1,0)),f.x),f.y),mix(mix(landscapeHash(i+vec3(0,0,1)),landscapeHash(i+vec3(1,0,1)),f.x),mix(landscapeHash(i+vec3(0,1,1)),landscapeHash(i+vec3(1,1,1)),f.x),f.y),f.z);}
  `);
-  const world=scope==='world'?'landscapeP':`vec3(landscapeP.x / 3.0 + ${Number(tile.x).toFixed(4)}, landscapeP.y / 0.30 + 0.7, landscapeP.z / 2.6 + ${Number(tile.z).toFixed(4)})`;
+  const world=scope==='world'?'landscapeP':`vec3(landscapeP.x / ${DETAIL_X.toFixed(2)} + ${Number(tile.x).toFixed(4)}, landscapeP.y / 0.30 + 0.7, landscapeP.z / ${DETAIL_Z.toFixed(2)} + ${Number(tile.z).toFixed(4)})`;
   shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
  vec3 landP=${world};
  float broad=landscapeNoise(landP*0.16),grain=landscapeNoise(landP*2.8);
