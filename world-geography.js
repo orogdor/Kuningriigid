@@ -26,7 +26,8 @@ export function buildDrainage(cells,noise,starts=[],natural=false){
   if(natural){cell.riverClass=acc[i]>440?'major':acc[i]>135?'river':'stream';cell.riverSource=acc[i]<threshold*1.7;cell.tributaryFlow=Math.round(acc[i]);}
   cell.riverDir=to.c!==cell.c?'h':'v';
   const regular=natural?(acc[i]<250&&(Math.round(acc[i]+noise(cell.c*7,cell.r*17)*29)%13===0)):(Math.round(acc[i]+noise(cell.c*7,cell.r*17)*19)%7===0);
-  cell.ford=cell.ford||regular||starts.some(s=>Math.abs(s.c-cell.c)+Math.abs(s.r-cell.r)<=3);
+  // A shallow ford is traversable land, never an impassable mountain face.
+  cell.ford=!cell.mountain&&(cell.ford||regular||starts.some(s=>Math.abs(s.c-cell.c)+Math.abs(s.r-cell.r)<=3));
   rivers++;
  }
  return {riverCells:rivers,totalCells:n,drainageDown:down,accumulation:acc};
