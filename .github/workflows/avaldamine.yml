@@ -42,6 +42,10 @@ jobs:
           node --check research-tree-v119.js
           node --check build-catalog-v121.js
           node --check map-gestures-v121.js
+          node --check research-preview-v123.js
+          node --check detail-scale-v123.js
+          node --check world-details.js
+          node --check battlefield-v88.js
           node --check continuous-landscape.js
           node --check continuous-landscape-visual.js
           node --check landscape-polish-v84.js
@@ -54,6 +58,7 @@ jobs:
           node --check era-availability-v116.js
           node --check campaign.js
           node --check fortifications.js
+          node TEST_V123.mjs
           node TEST_V122.mjs
           node TEST_V121.mjs
           node TEST_V120_LOCALE.mjs
