@@ -2,8 +2,8 @@
 // Models reuse atlas GLB geometry and materials; fallback templates are shared,
 // so changing tiles does not allocate new GPU resources on every visit.
 import * as T from './vendor/three.module.js';
-import {createCrossingModel} from './landscape-polish-v84.js?v=85a';
-import {worldToDetail} from './landscape-shared.js?v=65c';
+import {createCrossingModel} from './landscape-polish-v84.js?v=123a';
+import {worldToDetail} from './landscape-shared.js?v=123a';
 
 const stone=new T.MeshStandardMaterial({color:'#8f8a81',roughness:1,flatShading:true});
 const stoneLight=new T.MeshStandardMaterial({color:'#b5aa91',roughness:1,flatShading:true});
