@@ -1,4 +1,4 @@
-import {detailHeight} from './world-details.js';
+import {detailHeight} from './world-details.js?v=123a';
 import {localSurface} from './continuous-landscape.js?v=123a';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 
