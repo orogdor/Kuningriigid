@@ -1,4 +1,4 @@
-import {prepareAmmunition} from './combat-equipment-v100.js';
+import {prepareAmmunition,stoneThrower} from './combat-equipment-v100.js';
 import {BOW_DAMAGE_MULTIPLIER} from './unit-balance-v99.js';
 import {squadContactGoal} from './combat-contact-v96.js';
 import {FORMATIONS,formationDamage,missileExposure} from './formations-v94.js';
@@ -13,7 +13,7 @@ export function tacticalStats(def,u){const a=unitStats(def,u);a.speed*=u.routing
 export function deployHistoricalBattle(b){
  const teams=[...new Set(b.squads.map(u=>u.team))];for(let t=0;t<teams.length;t++){const team=teams[t],side=t%2?-1:1,list=b.squads.filter(u=>u.team===team&&!u.guardPost),front=list.filter(u=>troopRole(u.kind)==='melee'&&!/axeman/.test(u.kind)),reserve=list.filter(u=>/axeman/.test(u.kind)),guns=list.filter(u=>['musketeer','arquebusier','line_infantry','rifleman'].includes(u.kind)),bows=list.filter(u=>isBow(u)&&u.kind!=='chariot'&&!guns.includes(u)),mounted=list.filter(u=>troopRole(u.kind)==='cavalry'||troopRole(u.kind)==='vehicle'),other=list.filter(u=>![...front,...reserve,...bows,...guns,...mounted].includes(u));
   const line=(units,depth,spacing,role)=>units.forEach((u,i)=>{u.x=-side*(depth+Math.floor(i/10)*7);u.z=(i%10-(Math.min(10,units.length)-1)/2)*spacing;u.heading=side*Math.PI/2;u.tacticalRole=role;u.battleSide=side;u.deployment={x:u.x,z:u.z};u.releaseAt=role==='support'?16:0;});
-  line(front,BATTLE_FRONT_DEPTH,5.1,'line');guns.forEach((u,i)=>{const wing=i%2?1:-1;u.x=-side*(BATTLE_FRONT_DEPTH+Math.floor(i/8)*7);u.z=wing*(Math.max(12,Math.min(10,front.length)*2.55+5)+Math.floor(i/2)%4*6);u.heading=side*Math.PI/2;u.tacticalRole='shot';u.battleSide=side;u.deployment={x:u.x,z:u.z};});line(bows,BATTLE_FRONT_DEPTH+16,6,'missile');line(reserve,BATTLE_FRONT_DEPTH+30,7,'support');line(other,BATTLE_FRONT_DEPTH+22,8,'support');
+  line(front,BATTLE_FRONT_DEPTH,7.5,'line');guns.forEach((u,i)=>{const wing=i%2?1:-1;u.x=-side*(BATTLE_FRONT_DEPTH+Math.floor(i/8)*7);u.z=wing*(Math.max(12,Math.min(10,front.length)*2.55+5)+Math.floor(i/2)%4*6);u.heading=side*Math.PI/2;u.tacticalRole='shot';u.battleSide=side;u.deployment={x:u.x,z:u.z};});line(bows,BATTLE_FRONT_DEPTH+16,8,'missile');line(reserve,BATTLE_FRONT_DEPTH+30,7,'support');line(other,BATTLE_FRONT_DEPTH+22,8,'support');
   mounted.forEach((u,i)=>{const flank=i%2?1:-1;u.x=-side*(BATTLE_FRONT_DEPTH-2);u.z=flank*(Math.max(38,front.length*3.2+16)+Math.floor(i/2)*16);u.heading=side*Math.PI/2;u.tacticalRole=u.kind==='chariot'?'mobile-missile':'flank';u.flank=flank;u.battleSide=side;u.deployment={x:u.x,z:u.z};});
  }
  b.deploymentGap={minX:-BATTLE_EMPTY_HALF_WIDTH,maxX:BATTLE_EMPTY_HALF_WIDTH};b.doctrineVersion=1;b.doctrine='Rivi, laskurite toetus, tiivamanööver ja moraal';return b;
@@ -25,7 +25,7 @@ export function initializeTactics(b){
 }
 export function updateMorale(b,dt){
  for(const u of b.squads){if(!u.men||u.reserve||u.retreated)continue;const men=u.men.filter(m=>m.hp>0&&!m.escaped),loss=1-men.length/Math.max(1,u.startMen),friends=b.squads.filter(q=>q!==u&&q.team===u.team&&q.hp>0&&!q.routing&&!q.retreated&&!q.reserve&&distance(q,u)<16),panic=b.squads.some(q=>q!==u&&q.team===u.team&&q.routing&&distance(q,u)<18);
-  u.ammoRemaining=men.reduce((n,m)=>n+(m.ammo||0),0);u.cohesion=men.length?Math.max(0,1-men.reduce((n,m)=>n+Math.max(0,distance(m,u)-4),0)/men.length/12):0;
+  u.ammoRemaining=men.reduce((n,m)=>n+(m.ammo||0),0);if(stoneThrower(u)&&men.length&&u.ammoRemaining===0){u.routing=true;u.ammoDepleted=true;u.manualOrder=false;u.target=null;for(const m of men)m.routing=true;}u.cohesion=men.length?Math.max(0,1-men.reduce((n,m)=>n+Math.max(0,distance(m,u)-4),0)/men.length/12):0;
   for(const m of men){const base=u.grade==='mobilized'?64:u.grade==='elite'?94:82,target=base-loss*70+(friends.length?7:0)-(panic?9:0)-(u.moraleShock||0)-m.fatigue*.07-(1-u.cohesion)*10;
    m.morale=Math.max(0,Math.min(100,m.morale+(target-m.morale)*Math.min(1,dt*.5)));if(m.morale<24)m.routing=true;else if(m.morale>46&&!u.routing)m.routing=false;
   }u.morale=men.length?men.reduce((n,m)=>n+m.morale,0)/men.length:0;u.moraleShock=Math.max(0,(u.moraleShock||0)-dt*.5);
