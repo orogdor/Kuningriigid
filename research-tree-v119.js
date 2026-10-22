@@ -54,7 +54,10 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
   if(band.age===state.ages[0])b.classList.add('present-age');
   jumps.append(b);ageButtons.push({button:b,band});
  }
- const inspector=element('aside','tech-inspector');
+ // A div avoids the game's global <aside> positioning used for the map HUD.
+ const inspector=element('div','tech-inspector');
+ inspector.setAttribute('role','region');
+ inspector.setAttribute('aria-label','Selected technology details');
  inspector.setAttribute('aria-live','polite');
  const legend=element('p','tech-legend','Research progresses downward ↓. Solid arrows = all prerequisites required (AND); dashed arrows = one alternative (OR). Locked branches remain hidden.');
  const frame=element('div','tech-map-viewport tech-vertical-viewport'),
