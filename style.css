@@ -210,3 +210,29 @@ body:has(#startmenu:not([hidden])) :is(header,#tools,#commandhud,#hud-resource-t
 .tech-legend{font-size:11px;color:#c8d7c5;line-height:1.4;margin:0 0 8px}
 @media(max-width:850px){.tech-inspector{grid-template-columns:1fr 1fr}.tech-info-actions{grid-column:1/-1;flex-direction:row}.tech-info-actions button{flex:1;min-width:0}.tech-map-viewport{height:52vh;min-height:330px}}
 @media(max-width:600px){.tech-inspector{display:flex;flex-direction:column;align-items:stretch;padding:8px}.tech-info-name{font-size:16px}.tech-info-relations{max-height:94px}.tech-info-actions{flex-direction:row}.tech-info-actions button{padding:10px 5px}.tech-map-viewport{height:52dvh;min-height:300px}.research-window{padding:10px}.research-explanation{max-height:40px;overflow:auto}}
+
+
+/* V119: progress from top to bottom; future branches are absent from the DOM. */
+.tech-vertical-viewport{height:min(65vh,740px);overflow:auto;scrollbar-width:thin;overscroll-behavior:contain;touch-action:pan-x pan-y}
+.tech-vertical-era{left:0;right:0;border-right:0;border-top:2px solid #d7c18d65;border-bottom:1px solid #d7c18d22;background:linear-gradient(180deg,#34544922,#18322d09)}
+.tech-vertical-era.current{background:linear-gradient(180deg,#c0a2612d,#183d3614)}
+.tech-vertical-heading{left:20px;color:#f0daa1;font-size:22px;z-index:2}
+.tech-vertical-node{z-index:3;transition:border-color .12s,box-shadow .12s}
+.tech-link-path{stroke:#9ebba8;stroke-width:2;opacity:.43}
+.tech-link-path.optional{stroke:#edca8d;stroke-dasharray:6 5}
+.tech-link-path.implicit{stroke:#9ebba8;stroke-dasharray:2 5;opacity:.26}
+.tech-link-path.is-selected{stroke:#f3daa1;stroke-width:3;opacity:1}
+.tech-link-path.is-faded{opacity:.10}
+.tech-tree-node.known{opacity:1}
+.tech-legend{color:#d5dece}
+@media(max-width:700px){
+ .tech-vertical-viewport{height:57dvh;min-height:310px}
+ .tech-vertical-heading{font-size:18px}
+ .tech-inspector{position:relative}
+}
+@media(max-width:480px){
+ .tech-vertical-viewport{height:56dvh;min-height:320px}
+ .tech-vertical-node{font-size:12px}
+ .tech-info-actions{display:flex;flex-direction:row}
+ .tech-tree-subtitle{min-width:125px}
+}
