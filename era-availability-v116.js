@@ -11,7 +11,7 @@ export const UNIT_SUCCESSORS={
 };
 // Only genuine functional replacements. Sawmills do not replace woodcutters,
 // farms do not replace hunters, and the three requested wall tiers remain distinct.
-export const BUILDING_SUCCESSORS={study:['scriptorium'],scriptorium:['academy'],academy:['university'],university:['polytechnic'],polytechnic:['laboratory'],watchtower:['stonetower'],archery:['crossbow_range']};
+// An outdated model becomes unbuildable only after a valid successor is researched.\n// Resource specialists (hunters, foresters, mills, quarries) are not interchangeable and remain available.\nexport const BUILDING_SUCCESSORS={study:['scriptorium'],scriptorium:['academy'],academy:['university'],university:['polytechnic'],polytechnic:['laboratory'],watchtower:['stonetower'],archery:['crossbow_range'],palisade:['stonewall']};
 function successor(graph,id,unlocked){const seen=new Set([id]),queue=[...(graph[id]||[])];let found=null;while(queue.length){const next=queue.shift();if(seen.has(next))continue;seen.add(next);if(unlocked(next))found=next;queue.push(...(graph[next]||[]));}return found;}
 export const unitSuccessor=(state,team,id,troops,tech)=>successor(UNIT_SUCCESSORS,id,k=>troops[k]&&(troops[k].age??0)<=(state.ages[team]||0)&&(!tech[k]||state.research[team].known.includes(tech[k])));
 export const buildingSuccessor=(state,team,id,ages,tech)=>successor(BUILDING_SUCCESSORS,id,k=>(ages[k]??99)<=(state.ages[team]||0)&&(!tech[k]||state.research[team].known.includes(tech[k])));
