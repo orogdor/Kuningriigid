@@ -1,9 +1,14 @@
 import {BOW_UNITS} from './unit-balance-v99.js';
 export const carriesSword=u=>BOW_UNITS.has(u.kind);
 export const stoneThrower=u=>['bronze_catapult','catapult'].includes(u.kind);
-export const ammunitionLoad=u=>carriesSword(u)?u.kind==='chariot'?48:40:['slinger','javelinman'].includes(u.kind)?20:stoneThrower(u)?12:u.kind==='cuirassier'?8:u.kind==='dragoon'?24:60;
+export const ammunitionLoad=u=>carriesSword(u)?u.kind==='chariot'?48:40:['slinger','javelinman'].includes(u.kind)?20:stoneThrower(u)?6:u.kind==='cuirassier'?8:u.kind==='dragoon'?24:60;
 export function prepareAmmunition(m,u){
  if(carriesSword(u)&&m.arrowLoadVersion!==100){if(m.ammo!=null)m.ammo*=2;m.arrowLoadVersion=100;}
+ // Update ammunition in battles loaded from V102 without restoring used stones.
+ if(stoneThrower(u)&&m.stoneLoadVersion!==103){
+  if(m.ammo!=null)m.ammo=Math.max(0,Math.min(6,Math.floor(m.ammo/2)));
+  m.stoneLoadVersion=103;
+ }
  m.ammo??=ammunitionLoad(u);
 }
 
