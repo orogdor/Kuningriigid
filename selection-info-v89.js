@@ -1,8 +1,8 @@
 import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
-import {tacticalStats,isBow} from './historical-tactics-v92.js?v=115a';
-import {livingMen} from './individual-battle-v91.js?v=115a';
+import {tacticalStats,isBow} from './historical-tactics-v92.js?v=116a';
+import {livingMen} from './individual-battle-v91.js?v=116a';
 import {soldierCount} from './soldier-collision-v90.js?v=110a';
-import {UNIT_GRADES} from './military-v88.js';
+import {UNIT_GRADES} from './military-v88.js?v=116a';
 import {armyLevel,unitStats,armyForUnit} from './army-experience-v88.js';
 export function selectionDetails(game,q,troops,ships){
  if(!q)return '';const e=q.entity,s=game.s,location=q.local?'Detailkaart':'Ruut '+(e.c+1)+':'+(e.r+1);

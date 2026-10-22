@@ -1,16 +1,16 @@
 // Reproducible Bronze Age fortified-city assault; isolated from normal saves.
 // ?demo=bronze-siege creates one attacker supply city and one defended town.
 import {createStoneDemoState} from './stone-demo-v77.js?v=80c';
-import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js?v=115a';
-import {createBattle} from './campaign.js?v=115a';
-import {fortifyBattle} from './fortifications.js?v=115a';
+import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js?v=116a';
+import {createBattle} from './campaign.js?v=116a';
+import {fortifyBattle} from './fortifications.js?v=116a';
 import {soldierCount} from './soldier-collision-v90.js';
 import {battlefieldTiles} from './battlefield-v88.js';
 import {initArmyExperience} from './army-experience-v88.js';
 import {setRelation} from './diplomacy-v87.js';
 export const BRONZE_SIEGE_NAME='Hattuša eeskujul pronksiaja kindluslinn';
 const copy=o=>JSON.parse(JSON.stringify(o));
-export function createBronzeSiegeState(seed=20261020){
+export function createBronzeSiegeState(seed=20261020,age=1){
  const g=new Civilization(createStoneDemoState(seed)),s=g.s,city=s.cities[0];
  if(!city)throw Error('Bronze siege city is missing');
  const existingHall=city.economy.buildings.find(b=>b.type==='hall');if(!existingHall)throw Error('Siege city hall is missing');
@@ -33,13 +33,13 @@ export function createBronzeSiegeState(seed=20261020){
  city.world.resources=city.world.resources.filter(r=>r.x< -68||r.x>50||Math.abs(r.z)>36);city.world.revision=(city.world.revision||0)+1;
  // Worn streets connect the gate, central square and workshops.
  city.world.heat??={};for(let x=-26;x<=36;x++)for(let d=-1;d<=1;d++)city.world.heat[x+':'+(7+d)]=30;
- s.ages[0]=1;s.ages[1]=1;s.time=0;s.winner=null;s.demo='bronze-siege';s.settlers=[];s.ships=[];s.shipments=[];s.units=[];
+ s.ages[0]=age;s.ages[1]=age;s.time=0;s.winner=null;s.demo='bronze-siege';s.settlers=[];s.ships=[];s.shipments=[];s.units=[];
  for(const team of [0,1]){s.armies[team].c=city.c;s.armies[team].r=city.r;s.armies[team].path=[];s.armies[team].autoExplore=false;s.armies[team].xp=400;
-  s.research[team].known=[...new Set([...s.research[team].known,'warfare','archery','bronze','fortifications','wheel'])];
+  s.research[team].known=[...new Set([...s.research[team].known,'warfare','archery','bronze','fortifications','wheel',...(age>=2?['iron','early_siege_engineering','ancient_artillery']:[])])];
  }
  // Kadesh-inspired personnel balance: Egypt-like 192 foot + 24 two-man
  // chariots = 80% foot / 20% crew. Weapon splits are a game approximation.
- const roster0=[...Array(4).fill('bronze_spearman'),...Array(2).fill('bronze_axeman'),...Array(2).fill('bronze_archer'),'chariot','chariot','bronze_catapult','bronze_catapult'];
+ const roster0=[...Array(4).fill('bronze_spearman'),...Array(2).fill('bronze_axeman'),...Array(2).fill('bronze_archer'),'chariot','chariot',...(age>=2?['bronze_catapult','bronze_catapult']:[])];
  const roster1=['bronze_spearman','bronze_spearman','bronze_spearman','bronze_axeman','chariot'];
  for(const team of [0,1])for(const kind of (team?roster1:roster0))s.units.push({team,armyId:0,kind,grade:'standard',hp:TROOPS[kind].hp,menCount:soldierCount({kind}),morale:100,combatMode:'auto'});
  for(const wall of walls.filter(w=>w.type==='stonewall'&&w.x===-28&&Math.abs(w.z)<=21).concat(walls.filter(w=>w.type==='stonewall'&&w.z===-28&&[-21,-14].includes(w.x)))){
@@ -57,8 +57,8 @@ export function createBronzeSiegeState(seed=20261020){
  b.wallWalkEnabled=true;b.wallStairs=[{x:-28,z:-14,groundX:-21,groundZ:-14},{x:-14,z:-28,groundX:-14,groundZ:-21},{x:42,z:14,groundX:35,groundZ:14},{x:28,z:28,groundX:28,groundZ:21}];
  fortifyBattle(g,defender,b);
  let attack=0,defend=0;for(const u of b.squads){if(u.guardPost)continue;if(u.team===0){const i=attack++;u.x=u.kind==='chariot'?-143:u.kind==='bronze_catapult'?-172:-132-Math.floor(i/4)*10;u.z=u.kind==='chariot'?(i%2?43:-43):(i%4-1.5)*10;}else{const i=defend++;u.x=u.kind==='chariot'?65:0+(i%2)*16;u.z=u.kind==='chariot'?38:-9+Math.floor(i/2)*22;}u.deployment={x:u.x,z:u.z};u.anchor={x:u.x,z:u.z};}
- b.siegeHistoryNote='Pronksiaja linn on mänguline lähendus. Kaks katapulti on teadlik testilisand, mitte pronksiaja ajalooline relvastus.';
- b.historicalRoster={basis:'Kadeš u 1274 eKr; relvaliikide jaotus on mänguline lähendus',attack:{spearmen:96,axemen:48,archers:48,chariots:24,crew:48,catapults:2},defense:{spearmen:72,axemen:24,archers:128,chariots:12,crew:36}};
+ b.siegeHistoryNote=age>=2?'Rauaaja piiramine: heiterelvastus ja linnakaitse.':'Pronksiaja piiramine: jalavägi, vibud, kaarikud ja redelirünnak; katapulte ega ballistasid ei ole.';
+ b.historicalRoster={basis:'Kadeš u 1274 eKr; relvaliikide jaotus on mänguline lähendus',attack:{spearmen:96,axemen:48,archers:48,chariots:24,crew:48,catapults:age>=2?2:0},defense:{spearmen:72,axemen:24,archers:128,chariots:12,crew:36}};
  for(const u of b.squads)if(u.team===0)u.advance=true;
  s.battle=b;
  for(const tile of battlefieldTiles(field))if(tile.c>=0&&tile.r>=0&&tile.c<220&&tile.r<165)g.reveal(0,g.cell(tile),0);
@@ -66,3 +66,5 @@ export function createBronzeSiegeState(seed=20261020){
  // Constructing two 3×3 navigation maps during demo creation can exhaust mobile memory.
  return copy(s);
 }
+
+export function createIronSiegeState(seed=20261020){const s=createBronzeSiegeState(seed,2);s.demo='iron-siege';s.cities[0].name='Rauaaja kindluslinna piiramine';const map={bronze_spearman:'infantry',bronze_axeman:'infantry',bronze_archer:'iron_archer',chariot:'cavalry'};for(const list of [s.units,s.battle.squads])for(const u of list){const kind=map[u.kind];if(!kind)continue;const ratio=TROOPS[kind].hp/TROOPS[u.kind].hp;u.kind=kind;u.hp*=ratio;if(u.maxHp)u.maxHp*=ratio;}s.battle.historicalRoster.basis='Rauaaja kombineeritud vägi; mänguline lähendus';return s;}

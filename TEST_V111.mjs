@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=115a';
-import {Civilization,TROOPS} from './civilization-core.js?v=115a';
-import {initializeMen,tickIndividualBattle,battleManCount} from './individual-battle-v91.js?v=115a';
-import {wallPath,tickWallWalk,orderWallMove} from './wall-walk-v111.js?v=115a';
-import {startSiegeCraft,tickSiegeCraft} from './siege-assault-v108.js?v=115a';
-const s=createBronzeSiegeState(),g=new Civilization(s),b=s.battle,nav=g.battleNavigation(b);
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=116a';
+import {Civilization,TROOPS} from './civilization-core.js?v=116a';
+import {initializeMen,tickIndividualBattle,battleManCount} from './individual-battle-v91.js?v=116a';
+import {wallPath,tickWallWalk,orderWallMove} from './wall-walk-v111.js?v=116a';
+import {startSiegeCraft,tickSiegeCraft} from './siege-assault-v108.js?v=116a';
+const s=createBronzeSiegeState(undefined,2),g=new Civilization(s),b=s.battle,nav=g.battleNavigation(b);
 assert.equal(b.siegeSections.length,36);assert.equal(b.siegeSections.filter(w=>w.type==='gatehouse').length,2);
 assert.equal(s.cities[0].economy.buildings.filter(w=>w.type==='stonetower').length,10);
 assert.equal(b.squads.filter(u=>u.kind==='bronze_catapult').length,2);

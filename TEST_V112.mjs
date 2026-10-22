@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=115a';
-import {Civilization,TROOPS} from './civilization-core.js?v=115a';
-import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=115a';
-import {startSiegeCraft,tickSiegeCraft} from './siege-assault-v108.js?v=115a';
-import {createBronzeCityModel} from './bronze-city-v111.js?v=115a';
-import {createSiegeWorkModel} from './siege-work-visual-v108.js?v=115a';
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=116a';
+import {Civilization,TROOPS} from './civilization-core.js?v=116a';
+import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=116a';
+import {startSiegeCraft,tickSiegeCraft} from './siege-assault-v108.js?v=116a';
+import {createBronzeCityModel} from './bronze-city-v111.js?v=116a';
+import {createSiegeWorkModel} from './siege-work-visual-v108.js?v=116a';
 for(const kind of ['ladder','tower']){
- const s=createBronzeSiegeState(),g=new Civilization(s),b=s.battle,nav=g.battleNavigation(b);initializeMen(b,nav);
+ const s=createBronzeSiegeState(undefined,2),g=new Civilization(s),b=s.battle,nav=g.battleNavigation(b);initializeMen(b,nav);
  const infantry=b.squads.filter(u=>u.team===0&&u.kind==='bronze_spearman').slice(0,2),u=infantry[0];
  // Isolate navigation from enemy damage; keep the real start positions and all
  // formation/morale/pathfinding ticks. Never move a soldier directly in this test.

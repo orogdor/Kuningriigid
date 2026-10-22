@@ -2,7 +2,7 @@ name: V111 Bronze City Siege
 on:
   push:
     branches: [main]
-    paths: ['*v115*', '*v114*', '*v113*', '*v111*', '*v108*', 'civilization.js', 'fortifications.js', 'individual-battle-v91.js', 'navigation.js', 'battle-navigation-v88.js', 'index.html', 'TEST_V111*', 'TEST_V112*', '.github/workflows/v111.yml']
+    paths: ['*v116*', '*v115*', '*v114*', '*v113*', '*v111*', '*v108*', 'civilization.js', 'fortifications.js', 'individual-battle-v91.js', 'navigation.js', 'battle-navigation-v88.js', 'index.html', 'TEST_V111*', 'TEST_V112*', '.github/workflows/v111.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,6 +19,7 @@ jobs:
           node TEST_V112.mjs
           node TEST_V113.mjs
           node TEST_V114.mjs
+          node TEST_V116.mjs
           node TEST_V115.mjs
           node TEST_V115_AUTO.mjs
           npm install --no-save playwright
@@ -29,6 +30,7 @@ jobs:
           node TEST_V113_UI.mjs
           node TEST_V114_UI.mjs
           node TEST_V115_UI.mjs
+          node TEST_V116_UI.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -38,3 +40,4 @@ jobs:
             artifacts-v113/
             artifacts-v114/
             artifacts-v115/
+            artifacts-v116/

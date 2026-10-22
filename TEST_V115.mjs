@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import {tickSiegeSupply,tickTowerBallistas} from './siege-support-v115.js?v=115a';
-import {parapetCover} from './siege-rules-v114.js?v=115a';
-import {startSiegeCraft,planSiegeAI} from './siege-assault-v108.js?v=115a';
-import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=115a';
-import {Civilization,TROOPS} from './civilization-core.js?v=115a';
-import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=115a';
-import {createBallista,createSiegeCamp} from './siege-support-visual-v115.js?v=115a';
+import {tickSiegeSupply,tickTowerBallistas} from './siege-support-v115.js?v=116a';
+import {parapetCover} from './siege-rules-v114.js?v=116a';
+import {startSiegeCraft,planSiegeAI} from './siege-assault-v108.js?v=116a';
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=116a';
+import {Civilization,TROOPS} from './civilization-core.js?v=116a';
+import {initializeMen,tickIndividualBattle} from './individual-battle-v91.js?v=116a';
+import {createBallista,createSiegeCamp} from './siege-support-visual-v115.js?v=116a';
 const camp=()=>({id:1,kind:'camp',team:0,x:0,z:0,ready:true,arrived:true,hp:600,stones:0});
 const b={siegeWorks:[camp()],squads:[]};for(let i=0;i<300;i++)tickSiegeSupply(b,.1);assert.equal(b.siegeWorks[0].stones,4);assert.equal(b.siegeWorks[0].produced,4);tickSiegeSupply(b,0);assert.equal(b.siegeWorks[0].stones,4);
 const cat={source:1,kind:'bronze_catapult',team:0,hp:100,morale:80,x:0,z:0,combatMode:'manual',men:[{hp:100,x:0,z:0,ammo:0}]};b.squads=[cat];tickSiegeSupply(b,0);assert.equal(cat.men[0].ammo,4);assert.equal(b.siegeWorks[0].stones,0);assert.ok(cat.hasSiegeSupply);
@@ -14,9 +14,9 @@ const target={u:{source:9,team:0},m:{id:'man',hp:100,x:30,z:0}},battle={elapsed:
 assert.equal(parapetCover({u:{},m:{}},{u:{guardPost:true,wallType:'stonewall'},m:{elevation:3.8}},null),.85);assert.equal(parapetCover({u:{},m:{}},{u:{guardPost:true,wallType:'stonewall'},m:{elevation:3.8}},'arrow'),.45);
 for(const create of [createBallista,createSiegeCamp]){const m=create();m.traverse(o=>{if(o.geometry)assert.ok(o.geometry.attributes.position.array.every(Number.isFinite));});}
 // Auto mode applies equally to player and opponent; manual mode spends nothing.
-for(const team of [0,2]){const s=createBronzeSiegeState(),g=new Civilization(s),b=s.battle;if(team===2){for(const u of b.squads.filter(u=>u.team===0))u.team=2;const city=s.cities.find(c=>c.team===0);city.team=2;city.economy.realms[2]=city.economy.realms[0];}b.elapsed=6;const r=s.cities.find(c=>c.team===team).economy.realms[team].resources,wood=r.wood;for(const u of b.squads.filter(u=>u.team===team))u.combatMode='manual';planSiegeAI(b,s);assert.equal(r.wood,wood);b.elapsed+=13;for(const u of b.squads.filter(u=>u.team===team))u.combatMode='auto';planSiegeAI(b,s,g.battleNavigation(b));assert.equal(b.siegeWorks[0].kind,'camp');assert.equal(r.wood,wood-80);assert.equal(startSiegeCraft(b,b.squads.find(u=>u.team===team&&u.siegeBuildingId==null),'camp',s).ok,undefined);b.elapsed+=13;planSiegeAI(b,s,g.battleNavigation(b));assert.ok(b.siegeWorks.some(w=>w.kind==='ladder'));}
+for(const team of [0,2]){const s=createBronzeSiegeState(undefined,2),g=new Civilization(s),b=s.battle;if(team===2){s.ages[2]=2;s.research[2].known=[...s.research[0].known];for(const u of b.squads.filter(u=>u.team===0))u.team=2;const city=s.cities.find(c=>c.team===0);city.team=2;city.economy.realms[2]=city.economy.realms[0];}b.elapsed=6;const r=s.cities.find(c=>c.team===team).economy.realms[team].resources,wood=r.wood;for(const u of b.squads.filter(u=>u.team===team))u.combatMode='manual';planSiegeAI(b,s);assert.equal(r.wood,wood);b.elapsed+=13;for(const u of b.squads.filter(u=>u.team===team))u.combatMode='auto';planSiegeAI(b,s,g.battleNavigation(b));assert.equal(b.siegeWorks[0].kind,'camp');assert.equal(r.wood,wood-80);assert.equal(startSiegeCraft(b,b.squads.find(u=>u.team===team&&u.siegeBuildingId==null),'camp',s).ok,undefined);b.elapsed+=13;planSiegeAI(b,s,g.battleNavigation(b));assert.ok(b.siegeWorks.some(w=>w.kind==='ladder'));}
 // Real camp construction, without moving a man or advancing work.progress by hand.
-const s=createBronzeSiegeState(),g=new Civilization(s),fight=s.battle,nav=g.battleNavigation(fight);initializeMen(fight,nav);const builder=fight.squads.find(u=>u.team===0&&u.kind==='bronze_spearman'),archer=fight.squads.find(u=>u.team===0&&u.kind==='bronze_archer');
+const s=createBronzeSiegeState(undefined,2),g=new Civilization(s),fight=s.battle,nav=g.battleNavigation(fight);initializeMen(fight,nav);const builder=fight.squads.find(u=>u.team===0&&u.kind==='bronze_spearman'),archer=fight.squads.find(u=>u.team===0&&u.kind==='bronze_archer');
 for(const u of fight.squads)if(u!==builder&&u!==archer){u.hp=0;for(const m of u.men||[])m.hp=0;}fight.defensePosts=[];
 const made=startSiegeCraft(fight,builder,'camp',s,nav);assert.ok(made.ok);for(let i=0;i<1200&&!made.work.ready;i++)tickIndividualBattle(fight,.1,TROOPS,0,nav);assert.ok(made.work.ready,'builder physically reaches and completes camp');assert.ok(builder.men.some(m=>Math.hypot(m.x-made.work.x,m.z-made.work.z)<10));
 // Move only the camp in this second scenario so the existing archers must walk back.

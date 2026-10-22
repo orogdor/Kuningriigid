@@ -1,6 +1,6 @@
 // An elevated graph, separate from the ground grid: soldiers use continuous
 // wall walks and enter via interior stairs or a completed assault ladder/tower.
-import {troopRole} from './military-v88.js';
+import {troopRole} from './military-v88.js?v=116a';
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 // Two ranks fit on a 2.8m-wide wall walk. A sixteen-man detachment no
 // longer compresses every man beyond the eighth into the same end point.

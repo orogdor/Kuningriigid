@@ -1,6 +1,6 @@
 import {PRODUCTIVITY_TECHS} from './productivity-techs-v88.js';
 import {ERA_TECHS,ERA_MATERIALS,ageDeficit,payEraCost} from './era-economy.js';
-import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-v62.js?v=115a';
+import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-v62.js?v=116a';
 import {researchCost,scienceRate,discoveryUnlocked,EUREKAS,EUREKA_FRACTION} from './science.js';
 import {tempoMultiplier} from './tempo.js';
 export const TURN_SECONDS=60;
@@ -69,6 +69,7 @@ Object.assign(TECHS,{
  copper_tin:{name:'Vase- ja tinatöö',age:1,turns:4,requires:['bronze','masonry'],unlocks:'Vase- ja tinakaevandused ning pronksisulatus'},
  road_construction:{name:'Teedeehitus',age:1,turns:4,requires:['wheel','copper_tin'],unlocks:'Teemeistrite töökoda: liiklusega kujunevate teede tõhusam hooldus'}
 });
+Object.assign(TECHS,{early_siege_engineering:{name:'Varane piiramistehnika',age:2,turns:4,requires:['iron','wheel','stone_fortifications'],unlocks:'Piiramistöökoda, kaetud ramm ja piiramistorn'},ancient_artillery:{name:'Antiikne heiterelvastus',age:2,turns:4,requires:['early_siege_engineering','woodworking'],unlocks:'Varane kiviviskemasin ja tornide ballistad'}});
 // V61: Defensive structures must be researched before placement.
 Object.assign(TECHS,{
  fortifications:{name:'Kaitserajatised',age:0,turns:3,requires:['stone_tools','warfare'],unlocks:'Puidust kaitsemüür ja vahitorn (üks töötaja)'},

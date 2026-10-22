@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import {TECHS,BUILD_TECH,techBlock} from './research.js?v=115a';
-import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization-core.js?v=115a';
+import {TECHS,BUILD_TECH,techBlock} from './research.js?v=116a';
+import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization-core.js?v=116a';
 import {initialState} from './economy.js';
-import {armyUnits} from './v51-systems.js?v=115a';
-import {createBattle,tickBattle} from './campaign.js?v=115a';
-import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=115a';
-import {createAgeBuilding} from './buildings.js?v=115a';
+import {armyUnits} from './v51-systems.js?v=116a';
+import {createBattle,tickBattle} from './campaign.js?v=116a';
+import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=116a';
+import {createAgeBuilding} from './buildings.js?v=116a';
 
 assert.equal(TECHS.fortifications.age,0);
 assert.equal(TECHS.stone_fortifications.age,1);

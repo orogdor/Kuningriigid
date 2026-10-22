@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import * as T from './vendor/three.module.js';
-import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=115a';
-import {Civilization,TROOPS} from './civilization-core.js?v=115a';
-import {initializeMen,tickIndividualBattle,battleManCount} from './individual-battle-v91.js?v=115a';
-import {wallRankPoint,tickWallWalk} from './wall-walk-v111.js?v=115a';
-import {createBronzeCityModel} from './bronze-city-v111.js?v=115a';
+import {createBronzeSiegeState} from './bronze-siege-demo-v108.js?v=116a';
+import {Civilization,TROOPS} from './civilization-core.js?v=116a';
+import {initializeMen,tickIndividualBattle,battleManCount} from './individual-battle-v91.js?v=116a';
+import {wallRankPoint,tickWallWalk} from './wall-walk-v111.js?v=116a';
+import {createBronzeCityModel} from './bronze-city-v111.js?v=116a';
 import {damageStage,updateCatapultDamage} from './destruction-v113.js';
 import {createSoldier} from './visuals.js';
-import {persistSiegeDamage} from './medieval-v62.js?v=115a';
-const s=createBronzeSiegeState(),g=new Civilization(s),b=s.battle,nav=g.battleNavigation(b);initializeMen(b,nav);
+import {persistSiegeDamage} from './medieval-v62.js?v=116a';
+const s=createBronzeSiegeState(undefined,2),g=new Civilization(s),b=s.battle,nav=g.battleNavigation(b);initializeMen(b,nav);
 assert.equal(battleManCount(b,0),218);assert.equal(battleManCount(b,1),236);assert.equal(b.squads.filter(u=>u.guardPost).reduce((n,u)=>n+u.men.length,0),128);assert.equal(b.squads.filter(u=>u.kind==='bronze_catapult').length,2);assert.ok(b.squads.filter(u=>u.team===0).flatMap(u=>u.men).every(m=>m.x< -110),'whole army starts far outside the city');
 for(const wallAxis of [0,1]){const points=Array.from({length:16},(_,i)=>wallRankPoint({x:0,z:0,wallAxis},i,16));for(let i=0;i<16;i++)for(let j=0;j<i;j++)assert.ok(Math.hypot(points[i].x-points[j].x,points[i].z-points[j].z)>.75);assert.ok(points.every(p=>Math.abs(wallAxis?p.x:p.z)<1),'two ranks stay on the wall walk');}
 for(let i=0;i<100;i++)tickWallWalk(b,.1,nav);const guards=b.squads.filter(u=>u.guardPost).flatMap(u=>u.men.filter(m=>m.hp>0));for(let i=0;i<guards.length;i++)for(let j=0;j<i;j++)assert.ok(Math.hypot(guards[i].x-guards[j].x,guards[i].z-guards[j].z)>.69,'guard slots remain separate when squads converge');

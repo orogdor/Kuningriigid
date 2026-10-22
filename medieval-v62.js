@@ -1,4 +1,4 @@
-import {wallProfile,prepareWall,structuralMultiplier} from './siege-rules-v114.js?v=115a';
+import {wallProfile,prepareWall,structuralMultiplier} from './siege-rules-v114.js?v=116a';
 // V62: optional medieval expansion. Definitions are data; older V4 saves retain their schema.
 export const MEDIEVAL_TECHS={
  armor_craft:{name:'Soomusevalmistamine',age:3,turns:4,requires:['civics','smithing'],unlocks:'Soomustöökoda ja raskerelvastus'},
@@ -16,7 +16,7 @@ export const MEDIEVAL_TECHS={
 };
 export const MEDIEVAL_BUILDINGS={
  armor_workshop:{name:'Soomustöökoda',icon:'🛡',cost:{plank:40,iron:24,stone:25},requires:['smith'],workers:3,time:92,input:{iron:3,coal:1},out:'weapons',rate:5,cycle:20},
- crossbow_range:{name:'Ristvibude harjutusplats',icon:'⚔',cost:{wood:45,plank:28,stone:16},requires:['archery'],workers:0,time:74},
+ crossbow_range:{name:'Ristvibude harjutusplats',icon:'⚔',cost:{wood:45,plank:28,stone:16},requires:['barracks'],workers:0,time:74},
  guildhall:{name:'Gildimaja',icon:'✥',cost:{plank:65,stone:52,iron:10},requires:['saw'],workers:2,time:110},
  master_workshop:{name:'Meistritöökoda',icon:'⚒',cost:{plank:45,stone:32,iron:12},requires:['guildhall'],workers:3,time:98,input:{wood:4},out:'plank',rate:8,cycle:16},
  watermill:{name:'Vesiveski',icon:'≈',cost:{plank:45,stone:50,iron:8},requires:['mill'],workers:3,time:100,input:{grain:5},out:'flour',rate:11,cycle:16},
@@ -32,7 +32,7 @@ export const MEDIEVAL_BUILDINGS={
  reinforced_wall:{name:'Kõrge kivivall',icon:'▤',cost:{stone:120,cutstone:48,wood:20},requires:['stonewall'],workers:0,time:105}
 };
 export const MEDIEVAL_BUILD_TECH={
- armor_workshop:'armor_craft',crossbow_range:'crossbows',guildhall:'guilds',master_workshop:'guilds',watermill:'watermills',windmill:'windmills',infirmary:'medieval_healing',trade_yard:'city_trade',inn:'city_trade',monastery:'monasticism',chapel:'monasticism',keep:'castle_building',gatehouse:'stone_fortifications',siegeworkshop:'siege_engineering',reinforced_wall:'stone_fortifications'
+ armor_workshop:'armor_craft',crossbow_range:'crossbows',guildhall:'guilds',master_workshop:'guilds',watermill:'watermills',windmill:'windmills',infirmary:'medieval_healing',trade_yard:'city_trade',inn:'city_trade',monastery:'monasticism',chapel:'monasticism',keep:'castle_building',gatehouse:'stone_fortifications',siegeworkshop:'early_siege_engineering',reinforced_wall:'stone_fortifications'
 };
 export const MEDIEVAL_UNITS={
  crossbowman:{name:'Ristvibumees',age:3,cost:{weapons:4,plank:6,bread:10},requires:['crossbow_range'],hp:140,dmg:22,range:17,speed:2.65,time:63},
@@ -41,10 +41,10 @@ export const MEDIEVAL_UNITS={
  heavy_cavalry:{name:'Raskeratsavägi',age:3,cost:{weapons:10,iron:21,bread:22},requires:['stable','armor_workshop'],hp:330,dmg:39,range:3.5,speed:3.9,time:110},
  man_at_arms:{name:'Soomustatud jalaväelane',age:3,cost:{weapons:6,iron:12,bread:14},requires:['armor_workshop','barracks'],hp:250,dmg:29,range:3,speed:2.5,time:79},
  catapult:{name:'Katapult',age:3,cost:{plank:65,iron:12,stone:30},requires:['siegeworkshop'],hp:230,dmg:8.625,range:27,speed:1.5,time:118,siege:3.4},
- battering_ram:{name:'Müürilõhkuja',age:3,cost:{plank:45,iron:20},requires:['siegeworkshop'],hp:360,dmg:14,range:3.9,speed:1.6,time:94,siege:5.5},
- siege_tower:{name:'Piiramistorn',age:3,cost:{plank:75,iron:16},requires:['siegeworkshop'],hp:300,dmg:9,range:4,speed:1.35,time:115,siege:3.3}
+ battering_ram:{name:'Müürilõhkuja',age:2,cost:{plank:45,iron:20},requires:['siegeworkshop'],hp:360,dmg:14,range:3.9,speed:1.6,time:94,siege:5.5},
+ siege_tower:{name:'Piiramistorn',age:2,cost:{plank:75,iron:16},requires:['siegeworkshop'],hp:300,dmg:9,range:4,speed:1.35,time:115,siege:3.3}
 };
-export const MEDIEVAL_UNIT_TECH={crossbowman:'crossbows',halberdier:'knighthood',knight:'knighthood',heavy_cavalry:'knighthood',man_at_arms:'armor_craft',catapult:'siege_engineering',battering_ram:'siege_engineering',siege_tower:'siege_engineering'};
+export const MEDIEVAL_UNIT_TECH={crossbowman:'crossbows',halberdier:'knighthood',knight:'knighthood',heavy_cavalry:'knighthood',man_at_arms:'armor_craft',catapult:'siege_engineering',battering_ram:'early_siege_engineering',siege_tower:'early_siege_engineering'};
 export const SIEGE_KINDS=new Set(['bronze_catapult','catapult','battering_ram','siege_tower','field_cannon','industrial_artillery']);
 export const isSiegeUnit=kind=>SIEGE_KINDS.has(kind);
 export function hasReady(city,type){return city?.economy?.buildings?.some(b=>b.type===type&&b.ready&&b.hp>0&&!b.disabled)}

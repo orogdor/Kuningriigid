@@ -15,7 +15,7 @@ export function foundationNeeds(game,city){
  add('quarry');
  if(!has('house'))add('house');
  if(known.includes('woodworking'))add('saw');
- add('study');
+ add(game.obsoleteBuilding?.(city.team,'study')||'study');
  if(age>=2){add('mine');add('coal');if(known.includes('smelting'))add('smelter');}
  return needs;
 }

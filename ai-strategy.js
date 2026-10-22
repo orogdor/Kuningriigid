@@ -1,4 +1,4 @@
-import {foundationNeeds,reservesFoundation} from './ai-foundation-v88.js';
+import {foundationNeeds,reservesFoundation} from './ai-foundation-v88.js?v=116a';
 import {MINERAL_BUILDINGS} from './resource-sites-v88.js';
 import {RESOURCE_BUILDINGS} from './settlement-ai-v88.js';
 import {GOOD_BUILDINGS,cityNeeds} from './city-needs-v87.js';
@@ -73,7 +73,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  const happiness=cityNeeds(city,age);if(happiness.missing)for(const [type,d] of Object.entries(GOOD_BUILDINGS)){if(d.age<=age&&(stock[d.out]||0)<happiness.threshold*3)add(type,101,'Linna mitmekesisus');}
  // Maintain an early, diverse economy. The first source is important even
  // when current stores are high; dependence on initial stocks is not viable.
- for(const [type,priority] of [['lumber',125],['well',118],['hunter',115],['fisher',109],['farm',105],['quarry',103],['study',98]])add(type,priority,'Algmajandus');
+ for(const [type,priority] of [['lumber',125],['well',118],['hunter',115],['fisher',109],['farm',105],['quarry',103],[game.obsoleteBuilding?.(team,'study')||'study',98]])add(type,priority,'Algmajandus');
  if(science.known.includes('shipbuilding')&&!game.s.ships?.some(s=>s.team===team&&s.hp>0)&&!buildings.some(b=>b.type==='harbor'&&b.hp>0))add('harbor',136,'Väljapääs teistele mandritele');
  // Prevent permanent deforestation: start regenerating harvestable woodland
  // as soon as the forester technology is unlocked, *before* wood reaches zero.
@@ -107,7 +107,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  if(!missing){
   const development=['house','barracks','archery','watchtower','palisade','claypit','pottery_kiln','pasture','mason',
    ...(age>=1?['stonetower','stonewall','cartwright','coppermine','tinmine','bronze_foundry','road_depot','saw','warehouse','cellar','market','scriptorium','forester','mill','bakery','harbor']:[]),
-   ...(age>=2?['mine','coal','smelter','smith','academy','stable']:[]),
+   ...(age>=2?['mine','coal','smelter','smith','academy','stable','siegeworkshop']:[]),
    ...(age>=3?['guildhall','master_workshop','watermill','windmill','infirmary','trade_yard','inn','armor_workshop','crossbow_range','monastery','chapel','keep','gatehouse','siegeworkshop','reinforced_wall','university']:[]),
    ...(age>=4?['printer','observatory','nitrate','powdermill']:[]),
    ...(age>=5?['steelworks','engineworks','polytechnic','railstation']:[]),

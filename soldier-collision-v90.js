@@ -1,4 +1,4 @@
-import {troopRole} from './military-v88.js';
+import {troopRole} from './military-v88.js?v=116a';
 export const SQUAD_SIZE=12;
 export const soldierCount=u=>['scout','militia','bronze_catapult','catapult'].includes(u.kind)?1:['melee','ranged'].includes(troopRole(u.kind))?24:SQUAD_SIZE;
 const mounted=u=>['cavalry','vehicle'].includes(troopRole(u.kind));

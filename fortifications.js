@@ -1,7 +1,8 @@
-import {towerBallista} from './siege-support-v115.js?v=115a';
+import {ballistaUnlocked} from './era-availability-v116.js?v=116a';
+import {towerBallista} from './siege-support-v115.js?v=116a';
 // V62: medieval walls, castles and independent siege sections.
-import {wallProfile,prepareWall} from './siege-rules-v114.js?v=115a';
-import {attachSiegeSections} from './medieval-v62.js?v=115a';
+import {wallProfile,prepareWall} from './siege-rules-v114.js?v=116a';
+import {attachSiegeSections} from './medieval-v62.js?v=116a';
 // V61: One civilian worker mans each tower; wall soldiers come only from real units.
 export const WALL_TYPES=new Set(['palisade','stonewall','reinforced_wall','keep']);
 export const TOWER_TYPES=new Set(['watchtower','stonetower']);
@@ -68,7 +69,7 @@ export function fortifyBattle(game,city,battle){
  battle.wallStairs??=battle.siegeSections.map(w=>{const dx=battle.fortress.x-w.x,dz=battle.fortress.z-w.z,d=Math.hypot(dx,dz)||1;return {x:w.x,z:w.z,groundX:w.x+dx/d*7,groundZ:w.z+dz/d*7,height:w.height};});
  for(const e of battle.wallStairs){const w=battle.siegeSections.find(w=>Math.hypot(w.x-e.x,w.z-e.z)<1);e.height=w?.height||3.8;}
  battle.defensePosts=towers.filter(towerManned).map(b=>({
-  x:b.x,z:b.z,team:city.team,buildingIndex:city.economy.buildings.indexOf(b),active:true,damage:b.type==='stonetower'?12:8,range:b.type==='stonetower'?31:25,cool:0,ballista:towerBallista(b)
+  x:b.x,z:b.z,team:city.team,buildingIndex:city.economy.buildings.indexOf(b),active:true,damage:b.type==='stonetower'?12:8,range:b.type==='stonetower'?31:25,cool:0,ballista:ballistaUnlocked(game.s,city.team)?towerBallista(b):null
  }));
  for(const wall of walls){
   for(const {unit,source} of wallGuards(game.s,city,wall)){

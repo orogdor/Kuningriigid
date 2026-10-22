@@ -1,7 +1,8 @@
-import {siegeDamage} from './medieval-v62.js?v=115a';
+import {craftError} from './era-availability-v116.js?v=116a';
+import {siegeDamage} from './medieval-v62.js?v=116a';
 // V108: battlefield carpentry, wall-scaling access, and occupation-based capture.
 // Durations are wall-clock seconds (battle simulation runs at half speed).
-import {troopRole} from './military-v88.js';
+import {troopRole} from './military-v88.js?v=116a';
 export const SIEGE_CRAFT=Object.freeze({
  ladder:Object.freeze({name:'Redel',wood:18,duration:30,speed:2.6,lane:2.8}),
  tower:Object.freeze({name:'Lükatav piiramistorn',wood:75,duration:120,speed:1.15,lane:5.8}),
@@ -16,6 +17,7 @@ export function availableSiegeWood(state,team){
  return (state?.cities||[]).filter(c=>c.team===team).reduce((total,c)=>total+Math.max(0,c.economy?.realms?.[team]?.resources?.wood||0),0);
 }
 export function startSiegeCraft(b,u,kind,state,nav=null){
+ const eraError=craftError(state,u?.team,kind);if(eraError)return {error:eraError};
  const spec=SIEGE_CRAFT[kind];if(!spec)return {error:'Tundmatu piiramisvahend.'};
  if(!b?.fortress||b.fortress.hp<=0||b.result)return {error:'Piiramisvahendit saab ehitada ainult vaenlase kindlustatud linna piiramisel.'};
  if(!siegeBuilder(u)||u.team===b.fortress.team)return {error:'Vali elus jalaväe- või vibuküttide salk.'};
@@ -128,7 +130,7 @@ export function planSiegeAI(b,state,nav=null){
   if(sections.some(w=>['gatehouse','palisade'].includes(w.type))&&!works.some(w=>w.kind==='ram'))wanted.push('ram');
   if(sections.some(w=>(w.height||0)>4)&&!works.some(w=>w.kind==='tower'))wanted.push('tower');
   if(sections.length&&!works.some(w=>w.kind==='sap'))wanted.push('sap');
-  const kind=wanted.find(kind=>(state.cities||[]).some(c=>c.team===team&&(c.economy?.realms?.[team]?.resources?.wood||0)>=SIEGE_CRAFT[kind].wood));
+  const kind=wanted.find(kind=>!craftError(state,team,kind)&&(state.cities||[]).some(c=>c.team===team&&(c.economy?.realms?.[team]?.resources?.wood||0)>=SIEGE_CRAFT[kind].wood));
   if(kind==='camp')u=builders.sort((a,c)=>(troopRole(a.kind)==='ranged')-(troopRole(c.kind)==='ranged')||len(c,b.fortress)-len(a,b.fortress))[0];
   if(kind)startSiegeCraft(b,u,kind,state,nav);
  }

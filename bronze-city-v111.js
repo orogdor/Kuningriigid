@@ -1,4 +1,4 @@
-import {wallProfile} from './siege-rules-v114.js?v=115a';
+import {wallProfile} from './siege-rules-v114.js?v=116a';
 import {createDestructionModel} from './destruction-v113.js';
 // Late Bronze Age fortified town, inspired by Hattusa; game-scale, not a site reconstruction.
 import * as T from './vendor/three.module.js';

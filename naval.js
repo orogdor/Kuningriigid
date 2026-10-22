@@ -1,5 +1,5 @@
 import {balanceUnitDefinitions} from './unit-balance-v99.js';
-import {UNIT_GRADES,troopCost} from './military-v88.js';
+import {UNIT_GRADES,troopCost} from './military-v88.js?v=116a';
 import {canAfford,spendResources} from './economy.js';
 import {atWar} from './diplomacy-v87.js';
 import {tempoMultiplier} from './tempo.js';
