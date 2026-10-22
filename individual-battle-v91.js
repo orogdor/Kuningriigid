@@ -1,4 +1,4 @@
-import {carriesSword,stoneThrower} from './combat-equipment-v100.js';
+import {carriesSword,stoneThrower} from './combat-equipment-v100.js?v=102a';
 import {committedOpponent,marchingGoal,keepAdvance} from './battle-doctrine-v98.js?v=102a';
 import {retreatPoint} from './battle-movement-v97.js';
 import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
