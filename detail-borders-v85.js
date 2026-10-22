@@ -7,7 +7,7 @@ export function createDetailBorders(game,tile){
  game.refreshTerritory();const byTeam=new Map();
  const owner=p=>game.territory.get(p.c+':'+p.r);
  for(const cell of game.cells){
-  if(Math.abs(cell.x-tile.x)>110||Math.abs(cell.z-tile.z)>110||!game.seen(0,cell))continue;
+  if(Math.abs(cell.x-tile.x)>165||Math.abs(cell.z-tile.z)>165||!game.seen(0,cell))continue;
   const city=owner(cell);if(!city)continue;
   for(const [dc,dr,dx,dz]of [[-1,0,-25,-25],[1,0,25,-25],[0,-1,-25,-25],[0,1,-25,25]]){
    const other=owner({c:cell.c+dc,r:cell.r+dr});if(other?.id===city.id)continue;
