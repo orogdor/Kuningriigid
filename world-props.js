@@ -1,7 +1,7 @@
 // V58: evenly distributed, quality-aware GPU deployment of five low-poly World Atlas GLB props.
 // Uses real GLB geometry. Does not claim 3-view Mudelitehas 0.1.2 certification.
 import * as T from './vendor/three.module.js';
-import {crossingTemplate,crossingFrame,applyCrossingTransform} from './landscape-polish-v84.js?v=85a';
+import {crossingTemplate,crossingFrame,applyCrossingTransform} from './landscape-polish-v84.js?v=123a';
 import {loadWorldGLB} from './scripts/glb_lite.js';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const ROOT='./assets/world1000/';
