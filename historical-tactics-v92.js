@@ -74,15 +74,15 @@ export function tacticalGoal(u,nearest,squads,b,a,nav=null){
   const flank=u.flank||(u.source%2?1:-1);
   // Chariots are mobile missile platforms (Near Eastern practice): no ramming dense infantry.
   // Early mounted fighters must also keep clear of prepared spear walls.
-  const early=u.kind==='chariot'||u.kind==='bronze_cavalry',hazard=nearestGuard&&distance(u,nearestGuard)<(u.kind==='chariot'?19:13);
-  const tooClose=u.kind==='chariot'&&distance(u,nearest)<Math.max(10,a.range*.6);
-  if((hazard&&early)||tooClose){
-   const threat=hazard?nearestGuard:nearest,dx=u.x-threat.x,dz=u.z-threat.z,len=Math.hypot(dx,dz)||1;
+  const early=u.kind==='bronze_cavalry',braced=nearestGuard&&(nearestGuard.formation==='spear_wall'||(nearestGuard.cohesion??0)>.65),hazard=nearestGuard&&distance(u,nearestGuard)<(early?19:braced?17:10);
+  const denseBronzeFoot=early&&enemies.find(q=>troopRole(q.kind)==='melee'&&q.kind!=='militia'&&(q.cohesion??1)>.65&&distance(u,q)<11);
+  if(hazard&&(early||braced)||denseBronzeFoot){
+   const threat=hazard?nearestGuard:denseBronzeFoot||nearest,dx=u.x-threat.x,dz=u.z-threat.z,len=Math.hypot(dx,dz)||1;
    return {x:u.x+dx/len*22,z:u.z+dz/len*22+flank*5};
   }
   if(u.kind==='dragoon'||u.kind==='cuirassier'){
-   const range=a.range*(u.kind==='chariot'?.77:.8),d=distance(u,nearest);
-   if(u.ammoRemaining!==0&&d<=range*1.12)return u.anchor||u;
+   const range=a.range*.8,d=distance(u,nearest);
+   if(u.ammoRemaining!==0&&d<=range*1.12){if(u.kind==='dragoon'&&d<7)return {x:u.x-u.battleSide*12,z:u.z+flank*5};return u.anchor||u;}
    if(u.ammoRemaining!==0)return {x:nearest.x-u.battleSide*range,z:nearest.z+flank*4};
   }
   const spearAhead=early&&nearestGuard&&distance(u,nearestGuard)<25;
