@@ -2,9 +2,9 @@
 // ?demo=bronze-siege creates one attacker supply city and one defended town.
 import {createStoneDemoState} from './stone-demo-v77.js?v=80c';
 import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js';
-import {createBattle,mobilizeCity} from './campaign.js?v=107a';
+import {createBattle,mobilizeCity} from './campaign.js?v=108a';
 import {fortifyBattle} from './fortifications.js';
-import {initializeMen} from './individual-battle-v91.js?v=107a';
+import {initializeMen} from './individual-battle-v91.js?v=108a';
 import {soldierCount} from './soldier-collision-v90.js';
 import {battlefieldTiles} from './battlefield-v88.js';
 import {initArmyExperience} from './army-experience-v88.js';
