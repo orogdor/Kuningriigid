@@ -1,5 +1,6 @@
 import {detailHeight} from './world-details.js';
-import {localSurface} from './continuous-landscape.js';
+import {localSurface} from './continuous-landscape.js?v=123a';
+import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 
 export const MINERAL_BUILDINGS=Object.freeze({quarry:'stone',mine:'ore',coppermine:'copper',tinmine:'tin',claypit:'clay',gem_mine:'gems',oilwell:'oil'});
 export const COASTAL_BUILDINGS=new Set(['fisher','harbor']);
@@ -77,10 +78,10 @@ export function coastalPlacement(game,cell,type,p){
  if(height(low.x,low.z)>=0||height(high.x,high.z)<=.15)return {error:'Vali rannajoon, mitte sisemaa või avameri.'};
  for(let i=0;i<12;i++){const mid=(lo+hi)/2,q=sample(p,mid);if(height(q.x,q.z)>0)hi=mid;else lo=mid;}
  const q=sample(p,(lo+hi)/2),depth=type==='harbor'?8:6;
- if(Math.abs(q.x)>86||Math.abs(q.z)>76)return {error:'Kogu rannahoone peab mahtuma sellele detailkaardile.'};
+ if(Math.abs(q.x)>129||Math.abs(q.z)>114)return {error:'Kogu rannahoone peab mahtuma sellele detailkaardile.'};
  for(const u of [-2,0,2]){
   const land=sample(q,3.5,u),water=sample(q,-3.5,u);
-  const ocean=game.atlasHeight(cell.x+water.x/3,cell.z+water.z/2.6)<.7;
+  const ocean=game.atlasHeight(cell.x+water.x/DETAIL_X,cell.z+water.z/DETAIL_Z)<.7;
   if(height(land.x,land.z)<=.15||height(water.x,water.z)>=0||!ocean)return {error:'Hoone maaosa peab jääma kuivale ja kai merre.'};
  }
  const entry=sample(q,Math.max(9.5,depth+1.5));
