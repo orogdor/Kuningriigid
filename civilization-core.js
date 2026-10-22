@@ -1,4 +1,4 @@
-import {unitSuccessor,buildingSuccessor,suppliesBuilding} from './era-availability-v116.js?v=117a';
+import {unitSuccessor,buildingSuccessor,suppliesBuilding} from './era-availability-v116.js?v=118a';
 import {migrateBattleAmmunition} from './combat-equipment-v100.js';
 import {balanceUnitDefinitions,migrateUnitHealth,UNIT_BALANCE_VERSION} from './unit-balance-v99.js';
 import {createBattleNavigation} from './battle-navigation-v88.js';
