@@ -1,0 +1,28 @@
+name: V124 Campaign Checkpoint 240 Turns
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v124-campaign-checkpoint.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  checkpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: 240-turn four-faction progress checkpoint
+        env:
+          V124_MAX_TURNS: '240'
+        run: node TEST_V124_CAMPAIGN.mjs
+      - name: Save 240-turn AI progress report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v124-campaign-240-turns
+          path: |
+            artifacts-v124/campaign.json
+            artifacts-v124/CAMPAIGN_REPORT.md
+          if-no-files-found: warn
