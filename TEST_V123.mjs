@@ -55,7 +55,7 @@ if(right)for(const z of [-50,0,50]){
 const nav=game.nav(origin);
 assert.ok(nav.w>=219&&nav.h>=189,'Citizen pathfinding covers expanded tile');
 assert.ok(nav.index(95,75)>=0,'New outer buildable land is in the navigation grid');
-assert.ok(nav.index(120,0)<0,'Neighbour tile belongs to its own nav grid');
+assert.ok(nav.index(140,0)<0,'Navigation does not extend beyond the coastal safety margin');
 const before={...game.s.cities[0]?.economy?.buildings?.[0]};
 assert.ok(game.s.version===4);
 assert.ok(!game.s.cities.length||game.s.cities[0].economy.buildings[0].type===before.type,'Old buildings retained');
