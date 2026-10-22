@@ -31,9 +31,10 @@ function downwardArrow(svg,source,target,optional,implicit){
 export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  const state=game.s,research=state.research[0],known=new Set(research.known||[]),isOpen=id=>techBlock(research,id)==='';
  const ids=visibleResearchIds(TECHS,research,isOpen),visible=new Set(ids),entries=ids.map(id=>[id,TECHS[id]]);
+ const narrow=matchMedia('(max-width:480px)').matches;
  const compact=matchMedia('(max-width:700px)').matches;
- const layout=verticalResearchLayout(TECHS,ids,ERA_NAMES.length,V118_ERA_IDS,compact?2:4);
- const initialZoom=compact?.77:1;
+ const layout=verticalResearchLayout(TECHS,ids,ERA_NAMES.length,V118_ERA_IDS,narrow?1:compact?2:4);
+ const initialZoom=narrow?1:compact?.77:1;
  let zoom=clamp(Number(tree.dataset.zoom||initialZoom),.62,1.3);
  let selected=tree.dataset.selectedTech;
  const firstAvailable=ids.find(id=>!known.has(id)&&(TECHS[id].age===state.ages[0]));
