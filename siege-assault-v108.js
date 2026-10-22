@@ -52,7 +52,7 @@ export function tickSiegeCraft(b,dt,nav=null){
   if(!actor||actor.hp<=0||actor.retreated||actor.routing){work.destroyed=true;if(actor)actor.siegeBuildingId=null;continue;}
   if(!work.ready){
    work.progress=Math.min(spec.duration,work.progress+dt*2); // battleDelta = real seconds / 2
-   if(work.progress>=spec.duration){work.ready=true;actor.siegeBuildingId=null;}
+   if(work.progress>=spec.duration-1e-6){work.progress=spec.duration;work.ready=true;actor.siegeBuildingId=null;}
    continue;
   }
   if(!work.arrived){
