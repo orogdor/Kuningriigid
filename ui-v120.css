@@ -71,3 +71,6 @@
  #researchpanel .research-guide:not([open]){font-size:10px}
  #researchpanel .tech-map-viewport{min-height:125px}
 }
+
+/* English-only release: keep legacy language select IDs for initialization, not as UI chrome. */
+.menu-language,header .game-language{display:none!important}
