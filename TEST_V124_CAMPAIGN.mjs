@@ -56,6 +56,6 @@ md.push('','## Linnad, kaubandus, teadus ja sõjad','',
  '- Sõjaoleku sündmusi: '+wars.length,
  '','Detailne kronoloogia ja kõik iga 5 käigu andmed on failis campaign.json.',
  '','## Olulised piirangud','',
- 'See on kiirendatud AI-test, mitte inimese otsustega mäng; 12-sekundiline simulatsioonisamm erineb tavapärasest kaadrisammust. Brauseri lahingu-kokkupõrkekontroll ei ole Civilization.tick osa. Kümme taasesitatavat lahingut on eraldi kontrollitud katsestsenaariumid; neid ei nimetata kampaanias loomulikult peetud lahinguteks.'];
+ 'See on kiirendatud AI-test, mitte inimese otsustega mäng; 12-sekundiline simulatsioonisamm erineb tavapärasest kaadrisammust. Brauseri lahingu-kokkupõrkekontroll ei ole Civilization.tick osa. Kümme taasesitatavat lahingut on eraldi kontrollitud katsestsenaariumid; neid ei nimetata kampaanias loomulikult peetud lahinguteks.');
 fs.writeFileSync(dir+'/CAMPAIGN_REPORT.md',md.join('\n')+'\n');
 console.log('CAMPAIGN_RESULT',JSON.stringify({rounds,modern,cities:cityFoundings.length,trades:trades.length,research:research.length,events:eras.length,final:final.map(x=>({team:x.team,age:x.age,cities:x.cities,pop:x.pop,techs:x.techs,active:x.active,wait:x.wait,deficit:x.deficit}))}));
