@@ -42,14 +42,14 @@ export function chariotGoal(u,target,squads,b,a,nav=null){
  const protectedSpears=foes.filter(v=>isSpear(v)&&(v.formation==='spear_wall'||(v.cohesion??1)>.5));
  const spear=protectedSpears.reduce((q,v)=>!q||distance(u,v)<distance(u,q)?v:q,null);
  const danger=spear&&distance(u,spear)<22?spear:closest;
- const near=distance(u,closest)<11||distance(u,danger)<10,guarded=!!spear&&distance(u,spear)<18;
+ const near=distance(u,closest)<9||distance(u,danger)<9,guarded=!!spear&&distance(u,spear)<12;
  const flank=u.flank||1,elapsed=now-(u.chariotPhaseAt??now);
  const phase=name=>{if(u.chariotPhase!==name){u.chariotPhase=name;u.chariotPhaseAt=now;if(name==='shoot')u.anchor={x:u.x,z:u.z};}};
  if(!u.chariotPhase)phase('approach');
  if(near||guarded)phase('withdraw');
  else if(u.chariotPhase==='shoot'&&elapsed>=5.5)phase('withdraw');
  else if(u.chariotPhase==='withdraw'&&((distance(u,closest)>range*1.2&&elapsed>1.8)||elapsed>6))phase('approach');
- else if(u.chariotPhase==='approach'&&distance(u,target)<range*.9&&distance(u,target)>10&&distance(u,closest)>11)phase('shoot');
+ else if(u.chariotPhase==='approach'&&distance(u,target)<range*.98&&distance(u,target)>11&&distance(u,closest)>10)phase('shoot');
  if(u.chariotPhase==='shoot')return u.anchor||u;
  const d=Math.max(1,distance(u,danger));
  const goal=u.chariotPhase==='withdraw'
