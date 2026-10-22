@@ -35,10 +35,15 @@ jobs:
           test -s vendor/three.module.js
           node --check civilization.js
           node --check civilization-core.js
+          node --check research.js
+          node --check tech-tree-data-v118.js
+          node --check research-tree-v118.js
+          node --check research-ui.js
+          node --check era-availability-v116.js
           node --check campaign.js
           node --check fortifications.js
-          node TEST_V61.mjs
-          node TEST_V60.mjs
+          node TEST_V118.mjs
+          node TEST_V117.mjs
           node TEST_V59.mjs
           node TEST_V67.mjs
           node TEST_V68.mjs
