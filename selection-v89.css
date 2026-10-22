@@ -44,3 +44,13 @@ body #commandhud.readonly .command-buttons{display:none!important}
  body #commandhud .command-buttons #commandattack{flex:1 1 30%!important;min-width:0!important;width:auto!important;font-size:11px!important;min-height:38px!important;height:auto!important;padding:5px 2px!important}
  body #commandhud .command-buttons kbd{display:none!important}
 }
+
+/* V108 on-field siege craft */
+#siege-craft{margin-top:7px;border-top:1px solid #80967b55;padding-top:6px}
+#siege-craft[hidden]{display:none!important}
+#siege-craft>strong{display:block;font-size:11px;margin-bottom:5px}
+#siege-craft .siege-craft-buttons{display:flex;gap:5px}
+#siege-craft .siege-craft-buttons button{flex:1 1 0;min-width:0;padding:5px;border:1px solid #8f956c;border-radius:6px;background:#365044;color:#f3e1bb;font-size:10px;min-height:39px}
+#siege-craft .siege-craft-buttons button:disabled{opacity:.42}
+#siege-craft-progress{display:block;font-size:10px;color:#d2d8c6;margin-top:4px}
+@media(max-width:760px){body.battle #commandhud{max-height:min(360px,calc(100dvh - 130px))!important}#siege-craft .siege-craft-buttons button{font-size:9px}}
