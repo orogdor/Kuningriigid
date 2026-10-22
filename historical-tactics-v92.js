@@ -72,7 +72,7 @@ export function tacticalDamage(attacker,target,amount,projectile=usesArrows(atta
  const braced=isSpear(v)&&!n.moving&&(v.cohesion??1)>.45;
  if(flanked){amount*=front<-.4?1.35:1.15;v.moraleShock=Math.min(18,(v.moraleShock||0)+.25);}
  else if(braced&&projectile==='arrow')amount*=.7;
- if(braced&&horseKind(u)&&!isBow(u))amount*=u.kind==='bronze_cavalry'?.38:.55;
+ if(braced&&horseKind(u)&&!projectile)amount*=u.kind==='bronze_cavalry'?.38:.55;
  if(u.kind==='chariot'&&!projectile)amount*=.5;
  if(isSpear(u)&&troopRole(v.kind)==='cavalry'&&!m.moving&&(u.cohesion??1)>.45)amount*=1.6;
  return formationDamage(attacker,target,amount,projectile)*(1-m.fatigue*.002);
