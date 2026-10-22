@@ -5,8 +5,8 @@ import {detailWorldRoadWidth} from './road-width-v89.js';
 import * as T from './vendor/three.module.js';
 import {landscapeMaterial} from './landscape-material-v85.js?v=85a';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
-import {riverNear,localToWorld} from './continuous-landscape.js?v=122a';
-import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=122a';
+import {riverNear,localToWorld} from './continuous-landscape.js?v=123a';
+import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
@@ -59,7 +59,7 @@ function buffers(vertices,color,{standard=false,opacity=1,shade=null}={}){
  const mat=standard?new T.MeshStandardMaterial({vertexColors:true,roughness:.55,metalness:.10,transparent:opacity!==1,opacity,side:T.DoubleSide,depthWrite:opacity===1}):new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  return new T.Mesh(geo,mat);
 }
-function visible(tile,path,radius=90){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
+function visible(tile,path,radius=110){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
  const water=[],banks=[],fordShoals=[];
