@@ -1,7 +1,7 @@
 import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
-import {tacticalStats,isBow} from './historical-tactics-v92.js?v=102a';
-import {livingMen} from './individual-battle-v91.js?v=102a';
-import {soldierCount} from './soldier-collision-v90.js?v=102a';
+import {tacticalStats,isBow} from './historical-tactics-v92.js?v=103a';
+import {livingMen} from './individual-battle-v91.js?v=103a';
+import {soldierCount} from './soldier-collision-v90.js?v=103a';
 import {UNIT_GRADES} from './military-v88.js';
 import {armyLevel,unitStats,armyForUnit} from './army-experience-v88.js';
 export function selectionDetails(game,q,troops,ships){
