@@ -33,7 +33,9 @@ try{
   assert.equal(result.pausedMenu,true,'No splash screen should block scenario');
   await page.screenshot({path:'artifacts-v124-ui/replay-'+item.id+'.png',timeout:120000});
   await page.evaluate(()=>document.getElementById('menubtn').click());
+  await page.locator('#menu-saves>summary').click();
   await page.locator('#v51export').waitFor({state:'visible',timeout:12000});
+  assert.equal(await page.locator('#v51export').isEnabled(),true,'Replay export button enabled');
   const [file]=await Promise.all([page.waitForEvent('download',{timeout:30000}),page.locator('#v51export').click({timeout:12000})]);
   const name=file.suggestedFilename();
   assert.match(name,/V124_Lahing_\d+\.json/);
