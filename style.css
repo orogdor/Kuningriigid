@@ -163,3 +163,50 @@ body:has(#startmenu:not([hidden])) :is(header,#tools,#commandhud,#hud-resource-t
 @media(max-width:600px){#startmenu .menu-card{padding:18px}#startmenu .menu-heading{align-items:flex-start}#startmenu .menu-heading .eyebrow{font-size:9px;max-width:130px;line-height:1.7}#startmenu .menu-language{font-size:0}#startmenu .menu-language select{font-size:12px}#startmenu .menu-intro{font-size:13px}.menu-world-fields{grid-template-columns:1fr}.menu-seed{grid-column:auto}}
 
 #food-stocks-v87{width:min(34rem,calc(100vw - 2rem));max-height:80dvh;overflow:auto;color:#eee2bc;background:#193735;border:1px solid #b6a572;border-radius:16px;padding:20px;box-shadow:0 18px 70px #0009}#food-stocks-v87::backdrop{background:#071916ad}#food-stocks-v87 p{margin:.45rem 0}#resources [role=button]{cursor:pointer}#resources [role=button]:focus-visible{outline:2px solid #f3d897}
+
+
+/* V118: connected history-based research network, including touch zoom. */
+#researchtree{display:block;overflow:visible;grid-template-columns:none;margin-top:14px;width:100%;min-width:0}
+.research-window{max-width:1450px}
+.tech-tree-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid #ccb98155;padding:12px 0 8px}
+.tech-tree-subtitle{flex:1;min-width:180px;font:16px Georgia,serif;color:#ecd8a3}
+.tech-control,.tech-age-jump,.tech-info-actions button{cursor:pointer;border:1px solid #d5bf825c;color:#eaddbc;background:#25473f;border-radius:6px;padding:9px 12px}
+.tech-control{font-size:20px;font-weight:700;min-width:42px;min-height:42px}
+.tech-scale{font:12px Inter,Arial;min-width:40px;text-align:center}
+.tech-ages{display:flex;gap:8px;overflow:auto;padding:8px 0 12px;scrollbar-width:thin}
+.tech-age-jump{white-space:nowrap;font-size:12px;min-height:36px;flex:none}
+.tech-age-jump.present-age{background:#4b583c;border-color:#f1d68f}
+.tech-map-viewport{width:100%;height:min(61vh,710px);min-height:360px;position:relative;overflow:auto;overscroll-behavior:contain;border:1px solid #ddc48a44;background:#102b2c;scrollbar-width:thin;touch-action:pan-x pan-y}
+.tech-map-space{position:relative}
+.tech-map-canvas{position:absolute;top:0;left:0;transform-origin:top left}
+.tech-era-band{position:absolute;top:0;background:linear-gradient(180deg,#34534924,#18332d11);border-right:2px solid #d8c18639;z-index:0;pointer-events:none}
+.tech-era-band.current{background:linear-gradient(180deg,#b5995d2b,#193b3610)}
+.tech-era-heading{position:absolute;top:18px;margin:0;font:20px Georgia,serif;color:#e8d5a5;z-index:2;white-space:nowrap}
+.tech-links{position:absolute;inset:0;overflow:visible;pointer-events:none;z-index:1}
+.tech-link-path{fill:none;stroke:#92b6a5;stroke-width:1.6;opacity:.25;transition:opacity .15s,stroke .15s,stroke-width .15s}
+.tech-link-path.optional{stroke:#edca8d;stroke-dasharray:7 5}
+.tech-link-path.is-selected{opacity:1;stroke-width:3;stroke:#ead69d}
+.tech-link-path.is-faded{opacity:.08}
+.tech-card.tech-tree-node{position:absolute;margin:0;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;overflow:hidden;padding:8px 9px;text-align:left;border:1px solid #b9bd9c77;border-left-width:4px;border-radius:9px;box-shadow:0 3px 11px #071b1899;z-index:2;cursor:pointer}
+.tech-card.tech-tree-node strong{font-size:12px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tech-card.tech-tree-node span{font-size:10px;white-space:nowrap}
+.tech-card.tech-tree-node small{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tech-card.tech-tree-node progress{flex:none;height:4px;margin-top:auto}
+.tech-card.tech-tree-node.known{background:#234836;border-color:#82c89c}
+.tech-card.tech-tree-node.available{background:#315143;border-color:#f0d58c}
+.tech-card.tech-tree-node.researching{background:#585839;border-color:#eed27f;box-shadow:0 0 0 2px #d6bd70aa}
+.tech-card.tech-tree-node.locked{background:#283b3c;opacity:.75;border-color:#70847b}
+.tech-card.tech-tree-node.is-selected{opacity:1;outline:3px solid #f4d18c;outline-offset:0;z-index:4}
+.tech-card.tech-tree-node.is-neighbor{opacity:1;box-shadow:0 0 0 1px #d9bf88;z-index:3}
+.tech-inspector{display:grid;grid-template-columns:minmax(180px,.7fr) minmax(270px,2fr) auto;align-items:center;gap:10px;padding:12px;border:1px solid #c6b47888;border-radius:8px;background:#19382f;margin:0 0 10px}
+.tech-info-name{font:18px Georgia,serif;color:#eddbab;display:block}
+.tech-info-intro small{display:block;color:#c1d0bf;margin-top:4px}
+.tech-inspector p{margin:5px 0;font-size:11px;line-height:1.45}
+.tech-info-relations{max-height:175px;overflow:auto}
+.tech-info-actions{display:flex;flex-direction:column;gap:6px}
+.tech-info-actions button{min-width:140px}
+.tech-info-actions button:disabled{opacity:.45;cursor:not-allowed}
+.tech-info-actions .tech-study{background:#927942;color:#fff8dc;font-weight:700}
+.tech-legend{font-size:11px;color:#c8d7c5;line-height:1.4;margin:0 0 8px}
+@media(max-width:850px){.tech-inspector{grid-template-columns:1fr 1fr}.tech-info-actions{grid-column:1/-1;flex-direction:row}.tech-info-actions button{flex:1;min-width:0}.tech-map-viewport{height:52vh;min-height:330px}}
+@media(max-width:600px){.tech-inspector{display:flex;flex-direction:column;align-items:stretch;padding:8px}.tech-info-name{font-size:16px}.tech-info-relations{max-height:94px}.tech-info-actions{flex-direction:row}.tech-info-actions button{padding:10px 5px}.tech-map-viewport{height:52dvh;min-height:300px}.research-window{padding:10px}.research-explanation{max-height:40px;overflow:auto}}
