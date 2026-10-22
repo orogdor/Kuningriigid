@@ -1,0 +1,16 @@
+name: V124 Modern Combat Diagnostics
+on:
+  push:
+    branches: [main]
+    paths: [TEST_V124_MODERN_DIAG.mjs, .github/workflows/v124-modern-diag.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node TEST_V124_MODERN_DIAG.mjs
