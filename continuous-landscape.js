@@ -35,7 +35,10 @@ function prep(game){
    const rr0=p?.r??clamp(Math.floor((minZ+550)/50),0,ROWS-1),rr1=q?.r??clamp(Math.floor((maxZ+550)/50),0,ROWS-1);
    a.waterHeight??=Math.max(.86,game.atlasHeight(a.x,a.z)-(2.4+Math.min(2.1,a.width*.20)));
    b.waterHeight??=Math.max(.86,game.atlasHeight(b.x,b.z)-(2.4+Math.min(2.1,b.width*.20)));
-   const seg={a,b};
+   // A ford belongs to the upstream river cell. Its shallow bed runs across
+   // the water, with a short upstream/downstream transition to deep channel.
+   const seg={a,b,ford:!!e.c.ford&&!e.c.bridge,fordX:e.c.x,fordZ:e.c.z,
+    fordTangent:e.points.length>1?unit(e.points[1].x-e.points[0].x,e.points[1].z-e.points[0].z):{x:1,z:0}};
    for(let r=rr0;r<=rr1;r++)for(let c=cc0;c<=cc1;c++){
     const k=r*COLS+c,arr=bucket.get(k)||[];arr.push(seg);bucket.set(k,arr);
    }
@@ -79,13 +82,19 @@ export const getRivers=game=>prep(game).edges;
 export function riverNear(game,x,z){
  const pos=cellAt(x,z);if(!pos)return {distance:Infinity,width:0};
  const bucket=prep(game).bucket.get(idx(pos));if(!bucket)return {distance:Infinity,width:0};
- let nearest=Infinity,width=0,waterHeight=.86;
- for(const {a,b}of bucket){
+ let nearest=Infinity,width=0,waterHeight=.86,fordStrength=0;
+ for(const {a,b,ford,fordX,fordZ,fordTangent}of bucket){
   const dx=b.x-a.x,dz=b.z-a.z,len=dx*dx+dz*dz||1;
   const t=clamp(((x-a.x)*dx+(z-a.z)*dz)/len,0,1),px=a.x+t*dx,pz=a.z+t*dz;
-  const d=Math.hypot(px-x,pz-z);const w=a.width+(b.width-a.width)*t;if(d-w<nearest-width){nearest=d;width=w;waterHeight=a.waterHeight+(b.waterHeight-a.waterHeight)*t}
+  const d=Math.hypot(px-x,pz-z),w=a.width+(b.width-a.width)*t;
+  if(d-w<nearest-width){
+   nearest=d;width=w;waterHeight=a.waterHeight+(b.waterHeight-a.waterHeight)*t;
+   const along=ford?Math.abs((x-fordX)*fordTangent.x+(z-fordZ)*fordTangent.z):Infinity;
+   // 6m of flat, ankle-deep water at the centre, graded over the next 5m.
+   fordStrength=ford?1-smooth((along-5.5)/5.0):0;
+  }
  }
- return {distance:nearest,width,waterHeight};
+ return {distance:nearest,width,waterHeight,fordStrength};
 }
 export function baseHeight(game,x,z){
  const h=game.atlasHeight(x,z);
@@ -117,12 +126,14 @@ const coastal=(smooth((h-3.2)/4)*(1-smooth((h-15)/6)))*4.5*
  return h+ridge+scarp+fractured+coastal-oceanFloor;
 }
 export function worldElevation(game,x,z){
- const base=baseHeight(game,x,z),{distance:d,width:w,waterHeight}=riverNear(game,x,z);
+ const base=baseHeight(game,x,z),{distance:d,width:w,waterHeight,fordStrength=0}=riverNear(game,x,z);
  if(!Number.isFinite(d))return base;
  const inner=w*1.04,outer=Math.max(inner+3.5,w*1.8+3);
  // Incise the SAME water elevation into the terrain, even where a mountain
  // ridge crosses the river. Subtracting depth from the ridge left dry spikes.
- const bed=waterHeight-2.2-Math.max(0,1-d/inner)*1.4;
+ const deep=2.2+Math.max(0,1-d/inner)*1.4;
+ const depth=deep*(1-fordStrength)+.42*fordStrength;
+ const bed=waterHeight-depth;
  if(d<=inner)return Math.min(base,bed);
  if(d>=outer)return base;
  return Math.min(base,bed+(base-bed)*smooth((d-inner)/(outer-inner)));
