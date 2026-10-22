@@ -17,3 +17,5 @@ Alus: GitHub main V112 (`2aa7be51dfeebcaff64bd3aea8fbc3e08dec0272`). Säilitatud
 - TEST_V111: kindluslinna 36 lõiku, 2 väravat, 10 torni, müürigraafik, liikumine, piiramisvahendi hind ja kohalik läbimurre.
 - TEST_V111_UI: arvuti 1440×1000 ja telefon 412×915; 128 müürikaitsjat, 46 kindluse mudelit, müüril liikumine, lõplikud koordinaadid, JavaScripti vigadeta.
 - TEST_V113_UI: brauseris täisterve → kahjustatud → hävinud müür ja katapult; madalad rusud ning surnud masina nähtav vrakk, JavaScripti vigadeta. HP muutus on siin visuaalse oleku test; tegelik kivimürsu tabamus on eraldi simulatsioonitestiga kontrollitud.
+
+Müürikoha reserveerimisel säilib pidev maailmaruumis liikumine: vaba koha korral ei ümardata meeste asukohti iga 7m lõigu keskele. Lisakontroll mõõdab päris meeste liikumist ja piirab sirgel müüril ühe sammu alla 0,3 m.
