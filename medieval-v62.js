@@ -39,7 +39,7 @@ export const MEDIEVAL_UNITS={
  knight:{name:'Rüütel',age:3,cost:{weapons:8,iron:16,bread:20},requires:['stable','armor_workshop'],hp:290,dmg:35,range:3.4,speed:4.3,time:93},
  heavy_cavalry:{name:'Raskeratsavägi',age:3,cost:{weapons:10,iron:21,bread:22},requires:['stable','armor_workshop'],hp:330,dmg:39,range:3.5,speed:3.9,time:110},
  man_at_arms:{name:'Soomustatud jalaväelane',age:3,cost:{weapons:6,iron:12,bread:14},requires:['armor_workshop','barracks'],hp:250,dmg:29,range:3,speed:2.5,time:79},
- catapult:{name:'Katapult',age:3,cost:{plank:65,iron:12,stone:30},requires:['siegeworkshop'],hp:230,dmg:12,range:27,speed:1.5,time:118,siege:3.4},
+ catapult:{name:'Katapult',age:3,cost:{plank:65,iron:12,stone:30},requires:['siegeworkshop'],hp:230,dmg:6,range:27,speed:1.5,time:118,siege:3.4},
  battering_ram:{name:'Müürilõhkuja',age:3,cost:{plank:45,iron:20},requires:['siegeworkshop'],hp:360,dmg:14,range:3.9,speed:1.6,time:94,siege:5.5},
  siege_tower:{name:'Piiramistorn',age:3,cost:{plank:75,iron:16},requires:['siegeworkshop'],hp:300,dmg:9,range:4,speed:1.35,time:115,siege:3.3}
 };
