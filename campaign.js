@@ -5,7 +5,7 @@ import {moveSquad,squadRadius} from './soldier-collision-v90.js?v=110a';
 import {BATTLEFIELD} from './battlefield-v88.js';
 import {rangedTroop,troopRole} from './military-v88.js?v=117a';
 import {unitStats,armyForUnit} from './army-experience-v88.js';
-import {detailHeight} from './world-details.js';
+import {detailHeight} from './world-details.js?v=123a';
 export const COLS=220,ROWS=165,TILE=50,ORIGIN_X=-650,ORIGIN_Z=-550,WORLD_WIDTH=COLS*TILE,WORLD_DEPTH=ROWS*TILE,WORLD_CENTER_X=ORIGIN_X+WORLD_WIDTH/2,WORLD_CENTER_Z=ORIGIN_Z+WORLD_DEPTH/2;
 export function center(c,r){return {x:ORIGIN_X+(c+.5)*TILE,z:ORIGIN_Z+(r+.5)*TILE}}
 export function cellAt(x,z){const c=Math.floor((x-ORIGIN_X)/TILE),r=Math.floor((z-ORIGIN_Z)/TILE);return c>=0&&c<COLS&&r>=0&&r<ROWS?{c,r}:null}
