@@ -85,3 +85,19 @@
  #citypanel .v121-catalog-toolbar{gap:3px}
  #citypanel #buildsearch{height:30px}
 }
+
+
+/* V121.1: forced legacy card flex-basis caused 16px card overlap in the responsive grid.
+   Use vertical flex flow so every card's actual content height determines its slot. */
+#citypanel #citypane-build #tray,
+body.hud-city-open #citypanel #citypane-build #tray,
+body.hud-city-open.hud-queue-open #citypanel #citypane-build #tray{
+ display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;
+ align-items:stretch!important;justify-content:flex-start!important;
+}
+#citypanel #citypane-build #tray>button.v121-build-card{
+ flex:0 0 auto!important;align-self:stretch!important;
+}
+#citypanel #citypane-build #tray>.v121-build-empty{
+ display:block!important;flex:0 0 auto!important;
+}
