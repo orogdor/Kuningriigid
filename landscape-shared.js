@@ -3,11 +3,12 @@
 // either view, rather than independently regenerated.
 import {COLS,ROWS} from './campaign.js';
 
-export const TILE_X=150,TILE_Z=130;
+import {DETAIL_X,DETAIL_Z,DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
+export const TILE_X=DETAIL_TILE_X,TILE_Z=DETAIL_TILE_Z;
 const H_W=25,H_D=25;
-export function worldToDetail(tile,x,z){return {x:(x-tile.x)*3,z:(z-tile.z)*2.6}}
-export function detailToWorld(tile,x,z){return {x:tile.x+x/3,z:tile.z+z/2.6}}
-export const detailBounds=p=>Math.abs(p.x)<=75.3&&Math.abs(p.z)<=65.3;
+export function worldToDetail(tile,x,z){return {x:(x-tile.x)*DETAIL_X,z:(z-tile.z)*DETAIL_Z}}
+export function detailToWorld(tile,x,z){return {x:tile.x+x/DETAIL_X,z:tile.z+z/DETAIL_Z}}
+export const detailBounds=p=>Math.abs(p.x)<=DETAIL_HALF_X+.3&&Math.abs(p.z)<=DETAIL_HALF_Z+.3;
 export function pointsOfRiver(game,cell,count=10){
  if(!cell?.river||!cell.riverTo)return [];
  const target=game.cell(cell.riverTo);
@@ -71,6 +72,6 @@ export function lineToDetail(tile,points){
 }
 export function segmentTouchesTile(tile,a,b,margin=1){
  const A=worldToDetail(tile,a.x,a.z),B=worldToDetail(tile,b.x,b.z);
- return Math.max(A.x,B.x)>=-75-margin&&Math.min(A.x,B.x)<=75+margin
-  &&Math.max(A.z,B.z)>=-65-margin&&Math.min(A.z,B.z)<=65+margin;
+ return Math.max(A.x,B.x)>=-DETAIL_HALF_X-margin&&Math.min(A.x,B.x)<=DETAIL_HALF_X+margin
+  &&Math.max(A.z,B.z)>=-DETAIL_HALF_Z-margin&&Math.min(A.z,B.z)<=DETAIL_HALF_Z+margin;
 }
