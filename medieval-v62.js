@@ -48,7 +48,7 @@ export const SIEGE_KINDS=new Set(['bronze_catapult','catapult','battering_ram','
 export const isSiegeUnit=kind=>SIEGE_KINDS.has(kind);
 export function hasReady(city,type){return city?.economy?.buildings?.some(b=>b.type===type&&b.ready&&b.hp>0&&!b.disabled)}
 export const siegeSection=(building,index)=>({
- index,type:building.type,x:building.x,z:building.z,hp:Math.max(1,building.hp||350),maxHp:Math.max(1,building.hp||350),breached:false
+ index,type:building.type,x:building.x,z:building.z,team:building.team,wallAxis:building.wallAxis||0,hp:Math.max(1,building.hp||350),maxHp:Math.max(1,building.hp||350),breached:false
 });
 export function attachSiegeSections(city,battle){
  if(!battle.fortress)return;
