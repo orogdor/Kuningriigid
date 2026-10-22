@@ -55,7 +55,8 @@ try{
    console.log('V121_WORLD_TARGET',JSON.stringify(p));
    await page.mouse.click(p.x,p.y);
    assert.equal(await page.evaluate(()=>gameDebug.view()),'world','Single world click only selects');
-   await page.mouse.click(p.x,p.y,{delay:60});
+   await page.waitForTimeout(700);
+   await page.mouse.dblclick(p.x,p.y,{delay:55});
    const navState=await page.evaluate(()=>({view:gameDebug.view(),atlas:document.getElementById('atlasdetail')?.textContent,toast:document.getElementById('toast')?.textContent,menu:document.getElementById('startmenu')?.hidden,selected:gameDebug.currentSelection()?.name}));
    console.log('V121_WORLD_AFTER_DOUBLE',JSON.stringify(navState));
    assert.equal(navState.view,'local','Double-click opens detail');
