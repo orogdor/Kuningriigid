@@ -5,12 +5,13 @@ import {FORMATIONS,formationDamage,missileExposure} from './formations-v94.js?v=
 import {BATTLE_FRONT_DEPTH,BATTLE_EMPTY_HALF_WIDTH} from './battle-pacing-v93.js';
 import {troopRole,rangedTroop} from './military-v88.js';
 import {unitStats} from './army-experience-v88.js';
+import {fortifiedBowRange} from './siege-assault-v108.js';
 export const usesArrows=u=>['slinger','archer','bronze_archer','iron_archer','crossbowman','chariot','javelinman'].includes(u.kind);
 export const horseKind=u=>troopRole(u.kind)==='cavalry'||u.kind==='chariot';
 export const isBow=u=>rangedTroop(u.kind)||['chariot','dragoon','cuirassier'].includes(u.kind);
 export const isSpear=u=>['spearman','bronze_spearman','halberdier','pikeman','javelinman'].includes(u.kind);
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
-export function tacticalStats(def,u){const a=unitStats(def,u);a.speed*=u.routing?1:(FORMATIONS[u.formation]||FORMATIONS.line).speed;if(u.kind==='cuirassier')a.range=7.5; if(u.kind==='dragoon'){a.range=Math.min(a.range,17);a.speed*=.92;}if(u.kind==='chariot'){a.range=18*(u.experienceMultiplier||1);a.dmg=18*BOW_DAMAGE_MULTIPLIER*(u.experienceMultiplier||1)*({mobilized:.4,elite:1.4}[u.grade]||1);}return a;}
+export function tacticalStats(def,u){const a=unitStats(def,u);a.range=fortifiedBowRange(u.kind,u.guardPost,a.range);a.speed*=u.routing?1:(FORMATIONS[u.formation]||FORMATIONS.line).speed;if(u.kind==='cuirassier')a.range=7.5; if(u.kind==='dragoon'){a.range=Math.min(a.range,17);a.speed*=.92;}if(u.kind==='chariot'){a.range=18*(u.experienceMultiplier||1);a.dmg=18*BOW_DAMAGE_MULTIPLIER*(u.experienceMultiplier||1)*({mobilized:.4,elite:1.4}[u.grade]||1);}return a;}
 export function deployHistoricalBattle(b){
  const teams=[...new Set(b.squads.map(u=>u.team))];for(let t=0;t<teams.length;t++){const team=teams[t],side=t%2?-1:1,list=b.squads.filter(u=>u.team===team&&!u.guardPost),front=list.filter(u=>troopRole(u.kind)==='melee'&&!/axeman/.test(u.kind)),reserve=list.filter(u=>/axeman/.test(u.kind)),guns=list.filter(u=>['musketeer','arquebusier','line_infantry','rifleman'].includes(u.kind)),bows=list.filter(u=>isBow(u)&&u.kind!=='chariot'&&!guns.includes(u)),mounted=list.filter(u=>troopRole(u.kind)==='cavalry'||troopRole(u.kind)==='vehicle'),other=list.filter(u=>![...front,...reserve,...bows,...guns,...mounted].includes(u));
   const line=(units,depth,spacing,role)=>units.forEach((u,i)=>{u.x=-side*(depth+Math.floor(i/10)*7);u.z=(i%10-(Math.min(10,units.length)-1)/2)*spacing;u.heading=side*Math.PI/2;u.tacticalRole=role;u.battleSide=side;u.deployment={x:u.x,z:u.z};u.releaseAt=role==='support'?16:0;});
