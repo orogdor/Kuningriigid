@@ -42,14 +42,14 @@ export function chariotGoal(u,target,squads,b,a,nav=null){
  const protectedSpears=foes.filter(v=>isSpear(v)&&(v.formation==='spear_wall'||(v.cohesion??1)>.5));
  const spear=protectedSpears.reduce((q,v)=>!q||distance(u,v)<distance(u,q)?v:q,null);
  const danger=spear&&distance(u,spear)<22?spear:closest;
- const near=distance(u,closest)<12||distance(u,danger)<11,guarded=!!spear&&distance(u,spear)<21;
+ const near=distance(u,closest)<11||distance(u,danger)<10,guarded=!!spear&&distance(u,spear)<18;
  const flank=u.flank||1,elapsed=now-(u.chariotPhaseAt??now);
  const phase=name=>{if(u.chariotPhase!==name){u.chariotPhase=name;u.chariotPhaseAt=now;if(name==='shoot')u.anchor={x:u.x,z:u.z};}};
  if(!u.chariotPhase)phase('approach');
  if(near||guarded)phase('withdraw');
- else if(u.chariotPhase==='shoot'&&elapsed>=3.2)phase('withdraw');
+ else if(u.chariotPhase==='shoot'&&elapsed>=5.5)phase('withdraw');
  else if(u.chariotPhase==='withdraw'&&((distance(u,closest)>range*1.2&&elapsed>1.8)||elapsed>6))phase('approach');
- else if(u.chariotPhase==='approach'&&distance(u,target)<range*.92&&distance(u,target)>11&&distance(u,closest)>12)phase('shoot');
+ else if(u.chariotPhase==='approach'&&distance(u,target)<range*.9&&distance(u,target)>10&&distance(u,closest)>11)phase('shoot');
  if(u.chariotPhase==='shoot')return u.anchor||u;
  const d=Math.max(1,distance(u,danger));
  const goal=u.chariotPhase==='withdraw'
@@ -88,8 +88,8 @@ export function tacticalGoal(u,nearest,squads,b,a,nav=null){
   const spearAhead=early&&nearestGuard&&distance(u,nearestGuard)<25;
   if(spearAhead){const offset=flank*23;return {x:nearestGuard.x-u.battleSide*16,z:nearestGuard.z+offset};}
   const edge=Math.max(28,...enemies.filter(q=>troopRole(q.kind)==='melee').map(q=>Math.abs(q.z)))+12;
-  const wing=flank*Math.min(128,edge);
-  if(!u.flankReady&&Math.abs(u.z-wing)>9&&Math.abs(u.x-nearest.x)>13)return {x:u.x,z:wing};
+  const wing=flank*Math.min(72,edge);
+  if(!u.flankReady&&Math.abs(u.z-wing)>8&&Math.abs(u.x-nearest.x)>28&&b.elapsed-(u.flankStartAt??=b.elapsed)<6)return {x:u.x,z:wing};
   u.flankReady=true;
   return squadContactGoal(u,nearest);
  }
