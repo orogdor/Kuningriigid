@@ -18,9 +18,8 @@ const craft=startSiegeCraft(b,attacker,'ladder',s);assert.ok(craft.ok);assert.eq
 for(let i=0;i<150;i++)tickSiegeCraft(b,.1,nav);assert.ok(craft.work.ready);assert.equal(craft.work.progress,30);
 for(let i=0;i<500&&!craft.work.arrived;i++)tickSiegeCraft(b,.1,nav);assert.ok(craft.work.arrived);assert.equal(nav.passable(craft.work.wallX,craft.work.wallZ),false,'An assault ladder does not open a ground passage for chariots');
 assert.ok(orderWallMove(b,attacker,{x:craft.work.wallX,z:craft.work.wallZ},nav).ok);
-// Exercise completed ascent without relying on the enemy's combat movements.
-attacker.x=attacker.wallClimb.entry.groundX;attacker.z=attacker.wallClimb.entry.groundZ;
-for(let i=0;i<31;i++)tickWallWalk(b,.1,nav);assert.ok(attacker.guardPost);assert.ok(attacker.men.every(m=>m.elevation===3.8));
+// Approach and climb using the actual individual positions, without teleporting.
+for(let i=0;i<1600&&!attacker.guardPost;i++)tickWallWalk(b,.1,nav);assert.ok(attacker.guardPost);assert.ok(attacker.men.every(m=>m.elevation===3.8));
 // Gates block their own cells, and opening one does not open all 36 walls.
 const gate=b.siegeSections.find(w=>w.type==='gatehouse');assert.equal(nav.passable(gate.x,gate.z),false);gate.hp=0;gate.breached=true;nav.rebuildSiegeAccess();assert.equal(nav.passable(gate.x,gate.z),true);assert.equal(nav.passable(42,-14),false);
 for(let i=0;i<50;i++)tickIndividualBattle(b,.1,TROOPS,0,nav);

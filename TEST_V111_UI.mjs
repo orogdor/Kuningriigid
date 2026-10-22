@@ -6,7 +6,7 @@ const browser=await chromium.launch({headless:true,executablePath:process.env.CH
 try{for(const [name,viewport]of [['desktop',{width:1440,height:1000}],['mobile',{width:412,height:915}]]){
 const page=await browser.newPage({viewport}),errors=[];page.on('pageerror',e=>errors.push(e.message));
 await page.goto('http://127.0.0.1:8765/?demo=bronze-siege&v=111');await page.waitForFunction(()=>window.gameDebug,null,{timeout:120000});
-assert.match(await page.title(),/V111/);
+assert.match(await page.title(),/V112/);
 const before=await page.evaluate(()=>{const d=gameDebug,b=d.state.battle,models=[];d.localScene.traverse(o=>{if(o.userData.bronzeFortification)models.push(o)});return {sections:b.siegeSections.length,models:models.length,guards:b.squads.filter(u=>u.guardPost).reduce((n,u)=>n+u.men.length,0),maxY:Math.max(...models.map(o=>o.position.y)),perf:d.perfStats()};});
 assert.equal(before.sections,36);assert.equal(before.guards,64);assert.equal(before.models,46);
 await page.screenshot({path:`artifacts-v111/${name}-city.png`,timeout:120000});

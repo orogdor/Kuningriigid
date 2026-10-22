@@ -2,7 +2,7 @@ name: V111 Bronze City Siege
 on:
   push:
     branches: [main]
-    paths: ['*v111*', '*v108*', 'civilization.js', 'fortifications.js', 'individual-battle-v91.js', 'navigation.js', 'battle-navigation-v88.js', 'index.html', 'TEST_V111*', '.github/workflows/v111.yml']
+    paths: ['*v111*', '*v108*', 'civilization.js', 'fortifications.js', 'individual-battle-v91.js', 'navigation.js', 'battle-navigation-v88.js', 'index.html', 'TEST_V111*', 'TEST_V112*', '.github/workflows/v111.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,6 +16,7 @@ jobs:
         with: {node-version: 22}
       - run: |
           node TEST_V111.mjs
+          node TEST_V112.mjs
           npm install --no-save playwright
           echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
       - run: |

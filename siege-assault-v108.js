@@ -46,7 +46,7 @@ export function siegeAssaultGoal(b,u){
 export function tickSiegeCraft(b,dt,nav=null){
  if(!b?.siegeWorks?.length||b.result)return;
  for(const work of b.siegeWorks){
-  if(work.destroyed)continue;
+  if(work.destroyed||work.arrived)continue;
   const actor=b.squads.find(u=>u.source===work.ownerSource&&u.team===work.team);
   const spec=SIEGE_CRAFT[work.kind];
   if(!actor||actor.hp<=0||actor.retreated||actor.routing){work.destroyed=true;if(actor)actor.siegeBuildingId=null;continue;}
@@ -59,7 +59,7 @@ export function tickSiegeCraft(b,dt,nav=null){
    const target={x:work.wallX,z:work.wallZ},distance=len(work,target),speed=spec.speed*dt*2;
    if(distance<=speed+.3){work.x=target.x;work.z=target.z;work.arrived=true;actor.siegeBuildingId=null;nav?.rebuildSiegeAccess?.();}
    else{work.x+=(target.x-work.x)/distance*speed;work.z+=(target.z-work.z)/distance*speed;}
-   actor.anchor={x:work.x-work.inwardX*2,z:work.z-work.inwardZ*2};
+   const follow={x:work.x-work.inwardX*6,z:work.z-work.inwardZ*6};actor.anchor=nav?.nearest(follow,9)||follow;
   }
  }
 }
