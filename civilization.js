@@ -7,6 +7,7 @@ import {SoldierBatch} from './soldier-batch-v90.js';
 import {formationMen,soldierCount} from './soldier-collision-v90.js?v=107a';
 import {selectionDetails} from './selection-info-v89.js?v=107a';
 import {createBronzeBattleState,BRONZE_BATTLE_NAME} from './bronze-battle-demo-v89.js?v=107a';
+import {createBronzeSiegeState,BRONZE_SIEGE_NAME} from './bronze-siege-demo-v108.js';
 import {BATTLEFIELD,applyArmyRetreats,checkBattleRetreats,orderArmyWithdrawal} from './battlefield-v88.js';
 import {createBattleBoundary,batchBattleDecoration} from './battle-scene-v88.js';
 import {UNIT_GRADES,troopCost,rangedTroop} from './military-v88.js';
@@ -67,11 +68,11 @@ import {loadProtectedGame,writeAutosave,replaceProtectedGame} from './save-safet
 const $=id=>document.getElementById(id),dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),copy=x=>JSON.parse(JSON.stringify(x));
 initializeLocalization({BUILDINGS,TECHS,TROOPS,AGES,RESOURCE_NAMES,SHIPS,BASIC_JOBS,ERA_NAMES,onChange:()=>{renderUI();if(typeof slotUI==='function')slotUI()}});
 const demoParam=new URLSearchParams(location.search).get('demo');
-const battleDemo=demoParam==='bronze-battle';
-const stoneDemo=demoParam==='stone',bronzeDemo=demoParam==='bronze',medievalDemo=demoParam==='medieval',renaissanceDemo=demoParam==='renaissance',industrialDemo=demoParam==='industrial',sampleDemo=battleDemo||stoneDemo||bronzeDemo||medievalDemo||renaissanceDemo||industrialDemo;
+const battleDemo=demoParam==='bronze-battle',siegeDemo=demoParam==='bronze-siege';
+const stoneDemo=demoParam==='stone',bronzeDemo=demoParam==='bronze',medievalDemo=demoParam==='medieval',renaissanceDemo=demoParam==='renaissance',industrialDemo=demoParam==='industrial',sampleDemo=siegeDemo||battleDemo||stoneDemo||bronzeDemo||medievalDemo||renaissanceDemo||industrialDemo;
 let recovered=false,state;
 const validState=v=>v?.version===4&&Number.isFinite(v.seed)&&Array.isArray(v.cities)&&Array.isArray(v.settlers)&&Array.isArray(v.units)&&Array.isArray(v.armies);
-const loadedV73=sampleDemo?{state:battleDemo?createBronzeBattleState():stoneDemo?createStoneDemoState():bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
+const loadedV73=sampleDemo?{state:siegeDemo?createBronzeSiegeState():battleDemo?createBronzeBattleState():stoneDemo?createStoneDemoState():bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
 if(!state)try{state=migrateGame(JSON.parse(localStorage.getItem('kingdoms-v1')))}catch{}
 state??=createGame(Math.floor(Math.random()*2147483647));
 let commandMode='select',hoverPoint=null;const cameraKeys=new CameraKeys();let lastMenuRevision=0,lastOverviewStamp='';let selectedShip=null;let cityTab='info';let restarting=false;let game=new Civilization(state),s=game.s,view='world',activeTile=null,chosen=game.cell(s.settlers.find(a=>a.team===0)||s.cities.find(c=>c.team===0)||{c:10,r:11}),selectedMover=s.settlers.find(a=>a.team===0)?.id??null,armySelected=false,selectedArmyId=0,selectedTrade=null,selectedUnit=null,mode=null,wallAxis=0,tab='build',menuOpen=true,paused=false,toastTime=0,zoom=950,drag=null,focus=new T.Vector3(),last=performance.now(),saveTimer=0,uiTimer=0,signature='',localTerrain=null,frameDelta=0,selectedBuilding=null,buildingInspector=null,ghost=null,ghostPoint=null,ghostKey='',lastTrailTime=-1,lastTrailChanges=-1,lastTrailNavVersion=-1;
