@@ -1,4 +1,5 @@
 import {detailWorldRoadWidth} from './road-width-v89.js';
+import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 // V67: one topology for each river system and each road network. The atlas
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
@@ -17,7 +18,7 @@ function join(pts,game,scope,tile,kind,level=1){
  for(let i=0;i<pts.length;i++){
   const p=pts[i],before=pts[Math.max(0,i-1)],after=pts[Math.min(pts.length-1,i+1)];
   const tX=after.x-before.x,tZ=after.z-before.z,d=Math.hypot(tX,tZ)||1;
-  const nx=-tZ/d,nz=tX/d,width=isRiver?p.width:scope==='detail'?detailWorldRoadWidth(level)/2/Math.hypot(nx*3,nz*2.6):wBase;
+  const nx=-tZ/d,nz=tX/d,width=isRiver?p.width:scope==='detail'?detailWorldRoadWidth(level)/2/Math.hypot(nx*DETAIL_X,nz*DETAIL_Z):wBase;
   const left={x:p.x+nx*width,z:p.z+nz*width},right={x:p.x-nx*width,z:p.z-nz*width};
   const outer=isRiver?width+Math.max(1.4,width*.32)*(1+.24*Math.sin(p.x*.17+p.z*.13)):width*1.23;
   const outerL={x:p.x+nx*outer,z:p.z+nz*outer},outerR={x:p.x-nx*outer,z:p.z-nz*outer};
