@@ -2,6 +2,7 @@ import {detailWorldRoadWidth} from './road-width-v89.js';
 import assert from 'node:assert/strict';
 import {Civilization,createGame} from './civilization-core.js';
 import {getRivers,sampleRiver,roadSpline,baseHeight,worldElevation,surface,localSurface,worldToLocal,roadNetwork} from './continuous-landscape.js';
+import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X} from './detail-scale-v123.js';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js';
 import {recordWorldStep} from './roads.js';
 import {COLS,ROWS} from './campaign.js';
@@ -25,7 +26,7 @@ for(const seed of [17,12345,20261018]){
  const cell=first.c,neighbour=game.cell({c:cell.c+1,r:cell.r});
  if(neighbour){
   for(const z of [-24,-12,0,12,24]){
-   const y=localSurface(game,cell,75,z*2.6),other=localSurface(game,neighbour,-75,z*2.6);
+   const y=localSurface(game,cell,DETAIL_HALF_X,z*DETAIL_Z),other=localSurface(game,neighbour,-DETAIL_HALF_X,z*DETAIL_Z);
    assert.ok(Math.abs(y-other)<1e-8,'adjacent detail mesh heights meet exactly at x tile borders');
    const x=cell.x+25,Z=cell.z+z,global=surface(game,x,Z,'world');
    assert.ok(Math.abs((global-.7)*.30-y)<1e-8,'world and detail use the identical mountain/water height field');
@@ -63,9 +64,9 @@ for(const seed of [17,12345,20261018]){
   const W=worldRoad.attributes.position,L=localRoad.attributes.position;
   const wa=worldRoad.index.getX(0),wb=worldRoad.index.getX(1),la=localRoad.index.getX(0),lb=localRoad.index.getX(1);
   // Centerlines retain the world projection; tactical road widths intentionally do not scale 3x.
-  assert.ok(Math.abs((L.getX(la)+L.getX(lb))/2-((W.getX(wa)+W.getX(wb))/2-orig.x)*3)<.002);
+  assert.ok(Math.abs((L.getX(la)+L.getX(lb))/2-((W.getX(wa)+W.getX(wb))/2-orig.x)*DETAIL_X)<.002);
   assert.ok(Math.abs(L.getY(la)-(W.getY(wa)-.7)*.30)<.002);
-  assert.ok(Math.abs((L.getZ(la)+L.getZ(lb))/2-((W.getZ(wa)+W.getZ(wb))/2-orig.z)*2.6)<.002);
+  assert.ok(Math.abs((L.getZ(la)+L.getZ(lb))/2-((W.getZ(wa)+W.getZ(wb))/2-orig.z)*DETAIL_Z)<.002);
   assert.ok(Math.abs(Math.hypot(L.getX(la)-L.getX(lb),L.getZ(la)-L.getZ(lb))-detailWorldRoadWidth(edges[0].level))<.002);
   disposeNetwork(network);disposeNetwork(local);
  }
