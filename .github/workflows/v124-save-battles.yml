@@ -1,0 +1,35 @@
+name: V124 Persist Battle Archive
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v124-save-battles.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  save-battles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Download 10 tested playable battle states from original QA run
+        uses: actions/download-artifact@v4
+        with:
+          name: v124-ten-battles
+          run-id: 39860075725
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v124-replay-output
+      - name: Verify archive and commit permanently
+        run: |
+          set -e
+          test "$(find v124-replay-output -maxdepth 1 -name 'battle-*.json' | wc -l)" -eq 10
+          mkdir -p replays/V124 reports/V124
+          cp v124-replay-output/battle-*.json replays/V124/
+          cp v124-replay-output/TOP10_BATTLES.json reports/V124/TOP10_BATTLES.json
+          cp v124-replay-output/BATTLE_REPORT.md reports/V124/BATTLE_REPORT.md
+          git config user.name "Kuningriigid Test Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add replays/V124 reports/V124/BATTLE_REPORT.md reports/V124/TOP10_BATTLES.json
+          git diff --cached --quiet || (git commit -m "V124: preserve ten tested 1:1 replay starts and full battle analysis" && git push origin HEAD:main)
