@@ -1,12 +1,13 @@
 // V62: medieval walls, castles and independent siege sections.
-import {attachSiegeSections} from './medieval-v62.js';
+import {wallProfile,prepareWall} from './siege-rules-v114.js?v=114a';
+import {attachSiegeSections} from './medieval-v62.js?v=114a';
 // V61: One civilian worker mans each tower; wall soldiers come only from real units.
 export const WALL_TYPES=new Set(['palisade','stonewall','reinforced_wall','keep']);
 export const TOWER_TYPES=new Set(['watchtower','stonetower']);
 // Real collision footprint follows the selected segment orientation.
 // A 7-unit wall otherwise leaves navigation holes at its ends.
 export function configureWallFootprint(b){
- if(!WALL_TYPES.has(b?.type))return b;
+ prepareWall(b);if(!WALL_TYPES.has(b?.type))return b;
  if(b.type==='keep'){b.navWidth=3.3;b.navDepth=3.3;return b;}
  b.wallAxis=b.wallAxis?1:0;
  b.navWidth=b.wallAxis?1.1:3.6;
@@ -15,7 +16,7 @@ export function configureWallFootprint(b){
 }
 export const towerManned=b=>TOWER_TYPES.has(b?.type)&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>=.99;
 export const wallCapacity=type=>type==='keep'?6:type==='reinforced_wall'?4:type==='stonewall'?3:type==='palisade'?2:0;
-export const wallHeight=type=>type==='keep'?6.0:type==='reinforced_wall'?4.35:type==='stonewall'?3.8:type==='palisade'?3.1:0;
+export const wallHeight=type=>wallProfile(type)?.height||(type==='keep'?6:0);
 export function wallGuards(state,ctx,building){
  return state.units.map((unit,source)=>({unit,source})).filter(({unit})=>
   unit.hp>0&&unit.team===ctx.team&&unit.garrison&&
@@ -53,15 +54,18 @@ export function releaseWall(game,ctx,building){
  return {ok:true,source:chosen.source};
 }
 export function fortifyBattle(game,city,battle){
+ for(const b of city.economy.buildings)prepareWall(b);
+ battle.wallWalkEnabled=true;
  const buildings=city.economy.buildings.filter(b=>b.ready&&b.hp>0&&!b.disabled);
  const walls=buildings.filter(b=>WALL_TYPES.has(b.type));
  const towers=buildings.filter(b=>TOWER_TYPES.has(b.type));
  const barrier=walls.reduce((n,b)=>n+(b.type==='reinforced_wall'?220:b.type==='stonewall'?160:85)*Math.max(.1,b.hp/350),0);
  const towerArmor=towers.reduce((n,b)=>n+(b.type==='stonetower'?95:55)*Math.max(.1,b.hp/350),0);
- battle.fortress.hp+=(barrier+towerArmor);
- battle.fortress.maxHp+=(barrier+towerArmor);
+ // Curtain sections have their own health; do not count that armor again as city control HP.
  battle.fortress.defenseBonus=barrier+towerArmor;
  attachSiegeSections(city,battle);
+ battle.wallStairs??=battle.siegeSections.map(w=>{const dx=battle.fortress.x-w.x,dz=battle.fortress.z-w.z,d=Math.hypot(dx,dz)||1;return {x:w.x,z:w.z,groundX:w.x+dx/d*7,groundZ:w.z+dz/d*7,height:w.height};});
+ for(const e of battle.wallStairs){const w=battle.siegeSections.find(w=>Math.hypot(w.x-e.x,w.z-e.z)<1);e.height=w?.height||3.8;}
  battle.defensePosts=towers.filter(towerManned).map(b=>({
   x:b.x,z:b.z,team:city.team,buildingIndex:city.economy.buildings.indexOf(b),active:true,damage:b.type==='stonetower'?12:8,range:b.type==='stonetower'?31:25,cool:0
  }));
@@ -70,7 +74,7 @@ export function fortifyBattle(game,city,battle){
    if(battle.squads.some(q=>q.source===source))continue;
    const slot=wallGuards(game.s,city,wall).findIndex(q=>q.source===source);
    battle.squads.push({source,team:unit.team,kind:unit.kind,grade:unit.grade,experienceMultiplier:unit.experienceMultiplier,menCount:unit.menCount,wallWalk:!!battle.wallWalkEnabled,hp:unit.hp,maxHp:unit.maxHp||unit.hp,morale:unit.morale??100,
-    x:wall.x+(wall.wallAxis?0:(slot-0.5)*1.6),z:wall.z+(wall.wallAxis?(slot-0.5)*1.6:0),heading:wall.wallAxis?Math.PI/2:0,target:null,cool:0,guardPost:true,wallType:wall.type,advance:false});
+    x:wall.x+(wall.wallAxis?0:(slot-0.5)*1.6),z:wall.z+(wall.wallAxis?(slot-0.5)*1.6:0),heading:wall.wallAxis?Math.PI/2:0,target:null,cool:0,guardPost:true,wallElevation:wallHeight(wall.type),wallType:wall.type,advance:false});
   }
  }
  return battle;

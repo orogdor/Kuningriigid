@@ -1,3 +1,4 @@
+import {wallProfile,prepareWall,structuralMultiplier} from './siege-rules-v114.js?v=114a';
 // V62: optional medieval expansion. Definitions are data; older V4 saves retain their schema.
 export const MEDIEVAL_TECHS={
  armor_craft:{name:'Soomusevalmistamine',age:3,turns:4,requires:['civics','smithing'],unlocks:'Soomustöökoda ja raskerelvastus'},
@@ -28,10 +29,10 @@ export const MEDIEVAL_BUILDINGS={
  keep:{name:'Linnus ja peatorn',icon:'♜',cost:{stone:125,cutstone:65,iron:24},requires:['stonetower'],workers:2,time:185},
  gatehouse:{name:'Väravahoone',icon:'▣',cost:{stone:88,cutstone:34,plank:18},requires:['stonewall'],workers:1,time:130},
  siegeworkshop:{name:'Piiramistöökoda',icon:'⚒',cost:{wood:60,plank:70,iron:25},requires:['barracks','saw'],workers:2,time:140},
- reinforced_wall:{name:'Tugevdatud linnamüür',icon:'▤',cost:{stone:74,cutstone:44,iron:12},requires:['stonewall'],workers:0,time:105}
+ reinforced_wall:{name:'Kõrge kivivall',icon:'▤',cost:{stone:120,cutstone:48,wood:20},requires:['stonewall'],workers:0,time:105}
 };
 export const MEDIEVAL_BUILD_TECH={
- armor_workshop:'armor_craft',crossbow_range:'crossbows',guildhall:'guilds',master_workshop:'guilds',watermill:'watermills',windmill:'windmills',infirmary:'medieval_healing',trade_yard:'city_trade',inn:'city_trade',monastery:'monasticism',chapel:'monasticism',keep:'castle_building',gatehouse:'castle_building',siegeworkshop:'siege_engineering',reinforced_wall:'city_fortifications'
+ armor_workshop:'armor_craft',crossbow_range:'crossbows',guildhall:'guilds',master_workshop:'guilds',watermill:'watermills',windmill:'windmills',infirmary:'medieval_healing',trade_yard:'city_trade',inn:'city_trade',monastery:'monasticism',chapel:'monasticism',keep:'castle_building',gatehouse:'stone_fortifications',siegeworkshop:'siege_engineering',reinforced_wall:'stone_fortifications'
 };
 export const MEDIEVAL_UNITS={
  crossbowman:{name:'Ristvibumees',age:3,cost:{weapons:4,plank:6,bread:10},requires:['crossbow_range'],hp:140,dmg:22,range:17,speed:2.65,time:63},
@@ -47,9 +48,9 @@ export const MEDIEVAL_UNIT_TECH={crossbowman:'crossbows',halberdier:'knighthood'
 export const SIEGE_KINDS=new Set(['bronze_catapult','catapult','battering_ram','siege_tower','field_cannon','industrial_artillery']);
 export const isSiegeUnit=kind=>SIEGE_KINDS.has(kind);
 export function hasReady(city,type){return city?.economy?.buildings?.some(b=>b.type===type&&b.ready&&b.hp>0&&!b.disabled)}
-export const siegeSection=(building,index)=>({
- walkable:!!building.bronzeWall,index,type:building.type,x:building.x,z:building.z,team:building.team,wallAxis:building.wallAxis||0,hp:Math.max(1,building.hp||350),maxHp:Math.max(1,building.hp||350),breached:false
-});
+export const siegeSection=(building,index)=>{prepareWall(building);const profile=wallProfile(building.type);return {
+ walkable:true,height:profile?.height||3.8,index,type:building.type,x:building.x,z:building.z,team:building.team,wallAxis:building.wallAxis||0,hp:building.hp,maxHp:building.damageMaxHp||building.hp,breached:building.hp<=0
+};};
 export function attachSiegeSections(city,battle){
  if(!battle.fortress)return;
  battle.siegeSections=(city.economy.buildings||[]).flatMap((b,i)=>b.ready&&b.hp>0&&!b.disabled&&['palisade','stonewall','reinforced_wall','gatehouse'].includes(b.type)?[siegeSection(b,i)]:[]);
@@ -60,10 +61,7 @@ export function attachSiegeSections(city,battle){
  battle.fortress.maxHp+=battle.fortress.keepBonus;
 }
 export function siegeDamage(attacker,section,damage){
- const mode=isSiegeUnit(attacker.kind);
- const multiplier=mode?({bronze_catapult:2.1,catapult:2.9,battering_ram:3.4,siege_tower:1.6,field_cannon:4,industrial_artillery:5}[attacker.kind]||1):.16;
- const armor=section.type==='reinforced_wall'?.72:section.type==='gatehouse'?.86:1;
- const dealt=Math.max(.5,damage*multiplier*armor);
+ const dealt=Math.max(0,damage*structuralMultiplier(attacker.kind,section.type));
  section.hp=Math.max(0,section.hp-dealt);
  if(section.hp===0)section.breached=true;
  return dealt;

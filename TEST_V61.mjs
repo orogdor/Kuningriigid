@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import {TECHS,BUILD_TECH,techBlock} from './research.js';
-import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization-core.js';
+import {TECHS,BUILD_TECH,techBlock} from './research.js?v=114a';
+import {BUILDINGS,BUILD_AGE,TROOPS,Civilization,createGame} from './civilization-core.js?v=114a';
 import {initialState} from './economy.js';
-import {armyUnits} from './v51-systems.js';
-import {createBattle,tickBattle} from './campaign.js';
-import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=61c';
-import {createAgeBuilding} from './buildings.js';
+import {armyUnits} from './v51-systems.js?v=114a';
+import {createBattle,tickBattle} from './campaign.js?v=114a';
+import {WALL_TYPES,TOWER_TYPES,wallHeight,wallGuards,fortifyBattle,configureWallFootprint} from './fortifications.js?v=114a';
+import {createAgeBuilding} from './buildings.js?v=114a';
 
 assert.equal(TECHS.fortifications.age,0);
 assert.equal(TECHS.stone_fortifications.age,1);
@@ -45,7 +45,7 @@ fortifyBattle(game,city,b);
 assert.equal(b.squads.filter(x=>x.guardPost).length,2);
 assert.equal(b.defensePosts.length,1);
 assert.equal(b.defensePosts[0].team,0);
-assert.ok(b.fortress.hp>600,'Wall and tower add protection');
+assert.equal(b.fortress.hp,600,'Wall HP is resolved separately from city control');assert.ok(b.fortress.defenseBonus>0);assert.ok(b.siegeSections.some(w=>w.hp>0));
 const attacker={source:98,team:1,kind:'slinger',hp:120,maxHp:120,morale:100,x:-18,z:0,cool:0,target:null};
 const siege={cell:position,squads:[attacker],fortress:{team:0,x:0,z:0,hp:600,maxHp:600,cool:10},
  defensePosts:[{team:0,x:-9,z:0,damage:9,range:25,cool:0}],elapsed:0,result:null};
@@ -71,7 +71,7 @@ const guardBefore=b.squads[0].x;
 b.squads.push({source:99,team:1,kind:'slinger',hp:120,maxHp:120,morale:100,x:60,z:0,cool:0,target:null});
 b.elapsed=0;b.result=null;
 tickBattle(b,.1,TROOPS,0);
-assert.equal(b.squads[0].x,guardBefore,'Guard stays assigned to wall');
+assert.ok(Math.abs(b.squads[0].x-guardBefore)<.2&&b.squads[0].guardPost,'Guard walks on the wall without leaving its post');
 // New wall collision boxes follow 90-degree rotation and persist when loaded.
 const horizontal=configureWallFootprint({type:'palisade',wallAxis:0}),vertical=configureWallFootprint({type:'stonewall',wallAxis:1});
 assert(horizontal.navWidth>horizontal.navDepth,'horizontal wall must block its full length');

@@ -1,9 +1,9 @@
 // Reproducible Bronze Age fortified-city assault; isolated from normal saves.
 // ?demo=bronze-siege creates one attacker supply city and one defended town.
 import {createStoneDemoState} from './stone-demo-v77.js?v=80c';
-import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js';
-import {createBattle} from './campaign.js?v=113a';
-import {fortifyBattle} from './fortifications.js';
+import {Civilization,TROOPS,BUILDINGS} from './civilization-core.js?v=114a';
+import {createBattle} from './campaign.js?v=114a';
+import {fortifyBattle} from './fortifications.js?v=114a';
 import {soldierCount} from './soldier-collision-v90.js';
 import {battlefieldTiles} from './battlefield-v88.js';
 import {initArmyExperience} from './army-experience-v88.js';
@@ -25,7 +25,7 @@ export function createBronzeSiegeState(seed=20261020){
  const make=(type,x,z,axis=0)=>({type,x,z,wallAxis:axis,team:1,ready:true,disabled:false,hp:type==='gatehouse'?500:650,progress:BUILDINGS[type]?.time||40,assigned:type==='stonetower'?1:0,bronzeWall:true,previewAge:1});
  // Continuous 7m sections; two wooden gates close the only ground passages.
  const walls=[];
- for(let x=-28;x<=42;x+=7)for(const z of [-28,28])walls.push(make(z===28&&x===14?'gatehouse':'stonewall',x,z));
+ for(let x=-28;x<=42;x+=7)for(const z of [-28,28])walls.push(make(z===28&&x===14?'gatehouse':z===28?'reinforced_wall':'stonewall',x,z));
  for(let z=-21;z<=21;z+=7)for(const x of [-28,42])walls.push(make(x===-28&&z===0?'gatehouse':'stonewall',x,z,1));
  const towers=[[-28,-28],[-28,28],[42,-28],[42,28],[-28,-7],[-28,7],[7,28],[21,28],[7,-28],[42,0]].map(([x,z])=>make('stonetower',x,z));
  const town=[['warehouse',31,-17],['cellar',31,17],['market',7,13],['well',9,-7],['barracks',-15,-17],['study',20,16],['bronze_foundry',-15,17],['pottery_kiln',-5,18],...[-8,2,12,22].map(x=>['house',x,-18]),...[-10,1,12,23].map(x=>['house',x,0])].map(([type,x,z])=>make(type,x,z));
@@ -57,6 +57,7 @@ export function createBronzeSiegeState(seed=20261020){
  b.wallWalkEnabled=true;b.wallStairs=[{x:-28,z:-14,groundX:-21,groundZ:-14},{x:-14,z:-28,groundX:-14,groundZ:-21},{x:42,z:14,groundX:35,groundZ:14},{x:28,z:28,groundX:28,groundZ:21}];
  fortifyBattle(g,defender,b);
  let attack=0,defend=0;for(const u of b.squads){if(u.guardPost)continue;if(u.team===0){const i=attack++;u.x=u.kind==='chariot'?-143:u.kind==='bronze_catapult'?-172:-132-Math.floor(i/4)*10;u.z=u.kind==='chariot'?(i%2?43:-43):(i%4-1.5)*10;}else{const i=defend++;u.x=u.kind==='chariot'?65:0+(i%2)*16;u.z=u.kind==='chariot'?38:-9+Math.floor(i/2)*22;}u.deployment={x:u.x,z:u.z};u.anchor={x:u.x,z:u.z};}
+ b.siegeHistoryNote='Pronksiaja linn on mänguline lähendus. Kaks katapulti on teadlik testilisand, mitte pronksiaja ajalooline relvastus.';
  b.historicalRoster={basis:'Kadeš u 1274 eKr; relvaliikide jaotus on mänguline lähendus',attack:{spearmen:96,axemen:48,archers:48,chariots:24,crew:48,catapults:2},defense:{spearmen:72,axemen:24,archers:128,chariots:12,crew:36}};
  for(const u of b.squads)if(u.team===0)u.advance=true;
  s.battle=b;

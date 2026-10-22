@@ -5,7 +5,7 @@ import {FORMATIONS,formationDamage,missileExposure} from './formations-v94.js?v=
 import {BATTLE_FRONT_DEPTH,BATTLE_EMPTY_HALF_WIDTH} from './battle-pacing-v93.js';
 import {troopRole,rangedTroop} from './military-v88.js';
 import {unitStats} from './army-experience-v88.js';
-import {fortifiedBowRange} from './siege-assault-v108.js';
+import {fortifiedBowRange} from './siege-assault-v108.js?v=114a';
 export const usesArrows=u=>['slinger','archer','bronze_archer','iron_archer','crossbowman','chariot','javelinman'].includes(u.kind);
 export const horseKind=u=>troopRole(u.kind)==='cavalry'||u.kind==='chariot';
 export const isBow=u=>rangedTroop(u.kind)||['chariot','dragoon','cuirassier'].includes(u.kind);

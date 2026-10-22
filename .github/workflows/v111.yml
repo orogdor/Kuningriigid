@@ -2,7 +2,7 @@ name: V111 Bronze City Siege
 on:
   push:
     branches: [main]
-    paths: ['*v113*', '*v111*', '*v108*', 'civilization.js', 'fortifications.js', 'individual-battle-v91.js', 'navigation.js', 'battle-navigation-v88.js', 'index.html', 'TEST_V111*', 'TEST_V112*', '.github/workflows/v111.yml']
+    paths: ['*v114*', '*v113*', '*v111*', '*v108*', 'civilization.js', 'fortifications.js', 'individual-battle-v91.js', 'navigation.js', 'battle-navigation-v88.js', 'index.html', 'TEST_V111*', 'TEST_V112*', '.github/workflows/v111.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,12 +18,14 @@ jobs:
           node TEST_V111.mjs
           node TEST_V112.mjs
           node TEST_V113.mjs
+          node TEST_V114.mjs
           npm install --no-save playwright
           echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
       - run: |
           python3 -m http.server 8765 >/tmp/v111-server.log 2>&1 &
           node TEST_V111_UI.mjs
           node TEST_V113_UI.mjs
+          node TEST_V114_UI.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -31,3 +33,4 @@ jobs:
           path: |
             artifacts-v111/
             artifacts-v113/
+            artifacts-v114/

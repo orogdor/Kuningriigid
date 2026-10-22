@@ -1,3 +1,4 @@
+import {wallProfile} from './siege-rules-v114.js?v=114a';
 import {createDestructionModel} from './destruction-v113.js';
 // Late Bronze Age fortified town, inspired by Hattusa; game-scale, not a site reconstruction.
 import * as T from './vendor/three.module.js';
@@ -11,10 +12,12 @@ function parapet(g,w,d,y,closed=false){if(closed)for(const x of [-w/2,w/2]){box(
 // a handful of draw calls per building instead of one per masonry stone.
 function compile(g){g.updateMatrixWorld(true);const groups=new Map();g.traverse(o=>{if(!o.isMesh)return;const geo=o.geometry.toNonIndexed();geo.applyMatrix4(o.matrixWorld);const key=o.material.uuid;if(!groups.has(key))groups.set(key,{material:o.material,list:[]});groups.get(key).list.push(geo);});const out=new T.Group();out.userData={...g.userData};for(const {material,list}of groups.values()){const total=list.reduce((n,a)=>n+a.attributes.position.count,0),geo=new T.BufferGeometry();for(const [key,size]of [['position',3],['normal',3],['uv',2]]){const data=new Float32Array(total*size);let offset=0;for(const a of list){if(a.attributes[key])data.set(a.attributes[key].array,offset*size);offset+=a.attributes.position.count;}geo.setAttribute(key,new T.BufferAttribute(data,size));}geo.computeBoundingSphere();geo.userData.shared=true;const m=new T.Mesh(geo,material);m.castShadow=m.receiveShadow=true;out.add(m);for(const a of list)a.dispose();}g.traverse(o=>o.geometry?.dispose());return out;}
 export function createBronzeCityModel(type,team=1,stage=0){
- if(stage&&['stonewall','stonetower','gatehouse'].includes(type))return createDestructionModel(type,stage);
- if(!['stonewall','stonetower','gatehouse'].includes(type))return null;
+ if(stage&&type==='palisade'){const g=new T.Group();for(let i=0;i<12;i++){const x=(i%6-2.5)*1.05,z=(i<6?-1:1);const o=box(g,x,.2,z,1.5,.25,.3,wood);o.rotation.y=i*.7;}if(stage<3)for(let i=0;i<12;i++){const x=-3.2+i*.56,h=(stage===1?2.8:1.3)+(i%3)*.18;box(g,x,h/2,-1.35,.32,h,.35,wood);}const out=compile(g);out.userData.destruction=true;out.userData.destructionKind=type;out.userData.damageStage=stage;return out;}
+ if(stage&&['palisade','stonewall','reinforced_wall','stonetower','gatehouse'].includes(type)){const g=createDestructionModel(type==='palisade'?'gatehouse':type==='reinforced_wall'?'stonewall':type,stage);g.scale.y=(wallProfile(type)?.height||3.8)/3.8;const root=new T.Group();root.userData={...g.userData};root.add(g);return root;}
+ if(!['palisade','stonewall','reinforced_wall','stonetower','gatehouse'].includes(type))return null;
  const key=type+team;if(cache.has(key))return cache.get(key).clone(true);const g=new T.Group();g.userData.bronzeFortification=true;
- if(type==='stonewall'){masonry(g,7,3.8,2.8);box(g,0,3.72,0,7,.16,3,stone);parapet(g,7,2.8,3.8);}
+ if(type==='stonewall'||type==='reinforced_wall'){const h=wallProfile(type).height;masonry(g,7,h,2.8);box(g,0,h-.08,0,7,.16,3,stone);parapet(g,7,2.8,h);}
+ if(type==='palisade'){for(let x=-3.3;x<=3.4;x+=.38){box(g,x,1.8,-1.35,.32,3.6,.35,wood);box(g,x,1.8,1.35,.32,3.6,.35,wood);}box(g,0,2.3,0,7,.2,2.8,'#9b7c50');for(const x of [-2.7,0,2.7])box(g,x,1.15,0,.24,2.3,2.6,wood);}
  if(type==='stonetower'){masonry(g,4.6,3.8,4.6);for(const a of [-1.45,1.45])for(const edge of [-2,2]){box(g,a,4.9,edge,1.4,2.2,.4,clay);box(g,edge,4.9,a,.4,2.2,1.4,clay);}box(g,0,6.1,0,4.3,.6,4.3,clay);parapet(g,4.7,4.7,6.4,true);for(const z of [-2.17,2.17])for(const x of [-1,1])box(g,x,5.2,z,.24,.75,.08,'#403c30');}
  if(type==='gatehouse'){for(const x of [-2.55,2.55]){const t=new T.Group();masonry(t,1.9,3.8,4.4);box(t,0,5,0,1.9,2.4,4.4,clay);parapet(t,2,4.5,6.2,true);t.position.x=x;g.add(t);}box(g,0,3.6,0,3.2,.4,4.4,stone);for(const x of [-.78,.78]){box(g,x,1.8,0,1.5,3.6,.3,wood);for(const y of [.65,2.7])box(g,x,y,-.2,1.45,.16,.12,'#ab8854');}parapet(g,3.2,4.4,3.8);}
  const result=compile(g);cache.set(key,result);return result.clone(true);
@@ -30,4 +33,4 @@ export function createBronzeTownHouse(type,team=1){
  g.userData.bronzeTown=true;const result=compile(g);cache.set(key,result);return result.clone(true);
 }
 
-export function createWallStairs(){const g=new T.Group();for(let i=0;i<14;i++)box(g,0,(i+1)*3.8/28,-i*.5,2.3,(i+1)*3.8/14,.52,stone);return g;}
+export function createWallStairs(height=3.8){const g=new T.Group();for(let i=0;i<14;i++)box(g,0,(i+1)*height/28,-i*.5,2.3,(i+1)*height/14,.52,stone);return g;}

@@ -1,6 +1,6 @@
 import {battleDelta} from './battle-pacing-v93.js';
 import {deployHistoricalBattle} from './historical-tactics-v92.js?v=110a';
-import {tickIndividualBattle} from './individual-battle-v91.js?v=110a';
+import {tickIndividualBattle} from './individual-battle-v91.js?v=114a';
 import {moveSquad,squadRadius} from './soldier-collision-v90.js?v=110a';
 import {BATTLEFIELD} from './battlefield-v88.js';
 import {rangedTroop,troopRole} from './military-v88.js';

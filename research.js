@@ -1,6 +1,6 @@
 import {PRODUCTIVITY_TECHS} from './productivity-techs-v88.js';
 import {ERA_TECHS,ERA_MATERIALS,ageDeficit,payEraCost} from './era-economy.js';
-import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-v62.js';
+import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-v62.js?v=114a';
 import {researchCost,scienceRate,discoveryUnlocked,EUREKAS,EUREKA_FRACTION} from './science.js';
 import {tempoMultiplier} from './tempo.js';
 export const TURN_SECONDS=60;
@@ -72,7 +72,7 @@ Object.assign(TECHS,{
 // V61: Defensive structures must be researched before placement.
 Object.assign(TECHS,{
  fortifications:{name:'Kaitserajatised',age:0,turns:3,requires:['stone_tools','warfare'],unlocks:'Puidust kaitsemüür ja vahitorn (üks töötaja)'},
- stone_fortifications:{name:'Kivist kindlustused',age:1,turns:4,requires:['bronze','fortifications','masonry'],unlocks:'Kivimüür ning kivist kaitsetorn'}
+ stone_fortifications:{name:'Kivist kindlustused',age:1,turns:4,requires:['bronze','fortifications','masonry'],unlocks:'Madal ja kõrge kivivall ning kivist kaitsetorn'}
 });
 Object.assign(TECHS,MEDIEVAL_TECHS,PRODUCTIVITY_TECHS);
 export const ERA_NAMES=['Kiviaeg','Pronksiaeg','Rauaaeg','Keskaeg','Renessanss','Tööstusajastu','Moodne ajastu'];
