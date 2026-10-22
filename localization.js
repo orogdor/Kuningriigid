@@ -1,5 +1,6 @@
 import {ENGLISH_PAIRS} from './locale-en.js?v=97a';
 import {ENGLISH_V120_PAIRS} from './locale-en-v120.js?v=120a';
+import {TECH_UNLOCKS_EN_V120} from './research-unlocks-en-v120.js?v=120a';
 
 const buildVersion=typeof document!=='undefined'?(document.title.match(/V(\d+)/)?.[1]||'96'):'96';
 // V63: The save file stores gameplay, not language. Language is a separate,
@@ -42,7 +43,10 @@ function captureCollection(collection,fields=['name']){
  if(Array.isArray(collection)){for(const item of collection)if(typeof item==='string')continue;else for(const field of fields)includeField(item,field)}
  else if(collection)for(const obj of Object.values(collection))for(const field of fields)includeField(obj,field);
 }
-function updateDefinitions(){for(const {o,field,et}of binding)o[field]=language==='en'?translateEstonian(et):et}
+function updateDefinitions(){for(const {o,field,et}of binding)o[field]=language==='en'?translateEstonian(et):et;
+ if(language==='en')for(const [id,englishDescription] of Object.entries(TECH_UNLOCKS_EN_V120)){if(techReference?.[id])techReference[id].unlocks=englishDescription;}
+}
+let techReference=null;
 function saveOriginalHTML(){
  for(const [selector]of specialSelectors){const el=document.querySelector(selector);if(el&&!originalHTML.has(el))originalHTML.set(el,el.innerHTML)}
  for(const p of document.querySelectorAll('#help > p'))if(!helpOriginal.has(p))helpOriginal.set(p,p.innerHTML);
@@ -109,6 +113,7 @@ export function changeLanguage(next,{notify=true}={}){
 let notifyChange=null;
 export function initializeLocalization({BUILDINGS,TECHS,TROOPS,AGES,RESOURCE_NAMES,SHIPS,BASIC_JOBS,ERA_NAMES,onChange}){
  notifyChange=onChange;
+ techReference=TECHS;
  captureCollection(BUILDINGS);captureCollection(TECHS,['name','unlocks']);captureCollection(TROOPS);
  captureCollection(AGES);captureCollection(SHIPS);captureCollection(BASIC_JOBS);
  if(Array.isArray(ERA_NAMES))for(let i=0;i<ERA_NAMES.length;i++){const ref=ERA_NAMES,field=i;binding.push({o:ref,field,et:ref[i]})}
