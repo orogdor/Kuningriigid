@@ -54,7 +54,7 @@ import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
 import {renderResearchUI} from './research-ui.js?v=123a';
 import {BUILD_CATEGORIES,buildingCategory,matchesBuilding,appendBuildingCard,renderBuildingCategories} from './build-catalog-v121.js?v=121a';
-import {TileDoubleTap,detailWheelTransition} from './map-gestures-v121.js?v=121a';
+import {TileDoubleTap,detailWheelTransition} from './map-gestures-v121.js?v=123a';
 import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=86a';
 import {createWorldAtlasProps} from './world-props.js?v=123a';
