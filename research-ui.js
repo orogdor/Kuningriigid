@@ -3,7 +3,7 @@ import {RESOURCE_NAMES} from './economy.js';
 import {TECHS,techBlock,ERA_NAMES} from './research.js?v=118a';
 import {researchCost,EUREKAS,scienceRate} from './science.js';
 import {tempoName} from './tempo.js';
-import {renderTechTreeV118} from './research-tree-v118.js?v=118a';
+import {renderTechTreeV119} from './research-tree-v119.js?v=119a';
 const pretty=n=>Number(n||0).toLocaleString('et-EE',{maximumFractionDigits:1});
 export const remaining=(s,id,team=0)=>Math.max(0,researchCost(s,TECHS[id])-(s.research[team].progress[id]||0));
 export const clock=seconds=>!Number.isFinite(seconds)?'Ootab':Math.floor(Math.ceil(seconds)/60)+':'+String(Math.ceil(seconds)%60).padStart(2,'0');
@@ -35,5 +35,5 @@ export function renderResearchUI(game,{choose,queue,remove,details=true}){
  const queued=document.getElementById('researchqueue');queued.innerHTML='';
  for(const id of r.queue||[]){const item=document.createElement('button');item.textContent=TECHS[id].name+' ✕';item.onclick=()=>remove(id);queued.append(item)}
  tree.innerHTML='';
- renderTechTreeV118(tree,game,{choose,queue,remove,rate});
+ renderTechTreeV119(tree,game,{choose,queue,remove,rate});
 }
