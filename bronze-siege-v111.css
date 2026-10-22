@@ -1,0 +1,14 @@
+/* Keep siege construction reachable while leaving the town in view. */
+body.bronze-siege-demo #commandtactics{display:flex;flex-direction:column}
+body.bronze-siege-demo #siege-craft{order:-1;margin:0 0 6px;padding:0 0 6px;border-top:0;border-bottom:1px solid #80967b55}
+@media(max-width:760px){
+ body.bronze-siege-demo #battlepanel{top:54px!important;right:6px!important;left:auto!important;bottom:auto!important;width:170px!important;max-height:200px!important;overflow:auto!important;padding:8px!important}
+ body.bronze-siege-demo #battlepanel h2{font-size:16px!important;margin:2px 0 5px!important;padding-bottom:4px!important}
+ body.bronze-siege-demo #battlepanel p{margin:4px 0!important;font-size:10px!important}
+ body.bronze-siege-demo #battle-factions small,body.bronze-siege-demo #battle-demo-restart{display:none!important}
+ body.bronze-siege-demo #commandhud{max-height:280px!important;overflow:auto!important}
+ body.bronze-siege-demo #commandhud #commandstate{max-height:29px!important;overflow:hidden!important;margin:3px 0!important}
+ body.bronze-siege-demo #commandhud .command-buttons #commandselect,body.bronze-siege-demo #commandhud .command-buttons #commandfocus{display:none!important}
+ body.bronze-siege-demo #siege-craft-progress{font-size:9px!important}
+ body.bronze-siege-demo #formation-help{display:none!important}
+}

@@ -16,13 +16,13 @@ export function createBattleNavigation(game,battle){
   if(Math.abs(x-o.x)>o.rx||Math.abs(z-o.z)>o.rz)return false;
   if(['palisade','stonewall','reinforced_wall','gatehouse'].includes(o.type)){
    const sec=(battle.siegeSections||[]).find(w=>w.x===o.x&&w.z===o.z&&w.type===o.type);
-   if(sec&&assaultLaneAt(battle,x,z,sec))return false;
+   if(sec&&(sec.breached||sec.hp<=0||(!battle.wallWalkEnabled&&assaultLaneAt(battle,x,z,sec))))return false;
   }
   return true;
  });};
  const nav=new Navigation(world,(x,z)=>passable(x*scale,z*scale),()=>[],{minX:Math.ceil((BATTLEFIELD.outerMinX+3)/scale),minZ:Math.ceil((BATTLEFIELD.outerMinZ+3)/scale),w:Math.floor((BATTLEFIELD.outerMaxX-BATTLEFIELD.outerMinX-6)/scale)+1,h:Math.floor((BATTLEFIELD.outerMaxZ-BATTLEFIELD.outerMinZ-6)/scale)+1});
  // Do not spawn soldiers in tiny sealed pockets between overlapping shrubs.
- nav.ensureComponents();let main=1;for(let i=2;i<nav.componentSizes.length;i++)if(nav.componentSizes[i]>nav.componentSizes[main])main=i;for(let i=0;i<nav.n;i++)if(nav.components[i]!==main){nav.mask[i]=0;nav.base[i]=0;}nav.version++;nav.componentVersion=-1;
+ nav.ensureComponents();let main=1;for(let i=2;i<nav.componentSizes.length;i++)if(nav.componentSizes[i]>nav.componentSizes[main])main=i;for(let i=0;i<nav.n;i++)if(!battle.wallWalkEnabled&&nav.components[i]!==main){nav.mask[i]=0;nav.base[i]=0;}nav.version++;nav.componentVersion=-1;
  const down=p=>({x:p.x/scale,z:p.z/scale}),up=p=>p&&({x:p.x*scale,z:p.z*scale});
 // Reuse a persistent tactical path. Worker navigation re-rounds a moving
  // destination and restarts at the previous grid center, making whole ranks

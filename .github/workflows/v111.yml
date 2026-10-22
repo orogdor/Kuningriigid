@@ -1,0 +1,28 @@
+name: V111 Bronze City Siege
+on:
+  push:
+    branches: [main]
+    paths: ['*v111*', '*v108*', 'civilization.js', 'fortifications.js', 'individual-battle-v91.js', 'navigation.js', 'battle-navigation-v88.js', 'index.html', 'TEST_V111*', '.github/workflows/v111.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  siege:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: |
+          node TEST_V111.mjs
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - run: |
+          python3 -m http.server 8765 >/tmp/v111-server.log 2>&1 &
+          node TEST_V111_UI.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V111-bronze-city-siege
+          path: artifacts-v111/

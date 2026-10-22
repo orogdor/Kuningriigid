@@ -50,7 +50,8 @@ const attacker={source:98,team:1,kind:'slinger',hp:120,maxHp:120,morale:100,x:-1
 const siege={cell:position,squads:[attacker],fortress:{team:0,x:0,z:0,hp:600,maxHp:600,cool:10},
  defensePosts:[{team:0,x:-9,z:0,damage:9,range:25,cool:0}],elapsed:0,result:null};
 tickBattle(siege,.1,{slinger:{hp:120,dmg:0,range:10,speed:2}},0);
-assert.equal(attacker.hp,111,'Manned tower actually shoots');
+assert.equal(attacker.hp,115,'Tower shot kills one 5-HP individual; damage does not spill to the next man');
+assert.equal(siege.casualties[1],1,'Exactly one individual dies to the tower shot');
 const idleTower={...tower,assigned:0};
 const noCrewCity={...city,economy:{...econ,buildings:[hall,idleTower]}};
 const empty={squads:[],fortress:{team:0,hp:600,maxHp:600}};

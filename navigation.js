@@ -20,6 +20,8 @@ const FOOTPRINTS=Object.freeze({
 });
 export function buildingClearance(b){
  if(!b||b.type==='bridge')return null;
+ if(b.bronzeWall&&b.type==='gatehouse')return {rx:b.wallAxis?2.2:3.5,rz:b.wallAxis?3.5:2.2};
+ if(b.bronzeWall&&b.type==='stonetower')return {rx:2.4,rz:2.4};
  // Fortification walls are thin *oriented segments*, not wide buildings.
  // The fortification controller supplies these half-extents according to
  // wallAxis. Preserve them exactly so a 90-degree rotated wall keeps free
