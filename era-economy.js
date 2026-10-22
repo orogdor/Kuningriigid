@@ -9,7 +9,7 @@ export const ERA_MATERIALS={
  iron:{plank:50,stone:50,bread:30},
  civics:{iron:20,plank:75,bread:50},
  renaissance:{iron:35,plank:85},
- industrialization:{iron:50,plank:95,gunpowder:12.5},
+ industrialization:{iron:50,plank:120},
  modernity:{steel:35,machines:17.5}
 };
 export const FOOD_EQUIVALENCE={bread:1,flour:.85,grain:.70,...Object.fromEntries(Object.entries(GOODS).filter(([k,d])=>d.food).map(([k])=>[k,1]))};
