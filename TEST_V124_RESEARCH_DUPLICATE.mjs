@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {Civilization,createGame} from './civilization-core.js?v=123a';
 import {tickResearch,TECHS} from './research.js?v=118a';
 const base=new Civilization(createGame(1241023));
-base.aiTeam(0);base.tick(12);
+for(let i=0;i<5;i++){base.aiTeam(0);base.tick(12)}
 const state=JSON.parse(JSON.stringify(base.s));
 assert.ok(state.cities.some(c=>c.team===0));
 assert.ok(state.research[0].active);
