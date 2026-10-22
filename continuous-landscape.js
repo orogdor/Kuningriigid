@@ -3,7 +3,8 @@
 // scales; there are no separate local rivers, road segments or rock placements.
 import {COLS,ROWS,cellAt} from './campaign.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
-export const DETAIL_X=3,DETAIL_Z=2.6,DETAIL_Y=.30;
+export {DETAIL_X,DETAIL_Z,DETAIL_Y} from './detail-scale-v123.js';
+import {DETAIL_X,DETAIL_Z,DETAIL_Y} from './detail-scale-v123.js';
 const S=50,PI=Math.PI;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
