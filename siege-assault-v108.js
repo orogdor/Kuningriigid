@@ -1,12 +1,13 @@
 // V108: battlefield carpentry, wall-scaling access, and occupation-based capture.
 // Durations are wall-clock seconds (battle simulation runs at half speed).
+import {troopRole} from './military-v88.js';
 export const SIEGE_CRAFT=Object.freeze({
  ladder:Object.freeze({name:'Redel',wood:18,duration:30,speed:2.6,lane:2.8}),
  tower:Object.freeze({name:'Lükatav piiramistorn',wood:75,duration:120,speed:1.15,lane:5.8})
 });
 const len=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export const siegeBuilder=u=>!!u&&u.hp>0&&!u.retreated&&!u.reserve&&!u.guardPost&&!u.routing&&!u.civilian&&
-  ['melee','ranged'].includes(u.role||'melee')&&!['scout','militia'].includes(u.kind);
+  ['melee','ranged'].includes(troopRole(u.kind))&&!['scout','militia'].includes(u.kind);
 export function availableSiegeWood(state,team){
  return (state?.cities||[]).filter(c=>c.team===team).reduce((total,c)=>total+Math.max(0,c.economy?.realms?.[team]?.resources?.wood||0),0);
 }
