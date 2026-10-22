@@ -60,7 +60,7 @@ function resolveStoneLandings(b){
    const d=Math.max(0,Math.hypot(m.x-shot.x,m.z-shot.z)-(m.radius||.34)*.25);
    if(d>shot.radius)continue;
    const damage=shot.damage*(.25+.75*(1-d/shot.radius));
-   if(damageMan(b,attacker,{u,m},damage,true)>0){injured++;if(u.team===shot.team)friendlies++;}
+   if(damageMan(b,u.team===shot.team?null:attacker,{u,m},damage,true)>0){injured++;if(u.team===shot.team)friendlies++;}
   }
   for(const structure of [...(b.siegeSections||[]),...(b.fortress?[b.fortress]:[])]){
    if(structure.hp<=0||dist(structure,shot)>shot.radius+2)continue;
