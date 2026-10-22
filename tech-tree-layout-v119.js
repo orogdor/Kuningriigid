@@ -1,6 +1,6 @@
 // V119: stable top-to-bottom DAG layout; hidden research is not represented by nodes or edges.
 // Pure functions also run in Node regression tests (no DOM dependency).
-export const VERTICAL_TREE = Object.freeze({nodeWidth:218,nodeHeight:102,colGap:34,rowGap:64,marginX:36,topGap:74,bottomGap:24,eraGap:65});
+export const VERTICAL_TREE = Object.freeze({nodeWidth:218,nodeHeight:124,colGap:34,rowGap:64,marginX:36,topGap:74,bottomGap:24,eraGap:65});
 export function visibleResearchIds(techs,research,canResearch){
  const known=new Set(research.known||[]);
  return Object.keys(techs).filter(id=>known.has(id)||research.active===id||canResearch(id));
