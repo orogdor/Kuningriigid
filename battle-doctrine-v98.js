@@ -3,7 +3,7 @@ const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 // Squads keep an opponent and a marching lane. Small changes in enemy
 // centroids must not turn an advancing battle line into a series of U-turns.
 export function committedOpponent(u,foes){
- const available=foes.filter(v=>!v.routing),list=available.length?available:foes;
+ const available=foes.filter(v=>v.hp>0&&!v.retreated&&!v.reserve&&!v.routing),routed=foes.filter(v=>v.hp>0&&!v.retreated&&!v.reserve),list=available.length?available:routed;
  const cost=v=>{const d=distance(u,v),horse=horseKind(u),braced=isSpear(v)&&(v.formation==='spear_wall'||(v.cohesion??1)>.65),early=['chariot','bronze_cavalry'].includes(u.kind),missile=['archer','bronze_archer','iron_archer','slinger','crossbowman','musketeer','rifleman'].includes(v.kind);
  return d+Math.abs((u.deployment?.z??u.z)-v.z)*.65+(horse&&braced?(early?100:42):0)+(horse&&v.formation==='shield_wall'?14:0)+(horse&&missile?-13:0)+(horse&&v.routing?-10:0);};
  const best=list.reduce((p,v)=>!p||cost(v)<cost(p)?v:p,null),previous=list.find(v=>v.source===u.engagementTarget);
