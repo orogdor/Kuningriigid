@@ -43,7 +43,7 @@ export function initializeMen(b,nav=null){
 function damageMan(b,attacker,target,amount,splash=false){
  const m=target.m,u=target.u,before=m.hp;m.hp=Math.max(0,m.hp-amount);m.hitTime=b.elapsed;const hit=before-m.hp;
  if(attacker){attacker.m.damageDealt+=hit;attacker.u.damageDealt=(attacker.u.damageDealt||0)+hit;if(!splash){attacker.m.attackTime=b.elapsed;attacker.u.attackTime=b.elapsed;attacker.m.shot={x:attacker.m.x,z:attacker.m.z,toX:m.x,toZ:m.z};attacker.u.shot=attacker.m.shot;}}
- u.hitTime=b.elapsed;u.hp=Math.max(0,u.hp-hit);if(before>0&&m.hp<=0){m.deathTime=b.elapsed;b.casualties[u.team]=(b.casualties[u.team]||0)+1;if(attacker){attacker.m.kills++;attacker.u.kills=(attacker.u.kills||0)+1;}}return hit;
+ u.hitTime=b.elapsed;u.hp=Math.max(0,u.hp-hit);if(before>0&&m.hp<=0){m.deathTime=b.elapsed;b.casualties[u.team]=(b.casualties[u.team]||0)+1;if(attacker&&attacker.m!==m){attacker.m.kills++;attacker.u.kills=(attacker.u.kills||0)+1;}}return hit;
 }
 // An impact hits all living figures in the circle, irrespective of faction.
 function resolveStoneLandings(b){
