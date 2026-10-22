@@ -31,11 +31,13 @@ try{
   assert.ok(result.initial>80&&result.initial<=500);
   assert.ok(result.exports&&result.alive,'Full individual battle models and export available');
   assert.equal(result.pausedMenu,true,'No splash screen should block scenario');
-  const download=page.waitForEvent('download',{timeout:20000});
-  await page.locator('#v51export').click({timeout:12000});
-  const file=await download;const name=file.suggestedFilename();
-  assert.match(name,/V124_Lahing_\d+\.json/);
   await page.screenshot({path:'artifacts-v124-ui/replay-'+item.id+'.png',timeout:120000});
+  await page.evaluate(()=>document.getElementById('menubtn').click());
+  await page.locator('#v51export').waitFor({state:'visible',timeout:12000});
+  const [file]=await Promise.all([page.waitForEvent('download',{timeout:30000}),page.locator('#v51export').click({timeout:12000})]);
+  const name=file.suggestedFilename();
+  assert.match(name,/V124_Lahing_\d+\.json/);
+
   assert.deepEqual(errors,[],'No JavaScript errors while launching replay');
   await page.close();
  }
