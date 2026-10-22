@@ -1,4 +1,5 @@
 import {carriesSword,stoneThrower} from './combat-equipment-v100.js?v=104a';
+import {rockLandingPoint} from './catapult-accuracy-v105.js';
 import {committedOpponent,marchingGoal,keepAdvance} from './battle-doctrine-v98.js?v=104a';
 import {retreatPoint} from './battle-movement-v97.js';
 import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
@@ -12,7 +13,7 @@ import {isSiegeUnit,siegeDamage} from './medieval-v62.js';
 import {BATTLEFIELD,outsideBattlefield,checkBattleRetreats} from './battlefield-v88.js';
 export const MAX_BATTLE_MEN=500;
 // Stones have physical flight time. Damage is resolved on landing, not when fired.
-export const STONE_FLIGHT=1.1, STONE_RADIUS=5.6, CATAPULT_RELOAD=8.4;
+export const STONE_FLIGHT=1.1, STONE_RADIUS=4.2, CATAPULT_RELOAD=8.4;
 export const escapedMen=b=>b.squads.reduce((n,u)=>n+(u.men||[]).filter(m=>m.hp>0&&m.escaped).length,0);
 const live=u=>u.hp>0&&!u.retreated&&!u.reserve;
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
@@ -48,6 +49,8 @@ function damageMan(b,attacker,target,amount,splash=false){
 // An impact hits all living figures in the circle, irrespective of faction.
 function resolveStoneLandings(b){
  b.rockShots??=[];b.rockImpacts??=[];
+ // Convert projectiles already airborne in a saved V104 battle exactly once.
+ for(const shot of b.rockShots)if(shot.balanceVersion!==105){shot.radius*=.75;shot.damage*=1.25;shot.balanceVersion=105;}
  const due=b.rockShots.filter(shot=>shot.landsAt<=b.elapsed);
  b.rockShots=b.rockShots.filter(shot=>shot.landsAt>b.elapsed);
  for(const shot of due){
@@ -93,9 +96,10 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
   const sections=(b.siegeSections||[]).filter(p=>p.hp>0&&p.team!==u.team&&!b.siegeBreached),fort=b.fortress?.hp>0&&b.fortress.team!==u.team?b.fortress:null,wall=isSiegeUnit(u.kind)&&sections.length?sections.reduce((p,v)=>dist(m,v)<dist(m,p)?v:p):null,structure=wall||(!enemy?(sections[0]||fort):null);
   const target=structure||enemy?.m||((m.routing||u.routing)?{x:-u.battleSide*250,z:m.z}:null);if(!target)continue;const d=dist(m,target),desiredHeading=Math.atan2(target.x-m.x,target.z-m.z),defensive=!!(FORMATIONS[u.formation]||{}).defensive&&!m.routing&&!u.routing&&b.pursuitStoppedTeam!==u.team;m.heading=turnTowards(m.heading||0,defensive?(u.formationFacing??u.heading):desiredHeading,dt,defensive?.7:u.kind==='chariot'?.7:troopRole(u.kind)==='cavalry'?1.1:2);const facing=Math.abs(Math.atan2(Math.sin(desiredHeading-m.heading),Math.cos(desiredHeading-m.heading)));const rangedShot=isBow(u)&&m.ammo>0&&(!carriesSword(u)||d>=3);m.weapon=u.kind==='chariot'?(rangedShot?'bow':null):carriesSword(u)?rangedShot?'bow':'sword':stoneThrower(u)?rangedShot?'stone':'melee':['dragoon','cuirassier'].includes(u.kind)?rangedShot?'gun':'sabre':null;const range=(rangedShot?a.range:meleeReach(u,m,enemy?.m))+(u.guardPost&&rangedShot?5:0)+(structure?6:0),chariotReady=u.kind!=='chariot'||(rangedShot&&(u.chariotPhase==='shoot'||u.formation==='hold')&&!m.wasMoving),canAttack=formationAttackReady(u,m,b,chariotReady&&!u.manualOrder&&!m.routing&&!u.routing&&d<=range&&facing<(defensive?1.2:1.65)&&(!rangedShot||!['musketeer','arquebusier','line_infantry','rifleman','machinegun_team','modern_infantry','dragoon','cuirassier','chariot'].includes(u.kind)||clearShot(actor,enemy,agents)));
   m.fatigue=Math.max(0,Math.min(100,m.fatigue+(canAttack?.22:-.3)*dt));if(canAttack){if(m.cool===0){if(!rangedShot&&!structure){m.lastMeleeDistance=d;m.lastMeleeReach=range;}if(u.formation==='volley')m.lastVolley=u.volleyNumber;let amount=a.dmg/(u.guardPost?1:soldierCount(u))*(u.guardPost?1.3:1)*(1+(Array.isArray(tech)?tech[u.team]||0:u.team?0:tech)*.3);
-    u.projectile=rangedShot?(stoneThrower(u)?'stone':usesArrows(u)?'arrow':'bullet'):null;m.projectile=u.projectile;if(rangedShot){m.ammo--;const accurate=shotHits(m,u,d,range,enemy?.u);if(stoneThrower(u)){
-     const angle=(m.shotsFired*2.399963+u.source*1.7)%(Math.PI*2),error=accurate?0:4+(m.shotsFired%4)*2.2,tx=target.x+Math.cos(angle)*error,tz=target.z+Math.sin(angle)*error;
-     b.rockShots??=[];b.rockShots.push({id:u.source+':'+m.id+':'+m.shotsFired,source:u.source,team:u.team,kind:u.kind,manId:m.id,x:tx,z:tz,landsAt:b.elapsed+STONE_FLIGHT,damage:amount,radius:STONE_RADIUS});
+    u.projectile=rangedShot?(stoneThrower(u)?'stone':usesArrows(u)?'arrow':'bullet'):null;m.projectile=u.projectile;if(rangedShot){m.ammo--;const accurate=stoneThrower(u)?null:shotHits(m,u,d,range,enemy?.u);if(stoneThrower(u)){
+     m.shotsFired=(m.shotsFired||0)+1;
+     const {x:tx,z:tz}=rockLandingPoint(u,m.shotsFired,target);
+     b.rockShots??=[];b.rockShots.push({id:u.source+':'+m.id+':'+m.shotsFired,source:u.source,team:u.team,kind:u.kind,manId:m.id,x:tx,z:tz,landsAt:b.elapsed+STONE_FLIGHT,damage:amount,radius:STONE_RADIUS,balanceVersion:105});
      m.attackTime=b.elapsed;m.shot={x:m.x,z:m.z,toX:tx,toZ:tz};u.shot=m.shot;u.attackTime=b.elapsed;
      m.cool=CATAPULT_RELOAD/a.attackSpeed;continue;
     }if(!accurate){m.attackTime=b.elapsed;m.shot={x:m.x,z:m.z,toX:target.x+2,toZ:target.z+2};u.shot=m.shot;u.attackTime=b.elapsed;m.cool=(isSiegeUnit(u.kind)?2.8:1.8)/a.attackSpeed;continue;}}else if(isBow(u))amount*=carriesSword(u)?.6:.35;
