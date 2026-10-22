@@ -45,11 +45,20 @@ try{
    // Directly click the visible world tile. First click selects, second opens details.
    await page.evaluate(()=>gameDebug.openWorld());
    await page.waitForTimeout(900);
-   const p={x:Math.round(size.width*.55),y:Math.round(size.height*.55)};
+   const p=await page.evaluate(async()=>{
+    const d=gameDebug,cell=d.game.cell(d.state.cities.find(c=>c.team===0));
+    const {Vector3}=await import('./vendor/three.module.js');
+    d.camera.updateMatrixWorld(true);
+    const pt=new Vector3(cell.x,0,cell.z).project(d.camera);
+    return {x:Math.round((pt.x+1)*innerWidth/2),y:Math.round((1-pt.y)*innerHeight/2),ndc:{x:pt.x,y:pt.y},seen:d.game.seen(0,cell),cell:[cell.c,cell.r]};
+   });
+   console.log('V121_WORLD_TARGET',JSON.stringify(p));
    await page.mouse.click(p.x,p.y);
    assert.equal(await page.evaluate(()=>gameDebug.view()),'world','Single world click only selects');
    await page.mouse.click(p.x,p.y,{delay:60});
-   assert.equal(await page.evaluate(()=>gameDebug.view()),'local','Double-click opens detail');
+   const navState=await page.evaluate(()=>({view:gameDebug.view(),atlas:document.getElementById('atlasdetail')?.textContent,toast:document.getElementById('toast')?.textContent,menu:document.getElementById('startmenu')?.hidden,selected:gameDebug.currentSelection()?.name}));
+   console.log('V121_WORLD_AFTER_DOUBLE',JSON.stringify(navState));
+   assert.equal(navState.view,'local','Double-click opens detail');
    await page.mouse.move(p.x,p.y);
    await page.mouse.wheel(0,4400);
    assert.equal(await page.evaluate(()=>gameDebug.view()),'world','Deep wheel zoom exits detail to world map');
