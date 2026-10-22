@@ -27,6 +27,7 @@ try{
    const suspicious=visibleText.split('\n').filter(s=>/[õäöü]/i.test(s)).slice(0,25);
    return {win:rect('.research-window'),panel:rect('#researchpanel'),viewer:rect('.tech-map-viewport'),inspector:rect('.tech-inspector'),heading:rect('#researchpanel .research-heading'),controls:rect('.tech-tree-controls'),ages:rect('.tech-ages'),legend:rect('.tech-legend'),close:rect('#closeresearch'),nodeCount:nodeList.length,hiddenNodes:nodeList.filter(e=>e.classList.contains('locked')).length,selectedNode:document.querySelector('.tech-card.is-selected')?.innerText||'',intro,suspicious,viewport:{width:innerWidth,height:innerHeight},overflow:document.documentElement.scrollWidth>innerWidth+2,guideOpen:document.querySelector('.research-guide')?.open};
   });
+  console.log('V120_GEOMETRY',JSON.stringify({viewport,win:result.win,viewer:result.viewer,inspector:result.inspector,ages:result.ages,controls:result.controls,legend:result.legend,suspicious:result.suspicious}));
   assert.ok(result.nodeCount>0,'Technology nodes must render');
   assert.equal(result.hiddenNodes,0,'Future locked nodes must stay hidden');
   assert.match(result.intro,/Technology Tree/);
