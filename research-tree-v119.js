@@ -7,7 +7,7 @@ import {RESOURCE_NAMES} from './economy.js?v=117a';
 import {researchCost,EUREKAS} from './science.js?v=117a';
 const NS='http://www.w3.org/2000/svg';
 const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
-const fmt=n=>Number(n||0).toLocaleString('et-EE',{maximumFractionDigits:1});
+const fmt=n=>Number(n||0).toLocaleString('en-US',{maximumFractionDigits:1});
 const element=(tag,cls,text)=>{
  const e=document.createElement(tag);
  if(cls)e.className=cls;
@@ -41,11 +41,11 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  const lastKnown=[...ids].reverse().find(id=>known.has(id));
  if(!visible.has(selected))selected=research.active||firstAvailable||lastKnown||ids[0];
  const controls=element('div','tech-tree-controls');
- const summary=element('strong','tech-tree-subtitle',known.size+' uuritud · '+ids.filter(id=>!known.has(id)).length+' praegu avatud');
+ const summary=element('strong','tech-tree-subtitle',known.size+' researched · '+ids.filter(id=>!known.has(id)).length+' available now');
  const minus=element('button','tech-control','−'),scale=element('span','tech-scale',''),plus=element('button','tech-control','+');
  minus.type=plus.type='button';
- minus.setAttribute('aria-label','Vähenda tehnoloogiapuud');
- plus.setAttribute('aria-label','Suurenda tehnoloogiapuud');
+ minus.setAttribute('aria-label','Zoom out of technology tree');
+ plus.setAttribute('aria-label','Zoom into technology tree');
  controls.append(summary,minus,scale,plus);
  const jumps=element('div','tech-ages'),ageButtons=[];
  for(const band of layout.bands){
@@ -56,7 +56,7 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  }
  const inspector=element('aside','tech-inspector');
  inspector.setAttribute('aria-live','polite');
- const legend=element('p','tech-legend','Puu areneb ülevalt alla ↓. Pidev nool = kõik vajalikud teadmised (JA); katkendlik = alternatiivne teadmine (VÕI). Avamata harud on peidetud.');
+ const legend=element('p','tech-legend','Research progresses downward ↓. Solid arrows = all prerequisites required (AND); dashed arrows = one alternative (OR). Locked branches remain hidden.');
  const frame=element('div','tech-map-viewport tech-vertical-viewport'),
        space=element('div','tech-map-space'),canvas=element('div','tech-map-canvas');
  canvas.style.width=layout.width+'px';
@@ -96,14 +96,14 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
   card.style.left=x+'px';card.style.top=y+'px';
   card.style.width=VERTICAL_TREE.nodeWidth+'px';card.style.height=VERTICAL_TREE.nodeHeight+'px';
   card.setAttribute('aria-pressed','false');
-  card.setAttribute('aria-label',tech.name+'; '+(done?'Uuritud':active?'Uurimisel':'Saab uurida'));
+  card.setAttribute('aria-label',tech.name+'; '+(done?'Researched':active?'Researching':'Available'));
   card.append(element('strong','tech-node-name',(done?'✓ ':active?'▶ ':'')+tech.name));
-  card.append(element('span','tech-time',done?'Uuritud':fmt(cost)+' TP · '+(rate>0?Math.ceil((cost-progress)/rate)+' min':'Ootab teadust')));
-  card.append(element('small','tech-parents',done?'✓ Teada':active?'▶ Uurimisel':'● Saab uurida'));
+  card.append(element('span','tech-time',done?'Researched':fmt(cost)+' RP · '+(rate>0?Math.ceil((cost-progress)/rate)+' min':'Waiting for research')));
+  card.append(element('small','tech-parents',done?'✓ Known':active?'▶ Researching':'● Available'));
   const bar=element('progress');bar.max=cost;bar.value=done?cost:progress;card.append(bar);
   const detail=element('small','tech-progress-detail');
-  detail.hidden=!progress;detail.textContent='Tehtud '+fmt(progress)+' / '+fmt(cost);card.append(detail);
-  if(EUREKAS[id])card.append(element('small',research.boosted?.includes(id)?'eureka-earned':'eureka-available',research.boosted?.includes(id)?'⚡ +35% saadud':'⚡ +35% boonus'));
+  detail.hidden=!progress;detail.textContent='Progress '+fmt(progress)+' / '+fmt(cost);card.append(detail);
+  if(EUREKAS[id])card.append(element('small',research.boosted?.includes(id)?'eureka-earned':'eureka-available',research.boosted?.includes(id)?'⚡ +35% earned':'⚡ +35% bonus'));
   card.onclick=()=>inspect(id);
   canvas.append(card);cards.set(id,card);
  }
@@ -158,25 +158,25 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
   intro.append(element('strong','tech-info-name',tech.name),
                element('small','',ERA_NAMES[tech.age]+' · '+fmt(researchCost(state,tech))+' teaduspunkti'));
   const missing=techBlock(research,id);
-  intro.append(element('p','',known.has(id)?'✓ Uuritud':research.active===id?'▶ Uurimisel':missing||'✓ Saab kohe uurida'));
+  intro.append(element('p','',known.has(id)?'✓ Researched':research.active===id?'▶ Researching':missing||'✓ Ready to research'));
   inspector.append(intro);
   const relations=element('div','tech-info-relations');
-  const text=(parents.length?'JA: '+parents.map(p=>TECHS[p].name+(known.has(p)?' ✓':'')).join(' + '):'Algteadmine või ajastu eeldused täidetud')+
-             (alternatives.length?' · VÕI: '+alternatives.map(p=>TECHS[p].name+(known.has(p)?' ✓':'')).join(' / '):'');
-  relations.append(element('p','',text),element('p','tech-info-unlocks','Avab: '+tech.unlocks));
-  if(children.length)relations.append(element('p','','Nähtavad järglased: '+[...new Set(children)].map(p=>TECHS[p].name).join(' · ')));
+  const text=(parents.length?'AND: '+parents.map(p=>TECHS[p].name+(known.has(p)?' ✓':'')).join(' + '):'Basic knowledge or era prerequisites fulfilled')+
+             (alternatives.length?' · OR: '+alternatives.map(p=>TECHS[p].name+(known.has(p)?' ✓':'')).join(' / '):'');
+  relations.append(element('p','',text),element('p','tech-info-unlocks','Unlocks: '+tech.unlocks));
+  if(children.length)relations.append(element('p','','Visible successors: '+[...new Set(children)].map(p=>TECHS[p].name).join(' · ')));
   if(ERA_MATERIALS[id]){
    const deficit=ageDeficit(state,0,id);
-   relations.append(element('p','tech-era-cost','Ajastu materjalid: '+Object.entries(ERA_MATERIALS[id]).map(([k,n])=>n+' '+(RESOURCE_NAMES[k]||k)).join(', ')+(Object.keys(deficit).length?' · Puudu: '+Object.entries(deficit).map(([k,n])=>fmt(n)+' '+(RESOURCE_NAMES[k]||k)).join(', '):' · Materjalid olemas')));
+   relations.append(element('p','tech-era-cost','Era materials: '+Object.entries(ERA_MATERIALS[id]).map(([k,n])=>n+' '+(RESOURCE_NAMES[k]||k)).join(', ')+(Object.keys(deficit).length?' · Missing: '+Object.entries(deficit).map(([k,n])=>fmt(n)+' '+(RESOURCE_NAMES[k]||k)).join(', '):' · All materials available')));
   }
   inspector.append(relations);
   const actions=element('div','tech-info-actions');
-  const study=element('button','tech-study','⚗ Uuri');study.type='button';
+  const study=element('button','tech-study','⚗ Research');study.type='button';
   study.disabled=known.has(id)||!!missing||!state.cities.some(c=>c.team===0)||research.active===id;
   study.onclick=()=>choose(id);actions.append(study);
   const plan={known:[...research.known,...(research.active?[research.active]:[]),...(research.queue||[])]};
   const queued=research.queue?.includes(id);
-  const add=element('button','tech-plan-queue',queued?'✓ Järjekorras':'＋ Lisa järjekorda');add.type='button';
+  const add=element('button','tech-plan-queue',queued?'✓ Queued':'＋ Add to Queue');add.type='button';
   add.disabled=known.has(id)||queued||research.active===id||(research.queue?.length||0)>=4||!!techBlock(plan,id)||!state.cities.some(c=>c.team===0);
   add.onclick=()=>queue(id);actions.append(add);inspector.append(actions);
  }
