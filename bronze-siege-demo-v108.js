@@ -43,7 +43,8 @@ export function createBronzeSiegeState(seed=20261020){
  initArmyExperience(s,TROOPS);
  // Keep only the cell coordinates in battle state: copying an entire city there
  // multiplies world data and has caused fragile starts on memory-limited phones.
- const field={c:city.c,r:city.r},b=createBattle(field,s.units,s),defender=city;
+ const mapTile=g.cell(city);if(!mapTile||!Number.isFinite(mapTile.x)||!Number.isFinite(mapTile.z))throw Error('Linnapiiramise detailkaardi asukoht puudub.');
+ const field={c:mapTile.c,r:mapTile.r,x:mapTile.x,z:mapTile.z},b=createBattle(field,s.units,s),defender=city;
  b.squads=b.squads.filter(u=>!s.units[u.source]?.garrison);
  b.attackerTeam=0;b.fortress={team:1,cityId:city.id,x:hall.x,z:hall.z,hp:city.hp,maxHp:city.hp,cool:0};
  mobilizeCity(b,defender);fortifyBattle(g,defender,b);
