@@ -87,11 +87,15 @@ export function riverNear(game,x,z){
   const dx=b.x-a.x,dz=b.z-a.z,len=dx*dx+dz*dz||1;
   const t=clamp(((x-a.x)*dx+(z-a.z)*dz)/len,0,1),px=a.x+t*dx,pz=a.z+t*dz;
   const d=Math.hypot(px-x,pz-z),w=a.width+(b.width-a.width)*t;
+  // A tributary can have a slightly wider closest water segment. The
+  // ford still must stay shallow at its actual crossing coordinates.
+  if(ford&&d<=w+2){
+   const along=Math.abs((x-fordX)*fordTangent.x+(z-fordZ)*fordTangent.z);
+   const across=Math.abs((x-fordX)*(-fordTangent.z)+(z-fordZ)*fordTangent.x);
+   if(across<=w+1.5)fordStrength=Math.max(fordStrength,1-smooth((along-5.5)/5));
+  }
   if(d-w<nearest-width){
    nearest=d;width=w;waterHeight=a.waterHeight+(b.waterHeight-a.waterHeight)*t;
-   const along=ford?Math.abs((x-fordX)*fordTangent.x+(z-fordZ)*fordTangent.z):Infinity;
-   // 6m of flat, ankle-deep water at the centre, graded over the next 5m.
-   fordStrength=ford?1-smooth((along-5.5)/5.0):0;
   }
  }
  return {distance:nearest,width,waterHeight,fordStrength};
