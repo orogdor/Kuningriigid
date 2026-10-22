@@ -1,7 +1,7 @@
 // V123 one-step discovery silhouettes. No spoilers beyond technologies opened by
 // finishing exactly one currently researchable discovery.
 export function researchPreview(techs,research,canResearch){
- const known=new Set(research.known||[]),open=Object.keys(techs).filter(id=>!known.has(id)&&(research.active===id||canResearch(id)));
+ const known=new Set(research.known||[]),open=Object.keys(techs).filter(id=>!known.has(id)&&(research.active===id||canResearch(id,research)));
  const previews=new Map();
  for(const current of open){
   const simulated={...research,known:[...known,current],active:null,v118LegacyActive:null};
