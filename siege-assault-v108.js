@@ -15,7 +15,7 @@ export function startSiegeCraft(b,u,kind,state){
  const spec=SIEGE_CRAFT[kind];if(!spec)return {error:'Tundmatu piiramisvahend.'};
  if(!b?.fortress||b.fortress.hp<=0||b.result)return {error:'Piiramisvahendit saab ehitada ainult vaenlase kindlustatud linna piiramisel.'};
  if(!siegeBuilder(u)||u.team===b.fortress.team)return {error:'Vali elus jalaväe- või vibuküttide salk.'};
- if(u.siegeBuildingId!=null&&(b.siegeWorks||[]).some(w=>w.id===u.siegeBuildingId&&!w.ready))return {error:'Salk ehitab juba piiramisvahendit.'};
+ if(u.siegeBuildingId!=null&&(b.siegeWorks||[]).some(w=>w.id===u.siegeBuildingId&&!w.arrived))return {error:'Salk ehitab juba piiramisvahendit.'};
  const sections=(b.siegeSections||[]).filter(w=>w.hp>0&&!w.breached&&w.team!==u.team);
  if(!sections.length)return {error:'Linnal pole tervet müüri, millele piiramisvahendit asetada.'};
  const wall=sections.reduce((a,w)=>!a||len(w,u)<len(a,u)?w:a,null);
@@ -27,7 +27,7 @@ export function startSiegeCraft(b,u,kind,state){
  const dx=u.x-wall.x,dz=u.z-wall.z,d=Math.hypot(dx,dz)||1;
  const w={id,kind,team:u.team,ownerSource:u.source,wallIndex:wall.index,woodCost:spec.wood,
   duration:spec.duration,progress:0,ready:false,arrived:false,
-  x:wall.x+dx/d*10,z:wall.z+dz/d*10,wallX:wall.x,wallZ:wall.z,supplyCityId:city.id,
+  x:u.x,z:u.z,wallX:wall.x,wallZ:wall.z,supplyCityId:city.id,
   inwardX:-dx/d,inwardZ:-dz/d,startedAt:b.elapsed||0};
  b.siegeWorks.push(w);u.siegeBuildingId=id;u.attackTargetSource=null;u.manualOrder=false;u.target=null;u.anchor={x:u.x,z:u.z};
  return {ok:true,work:w,woodRemaining:stock.wood};
@@ -52,13 +52,14 @@ export function tickSiegeCraft(b,dt,nav=null){
   if(!actor||actor.hp<=0||actor.retreated||actor.routing){work.destroyed=true;if(actor)actor.siegeBuildingId=null;continue;}
   if(!work.ready){
    work.progress=Math.min(spec.duration,work.progress+dt*2); // battleDelta = real seconds / 2
-   if(work.progress>=spec.duration-1e-6){work.progress=spec.duration;work.ready=true;actor.siegeBuildingId=null;}
+   if(work.progress>=spec.duration-1e-6){work.progress=spec.duration;work.ready=true;}
    continue;
   }
   if(!work.arrived){
    const target={x:work.wallX,z:work.wallZ},distance=len(work,target),speed=spec.speed*dt*2;
-   if(distance<=speed+.3){work.x=target.x;work.z=target.z;work.arrived=true;nav?.rebuildSiegeAccess?.();}
+   if(distance<=speed+.3){work.x=target.x;work.z=target.z;work.arrived=true;actor.siegeBuildingId=null;nav?.rebuildSiegeAccess?.();}
    else{work.x+=(target.x-work.x)/distance*speed;work.z+=(target.z-work.z)/distance*speed;}
+   actor.anchor={x:work.x-work.inwardX*2,z:work.z-work.inwardZ*2};
   }
  }
 }
