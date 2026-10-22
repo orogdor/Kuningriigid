@@ -9,7 +9,7 @@ export class TileDoubleTap {
   this.reset();return true;
  }
 }
-export const detailWheelTransition=({view,zoom,deltaY,isBattle=false,localMax=300})=>{
+export const detailWheelTransition=({view,zoom,deltaY,isBattle=false,localMax=450})=>{
  const next=zoom+deltaY*(view==='world'?.5:.04);
  return {zoom:Math.max(view==='world'?150:22,Math.min(view==='world'?9000:isBattle?2800:localMax,next)),
    exitToWorld:view==='local'&&!isBattle&&deltaY>0&&next>=localMax};
