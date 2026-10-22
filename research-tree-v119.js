@@ -1,7 +1,8 @@
 // V119: downward, progressive research tree. Only researched and currently researchable nodes exist in the DOM.
 import {TECHS,techBlock,ERA_NAMES} from './research.js?v=118a';
 import {V118_ERA_IDS} from './tech-tree-data-v118.js?v=118a';
-import {VERTICAL_TREE,visibleResearchIds,verticalResearchLayout} from './tech-tree-layout-v119.js?v=119a';
+import {VERTICAL_TREE,verticalResearchLayout} from './tech-tree-layout-v119.js?v=119a';
+import {progressiveResearchIds} from './research-preview-v123.js?v=123a';
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js?v=118a';
 import {RESOURCE_NAMES} from './economy.js?v=117a';
 import {researchCost,EUREKAS} from './science.js?v=117a';
@@ -30,7 +31,7 @@ function downwardArrow(svg,source,target,optional,implicit){
 }
 export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  const state=game.s,research=state.research[0],known=new Set(research.known||[]),isOpen=id=>techBlock(research,id)==='';
- const ids=visibleResearchIds(TECHS,research,isOpen),visible=new Set(ids),entries=ids.map(id=>[id,TECHS[id]]);
+ const progression=progressiveResearchIds(TECHS,research,(id,r)=>techBlock(r||research,id)===''),{ids,present,previews}=progression,visible=new Set(ids),entries=ids.map(id=>[id,TECHS[id]]);
  const narrow=matchMedia('(max-width:480px)').matches;
  const compact=matchMedia('(max-width:700px)').matches;
  const layout=verticalResearchLayout(TECHS,ids,ERA_NAMES.length,V118_ERA_IDS,narrow?1:compact?2:4);
@@ -41,7 +42,7 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  const lastKnown=[...ids].reverse().find(id=>known.has(id));
  if(!visible.has(selected))selected=research.active||firstAvailable||lastKnown||ids[0];
  const controls=element('div','tech-tree-controls');
- const summary=element('strong','tech-tree-subtitle',known.size+' researched · '+ids.filter(id=>!known.has(id)).length+' available now');
+ const summary=element('strong','tech-tree-subtitle',known.size+' researched · '+[...present].filter(id=>!known.has(id)).length+' available · '+previews.size+' next in grey');
  const minus=element('button','tech-control','−'),scale=element('span','tech-scale',''),plus=element('button','tech-control','+');
  minus.type=plus.type='button';
  minus.setAttribute('aria-label','Zoom out of technology tree');
@@ -59,7 +60,7 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  inspector.setAttribute('role','region');
  inspector.setAttribute('aria-label','Selected technology details');
  inspector.setAttribute('aria-live','polite');
- const legend=element('p','tech-legend','Research progresses downward ↓. Solid arrows = all prerequisites required (AND); dashed arrows = one alternative (OR). Locked branches remain hidden.');
+ const legend=element('p','tech-legend','Research progresses downward ↓. Solid arrows = all prerequisites required (AND); dashed arrows = one alternative (OR). Grey cards preview the discoveries unlocked by your next research. Later technologies remain hidden.');
  const frame=element('div','tech-map-viewport tech-vertical-viewport'),
        space=element('div','tech-map-space'),canvas=element('div','tech-map-canvas');
  canvas.style.width=layout.width+'px';
@@ -93,17 +94,22 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  canvas.append(svg);
  const cards=new Map();
  for(const [id,tech] of entries){
-  const {x,y}=layout.positions.get(id),done=known.has(id),active=research.active===id,progress=research.progress[id]||0,cost=researchCost(state,tech);
-  const card=element('button','tech-card tech-tree-node tech-vertical-node '+(done?'known':active?'researching':'available'));
-  card.type='button';card.dataset.tech=id;
+  const {x,y}=layout.positions.get(id),done=known.has(id),active=research.active===id,preview=previews.has(id),progress=research.progress[id]||0,cost=researchCost(state,tech);
+  const card=element('button','tech-card tech-tree-node tech-vertical-node '+(done?'known':active?'researching':preview?'locked v123-preview':'available'));
+  card.type='button';card.dataset.tech=id;if(preview)card.dataset.preview='true';
   card.style.left=x+'px';card.style.top=y+'px';
   card.style.width=VERTICAL_TREE.nodeWidth+'px';card.style.height=VERTICAL_TREE.nodeHeight+'px';
   card.setAttribute('aria-pressed','false');
-  card.setAttribute('aria-label',tech.name+'; '+(done?'Researched':active?'Researching':'Available'));
-  card.append(element('strong','tech-node-name',(done?'✓ ':active?'▶ ':'')+tech.name));
-  card.append(element('span','tech-time',done?'Researched':fmt(cost)+' RP · '+(rate>0?Math.ceil((cost-progress)/rate)+' min':'Waiting for research')));
-  card.append(element('small','tech-parents',done?'✓ Known':active?'▶ Researching':'● Available'));
-  const bar=element('progress');bar.max=cost;bar.value=done?cost:progress;card.append(bar);
+  card.setAttribute('aria-label',tech.name+'; '+(done?'Researched':active?'Researching':preview?'Preview of next unlock':'Available'));
+  card.append(element('strong','tech-node-name',(done?'✓ ':active?'▶ ':preview?'◇ ':'')+tech.name));
+  card.append(element('span','tech-time',done?'Researched':preview?'Upcoming discovery':fmt(cost)+' RP · '+(rate>0?Math.ceil((cost-progress)/rate)+' min':'Waiting for research')));
+  card.append(element('small','tech-parents',done?'✓ Known':active?'▶ Researching':preview?'○ Locked — next step':'● Available'));
+  if(preview){
+   const reveal=element('small','v123-preview-unlocks',tech.unlocks);
+   reveal.title='Unlocks: '+tech.unlocks;
+   card.append(reveal);
+  }
+  const bar=element('progress');bar.max=cost;bar.value=done?cost:progress;bar.hidden=preview;card.append(bar);
   const detail=element('small','tech-progress-detail');
   detail.hidden=!progress;detail.textContent='Progress '+fmt(progress)+' / '+fmt(cost);card.append(detail);
   if(EUREKAS[id])card.append(element('small',research.boosted?.includes(id)?'eureka-earned':'eureka-available',research.boosted?.includes(id)?'⚡ +35% earned':'⚡ +35% bonus'));
@@ -159,14 +165,15 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
   inspector.replaceChildren();
   const intro=element('div','tech-info-intro');
   intro.append(element('strong','tech-info-name',tech.name),
-               element('small','',ERA_NAMES[tech.age]+' · '+fmt(researchCost(state,tech))+' teaduspunkti'));
+               element('small','',ERA_NAMES[tech.age]+' · '+fmt(researchCost(state,tech))+' research points'));
   const missing=techBlock(research,id);
-  intro.append(element('p','',known.has(id)?'✓ Researched':research.active===id?'▶ Researching':missing||'✓ Ready to research'));
+  intro.append(element('p','',known.has(id)?'✓ Researched':research.active===id?'▶ Researching':previews.has(id)?'◇ Preview — not available yet':'✓ Ready to research'));
   inspector.append(intro);
   const relations=element('div','tech-info-relations');
   const text=(parents.length?'AND: '+parents.map(p=>TECHS[p].name+(known.has(p)?' ✓':'')).join(' + '):'Basic knowledge or era prerequisites fulfilled')+
              (alternatives.length?' · OR: '+alternatives.map(p=>TECHS[p].name+(known.has(p)?' ✓':'')).join(' / '):'');
   relations.append(element('p','',text),element('p','tech-info-unlocks','Unlocks: '+tech.unlocks));
+  if(previews.has(id))relations.append(element('p','v123-preview-requires','Research one of these next to unlock it: '+previews.get(id).map(p=>TECHS[p].name).join(' / ')));
   if(children.length)relations.append(element('p','','Visible successors: '+[...new Set(children)].map(p=>TECHS[p].name).join(' · ')));
   if(ERA_MATERIALS[id]){
    const deficit=ageDeficit(state,0,id);
@@ -175,12 +182,12 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
   inspector.append(relations);
   const actions=element('div','tech-info-actions');
   const study=element('button','tech-study','⚗ Research');study.type='button';
-  study.disabled=known.has(id)||!!missing||!state.cities.some(c=>c.team===0)||research.active===id;
+  study.disabled=known.has(id)||previews.has(id)||!!missing||!state.cities.some(c=>c.team===0)||research.active===id;
   study.onclick=()=>choose(id);actions.append(study);
   const plan={known:[...research.known,...(research.active?[research.active]:[]),...(research.queue||[])]};
   const queued=research.queue?.includes(id);
   const add=element('button','tech-plan-queue',queued?'✓ Queued':'＋ Add to Queue');add.type='button';
-  add.disabled=known.has(id)||queued||research.active===id||(research.queue?.length||0)>=4||!!techBlock(plan,id)||!state.cities.some(c=>c.team===0);
+  add.disabled=known.has(id)||previews.has(id)||queued||research.active===id||(research.queue?.length||0)>=4||!!techBlock(plan,id)||!state.cities.some(c=>c.team===0);
   add.onclick=()=>queue(id);actions.append(add);inspector.append(actions);
  }
  redrawScale();
