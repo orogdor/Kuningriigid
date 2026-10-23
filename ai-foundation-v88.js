@@ -29,6 +29,15 @@ export function reservesFoundation(game,city,type){
  if(type==='well'&&(realm.resources.water||0)<realm.pop*2)return false;
  if(type==='house'&&realm.pop>=4+1.5*buildings.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length-1)return false;
  const stock=city.economy.realms[city.team].resources,cost=BUILDINGS[type]?.cost||{};
+ // The first masonry workshop and defenders are necessities for a prosperous
+ // Bronze/Medieval town, not optional luxury. Never consume emergency stores.
+ const activeHomes=buildings.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
+ const hasMarket=buildings.some(b=>b.type==='market'&&b.ready&&b.hp>0);
+ if(['mason','barracks'].includes(type)&&game.s.ages[city.team]>=1&&realm.pop>=11&&
+    activeHomes>=4&&hasMarket&&foodTotal(stock)>=realm.pop*3&&
+    (stock.water||0)>=realm.pop*1.5&&
+    (stock.wood||0)-(cost.wood||0)>=23&&
+    (stock.stone||0)-(cost.stone||0)>=18)return false;
  // A growing Bronze/Medieval town may fund its first market without
  // dismantling the remaining wood/stone reserve needed for survival.
  if(type==='market'&&game.s.ages[city.team]>=1&&realm.pop>=5&&
