@@ -1,0 +1,41 @@
+name: V135 Real AI City Test
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v135-ai-city.yml'
+      - 'historical-city-v135.js'
+      - 'scripts/make-ai-city-v135.mjs'
+      - 'TEST_V135.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: V135 deterministic placement regression
+        run: node TEST_V135.mjs
+      - name: Simulate natural AI empire and export savegame
+        run: node scripts/make-ai-city-v135.mjs
+      - name: Validate generated save
+        run: |
+          test -s scenarios/ai-city-v135.json
+          node -e "const x=require('./scenarios/ai-city-v135.json');if(!x.aiCityTestV135||x.cities.filter(c=>c.team===0).length<1)process.exit(1);console.log(x.aiCityTestV135)"
+      - name: Commit the simulated scenario
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scenarios/ai-city-v135.json scenarios/ai-city-v135.manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "V135: publish authentic AI-built city save"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
