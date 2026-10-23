@@ -55,5 +55,5 @@ export function ancientWallPlan(buildings=[],wall='palisade',tower='watchtower',
 export function reserveAfterWalls(stock,cost){
  const remaining={...stock};
  for(const [resource,n] of Object.entries(cost||{}))remaining[resource]=(remaining[resource]||0)-n;
- return (remaining.wood||0)>=20&&(remaining.stone||0)>=18&&((cost?.plank||0)===0||(remaining.plank||0)>=8);
+ return (remaining.wood||0)>=12&&(remaining.stone||0)>=18&&((cost?.plank||0)===0||(remaining.plank||0)>=8);
 }
