@@ -81,7 +81,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  // V136: every established town needs civic functions, not only production buildings.
  // A Bronze settlement without a marketplace is still a village; reserve time
  // for civic construction even during long era-research material shortages.
- if(age>=1&&r.pop>=5)add('market',218,'Ajaloolise linnasüdame oluline turuplats');
+ if(age>=1&&r.pop>=5)add('market',244,'Ajaloolise linnasüdame oluline turuplats');
  if(age>=1&&r.pop>=8)add('warehouse',172,'Kaubanduse ja ehitusmaterjalide põhilaod');
  if(age>=1&&r.pop>=10)add('cellar',168,'Linnakodanike ühine toidukelder');
  if(age>=3&&r.pop>=11){
@@ -90,7 +90,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  }
  // Central civic services are not decoration. Ensure every district capital
  // prioritises one operational research, storage, water and market facility.
- if(r.pop>=5)add(game.obsoleteBuilding?.(team,'study')||'study',207,'Teaduse ja hariduse keskne töökoht');
+ if(r.pop>=5)add(game.obsoleteBuilding?.(team,'study')||'study',226,'Teaduse ja hariduse keskne töökoht');
  if(r.pop>=6){const existingEducation=buildings.some(b=>EDUCATION_TYPES.includes(b.type)&&b.hp>0&&!b.disabled);if(!existingEducation)for(const type of ['study','scriptorium','library','school'])add(type,200,'Linna esimene haridusasutus');}
  if(r.pop>=11)for(const type of ['scriptorium','library','school','academy'])add(type,141,'Hariduse järgmine tase');
  if(age>=1&&r.pop>=9)add('scriptorium',164,'Ajaloolise linna kirjutuskoda');
@@ -146,7 +146,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
    (gaps.plank>35&&(stock.plank||0)>=BUILDINGS.house.cost.plank+12)||
    (gaps.bread>0)||
    (gaps.wood>0&&(stock.wood||0)>=BUILDINGS.house.cost.wood+20);
-  if(enoughToInvest||capacity<=r.pop+1.5)add('house',r.pop>=capacity-2?216:missing?104:112,'Eluruumid ja järgmise rahvastikukasvu varu');
+  if(enoughToInvest||capacity<=r.pop+1.5)add('house',r.pop>=capacity-2?238:missing?104:112,'Eluruumid ja järgmise rahvastikukasvu varu');
  }
  const foodCap=game.storageCap(city,'bread'),materialCap=game.storageCap(city,'plank');
  const eraCost=ERA_MATERIALS[science.ageWait?.id]||{};
