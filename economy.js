@@ -102,7 +102,7 @@ if(Math.floor(s.time/60)>before)for(const team of s.realms.map((_,i)=>i)){
    supplied=food+1e-6>=foodNeed&&water+1e-6>=waterNeed;}
  r.housingShortage=!supplied;
  r.growthProgress??=0;
- r.growthNeed=(2.3+r.pop*.28)*(env.growthFactor||1);
+ const growth=env.marketFoodGrowth?.(team,r)||{multiplier:1,varieties:[],bonus:0};r.marketFoodVarietiesV137=growth.varieties.length;r.marketFoodBonusV137=growth.bonus;r.growthNeed=(2.3+r.pop*.28)*(env.growthFactor||1)/Math.max(1,growth.multiplier);
  if(supplied){
    r.shortageTurns=0;
    if(r.pop<cap){
