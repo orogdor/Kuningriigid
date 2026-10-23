@@ -92,6 +92,6 @@ export function coastalSites(game,cell,type){
  let cache=shoreCache.get(game);if(!cache){cache=new Map();shoreCache.set(game,cache);}
  const key=cell.c+':'+cell.r+':'+type;if(cache.has(key))return cache.get(key);
  const result=[],seen=new Set();
- for(let x=-120;x<=120;x+=6)for(let z=-108;z<=108;z+=6){const r=coastalPlacement(game,cell,type,{x,z});if(r.error)continue;const k=Math.round(r.p.x)+':'+Math.round(r.p.z);if(!seen.has(k)){seen.add(k);result.push(r.p);}}
+ for(let x=-120;x<=120;x+=6)for(let z=-108;z<=108;z+=6){const r=coastalPlacement(game,cell,type,{x,z});if(r.error)continue;const k=Math.round(r.p.x)+':'+Math.round(r.p.z);if(!seen.has(k)){seen.add(k);result.push({x,z});}}
  cache.set(key,result);return result;
 }
