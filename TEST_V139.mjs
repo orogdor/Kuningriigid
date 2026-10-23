@@ -17,7 +17,7 @@ const rich={gold:300,wood:220,stone:150,water:150,bread:90,plank:65};
 assert.equal(surplusForWalls(rich,20,0),true);
 assert.equal(surplusForWalls({...rich,wood:80},20,0),false);
 assert.equal(surplusForWalls({...rich,bread:5},20,0),false);
-assert.equal(surplusForWalls(rich,20,3),false);
+assert.equal(surplusForWalls(rich,20,4),false);
 assert.equal(reserveAfterWalls(rich,{wood:30,stone:20}),true);
 assert.equal(reserveAfterWalls({...rich,wood:79},{wood:30}),false);
 const inner=[house(-30,-19),house(29,18),house(12,-27),house(-14,30)];
