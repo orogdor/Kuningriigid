@@ -24,7 +24,7 @@ import {settlerPolicy,armyCapacity} from './growth-balance-v125.js';
 import {productionReformV125,expandResearchOrderV125} from './technology-reforms-v125.js';
 import {tickBuilders,tickMarketHouseholds,operateWorker,trainingWorker} from './builders.js?v=100a';
 import {tickTownStreets} from './town-streets-v80.js?v=80c';
-import {SHIPS,seaAllowed,seaPath,harborExit,buildShip,finishShip,tickShips,embark,disembark,aiNavy,autoExploreNavy} from './naval.js?v=100a';
+import {SHIPS,seaAllowed,seaPath,harborExit,buildShip,finishShip,tickShips,embark,disembark,aiNavy,autoExploreNavy} from './naval.js?v=125b';
 import {reconcileVictory,captureEnemySettlers} from './victory-v72.js';
 import {initializeFisheries,isShore,fishingHarvest} from './fishery.js?v=64b';
 import {upgradeLevel,productionBonus,upgradedName} from './upgrades.js';
