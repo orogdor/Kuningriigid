@@ -28,12 +28,12 @@ for(turn=1;turn<=maxTurns;turn++){
 }
 if(lastLog!==turn){const row=snapshot(turn);history.push(row);console.log('V147 PROGRESS',JSON.stringify(row));}
 const participants=game.s.cities.filter(c=>c.team>=1&&c.team<=3);
-const medievalTeams=[1,2,3].filter(team=>game.s.ages[team]===3);
+const medievalTeams=[1,2,3].filter(team=>game.s.ages[team]>=3);
 const eligible=participants.filter(c=>medievalTeams.includes(c.team));
-const greatest=(eligible.length?eligible:participants).sort((a,b)=>(b.economy.realms[b.team]?.pop||0)-(a.economy.realms[a.team]?.pop||0)
- ||game.allBuildings(b).length-game.allBuildings(a).length||a.id-b.id)[0];
+const fortified=c=>game.allBuildings(c).filter(b=>['palisade','stonewall','stonetower','watchtower','gatehouse','reinforced_wall'].includes(b.type)&&b.hp>0).length;
+const greatest=(eligible.length?eligible:participants).sort((a,b)=>fortified(b)-fortified(a)||(b.economy.realms[b.team]?.pop||0)-(a.economy.realms[a.team]?.pop||0)||game.allBuildings(b).length-game.allBuildings(a).length||a.id-b.id)[0];
 if(!greatest||medievalAt==null)throw Error('V147 incomplete: medieval age not reached; '+JSON.stringify({turn,medievalAt,stopReason,history}));
-if(game.s.ages[greatest.team]!==3)throw Error('V147 incomplete: no medieval AI town at checkpoint');
+if(game.s.ages[greatest.team]<3)throw Error('V147 incomplete: no medieval-or-later town at checkpoint');
 const source=greatest.team,selectedId=greatest.id;
 const allCities=game.s.cities.map(c=>{
  const team=c.team,r=c.economy.realms[team]||{},buildings=game.allBuildings(c).filter(b=>!b.virtual&&b.hp>0),
