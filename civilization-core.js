@@ -557,7 +557,8 @@ const science=this.s.research[team];if(!science.active&&this.s.cities.some(c=>c.
  const living=this.s.units.filter(u=>u.team===team&&u.hp>0&&!u.garrison);
  const desired=armyCapacity(this.s.cities.filter(c=>c.team===team).length,age,
   this.s.cities.some(c=>c.team!==team&&atWar(this.s,team,c.team)));
- const nextRecruitAt=(this.s.aiRecruitAt??={})[team]??(this.s.time+90);
+ const schedule=this.s.aiRecruitAt??={};
+ const nextRecruitAt=schedule[team]??=210;
  if(this.s.time>=nextRecruitAt&&living.length<desired&&city.economy.realms[team].pop>=8&&
    foodTotal(stock)>=Math.max(24,city.economy.realms[team].pop*1.8)&&(city.training?.length||0)<2){
   const eraChoices=Object.keys(TROOPS).filter(k=>!SHIPS[k]&&k!=='militia'&&TROOPS[k].age===age)
