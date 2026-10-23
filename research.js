@@ -4,6 +4,7 @@ import {MEDIEVAL_TECHS,MEDIEVAL_BUILD_TECH,MEDIEVAL_UNIT_TECH} from './medieval-
 import {researchCost,scienceRate,discoveryUnlocked,EUREKAS,EUREKA_FRACTION} from './science.js';
 import {tempoMultiplier} from './tempo.js';
 import {applyTechTreeV118,V118_ERA_IDS,V118_NEW_IDS} from './tech-tree-data-v118.js?v=118a';
+import {TECHS_V125} from './technology-reforms-v125.js';
 export const TURN_SECONDS=60;
 export const TECHS={
  hunting:{name:'Jahipidamine',age:0,turns:1,requires:[],unlocks:'Jahimehe onn'},
@@ -78,6 +79,7 @@ Object.assign(TECHS,{
 });
 Object.assign(TECHS,MEDIEVAL_TECHS,PRODUCTIVITY_TECHS);
 applyTechTreeV118(TECHS);
+Object.assign(TECHS,TECHS_V125);
 export const ERA_NAMES=['Kiviaeg','Pronksiaeg','Rauaaeg','Keskaeg','Renessanss','Tööstusajastu','Moodne ajastu'];
 
 export const BUILD_TECH={palisade:'fortifications',watchtower:'fortifications',stonewall:'stone_fortifications',stonetower:'stone_fortifications',claypit:'pottery',pottery_kiln:'pottery',pasture:'animal_husbandry',mason:'masonry',cartwright:'wheel',coppermine:'copper_tin',tinmine:'copper_tin',bronze_foundry:'copper_tin',road_depot:'road_construction',study:'learning',printer:'printing',observatory:'astronomy',nitrate:'gunpowder',powdermill:'gunpowder',steelworks:'steelmaking',engineworks:'steam_engine',polytechnic:'industrial_education',railstation:'railways',oilwell:'oil_drilling',refinery:'petroleum',powerplant:'electricity',autofactory:'combustion',laboratory:'modern_science',airfield:'aviation',scriptorium:'writing',academy:'philosophy',university:'scholasticism',warehouse:'storage',cellar:'cellaring',market:'commerce',harbor:'shipbuilding',bridge:'bridges',quarry:'stone_tools',hunter:'hunting',fisher:'fishing',barracks:'warfare',forester:'forestry',farm:'agriculture',saw:'woodworking',mill:'milling',bakery:'milling',archery:'archery',mine:'iron',coal:'iron',smelter:'smelting',smith:'smithing',stable:'horsemanship'};
