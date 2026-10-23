@@ -1,0 +1,39 @@
+name: V136 Historical AI Town Simulation
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v136-ai-city.yml'
+      - 'scripts/make-ai-city-v136.mjs'
+      - 'TEST_V136.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Verify organic town shape and harbor policy
+        run: node TEST_V136.mjs
+      - name: Real AI campaign through historical eras
+        run: node scripts/make-ai-city-v136.mjs
+      - name: Inspect authentic AI settlements
+        run: |
+          test -s scenarios/ai-city-v136.json
+          node -e "const s=require('./scenarios/ai-city-v136.json');console.log(s.aiCityTestV136);if(s.demo!=='ai-city-v136'||s.cities.filter(c=>c.team===0).length<1)process.exit(1)"
+      - name: Publish simulated AI city save
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scenarios/ai-city-v136.json scenarios/ai-city-v136.manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "V136: publish organic historical AI towns after real simulation"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
