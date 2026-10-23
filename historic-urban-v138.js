@@ -1,0 +1,85 @@
+// V138: historically grown street blocks, continuous over neighboring 225x195 detail tiles.
+// Pure/deterministic: candidate planning cannot change saves or reserve fake buildings.
+import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
+const hash=(a,b,seed=0)=>{const t=Math.sin(a*127.1+b*311.7+seed*74.7)*43758.5453;return t-Math.floor(t);};
+const sqr=x=>x*x;
+const snap=x=>Math.round(x*2)/2;
+const CIVIC=new Set(['market','study','scriptorium','warehouse','cellar','guildhall','chapel','temple','townhall','inn','keep']);
+const INDUSTRIAL=new Set(['saw','mason','pottery_kiln','bronze_foundry','smith','smelter','barracks','archery']);
+const RURAL=new Set(['farm','pasture','field','hunter','lumber','quarry','forester','well','fisher']);
+export const V138_BUILD_MARGIN=8; // only keep a roof-width of setback; allow plots at all four tile edges
+// Main arteries radiate from the parent town center; secondary bent lanes
+// follow irregular rings. They work in global-detail coordinates and therefore
+// continue across a seam without restarting at a new tile.
+export function ancientStreetSpace(x,z,seed=0){
+ const angle=Math.atan2(z,x),radius=Math.hypot(x,z),phase=hash(seed,5)*Math.PI*2;
+ const bend=(t)=>.13*Math.sin(t*.013+phase)+.05*Math.sin(t*.029-phase);
+ const arms=7,theta=((angle-bend(radius)+phase)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+ let nearestRay=Infinity;
+ for(let i=0;i<arms;i++){
+  const ray=i*2*Math.PI/arms;
+  const diff=Math.abs(Math.atan2(Math.sin(theta-ray),Math.cos(theta-ray)));
+  nearestRay=Math.min(nearestRay,diff*radius);
+ }
+ // Three alternating circumferential market/quarter routes, wider near center.
+ const ringIndex=Math.round((radius-30)/75);
+ const ring=30+75*ringIndex+6*Math.sin(angle*4+phase+ringIndex*.7);
+ const ringDistance=Math.abs(radius-ring);
+ return {road:nearestRay<(radius<70?9:6)||ringDistance<6,artery:nearestRay,ring:ringDistance,radius};
+}
+export function historicalBuildingPlots(tile,parent,type='house',seed=0){
+ if(!tile||!parent)return [];
+ const dx=tile.c-parent.c,dz=tile.r-parent.r;
+ const plots=[];
+ const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?11.8:13.2;
+ // Staggered rows and slight bends, not a chessboard; deterministic per tile.
+ const line=0;
+ for(let row=0,z=-DETAIL_HALF_Z+margin;z<=DETAIL_HALF_Z-margin;row++,z+=grid){
+  const rowShift=(row%2)*grid*.43;
+  for(let col=0,x=-DETAIL_HALF_X+margin+rowShift;x<=DETAIL_HALF_X-margin;col++,x+=grid){
+   const h=hash(dx*40+col,dz*40+row,seed),j=hash(dx*13+row,dz*19+col,seed+17);
+   const px=snap(x+(h-.5)*3.3),pz=snap(z+(j-.5)*3.3);
+   if(Math.abs(px)>DETAIL_HALF_X-margin||Math.abs(pz)>DETAIL_HALF_Z-margin)continue;
+   const gx=dx*DETAIL_TILE_X+px,gz=dz*DETAIL_TILE_Z+pz;
+   const street=ancientStreetSpace(gx,gz,seed);
+   // The heart of a capital reserves space for a main bazaar/sanctuary.
+   if(type==='house'&&street.radius<20)continue;
+   if(street.road)continue;
+   // No building sits on a main route or over the wide marketplace.
+   const key=Math.round(street.radius/24);
+   const quarterNoise=hash(Math.floor(gx/32),Math.floor(gz/32),seed+5);
+   const civic=CIVIC.has(type),rural=RURAL.has(type),industrial=INDUSTRIAL.has(type);
+   const priority=(civic?Math.abs(street.radius-42)*.13:
+                    rural?-street.radius*.075:
+                    industrial?Math.abs(street.radius-170)*.045:
+                    street.radius*.045)+
+                    Math.abs(street.artery-12)*.08+(quarterNoise-.5)*3+
+                    (type==='house'?hash(key,row,seed)*.9:0);
+   plots.push({x:px,z:pz,priority,globalX:gx,globalZ:gz});
+  }
+ }
+ plots.sort((a,b)=>a.priority-b.priority||a.globalZ-b.globalZ||a.globalX-b.globalX);
+ return plots.map(p=>({x:p.x,z:p.z}));
+}
+export function nextPlotBatch(plots,cursor=0,count=32){
+ if(!plots.length)return [];
+ const out=[],offset=((cursor%plots.length)+plots.length)%plots.length;
+ for(let i=0;i<Math.min(count,plots.length);i++)out.push(plots[(offset+i)%plots.length]);
+ return out;
+}
+export function tilesTouch(a,b){return Math.abs(a.c-b.c)+Math.abs(a.r-b.r)===1;}
+export function urbanExpansionEligible(game,parent,p){
+ if(!parent||!p||game.territoryOwner(p)?.id!==parent.id)return false;
+ const cell=game.cell(p);
+ if(!cell?.land||cell.mountain)return false;
+ const urban=t=>!game.isCountyTile(t,parent)||!!game.contextAt(t,false)?.urbanExpansionV138;
+ return [[1,0],[-1,0],[0,1],[0,-1]].some(([dc,dr])=>{
+  const n={c:p.c+dc,r:p.r+dr};
+  if(!urban(n))return false;
+  const context=game.contextAt(n,false);
+  if(!context)return false;
+  // A neighbouring street block is dense enough before expansion begins.
+  return context.economy.buildings.filter(b=>b.hp>0&&!b.virtual&&
+   ['house','market','well','warehouse','cellar','study','scriptorium'].includes(b.type)).length>=4;
+ });
+}
