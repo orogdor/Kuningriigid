@@ -57,8 +57,8 @@ export function planAIDefenses(game,team,city){
  };
  const slots=plan.slots.map(effective);
  const candidates=[
-  ...slots.filter(s=>['stonetower','watchtower'].includes(s.type)),
   ...slots.filter(s=>!['stonetower','watchtower'].includes(s.type)),
+  ...slots.filter(s=>['stonetower','watchtower'].includes(s.type)),
   ...(game.s.ages[team]>=3?[-plan.rz,plan.rz].map(z=>({type:'gatehouse',x:0,z,wallAxis:0})):[])
  ];
  const reasons={};
