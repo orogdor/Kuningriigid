@@ -1,0 +1,18 @@
+name: V138 Suburb Diagnostic
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v138-diagnostic.yml'
+      - 'scripts/inspect-v138-expand.mjs'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node scripts/inspect-v138-expand.mjs
