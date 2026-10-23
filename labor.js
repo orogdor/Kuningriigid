@@ -99,7 +99,7 @@ export function allocateCity(game,city){
   return {b,need,want,priority};
  }).filter(e=>e.want>0);
  const builders={};
- if(pending&&city.builderCount>0)entries.push({b:builders,need:city.builderCount,want:city.builderCount,priority:90});
+ if(pending&&city.builderCount>0)entries.push({b:builders,need:city.builderCount,want:city.builderCount,priority:city.team>0?250:90}); // V145: never starve the builder behind extractive industry
  city.training??=[];const train=city.training[0];
  if(train&&!train.blocked&&train.progress<train.total)entries.push({b:train,need:1,want:Math.max(0,Math.min(1,train.workerLimit??1)),priority:96});
  // Guarantee a small portion for each operational task, then assign the rest
@@ -109,7 +109,7 @@ export function allocateCity(game,city){
  const emergencyBerries=foodCritical&&!foodSource?Math.min(1,budget*.4,Math.max(0,city.basicJobs?.berries??1)):0;
  let remaining=budget-emergencyBerries;
  const aiFoundation=city.team>0;
- for(const e of entries){const essential=FOUNDATION_TYPES.has(e.b.type)||e.b===builders||e.b===train;const seed=Math.min(e.want,aiFoundation?(essential?.25:0):(wait?.1:.25),remaining);e.b.assigned=seed;remaining-=seed}
+ for(const e of entries){const essential=FOUNDATION_TYPES.has(e.b.type)||e.b===builders||e.b===train;const seed=Math.min(e.want,aiFoundation?(e.b===builders?Math.max(.5,Math.min(.8,budget*.16)):essential?.25:0):(wait?.1:.25),remaining);e.b.assigned=seed;remaining-=seed}
  for(const e of entries){const extra=Math.min(e.want-e.b.assigned,remaining);e.b.assigned+=extra;remaining-=extra}
  for(const e of entries)e.b.efficiency=workerEfficiency(e.b.assigned,e.need);
  for(const b of all.filter(b=>b.ready&&!entries.some(e=>e.b===b))) {b.assigned=0;b.efficiency=0}
