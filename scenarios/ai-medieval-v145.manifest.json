@@ -7,7 +7,7 @@
   "firstMedievalTeam": 1,
   "midwayTurns": 30,
   "stopReason": "30 turns after first AI entered Medieval Age",
-  "elapsedSeconds": 126,
+  "elapsedSeconds": 137,
   "age": 3,
   "sourceTeam": 2,
   "targetCityId": 1,
@@ -145,7 +145,7 @@
       ],
       "cities": 3,
       "population": 17,
-      "seconds": 9
+      "seconds": 10
     },
     {
       "turn": 60,
@@ -157,7 +157,7 @@
       ],
       "cities": 3,
       "population": 25,
-      "seconds": 13
+      "seconds": 14
     },
     {
       "turn": 80,
@@ -169,7 +169,7 @@
       ],
       "cities": 8,
       "population": 50,
-      "seconds": 20
+      "seconds": 22
     },
     {
       "turn": 100,
@@ -181,7 +181,7 @@
       ],
       "cities": 9,
       "population": 80,
-      "seconds": 30
+      "seconds": 33
     },
     {
       "turn": 120,
@@ -193,7 +193,7 @@
       ],
       "cities": 12,
       "population": 114,
-      "seconds": 44
+      "seconds": 49
     },
     {
       "turn": 140,
@@ -205,7 +205,7 @@
       ],
       "cities": 14,
       "population": 143,
-      "seconds": 67
+      "seconds": 74
     },
     {
       "turn": 150,
@@ -217,7 +217,7 @@
       ],
       "cities": 14,
       "population": 152,
-      "seconds": 81
+      "seconds": 89
     },
     {
       "turn": 160,
@@ -229,7 +229,7 @@
       ],
       "cities": 15,
       "population": 165,
-      "seconds": 96
+      "seconds": 105
     },
     {
       "turn": 180,
@@ -241,7 +241,7 @@
       ],
       "cities": 15,
       "population": 190,
-      "seconds": 126
+      "seconds": 137
     }
   ],
   "byTeam": [
