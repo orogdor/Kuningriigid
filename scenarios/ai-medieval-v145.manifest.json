@@ -1,0 +1,870 @@
+{
+  "version": 145,
+  "success": true,
+  "seed": 142023,
+  "turn": 541,
+  "medievalAt": 521,
+  "firstMedievalTeam": 1,
+  "midwayTurns": 30,
+  "stopReason": "",
+  "elapsedSeconds": 68,
+  "age": 3,
+  "sourceTeam": 1,
+  "targetCityId": 2,
+  "largestMedievalCity": {
+    "id": 2,
+    "name": "Idaküla 1",
+    "team": 1,
+    "age": 3,
+    "pop": 5,
+    "employed": 5,
+    "radius": 2,
+    "extent": 5,
+    "ownedTiles": 75,
+    "buildings": 35,
+    "ready": 32,
+    "pending": 3,
+    "markets": 1,
+    "houses": 1,
+    "farms": 1,
+    "fields": 1,
+    "mines": 4,
+    "education": 3,
+    "buildingTypes": {
+      "academy": 1,
+      "archery": 1,
+      "bakery": 1,
+      "barracks": 1,
+      "cellar": 1,
+      "claypit": 1,
+      "coal": 1,
+      "coppermine": 1,
+      "farm": 1,
+      "field": 1,
+      "flax_farm": 1,
+      "forester": 1,
+      "hall": 1,
+      "house": 1,
+      "hunter": 2,
+      "lumber": 2,
+      "market": 1,
+      "mason": 1,
+      "mill": 1,
+      "mine": 1,
+      "pasture": 1,
+      "pottery_kiln": 1,
+      "quarry": 1,
+      "saw": 1,
+      "scriptorium": 1,
+      "smelter": 1,
+      "smith": 1,
+      "stable": 1,
+      "study": 1,
+      "tinmine": 1,
+      "vegetable_garden": 1,
+      "warehouse": 1,
+      "well": 1
+    },
+    "stocks": {
+      "gold": 2141,
+      "wood": 420,
+      "stone": 420,
+      "copper": 324,
+      "ore": 255,
+      "tin": 201,
+      "grain": 160.428571428572,
+      "meat": 159.19999999999996,
+      "water": 100,
+      "coal": 90,
+      "plank": 52,
+      "berries": 27.542857142857123,
+      "weapons": 24,
+      "iron": 1
+    },
+    "foodSupply": 347.1714285714291
+  },
+  "largestGlobalCity": {
+    "id": 2,
+    "name": "Idaküla 1",
+    "team": 1,
+    "age": 3,
+    "pop": 5,
+    "employed": 5,
+    "radius": 2,
+    "extent": 5,
+    "ownedTiles": 75,
+    "buildings": 35,
+    "ready": 32,
+    "pending": 3,
+    "markets": 1,
+    "houses": 1,
+    "farms": 1,
+    "fields": 1,
+    "mines": 4,
+    "education": 3,
+    "buildingTypes": {
+      "academy": 1,
+      "archery": 1,
+      "bakery": 1,
+      "barracks": 1,
+      "cellar": 1,
+      "claypit": 1,
+      "coal": 1,
+      "coppermine": 1,
+      "farm": 1,
+      "field": 1,
+      "flax_farm": 1,
+      "forester": 1,
+      "hall": 1,
+      "house": 1,
+      "hunter": 2,
+      "lumber": 2,
+      "market": 1,
+      "mason": 1,
+      "mill": 1,
+      "mine": 1,
+      "pasture": 1,
+      "pottery_kiln": 1,
+      "quarry": 1,
+      "saw": 1,
+      "scriptorium": 1,
+      "smelter": 1,
+      "smith": 1,
+      "stable": 1,
+      "study": 1,
+      "tinmine": 1,
+      "vegetable_garden": 1,
+      "warehouse": 1,
+      "well": 1
+    },
+    "stocks": {
+      "gold": 2141,
+      "wood": 420,
+      "stone": 420,
+      "copper": 324,
+      "ore": 255,
+      "tin": 201,
+      "grain": 160.428571428572,
+      "meat": 159.19999999999996,
+      "water": 100,
+      "coal": 90,
+      "plank": 52,
+      "berries": 27.542857142857123,
+      "weapons": 24,
+      "iron": 1
+    },
+    "foodSupply": 347.1714285714291
+  },
+  "totalCities": 3,
+  "history": [
+    {
+      "turn": 20,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 4
+    },
+    {
+      "turn": 40,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "population": 14,
+      "seconds": 8
+    },
+    {
+      "turn": 60,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 11
+    },
+    {
+      "turn": 80,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 14
+    },
+    {
+      "turn": 100,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 16
+    },
+    {
+      "turn": 120,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 18
+    },
+    {
+      "turn": 140,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 20
+    },
+    {
+      "turn": 160,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 23
+    },
+    {
+      "turn": 180,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 25
+    },
+    {
+      "turn": 200,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 28
+    },
+    {
+      "turn": 220,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 30
+    },
+    {
+      "turn": 240,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 33
+    },
+    {
+      "turn": 260,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 35
+    },
+    {
+      "turn": 280,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 37
+    },
+    {
+      "turn": 300,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 39
+    },
+    {
+      "turn": 320,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 41
+    },
+    {
+      "turn": 340,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 43
+    },
+    {
+      "turn": 360,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 45
+    },
+    {
+      "turn": 380,
+      "ages": [
+        0,
+        2,
+        1,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 47
+    },
+    {
+      "turn": 400,
+      "ages": [
+        0,
+        2,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 50
+    },
+    {
+      "turn": 420,
+      "ages": [
+        0,
+        2,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 53
+    },
+    {
+      "turn": 440,
+      "ages": [
+        0,
+        2,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 55
+    },
+    {
+      "turn": 460,
+      "ages": [
+        0,
+        2,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 58
+    },
+    {
+      "turn": 480,
+      "ages": [
+        0,
+        2,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 60
+    },
+    {
+      "turn": 500,
+      "ages": [
+        0,
+        2,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 63
+    },
+    {
+      "turn": 520,
+      "ages": [
+        0,
+        2,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 66
+    },
+    {
+      "turn": 521,
+      "ages": [
+        0,
+        3,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 66
+    },
+    {
+      "turn": 540,
+      "ages": [
+        0,
+        3,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 68
+    },
+    {
+      "turn": 541,
+      "ages": [
+        0,
+        3,
+        2,
+        2
+      ],
+      "cities": 3,
+      "population": 15,
+      "seconds": 68
+    }
+  ],
+  "byTeam": [
+    {
+      "team": 0,
+      "age": 0,
+      "cities": 0,
+      "population": 0,
+      "technologies": 0,
+      "researchActive": null,
+      "resourcesAvailable": 0
+    },
+    {
+      "team": 1,
+      "age": 3,
+      "cities": 1,
+      "population": 5,
+      "technologies": 69,
+      "researchActive": "medieval_crafts",
+      "resourcesAvailable": 4375.17142857143
+    },
+    {
+      "team": 2,
+      "age": 2,
+      "cities": 1,
+      "population": 5,
+      "technologies": 64,
+      "researchActive": "civics",
+      "resourcesAvailable": 3401.3785714285714
+    },
+    {
+      "team": 3,
+      "age": 2,
+      "cities": 1,
+      "population": 5,
+      "technologies": 64,
+      "researchActive": "civics",
+      "resourcesAvailable": 3376
+    }
+  ],
+  "totals": {
+    "pop": 15,
+    "buildings": 103,
+    "ready": 96,
+    "pending": 7,
+    "houses": 3,
+    "markets": 3,
+    "education": 9,
+    "fields": 3,
+    "farms": 3,
+    "mines": 12,
+    "withMarket": 3,
+    "withEducation": 3,
+    "withHousing": 3,
+    "withDefenses": 0,
+    "fortifications": 0
+  },
+  "baseline": {
+    "version": 144,
+    "turn": 230,
+    "totalCities": 18,
+    "population": 152,
+    "buildings": 315,
+    "houses": 58,
+    "markets": 4,
+    "education": 15,
+    "farms": 15,
+    "mines": 59,
+    "withMarket": 4,
+    "withEducation": 12,
+    "withDefenses": 0,
+    "fortifications": 0
+  },
+  "comparison": {
+    "population": {
+      "v144": 152,
+      "v145": 15,
+      "delta": -137
+    },
+    "buildings": {
+      "v144": 315,
+      "v145": 103,
+      "delta": -212
+    },
+    "houses": {
+      "v144": 58,
+      "v145": 3,
+      "delta": -55
+    },
+    "markets": {
+      "v144": 4,
+      "v145": 3,
+      "delta": -1
+    },
+    "education": {
+      "v144": 15,
+      "v145": 9,
+      "delta": -6
+    },
+    "farms": {
+      "v144": 15,
+      "v145": 3,
+      "delta": -12
+    },
+    "mines": {
+      "v144": 59,
+      "v145": 12,
+      "delta": -47
+    },
+    "withMarket": {
+      "v144": 4,
+      "v145": 3,
+      "delta": -1
+    },
+    "withEducation": {
+      "v144": 12,
+      "v145": 3,
+      "delta": -9
+    },
+    "withDefenses": {
+      "v144": 0,
+      "v145": 0,
+      "delta": 0
+    },
+    "fortifications": {
+      "v144": 0,
+      "v145": 0,
+      "delta": 0
+    }
+  },
+  "trade": {
+    "ongoingShipments": 0
+  },
+  "military": {
+    "armyCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "unitCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "relations": {}
+  },
+  "cities": [
+    {
+      "id": 2,
+      "name": "Idaküla 1",
+      "team": 1,
+      "age": 3,
+      "pop": 5,
+      "employed": 5,
+      "radius": 2,
+      "extent": 5,
+      "ownedTiles": 75,
+      "buildings": 35,
+      "ready": 32,
+      "pending": 3,
+      "markets": 1,
+      "houses": 1,
+      "farms": 1,
+      "fields": 1,
+      "mines": 4,
+      "education": 3,
+      "buildingTypes": {
+        "academy": 1,
+        "archery": 1,
+        "bakery": 1,
+        "barracks": 1,
+        "cellar": 1,
+        "claypit": 1,
+        "coal": 1,
+        "coppermine": 1,
+        "farm": 1,
+        "field": 1,
+        "flax_farm": 1,
+        "forester": 1,
+        "hall": 1,
+        "house": 1,
+        "hunter": 2,
+        "lumber": 2,
+        "market": 1,
+        "mason": 1,
+        "mill": 1,
+        "mine": 1,
+        "pasture": 1,
+        "pottery_kiln": 1,
+        "quarry": 1,
+        "saw": 1,
+        "scriptorium": 1,
+        "smelter": 1,
+        "smith": 1,
+        "stable": 1,
+        "study": 1,
+        "tinmine": 1,
+        "vegetable_garden": 1,
+        "warehouse": 1,
+        "well": 1
+      },
+      "stocks": {
+        "gold": 2141,
+        "wood": 420,
+        "stone": 420,
+        "copper": 324,
+        "ore": 255,
+        "tin": 201,
+        "grain": 160.428571428572,
+        "meat": 159.19999999999996,
+        "water": 100,
+        "coal": 90,
+        "plank": 52,
+        "berries": 27.542857142857123,
+        "weapons": 24,
+        "iron": 1
+      },
+      "foodSupply": 347.1714285714291
+    },
+    {
+      "id": 0,
+      "name": "Lõunaküla 1",
+      "team": 3,
+      "age": 2,
+      "pop": 5,
+      "employed": 5,
+      "radius": 2,
+      "extent": 5,
+      "ownedTiles": 75,
+      "buildings": 34,
+      "ready": 32,
+      "pending": 2,
+      "markets": 1,
+      "houses": 1,
+      "farms": 1,
+      "fields": 1,
+      "mines": 4,
+      "education": 3,
+      "buildingTypes": {
+        "academy": 1,
+        "archery": 1,
+        "barracks": 1,
+        "cellar": 1,
+        "claypit": 1,
+        "coal": 1,
+        "coppermine": 1,
+        "farm": 1,
+        "field": 1,
+        "fisher": 1,
+        "flax_farm": 1,
+        "forester": 1,
+        "hall": 1,
+        "harbor": 1,
+        "house": 1,
+        "hunter": 2,
+        "lumber": 2,
+        "market": 1,
+        "mason": 1,
+        "mine": 1,
+        "pasture": 1,
+        "pottery_kiln": 1,
+        "quarry": 1,
+        "saw": 1,
+        "scriptorium": 1,
+        "smelter": 1,
+        "smith": 1,
+        "stable": 1,
+        "study": 1,
+        "tinmine": 1,
+        "vegetable_garden": 1,
+        "well": 1
+      },
+      "stocks": {
+        "gold": 2196,
+        "wood": 120,
+        "plank": 120,
+        "stone": 120,
+        "coal": 120,
+        "copper": 120,
+        "tin": 120,
+        "meat": 114.29999999999998,
+        "grain": 110.00000000000014,
+        "water": 100,
+        "fish": 83.69999999999985,
+        "berries": 27,
+        "bread": 25
+      },
+      "foodSupply": 360
+    },
+    {
+      "id": 1,
+      "name": "Põhjaküla 1",
+      "team": 2,
+      "age": 2,
+      "pop": 5,
+      "employed": 5,
+      "radius": 2,
+      "extent": 5,
+      "ownedTiles": 75,
+      "buildings": 34,
+      "ready": 32,
+      "pending": 2,
+      "markets": 1,
+      "houses": 1,
+      "farms": 1,
+      "fields": 1,
+      "mines": 4,
+      "education": 3,
+      "buildingTypes": {
+        "academy": 1,
+        "archery": 1,
+        "barracks": 1,
+        "cellar": 1,
+        "claypit": 1,
+        "coal": 1,
+        "coppermine": 1,
+        "farm": 1,
+        "field": 1,
+        "forester": 1,
+        "hall": 1,
+        "harbor": 1,
+        "house": 1,
+        "hunter": 2,
+        "lumber": 2,
+        "market": 1,
+        "mason": 1,
+        "mill": 1,
+        "mine": 1,
+        "pasture": 1,
+        "pottery_kiln": 1,
+        "quarry": 1,
+        "saw": 1,
+        "scriptorium": 1,
+        "smelter": 1,
+        "smith": 1,
+        "stable": 1,
+        "study": 1,
+        "tinmine": 1,
+        "vegetable_garden": 1,
+        "warehouse": 1,
+        "well": 1
+      },
+      "stocks": {
+        "gold": 2121,
+        "stone": 331,
+        "ore": 156,
+        "copper": 136,
+        "tin": 129,
+        "coal": 109,
+        "water": 99.55000000000005,
+        "grain": 78.4285714285714,
+        "meat": 75.39999999999995,
+        "wood": 46,
+        "plank": 42,
+        "weapons": 42,
+        "berries": 24,
+        "iron": 12
+      },
+      "foodSupply": 177.82857142857137
+    }
+  ]
+}
