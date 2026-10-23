@@ -660,9 +660,34 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
    const tile=this.cell({c:cc,r:rr});if(cc<0||cc>=COLS||rr<0||rr>=ROWS||!tile?.land||tile.mountain||this.cityAt(tile)||this.territoryOwner(tile)?.id!==city.id||contexts.some(ctx=>ctx.c===cc&&ctx.r===rr))continue;
    contexts.push({c:cc,r:rr,lazy:true});
   }
-  for(let ctx of historicalDistrictOrder(city,contexts)){
+  // The first six houses surround the hall. Later houses form a dense,
+  // connected neighborhood on ONE adjacent tile before another is opened.
+  // The AI can also extend that neighborhood into an owned rural tile once
+  // at least two buildings stand on the shared side.
+  const isHousing=next==='house',existingHomes=this.allBuildings(city).filter(b=>b.type==='house'&&b.hp>0).length;
+  if(isHousing&&existingHomes>=6)for(const tile of this.constructionArea(city).tiles){
+   if(!this.isCountyTile(tile,city)||!urbanExpansionEligible(this,city,tile))continue;
+   if(contexts.some(ctx=>ctx.c===tile.c&&ctx.r===tile.r))continue;
+   contexts.push({...tile,lazy:true,expandV138:true});
+  }
+  const orderedContexts=historicalDistrictOrder(city,contexts);
+  if(isHousing&&existingHomes>=6)orderedContexts.sort((a,b)=>{
+   const rank=ctx=>{
+    if(ctx.expandV138)return -36;
+    const live=ctx.lazy?this.contextAt(ctx,false)?.economy.buildings||[]:ctx.economy.buildings;
+    const homes=live.filter(t=>t.type==='house'&&t.hp>0).length;
+    if(ctx.c===city.c&&ctx.r===city.r)return 20+Math.max(0,homes-6)*12;
+    return homes>0?-30+homes*2:15+Math.abs(ctx.c-city.c)+Math.abs(ctx.r-city.r);
+   };
+   return rank(a)-rank(b);
+  });
+  for(let ctx of orderedContexts){
+   const expansion=!!ctx.expandV138;
    if(ctx.lazy)ctx=this.contextAt(ctx,true);
-   if(!ctx||this.buildRule(ctx,next))continue;
+   if(!ctx)continue;
+   const wasUrban=!!ctx.urbanExpansionV138;
+   if(expansion)ctx.urbanExpansionV138=true;
+   if(this.buildRule(ctx,next)){if(expansion&&!wasUrban)delete ctx.urbanExpansionV138;continue;}
    const h=ctx.economy.buildings[0],spots=this.buildingSites(ctx,next),kind=({lumber:'tree',hunter:'game'})[next];
    const deposits=kind?ctx.world.resources.filter(r=>r.kind===kind&&!r.removed&&r.amount>0):[];
    const score=p=>historicalSiteScore(h,p,next,ctx.economy.buildings,deposits);
@@ -678,6 +703,7 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
     if(this.build(ctx,next,p).building){built=true;break;}
    }
    if(built)break;
+   if(expansion&&!wasUrban)delete ctx.urbanExpansionV138;
   }
   if(built){city.aiPlacementRetry={};break;}excluded.add(next);(city.aiPlacementRetry??={})[next]=this.s.time+15;
  }
