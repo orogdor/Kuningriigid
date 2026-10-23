@@ -1,0 +1,53 @@
+name: V125 Long Campaign Validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - TEST_V125_CAMPAIGN.mjs
+      - .github/workflows/v125-long-game.yml
+      - growth-balance-v125.js
+      - science.js
+      - research.js
+      - ai-strategy.js
+      - settlement-ai-v88.js
+      - civilization-core.js
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Verify V125 functionality
+        run: |
+          node TEST_V125.mjs
+          node TEST_V123.mjs
+          node TEST_V122.mjs
+  long-campaign:
+    needs: core
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: ['12501', '12502', '12503']
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Simulate real four-country play to Modern Age
+        env:
+          V125_SEED: ${{ matrix.seed }}
+          V125_TURNS: '900'
+        run: node TEST_V125_CAMPAIGN.mjs
+      - name: Preserve full timeline and all buildings, troop counts and deficits
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v125-campaign-${{ matrix.seed }}
+          path: artifacts-v125/seed-*.json
+          if-no-files-found: warn
