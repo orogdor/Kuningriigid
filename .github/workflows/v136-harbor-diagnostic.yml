@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/v136-harbor-diagnostic.yml'
       - 'scripts/report-ai-city-v136.mjs'
+      - 'resource-sites-v88.js'
   workflow_dispatch:
 permissions:
   contents: read
