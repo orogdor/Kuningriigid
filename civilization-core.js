@@ -6,6 +6,7 @@ import {marketFoodGrowth} from './city-growth-v137.js';
 import {historicalTilePlan,historicalTilePriority} from './historical-districts-v137.js';
 import {countyFootprint,countySearchRadius,urbanTile,countyBuildRule,countyBuildingCount,citySpacingAllowed,MIN_CITY_SPACING} from './counties-v126.js?v=136a';
 import {AI_CITY_SPACING,historicalCitySites,historicalDistrictOrder,historicalSiteScore} from './historical-city-v135.js';
+import {historicalBuildingPlots,nextPlotBatch,urbanExpansionEligible} from './historic-urban-v138.js';
 import {unitSuccessor,buildingSuccessor,suppliesBuilding} from './era-availability-v116.js?v=118a';
 import {migrateBattleAmmunition} from './combat-equipment-v100.js';
 import {balanceUnitDefinitions,migrateUnitHealth,UNIT_BALANCE_VERSION} from './unit-balance-v99.js';
@@ -372,7 +373,7 @@ export class Civilization{
  disembark(ship,p){return disembark(this,ship,p)}
  radius(city){const pop=city.economy.realms[city.team].pop;return city.radius=Math.min(4,Math.max(city.radius||1,pop>=64?4:pop>=48?3:pop>=32?2:1))}
  countyRadius(city){return countySearchRadius(this.radius(this.parentCity(city)))}
- isCountyTile(p,parent=this.territoryOwner(p)){return !!parent&&!urbanTile(parent,p,this.radius(parent))}
+ isCountyTile(p,parent=this.territoryOwner(p)){return !!parent&&!urbanTile(parent,p,this.radius(parent))&&!parent.districts?.[tileKey(p)]?.urbanExpansionV138}
  countySlots(ctx){return {used:countyBuildingCount(ctx),limit:3}}
  refreshTerritory(){
   if(this._perf&&this.territoryStamp!=null&&this._perf.areaBuilt===this._perf.areaRevision)return;
@@ -436,7 +437,7 @@ export class Civilization{
  canBuildNow(city,type){const area=this.constructionArea(city);return !!area&&!this.buildRule(city,type)&&canAfford(area.stock,BUILDINGS[type].cost)&&area.pending.length<12}
  buildRule(city,type){if(type==='field'&&!city.economy.buildings.some(b=>b.type==='farm'&&b.ready&&b.hp>0&&!b.disabled))return 'Ehita samale ruudule kõigepealt valmis põllutalu.';if(this.isCountyTile(city,this.parentCity(city))){const rural=new Set(['field','farm','pasture','hunter','fisher','lumber','forester','quarry','mine','coal','coppermine','tinmine','claypit','oilwell','well','bridge','harbor','road_depot','windmill','watermill',...Object.keys(GOOD_BUILDINGS).filter(k=>GOOD_BUILDINGS[k].deposit)]);const error=countyBuildRule(city,type,rural);if(error)return error;}const replacement=this.obsoleteBuilding(city.team,type);if(replacement)return 'Asendatud: '+BUILDINGS[replacement].name;if(this.cell(city)?.mountain)return 'Mäed on läbimatud ja sinna ei saa ehitada.';if(this.territoryOwner(city)?.id!==this.parentCity(city)?.id)return 'See ruut ei kuulu enam selle linna alasse.';if(type==='bridge'){const cell=this.cell(city);if(!cell?.river)return 'Silda saab ehitada ainult jõeruudule.';if(cell.bridge)return 'Sellel ruudul on sild juba olemas.';}if(type==='harbor'&&!isShore(this,city))return 'Sadam vajab rannikuruutu, mille kõrval on meri.';if(type==='fisher'&&!isShore(this,city))return 'Kalamehe onni saab ehitada ainult päris mererannale.';if(type==='watermill'&&!this.cell(city)?.river&&![[1,0],[-1,0],[0,1],[0,-1]].some(([dc,dr])=>this.cells[(city.r+dr)*COLS+city.c+dc]?.river))return 'Vesiveski vajab jõge samal või naaberruudul.';if(type==='windmill'&&!this.cell(city)?.deposits.grain)return 'Tuuleveski vajab avatud viljakat maad.';const tech=BUILD_TECH[type];if(tech&&!this.s.research[city.team].known.includes(tech))return 'Uuri: '+TECHS[tech].name;const age=this.s.ages[city.team],d=BUILDINGS[type];if((BUILD_AGE[type]??9)>age)return 'Vajab ajastut: '+AGES[BUILD_AGE[type]]?.name;const dep={...Object.fromEntries(Object.entries(GOOD_BUILDINGS).map(([k,d])=>[k,d.deposit])),claypit:'clay',coppermine:'copper',tinmine:'tin',lumber:'wood',quarry:'stone',mine:'ore',oilwell:'oil',field:'grain',well:'water',hunter:'game'}[type];if(dep&&!this.cell(city).deposits[dep])return 'Selle linna ruudul puudub '+({clay:'savi',copper:'vasemaak',tin:'tinamaak',wood:'mets',stone:'kivi',ore:'rauamaak',grain:'viljakas põllumaa',water:'mageveeallikas',game:'ulukid',fish:'kalapüügikoht',oil:'naftamaardla',...Object.fromEntries(Object.entries(GOOD_BUILDINGS).filter(([k,d])=>d.deposit).map(([k,d])=>[d.deposit,RESOURCE_NAMES[d.deposit]||d.deposit]))}[dep])+'.';const missing=d.requires.filter(k=>!this.cityReady(city,k)&&!(['oilwell','refinery'].includes(type)&&((type==='oilwell'&&k==='engineworks')||(type==='refinery'&&k==='oilwell'))&&this.s.cities.some(c=>c.team===city.team&&this.cityReady(c,k))));return missing.length?'Vaja: '+missing.map(k=>BUILDINGS[k].name).join(', '):''}
  placementEnv(city,type){const env=this.env(city);if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
- buildingSites(city,type){if(MINERAL_BUILDINGS[type]){const r=mineralSite(city.world,type);return r?[{x:r.x,z:r.z}]:[]}if(COASTAL_BUILDINGS.has(type))return coastalSites(this,this.cell(city),type);const h=city.economy.buildings[0];return historicalCitySites(h,type,this.s.seed+city.c*11+city.r*31+city.team*7)}
+ buildingSites(city,type){if(MINERAL_BUILDINGS[type]){const r=mineralSite(city.world,type);return r?[{x:r.x,z:r.z}]:[]}if(COASTAL_BUILDINGS.has(type))return coastalSites(this,this.cell(city),type);const parent=this.parentCity(city);return historicalBuildingPlots(city,parent,type,this.s.seed+parent.id*31)}
  previewBuild(city,type,p){
   const error=this.buildRule(city,type);if(error)return {error};
   if(type==='field'){const error=validateField(city,p,(x,z)=>this.nav(city).passable(x,z));if(error)return {error};const d=fieldSize(p),heights=[];for(let x=-d.width/2;x<=d.width/2;x+=4)for(let z=-d.depth/2;z<=d.depth/2;z+=4)heights.push(detailHeight(this.cell(city),p.x+x,p.z+z));if(Math.max(...heights)-Math.min(...heights)>1.8)return {error:'Põllu maapind on liiga järsk. Vali väiksem või tasasem ala.'};}
@@ -545,9 +546,9 @@ export class Civilization{
   const tiles=area.tiles.map(p=>{
    const cell=this.cell(p),ctx=this.contextAt(p,false);
    const n=ctx?ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0).length:0;
-   const urban=urbanTile(city,p,this.radius(city));
+   const urban=!this.isCountyTile(p,city);
    return {cell,ctx,n,urban,score:cell?historicalTilePriority(city,cell,urban,n):-Infinity};
-  }).filter(o=>o.cell?.land&&!o.cell.mountain&&o.n<(o.urban?4:2))
+  }).filter(o=>o.cell?.land&&!o.cell.mountain&&o.n<(o.urban?28:2))
     .sort((a,b)=>b.score-a.score);
   // Rotate through the entire county over time; never reconsider only the nine easiest cells.
   const cursor=(city.aiTerritoryCursorV137||0)%Math.max(1,tiles.length);
@@ -556,22 +557,33 @@ export class Civilization{
   for(const item of [...tiles.slice(cursor),...tiles.slice(0,cursor)]){
    if(++examined>9)break;
    const {cell,urban}=item;
-   const types=historicalTilePlan(city,cell,urban,age);
+   const mayExpand=!urban&&urbanExpansionEligible(this,city,cell);
+   const types=historicalTilePlan(city,cell,urban||mayExpand,age);
    for(const type of types){
     if(urban&&type==='house'&&(r.pop<Math.floor(capacity)-5||houses>=70))continue;
     if(['market','warehouse','cellar','study','scriptorium','barracks','archery'].includes(type)&&
        area.buildings.some(b=>b.type===type&&b.hp>0))continue;
-    if(!urban&&item.n>=1)continue;
+    if(!urban&&!mayExpand&&item.n>=1)continue;
     if((BUILD_AGE[type]??99)>age||(BUILD_TECH[type]&&!this.s.research[city.team].known.includes(BUILD_TECH[type])))continue;
     if(!BUILDINGS[type]||!canAfford(r.resources,BUILDINGS[type].cost))continue;
     if(type!=='house'&&(r.resources.wood||0)<(BUILDINGS[type].cost.wood||0)+15)continue;
     const ctx=item.ctx||this.contextAt(cell,true);
-    if(!ctx||this.buildRule(ctx,type))continue;
+    if(!ctx)continue;
+    const expanding=mayExpand&&['house','market','warehouse','cellar','well','study','scriptorium'].includes(type);
+    const previousExpansion=!!ctx.urbanExpansionV138;
+    if(expanding)ctx.urbanExpansionV138=true;
+    if(this.buildRule(ctx,type)){if(expanding&&!previousExpansion)delete ctx.urbanExpansionV138;continue;}
     const candidates=this.buildingSites(ctx,type);
-    for(const p of candidates.slice(0,28)){
+    const cursor=(ctx.aiPlotCursorV138?.[type]||0);
+    const batch=nextPlotBatch(candidates,cursor,48);
+    (ctx.aiPlotCursorV138??={})[type]=cursor+batch.length;
+    let succeeded=false;
+    for(const p of batch){
      if(this.previewBuild(ctx,type,p).error)continue;
-     if(this.build(ctx,type,p).building){city.aiTerritoryBuiltV137=(city.aiTerritoryBuiltV137||0)+1;return;}
+     if(this.build(ctx,type,p).building){city.aiTerritoryBuiltV137=(city.aiTerritoryBuiltV137||0)+1;succeeded=true;break;}
     }
+    if(succeeded)return;
+    if(expanding&&!previousExpansion)delete ctx.urbanExpansionV138;
    }
   }
  }
@@ -652,8 +664,11 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
    const h=ctx.economy.buildings[0],spots=this.buildingSites(ctx,next),kind=({lumber:'tree',hunter:'game'})[next];
    const deposits=kind?ctx.world.resources.filter(r=>r.kind===kind&&!r.removed&&r.amount>0):[];
    const score=p=>historicalSiteScore(h,p,next,ctx.economy.buildings,deposits);
-   spots.sort((a,b)=>score(a)-score(b));
-   for(const p of spots.slice(0,96)){
+   // V138 candidates already follow a continuous ancient street plan. Scan
+   // successive batches so no district edge remains permanently unreachable.
+   const plotCursor=(ctx.aiPlotCursorV138?.[next]||0),batch=nextPlotBatch(spots,plotCursor,96);
+   (ctx.aiPlotCursorV138??={})[next]=plotCursor+batch.length;
+   for(const p of batch){
     const check=this.previewBuild(ctx,next,p);if(check.error)continue;
     const nav=this.nav(ctx),home=nav.nearest(check.landEntry||door({...p,type:next}),9),depot=nav.nearest(door(h),9);
     if(!home||!depot||!nav.reachable(depot,home))continue;
