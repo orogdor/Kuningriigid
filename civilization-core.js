@@ -7,6 +7,7 @@ import {historicalTilePlan,historicalTilePriority} from './historical-districts-
 import {countyFootprint,countySearchRadius,urbanTile,countyBuildRule,countyBuildingCount,citySpacingAllowed,MIN_CITY_SPACING} from './counties-v126.js?v=136a';
 import {AI_CITY_SPACING,historicalCitySites,historicalDistrictOrder,historicalSiteScore} from './historical-city-v135.js';
 import {historicalBuildingPlots,nextPlotBatch,urbanExpansionEligible} from './historic-urban-v138.js';
+import {V139_CORE_HOUSES,cityInfillRank} from './urban-infill-v139.js';
 import {unitSuccessor,buildingSuccessor,suppliesBuilding} from './era-availability-v116.js?v=118a';
 import {migrateBattleAmmunition} from './combat-equipment-v100.js';
 import {balanceUnitDefinitions,migrateUnitHealth,UNIT_BALANCE_VERSION} from './unit-balance-v99.js';
@@ -547,9 +548,13 @@ export class Civilization{
    const cell=this.cell(p),ctx=this.contextAt(p,false);
    const n=ctx?ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0).length:0;
    const urban=!this.isCountyTile(p,city);
-   const canExpand=!urban&&r.pop>=10&&houses>=5&&urbanExpansionEligible(this,city,p);
+   const supported=!![[1,0],[-1,0],[0,1],[0,-1]].find(([dc,dr])=>this.contextAt({c:p.c+dc,r:p.r+dr},false)?.economy.buildings.filter(b=>b.type==='house'&&b.hp>0).length>=8);
+   const canExpand=!urban&&r.pop>=14&&houses>=V139_CORE_HOUSES&&supported&&urbanExpansionEligible(this,city,p);
    // Establish a connected suburb before the entire historic centre is packed.
-   return {cell,ctx,n,urban,canExpand,score:cell?historicalTilePriority(city,cell,urban,n)+(canExpand?43:0):-Infinity};
+   const centre=cell&&cell.c===city.c&&cell.r===city.r;
+   const activeTownHouses=ctx?.economy.buildings.filter(b=>b.type==='house'&&b.hp>0).length||0;
+   const priority=cell?historicalTilePriority(city,cell,urban,n)+(centre&&activeTownHouses<V139_CORE_HOUSES?85:0)+(canExpand?activeTownHouses>=12?9:-18:0): -Infinity;
+   return {cell,ctx,n,urban,canExpand,score:priority};
   }).filter(o=>o.cell?.land&&!o.cell.mountain&&o.n<(o.urban?28:2))
     .sort((a,b)=>b.score-a.score);
   // Rotate through the entire county over time; never reconsider only the nine easiest cells.
@@ -665,19 +670,17 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
   // The AI can also extend that neighborhood into an owned rural tile once
   // at least two buildings stand on the shared side.
   const isHousing=next==='house',existingHomes=this.allBuildings(city).filter(b=>b.type==='house'&&b.hp>0).length;
-  if(isHousing&&existingHomes>=6)for(const tile of this.constructionArea(city).tiles){
+  if(isHousing&&existingHomes>=V139_CORE_HOUSES+6&&this.allBuildings(city).filter(b=>['market','study','warehouse','cellar','well'].includes(b.type)&&b.ready&&b.hp>0).length>=2)for(const tile of this.constructionArea(city).tiles){
    if(!this.isCountyTile(tile,city)||!urbanExpansionEligible(this,city,tile))continue;
+   if(![[1,0],[-1,0],[0,1],[0,-1]].some(([dc,dr])=>this.contextAt({c:tile.c+dc,r:tile.r+dr},false)?.economy.buildings.filter(b=>b.type==='house'&&b.hp>0).length>=8))continue;
    if(contexts.some(ctx=>ctx.c===tile.c&&ctx.r===tile.r))continue;
    contexts.push({...tile,lazy:true,expandV138:true});
   }
   const orderedContexts=historicalDistrictOrder(city,contexts);
-  if(isHousing&&existingHomes>=6)orderedContexts.sort((a,b)=>{
+  if(isHousing)orderedContexts.sort((a,b)=>{
    const rank=ctx=>{
-    if(ctx.expandV138)return -36;
-    const live=ctx.lazy?this.contextAt(ctx,false)?.economy.buildings||[]:ctx.economy.buildings;
-    const homes=live.filter(t=>t.type==='house'&&t.hp>0).length;
-    if(ctx.c===city.c&&ctx.r===city.r)return 20+Math.max(0,homes-6)*12;
-    return homes>0?-30+homes*2:15+Math.abs(ctx.c-city.c)+Math.abs(ctx.r-city.r);
+    if(ctx.expandV138)return 85; // outer suburb after compact inner quarters
+    return cityInfillRank(city,ctx,next,this);
    };
    return rank(a)-rank(b);
   });
