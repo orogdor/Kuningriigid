@@ -1,9 +1,9 @@
-export const FIELD_MIN=8,FIELD_MAX=64;
+export const FIELD_MIN=8,FIELD_MAX=64, AI_FIELD_WIDTH=48, AI_FIELD_DEPTH=32; // 6 x old 16×16 area
 export function fieldRect(a,b){
  const width=Math.round(Math.abs(a.x-b.x)/2)*2,depth=Math.round(Math.abs(a.z-b.z)/2)*2;
  return {x:Math.round((a.x+b.x)/4)*2,z:Math.round((a.z+b.z)/4)*2,width,depth};
 }
-export const fieldSize=b=>({width:b.width??16,depth:b.depth??16});
+export const fieldSize=b=>({width:b.width??AI_FIELD_WIDTH,depth:b.depth??AI_FIELD_DEPTH});
 export function fieldContains(field,p,margin=0){const {width,depth}=fieldSize(field);return Math.abs(field.x-p.x)<width/2+margin&&Math.abs(field.z-p.z)<depth/2+margin;}
 export function farmingProfile(age,known=[],powered=false){
  const has=id=>known.includes(id);
