@@ -11,7 +11,7 @@ import {DETAIL_HALF_X,DETAIL_HALF_Z,DETAIL_TILE_X,DETAIL_TILE_Z,tileDelta,localT
 import {MINERAL_BUILDINGS,COASTAL_BUILDINGS,consolidateMinerals,mineralSite,mineralPlacement,harvestMineral,coastalPlacement,coastalSites} from './resource-sites-v88.js';
 import {nationalResourceNeeds,settlementResourceScore,specializeNewCity} from './settlement-ai-v88.js';
 import {GOOD_BUILDINGS,cityNeeds,seedGoods,foodTotal,consumeLuxuries} from './city-needs-v87.js';
-import {atWar,tickDiplomacy} from './diplomacy-v87.js';
+import {atWar,tickDiplomacy,setRelation} from './diplomacy-v87.js';
 import {advanceMerchant,receiveMerchant,planMerchants} from './merchant-v87.js';
 import {availableLabor} from './gameplay-flow-v86.js?v=86a';
 import {visibleNow,updateEnemyIntel,armyUnits,activeArmies,splitArmy,mergeArmies,cityProblems} from './v51-systems.js';
@@ -581,6 +581,29 @@ const science=this.s.research[team];if(!science.active&&this.s.cities.some(c=>c.
  if(policy.allow){const result=this.recruitSettler(city);
   if(result.settler){this.s.aiSettlerLastAt[team]=this.s.time;city.lastSettler=this.s.time;}}
 }
+ // Territorial competition: AI may declare a limited war only after scouting
+ // the opponent, fielding a real army, and approaching contested settlements.
+ if(this.s.strategyPacingV125&&this.s.time>180*60){
+  const mobile=this.s.units.filter(u=>u.team===team&&u.hp>0&&!u.garrison);
+  const last=(this.s.aiLastWarAt??={})[team]||0;
+  if(mobile.length>=8&&this.s.time-last>150*60){
+   const ourCities=this.s.cities.filter(c=>c.team===team);
+   const knownRivals=this.s.cities.filter(c=>c.team!==team&&
+     this.seen(team,c)&&!atWar(this.s,team,c.team));
+   const candidates=knownRivals.filter(c=>ourCities.some(own=>
+     Math.abs(own.c-c.c)+Math.abs(own.r-c.r)<42)).sort((a,b)=>
+       Math.min(...ourCities.map(x=>Math.abs(x.c-a.c)+Math.abs(x.r-a.r)))-
+       Math.min(...ourCities.map(x=>Math.abs(x.c-b.c)+Math.abs(x.r-b.r))));
+   const enemy=candidates[0];
+   if(enemy){
+    const enemyStrength=this.s.units.filter(u=>u.team===enemy.team&&u.hp>0&&!u.garrison).length;
+    if(mobile.length>=Math.max(8,Math.ceil(enemyStrength*.75))){
+     setRelation(this.s,team,enemy.team,'war');
+     this.s.aiLastWarAt[team]=this.s.time;
+    }
+   }
+  }
+ }
  const army=activeArmies(this.s,team).sort((a,b)=>armyUnits(this.s,b).length-armyUnits(this.s,a).length)[0]||this.s.armies[team];
  // AI must scout rather than know all opponents' city coordinates from the start.
  if(army.embarked==null&&!army.path.length&&this.s.time>360&&!this.s.cities.some(c=>c.team!==team&&this.visibleNow(team,c))){
