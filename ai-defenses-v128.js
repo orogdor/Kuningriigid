@@ -47,9 +47,18 @@ export function planAIDefenses(game,team,city){
  city.defensePlanV128={kind:plan.kind,slots:plan.slots.length,gateOpenings:plan.gateOpenings};
  // Towers secure the ring first. Wall sections follow with an unblocked
  // entrance; actual gatehouses need medieval technology.
+ // A Bronze palisade planned early may be obsolete by Medieval Age.
+ // Keep the geometry and saved ring, but adapt each unbuilt segment to the
+ // currently legal material/tower tier.
+ const effective=slot=>{
+  const upgrade={palisade:'stonewall',watchtower:'stonetower'};
+  const later=upgrade[slot.type];
+  return later&&!game.buildRule(city,later)?{...slot,type:later}:slot;
+ };
+ const slots=plan.slots.map(effective);
  const candidates=[
-  ...plan.slots.filter(s=>['stonetower','watchtower'].includes(s.type)),
-  ...plan.slots.filter(s=>!['stonetower','watchtower'].includes(s.type)),
+  ...slots.filter(s=>['stonetower','watchtower'].includes(s.type)),
+  ...slots.filter(s=>!['stonetower','watchtower'].includes(s.type)),
   ...(game.s.ages[team]>=3?[-plan.rz,plan.rz].map(z=>({type:'gatehouse',x:0,z,wallAxis:0})):[])
  ];
  const reasons={};
