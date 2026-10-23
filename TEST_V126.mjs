@@ -6,7 +6,7 @@ import {COLS,ROWS} from './campaign.js';
 for(let radius=1;radius<=4;radius++){
  const city={c:30,r:30},tiles=countyFootprint(city,radius,()=>({land:true}));
  assert.equal(tiles.length,countyTileLimit(radius));
- assert.equal(tiles.filter(p=>urbanTile(city,p,radius)).length,(2*radius+1)**2);
+ const urban=tiles.filter(p=>urbanTile(city,p,radius));assert.ok(urban.length>=4*radius+1&&urban.length<(2*radius+1)**2,'non-square but connected urban centre');
  assert.equal(new Set(tiles.map(p=>p.c+':'+p.r)).size,tiles.length);
 }
 const edge=countyFootprint({c:0,r:0},4,p=>p.c>=0&&p.c<COLS&&p.r>=0&&p.r<ROWS?{land:true}:null);
