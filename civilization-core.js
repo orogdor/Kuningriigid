@@ -555,7 +555,7 @@ export class Civilization{
    const {cell,urban}=item;
    const types=historicalTilePlan(city,cell,urban,age);
    for(const type of types){
-    if(urban&&type==='house'&&(r.pop<Math.floor(capacity)-2||houses>=64))continue;
+    if(urban&&type==='house'&&(r.pop<Math.floor(capacity)-5||houses>=70))continue;
     if(['market','warehouse','cellar','study','scriptorium','barracks','archery'].includes(type)&&
        area.buildings.some(b=>b.type===type&&b.hp>0))continue;
     if(!urban&&item.n>=1)continue;
