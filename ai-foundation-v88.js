@@ -27,7 +27,7 @@ export function reservesFoundation(game,city,type){
  const realm=city.economy.realms[city.team],buildings=game.allBuildings(city);
  if(['hunter','fisher','farm'].includes(type)&&foodTotal(realm.resources)<realm.pop*3)return false;
  if(type==='well'&&(realm.resources.water||0)<realm.pop*2)return false;
- if(type==='house'&&realm.pop>=4+3*buildings.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length-1)return false;
+ if(type==='house'&&realm.pop>=4+1.5*buildings.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length-1)return false;
  const stock=city.economy.realms[city.team].resources,cost=BUILDINGS[type]?.cost||{};
  return missing.some(need=>Object.entries(BUILDINGS[need].cost).some(([key,n])=>(stock[key]||0)-(cost[key]||0)<n));
 }
