@@ -10,6 +10,7 @@ on:
       - 'ai-foundation-v88.js'
       - 'ai-defenses-v128.js'
       - 'civilization-core.js'
+      - 'labor.js'
   workflow_dispatch:
 permissions:
   contents: write
@@ -40,7 +41,7 @@ jobs:
       - name: Validate generated test state
         run: |
           test -s scenarios/ai-medieval-v145.json
-          node --input-type=module -e "import fs from 'node:fs'; const s=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v145.json')); const t=s.medievalTestV145; if(!t||s.ages[0]!==3||!s.cities.some(c=>c.id===t.targetCityId&&c.team===0))process.exit(1);console.log('MEDIEVAL STATE VERIFIED',t)"
+          node --input-type=module -e "import fs from 'node:fs'; const s=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v145.json')); const t=s.medievalTestV145; if(!t||s.ages[0]!==3||!s.cities.some(c=>c.id===t.targetCityId&&c.team===0))process.exit(1);const m=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v145.manifest.json')); if(m.turn>360||m.totalCities<12||m.totals.pop<95)throw Error('Economic regression: '+JSON.stringify({turn:m.turn,cities:m.totalCities,pop:m.totals.pop,comparison:m.comparison}));console.log('MEDIEVAL STATE VERIFIED',t,m.totals)"
       - name: Verify browser on phone and computer
         run: |
           npm install --no-save playwright
