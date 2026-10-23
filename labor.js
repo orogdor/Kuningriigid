@@ -7,7 +7,7 @@ export const BASIC_JOBS={berries:{name:'Marjakorjajad',type:'berries',kind:'berr
 // V36: A worker represents a small household work team. Houses add 3 places.
 // Partially staffed workplaces can still function, but never exceed full production
 // without a technological bonus. Idle builders do not consume workforce.
-export const HALL_CAPACITY=4, HOUSE_CAPACITY=3;
+export const HALL_CAPACITY=4, HOUSE_CAPACITY=1.5; // V137: two affordable homes replace one former 3-person home
 export const FOOD_PER_RESIDENT=.60, WATER_PER_RESIDENT=.45;
 export const housingCapacity=buildings=>HALL_CAPACITY+buildings.filter(b=>b.type==='house'&&b.ready&&b.hp>0&&!b.virtual).length*HOUSE_CAPACITY;
 export function workerEfficiency(assigned,need){return need>0?Math.pow(Math.min(1,Math.max(0,assigned)/need),.85):1}
