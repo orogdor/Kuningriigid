@@ -9,7 +9,7 @@ try{
   const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});
   await context.addInitScript(()=>{localStorage.setItem('kingdoms-quality','low');localStorage.setItem('kingdoms-civ4','existing-player-save');localStorage.setItem('kingdoms-civ4-backup','existing-player-backup');});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('http://127.0.0.1:8765/?demo=ai-city-v138&v=136',{waitUntil:'domcontentloaded',timeout:120000});
+  await page.goto('http://127.0.0.1:8765/?demo=ai-city-v138&v=138',{waitUntil:'domcontentloaded',timeout:120000});
   await page.waitForFunction(()=>window.gameDebug&&document.getElementById('menu-status').hidden,{timeout:120000});
   const result=await page.evaluate(()=>{
    const s=gameDebug.state,city=s.cities.find(c=>c.team===0);
