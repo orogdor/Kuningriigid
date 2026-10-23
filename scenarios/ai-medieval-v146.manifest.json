@@ -7,7 +7,7 @@
   "firstMedievalTeam": 1,
   "midwayTurns": 30,
   "stopReason": "30 turns after first AI entered Medieval Age",
-  "elapsedSeconds": 85,
+  "elapsedSeconds": 122,
   "age": 3,
   "sourceTeam": 2,
   "targetCityId": 1,
@@ -48,6 +48,7 @@
       "well": 2
     },
     "defenseStatus": "locked",
+    "defenseLock": "Vaja: Madal kivivall",
     "defenseAttempts": 0,
     "stocks": {
       "gold": 1605,
@@ -105,6 +106,7 @@
       "well": 2
     },
     "defenseStatus": "locked",
+    "defenseLock": "Vaja: Madal kivivall",
     "defenseAttempts": 0,
     "stocks": {
       "gold": 1605,
@@ -137,7 +139,7 @@
       ],
       "cities": 3,
       "population": 18,
-      "seconds": 3
+      "seconds": 5
     },
     {
       "turn": 40,
@@ -149,7 +151,7 @@
       ],
       "cities": 3,
       "population": 17,
-      "seconds": 6
+      "seconds": 8
     },
     {
       "turn": 60,
@@ -161,7 +163,7 @@
       ],
       "cities": 3,
       "population": 25,
-      "seconds": 8
+      "seconds": 12
     },
     {
       "turn": 80,
@@ -173,7 +175,7 @@
       ],
       "cities": 8,
       "population": 50,
-      "seconds": 13
+      "seconds": 19
     },
     {
       "turn": 100,
@@ -185,7 +187,7 @@
       ],
       "cities": 9,
       "population": 80,
-      "seconds": 20
+      "seconds": 29
     },
     {
       "turn": 120,
@@ -197,7 +199,7 @@
       ],
       "cities": 12,
       "population": 114,
-      "seconds": 29
+      "seconds": 43
     },
     {
       "turn": 140,
@@ -209,7 +211,7 @@
       ],
       "cities": 14,
       "population": 143,
-      "seconds": 45
+      "seconds": 65
     },
     {
       "turn": 150,
@@ -221,7 +223,7 @@
       ],
       "cities": 14,
       "population": 152,
-      "seconds": 54
+      "seconds": 78
     },
     {
       "turn": 160,
@@ -233,7 +235,7 @@
       ],
       "cities": 15,
       "population": 165,
-      "seconds": 64
+      "seconds": 92
     },
     {
       "turn": 180,
@@ -245,7 +247,7 @@
       ],
       "cities": 15,
       "population": 190,
-      "seconds": 84
+      "seconds": 122
     }
   ],
   "byTeam": [
@@ -315,8 +317,8 @@
     "version": 145,
     "turn": 180,
     "totalCities": 15,
-    "population": 189,
-    "buildings": 329,
+    "population": 190,
+    "buildings": 330,
     "houses": 114,
     "markets": 10,
     "education": 23,
@@ -324,19 +326,19 @@
     "mines": 33,
     "withMarket": 10,
     "withEducation": 9,
-    "withDefenses": 1,
-    "fortifications": 1
+    "withDefenses": 3,
+    "fortifications": 3
   },
   "comparison": {
     "population": {
-      "v144": 189,
+      "v144": 190,
       "v146": 190,
-      "delta": 1
+      "delta": 0
     },
     "buildings": {
-      "v144": 329,
+      "v144": 330,
       "v146": 330,
-      "delta": 1
+      "delta": 0
     },
     "houses": {
       "v144": 114,
@@ -374,14 +376,14 @@
       "delta": 0
     },
     "withDefenses": {
-      "v144": 1,
+      "v144": 3,
       "v146": 3,
-      "delta": 2
+      "delta": 0
     },
     "fortifications": {
-      "v144": 1,
+      "v144": 3,
       "v146": 3,
-      "delta": 2
+      "delta": 0
     }
   },
   "trade": {
@@ -446,6 +448,7 @@
         "well": 2
       },
       "defenseStatus": "locked",
+      "defenseLock": "Vaja: Madal kivivall",
       "defenseAttempts": 0,
       "stocks": {
         "gold": 1605,
@@ -511,6 +514,7 @@
         "well": 1
       },
       "defenseStatus": "materials",
+      "defenseLock": "Uuri: Puidust kaitserajatised",
       "defenseAttempts": 1,
       "stocks": {
         "gold": 1636,
@@ -571,6 +575,7 @@
         "well": 2
       },
       "defenseStatus": "locked",
+      "defenseLock": "Vaja: Madal kivivall",
       "defenseAttempts": 1,
       "stocks": {
         "gold": 1496,
@@ -634,6 +639,7 @@
         "well": 1
       },
       "defenseStatus": "locked",
+      "defenseLock": "Vaja: Madal kivivall",
       "defenseAttempts": 0,
       "stocks": {
         "gold": 927,
@@ -700,6 +706,7 @@
         "well": 1
       },
       "defenseStatus": "locked",
+      "defenseLock": "Vaja: Madal kivivall",
       "defenseAttempts": 0,
       "stocks": {
         "gold": 869,
@@ -768,6 +775,7 @@
         "vegetable_garden": 1
       },
       "defenseStatus": "insufficient-surplus",
+      "defenseLock": null,
       "defenseAttempts": 0,
       "stocks": {
         "gold": 636,
@@ -826,6 +834,7 @@
         "well": 1
       },
       "defenseStatus": "locked",
+      "defenseLock": "Vaja: Madal kivivall",
       "defenseAttempts": 0,
       "stocks": {
         "gold": 989,
@@ -898,6 +907,7 @@
         "well": 1
       },
       "defenseStatus": "construction-backlog",
+      "defenseLock": "Vaja: Madal kivivall",
       "defenseAttempts": 1,
       "stocks": {
         "gold": 960,
@@ -956,6 +966,7 @@
         "well": 1
       },
       "defenseStatus": "services",
+      "defenseLock": null,
       "defenseAttempts": 0,
       "stocks": {
         "gold": 498,
@@ -1026,6 +1037,7 @@
         "warehouse": 1
       },
       "defenseStatus": "insufficient-surplus",
+      "defenseLock": "Vaja: Madal kivivall",
       "defenseAttempts": 0,
       "stocks": {
         "gold": 642,
@@ -1073,6 +1085,7 @@
         "well": 1
       },
       "defenseStatus": "population",
+      "defenseLock": null,
       "defenseAttempts": 0,
       "stocks": {
         "gold": 240,
@@ -1119,6 +1132,7 @@
         "well": 1
       },
       "defenseStatus": "population",
+      "defenseLock": null,
       "defenseAttempts": 0,
       "stocks": {
         "gold": 211,
@@ -1163,6 +1177,7 @@
         "tinmine": 1
       },
       "defenseStatus": "population",
+      "defenseLock": null,
       "defenseAttempts": 0,
       "stocks": {
         "gold": 266,
@@ -1214,6 +1229,7 @@
         "well": 1
       },
       "defenseStatus": "population",
+      "defenseLock": null,
       "defenseAttempts": 0,
       "stocks": {
         "gold": 201,
@@ -1262,6 +1278,7 @@
         "well": 1
       },
       "defenseStatus": "population",
+      "defenseLock": null,
       "defenseAttempts": 0,
       "stocks": {
         "gold": 74,
