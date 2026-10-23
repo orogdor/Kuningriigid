@@ -33,6 +33,7 @@ jobs:
           test -s civilization-core.js
           test -s fortifications.js
           test -s vendor/three.module.js
+          node TEST_V132.mjs
           node --check civilization.js
           node --check civilization-core.js
           node --check research.js
@@ -53,6 +54,7 @@ jobs:
           node --check continuous-landscape-visual.js
           node --check landscape-polish-v84.js
           node --check civilization-core.js
+          node TEST_V132.mjs
           node --check civilization.js
           node --check research-ui.js
           node --check localization.js

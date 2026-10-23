@@ -1,3 +1,4 @@
+import {crowdWaypoint,forgetCrowdRoute} from './crowd-movement-v132.js';
 import {troopRole} from './military-v88.js?v=117a';
 export const SQUAD_SIZE=12;
 export const soldierCount=u=>['scout','militia','bronze_catapult','catapult'].includes(u.kind)?1:['melee','ranged'].includes(troopRole(u.kind))?24:SQUAD_SIZE;
@@ -17,9 +18,16 @@ export function constrainStep(agent,to,others,open=()=>true){
 }
 export function moveSquad(u,target,dt,speed,nav,squads){
  const before={x:u.x,z:u.z};let done=false;if(nav)done=nav.move(u,target,dt,speed);else{const d=Math.hypot(target.x-u.x,target.z-u.z),f=d?Math.min(1,speed*dt/d):0;u.x+=(target.x-u.x)*f;u.z+=(target.z-u.z)*f;done=d<=speed*dt;}
- const to={x:u.x,z:u.z};Object.assign(u,before);const peers=squads.filter(alive);u.moving=constrainStep(u,to,peers,nav?((x,z)=>nav.open(x,z)):undefined);if(!u.moving){ // Slide around a friendly queue instead of pushing through it.
-  const dx=to.x-before.x,dz=to.z-before.z;for(const sign of [1,-1])if(constrainStep(u,{x:before.x-dz*sign,z:before.z+dx*sign},peers,nav?((x,z)=>nav.open(x,z)):undefined)){u.moving=true;break;}
- }
+ const to={x:u.x,z:u.z};Object.assign(u,before);const peers=squads.filter(alive),open=nav?((x,z)=>nav.open(x,z)):()=>true;
+ // Look along the ordinary terrain route, beyond the blocking formation.
+ let goal=target;const path=nav?.cache?.get(u)?.path;
+ if(path?.length){goal=to;for(const point of path){if(Math.hypot(point.x-before.x,point.z-before.z)>60||!nav.clear(before,point))break;goal=point;}}
+ const waypoint=crowdWaypoint(u,goal,peers,open,radius,dt),distance=Math.hypot(waypoint.x-u.x,waypoint.z-u.z);
+ const detour=waypoint!==goal,step=Math.min(distance,speed*dt),desired=detour&&distance?{x:u.x+(waypoint.x-u.x)*step/distance,z:u.z+(waypoint.z-u.z)*step/distance}:to;
+ u.moving=constrainStep(u,desired,peers,open);
+ if(Math.hypot(u.x-desired.x,u.z-desired.z)>.01)forgetCrowdRoute(u);
+ // A proposed nav step must never consume waypoints the formation did not reach.
+ if(nav&&Math.hypot(u.x-to.x,u.z-to.z)>.01)nav.cache?.delete(u);
  if(u.moving)u.heading=Math.atan2(u.x-before.x,u.z-before.z);return done&&Math.hypot(u.x-target.x,u.z-target.z)<.25;
 }
 export function separateSquads(squads,nav=null){
@@ -34,6 +42,6 @@ export function formationMen(squads,dt,nav){
  const nearby=p=>{const out=[];const x=Math.floor(p.x/size),z=Math.floor(p.z/size);for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++)out.push(...(bins.get((x+dx)+':'+(z+dz))||[]));return out;};
  const goals=[];for(const u of squads){if(!alive(u))continue;let men=stored.get(u);if(!men){men=[];stored.set(u,men);}const count=u.soldiers?u.soldiers.filter(m=>m.hp>0).length:Math.ceil((u.menCount||soldierCount(u))*Math.min(1,u.hp/(u.maxHp||u.hp))),c=Math.cos(u.heading||0),sn=Math.sin(u.heading||0),spacing=u.kind==='chariot'?6.2:mounted(u)?4.1:1.05;
   men.length=count;for(let i=0;i<count;i++){const columns=count>=24&&!mounted(u)?6:4,ox=count===1?0:(i%columns-(columns-1)/2)*spacing,oz=count===1?0:(Math.floor(i/columns)-(Math.ceil(count/columns)-1)/2)*spacing,goal={x:u.x+c*ox+sn*oz,z:u.z-sn*ox+c*oz};if(!men[i]){const p={...goal,radius:mounted(u)?2:.34};let found=false;for(let ring=0;ring<40&&!found;ring++)for(let n=0;n<Math.max(1,ring*8);n++){const a=n/Math.max(1,ring*8)*Math.PI*2;p.x=goal.x+Math.cos(a)*ring*.4;p.z=goal.z+Math.sin(a)*ring*.4;if((!nav||nav.open(p.x,p.z))&&nearby(p).every(q=>Math.hypot(q.x-p.x,q.z-p.z)>=q.radius+p.radius+.02)){found=true;break;}}men[i]=p;}insert(men[i]);goals.push({p:men[i],goal,speed:Math.max(5,(u.moving?9:5))});}result.set(u,men);}
- for(const {p,goal,speed}of goals){if(dt<=0)continue;const old=key(p.x,p.z),list=bins.get(old);list.splice(list.indexOf(p),1);const d=Math.hypot(goal.x-p.x,goal.z-p.z),f=d?Math.min(1,speed*Math.min(dt,.1)/d):0,to={x:p.x+(goal.x-p.x)*f,z:p.z+(goal.z-p.z)*f};constrainStep(p,to,nearby(p),nav?((x,z)=>nav.open(x,z)):undefined);insert(p);}
+ for(const {p,goal,speed}of goals){if(dt<=0)continue;const old=key(p.x,p.z),list=bins.get(old);list.splice(list.indexOf(p),1);const peers=nearby(p),open=nav?((x,z)=>nav.open(x,z)):()=>true,waypoint=crowdWaypoint(p,goal,peers,open,radius,Math.min(dt,.1)),d=Math.hypot(waypoint.x-p.x,waypoint.z-p.z),f=d?Math.min(1,speed*Math.min(dt,.1)/d):0,to={x:p.x+(waypoint.x-p.x)*f,z:p.z+(waypoint.z-p.z)*f};constrainStep(p,to,peers,open);if(Math.hypot(p.x-to.x,p.z-to.z)>.01)forgetCrowdRoute(p);insert(p);}
  return result;
 }

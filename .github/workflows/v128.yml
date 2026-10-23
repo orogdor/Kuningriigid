@@ -1,4 +1,4 @@
-name: V131 Invisible Performance Optimizations
+name: V132 Army Passing
 on:
   push:
     branches: [main]
@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: 22}
+      - run: node TEST_V132.mjs
       - run: node TEST_V131.mjs
       - run: node TEST_V130.mjs
       - run: node TEST_V129.mjs
@@ -37,6 +38,7 @@ jobs:
       - run: |
           python3 -m http.server 8765 >/tmp/v128-http.log 2>&1 &
           node TEST_V128_BROWSER.mjs
+          node TEST_V132_BROWSER.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
