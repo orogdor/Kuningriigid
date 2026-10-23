@@ -6,7 +6,7 @@ export const countySearchRadius=radius=>Math.ceil((Math.sqrt(3)*(2*radius+1)-1)/
 export function urbanTile(city,p,radius){
  const dx=p.c-city.c,dz=p.r-city.r;
  if(Math.abs(dx)>radius||Math.abs(dz)>radius)return false;
- if(dx===0&&dz===0)return true;
+ if(dx===0||dz===0)return true; // retain road corridors and cardinal growth arms
  const angle=Math.atan2(dz,dx),seed=(city.id??city.c*7+city.r*11)*.71;
  const contour=1+.085*Math.sin(angle*3+seed)+.055*Math.cos(angle*5+seed*.73);
  return Math.hypot(dx,dz)<=(radius+.28)*contour;
