@@ -30,7 +30,7 @@ jobs:
         if: steps.file.outputs.ready == 'yes'
         run: |
           npm install --no-save playwright
-          npx playwright install --with-deps chromium
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
       - name: Open historical test on desktop and mobile
         if: steps.file.outputs.ready == 'yes'
         run: |
