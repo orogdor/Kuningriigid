@@ -127,7 +127,7 @@ export function startResearch(state,team,id){const r=state.research[team],error=
 export function queueResearch(state,team,id){const r=state.research[team];r.queue??=[];if(r.known.includes(id)||r.active===id||r.queue.includes(id))return {error:'See teema on juba uuritud või järjekorras.'};if(r.queue.length>=4)return {error:'Järjekorda mahub kuni neli teemat.'};if(!r.active&&!r.paused&&!r.queue.length)return startResearch(state,team,id);const planned={known:[...r.known,...(r.active?[r.active]:[]),...r.queue]};const error=techBlock(planned,id);if(error)return {error};r.queue.push(id);return {ok:true}}
 export function tickResearch(state,dt){
  const events=[];
- for(const team of state.armies.map(a=>a.team)){
+ for(const team of [...new Set(state.armies.map(a=>a.team))]){
   const r=state.research[team];r.queue??=[];r.boosted??=[];
   r.rate=scienceRate(state,team);
   if(!r.paused && r.rate>0){
