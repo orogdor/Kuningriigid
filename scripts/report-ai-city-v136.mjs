@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import {Civilization,BUILDINGS} from '../civilization-core.js';
 import {isShore} from '../fishery.js';
+import {coastalPlacement} from '../resource-sites-v88.js';
 const g=new Civilization(JSON.parse(fs.readFileSync('scenarios/ai-city-v136.json'))),s=g.s;
 const totals=[];
 for(let team=0;team<=3;team++){
@@ -13,7 +14,13 @@ for(let team=0;team<=3;team++){
    coast:coasts.length,coastCandidates:[],market:g.allBuildings(city).filter(b=>b.type==='market'&&b.hp>0).length,harbor:g.allBuildings(city).filter(b=>b.type==='harbor'&&b.hp>0).length};
   for(const p of coasts.slice(0,4)){
    const ctx=g.contextAt(p,true),sites=g.buildingSites(ctx,'harbor');
-   data.coastCandidates.push({tile:[p.c,p.r],sites:sites.length,rule:g.buildRule(ctx,'harbor'),preview:sites.length?g.previewBuild(ctx,'harbor',sites[0]).error||'ok':'no-coast-sites'});
+   const scan={checked:0,valid:0,errors:{}};if(data.coastCandidates.length===0){
+    for(let x=-124;x<=124;x+=10)for(let z=-108;z<=108;z+=10){
+     const r=coastalPlacement(g,g.cell(p),'harbor',{x,z});scan.checked++;
+     if(r.error)scan.errors[r.error]=(scan.errors[r.error]||0)+1;else scan.valid++;
+    }
+   }
+   data.coastCandidates.push({tile:[p.c,p.r],sites:sites.length,scan,rule:g.buildRule(ctx,'harbor'),preview:sites.length?g.previewBuild(ctx,'harbor',sites[0]).error||'ok':'no-coast-sites'});
   }
   cities.push(data);
  }
