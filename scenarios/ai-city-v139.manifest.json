@@ -24,7 +24,7 @@
     {
       "team": 3,
       "cities": 4,
-      "buildings": 104,
+      "buildings": 109,
       "markets": 0,
       "harbors": 0,
       "houses": 38,
@@ -75,7 +75,7 @@
       "city": "Lõunaküla 1",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 22,
+      "urbanBuildings": 24,
       "urbanTiles": 5
     },
     {
@@ -89,7 +89,7 @@
       "city": "Lõunaküla 3",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 25,
+      "urbanBuildings": 28,
       "urbanTiles": 5
     },
     {
@@ -106,7 +106,7 @@
       "centreHouses": 9,
       "mainTileHouses": 11,
       "totalHouses": 11,
-      "walls": 0,
+      "walls": 2,
       "gates": 0,
       "wallPlan": 64,
       "services": {
@@ -132,7 +132,7 @@
       "centreHouses": 9,
       "mainTileHouses": 9,
       "totalHouses": 9,
-      "walls": 0,
+      "walls": 3,
       "gates": 0,
       "wallPlan": 84,
       "services": {
@@ -158,7 +158,7 @@
   "turn": 201,
   "sourceTeam": 3,
   "cities": 4,
-  "buildings": 104,
+  "buildings": 109,
   "spacingPairs": [
     9,
     9,
@@ -173,6 +173,6 @@
     1,
     0
   ],
-  "bytes": 986270,
-  "seconds": 70
+  "bytes": 984489,
+  "seconds": 86
 }
