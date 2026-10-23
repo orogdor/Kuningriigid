@@ -23,7 +23,7 @@ const landUse=originalCities.map(city=>{
  const area=game.constructionArea(city),tiles=area.tiles.map(p=>({p,ctx:game.contextAt(p,false)}));
  const developed=tiles.filter(({ctx})=>ctx?.economy.buildings.some(b=>!b.virtual&&b.hp>0)).length;
  const ruralDeveloped=tiles.filter(({p,ctx})=>game.isCountyTile(p,city)&&ctx?.economy.buildings.some(b=>!b.virtual&&b.hp>0)).length;
- return {name:city.name,owned:tiles.length,developed,ruralDeveloped,planned:city.aiTerritoryBuiltV138||0,homes:game.allBuildings(city).filter(b=>b.type==='house'&&b.hp>0).length,foodGrowthBonus:city.economy.realms[city.team].marketFoodBonusV138||0};
+ return {name:city.name,owned:tiles.length,developed,ruralDeveloped,planned:city.aiTerritoryBuiltV137||0,homes:game.allBuildings(city).filter(b=>b.type==='house'&&b.hp>0).length,foodGrowthBonus:city.economy.realms[city.team].marketFoodBonusV137||0};
 });
 const density=originalCities.map(city=>{
  const area=game.constructionArea(city),tiles=area.tiles.map(p=>({p,ctx:game.contextAt(p,false)}));
