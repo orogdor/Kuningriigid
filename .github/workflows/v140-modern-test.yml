@@ -13,11 +13,12 @@ concurrency:
 jobs:
   simulate:
     runs-on: ubuntu-latest
-    timeout-minutes: 27
+    timeout-minutes: 23
     env:
       MODERN_SEED: 139023
-      MODERN_MAX_TURNS: 2400
-      MODERN_MAX_MS: 1110000
+      MODERN_MAX_TURNS: 1600
+      MODERN_MAX_MS: 900000
+      MODERN_RESUME: '1'
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: true}
