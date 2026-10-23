@@ -28,7 +28,7 @@ assert.ok(ring.slots.filter(s=>s.type==='watchtower').length>=8);
 assert.ok(ring.slots.every(p=>Math.abs(p.x)<105&&Math.abs(p.z)<88));
 assert.ok(!ring.slots.some(p=>p.type==='palisade'&&Math.abs(p.x)<8&&Math.abs(p.z)===ring.rz),'north/south roads never sealed');
 assert.ok(!ring.slots.some(p=>p.type==='palisade'&&Math.abs(p.z)<8&&Math.abs(p.x)===ring.rx),'east/west roads never sealed');
-assert.notDeepEqual(ring.slots.map(x=>[x.x,x.z]),ancientWallPlan([...inner,house(71,0)],'palisade','watchtower',12).slots.map(x=>[x.x,x.z]),'perimeter responds to actual settled buildings');
+assert.notDeepEqual(ring.slots.map(x=>[x.x,x.z]),ancientWallPlan([...inner,house(71,0),house(72,4),house(68,-3),house(67,7),house(66,1)],'palisade','watchtower',12).slots.map(x=>[x.x,x.z]),'perimeter responds to actual settled buildings');
 const town=ctx(10,10,8),realm={pop:20,resources:{...rich}},city={...town,id:2,team:1,economy:{...town.economy,realms:[{},realm]}};
 city.economy.buildings.push({type:'market',hp:350,ready:true},{type:'well',hp:350,ready:true});
 const mock={s:{time:80,seed:13901,ages:[0,1],units:[]},allBuildings:()=>city.economy.buildings,
