@@ -21,8 +21,8 @@ try{
   await page.locator('#pause').click();
   await page.waitForFunction(time=>window.gameDebug.state.time>time+.1,state.time,{timeout:15000});
   await page.locator('#pause').click();
-  const later=await page.evaluate(()=>({main:localStorage.getItem('kingdoms-civ4'),backup:localStorage.getItem('kingdoms-civ4-backup')}));
-  assert.equal(later.main,state.main);assert.equal(later.backup,state.backup);
+  const later=await page.evaluate(()=>({main:localStorage.getItem('kingdoms-civ4'),backup:localStorage.getItem('kingdoms-civ4-backup'),citizenSearches:[...window.gameDebug.game.navs.values()].reduce((n,nav)=>n+nav.citizenRoutes.stats.searches,0)}));
+  assert.ok(later.citizenSearches>0,'real citizens use the new navigation in the browser');assert.equal(later.main,state.main);assert.equal(later.backup,state.backup);
   assert.deepEqual(errors,[]);results.push({mobile,...state,errors});await context.close();
  }
  const context=await browser.newContext(),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));

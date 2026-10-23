@@ -1,0 +1,198 @@
+[
+  {
+    "grown": false,
+    "city": "Põhjaküla 1",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Lõunaküla 1",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Idaküla 1",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Kadakaküla 1",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Kadakaküla 2",
+    "urban": 8,
+    "rural": 19,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Kadakaküla 3",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Põhjaküla 2",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Idaküla 2",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Lõunaküla 2",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Idaküla 3",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Kadakaküla 4",
+    "urban": 8,
+    "rural": 19,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Lõunaküla 3",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Kadakaküla 5",
+    "urban": 9,
+    "rural": 18,
+    "total": 27
+  },
+  {
+    "grown": false,
+    "city": "Lõunaküla 4",
+    "urban": 8,
+    "rural": 19,
+    "total": 27
+  },
+  {
+    "grown": true,
+    "city": "Põhjaküla 1",
+    "urban": 57,
+    "rural": 114,
+    "total": 171
+  },
+  {
+    "grown": true,
+    "city": "Lõunaküla 1",
+    "urban": 58,
+    "rural": 105,
+    "total": 163
+  },
+  {
+    "grown": true,
+    "city": "Idaküla 1",
+    "urban": 74,
+    "rural": 161,
+    "total": 235
+  },
+  {
+    "grown": true,
+    "city": "Kadakaküla 1",
+    "urban": 81,
+    "rural": 162,
+    "total": 243
+  },
+  {
+    "grown": true,
+    "city": "Kadakaküla 2",
+    "urban": 49,
+    "rural": 106,
+    "total": 155
+  },
+  {
+    "grown": true,
+    "city": "Kadakaküla 3",
+    "urban": 81,
+    "rural": 162,
+    "total": 243
+  },
+  {
+    "grown": true,
+    "city": "Põhjaküla 2",
+    "urban": 81,
+    "rural": 136,
+    "total": 217
+  },
+  {
+    "grown": true,
+    "city": "Idaküla 2",
+    "urban": 60,
+    "rural": 108,
+    "total": 168
+  },
+  {
+    "grown": true,
+    "city": "Lõunaküla 2",
+    "urban": 66,
+    "rural": 72,
+    "total": 138
+  },
+  {
+    "grown": true,
+    "city": "Idaküla 3",
+    "urban": 81,
+    "rural": 162,
+    "total": 243
+  },
+  {
+    "grown": true,
+    "city": "Kadakaküla 4",
+    "urban": 50,
+    "rural": 93,
+    "total": 143
+  },
+  {
+    "grown": true,
+    "city": "Lõunaküla 3",
+    "urban": 81,
+    "rural": 162,
+    "total": 243
+  },
+  {
+    "grown": true,
+    "city": "Kadakaküla 5",
+    "urban": 79,
+    "rural": 139,
+    "total": 218
+  },
+  {
+    "grown": true,
+    "city": "Lõunaküla 4",
+    "urban": 47,
+    "rural": 107,
+    "total": 154
+  }
+]

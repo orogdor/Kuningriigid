@@ -8,7 +8,7 @@ const ctx={team:0,economy:{buildings:[farm],realms:[{resources:{machines:2,fuel:
 assert.equal(validateField(ctx,{x:24,z:0,width:4,depth:16},()=>true).length>0,true);
 assert.equal(validateField(ctx,{x:24,z:0,width:16,depth:16},()=>true),'');
 assert.match(validateField(ctx,{x:24,z:0,width:16,depth:16},()=>false),/kuival/);
-const nav={nearest:p=>p,move(w,p,dt,speed){const d=Math.hypot(p.x-w.x,p.z-w.z),step=dt*speed;if(d<=step){Object.assign(w,p);return true;}w.x+=(p.x-w.x)/d*step;w.z+=(p.z-w.z)/d*step;return false;}};
+const nav={nearest:p=>p,moveCitizen(w,p,dt,speed){const d=Math.hypot(p.x-w.x,p.z-w.z),step=dt*speed;if(d<=step){Object.assign(w,p);return true;}w.x+=(p.x-w.x)/d*step;w.z+=(p.z-w.z)/d*step;return false;}};
 const game={s:{ages:[0],research:[{known:['agriculture']}]},nav:()=>nav};
 assert.equal(farmWork(game,ctx,farm,1),0,'farmhouse alone never produces grain');
 ctx.economy.buildings.push(field);

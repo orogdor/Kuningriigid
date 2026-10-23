@@ -41,7 +41,7 @@ export function farmWork(game,ctx,farm,dt){
   const target={x:field.x+(w.pass%2?1:-1)*(size.width/2-2),z:field.z-size.depth/2+2+row*3};
   const point=nav.nearest(target,4);if(!point)continue;
   const movingDistance=Math.hypot(w.x-point.x,w.z-point.z);
-  if(!nav.move(w,point,dt,profile.speed)){w.working=fieldContains(field,w);w.action=w.working?'farm':null;}
+  if(!nav.moveCitizen(w,point,dt,profile.speed)){w.working=fieldContains(field,w);w.action=w.working?'farm':null;}
   else{w.working=true;w.action='farm';w.pass++;w.row=(row+1)%rows;}
   // Walking from the farmhouse produces no grain; traversal inside the field is work.
   if(w.working)work+=Math.min(1,assigned-i);
