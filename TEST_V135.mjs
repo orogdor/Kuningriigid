@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {AI_CITY_SPACING,historicalCitySites,historicalDistrictOrder,historicalSiteScore} from './historical-city-v135.js';
 import {MIN_CITY_SPACING,citySpacingAllowed} from './counties-v126.js';
+import {historicalBuildingPlots} from './historic-urban-v138.js';
 import {Civilization} from './civilization-core.js';
 assert.equal(AI_CITY_SPACING,9);
 assert.equal(MIN_CITY_SPACING,17,'the player retains existing spacing');
@@ -24,6 +25,6 @@ const ordered=historicalDistrictOrder(town,districts);assert.deepEqual({c:ordere
 assert.ok(ordered.findIndex(p=>p.c===52&&p.r===52)>ordered.findIndex(p=>p.c===51&&p.r===50),'rounded growth before far diagonal corners');
 const existing=new Civilization(JSON.parse(fs.readFileSync('scenarios/iron-ai-v129.json'))),city=existing.s.cities[0];
 const sites=existing.buildingSites(city,'house');assert.ok(sites.length>0&&sites.length<250);
-assert.deepEqual(sites,historicalCitySites(city.economy.buildings[0],'house',existing.s.seed+city.c*11+city.r*31+city.team*7));
+assert.deepEqual(sites,historicalBuildingPlots(city,existing.parentCity(city),'house',existing.s.seed+existing.parentCity(city).id*31),'live engine uses current V138 geometry; V135 historical generator remains independently deterministic');
 assert.ok(existing.buildingSites(city,'quarry').length>=0,'deposit special-case remains supported');
 console.log('V135 PASS: 9-tile AI spacing, 17-tile player spacing, deterministic curved plots, central density, historical district order, real engine integration');
