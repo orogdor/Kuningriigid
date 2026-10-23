@@ -2,7 +2,15 @@
 export const COUNTY_BUILDING_LIMIT=3;
 export const countyTileLimit=radius=>3*(2*radius+1)**2;
 export const countySearchRadius=radius=>Math.ceil((Math.sqrt(3)*(2*radius+1)-1)/2);
-export const urbanTile=(city,p,radius)=>Math.max(Math.abs(p.c-city.c),Math.abs(p.r-city.r))<=radius;
+// V136: a town's developed core is a compact, winding oval rather than a square.
+export function urbanTile(city,p,radius){
+ const dx=p.c-city.c,dz=p.r-city.r;
+ if(Math.abs(dx)>radius||Math.abs(dz)>radius)return false;
+ if(dx===0&&dz===0)return true;
+ const angle=Math.atan2(dz,dx),seed=(city.id??city.c*7+city.r*11)*.71;
+ const contour=1+.085*Math.sin(angle*3+seed)+.055*Math.cos(angle*5+seed*.73);
+ return Math.hypot(dx,dz)<=(radius+.28)*contour;
+}
 export function countyFootprint(city,radius,cellAt){
  const span=countySearchRadius(radius),queue=[{c:city.c,r:city.r}],seen=new Set(),tiles=[];
  for(let i=0;i<queue.length;i++){
