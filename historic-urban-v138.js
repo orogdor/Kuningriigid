@@ -14,7 +14,7 @@ export const V138_BUILD_MARGIN=8; // only keep a roof-width of setback; allow pl
 export function ancientStreetSpace(x,z,seed=0){
  const angle=Math.atan2(z,x),radius=Math.hypot(x,z),phase=hash(seed,5)*Math.PI*2;
  const bend=(t)=>.13*Math.sin(t*.013+phase)+.05*Math.sin(t*.029-phase);
- const arms=7,theta=((angle-bend(radius)+phase)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+ const arms=5,theta=((angle-bend(radius)+phase)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
  let nearestRay=Infinity;
  for(let i=0;i<arms;i++){
   const ray=i*2*Math.PI/arms;
@@ -22,16 +22,16 @@ export function ancientStreetSpace(x,z,seed=0){
   nearestRay=Math.min(nearestRay,diff*radius);
  }
  // Three alternating circumferential market/quarter routes, wider near center.
- const ringIndex=Math.round((radius-30)/75);
- const ring=30+75*ringIndex+6*Math.sin(angle*4+phase+ringIndex*.7);
+ const ringIndex=Math.round((radius-42)/79);
+ const ring=42+79*ringIndex+4*Math.sin(angle*4+phase+ringIndex*.7);
  const ringDistance=Math.abs(radius-ring);
- return {road:nearestRay<(radius<70?9:6)||ringDistance<6,artery:nearestRay,ring:ringDistance,radius};
+ return {road:nearestRay<(radius<70?5.8:5.5)||ringDistance<4.5,artery:nearestRay,ring:ringDistance,radius};
 }
 export function historicalBuildingPlots(tile,parent,type='house',seed=0){
  if(!tile||!parent)return [];
  const dx=tile.c-parent.c,dz=tile.r-parent.r;
  const plots=[];
- const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?11.8:13.2;
+ const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?10.6:13.2;
  // Staggered rows and slight bends, not a chessboard; deterministic per tile.
  const line=0;
  for(let row=0,z=-DETAIL_HALF_Z+margin;z<=DETAIL_HALF_Z-margin;row++,z+=grid){
@@ -52,7 +52,7 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0){
    const priority=(civic?Math.abs(street.radius-42)*.13:
                     rural?-street.radius*.075:
                     industrial?Math.abs(street.radius-170)*.045:
-                    street.radius*.045)+
+                    street.radius*.22)+
                     Math.abs(street.artery-12)*.08+(quarterNoise-.5)*3+
                     (type==='house'?hash(key,row,seed)*.9:0);
    plots.push({x:px,z:pz,priority,globalX:gx,globalZ:gz});
