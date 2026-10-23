@@ -7,7 +7,7 @@
   "firstMedievalTeam": 1,
   "midwayTurns": 30,
   "stopReason": "30 turns after first AI entered Medieval Age",
-  "elapsedSeconds": 122,
+  "elapsedSeconds": 126,
   "age": 3,
   "sourceTeam": 2,
   "targetCityId": 1,
@@ -145,7 +145,7 @@
       ],
       "cities": 3,
       "population": 17,
-      "seconds": 8
+      "seconds": 9
     },
     {
       "turn": 60,
@@ -157,7 +157,7 @@
       ],
       "cities": 3,
       "population": 25,
-      "seconds": 12
+      "seconds": 13
     },
     {
       "turn": 80,
@@ -169,7 +169,7 @@
       ],
       "cities": 8,
       "population": 50,
-      "seconds": 19
+      "seconds": 20
     },
     {
       "turn": 100,
@@ -181,7 +181,7 @@
       ],
       "cities": 9,
       "population": 80,
-      "seconds": 29
+      "seconds": 30
     },
     {
       "turn": 120,
@@ -193,7 +193,7 @@
       ],
       "cities": 12,
       "population": 114,
-      "seconds": 42
+      "seconds": 44
     },
     {
       "turn": 140,
@@ -205,7 +205,7 @@
       ],
       "cities": 14,
       "population": 143,
-      "seconds": 65
+      "seconds": 67
     },
     {
       "turn": 150,
@@ -217,7 +217,7 @@
       ],
       "cities": 14,
       "population": 152,
-      "seconds": 78
+      "seconds": 81
     },
     {
       "turn": 160,
@@ -228,8 +228,8 @@
         1
       ],
       "cities": 15,
-      "population": 167,
-      "seconds": 92
+      "population": 165,
+      "seconds": 96
     },
     {
       "turn": 180,
@@ -240,8 +240,8 @@
         2
       ],
       "cities": 15,
-      "population": 189,
-      "seconds": 122
+      "population": 190,
+      "seconds": 126
     }
   ],
   "byTeam": [
@@ -261,7 +261,7 @@
       "population": 100,
       "technologies": 101,
       "researchActive": "experimental_science",
-      "resourcesAvailable": 11077.691693277313
+      "resourcesAvailable": 11111.463264705884
     },
     {
       "team": 2,
@@ -276,17 +276,17 @@
       "team": 3,
       "age": 2,
       "cities": 2,
-      "population": 28,
+      "population": 29,
       "technologies": 48,
       "researchActive": "smelting",
-      "resourcesAvailable": 3137.5628571428615
+      "resourcesAvailable": 3100.5680000000043
     }
   ],
   "totals": {
-    "pop": 189,
-    "buildings": 329,
+    "pop": 190,
+    "buildings": 330,
     "ready": 290,
-    "pending": 39,
+    "pending": 40,
     "houses": 114,
     "markets": 10,
     "education": 23,
@@ -296,8 +296,8 @@
     "withMarket": 10,
     "withEducation": 9,
     "withHousing": 15,
-    "withDefenses": 1,
-    "fortifications": 1
+    "withDefenses": 3,
+    "fortifications": 3
   },
   "baseline": {
     "version": 144,
@@ -318,13 +318,13 @@
   "comparison": {
     "population": {
       "v144": 152,
-      "v145": 189,
-      "delta": 37
+      "v145": 190,
+      "delta": 38
     },
     "buildings": {
       "v144": 315,
-      "v145": 329,
-      "delta": 14
+      "v145": 330,
+      "delta": 15
     },
     "houses": {
       "v144": 58,
@@ -363,17 +363,17 @@
     },
     "withDefenses": {
       "v144": 0,
-      "v145": 1,
-      "delta": 1
+      "v145": 3,
+      "delta": 3
     },
     "fortifications": {
       "v144": 0,
-      "v145": 1,
-      "delta": 1
+      "v145": 3,
+      "delta": 3
     }
   },
   "trade": {
-    "ongoingShipments": 8
+    "ongoingShipments": 7
   },
   "military": {
     "armyCounts": [
@@ -451,13 +451,13 @@
       "name": "Lõunaküla 1",
       "team": 3,
       "age": 2,
-      "pop": 17,
-      "employed": 17,
+      "pop": 18,
+      "employed": 18,
       "radius": 4,
       "extent": 9,
       "ownedTiles": 243,
-      "buildings": 37,
-      "ready": 34,
+      "buildings": 38,
+      "ready": 35,
       "pending": 3,
       "markets": 1,
       "houses": 14,
@@ -479,6 +479,8 @@
         "lumber": 2,
         "market": 1,
         "mason": 1,
+        "mill": 1,
+        "palisade": 1,
         "pottery_kiln": 1,
         "quarry": 1,
         "saw": 1,
@@ -486,24 +488,23 @@
         "study": 1,
         "tinmine": 1,
         "vegetable_garden": 1,
-        "warehouse": 1,
         "well": 1
       },
       "stocks": {
-        "gold": 1642,
+        "gold": 1636,
         "clay": 120,
         "copper": 120,
-        "pottery": 106.538000000001,
-        "stone": 96.85,
-        "water": 93.10000000000223,
-        "plank": 75.05,
-        "tin": 63.8,
-        "wood": 63,
-        "meat": 55.05000000000042,
-        "grain": 39.185714285714276,
+        "pottery": 106.68600000000102,
+        "water": 95.80000000000223,
+        "stone": 86.85,
+        "wood": 79,
+        "meat": 64.35000000000048,
+        "tin": 45.8,
+        "plank": 40.05,
+        "grain": 35.042857142857166,
         "berries": 25.450000000000053
       },
-      "foodSupply": 119.68571428571474
+      "foodSupply": 124.8428571428577
     },
     {
       "id": 2,
@@ -553,23 +554,23 @@
         "coal": 118.17750000000001,
         "stone": 107.38999999999997,
         "water": 100,
-        "plank": 90.855,
+        "plank": 90.8075,
         "wood": 37.72500000000001,
         "clay": 25.6,
-        "weapons": 21.325000000000003,
-        "meat": 17.902875000000165,
+        "weapons": 21.087500000000002,
+        "iron": 19.385,
+        "berries": 18.212499999999995,
         "vegetables": 17.814999999999994,
-        "berries": 17.312499999999996,
-        "iron": 14.635,
-        "grain": 11.236071428571659,
+        "meat": 17.002875000000166,
+        "grain": 16.93607142857166,
         "flour": 9.5475,
         "copper": 5.225,
         "cutstone": 4.987500000000001,
-        "pottery": 4.279999999999999,
-        "tin": 4.18,
+        "pottery": 4.279999999999997,
+        "tin": 3.9899999999999998,
         "flax": 3.9899999999999998
       },
-      "foodSupply": 64.26644642857181
+      "foodSupply": 69.96644642857181
     },
     {
       "id": 5,
@@ -577,7 +578,7 @@
       "team": 1,
       "age": 4,
       "pop": 17,
-      "employed": 17,
+      "employed": 16,
       "radius": 4,
       "extent": 9,
       "ownedTiles": 243,
@@ -615,9 +616,9 @@
         "ore": 120,
         "coal": 120,
         "water": 100,
-        "iron": 63.76,
-        "wood": 46.304999999999986,
-        "grain": 31.357142857143074,
+        "iron": 53.309999999999995,
+        "wood": 53.15499999999999,
+        "grain": 24.707142857143076,
         "vegetables": 17.365000000000006,
         "berries": 17.211428571428403,
         "meat": 17.167500000000004,
@@ -631,7 +632,7 @@
         "tin": 3.6100000000000003,
         "bread": 0.095
       },
-      "foodSupply": 83.19607142857149
+      "foodSupply": 76.54607142857148
     },
     {
       "id": 7,
@@ -676,11 +677,11 @@
         "gold": 869,
         "plank": 120,
         "coal": 118.7,
-        "water": 98.46750000000078,
+        "wood": 104.95,
         "flax": 97.2,
-        "wood": 87.85000000000001,
+        "water": 81.36750000000079,
+        "stone": 41.49999999999999,
         "cutstone": 38.400000000000006,
-        "stone": 33.699999999999996,
         "berries": 18.317500000000006,
         "flour": 17.96911764705883,
         "meat": 17.807500000000278,
@@ -691,6 +692,7 @@
         "weapons": 4.75,
         "copper": 4.5125,
         "tin": 3.8,
+        "pottery": 3.6079999999999997,
         "ore": 2.3000000000000025
       },
       "foodSupply": 60.12750000000037
@@ -799,11 +801,11 @@
         "clay": 120,
         "copper": 120,
         "water": 100,
-        "wood": 86.7,
+        "wood": 89.55000000000003,
         "plank": 78.5,
-        "meat": 26.900000000000496,
-        "berries": 25.950000000000053,
-        "pottery": 25.50200000000003,
+        "meat": 27.850000000000495,
+        "berries": 26.900000000000052,
+        "pottery": 22.65200000000003,
         "vegetables": 17.099999999999998,
         "ore": 11.4,
         "iron": 11.399999999999999,
@@ -816,7 +818,7 @@
         "flax": 3.8,
         "bread": 1.805
       },
-      "foodSupply": 81.21214285714339
+      "foodSupply": 83.1121428571434
     },
     {
       "id": 4,
@@ -829,8 +831,8 @@
       "extent": 9,
       "ownedTiles": 59,
       "buildings": 34,
-      "ready": 31,
-      "pending": 3,
+      "ready": 30,
+      "pending": 4,
       "markets": 1,
       "houses": 11,
       "farms": 1,
@@ -840,7 +842,6 @@
       "buildingTypes": {
         "armor_workshop": 1,
         "barracks": 1,
-        "bronze_foundry": 1,
         "coal": 1,
         "coppermine": 1,
         "crossbow_range": 1,
@@ -858,6 +859,7 @@
         "scriptorium": 1,
         "smelter": 1,
         "smith": 1,
+        "stonetower": 1,
         "study": 1,
         "tinmine": 1,
         "university": 1,
@@ -866,26 +868,26 @@
       "stocks": {
         "gold": 960,
         "stone": 120,
-        "coal": 118.55,
-        "tin": 118.2,
-        "plank": 113,
-        "ore": 106.4,
+        "coal": 120,
+        "tin": 120,
+        "ore": 117.80000000000001,
+        "plank": 111.79999999999998,
         "water": 100,
         "copper": 84.75,
-        "wood": 45.60000000000004,
-        "grain": 17.272142857142995,
-        "meat": 16.722124999999984,
+        "wood": 51.70000000000003,
+        "grain": 18.700714285714422,
+        "weapons": 16.15,
+        "meat": 15.772124999999985,
         "berries": 15.004999999999988,
         "vegetables": 14.850000000000001,
         "flour": 14.21764705882353,
-        "weapons": 13.4,
         "clay": 7.6,
-        "cutstone": 3.8499999999999983,
+        "cutstone": 6.849999999999999,
         "flax": 3.8,
         "pottery": 2.5819999999999994,
-        "iron": 2.169999999999998
+        "iron": 0.16999999999999815
       },
-      "foodSupply": 63.84926785714297
+      "foodSupply": 64.32783928571439
     },
     {
       "id": 9,
@@ -1038,7 +1040,7 @@
         "tin": 113.2,
         "water": 95.50000000000001,
         "plank": 19.95,
-        "wood": 9,
+        "wood": 17,
         "berries": 8.749999999999984,
         "meat": 8.249999999999996,
         "grain": 7.957142857142851,
@@ -1172,7 +1174,7 @@
         "stone": 120,
         "copper": 120,
         "plank": 33.902499999999996,
-        "meat": 28.60000000000004,
+        "meat": 24.80000000000004,
         "wood": 15.600000000000001,
         "coal": 14.025,
         "iron": 12.635000000000002,
@@ -1182,7 +1184,7 @@
         "cutstone": 4.5125,
         "flax": 3.61
       },
-      "foodSupply": 40.603250000000045
+      "foodSupply": 36.80325000000004
     },
     {
       "id": 14,
@@ -1215,9 +1217,9 @@
       },
       "stocks": {
         "gold": 74,
-        "stone": 28.439999999999994,
+        "stone": 28.249999999999993,
+        "meat": 7.73,
         "wood": 6.789999999999992,
-        "meat": 6.78,
         "copper": 4.75,
         "bread": 2.699999999999998,
         "berries": 2.6158750000000013,
@@ -1229,7 +1231,7 @@
         "flax": 0.19,
         "plank": 0.0475
       },
-      "foodSupply": 12.41175
+      "foodSupply": 13.361749999999999
     }
   ]
 }
