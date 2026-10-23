@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/v139-simulation.yml'
       - 'scripts/make-ai-city-v139.mjs'
+      - 'TEST_V139.mjs'
       - 'ai-strategy.js'
       - 'ancient-walls-v139.js'
       - 'ai-defenses-v128.js'
