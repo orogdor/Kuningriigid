@@ -1,0 +1,32 @@
+{
+  "baseline": "V130 / 61281bdf375b03b5f1433f06e3331f3fd5f2e0a6",
+  "note": "Single Node timing sample; not a browser FPS benchmark.",
+  "results": [
+    {
+      "name": "economy-120-seconds",
+      "dt": 12,
+      "steps": 10,
+      "identical": true,
+      "beforeMs": 5359.906602000001,
+      "afterMs": 3395.4720530000013,
+      "sha256": "6b18009c933b08884b57874d17970dc19aa5f086d7d130ddfb6b9e75415fac5e",
+      "caches": {
+        "territoryBuilds": 6,
+        "summaryBuilds": 19
+      }
+    },
+    {
+      "name": "frame-10-seconds",
+      "dt": 0.1,
+      "steps": 100,
+      "identical": true,
+      "beforeMs": 3544.926377,
+      "afterMs": 2871.332805000002,
+      "sha256": "6d8539465f35ac22a3c00be37daee287878900a3f361c2ddb93990fd15758e93",
+      "caches": {
+        "territoryBuilds": 1,
+        "summaryBuilds": 14
+      }
+    }
+  ]
+}

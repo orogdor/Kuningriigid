@@ -1,4 +1,4 @@
-name: V130 Citizen Routes and City Areas
+name: V131 Invisible Performance Optimizations
 on:
   push:
     branches: [main]
@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: 22}
+      - run: node TEST_V131.mjs
       - run: node TEST_V130.mjs
       - run: node TEST_V129.mjs
       - run: node TEST_V128.mjs

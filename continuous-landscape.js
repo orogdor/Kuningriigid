@@ -1,3 +1,4 @@
+import {memoHeight} from './perf-render-v131.js';
 // V67. One procedural elevation/drainage/transport coordinate space.
 // Everything is generated in WORLD metres and merely projected at different
 // scales; there are no separate local rivers, road segments or rock placements.
@@ -145,10 +146,10 @@ export function worldElevation(game,x,z){
 
 }
 export function projectHeight(y,view){return view==='detail'?(y-.7)*DETAIL_Y:y}
-export function surface(game,x,z,view='world'){return projectHeight(worldElevation(game,x,z),view)}
+export function surface(game,x,z,view='world'){return projectHeight(memoHeight(game,x,z,()=>worldElevation(game,x,z)),view)}
 export function worldToLocal(tile,x,z){return {x:(x-tile.x)*DETAIL_X,z:(z-tile.z)*DETAIL_Z}}
 export function localToWorld(tile,x,z){return {x:tile.x+x/DETAIL_X,z:tile.z+z/DETAIL_Z}}
-export function localSurface(game,tile,x,z){const p=localToWorld(tile,x,z);return surface(game,p.x,p.z,'detail')}
+export function localSurface(game,tile,x,z,cache=true){const p=localToWorld(tile,x,z);return cache?surface(game,p.x,p.z,'detail'):projectHeight(worldElevation(game,p.x,p.z),'detail')}
 export function inNeighbourhood(tile,x,z,margin=10){
  return Math.abs(x-tile.x)<75+margin&&Math.abs(z-tile.z)<75+margin;
 }

@@ -1,3 +1,4 @@
+import {observeArray} from './perf-state-v131.js';
 // National, additive work-speed improvements. They never create resources,
 // enlarge deposits, change recipe inputs, or accelerate construction/science.
 const crops=['farm'];
@@ -38,10 +39,15 @@ export const PRODUCTIVITY_TECHS=Object.fromEntries(rows.map(([id,name,age,catego
  name,age,turns:2,requires,category,targets,workBonus:.25,
  unlocks:`Kogu riigis ${category==='food'?'toidu tootmise':'maavarade kaevandamise'} töökiirus +25 protsendipunkti (${category==='mining'?'kaevandused ja kivimurrud':targets===crops?'põllud':targets.map(type=>targetLabels[type]||type).join(', ')}).`
 }]));
+const bonuses=new WeakMap();
 export function productivityBonus(state,team,type){
- const known=new Set(state.research?.[team]?.known||[]);
+ const research=state.research?.[team];if(!research)return 1;
+ let cache=bonuses.get(research);if(!cache){cache={record:observeArray(research,'known'),version:-1,values:new Map()};bonuses.set(research,cache)}
+ if(cache.version!==cache.record.version){cache.version=cache.record.version;cache.known=new Set(research.known||[]);cache.values.clear()}
+ const known=cache.known;
  // Basic stone collection uses the same national tools as a quarry.
  const target=type==='basic_stone'?'quarry':type;
- return 1+Object.entries(PRODUCTIVITY_TECHS).reduce((n,[id,t])=>n+(known.has(id)&&t.targets.includes(target)?t.workBonus:0),0);
+ if(!cache.values.has(target))cache.values.set(target,1+Object.entries(PRODUCTIVITY_TECHS).reduce((n,[id,t])=>n+(known.has(id)&&t.targets.includes(target)?t.workBonus:0),0));
+ return cache.values.get(target);
 }
 export function productivityResearchOrder(age){return Object.entries(PRODUCTIVITY_TECHS).filter(([,t])=>t.age<=age).map(([id])=>id);}

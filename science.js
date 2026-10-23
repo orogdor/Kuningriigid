@@ -1,3 +1,4 @@
+import {cachedCityBuildings} from './perf-state-v131.js';
 // Every city contributes basic knowledge; staffed academic buildings add science.
 // Science points are per *game minute*, not flat points per real second.
 import {tempoMultiplier} from './tempo.js';
@@ -8,7 +9,7 @@ export const SCIENCE_PER_CITY = 2.4;
 export const SCIENCE_PER_TURN = 10;
 export const EUREKA_FRACTION = .35;
 export const researchCost = (state, tech) => (tech?.turns ?? 0) * SCIENCE_PER_TURN * tempoMultiplier(state) * (state.strategyPacingV125===true?knowledgeCostFactor(tech?.age??0):1);
-const allBuildings=city=>[city,...Object.values(city.districts||{})].flatMap(ctx=>ctx.economy?.buildings||[]).filter(b=>!b.virtual);
+const allBuildings=city=>cachedCityBuildings(city)||[city,...Object.values(city.districts||{})].flatMap(ctx=>ctx.economy?.buildings||[]).filter(b=>!b.virtual);
 export function cityScience(city){
  const pop=Math.max(0,city.economy?.realms?.[city.team]?.pop||0);
  const base=SCIENCE_PER_CITY+pop*SCIENCE_PER_RESIDENT;
