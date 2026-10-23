@@ -1,20 +1,24 @@
 {
   "version": 140,
-  "success": false,
-  "reason": "time_limit",
+  "success": true,
+  "reason": "first_modern",
   "seed": 139023,
-  "startTurn": 0,
-  "turn": 607,
-  "modern": null,
+  "startTurn": 607,
+  "turn": 745,
+  "modern": {
+    "team": 1,
+    "turn": 745,
+    "time": 44700
+  },
   "sourceTeam": 1,
-  "age": 3,
+  "age": 6,
   "ages": [
     0,
-    3,
-    3,
-    3
+    6,
+    4,
+    5
   ],
-  "elapsedSeconds": 1111,
+  "elapsedSeconds": 423,
   "cities": [
     {
       "id": 1,
@@ -22,20 +26,20 @@
       "c": 185,
       "r": 103,
       "pop": 19,
-      "structures": 92,
+      "structures": 119,
       "houses": 10,
       "markets": 1,
       "harbors": 0,
-      "walls": 43
+      "walls": 60
     },
     {
       "id": 6,
       "name": "Idaküla 2",
       "c": 189,
       "r": 94,
-      "pop": 36,
-      "structures": 72,
-      "houses": 24,
+      "pop": 43,
+      "structures": 84,
+      "houses": 26,
       "markets": 1,
       "harbors": 0,
       "walls": 0
@@ -46,7 +50,7 @@
       "c": 176,
       "r": 99,
       "pop": 22,
-      "structures": 40,
+      "structures": 44,
       "houses": 12,
       "markets": 1,
       "harbors": 0,
@@ -58,7 +62,7 @@
       "c": 177,
       "r": 90,
       "pop": 11,
-      "structures": 26,
+      "structures": 32,
       "houses": 5,
       "markets": 1,
       "harbors": 0,
@@ -69,9 +73,9 @@
       "name": "Idaküla 5",
       "c": 180,
       "r": 81,
-      "pop": 17,
-      "structures": 99,
-      "houses": 9,
+      "pop": 31,
+      "structures": 131,
+      "houses": 23,
       "markets": 1,
       "harbors": 0,
       "walls": 51
@@ -82,22 +86,22 @@
       "c": 191,
       "r": 112,
       "pop": 26,
-      "structures": 70,
-      "houses": 19,
+      "structures": 86,
+      "houses": 21,
       "markets": 1,
       "harbors": 0,
-      "walls": 8
+      "walls": 12
     },
     {
       "id": 19,
       "name": "Idaküla 7",
       "c": 187,
       "r": 121,
-      "pop": 38,
-      "structures": 77,
-      "houses": 28,
+      "pop": 49,
+      "structures": 91,
+      "houses": 30,
       "markets": 1,
-      "harbors": 0,
+      "harbors": 1,
       "walls": 0
     }
   ],
@@ -111,22 +115,22 @@
     },
     {
       "team": 1,
-      "active": null,
-      "known": 79,
+      "active": "modern_science",
+      "known": 124,
       "ageWait": null,
       "missing": {}
     },
     {
       "team": 2,
-      "active": null,
-      "known": 79,
+      "active": "industrialization",
+      "known": 106,
       "ageWait": null,
       "missing": {}
     },
     {
       "team": 3,
-      "active": null,
-      "known": 79,
+      "active": "rifles",
+      "known": 115,
       "ageWait": null,
       "missing": {}
     }
@@ -1406,6 +1410,346 @@
       ],
       "winner": null,
       "seconds": 1088
+    },
+    {
+      "turn": 640,
+      "ages": [
+        0,
+        3,
+        3,
+        3
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 3,
+          "cities": 7,
+          "pop": 182,
+          "active": "garrison_system",
+          "known": 89,
+          "resources": {
+            "wood": 2808,
+            "stone": 2207,
+            "plank": 2940,
+            "iron": 1719,
+            "steel": 0,
+            "machines": 0,
+            "water": 480,
+            "bread": 272
+          }
+        },
+        {
+          "team": 2,
+          "age": 3,
+          "cities": 9,
+          "pop": 109,
+          "active": "medieval_hospitals",
+          "known": 85,
+          "resources": {
+            "wood": 2412,
+            "stone": 1506,
+            "plank": 2304,
+            "iron": 167,
+            "steel": 0,
+            "machines": 0,
+            "water": 310,
+            "bread": 43
+          }
+        },
+        {
+          "team": 3,
+          "age": 3,
+          "cities": 8,
+          "pop": 132,
+          "active": "guild_accounts",
+          "known": 87,
+          "resources": {
+            "wood": 2243,
+            "stone": 1904,
+            "plank": 1910,
+            "iron": 1263,
+            "steel": 0,
+            "machines": 0,
+            "water": 605,
+            "bread": 196
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 89
+    },
+    {
+      "turn": 680,
+      "ages": [
+        0,
+        4,
+        4,
+        4
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 4,
+          "cities": 7,
+          "pop": 191,
+          "active": "industrialization",
+          "known": 106,
+          "resources": {
+            "wood": 2514,
+            "stone": 2303,
+            "plank": 2940,
+            "iron": 1713,
+            "steel": 0,
+            "machines": 0,
+            "water": 477,
+            "bread": 264
+          }
+        },
+        {
+          "team": 2,
+          "age": 4,
+          "cities": 9,
+          "pop": 115,
+          "active": "seed_selection",
+          "known": 92,
+          "resources": {
+            "wood": 2104,
+            "stone": 1672,
+            "plank": 2332,
+            "iron": 226,
+            "steel": 0,
+            "machines": 0,
+            "water": 353,
+            "bread": 63
+          }
+        },
+        {
+          "team": 3,
+          "age": 4,
+          "cities": 12,
+          "pop": 154,
+          "active": "merchant_banking",
+          "known": 98,
+          "resources": {
+            "wood": 2620,
+            "stone": 2120,
+            "plank": 2348,
+            "iron": 1267,
+            "steel": 0,
+            "machines": 0,
+            "water": 1053,
+            "bread": 180
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 207
+    },
+    {
+      "turn": 720,
+      "ages": [
+        0,
+        5,
+        4,
+        4
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 5,
+          "cities": 7,
+          "pop": 199,
+          "active": "electricity",
+          "known": 122,
+          "resources": {
+            "wood": 2561,
+            "stone": 2218,
+            "plank": 2899,
+            "iron": 1689,
+            "steel": 0,
+            "machines": 0,
+            "water": 498,
+            "bread": 254
+          }
+        },
+        {
+          "team": 2,
+          "age": 4,
+          "cities": 9,
+          "pop": 120,
+          "active": "firearms",
+          "known": 102,
+          "resources": {
+            "wood": 2859,
+            "stone": 1850,
+            "plank": 2512,
+            "iron": 430,
+            "steel": 0,
+            "machines": 0,
+            "water": 342,
+            "bread": 59
+          }
+        },
+        {
+          "team": 3,
+          "age": 4,
+          "cities": 12,
+          "pop": 184,
+          "active": "industrialization",
+          "known": 106,
+          "resources": {
+            "wood": 2911,
+            "stone": 2138,
+            "plank": 2840,
+            "iron": 1350,
+            "steel": 0,
+            "machines": 0,
+            "water": 1055,
+            "bread": 167
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 339
+    },
+    {
+      "turn": 745,
+      "ages": [
+        0,
+        6,
+        4,
+        5
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 6,
+          "cities": 7,
+          "pop": 201,
+          "active": "modern_science",
+          "known": 124,
+          "resources": {
+            "wood": 2428,
+            "stone": 2046,
+            "plank": 2940,
+            "iron": 1683,
+            "steel": 49,
+            "machines": 1,
+            "water": 566,
+            "bread": 259
+          }
+        },
+        {
+          "team": 2,
+          "age": 4,
+          "cities": 9,
+          "pop": 123,
+          "active": "industrialization",
+          "known": 106,
+          "resources": {
+            "wood": 3057,
+            "stone": 1844,
+            "plank": 2470,
+            "iron": 561,
+            "steel": 0,
+            "machines": 0,
+            "water": 321,
+            "bread": 42
+          }
+        },
+        {
+          "team": 3,
+          "age": 5,
+          "cities": 12,
+          "pop": 198,
+          "active": "rifles",
+          "known": 115,
+          "resources": {
+            "wood": 2806,
+            "stone": 2157,
+            "plank": 3159,
+            "iron": 1553,
+            "steel": 0,
+            "machines": 0,
+            "water": 1052,
+            "bread": 171
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 422
     }
   ]
 }
