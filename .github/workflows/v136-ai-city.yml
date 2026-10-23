@@ -8,6 +8,7 @@ on:
       - 'TEST_V136.mjs'
       - 'counties-v126.js'
       - 'ai-strategy.js'
+      - 'resource-sites-v88.js'
   workflow_dispatch:
 permissions:
   contents: write
