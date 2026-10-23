@@ -5,8 +5,8 @@
       "team": 1,
       "cities": 7,
       "buildings": 189,
-      "markets": 6,
-      "harbors": 0,
+      "markets": 4,
+      "harbors": 3,
       "ages": 2
     },
     {
@@ -14,15 +14,15 @@
       "cities": 5,
       "buildings": 139,
       "markets": 5,
-      "harbors": 0,
+      "harbors": 1,
       "ages": 2
     },
     {
       "team": 3,
       "cities": 9,
-      "buildings": 245,
+      "buildings": 248,
       "markets": 6,
-      "harbors": 0,
+      "harbors": 2,
       "ages": 2
     }
   ],
@@ -30,7 +30,7 @@
   "turn": 246,
   "sourceTeam": 3,
   "cities": 9,
-  "buildings": 245,
+  "buildings": 248,
   "spacingPairs": [
     9,
     9,
@@ -75,6 +75,6 @@
     2,
     0
   ],
-  "bytes": 2910035,
-  "seconds": 129
+  "bytes": 2759967,
+  "seconds": 125
 }
