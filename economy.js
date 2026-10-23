@@ -63,7 +63,7 @@ mine:{name:'Rauakaevandus',icon:'◆',cost:{plank:25,stone:20},requires:['bakery
 coal:{name:'Söepõletaja',icon:'♨',cost:{wood:25,plank:15},requires:['bakery'],workers:2,time:20,input:{wood:4},out:'coal',rate:5,cycle:10},
 smelter:{name:'Rauasulatus',icon:'♨',cost:{plank:25,stone:20},requires:['mine','coal'],workers:3,time:24,input:{ore:3,coal:2},out:'iron',rate:3,cycle:12},
 smith:{name:'Relvasepp',icon:'⚒',cost:{plank:30,stone:25},requires:['smelter'],workers:2,time:24,input:{iron:2,plank:1},out:'weapons',rate:2,cycle:12},
-barracks:{name:'Kasarm',icon:'⚑',cost:{plank:35,stone:25},requires:['smith','bakery','house'],workers:2,time:25},
+barracks:{name:'Kasarm',icon:'⚑',cost:{plank:35,stone:25},requires:['house','lumber'],workers:2,time:25},
 archery:{name:'Lasketiir',icon:'➶',cost:{plank:30,stone:15},requires:['barracks'],workers:1,time:20},
 stable:{name:'Tall',icon:'♞',cost:{plank:45,stone:30},requires:['barracks','house'],workers:2,time:25}
 };
