@@ -6,6 +6,8 @@ on:
       - '.github/workflows/v136-ai-city.yml'
       - 'scripts/make-ai-city-v136.mjs'
       - 'TEST_V136.mjs'
+      - 'counties-v126.js'
+      - 'ai-strategy.js'
   workflow_dispatch:
 permissions:
   contents: write
