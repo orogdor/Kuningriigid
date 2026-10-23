@@ -22,6 +22,15 @@ for(const x of [0,48,112,224])for(const z of [0,31,97,205]){
 const first=nextPlotBatch(core,0,25),later=nextPlotBatch(core,25,25);
 assert.equal(first.length,25);assert.equal(later.length,25);assert.notDeepEqual(first,later,'search advances to unoccupied edge parcels instead of endlessly retrying its centre');
 assert.ok(historicalTilePriority(town,{...town,land:true,deposits:{}},true,5)>historicalTilePriority(town,east,true,0),'urban planner fills an occupied block before founding a disconnected new one');
+const neighbor={c:10,r:11},syntheticParent={id:1,c:10,r:10,districts:{}};
+const syntheticGame={
+ territoryOwner:p=>p.c>=9&&p.c<=11&&p.r>=9&&p.r<=12?syntheticParent:null,
+ cell:p=>({land:true,mountain:false}),
+ isCountyTile:p=>!(p.c===10&&p.r===10),
+ contextAt:p=>p.c===10&&p.r===10?{economy:{buildings:[{type:'house',hp:350},{type:'house',hp:350}]}}:null
+};
+assert.equal(urbanExpansionEligible(syntheticGame,syntheticParent,neighbor),true,'a real developed neighbor unlocks the adjacent owned tile');
+assert.equal(urbanExpansionEligible(syntheticGame,syntheticParent,{c:13,r:13}),false,'cannot develop another city or unowned land');
 const game=new Civilization(JSON.parse(fs.readFileSync('scenarios/ai-city-v137.json'))),city=game.s.cities.find(c=>c.team===0);
 const area=game.constructionArea(city);
 assert.ok(area.tiles.length>8);
