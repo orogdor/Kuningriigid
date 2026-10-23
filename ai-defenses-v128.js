@@ -1,5 +1,6 @@
 import {canAfford} from './economy.js';
 import {combatUnit} from './ai-development-v128.js';
+import {ancientWallPlan,surplusForWalls,reserveAfterWalls} from './ancient-walls-v139.js';
 export const DEFENSE_TYPES=new Set(['palisade','stonewall','reinforced_wall','gatehouse','watchtower','stonetower']);
 export function defenseLayout(wall='palisade',tower='watchtower'){
  const plan=[];
@@ -11,20 +12,42 @@ export function defenseLayout(wall='palisade',tower='watchtower'){
 export function planAIDefenses(game,team,city){
  if(game.s.time<(city.nextDefenseCheckV128||0))return;
  city.nextDefenseCheckV128=game.s.time+60;
- const realm=city.economy.realms[team],stock=realm.resources;
- if(realm.pop<12||game.s.units.filter(u=>u.team===team&&combatUnit(u)).length<3)return;
- if(game.allBuildings(city).filter(b=>!b.ready&&b.hp>0).length>=2)return;
- const wall=!game.buildRule(city,'stonewall')?'stonewall':'palisade';
- const tower=!game.buildRule(city,'stonetower')?'stonetower':'watchtower';
- const plan=defenseLayout(wall,tower);city.defensePlanV128={kind:'perimeter',slots:plan.length,gateOpenings:2};
- const existing=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
- for(const slot of plan){
-  if(existing.some(b=>Math.hypot(b.x-slot.x,b.z-slot.z)<2))continue;
+ const realm=city.economy.realms[team],stock=realm.resources,waiting=game.allBuildings(city).filter(b=>b.hp>0&&!b.ready).length;
+ // Civic services and food reserves must be operating before fortifying.
+ const all=game.allBuildings(city);
+ const residents=all.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
+ const services=all.filter(b=>['well','market','warehouse','study','scriptorium'].includes(b.type)&&b.ready&&b.hp>0).length;
+ if(residents<5||services<2||!surplusForWalls(stock,realm.pop,waiting))return;
+ const local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
+ // Store the initial historical old-town perimeter in the save; it must not
+ // move with each added house. Outer suburbs may grow beyond these walls.
+ if(!city.defensePlanV139){
+  const wall=game.buildRule(city,'stonewall')?'palisade':'stonewall';
+  const tower=game.buildRule(city,'stonetower')?'watchtower':'stonetower';
+  const ring=ancientWallPlan(local,wall,tower,game.s.seed+city.id*19);
+  city.defensePlanV139={version:139,kind:'historic-core',...ring,nextIndex:0,constructed:0};
+ }
+ const plan=city.defensePlanV139;
+ city.defensePlanV128={kind:plan.kind,slots:plan.slots.length,gateOpenings:plan.gateOpenings};
+ // Medieval gatehouses can replace the earlier passable Bronze Age openings.
+ // Do not fill a Bronze entrance with an impassable wooden wall.
+ const candidates=[...plan.slots];
+ if(game.s.ages[team]>=3)for(const z of [-plan.rz,plan.rz])candidates.push({type:'gatehouse',x:0,z,wallAxis:0});
+ const tried=candidates.length;
+ for(let i=0;i<tried;i++){
+  const n=(plan.nextIndex+i)%tried,slot=candidates[n];
+  if(local.some(b=>b.type===slot.type&&Math.hypot(b.x-slot.x,b.z-slot.z)<3))continue;
+  if(local.some(b=>['house','market','warehouse','study','scriptorium','well','cellar'].includes(b.type)&&Math.abs(b.x-slot.x)<9&&Math.abs(b.z-slot.z)<9))continue;
   if(game.buildRule(city,slot.type))continue;
-  const cost=game.buildingDefinitions[slot.type].cost;
-  const reserves={...stock,wood:Math.max(0,(stock.wood||0)-65),stone:Math.max(0,(stock.stone||0)-40),plank:Math.max(0,(stock.plank||0)-12)};
-  if(!canAfford(reserves,cost))continue;
+  const cost=game.buildingDefinitions[slot.type]?.cost||{};
+  if(!canAfford(stock,cost)||!reserveAfterWalls(stock,cost))continue;
   const result=game.build(city,slot.type,{...slot,plannedDefense:true});
-  if(result.building){result.building.plannedDefense=true;return;}
+  if(result.building){
+   result.building.plannedDefense=true;
+   result.building.historicPerimeterV139=true;
+   plan.constructed++;
+   plan.nextIndex=(n+1)%tried;
+   return;
+  }
  }
 }
