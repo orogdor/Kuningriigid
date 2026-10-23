@@ -78,6 +78,15 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  // The first barracks must be built before training can ever occur.
  const defending=game.s.units.filter(u=>u.team===team&&combatUnit(u)&&!u.garrison).length;
  if(defending<Math.min(20,game.s.cities.filter(c=>c.team===team).length*2+age*2+3))for(const [id,priority]of militaryInfrastructure(game,team,city))add(id,priority,'Ajastule vastava sõjaväe varustamine');
+ // V146: a large town should secure its historical core without taking
+ // investment away from housing, food, the first market, or basic science.
+ // Mason is a real production prerequisite for the first stone wall.
+ const hasCivic=buildings.some(b=>b.type==='market'&&b.ready&&b.hp>0);
+ if(age>=1&&r.pop>=11&&hasCivic&&edibleSupply(stock)>=r.pop*2.3&&
+    (stock.stone||0)>=45){
+  if((stock.cutstone||0)<26)add('mason',215,'Kiviraidur linnamüüri rajamiseks');
+  if(!buildings.some(b=>b.type==='barracks'&&b.hp>0))add('barracks',201,'Kodanike ja linnamüüri kaitsjate väljaõpe');
+ }
  // V136: every established town needs civic functions, not only production buildings.
  // A Bronze settlement without a marketplace is still a village; reserve time
  // for civic construction even during long era-research material shortages.
