@@ -4,7 +4,7 @@
     {
       "team": 1,
       "cities": 8,
-      "buildings": 247,
+      "buildings": 246,
       "markets": 6,
       "harbors": 2,
       "houses": 70,
@@ -14,12 +14,12 @@
     {
       "team": 2,
       "cities": 5,
-      "buildings": 216,
+      "buildings": 227,
       "markets": 5,
       "harbors": 0,
-      "houses": 64,
-      "fields": 3,
-      "ages": 4
+      "houses": 67,
+      "fields": 1,
+      "ages": 5
     },
     {
       "team": 3,
@@ -35,12 +35,12 @@
   "landUse": [
     {
       "name": "Idaküla 1",
-      "owned": 47,
+      "owned": 182,
       "developed": 4,
       "ruralDeveloped": 0,
       "planned": 3,
-      "homes": 11,
-      "foodGrowthBonus": 0.2
+      "homes": 13,
+      "foodGrowthBonus": 0.25
     },
     {
       "name": "Idaküla 2",
@@ -48,25 +48,25 @@
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 16,
-      "foodGrowthBonus": 0.2
+      "homes": 14,
+      "foodGrowthBonus": 0.25
     },
     {
       "name": "Idaküla 3",
-      "owned": 145,
+      "owned": 67,
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 10,
-      "foodGrowthBonus": 0.2
+      "homes": 11,
+      "foodGrowthBonus": 0.25
     },
     {
       "name": "Idaküla 4",
-      "owned": 73,
+      "owned": 50,
       "developed": 4,
-      "ruralDeveloped": 0,
+      "ruralDeveloped": 1,
       "planned": 0,
-      "homes": 9,
+      "homes": 8,
       "foodGrowthBonus": 0.25
     },
     {
@@ -75,8 +75,8 @@
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 11,
-      "foodGrowthBonus": 0.2
+      "homes": 12,
+      "foodGrowthBonus": 0.25
     },
     {
       "name": "Idaküla 6",
@@ -85,7 +85,7 @@
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 10,
-      "foodGrowthBonus": 0.1
+      "foodGrowthBonus": 0.05
     },
     {
       "name": "Idaküla 7",
@@ -93,7 +93,7 @@
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 2,
+      "homes": 1,
       "foodGrowthBonus": 0
     },
     {
@@ -110,7 +110,7 @@
   "turn": 246,
   "sourceTeam": 1,
   "cities": 8,
-  "buildings": 247,
+  "buildings": 246,
   "spacingPairs": [
     9,
     9,
@@ -118,35 +118,35 @@
     15,
     18,
     23,
-    29,
+    28,
     18,
     9,
     17,
     9,
     21,
-    20,
+    19,
     17,
     9,
     27,
     29,
-    38,
+    37,
     26,
     13,
     12,
-    24,
+    23,
     26,
     38,
-    37,
+    36,
     25,
-    11,
-    36
+    10,
+    35
   ],
   "ages": [
     5,
     0,
-    4,
+    5,
     5
   ],
-  "bytes": 3348086,
-  "seconds": 244
+  "bytes": 3288192,
+  "seconds": 332
 }
