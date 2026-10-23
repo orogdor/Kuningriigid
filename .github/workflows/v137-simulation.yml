@@ -11,6 +11,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: v137-city-simulation
+  cancel-in-progress: true
 jobs:
   simulate:
     runs-on: ubuntu-latest
