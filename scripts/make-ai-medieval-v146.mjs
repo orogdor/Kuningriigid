@@ -48,6 +48,7 @@ const allCities=game.s.cities.map(c=>{
  education:(types.study||0)+(types.scriptorium||0)+(types.academy||0)+(types.university||0),
  buildingTypes:types,
  defenseStatus:c.aiDefenseDiagnosticV146?.reason||'not-assessed',
+  defenseLock:c.aiDefenseLockedReasonV146||null,
   defenseAttempts:c.defensePlanV139?.constructed||0,
   stocks:Object.fromEntries(Object.entries(r.resources||{}).filter(([k,v])=>Number(v)>0).sort((a,b)=>b[1]-a[1]).slice(0,24)),
  foodSupply:foodKeys.reduce((n,k)=>n+(r.resources?.[k]||0),0)
