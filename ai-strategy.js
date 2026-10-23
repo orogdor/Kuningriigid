@@ -70,6 +70,28 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  };
  for(const [i,type] of foundationNeeds(game,city).entries())add(type,220-i,'Linna põhiehitis');
  for(const resource of city.resourceSpecialization||[])add(RESOURCE_BUILDINGS[resource],139,'Puuduva riigiressursi tootmine');
+ const role=city.economicRole||'trade';
+ const roleBuilds={
+  food:['farm','pasture','mill','bakery','watermill'],
+  timber:['lumber','saw','forester','cartwright'],
+  industry:['mine','coal','smelter','steelworks','engineworks'],
+  energy:['oilwell','refinery','powerplant','engineworks'],
+  port:['fisher','harbor','warehouse','cartwright'],
+  trade:['market','warehouse','saw','trade_yard']
+ };
+ for(const [i,type] of (roleBuilds[role]||[]).entries())
+    if(age>=0)add(type,missing?178-i:142-i,'Specialist town: '+role);
+ // Heavy industry is a chain, not an isolated factory. Prioritize a supply
+ // depot where the current factory requires goods from a different town.
+ for(const type of ['steelworks','engineworks']){
+  const existing=buildings.find(b=>b.type===type&&b.ready&&b.hp>0);
+  if(existing){city.importRequests??={};
+    const inputs=BUILDINGS[type]?.input||{};
+    for(const [resource,n]of Object.entries(inputs))
+      city.importRequests[resource]=Math.max(city.importRequests[resource]||0,n*12);
+  }
+ }
+ 
  const happiness=cityNeeds(city,age);if(happiness.missing)for(const [type,d] of Object.entries(GOOD_BUILDINGS)){if(d.age<=age&&(stock[d.out]||0)<happiness.threshold*3)add(type,101,'Linna mitmekesisus');}
  // Maintain an early, diverse economy. The first source is important even
  // when current stores are high; dependence on initial stocks is not viable.
