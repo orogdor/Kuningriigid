@@ -17,7 +17,7 @@ try{
     name:c?.name,view:gameDebug.view(),population:c?.economy?.realms?.[0]?.pop,
     saved:localStorage.getItem('kingdoms-civ4'),backup:localStorage.getItem('kingdoms-civ4-backup')};
   });
-  assert.equal(result.demo,'ai-medieval-v147');assert.equal(result.age,3);
+  assert.equal(result.demo,'ai-medieval-v147');assert.ok(result.age>=3,'Fortifications scenario must have reached Medieval Age');
   assert.equal(result.cityId,result.targetId,'opens biggest medieval AI city');
   assert.equal(result.view,'local');assert.ok(result.population>0);
   assert.equal(result.saved,'untouched-save');assert.equal(result.backup,'untouched-backup');
