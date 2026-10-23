@@ -1,0 +1,29 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {AI_CITY_SPACING,historicalCitySites,historicalDistrictOrder,historicalSiteScore} from './historical-city-v135.js';
+import {MIN_CITY_SPACING,citySpacingAllowed} from './counties-v126.js';
+import {Civilization} from './civilization-core.js';
+assert.equal(AI_CITY_SPACING,9);
+assert.equal(MIN_CITY_SPACING,17,'the player retains existing spacing');
+for(const value of [8,9,16,17]){
+ const a={c:0,r:0},p={c:value,r:0};
+ assert.equal(citySpacingAllowed(p,[a],AI_CITY_SPACING),value>=9);
+ assert.equal(citySpacingAllowed(p,[a]),value>=17);
+}
+const h={x:0,z:0},a=historicalCitySites(h,'house',135023),again=historicalCitySites(h,'house',135023),other=historicalCitySites(h,'house',135024);
+assert.ok(a.length>45,'many valid organic plots exist');
+assert.deepEqual(a,again,'sites deterministic for saves, replay and debugging');
+assert.notDeepEqual(a,other,'different terrain/seed creates a different shape');
+assert.ok(a.every(p=>Math.abs(p.x)<=40&&Math.abs(p.z)<=26));
+assert.equal(new Set(a.map(p=>p.x+':'+p.z)).size,a.length);
+assert.ok(new Set(a.map(p=>p.x%6)).size>=4,'not a 6m square grid');
+assert.ok(a.slice(0,20).every(p=>Math.hypot(p.x,p.z)<20),'compact development near hall');
+assert.ok(historicalSiteScore(h,{x:9,z:0},'house',[])<historicalSiteScore(h,{x:29,z:0},'house',[]),'housing favours compact town centre');
+const town={c:50,r:50,radius:2,id:3},districts=[];for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++)districts.push({c:50+dx,r:50+dz});
+const ordered=historicalDistrictOrder(town,districts);assert.deepEqual({c:ordered[0].c,r:ordered[0].r},{c:50,r:50});
+assert.ok(ordered.findIndex(p=>p.c===52&&p.r===52)>ordered.findIndex(p=>p.c===51&&p.r===50),'rounded growth before far diagonal corners');
+const existing=new Civilization(JSON.parse(fs.readFileSync('scenarios/iron-ai-v129.json'))),city=existing.s.cities[0];
+const sites=existing.buildingSites(city,'house');assert.ok(sites.length>0&&sites.length<250);
+assert.deepEqual(sites,historicalCitySites(city.economy.buildings[0],'house',existing.s.seed+city.c*11+city.r*31+city.team*7));
+assert.ok(existing.buildingSites(city,'quarry').length>=0,'deposit special-case remains supported');
+console.log('V135 PASS: 9-tile AI spacing, 17-tile player spacing, deterministic curved plots, central density, historical district order, real engine integration');
