@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {BUILDINGS} from './economy.js';
+import {BUILDINGS} from './civilization-core.js';
 import {surplusForWalls,reserveAfterWalls} from './ancient-walls-v139.js';
 import {FOUNDATION_TYPES} from './ai-foundation-v88.js';
 import {cityExtent,populationCityRadius} from './city-area-v142.js';
