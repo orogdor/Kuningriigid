@@ -38,6 +38,6 @@ jobs:
           git add scenarios/ai-city-v137.json scenarios/ai-city-v137.manifest.json
           if ! git diff --cached --quiet; then
             git commit -m "V137: publish 245-turn AI housing, field and territory demo"
-            git pull --rebase origin main
+            git pull --rebase -X theirs origin main
             git push origin HEAD:main
           fi
