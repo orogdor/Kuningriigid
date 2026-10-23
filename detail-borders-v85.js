@@ -22,6 +22,6 @@ export function createDetailBorders(game,tile){
    }
   }
  }
- for(const [team,vertices]of byTeam){const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));const mat=new T.MeshBasicMaterial({color:team>=12?'#172126':team>=8?colors[team%4]:team>=4?'#e2ca85':colors[team%4],side:T.DoubleSide,transparent:true,opacity:team>=8?1:team>=4?.45:.7,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});const mesh=new T.Mesh(geo,mat);mesh.name='territory team '+team;mesh.renderOrder=team>=12?11:12;group.add(mesh)}
+ for(const [team,vertices]of byTeam){const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));const mat=new T.MeshBasicMaterial({color:team>=12?'#172126':team>=8?colors[team%4]:team>=4?'#e2ca85':colors[team%4],side:T.DoubleSide,transparent:true,opacity:team>=8?1:team>=4?.45:.7,depthWrite:false,depthTest:team<8,polygonOffset:true,polygonOffsetFactor:-2});const mesh=new T.Mesh(geo,mat);mesh.name='territory team '+team;mesh.renderOrder=team>=12?11:12;group.add(mesh)}
  group.userData.borderTeams=byTeam.size;return group;
 }
