@@ -13,7 +13,8 @@ const existing=process.env.MODERN_RESUME==='1'&&fs.existsSync(checkpointPath);
 const startState=existing?JSON.parse(fs.readFileSync(checkpointPath,'utf8')):createGame(seed);
 const game=new Civilization(startState);
 const began=Math.floor(game.s.time/60);
-const stages=[];
+const reportPath='scenarios/ai-modern-v140.manifest.json';
+const stages=existing&&fs.existsSync(reportPath)?(JSON.parse(fs.readFileSync(reportPath,'utf8')).history||[]):[];
 let modern=null,stopReason=null,iteration=began,latestEvent='';
 const status=turn=>{
  const teams=[0,1,2,3].map(team=>{
