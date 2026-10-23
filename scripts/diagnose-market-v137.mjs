@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import {Civilization,BUILDINGS} from '../civilization-core.js';
 import {selectAIBuild} from '../ai-strategy.js';
+import {grantTech} from '../research.js';
 const g=new Civilization(JSON.parse(fs.readFileSync('scenarios/ai-city-v137.json')));
 for(const city of g.s.cities.filter(c=>c.team===0).slice(0,8)){
+ grantTech(g.s.research[city.team],'commerce');
  const all=g.allBuildings(city),r=city.economy.realms[city.team],urban=g.contexts(city).filter(ctx=>!g.isCountyTile(ctx,city));
  const sites=g.constructionArea(city).tiles.filter(p=>Math.max(Math.abs(p.c-city.c),Math.abs(p.r-city.r))<=2);
  const test=[];
