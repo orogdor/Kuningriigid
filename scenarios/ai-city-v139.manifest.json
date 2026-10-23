@@ -3,168 +3,174 @@
   "roster": [
     {
       "team": 1,
-      "cities": 6,
-      "buildings": 92,
-      "markets": 1,
-      "harbors": 1,
-      "houses": 15,
-      "fields": 5,
+      "cities": 7,
+      "buildings": 85,
+      "markets": 0,
+      "harbors": 0,
+      "houses": 37,
+      "fields": 2,
       "ages": 2
     },
     {
       "team": 2,
-      "cities": 8,
-      "buildings": 106,
-      "markets": 0,
+      "cities": 7,
+      "buildings": 211,
+      "markets": 4,
       "harbors": 0,
-      "houses": 19,
-      "fields": 8,
-      "ages": 2
+      "houses": 65,
+      "fields": 4,
+      "ages": 5
     },
     {
       "team": 3,
       "cities": 4,
-      "buildings": 79,
-      "markets": 2,
+      "buildings": 140,
+      "markets": 4,
       "harbors": 0,
-      "houses": 16,
-      "fields": 2,
-      "ages": 2
+      "houses": 50,
+      "fields": 1,
+      "ages": 4
     }
   ],
   "landUse": [
     {
-      "name": "Idaküla 1",
+      "name": "Põhjaküla 1",
+      "owned": 36,
+      "developed": 4,
+      "ruralDeveloped": 0,
+      "planned": 2,
+      "homes": 9,
+      "foodGrowthBonus": 0.25
+    },
+    {
+      "name": "Põhjaküla 2",
+      "owned": 243,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 13,
+      "foodGrowthBonus": 0.25
+    },
+    {
+      "name": "Põhjaküla 3",
+      "owned": 243,
+      "developed": 2,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 12,
+      "foodGrowthBonus": 0.2
+    },
+    {
+      "name": "Põhjaküla 4",
+      "owned": 97,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 12,
+      "foodGrowthBonus": 0.25
+    },
+    {
+      "name": "Põhjaküla 5",
       "owned": 147,
-      "developed": 6,
-      "ruralDeveloped": 2,
-      "planned": 4,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
       "homes": 8,
       "foodGrowthBonus": 0
     },
     {
-      "name": "Idaküla 2",
-      "owned": 75,
+      "name": "Põhjaküla 6",
+      "owned": 44,
       "developed": 5,
-      "ruralDeveloped": 2,
+      "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 2,
+      "homes": 8,
       "foodGrowthBonus": 0
     },
     {
-      "name": "Idaküla 3",
+      "name": "Põhjaküla 7",
       "owned": 75,
       "developed": 4,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 2,
-      "foodGrowthBonus": 0.15000000000000002
-    },
-    {
-      "name": "Idaküla 4",
-      "owned": 75,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 1,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Idaküla 5",
-      "owned": 75,
-      "developed": 6,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 1,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Idaküla 6",
-      "owned": 75,
-      "developed": 6,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 1,
+      "homes": 3,
       "foodGrowthBonus": 0
     }
   ],
   "density": [
     {
-      "city": "Idaküla 1",
+      "city": "Põhjaküla 1",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 19,
+      "urbanBuildings": 43,
+      "urbanTiles": 36
+    },
+    {
+      "city": "Põhjaküla 2",
+      "nearEdge": 2,
+      "expanded": 0,
+      "urbanBuildings": 32,
+      "urbanTiles": 60
+    },
+    {
+      "city": "Põhjaküla 3",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 42,
+      "urbanTiles": 58
+    },
+    {
+      "city": "Põhjaküla 4",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 40,
+      "urbanTiles": 59
+    },
+    {
+      "city": "Põhjaküla 5",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 26,
       "urbanTiles": 35
     },
     {
-      "city": "Idaküla 2",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 13,
-      "urbanTiles": 18
-    },
-    {
-      "city": "Idaküla 3",
+      "city": "Põhjaküla 6",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 16,
-      "urbanTiles": 17
+      "urbanTiles": 37
     },
     {
-      "city": "Idaküla 4",
+      "city": "Põhjaküla 7",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 11,
+      "urbanBuildings": 8,
       "urbanTiles": 18
-    },
-    {
-      "city": "Idaküla 5",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 14,
-      "urbanTiles": 18
-    },
-    {
-      "city": "Idaküla 6",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 10,
-      "urbanTiles": 17
     }
   ],
   "historicMetrics": [
     {
-      "name": "Idaküla 1",
-      "centreHouses": 8,
-      "mainTileHouses": 8,
-      "totalHouses": 8,
+      "name": "Põhjaküla 1",
+      "centreHouses": 9,
+      "mainTileHouses": 9,
+      "totalHouses": 9,
       "walls": 0,
       "gates": 0,
-      "wallPlan": 52,
+      "wallPlan": 60,
       "services": {
-        "well": 2,
-        "study": 1
-      }
-    },
-    {
-      "name": "Idaküla 2",
-      "centreHouses": 2,
-      "mainTileHouses": 2,
-      "totalHouses": 2,
-      "walls": 0,
-      "gates": 0,
-      "wallPlan": 0,
-      "services": {
-        "well": 1,
+        "well": 3,
         "study": 1,
-        "harbor": 1
+        "market": 1,
+        "scriptorium": 1,
+        "warehouse": 1,
+        "cellar": 1
       }
     },
     {
-      "name": "Idaküla 3",
-      "centreHouses": 2,
-      "mainTileHouses": 2,
-      "totalHouses": 2,
+      "name": "Põhjaküla 2",
+      "centreHouses": 11,
+      "mainTileHouses": 13,
+      "totalHouses": 13,
       "walls": 0,
       "gates": 0,
       "wallPlan": 0,
@@ -172,75 +178,112 @@
         "well": 1,
         "study": 1,
         "scriptorium": 1,
-        "market": 1
+        "market": 1,
+        "warehouse": 1
       }
     },
     {
-      "name": "Idaküla 4",
-      "centreHouses": 1,
-      "mainTileHouses": 1,
-      "totalHouses": 1,
+      "name": "Põhjaküla 3",
+      "centreHouses": 10,
+      "mainTileHouses": 12,
+      "totalHouses": 12,
       "walls": 0,
       "gates": 0,
       "wallPlan": 0,
       "services": {
         "study": 1,
-        "scriptorium": 1
+        "scriptorium": 1,
+        "market": 1,
+        "warehouse": 1,
+        "cellar": 1
       }
     },
     {
-      "name": "Idaküla 5",
-      "centreHouses": 1,
-      "mainTileHouses": 1,
-      "totalHouses": 1,
+      "name": "Põhjaküla 4",
+      "centreHouses": 12,
+      "mainTileHouses": 12,
+      "totalHouses": 12,
       "walls": 0,
       "gates": 0,
       "wallPlan": 0,
       "services": {
-        "scriptorium": 1
+        "study": 1,
+        "scriptorium": 1,
+        "warehouse": 1,
+        "market": 1,
+        "well": 1
       }
     },
     {
-      "name": "Idaküla 6",
-      "centreHouses": 1,
-      "mainTileHouses": 1,
-      "totalHouses": 1,
+      "name": "Põhjaküla 5",
+      "centreHouses": 7,
+      "mainTileHouses": 8,
+      "totalHouses": 8,
+      "walls": 0,
+      "gates": 0,
+      "wallPlan": 0,
+      "services": {
+        "well": 1,
+        "study": 1
+      }
+    },
+    {
+      "name": "Põhjaküla 6",
+      "centreHouses": 7,
+      "mainTileHouses": 8,
+      "totalHouses": 8,
       "walls": 0,
       "gates": 0,
       "wallPlan": 0,
       "services": {
         "well": 1
       }
+    },
+    {
+      "name": "Põhjaküla 7",
+      "centreHouses": 3,
+      "mainTileHouses": 3,
+      "totalHouses": 3,
+      "walls": 0,
+      "gates": 0,
+      "wallPlan": 0,
+      "services": {}
     }
   ],
   "seed": 139023,
   "turn": 201,
-  "sourceTeam": 1,
-  "cities": 6,
-  "buildings": 92,
+  "sourceTeam": 2,
+  "cities": 7,
+  "buildings": 211,
   "spacingPairs": [
     9,
-    10,
     9,
-    18,
-    18,
     9,
-    18,
-    9,
-    27,
-    16,
     13,
-    23,
-    27,
+    11,
+    18,
+    18,
+    13,
     9,
-    36
+    20,
+    27,
+    11,
+    14,
+    9,
+    9,
+    22,
+    9,
+    16,
+    20,
+    23,
+    9
   ],
   "ages": [
+    5,
     2,
     0,
-    2,
-    2
+    4
   ],
-  "bytes": 2206661,
-  "seconds": 146
+  "bytes": 2008856,
+  "seconds": 175
 }
