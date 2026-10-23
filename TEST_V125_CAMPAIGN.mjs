@@ -6,6 +6,7 @@ import {Civilization,createGame,FACTION_NAMES} from './civilization-core.js?v=12
 import {ageDeficit} from './era-economy.js';
 import {scienceRate} from './science.js';
 import {TECHS} from './research.js?v=125a';
+import {aiNavy} from './naval.js?v=125b';
 const seed=Number(process.env.V125_SEED||12501),limit=Number(process.env.V125_TURNS||900);
 const g=new Civilization(createGame(seed)),s=g.s;
 const history=[],eras=[],wars=[],trades=[],cities=[],knownCity=new Set(),knownShipment=new Set();
@@ -26,7 +27,7 @@ const sample=team=>{
 };
 const started=Date.now();
 for(let t=1;t<=limit;t++){
- for(let k=0;k<5;k++){g.aiTeam(0);g.tick(12)}
+ for(let k=0;k<5;k++){g.aiTeam(0);aiNavy(g,0);g.tick(12)}
  turns=t;
  for(let team=0;team<4;team++){for(let age=oldAges[team]+1;age<=s.ages[team];age++)eras.push({turn:t,team,age});oldAges[team]=s.ages[team]}
  for(const c of s.cities)if(!knownCity.has(c.id)){knownCity.add(c.id);cities.push({turn:t,team:c.team,name:c.name,role:c.economicRole||null,c:c.c,r:c.r})}
