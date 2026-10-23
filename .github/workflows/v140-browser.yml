@@ -1,0 +1,43 @@
+name: V140 Modern Takeover Browser
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v140-browser.yml'
+      - 'scenarios/ai-modern-v140.json'
+      - 'scenarios/ai-modern-v140.manifest.json'
+      - 'TEST_V140_BROWSER.mjs'
+      - 'ai-modern-demo-v140.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Verify genuine scenario before the UI test
+        id: file
+        run: |
+          if [ -s scenarios/ai-modern-v140.json ] && [ -s scenarios/ai-modern-v140.manifest.json ]; then echo "ready=yes" >> "$GITHUB_OUTPUT"; else echo "ready=no" >> "$GITHUB_OUTPUT"; fi
+      - name: Browser availability
+        if: steps.file.outputs.ready == 'no'
+        run: echo "Campaign simulation has not published the save yet"
+      - name: Install browser
+        if: steps.file.outputs.ready == 'yes'
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Open historical test on desktop and mobile
+        if: steps.file.outputs.ready == 'yes'
+        run: |
+          python3 -m http.server 8765 >/tmp/kingdoms-v140-server.log 2>&1 &
+          node TEST_V140_BROWSER.mjs
+      - uses: actions/upload-artifact@v4
+        if: steps.file.outputs.ready == 'yes'
+        with:
+          name: V140-modern-city-phone-and-desktop
+          path: artifacts-v140/
