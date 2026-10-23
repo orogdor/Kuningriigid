@@ -19,6 +19,7 @@ assert.equal(surplusForWalls({...rich,wood:80},20,0),false);
 assert.equal(surplusForWalls({...rich,bread:5},20,0),false);
 assert.equal(surplusForWalls(rich,20,7),false);
 assert.equal(reserveAfterWalls(rich,{wood:30,stone:20}),true);
+assert.equal(reserveAfterWalls({...rich,plank:0},{wood:12,stone:2}),true,'wooden palisades do not require a separate plank stockpile');
 assert.equal(reserveAfterWalls({...rich,wood:79},{wood:30}),false);
 const inner=[house(-30,-19),house(29,18),house(12,-27),house(-14,30)];
 const extents=wallExtents(inner,12),ring=ancientWallPlan(inner,'palisade','watchtower',12);
