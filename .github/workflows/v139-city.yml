@@ -1,0 +1,27 @@
+name: V139 Compact Cities and Walls
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v139-city.yml'
+      - 'TEST_V139.mjs'
+      - 'urban-infill-v139.js'
+      - 'ancient-walls-v139.js'
+      - 'ai-defenses-v128.js'
+      - 'ai-strategy.js'
+      - 'civilization-core.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node --check civilization-core.js
+      - run: node TEST_V139.mjs
+      - run: node TEST_V138.mjs
+      - run: node TEST_V137.mjs
