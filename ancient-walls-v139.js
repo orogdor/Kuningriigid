@@ -4,9 +4,9 @@ const hash=(seed,n)=>{const t=Math.sin(seed*17.71+n*7.47)*43758.5;return t-Math.
 const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
 export function surplusForWalls(stock,pop,waiting=0){
  const food=(stock.bread||0)+(stock.meat||0)+(stock.fish||0)+(stock.grain||0)+(stock.berries||0)+(stock.vegetables||0);
- return pop>=12&&waiting<=1&&(stock.gold||0)>=120&&
- (stock.wood||0)>=110&&(stock.stone||0)>=70&&
- (stock.water||0)>=pop*2&&food>=pop*3;
+ return pop>=12&&waiting<=2&&(stock.gold||0)>=120&&
+ (stock.wood||0)>=100&&(stock.stone||0)>=30&&
+ (stock.water||0)>=pop*1.5&&food>=pop*2;
 }
 export function wallExtents(buildings=[],seed=0){
  // Protect the historic core. Distant suburbs remain outside until the city
@@ -55,5 +55,5 @@ export function ancientWallPlan(buildings=[],wall='palisade',tower='watchtower',
 export function reserveAfterWalls(stock,cost){
  const remaining={...stock};
  for(const [resource,n] of Object.entries(cost||{}))remaining[resource]=(remaining[resource]||0)-n;
- return (remaining.wood||0)>=65&&(remaining.stone||0)>=45&&(remaining.plank||0)>=12;
+ return (remaining.wood||0)>=55&&(remaining.stone||0)>=25&&(remaining.plank||0)>=8;
 }
