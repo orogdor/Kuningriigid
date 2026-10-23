@@ -3,8 +3,8 @@
   "roster": [
     {
       "team": 1,
-      "cities": 9,
-      "buildings": 242,
+      "cities": 7,
+      "buildings": 241,
       "markets": 6,
       "harbors": 2,
       "ages": 5
@@ -12,10 +12,10 @@
     {
       "team": 2,
       "cities": 5,
-      "buildings": 182,
-      "markets": 4,
+      "buildings": 195,
+      "markets": 5,
       "harbors": 0,
-      "ages": 5
+      "ages": 4
     },
     {
       "team": 3,
@@ -91,9 +91,9 @@
   "ages": [
     5,
     5,
-    5,
+    4,
     0
   ],
-  "bytes": 3397955,
-  "seconds": 321
+  "bytes": 3471761,
+  "seconds": 339
 }
