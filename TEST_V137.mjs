@@ -42,4 +42,10 @@ const start=game.allBuildings(parent).length;
 game.developOwnedCityTiles(parent);
 assert.ok(game.allBuildings(parent).length>=start,'owned-plot planning never destroys buildings');
 assert.ok(parent.aiNextTerritoryBuildV137>game.s.time,'district planner is budgeted rather than called every frame');
+const housingCounts=label=>{
+ const state=JSON.parse(fs.readFileSync('scenarios/ai-city-'+label+'.json'));
+ return Object.fromEntries([1,2,3].map(team=>[team,state.cities.filter(city=>city.team===team).flatMap(city=>[city,...Object.values(city.districts||{})]).flatMap(ctx=>ctx.economy.buildings||[]).filter(b=>b.type==='house'&&b.hp>0).length]));
+};
+const baseline=housingCounts('v136'),current=housingCounts('v137');
+console.log('V137 HOUSING COMPARISON',JSON.stringify({baseline,current}));
 console.log('V137 PASS: half-price/half-benefit houses, 4x market, 6x fields, +5% distinct food growth, terrain-led all-owned-tile zoning');
