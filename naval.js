@@ -229,6 +229,37 @@ export function autoExploreNavy(game){
   }
  }
 }
+// V125: existing transport ships, genuine sea routes and real settler cargo
+// are required. Colonization never teleports units or reveals the whole map.
+function aiColonialVoyage(game,ship,settler){
+ const home=game.s.cities.find(c=>c.team===ship.team);
+ if(!home||ship.path.length||!game.s.research[ship.team].known.includes('shipbuilding'))return false;
+ const destinations=[];
+ const radius=game.s.research[ship.team].known.includes('ocean_sailing')?48:28;
+ for(let dr=-radius;dr<=radius;dr+=2)for(let dc=-radius;dc<=radius;dc+=2){
+  const c=game.cell({c:ship.c+dc,r:ship.r+dr});
+  if(!c?.land||c.mountain||game.territoryOwner(c))continue;
+  if(game.s.cities.some(t=>Math.abs(t.c-c.c)+Math.abs(t.r-c.r)<5))continue;
+  // New city still must pass all normal founding checks after disembarking.
+  const candidate={...settler,c:c.c,r:c.r,landed:true,path:[],localTarget:null,embarked:null};
+  if(![-18,-6,6,18].some(x=>[-18,-6,6,18].some(z=>!game.siteRule(candidate,{x,z}))))continue;
+  for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
+   const water={c:c.c+dx,r:c.r+dz};
+   if(!seaAllowed(game,ship.team,water))continue;
+   destinations.push({shore:{c:c.c,r:c.r},water,
+     score:Math.abs(dc)+Math.abs(dr)+(c.deposits.wood? -6:0)+(c.deposits.ore? -4:0)});
+   break;
+  }
+ }
+ destinations.sort((a,b)=>a.score-b.score);
+ for(const place of destinations.slice(0,24)){
+  const route=seaPath(game,ship,place.water);
+  if(!route)continue;
+  ship.path=route;ship.landing=place.shore;ship.targetKind='colonization';
+  ship.targetCity=null;ship.colonistVoyageV125=true;return true;
+ }
+ return false;
+}
 export function aiNavy(game,team){
  const ships=game.s.ships||[],owned=ships.filter(a=>a.team===team&&a.hp>0);
  const cities=game.s.cities.filter(c=>c.team===team);
@@ -250,7 +281,33 @@ export function aiNavy(game,team){
   if(oversized)game.splitArmy(oversized);
   const combat=activeArmies(game.s,team).filter(a=>a.embarked==null&&armyUnits(game.s,a).length>=2&&armyUnits(game.s,a).length<=SHIPS.transport.capacity)
     .sort((a,b)=>armyUnits(game.s,b).length-armyUnits(game.s,a).length)[0];
+  // Stranded settlers get first use of idle transports once a harbor is built.
+  if(ship.kind==='transport'&&!ship.cargo){
+   const waiting=game.s.settlers.filter(a=>a.team===team&&a.embarked==null&&a.aiSeaNeeded&&a.path.length===0);
+   if(waiting.length){
+    const settler=waiting[0];
+    if(near(ship,settler)){
+     if(!embark(game,ship,'settler')){
+      aiColonialVoyage(game,ship,settler);continue;
+     }
+    }else if(!ship.path.length){
+     // Move the ship alongside the coastal settler, respecting actual sailing.
+     outer:for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+      const water={c:settler.c+dc,r:settler.r+dr};
+      if(!seaAllowed(game,team,water))continue;
+      const path=seaPath(game,ship,water);
+      if(path){ship.path=path;break outer;}
+     }
+    }
+    if(ship.path.length)continue;
+   }
+  }
   const passenger=cargoArmy(game,ship);
+  if(ship.cargo?.kind==='settler'){
+   const settler=game.s.settlers.find(a=>a.id===ship.cargo.id);
+   if(!ship.path.length&&settler&&!ship.landing)aiColonialVoyage(game,ship,settler);
+   if(ship.path.length||ship.landing){navyExpedition(game,ship,null);continue;}
+  }
   if(passenger||ship.cargo){navyExpedition(game,ship,passenger);continue;}
   const enemyKnown=[...game.s.cities,...game.s.settlers].some(c=>atWar(game.s,c.team,team)&&game.seen(team,c));
   if(!enemyKnown){
