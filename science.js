@@ -1,12 +1,13 @@
 // Every city contributes basic knowledge; staffed academic buildings add science.
 // Science points are per *game minute*, not flat points per real second.
 import {tempoMultiplier} from './tempo.js';
+import {knowledgeCostFactor,knowledgeCityMultiplier} from './growth-balance-v125.js';
 export const SCIENCE_BUILDINGS = Object.freeze({study:6,scriptorium:10,academy:16,university:24,monastery:16,chapel:10,observatory:30,polytechnic:42,laboratory:65});
 export const SCIENCE_PER_RESIDENT = .45;
 export const SCIENCE_PER_CITY = 2.4;
 export const SCIENCE_PER_TURN = 10;
 export const EUREKA_FRACTION = .35;
-export const researchCost = (state, tech) => (tech?.turns ?? 0) * SCIENCE_PER_TURN * tempoMultiplier(state);
+export const researchCost = (state, tech) => (tech?.turns ?? 0) * SCIENCE_PER_TURN * tempoMultiplier(state) * (state.strategyPacingV125===true?knowledgeCostFactor(tech?.age??0):1);
 const allBuildings=city=>[city,...Object.values(city.districts||{})].flatMap(ctx=>ctx.economy?.buildings||[]).filter(b=>!b.virtual);
 export function cityScience(city){
  const pop=Math.max(0,city.economy?.realms?.[city.team]?.pop||0);
@@ -17,7 +18,8 @@ export function cityScience(city){
 export function scienceRate(state,team){
  const own=state.cities?.filter(c=>c.team===team)||[];
  if(!own.length)return 0;
- const rate=own.reduce((n,c)=>n+cityScience(c).total,0);
+ const raw=own.reduce((n,c)=>n+cityScience(c).total,0);
+ const rate=state.strategyPacingV125===true ? raw * knowledgeCityMultiplier(own.length) / Math.max(1,own.length) * (1+.40*Math.log2(Math.max(1,own.length))) : raw;
  // Difficulty is only a small scientific catch-up adjustment, not the old 45% penalty.
  const modifier=team===0?1:(state.difficulty==='easy'?.88:state.difficulty==='hard'?1.12:1);
  return rate*modifier;
