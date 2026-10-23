@@ -6,12 +6,15 @@ export function readyForNextEra(state,team,troops){
  const minimum=[1,3,5,7,9,10,0][age]||0;
  const current=units.filter(u=>(troops[u.kind]?.age??0)>=age).length;
  const modernMinimum=age<6?Math.max([1,2,2,3,3,4,0][age]||0,Math.ceil(units.length*.35)):0;
- return units.length>=minimum&&current>=modernMinimum;
+ // V140: after organized medieval armies exist, scientific progress cannot
+ // be deadlocked solely because the AI has not upgraded every field unit.
+ // Real combat squads and all research/material era costs remain necessary.
+ return units.length>=minimum&&(age>=3||current>=modernMinimum);
 }
 export function allowAIResearch(state,team,id,troops,techs){
  const age=state.ages[team],d=techs[id];if(!d)return false;
  if(d.age>age)return readyForNextEra(state,team,troops);
- if(d.age<age)return true;
+ if(d.age<age||age>=3)return true; // V140: current-era scholarly prerequisites must stay researchable in medieval+ periods
  const known=state.research[team].known,topics=Object.keys(techs).filter(k=>techs[k].age===age);
  const current=state.units.filter(u=>u.team===team&&combatUnit(u)&&(troops[u.kind]?.age??0)>=age).length;
  const total=state.units.filter(u=>u.team===team&&combatUnit(u)).length,needed=age<6?Math.max([1,2,2,3,3,4,0][age]||0,Math.ceil(total*.35)):0;
