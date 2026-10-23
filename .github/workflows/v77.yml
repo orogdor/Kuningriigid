@@ -1,16 +1,5 @@
 name: V77 Stone Age buildings and demo save
 on:
-  push:
-    branches: [dev/v77-stone-buildings-demo, main]
-    paths:
-      - 'buildings.js'
-      - 'stone-buildings-v77.js'
-      - 'stone-demo-v77.js'
-      - 'civilization.js'
-      - 'index.html'
-      - 'TEST_V77.mjs'
-      - 'TEST_V77_UI.mjs'
-      - '.github/workflows/v77.yml'
   workflow_dispatch:
 permissions:
   contents: read

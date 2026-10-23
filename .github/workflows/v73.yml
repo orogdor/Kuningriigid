@@ -1,14 +1,5 @@
 name: V73 safe saves and responsive UI
 on:
-  push:
-    branches: [dev/v73-save-reliability]
-    paths:
-      - 'save-safety-v73.js'
-      - 'civilization.js'
-      - 'index.html'
-      - 'TEST_V73.mjs'
-      - 'TEST_V73_UI.mjs'
-      - '.github/workflows/v73.yml'
   workflow_dispatch:
 permissions:
   contents: read

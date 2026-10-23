@@ -1,8 +1,5 @@
 name: V83 Real Mobile Opening Playtest
 on:
-  push:
-    branches: [feature/v83-menu-polish-playtest, main]
-    paths: ['TEST_V83_PLAY.mjs', '.github/workflows/v83-play.yml']
   workflow_dispatch:
 permissions:
   contents: read

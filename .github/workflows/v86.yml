@@ -1,8 +1,5 @@
 name: V86 Gameplay Flow Audit
 on:
-  push:
-    branches: [feature/v86-gameplay, main]
-    paths: ['gameplay-flow-v86.js', 'spatial-batches-v86.js', 'model-runtime-v48.js', 'navigation.js', 'economy.js', 'labor.js', 'ai-strategy.js', 'civilization-core.js', 'civilization.js', 'labor-ui.js', 'TEST_V86*.mjs', '.github/workflows/v86.yml']
   workflow_dispatch:
 permissions:
   contents: read

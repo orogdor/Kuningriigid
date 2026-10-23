@@ -1,14 +1,5 @@
 name: V71 touch and exploration smoke tests
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'civilization.js'
-      - 'hud-v71.css'
-      - 'hud-v69.js'
-      - 'TEST_V71_UI.mjs'
-      - '.github/workflows/ui-v71.yml'
   workflow_dispatch:
 permissions:
   contents: read

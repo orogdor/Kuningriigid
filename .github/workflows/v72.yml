@@ -1,15 +1,5 @@
 name: V72 naval and conquest regression
 on:
-  push:
-    branches: [dev/v72-naval-victory, main]
-    paths:
-      - 'naval.js'
-      - 'civilization-core.js'
-      - 'civilization.js'
-      - 'ai-strategy.js'
-      - 'victory-v72.js'
-      - 'TEST_V72.mjs'
-      - '.github/workflows/v72.yml'
   workflow_dispatch:
 permissions:
   contents: read

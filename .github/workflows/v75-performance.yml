@@ -1,11 +1,5 @@
 name: V75 model size and performance benchmark
 on:
-  push:
-    branches: [test/v75-model-size-perf, main]
-    paths:
-      - 'TEST_V75_PERF.mjs'
-      - '.github/workflows/v75-performance.yml'
-      - 'detail-world-objects.js'
   workflow_dispatch:
 
 permissions:

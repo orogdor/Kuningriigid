@@ -1,20 +1,5 @@
 name: V80 Cities, building-safe streets and saves
 on:
-  push:
-    branches: [feature/v80-medieval-demo-roads, fix/v80-safe-street-network, fix/v80-rotated-wall-clearance, main]
-    paths:
-      - 'medieval-*.js'
-      - 'bronze-demo-v79.js'
-      - 'stone-demo-v77.js'
-      - 'town-streets-v80.js'
-      - 'navigation.js'
-      - 'detail-roads.js'
-      - 'civilization-core.js'
-      - 'civilization.js'
-      - 'buildings.js'
-      - 'index.html'
-      - 'TEST_V80*.mjs'
-      - '.github/workflows/v80.yml'
   workflow_dispatch:
 permissions:
   contents: read

@@ -1,15 +1,5 @@
 name: V70 mobile construction and resource HUD
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'civilization.js'
-      - 'hud-v70.css'
-      - 'hud-v74.css'
-      - 'hud-v74.js'
-      - 'TEST_V70_UI.mjs'
-      - '.github/workflows/ui-v70.yml'
   workflow_dispatch:
 
 permissions:

@@ -1,10 +1,5 @@
 name: V72 long AI navy campaign
 on:
-  push:
-    branches: [dev/v72-naval-victory]
-    paths:
-      - 'TEST_V72_AI_NAVY.mjs'
-      - '.github/workflows/v72-ai-navy.yml'
   workflow_dispatch:
 permissions:
   contents: read

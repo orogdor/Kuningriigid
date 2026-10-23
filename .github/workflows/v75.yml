@@ -1,16 +1,5 @@
 name: V75 world/detail object parity
 on:
-  push:
-    branches: [dev/v75-world-detail-objects, main]
-    paths:
-      - 'world-object-catalog.js'
-      - 'world-props.js'
-      - 'detail-world-objects.js'
-      - 'civilization.js'
-      - 'index.html'
-      - 'TEST_V75.mjs'
-      - 'TEST_V75_UI.mjs'
-      - '.github/workflows/v75.yml'
   workflow_dispatch:
 permissions:
   contents: read

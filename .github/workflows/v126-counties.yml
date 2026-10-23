@@ -1,8 +1,5 @@
 name: V126 County Rules
 on:
-  push:
-    branches: [main]
-    paths: ['counties-v126.js', 'civilization-core.js', 'TEST_V126.mjs', '.github/workflows/v126-counties.yml']
   workflow_dispatch:
 permissions: {contents: read}
 jobs:

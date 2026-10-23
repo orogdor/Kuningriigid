@@ -1,8 +1,5 @@
 name: V124 Campaign Checkpoint 240 Turns
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/v124-campaign-checkpoint.yml']
   workflow_dispatch:
 permissions: {contents: read}
 jobs:

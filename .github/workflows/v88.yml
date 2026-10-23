@@ -1,11 +1,5 @@
 name: V88 Resource Sites and National Expansion
 on:
-  push:
-    branches: [feature/v88-resource-sites, main]
-    paths-ignore:
-      - "**.md"
-      - "V88_*TEST.json"
-      - "V88_*TEST.jsonl.gz"
   workflow_dispatch:
 permissions:
   contents: read

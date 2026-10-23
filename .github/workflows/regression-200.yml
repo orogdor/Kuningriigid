@@ -1,10 +1,5 @@
 name: Kuningriigid 200-turn regression
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'regression/**'
-      - '.github/workflows/regression-200.yml'
   workflow_dispatch:
   pull_request:
     paths:

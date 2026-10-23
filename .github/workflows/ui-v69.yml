@@ -1,17 +1,5 @@
 name: V69 responsive HUD browser tests
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'civilization.js'
-      - 'hud-v69.css'
-      - 'hud-v69.js'
-      - 'hud-v74.css'
-      - 'hud-v74.js'
-      - 'continuous-landscape.js'
-      - 'TEST_V69_UI.mjs'
-      - '.github/workflows/ui-v69.yml'
   workflow_dispatch:
 
 permissions:

@@ -1,8 +1,5 @@
 name: V83 Menu and New Game Regression
 on:
-  push:
-    branches: [feature/v83-menu-polish-playtest, main]
-    paths: ['boot-v83.js', 'civilization.js', 'index.html', 'style.css', 'localization.js', 'locale-en.js', 'TEST_V83_MENU.mjs', '.github/workflows/v83.yml']
   workflow_dispatch:
 permissions:
   contents: read

@@ -1,8 +1,5 @@
 name: V124 Long Campaign Pilot
 on:
-  push:
-    branches: [main]
-    paths: [TEST_V124_PILOT.mjs, .github/workflows/v124-pilot.yml]
   workflow_dispatch:
 permissions: {contents: read}
 jobs:

@@ -1,10 +1,5 @@
 name: Paigalda Kuningriigid V50 failid
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'Kuningriigid_V50_patch.zip'
-      - '.github/workflows/install-v50.yml'
   workflow_dispatch:
 permissions:
   contents: write

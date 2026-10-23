@@ -1,8 +1,5 @@
 name: V84 Mountain River Bridge Visual Check
 on:
-  push:
-    branches: [feature/v84-landscape, main]
-    paths: ['landscape-polish-v84.js', 'continuous-landscape-visual.js', 'TEST_V84*.mjs', '.github/workflows/v84.yml']
   workflow_dispatch:
 permissions:
   contents: read

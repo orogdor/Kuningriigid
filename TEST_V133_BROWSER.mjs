@@ -3,12 +3,12 @@ import fs from 'node:fs';
 import {chromium} from 'playwright';
 const out='artifacts-v133';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const results=[];
+const results=[];let debugPage=null,debugLabel='boot';
 try{
  for(const mobile of [false,true]){
   const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});
   await context.addInitScript(()=>{localStorage.setItem('kingdoms-quality','low');localStorage.setItem('kingdoms-civ4','traffic-player-save');localStorage.setItem('kingdoms-civ4-backup','traffic-player-backup');});
-  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const page=await context.newPage(),errors=[];debugPage=page;debugLabel=mobile?'mobile':'desktop';page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:8765/?demo=army-traffic&v=133',{waitUntil:'domcontentloaded',timeout:120000});
   await page.waitForFunction(()=>window.gameDebug&&document.getElementById('menu-status').hidden,{timeout:120000});
   const before=await page.evaluate(()=>{const d=gameDebug,s=d.state,key=Object.keys(s.deployments)[0],source=s.trafficTest.sources[0],unit=s.deployments[key][source];d.localClick({x:unit.x,z:unit.z});return {demo:s.demo,key,source,count:s.trafficTest.sources.length,view:d.view(),selected:d.currentSelection()?.kind,time:s.time};});
@@ -32,4 +32,4 @@ try{
   results.push({mobile,wallSeconds:(Date.now()-start)/1000,...result,errors});await context.close();
  }
  fs.writeFileSync(out+'/city-gate-results.json',JSON.stringify(results,null,2));console.log('V133 BROWSER PASS',JSON.stringify(results));
-}finally{await browser.close();}
+}catch(error){if(debugPage&&!debugPage.isClosed())await debugPage.screenshot({path:`${out}/failure-${debugLabel}.png`}).catch(()=>{});fs.writeFileSync(out+'/failure.json',JSON.stringify({message:error.message,stack:error.stack},null,2));throw error;}finally{await browser.close();}

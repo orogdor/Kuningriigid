@@ -1,17 +1,5 @@
 name: V121 Build Menu and Map Navigation UI
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'civilization.js'
-      - 'boot-v83.js'
-      - 'build-catalog-v121.js'
-      - 'map-gestures-v121.js'
-      - 'ui-v121.css'
-      - 'TEST_V121_UI.mjs'
-      - 'TEST_V121.mjs'
-      - '.github/workflows/ui-v121.yml'
   workflow_dispatch:
 permissions:
   contents: read

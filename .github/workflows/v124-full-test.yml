@@ -1,12 +1,5 @@
 name: V124 Full Campaign and Replay Archive
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'TEST_V124_CAMPAIGN.mjs'
-      - 'TEST_V124_BATTLES.mjs'
-      - 'battle-replays-v124.js'
-      - '.github/workflows/v124-full-test.yml'
   workflow_dispatch:
 permissions:
   contents: write

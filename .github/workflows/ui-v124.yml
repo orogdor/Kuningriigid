@@ -1,10 +1,5 @@
 name: V124 Playable Battle Replays Browser QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'TEST_V124_UI.mjs'
-      - '.github/workflows/ui-v124.yml'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:

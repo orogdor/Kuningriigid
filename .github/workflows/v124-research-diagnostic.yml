@@ -1,8 +1,5 @@
 name: V124 Research Economy Consistency Diagnostic
 on:
-  push:
-    branches: [main]
-    paths: ['TEST_V124_RESEARCH_DUPLICATE.mjs', '.github/workflows/v124-research-diagnostic.yml']
   workflow_dispatch:
 permissions: {contents: read}
 jobs:

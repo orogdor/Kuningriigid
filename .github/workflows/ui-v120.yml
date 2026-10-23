@@ -1,17 +1,5 @@
 name: V120 English UI and responsive layout
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'localization.js'
-      - 'locale-en-v120.js'
-      - 'research-unlocks-en-v120.js'
-      - 'research-tree-v119.js'
-      - 'research-ui.js'
-      - 'ui-v120.css'
-      - 'TEST_V120_UI.mjs'
-      - '.github/workflows/ui-v120.yml'
   workflow_dispatch:
 permissions:
   contents: read

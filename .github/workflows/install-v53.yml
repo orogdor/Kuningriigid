@@ -1,10 +1,5 @@
 name: Paigalda V53 mäng ja teede parandus
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'Kuningriigid_V53_patch.zip'
-      - '.github/workflows/install-v53.yml'
   workflow_dispatch:
 permissions:
   contents: write

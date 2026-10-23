@@ -1,7 +1,5 @@
 name: V87 City Trade and Needs
 on:
-  push:
-    branches: [feature/v87-city-trade]
   workflow_dispatch:
 permissions:
   contents: read

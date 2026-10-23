@@ -1,10 +1,5 @@
 name: Paigalda Kuningriigid V51
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'Kuningriigid_V51_patch.zip'
-      - '.github/workflows/install-v51.yml'
   workflow_dispatch:
 permissions:
   contents: write

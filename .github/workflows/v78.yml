@@ -1,17 +1,5 @@
 name: V78 Market walkers and footpaths
 on:
-  push:
-    branches: [fix/v78-market-walk-and-footpaths, main]
-    paths:
-      - 'civilization-core.js'
-      - 'navigation.js'
-      - 'civilization.js'
-      - 'stone-demo-v77.js'
-      - 'index.html'
-      - 'README.md'
-      - 'TEST_V78.mjs'
-      - 'TEST_V78_UI.mjs'
-      - '.github/workflows/v78.yml'
   workflow_dispatch:
 permissions:
   contents: read

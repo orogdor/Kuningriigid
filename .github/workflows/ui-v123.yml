@@ -1,17 +1,5 @@
 name: V123 Research Preview and Large Detail UI
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'research-tree-v119.js'
-      - 'research-preview-v123.js'
-      - 'tech-tree-layout-v119.js'
-      - 'civilization.js'
-      - 'detail-scale-v123.js'
-      - 'ui-v123.css'
-      - 'TEST_V123_UI.mjs'
-      - '.github/workflows/ui-v123.yml'
   workflow_dispatch:
 permissions:
   contents: read

@@ -1,16 +1,5 @@
 name: V82 Industrial Architecture and All-Era Building Inspector
 on:
-  push:
-    branches: [feature/v82-industrial-buildings-click-info, main]
-    paths:
-      - 'industrial-*.js'
-      - 'building-inspector-v82.js'
-      - 'civilization.js'
-      - 'buildings.js'
-      - 'index.html'
-      - 'style.css'
-      - 'TEST_V82*.mjs'
-      - '.github/workflows/v82.yml'
   workflow_dispatch:
 permissions:
   contents: read

@@ -1,8 +1,5 @@
 name: V127 Farming Rules
 on:
-  push:
-    branches: [main]
-    paths: ['farming-v127.js', 'farm-visuals-v127.js', 'civilization-core.js', 'navigation.js', 'TEST_V127.mjs', '.github/workflows/v127-farming.yml']
   workflow_dispatch:
 permissions: {contents: read}
 jobs:

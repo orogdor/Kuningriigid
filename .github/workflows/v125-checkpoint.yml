@@ -1,8 +1,5 @@
 name: V125 Checkpoint 240 Turns
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/v125-checkpoint.yml', 'TEST_V125_CAMPAIGN.mjs', 'naval.js', 'civilization-core.js']
   workflow_dispatch:
 permissions: {contents: read}
 jobs:

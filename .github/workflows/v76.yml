@@ -1,15 +1,5 @@
 name: V76 lively villages and save compatibility
 on:
-  push:
-    branches: [dev/v76-village-life, main]
-    paths:
-      - 'village-life-v76.js'
-      - 'civilization.js'
-      - 'index.html'
-      - 'localization.js'
-      - 'TEST_V76.mjs'
-      - 'TEST_V76_UI.mjs'
-      - '.github/workflows/v76.yml'
   workflow_dispatch:
 permissions:
   contents: read

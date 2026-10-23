@@ -1,18 +1,5 @@
 name: V79 Bronze Age architecture and road formation
 on:
-  push:
-    branches: [dev/v79-bronze-buildings-and-roads, main]
-    paths:
-      - 'bronze-buildings-v79.js'
-      - 'bronze-demo-v79.js'
-      - 'navigation.js'
-      - 'detail-roads.js'
-      - 'buildings.js'
-      - 'civilization.js'
-      - 'index.html'
-      - 'TEST_V79.mjs'
-      - 'TEST_V79_UI.mjs'
-      - '.github/workflows/v79.yml'
   workflow_dispatch:
 permissions:
   contents: read

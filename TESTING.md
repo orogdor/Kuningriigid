@@ -30,3 +30,5 @@ Automatic release order:
 3. Publish only after all three branches pass.
 
 The browser gate test issues a movement command through the actual command controls, exercises real-time movement, then advances the same movement engine without frame waits. Before/after screenshots and JSON evidence are uploaded separately from the UI evidence. Browser rendering is checked at the end instead of slowing every numerical test. Pages reuses this validation result instead of running the same suites again.
+
+Historical version-specific workflows remain available through workflow_dispatch, rather than launching dozens of duplicate browser checks on every current-source edit. Their scripts and manual campaign/archive workflows are retained. The current automatic suite above includes the existing release regressions.
