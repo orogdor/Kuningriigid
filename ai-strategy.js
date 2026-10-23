@@ -16,7 +16,7 @@ export const RESOURCE_CHAINS={
  machines:['steelworks','engineworks'],oil:['oilwell'],fuel:['oilwell','refinery'],clay:['claypit'],pottery:['claypit','pottery_kiln'],cutstone:['quarry','mason'],copper:['coppermine'],tin:['tinmine'],bronze:['coppermine','tinmine','bronze_foundry'],carts:['cartwright']
 };
 export const RESOURCE_SITES={claypit:'clay',coppermine:'copper',tinmine:'tin',lumber:'wood',quarry:'stone',hunter:'game',fisher:'coast',well:'water',farm:'grain',mine:'ore',oilwell:'oil'};
-export const CRITICAL_BUILDINGS=new Set(['lumber','quarry','well','hunter','fisher','farm','saw','mill','bakery','mine','coal','smelter','nitrate','powdermill','steelworks','engineworks','oilwell','refinery','house','warehouse','cellar','forester','claypit','pottery_kiln','pasture','mason','coppermine','tinmine','bronze_foundry','cartwright']);
+export const CRITICAL_BUILDINGS=new Set(['lumber','quarry','well','hunter','fisher','farm','saw','mill','bakery','mine','coal','smelter','nitrate','powdermill','steelworks','engineworks','oilwell','refinery','house','warehouse','cellar','forester','claypit','pottery_kiln','pasture','mason','coppermine','tinmine','bronze_foundry','cartwright','study','scriptorium','market','road_depot','inn','trade_yard']);
 for(const type of Object.keys(MINERAL_BUILDINGS))CRITICAL_BUILDINGS.add(type);
 function healthy(b){return b.hp>0&&!b.disabled}
 export function hasWorkingSource(buildings,type){return buildings.some(b=>b.type===type&&healthy(b)&&!(b.ready&&/pole ligipääsetavat|maardla puudub/.test(b.status||'')))}
@@ -80,13 +80,19 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  // V136: every established town needs civic functions, not only production buildings.
  // A Bronze settlement without a marketplace is still a village; reserve time
  // for civic construction even during long era-research material shortages.
- if(age>=1&&r.pop>=5)add('market',169,'Linnakeskuse kauplemine ja toidu jagamine');
- if(age>=1&&r.pop>=8)add('warehouse',143,'Linnakaupade ja tööriistade ladu');
- if(age>=1&&r.pop>=10)add('cellar',137,'Elanike ühine toiduvaru');
+ if(age>=1&&r.pop>=5)add('market',191,'Ajaloolise linnasüdame oluline turuplats');
+ if(age>=1&&r.pop>=8)add('warehouse',172,'Kaubanduse ja ehitusmaterjalide põhilaod');
+ if(age>=1&&r.pop>=10)add('cellar',168,'Linnakodanike ühine toidukelder');
  if(age>=3&&r.pop>=11){
   add('inn',129,'Ajalooline võõrastemaja');
   add('trade_yard',126,'Kaupmeeste õu');
  }
+ // Central civic services are not decoration. Ensure every district capital
+ // prioritises one operational research, storage, water and market facility.
+ if(r.pop>=5)add(game.obsoleteBuilding?.(team,'study')||'study',175,'Teaduse ja hariduse keskne töökoht');
+ if(age>=1&&r.pop>=9)add('scriptorium',158,'Ajaloolise linna kirjutuskoda');
+ if(age>=1&&r.pop>=12)add('road_depot',126,'Linna peatänavate ja teede korrashoid');
+ if(age>=1&&r.pop>=10&&game.cell(city)?.coast)add('harbor',151,'Rannikulinna vajalik sadam');
  const role=city.economicRole||'trade';
  const roleBuilds={
   food:['farm','pasture','mill','bakery','watermill'],
@@ -137,7 +143,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
    (gaps.plank>35&&(stock.plank||0)>=BUILDINGS.house.cost.plank+12)||
    (gaps.bread>0)||
    (gaps.wood>0&&(stock.wood||0)>=BUILDINGS.house.cost.wood+20);
-  if(enoughToInvest)add('house',missing?131:115,'Elanike tööjõud');
+  if(enoughToInvest)add('house',r.pop>=capacity-2?165:missing?97:100,'Uued elanikud ainult vajaliku tööjõu jaoks');
  }
  const foodCap=game.storageCap(city,'bread'),materialCap=game.storageCap(city,'plank');
  const eraCost=ERA_MATERIALS[science.ageWait?.id]||{};
