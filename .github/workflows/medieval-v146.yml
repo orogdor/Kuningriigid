@@ -1,0 +1,80 @@
+name: V146 Fortified Medieval City Simulation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/make-ai-medieval-v146.mjs'
+      - '.github/workflows/medieval-v146.yml'
+      - 'TEST_V146.mjs'
+      - 'ai-strategy.js'
+      - 'ai-foundation-v88.js'
+      - 'ai-defenses-v128.js'
+      - 'civilization-core.js'
+      - 'labor.js'
+      - 'ai-development-v128.js'
+      - 'ancient-walls-v139.js'
+      - 'TEST_V146_BROWSER.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: v146-medieval-run
+  cancel-in-progress: true
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Validate V143 and prior game rules
+        run: |
+          node --check scripts/make-ai-medieval-v146.mjs
+          node TEST_V146.mjs
+          node --check civilization.js
+          node TEST_V143.mjs
+          node TEST_V143_RURAL.mjs
+          node TEST_V142.mjs
+          node TEST_V141.mjs
+      - name: Run original AI to the middle of Medieval Age
+        run: node scripts/make-ai-medieval-v146.mjs
+      - name: Validate generated test state
+        run: |
+          test -s scenarios/ai-medieval-v146.json
+          node --input-type=module -e "import fs from 'node:fs'; const s=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v146.json')); const t=s.medievalTestV146; if(!t||s.ages[0]!==3||!s.cities.some(c=>c.id===t.targetCityId&&c.team===0))process.exit(1);const m=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v146.manifest.json')); if(m.turn>360||m.totalCities<12||m.totals.pop<165||m.totals.fortifications<2||m.totals.withDefenses<1)throw Error('Population or fortification regression: '+JSON.stringify({turn:m.turn,cities:m.totalCities,pop:m.totals.pop,comparison:m.comparison}));console.log('MEDIEVAL STATE VERIFIED',t,m.totals)"
+      - name: Verify browser on phone and computer
+        run: |
+          npm install --no-save playwright
+          export CHROME_PATH="$(command -v google-chrome)"
+          test -x "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          python3 -m http.server 8765 >/tmp/v146-http.log 2>&1 &
+          node TEST_V143_BROWSER.mjs
+          node TEST_V146_BROWSER.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v146-medieval-analysis
+          path: |
+            scenarios/ai-medieval-v146.manifest.json
+            scenarios/ai-medieval-v146.json
+            artifacts-v146/
+            artifacts-tests/
+      - name: Save reproducible AI state and analysis
+        run: |
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git add scenarios/ai-medieval-v146.json scenarios/ai-medieval-v146.manifest.json
+          git commit -m 'V146: verified mid-medieval AI snapshot and city analysis'
+          # Rebase the generated, tested snapshot onto newer main changes.
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
+  publish:
+    needs: simulate
+    uses: ./.github/workflows/avaldamine.yml
+    with:
+      validated: true
