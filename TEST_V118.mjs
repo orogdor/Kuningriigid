@@ -1,8 +1,11 @@
+import {TECHS_V125} from './technology-reforms-v125.js';
+const TECHS_V125_IDS=new Set(Object.keys(TECHS_V125));
 import assert from 'node:assert/strict';
 import {TECHS,BUILD_TECH,UNIT_TECH,ERA_NAMES,techBlock,newResearch,grantTech,initResearch,nextResearchForGoals} from './research.js?v=118a';
 import {TECH_TREE_V118,V118_NEW_IDS,V118_ERA_IDS} from './tech-tree-data-v118.js?v=118a';
 import {BUILDING_SUCCESSORS,UNIT_SUCCESSORS,unitSuccessor,buildingSuccessor} from './era-availability-v116.js?v=118a';
-const ids=Object.keys(TECHS);
+const V118_GRAPH=Object.fromEntries(Object.entries(TECHS).filter(([id])=>!id.match(/^v125_/)&&!TECHS_V125_IDS.has(id)));
+const ids=Object.keys(V118_GRAPH);
 assert.equal(ids.length,111,'111 research nodes must be available');
 assert.equal(V118_NEW_IDS.length,12);
 assert.equal(ERA_NAMES.length,7);
