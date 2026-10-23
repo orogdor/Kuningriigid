@@ -1,0 +1,80 @@
+{
+  "version": 136,
+  "roster": [
+    {
+      "team": 1,
+      "cities": 7,
+      "buildings": 189,
+      "markets": 6,
+      "harbors": 0,
+      "ages": 2
+    },
+    {
+      "team": 2,
+      "cities": 5,
+      "buildings": 139,
+      "markets": 5,
+      "harbors": 0,
+      "ages": 2
+    },
+    {
+      "team": 3,
+      "cities": 9,
+      "buildings": 245,
+      "markets": 6,
+      "harbors": 0,
+      "ages": 2
+    }
+  ],
+  "seed": 136023,
+  "turn": 246,
+  "sourceTeam": 3,
+  "cities": 9,
+  "buildings": 245,
+  "spacingPairs": [
+    9,
+    9,
+    9,
+    9,
+    18,
+    10,
+    18,
+    18,
+    18,
+    9,
+    17,
+    9,
+    9,
+    18,
+    27,
+    10,
+    9,
+    27,
+    19,
+    18,
+    9,
+    9,
+    17,
+    9,
+    9,
+    19,
+    26,
+    18,
+    9,
+    10,
+    9,
+    18,
+    36,
+    10,
+    28,
+    18
+  ],
+  "ages": [
+    2,
+    2,
+    2,
+    0
+  ],
+  "bytes": 2910035,
+  "seconds": 129
+}
