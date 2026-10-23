@@ -1,6 +1,6 @@
 import {foundationNeeds,reservesFoundation} from './ai-foundation-v88.js?v=117a';
 import {MINERAL_BUILDINGS} from './resource-sites-v88.js';
-import {RESOURCE_BUILDINGS} from './settlement-ai-v88.js';
+import {RESOURCE_BUILDINGS} from './settlement-ai-v88.js?v=125a';
 import {GOOD_BUILDINGS,cityNeeds} from './city-needs-v87.js';
 // V45: needs-led AI. Decisions are pure so the reasoning can be tested without a renderer.
 import {ERA_MATERIALS,ageDeficit,edibleSupply} from './era-economy.js';
