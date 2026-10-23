@@ -1,0 +1,23 @@
+name: V136 Harbor Diagnostic
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v136-harbor-diagnostic.yml'
+      - 'scripts/report-ai-city-v136.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node scripts/report-ai-city-v136.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v136-harbor-diagnostics
+          path: reports/ai-city-v136/harbors.json
