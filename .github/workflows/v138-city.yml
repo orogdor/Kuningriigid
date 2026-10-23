@@ -1,0 +1,25 @@
+name: V138 Ancient City Streets
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v138-city.yml'
+      - 'TEST_V138.mjs'
+      - 'historic-urban-v138.js'
+      - 'historical-districts-v137.js'
+      - 'civilization-core.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node --check civilization-core.js
+      - run: node TEST_V138.mjs
+      - run: node TEST_V137.mjs
+      - run: node TEST_V126.mjs
