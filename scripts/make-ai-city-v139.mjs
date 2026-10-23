@@ -51,6 +51,6 @@ const districts=new Set(state.cities.flatMap(c=>Object.values(c.districts||{}).m
 fs.mkdirSync('scenarios',{recursive:true});
 const output='scenarios/ai-city-v139.json';
 fs.writeFileSync(output,JSON.stringify(state,function(k,v){return districts.has(this)&&['realms','resources'].includes(k)?undefined:v}));
-const metrics={version:138,roster,landUse,density,seed,turn:state.aiCityTestV139.turn,sourceTeam:source,cities:originalCities.length,buildings:count(source),spacingPairs:spacings,ages:state.ages,bytes:fs.statSync(output).size,seconds:Math.round((Date.now()-started)/1000)};
+const metrics={version:139,roster,landUse,density,historicMetrics,seed,turn:state.aiCityTestV139.turn,sourceTeam:source,cities:originalCities.length,buildings:count(source),spacingPairs:spacings,ages:state.ages,bytes:fs.statSync(output).size,seconds:Math.round((Date.now()-started)/1000)};
 fs.writeFileSync('scenarios/ai-city-v139.manifest.json',JSON.stringify(metrics,null,2));
 console.log('V139 AI CITY DEMO GENERATED',JSON.stringify(metrics));
