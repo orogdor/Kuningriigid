@@ -547,7 +547,9 @@ export class Civilization{
    const cell=this.cell(p),ctx=this.contextAt(p,false);
    const n=ctx?ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0).length:0;
    const urban=!this.isCountyTile(p,city);
-   return {cell,ctx,n,urban,score:cell?historicalTilePriority(city,cell,urban,n):-Infinity};
+   const canExpand=!urban&&r.pop>=10&&houses>=5&&urbanExpansionEligible(this,city,p);
+   // Establish a connected suburb before the entire historic centre is packed.
+   return {cell,ctx,n,urban,canExpand,score:cell?historicalTilePriority(city,cell,urban,n)+(canExpand?43:0):-Infinity};
   }).filter(o=>o.cell?.land&&!o.cell.mountain&&o.n<(o.urban?28:2))
     .sort((a,b)=>b.score-a.score);
   // Rotate through the entire county over time; never reconsider only the nine easiest cells.
@@ -557,10 +559,10 @@ export class Civilization{
   for(const item of [...tiles.slice(cursor),...tiles.slice(0,cursor)]){
    if(++examined>9)break;
    const {cell,urban}=item;
-   const mayExpand=!urban&&urbanExpansionEligible(this,city,cell);
+   const mayExpand=item.canExpand;
    const types=historicalTilePlan(city,cell,urban||mayExpand,age);
    for(const type of types){
-    if(urban&&type==='house'&&(r.pop<Math.floor(capacity)-5||houses>=70))continue;
+    if((urban||mayExpand)&&type==='house'&&((!mayExpand&&r.pop<Math.floor(capacity)-5)||houses>=70))continue;
     if(['market','warehouse','cellar','study','scriptorium','barracks','archery'].includes(type)&&
        area.buildings.some(b=>b.type===type&&b.hp>0))continue;
     if(!urban&&!mayExpand&&item.n>=1)continue;
