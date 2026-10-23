@@ -1,0 +1,1411 @@
+{
+  "version": 140,
+  "success": false,
+  "reason": "time_limit",
+  "seed": 139023,
+  "startTurn": 0,
+  "turn": 607,
+  "modern": null,
+  "sourceTeam": 1,
+  "age": 3,
+  "ages": [
+    0,
+    3,
+    3,
+    3
+  ],
+  "elapsedSeconds": 1111,
+  "cities": [
+    {
+      "id": 1,
+      "name": "Idaküla 1",
+      "c": 185,
+      "r": 103,
+      "pop": 19,
+      "structures": 92,
+      "houses": 10,
+      "markets": 1,
+      "harbors": 0,
+      "walls": 43
+    },
+    {
+      "id": 6,
+      "name": "Idaküla 2",
+      "c": 189,
+      "r": 94,
+      "pop": 36,
+      "structures": 72,
+      "houses": 24,
+      "markets": 1,
+      "harbors": 0,
+      "walls": 0
+    },
+    {
+      "id": 7,
+      "name": "Idaküla 3",
+      "c": 176,
+      "r": 99,
+      "pop": 22,
+      "structures": 40,
+      "houses": 12,
+      "markets": 1,
+      "harbors": 0,
+      "walls": 2
+    },
+    {
+      "id": 11,
+      "name": "Idaküla 4",
+      "c": 177,
+      "r": 90,
+      "pop": 11,
+      "structures": 26,
+      "houses": 5,
+      "markets": 1,
+      "harbors": 0,
+      "walls": 0
+    },
+    {
+      "id": 15,
+      "name": "Idaküla 5",
+      "c": 180,
+      "r": 81,
+      "pop": 17,
+      "structures": 99,
+      "houses": 9,
+      "markets": 1,
+      "harbors": 0,
+      "walls": 51
+    },
+    {
+      "id": 18,
+      "name": "Idaküla 6",
+      "c": 191,
+      "r": 112,
+      "pop": 26,
+      "structures": 70,
+      "houses": 19,
+      "markets": 1,
+      "harbors": 0,
+      "walls": 8
+    },
+    {
+      "id": 19,
+      "name": "Idaküla 7",
+      "c": 187,
+      "r": 121,
+      "pop": 38,
+      "structures": 77,
+      "houses": 28,
+      "markets": 1,
+      "harbors": 0,
+      "walls": 0
+    }
+  ],
+  "research": [
+    {
+      "team": 0,
+      "active": null,
+      "known": 0,
+      "ageWait": null,
+      "missing": {}
+    },
+    {
+      "team": 1,
+      "active": null,
+      "known": 79,
+      "ageWait": null,
+      "missing": {}
+    },
+    {
+      "team": 2,
+      "active": null,
+      "known": 79,
+      "ageWait": null,
+      "missing": {}
+    },
+    {
+      "team": 3,
+      "active": null,
+      "known": 79,
+      "ageWait": null,
+      "missing": {}
+    }
+  ],
+  "history": [
+    {
+      "turn": 40,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 0,
+          "cities": 1,
+          "pop": 4,
+          "active": "stone_sickles",
+          "known": 3,
+          "resources": {
+            "wood": 56,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 99,
+            "bread": 0
+          }
+        },
+        {
+          "team": 2,
+          "age": 0,
+          "cities": 1,
+          "pop": 4,
+          "active": "stone_sickles",
+          "known": 3,
+          "resources": {
+            "wood": 72,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 100,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 0,
+          "cities": 1,
+          "pop": 4,
+          "active": "stone_sickles",
+          "known": 3,
+          "resources": {
+            "wood": 120,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 100,
+            "bread": 0
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 11
+    },
+    {
+      "turn": 80,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 0,
+          "cities": 1,
+          "pop": 3,
+          "active": "antler_picks",
+          "known": 7,
+          "resources": {
+            "wood": 95,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 98,
+            "bread": 0
+          }
+        },
+        {
+          "team": 2,
+          "age": 0,
+          "cities": 1,
+          "pop": 4,
+          "active": "stone_wedges",
+          "known": 8,
+          "resources": {
+            "wood": 96,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 97,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 0,
+          "cities": 1,
+          "pop": 10,
+          "active": "stone_wedges",
+          "known": 8,
+          "resources": {
+            "wood": 120,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 100,
+            "bread": 0
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 22
+    },
+    {
+      "turn": 120,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 0,
+          "cities": 1,
+          "pop": 4,
+          "active": "village_council",
+          "known": 11,
+          "resources": {
+            "wood": 112,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 100,
+            "bread": 0
+          }
+        },
+        {
+          "team": 2,
+          "age": 0,
+          "cities": 1,
+          "pop": 5,
+          "active": "village_council",
+          "known": 11,
+          "resources": {
+            "wood": 120,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 100,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 0,
+          "cities": 4,
+          "pop": 21,
+          "active": "masonry",
+          "known": 16,
+          "resources": {
+            "wood": 463,
+            "stone": 206,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 400,
+            "bread": 23
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 41
+    },
+    {
+      "turn": 160,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 0,
+          "cities": 2,
+          "pop": 12,
+          "active": "masonry",
+          "known": 16,
+          "resources": {
+            "wood": 27,
+            "stone": 147,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 197,
+            "bread": 5
+          }
+        },
+        {
+          "team": 2,
+          "age": 0,
+          "cities": 1,
+          "pop": 10,
+          "active": "copper_tin",
+          "known": 19,
+          "resources": {
+            "wood": 120,
+            "stone": 120,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 97,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 0,
+          "cities": 4,
+          "pop": 44,
+          "active": "grain_storage",
+          "known": 20,
+          "resources": {
+            "wood": 458,
+            "stone": 291,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 396,
+            "bread": 23
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 64
+    },
+    {
+      "turn": 200,
+      "ages": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 0,
+          "cities": 3,
+          "pop": 21,
+          "active": "copper_smelting",
+          "known": 21,
+          "resources": {
+            "wood": 76,
+            "stone": 175,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 300,
+            "bread": 9
+          }
+        },
+        {
+          "team": 2,
+          "age": 1,
+          "cities": 3,
+          "pop": 17,
+          "active": "commerce",
+          "known": 25,
+          "resources": {
+            "wood": 23,
+            "stone": 159,
+            "plank": 18,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 242,
+            "bread": 20
+          }
+        },
+        {
+          "team": 3,
+          "age": 1,
+          "cities": 4,
+          "pop": 62,
+          "active": null,
+          "known": 37,
+          "resources": {
+            "wood": 479,
+            "stone": 294,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 392,
+            "bread": 6
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 94
+    },
+    {
+      "turn": 240,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 1,
+          "cities": 5,
+          "pop": 36,
+          "active": "fortifications",
+          "known": 34,
+          "resources": {
+            "wood": 129,
+            "stone": 335,
+            "plank": 18,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 417,
+            "bread": 15
+          }
+        },
+        {
+          "team": 2,
+          "age": 1,
+          "cities": 9,
+          "pop": 48,
+          "active": "wheel",
+          "known": 35,
+          "resources": {
+            "wood": 402,
+            "stone": 404,
+            "plank": 236,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 341,
+            "bread": 44
+          }
+        },
+        {
+          "team": 3,
+          "age": 1,
+          "cities": 4,
+          "pop": 72,
+          "active": null,
+          "known": 37,
+          "resources": {
+            "wood": 474,
+            "stone": 295,
+            "plank": 195,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 386,
+            "bread": 6
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 140
+    },
+    {
+      "turn": 280,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 1,
+          "cities": 7,
+          "pop": 55,
+          "active": null,
+          "known": 37,
+          "resources": {
+            "wood": 300,
+            "stone": 743,
+            "plank": 499,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 517,
+            "bread": 60
+          }
+        },
+        {
+          "team": 2,
+          "age": 1,
+          "cities": 9,
+          "pop": 52,
+          "active": null,
+          "known": 37,
+          "resources": {
+            "wood": 963,
+            "stone": 573,
+            "plank": 402,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 367,
+            "bread": 17
+          }
+        },
+        {
+          "team": 3,
+          "age": 1,
+          "cities": 4,
+          "pop": 72,
+          "active": null,
+          "known": 37,
+          "resources": {
+            "wood": 480,
+            "stone": 274,
+            "plank": 240,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 396,
+            "bread": 6
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 218
+    },
+    {
+      "turn": 320,
+      "ages": [
+        0,
+        1,
+        1,
+        2
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 1,
+          "cities": 7,
+          "pop": 73,
+          "active": "bronze_survey",
+          "known": 45,
+          "resources": {
+            "wood": 462,
+            "stone": 1363,
+            "plank": 1280,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 514,
+            "bread": 83
+          }
+        },
+        {
+          "team": 2,
+          "age": 1,
+          "cities": 9,
+          "pop": 64,
+          "active": null,
+          "known": 37,
+          "resources": {
+            "wood": 906,
+            "stone": 781,
+            "plank": 817,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 351,
+            "bread": 17
+          }
+        },
+        {
+          "team": 3,
+          "age": 2,
+          "cities": 4,
+          "pop": 73,
+          "active": "smelting",
+          "known": 47,
+          "resources": {
+            "wood": 546,
+            "stone": 247,
+            "plank": 770,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 362,
+            "bread": 0
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 291
+    },
+    {
+      "turn": 360,
+      "ages": [
+        0,
+        2,
+        1,
+        2
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 2,
+          "cities": 7,
+          "pop": 102,
+          "active": null,
+          "known": 56,
+          "resources": {
+            "wood": 781,
+            "stone": 1964,
+            "plank": 1985,
+            "iron": 21,
+            "steel": 0,
+            "machines": 0,
+            "water": 494,
+            "bread": 54
+          }
+        },
+        {
+          "team": 2,
+          "age": 1,
+          "cities": 9,
+          "pop": 74,
+          "active": "cellaring",
+          "known": 40,
+          "resources": {
+            "wood": 1088,
+            "stone": 1085,
+            "plank": 1533,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 337,
+            "bread": 17
+          }
+        },
+        {
+          "team": 3,
+          "age": 2,
+          "cities": 4,
+          "pop": 76,
+          "active": null,
+          "known": 56,
+          "resources": {
+            "wood": 1026,
+            "stone": 327,
+            "plank": 1071,
+            "iron": 2,
+            "steel": 0,
+            "machines": 0,
+            "water": 398,
+            "bread": 0
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 372
+    },
+    {
+      "turn": 400,
+      "ages": [
+        0,
+        2,
+        2,
+        2
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 2,
+          "cities": 7,
+          "pop": 119,
+          "active": "crop_rotation_v125",
+          "known": 61,
+          "resources": {
+            "wood": 1043,
+            "stone": 2262,
+            "plank": 2607,
+            "iron": 172,
+            "steel": 0,
+            "machines": 0,
+            "water": 501,
+            "bread": 53
+          }
+        },
+        {
+          "team": 2,
+          "age": 2,
+          "cities": 9,
+          "pop": 94,
+          "active": "iron_pickaxes",
+          "known": 51,
+          "resources": {
+            "wood": 1458,
+            "stone": 1385,
+            "plank": 1921,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 328,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 2,
+          "cities": 4,
+          "pop": 84,
+          "active": "iron_markets",
+          "known": 62,
+          "resources": {
+            "wood": 996,
+            "stone": 312,
+            "plank": 1080,
+            "iron": 188,
+            "steel": 0,
+            "machines": 0,
+            "water": 383,
+            "bread": 0
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 467
+    },
+    {
+      "turn": 440,
+      "ages": [
+        0,
+        3,
+        2,
+        3
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 3,
+          "cities": 7,
+          "pop": 128,
+          "active": "city_trade",
+          "known": 75,
+          "resources": {
+            "wood": 1416,
+            "stone": 2545,
+            "plank": 2939,
+            "iron": 659,
+            "steel": 0,
+            "machines": 0,
+            "water": 518,
+            "bread": 2
+          }
+        },
+        {
+          "team": 2,
+          "age": 2,
+          "cities": 9,
+          "pop": 109,
+          "active": null,
+          "known": 56,
+          "resources": {
+            "wood": 1785,
+            "stone": 1437,
+            "plank": 2270,
+            "iron": 24,
+            "steel": 0,
+            "machines": 0,
+            "water": 266,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 3,
+          "cities": 5,
+          "pop": 92,
+          "active": "knighthood",
+          "known": 77,
+          "resources": {
+            "wood": 1000,
+            "stone": 687,
+            "plank": 1338,
+            "iron": 534,
+            "steel": 0,
+            "machines": 0,
+            "water": 400,
+            "bread": 42
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 562
+    },
+    {
+      "turn": 480,
+      "ages": [
+        0,
+        3,
+        2,
+        3
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 3,
+          "cities": 7,
+          "pop": 141,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 1634,
+            "stone": 2588,
+            "plank": 2939,
+            "iron": 1210,
+            "steel": 0,
+            "machines": 0,
+            "water": 446,
+            "bread": 86
+          }
+        },
+        {
+          "team": 2,
+          "age": 2,
+          "cities": 9,
+          "pop": 99,
+          "active": null,
+          "known": 57,
+          "resources": {
+            "wood": 2086,
+            "stone": 1417,
+            "plank": 2301,
+            "iron": 16,
+            "steel": 0,
+            "machines": 0,
+            "water": 314,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 3,
+          "cities": 7,
+          "pop": 116,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 1177,
+            "stone": 975,
+            "plank": 1351,
+            "iron": 792,
+            "steel": 0,
+            "machines": 0,
+            "water": 577,
+            "bread": 66
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 683
+    },
+    {
+      "turn": 520,
+      "ages": [
+        0,
+        3,
+        3,
+        3
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 3,
+          "cities": 7,
+          "pop": 152,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 2306,
+            "stone": 2604,
+            "plank": 2940,
+            "iron": 1475,
+            "steel": 0,
+            "machines": 0,
+            "water": 526,
+            "bread": 230
+          }
+        },
+        {
+          "team": 2,
+          "age": 3,
+          "cities": 9,
+          "pop": 102,
+          "active": "heavy_plough",
+          "known": 64,
+          "resources": {
+            "wood": 1966,
+            "stone": 1315,
+            "plank": 2128,
+            "iron": 21,
+            "steel": 0,
+            "machines": 0,
+            "water": 351,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 3,
+          "cities": 7,
+          "pop": 124,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 1416,
+            "stone": 1335,
+            "plank": 1615,
+            "iron": 966,
+            "steel": 0,
+            "machines": 0,
+            "water": 578,
+            "bread": 117
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 826
+    },
+    {
+      "turn": 560,
+      "ages": [
+        0,
+        3,
+        3,
+        3
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 3,
+          "cities": 7,
+          "pop": 158,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 2588,
+            "stone": 2597,
+            "plank": 2912,
+            "iron": 1543,
+            "steel": 0,
+            "machines": 0,
+            "water": 472,
+            "bread": 271
+          }
+        },
+        {
+          "team": 2,
+          "age": 3,
+          "cities": 9,
+          "pop": 102,
+          "active": "city_trade",
+          "known": 75,
+          "resources": {
+            "wood": 2317,
+            "stone": 1418,
+            "plank": 2432,
+            "iron": 67,
+            "steel": 0,
+            "machines": 0,
+            "water": 332,
+            "bread": 0
+          }
+        },
+        {
+          "team": 3,
+          "age": 3,
+          "cities": 7,
+          "pop": 138,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 1901,
+            "stone": 1302,
+            "plank": 1954,
+            "iron": 1097,
+            "steel": 0,
+            "machines": 0,
+            "water": 570,
+            "bread": 115
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 960
+    },
+    {
+      "turn": 600,
+      "ages": [
+        0,
+        3,
+        3,
+        3
+      ],
+      "teams": [
+        {
+          "team": 0,
+          "age": 0,
+          "cities": 0,
+          "pop": 0,
+          "active": null,
+          "known": 0,
+          "resources": {
+            "wood": 0,
+            "stone": 0,
+            "plank": 0,
+            "iron": 0,
+            "steel": 0,
+            "machines": 0,
+            "water": 0,
+            "bread": 0
+          }
+        },
+        {
+          "team": 1,
+          "age": 3,
+          "cities": 7,
+          "pop": 166,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 2788,
+            "stone": 2346,
+            "plank": 2940,
+            "iron": 1714,
+            "steel": 0,
+            "machines": 0,
+            "water": 506,
+            "bread": 282
+          }
+        },
+        {
+          "team": 2,
+          "age": 3,
+          "cities": 9,
+          "pop": 104,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 2459,
+            "stone": 1603,
+            "plank": 2491,
+            "iron": 153,
+            "steel": 0,
+            "machines": 0,
+            "water": 325,
+            "bread": 42
+          }
+        },
+        {
+          "team": 3,
+          "age": 3,
+          "cities": 7,
+          "pop": 122,
+          "active": null,
+          "known": 79,
+          "resources": {
+            "wood": 2005,
+            "stone": 1708,
+            "plank": 2127,
+            "iron": 1153,
+            "steel": 0,
+            "machines": 0,
+            "water": 587,
+            "bread": 162
+          }
+        }
+      ],
+      "winner": null,
+      "seconds": 1088
+    }
+  ]
+}
