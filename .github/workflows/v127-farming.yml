@@ -1,0 +1,18 @@
+name: V127 Farming Rules
+on:
+  push:
+    branches: [main]
+    paths: ['farming-v127.js', 'farm-visuals-v127.js', 'civilization-core.js', 'navigation.js', 'TEST_V127.mjs', '.github/workflows/v127-farming.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  farming:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node TEST_V127.mjs
+      - run: node TEST_V126.mjs
+      - run: node TEST_V125.mjs

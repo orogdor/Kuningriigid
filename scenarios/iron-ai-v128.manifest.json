@@ -1,0 +1,119 @@
+{
+  "version": "V128",
+  "seed": 12501,
+  "turn": 388,
+  "target": 1,
+  "ironDiscoveries": "9/17",
+  "sha256": "46a63ce694e41e7ade0373d8cf2bfcffdb636f66ddb84d1a3c52e17bf3ff15e8",
+  "bytes": 5245589,
+  "teams": [
+    {
+      "team": 0,
+      "name": "Kadaka",
+      "age": 3,
+      "ageName": "Keskaeg",
+      "cities": 12,
+      "pop": 287,
+      "units": {
+        "scout": 1,
+        "axeman": 2,
+        "crossbowman": 4,
+        "battering_ram": 3,
+        "bronze_archer": 7,
+        "bronze_axeman": 7,
+        "siege_tower": 1,
+        "bronze_spearman": 1,
+        "chariot": 5,
+        "cavalry": 3,
+        "javelinman": 2,
+        "infantry": 2
+      },
+      "combatSquads": 37,
+      "farms": 3,
+      "fields": 3,
+      "livestock": 12,
+      "walls": {
+        "stonewall": 174,
+        "gatehouse": 11,
+        "stonetower": 20,
+        "palisade": 1
+      }
+    },
+    {
+      "team": 1,
+      "name": "Ida",
+      "age": 2,
+      "ageName": "Rauaaeg",
+      "cities": 8,
+      "pop": 218,
+      "units": {
+        "scout": 1,
+        "axeman": 3,
+        "slinger": 1,
+        "cavalry": 5,
+        "bronze_axeman": 5,
+        "bronze_archer": 6,
+        "infantry": 2,
+        "battering_ram": 1,
+        "javelinman": 1
+      },
+      "combatSquads": 24,
+      "farms": 4,
+      "fields": 4,
+      "livestock": 8,
+      "walls": {
+        "stonewall": 20,
+        "gatehouse": 1
+      }
+    },
+    {
+      "team": 2,
+      "name": "Põhja",
+      "age": 2,
+      "ageName": "Rauaaeg",
+      "cities": 4,
+      "pop": 124,
+      "units": {
+        "scout": 1,
+        "cavalry": 3,
+        "battering_ram": 1,
+        "infantry": 3,
+        "javelinman": 2,
+        "bronze_archer": 3,
+        "bronze_axeman": 4
+      },
+      "combatSquads": 16,
+      "farms": 3,
+      "fields": 3,
+      "livestock": 4,
+      "walls": {
+        "stonewall": 27
+      }
+    },
+    {
+      "team": 3,
+      "name": "Lõuna",
+      "age": 2,
+      "ageName": "Rauaaeg",
+      "cities": 7,
+      "pop": 194,
+      "units": {
+        "scout": 1,
+        "axeman": 4,
+        "slinger": 2,
+        "javelinman": 8,
+        "bronze_axeman": 6,
+        "bronze_archer": 2
+      },
+      "combatSquads": 22,
+      "farms": 3,
+      "fields": 3,
+      "livestock": 7,
+      "walls": {
+        "stonewall": 33,
+        "gatehouse": 2,
+        "stonetower": 1
+      }
+    }
+  ]
+}

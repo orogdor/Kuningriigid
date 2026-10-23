@@ -1,16 +1,5 @@
 name: V125 Long Campaign Validation
 on:
-  push:
-    branches: [main]
-    paths:
-      - TEST_V125_CAMPAIGN.mjs
-      - .github/workflows/v125-long-game.yml
-      - growth-balance-v125.js
-      - science.js
-      - research.js
-      - ai-strategy.js
-      - settlement-ai-v88.js
-      - civilization-core.js
   workflow_dispatch:
 permissions:
   contents: read

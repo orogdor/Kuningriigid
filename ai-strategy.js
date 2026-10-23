@@ -1,3 +1,5 @@
+import {DEFENSE_TYPES} from './ai-defenses-v128.js';
+import {combatUnit,militaryInfrastructure} from './ai-development-v128.js';
 import {foundationNeeds,reservesFoundation} from './ai-foundation-v88.js?v=117a';
 import {MINERAL_BUILDINGS} from './resource-sites-v88.js';
 import {RESOURCE_BUILDINGS} from './settlement-ai-v88.js?v=125a';
@@ -13,7 +15,7 @@ export const RESOURCE_CHAINS={
  steel:['mine','coal','smelter','steelworks'],
  machines:['steelworks','engineworks'],oil:['oilwell'],fuel:['oilwell','refinery'],clay:['claypit'],pottery:['claypit','pottery_kiln'],cutstone:['quarry','mason'],copper:['coppermine'],tin:['tinmine'],bronze:['coppermine','tinmine','bronze_foundry'],carts:['cartwright']
 };
-export const RESOURCE_SITES={claypit:'clay',pasture:'grain',coppermine:'copper',tinmine:'tin',lumber:'wood',quarry:'stone',hunter:'game',fisher:'coast',well:'water',farm:'grain',mine:'ore',oilwell:'oil'};
+export const RESOURCE_SITES={claypit:'clay',coppermine:'copper',tinmine:'tin',lumber:'wood',quarry:'stone',hunter:'game',fisher:'coast',well:'water',farm:'grain',mine:'ore',oilwell:'oil'};
 export const CRITICAL_BUILDINGS=new Set(['lumber','quarry','well','hunter','fisher','farm','saw','mill','bakery','mine','coal','smelter','nitrate','powdermill','steelworks','engineworks','oilwell','refinery','house','warehouse','cellar','forester','claypit','pottery_kiln','pasture','mason','coppermine','tinmine','bronze_foundry','cartwright']);
 for(const type of Object.keys(MINERAL_BUILDINGS))CRITICAL_BUILDINGS.add(type);
 function healthy(b){return b.hp>0&&!b.disabled}
@@ -23,7 +25,7 @@ export function aiResourcePriorities(game,team,city){
  const needs=s.research[team]?.ageWait?ageDeficit(s,team,s.research[team].ageWait.id):{};
  const targets={
   bread:Math.max(16,pop*6),water:Math.max(18,pop*5),wood:50,stone:32,
-  plank:s.ages[team]>=1?30:0,iron:s.ages[team]>=2?18:0,
+  plank:s.ages[team]>=1?30:0,bronze:s.ages[team]>=1?12:0,weapons:s.ages[team]>=2?12:0,iron:s.ages[team]>=2?18:0,
   coal:s.ages[team]>=2?12:0,gunpowder:s.ages[team]>=4?10:0,
   steel:s.ages[team]>=5?15:0,machines:s.ages[team]>=5?12:0,
   oil:s.ages[team]>=6?12:0,fuel:s.ages[team]>=6?10:0,
@@ -50,9 +52,10 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  const missing=Object.keys(gaps).length>0;
  const housing=game.allBuildings(city).filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
  const capacity=4+housing*3;
- const possibilities=[];
+ const possibilities=[],visiting=new Set();
  const add=(type,priority,reason)=>{
-  if(excluded.has(type))return;
+  if(excluded.has(type)||DEFENSE_TYPES.has(type))return;
+  if(type==='farm'&&!game.cell(city)?.deposits.grain)return;
   if(type==='house'){if(buildings.some(b=>b.type==='house'&&!b.ready&&b.hp>0))return;}
   else if(hasWorkingSource(buildings,type)){
    const foodExpansion=['hunter','fisher'].includes(type)&&r.pop>=5&&edibleSupply(stock)<r.pop*3&&!buildings.some(b=>['hunter','fisher','farm','bakery'].includes(b.type)&&!b.ready&&b.hp>0&&!b.disabled);
@@ -61,22 +64,19 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   // Prevent the AI from wasting a whole town's labour on repeated quarries.
   if(['quarry','lumber','hunter','fisher','well','farm'].includes(type)&&buildings.filter(b=>b.type===type&&b.hp>0).length>=(['hunter','fisher'].includes(type)?3:2))return;
   if(type==='harbor'&&buildings.some(b=>b.type==='harbor'&&b.hp>0))return;
-  if(!eligible(game,city,type))return;
+  if(!eligible(game,city,type)){if(!game.buildRule(city,type)){city.aiImportRequestsV128??={};for(const [k,n]of Object.entries(BUILDINGS[type]?.cost||{}))if((stock[k]||0)<n+4)city.aiImportRequestsV128[k]=Math.max(city.aiImportRequestsV128[k]||0,n+4);}if(!visiting.has(type)){visiting.add(type);for(const dep of BUILDINGS[type]?.requires||[])if(!game.cityReady(city,dep))add(dep,priority+.5,'Eeltingimus: '+type);visiting.delete(type);}return;}
   if(reservesFoundation(game,city,type))return;
   // While saving for an era, build only a resource-producing dependency,
   // storage, or indispensable housing. No military or cosmetic construction.
-  if(missing&&!CRITICAL_BUILDINGS.has(type))return;
+  if(missing&&!CRITICAL_BUILDINGS.has(type)&&!['barracks','archery','stable','armor_workshop','crossbow_range','siegeworkshop'].includes(type))return;
   possibilities.push({type,priority,reason});
  };
  for(const [i,type] of foundationNeeds(game,city).entries())add(type,220-i,'Linna põhiehitis');
  for(const resource of city.resourceSpecialization||[])add(RESOURCE_BUILDINGS[resource],139,'Puuduva riigiressursi tootmine');
  // War production is an economic workstream, not a last-priority luxury.
  // The first barracks must be built before training can ever occur.
- const defending=game.s.units.filter(u=>u.team===team&&u.hp>0&&!u.garrison).length;
- if(age>=1&&defending<Math.min(12,game.s.cities.filter(c=>c.team===team).length*2+3)){
-   add('barracks',163,'Raise a standing defense force');
-   if(age>=2)add('stable',88,'Train mobile border scouts');
- }
+ const defending=game.s.units.filter(u=>u.team===team&&combatUnit(u)&&!u.garrison).length;
+ if(defending<Math.min(20,game.s.cities.filter(c=>c.team===team).length*2+age*2+3))for(const [id,priority]of militaryInfrastructure(game,team,city))add(id,priority,'Ajastule vastava sõjaväe varustamine');
  const role=city.economicRole||'trade';
  const roleBuilds={
   food:['farm','pasture','mill','bakery','watermill'],
@@ -99,10 +99,10 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   }
  }
  
- const happiness=cityNeeds(city,age);if(happiness.missing)for(const [type,d] of Object.entries(GOOD_BUILDINGS)){if(d.age<=age&&(stock[d.out]||0)<happiness.threshold*3)add(type,101,'Linna mitmekesisus');}
+ const happiness=cityNeeds(city,age);if(happiness.missing&&r.pop>=14&&defending>=Math.min(4,age+1))for(const [type,d] of Object.entries(GOOD_BUILDINGS)){if(d.age<=age&&(stock[d.out]||0)<happiness.threshold*3)add(type,101,'Linna mitmekesisus');}
  // Maintain an early, diverse economy. The first source is important even
  // when current stores are high; dependence on initial stocks is not viable.
- for(const [type,priority] of [['lumber',125],['well',118],['hunter',115],['fisher',109],['farm',105],['quarry',103],[game.obsoleteBuilding?.(team,'study')||'study',98]])add(type,priority,'Algmajandus');
+ for(const [type,priority] of [['lumber',125],['well',118],['hunter',115],['fisher',109],['farm',146],['quarry',103],[game.obsoleteBuilding?.(team,'study')||'study',98]])add(type,priority,'Algmajandus');
  if(science.known.includes('shipbuilding')&&!game.s.ships?.some(s=>s.team===team&&s.hp>0)&&!buildings.some(b=>b.type==='harbor'&&b.hp>0))add('harbor',136,'Väljapääs teistele mandritele');
  // Prevent permanent deforestation: start regenerating harvestable woodland
  // as soon as the forester technology is unlocked, *before* wood reaches zero.
@@ -161,12 +161,13 @@ export function usefulDistrictTypes(game,team){
  for(const [resource,missing] of Object.entries(needs))if(missing>0){
   for(const type of RESOURCE_CHAINS[resource]||[])if(RESOURCE_SITES[type])deficits.add(type);
  }
- const totals=Object.fromEntries(['wood','stone','bread','water','ore','oil'].map(k=>[k,cities.reduce((n,c)=>n+(k==='bread'?edibleSupply(c.economy.realms[team].resources):(c.economy.realms[team].resources[k]||0)),0)]));
+ const totals=Object.fromEntries(['wood','stone','bread','water','ore','oil','copper','tin','bronze'].map(k=>[k,cities.reduce((n,c)=>n+(k==='bread'?edibleSupply(c.economy.realms[team].resources):(c.economy.realms[team].resources[k]||0)),0)]));
  const population=cities.reduce((n,c)=>n+c.economy.realms[team].pop,0);
  if(totals.wood<40)deficits.add('lumber');
  if(totals.stone<28)deficits.add('quarry');
  if(totals.bread<population*3){deficits.add('hunter');deficits.add('fisher');deficits.add('farm')}
  if(totals.water<population*2)deficits.add('well');
+ if(game.s.ages[team]>=1&&totals.bronze<16){if(totals.copper<20)deficits.add('coppermine');if(totals.tin<16)deficits.add('tinmine');}
  if(game.s.ages[team]>=2&&totals.ore<15)deficits.add('mine');
  if(game.s.ages[team]>=6&&totals.oil<20)deficits.add('oilwell');
  if(research?.known.includes('shipbuilding')&&!cities.some(c=>game.allBuildings(c).some(b=>b.type==='harbor'&&b.hp>0)))deficits.add('harbor');

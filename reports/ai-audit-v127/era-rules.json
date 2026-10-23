@@ -1,0 +1,335 @@
+[
+  {
+    "age": 0,
+    "name": "Kiviaeg",
+    "fixture": "Supplied resources and prerequisite buildings; this is not campaign progress",
+    "allowedRecruitment": [
+      {
+        "id": "scout",
+        "name": "Avastaja",
+        "age": 0,
+        "technology": null
+      },
+      {
+        "id": "slinger",
+        "name": "Kiviviskajad",
+        "age": 0,
+        "technology": "warfare"
+      },
+      {
+        "id": "spearman",
+        "name": "Puuodamehed",
+        "age": 0,
+        "technology": "warfare"
+      },
+      {
+        "id": "axeman",
+        "name": "Kivikirvemehed",
+        "age": 0,
+        "technology": "warfare"
+      },
+      {
+        "id": "archer",
+        "name": "Vibukütid",
+        "age": 0,
+        "technology": "archery"
+      }
+    ],
+    "futureUnitErrors": [],
+    "futureBuildingErrors": []
+  },
+  {
+    "age": 1,
+    "name": "Pronksiaeg",
+    "fixture": "Supplied resources and prerequisite buildings; this is not campaign progress",
+    "allowedRecruitment": [
+      {
+        "id": "scout",
+        "name": "Avastaja",
+        "age": 0,
+        "technology": null
+      },
+      {
+        "id": "bronze_spearman",
+        "name": "Pronksodamees",
+        "age": 1,
+        "technology": "bronze"
+      },
+      {
+        "id": "bronze_axeman",
+        "name": "Pronkskirvemees",
+        "age": 1,
+        "technology": "bronze"
+      },
+      {
+        "id": "bronze_archer",
+        "name": "Pronksiaja vibukütt",
+        "age": 1,
+        "technology": "bronze"
+      },
+      {
+        "id": "chariot",
+        "name": "Sõjavanker",
+        "age": 1,
+        "technology": "wheel"
+      }
+    ],
+    "futureUnitErrors": [],
+    "futureBuildingErrors": []
+  },
+  {
+    "age": 2,
+    "name": "Rauaaeg",
+    "fixture": "Supplied resources and prerequisite buildings; this is not campaign progress",
+    "allowedRecruitment": [
+      {
+        "id": "scout",
+        "name": "Avastaja",
+        "age": 0,
+        "technology": null
+      },
+      {
+        "id": "infantry",
+        "name": "Raudmõõgamehed",
+        "age": 2,
+        "technology": "smithing"
+      },
+      {
+        "id": "cavalry",
+        "name": "Ratsavägi",
+        "age": 2,
+        "technology": "horsemanship"
+      },
+      {
+        "id": "battering_ram",
+        "name": "Müürilõhkuja",
+        "age": 2,
+        "technology": "early_siege_engineering"
+      },
+      {
+        "id": "siege_tower",
+        "name": "Piiramistorn",
+        "age": 2,
+        "technology": "early_siege_engineering"
+      },
+      {
+        "id": "bronze_catapult",
+        "name": "Varane kiviviskemasin",
+        "age": 2,
+        "technology": "ancient_artillery"
+      },
+      {
+        "id": "iron_archer",
+        "name": "Rauaaja vibukütt",
+        "age": 2,
+        "technology": "iron"
+      },
+      {
+        "id": "javelinman",
+        "name": "Heiteodamees",
+        "age": 2,
+        "technology": "iron"
+      }
+    ],
+    "futureUnitErrors": [],
+    "futureBuildingErrors": []
+  },
+  {
+    "age": 3,
+    "name": "Keskaeg",
+    "fixture": "Supplied resources and prerequisite buildings; this is not campaign progress",
+    "allowedRecruitment": [
+      {
+        "id": "scout",
+        "name": "Avastaja",
+        "age": 0,
+        "technology": null
+      },
+      {
+        "id": "crossbowman",
+        "name": "Ristvibumees",
+        "age": 3,
+        "technology": "crossbows"
+      },
+      {
+        "id": "halberdier",
+        "name": "Hellebardimees",
+        "age": 3,
+        "technology": "knighthood"
+      },
+      {
+        "id": "knight",
+        "name": "Rüütel",
+        "age": 3,
+        "technology": "knighthood"
+      },
+      {
+        "id": "heavy_cavalry",
+        "name": "Raskeratsavägi",
+        "age": 3,
+        "technology": "knighthood"
+      },
+      {
+        "id": "man_at_arms",
+        "name": "Soomustatud jalaväelane",
+        "age": 3,
+        "technology": "armor_craft"
+      },
+      {
+        "id": "catapult",
+        "name": "Katapult",
+        "age": 3,
+        "technology": "siege_engineering"
+      },
+      {
+        "id": "battering_ram",
+        "name": "Müürilõhkuja",
+        "age": 2,
+        "technology": "early_siege_engineering"
+      },
+      {
+        "id": "siege_tower",
+        "name": "Piiramistorn",
+        "age": 2,
+        "technology": "early_siege_engineering"
+      }
+    ],
+    "futureUnitErrors": [],
+    "futureBuildingErrors": []
+  },
+  {
+    "age": 4,
+    "name": "Renessanss",
+    "fixture": "Supplied resources and prerequisite buildings; this is not campaign progress",
+    "allowedRecruitment": [
+      {
+        "id": "scout",
+        "name": "Avastaja",
+        "age": 0,
+        "technology": null
+      },
+      {
+        "id": "musketeer",
+        "name": "Musketärid",
+        "age": 4,
+        "technology": "firearms"
+      },
+      {
+        "id": "pikeman",
+        "name": "Piigimees",
+        "age": 4,
+        "technology": "renaissance"
+      },
+      {
+        "id": "arquebusier",
+        "name": "Arkebuusimees",
+        "age": 4,
+        "technology": "gunpowder"
+      },
+      {
+        "id": "cuirassier",
+        "name": "Kürassiir",
+        "age": 4,
+        "technology": "gunpowder"
+      },
+      {
+        "id": "field_cannon",
+        "name": "Välisuurtükk",
+        "age": 4,
+        "technology": "gunpowder"
+      }
+    ],
+    "futureUnitErrors": [],
+    "futureBuildingErrors": []
+  },
+  {
+    "age": 5,
+    "name": "Tööstusajastu",
+    "fixture": "Supplied resources and prerequisite buildings; this is not campaign progress",
+    "allowedRecruitment": [
+      {
+        "id": "scout",
+        "name": "Avastaja",
+        "age": 0,
+        "technology": null
+      },
+      {
+        "id": "rifleman",
+        "name": "Püssimehed",
+        "age": 5,
+        "technology": "rifles"
+      },
+      {
+        "id": "line_infantry",
+        "name": "Rivijalavägi",
+        "age": 5,
+        "technology": "industrialization"
+      },
+      {
+        "id": "dragoon",
+        "name": "Ratsalaskur",
+        "age": 5,
+        "technology": "rifles"
+      },
+      {
+        "id": "industrial_artillery",
+        "name": "Vintraudne suurtükk",
+        "age": 5,
+        "technology": "rifles"
+      }
+    ],
+    "futureUnitErrors": [],
+    "futureBuildingErrors": []
+  },
+  {
+    "age": 6,
+    "name": "Moodne ajastu",
+    "fixture": "Supplied resources and prerequisite buildings; this is not campaign progress",
+    "allowedRecruitment": [
+      {
+        "id": "scout",
+        "name": "Avastaja",
+        "age": 0,
+        "technology": null
+      },
+      {
+        "id": "motorized",
+        "name": "Motoriseeritud jalavägi",
+        "age": 6,
+        "technology": "combustion"
+      },
+      {
+        "id": "industrial_artillery",
+        "name": "Vintraudne suurtükk",
+        "age": 5,
+        "technology": "rifles"
+      },
+      {
+        "id": "modern_infantry",
+        "name": "Moodne jalavägi",
+        "age": 6,
+        "technology": "modernity"
+      },
+      {
+        "id": "machinegun_team",
+        "name": "Kuulipildujameeskond",
+        "age": 6,
+        "technology": "modernity"
+      },
+      {
+        "id": "tank",
+        "name": "Tank",
+        "age": 6,
+        "technology": "combustion"
+      },
+      {
+        "id": "rocket_team",
+        "name": "Tankitõrjerühm",
+        "age": 6,
+        "technology": "modernity"
+      }
+    ],
+    "futureUnitErrors": [],
+    "futureBuildingErrors": []
+  }
+]

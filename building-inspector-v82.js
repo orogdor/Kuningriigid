@@ -39,7 +39,7 @@ export function describeBuilding(game,city,building,ages=[],names={},definitions
   technology:techUnlocks[building.type]||null,
   position:{x:building.x,z:building.z},
   researchActivity:building.researchActivity,
-  description:d.out?'Tootmishoone':['study','academy','university','observatory','polytechnic','laboratory','scriptorium'].includes(building.type)?'Teadusasutus':
+  description:building.type==='field'?'Eraldi põld · '+(building.width||16)+' × '+(building.depth||16)+' ühikut':building.type==='farm'?'Põllutalu · '+(building.farming?.tool||'vajab eraldi põldu')+(building.farming?' · '+building.farming.fields+' põldu · pindala '+building.farming.area+' / tööjõu võimekus '+Math.round(building.farming.capacity):''):building.type==='pasture'?'Loomafarm · kariloomad, liha ja veevajadus':d.out?'Tootmishoone':['study','academy','university','observatory','polytechnic','laboratory','scriptorium'].includes(building.type)?'Teadusasutus':
    building.type==='house'?'Elamu':building.type==='hall'?'Linna peahoone':'Linnahoone'
  };
 }

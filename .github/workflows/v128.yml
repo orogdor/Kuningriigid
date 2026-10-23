@@ -1,0 +1,41 @@
+name: V128 Balanced AI and Iron Age Takeover
+on:
+  push:
+    branches: [main]
+    paths: ['**.js', '**.mjs', 'index.html', 'scenarios/iron-ai-v128.json', '.github/workflows/v128.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency:
+  group: v128-validation
+  cancel-in-progress: true
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node TEST_V128.mjs
+      - run: node TEST_V127.mjs
+      - run: node TEST_V126.mjs
+      - run: node TEST_V125.mjs
+  browser:
+    needs: rules
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - run: |
+          python3 -m http.server 8765 >/tmp/v128-http.log 2>&1 &
+          node TEST_V128_BROWSER.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V128-browser-evidence
+          path: artifacts-v128/

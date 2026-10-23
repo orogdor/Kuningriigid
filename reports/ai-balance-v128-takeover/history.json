@@ -1,0 +1,30 @@
+[
+  {
+    "turn": 388,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 31,
+    "fields": 13,
+    "farms": 13,
+    "walls": 290,
+    "troops": 103
+  },
+  {
+    "turn": 388,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 31,
+    "fields": 13,
+    "farms": 13,
+    "walls": 290,
+    "troops": 103
+  }
+]

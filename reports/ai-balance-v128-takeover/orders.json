@@ -1,0 +1,1448 @@
+{
+  "seed": 12501,
+  "violations": [],
+  "events": [
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        92,
+        105
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 0,
+      "age": 3
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 0,
+      "city": 26,
+      "tile": [
+        88,
+        108
+      ],
+      "type": "house",
+      "x": 24,
+      "z": 12,
+      "age": 3
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        85,
+        22
+      ],
+      "type": "bronze_foundry",
+      "x": 12,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 3,
+      "city": 21,
+      "tile": [
+        141,
+        81
+      ],
+      "type": "smelter",
+      "x": -12,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 1,
+      "city": 6,
+      "tile": [
+        81,
+        24
+      ],
+      "type": "bronze_foundry",
+      "x": 0,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 1,
+      "city": 20,
+      "tile": [
+        86,
+        18
+      ],
+      "type": "stable",
+      "x": 24,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 2,
+      "city": 15,
+      "tile": [
+        184,
+        111
+      ],
+      "type": "smelter",
+      "x": -18,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        101
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -14,
+      "age": 3
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 0,
+      "city": 11,
+      "tile": [
+        84,
+        104
+      ],
+      "type": "stonewall",
+      "x": 52.5,
+      "z": -14,
+      "age": 3
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 2,
+      "city": 10,
+      "tile": [
+        187,
+        112
+      ],
+      "type": "flax_farm",
+      "x": -24,
+      "z": -6,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 0,
+      "city": 19,
+      "tile": [
+        90,
+        102
+      ],
+      "type": "stonewall",
+      "x": 42,
+      "z": 38.5,
+      "age": 3
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 0,
+      "city": 29,
+      "tile": [
+        81,
+        107
+      ],
+      "type": "armor_workshop",
+      "x": 0,
+      "z": 24,
+      "age": 3
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 1,
+      "city": 13,
+      "tile": [
+        87,
+        24
+      ],
+      "type": "smith",
+      "x": 24,
+      "z": -6,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        136,
+        82
+      ],
+      "type": "road_depot",
+      "x": -24,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 3,
+      "city": 21,
+      "tile": [
+        141,
+        81
+      ],
+      "type": "siegeworkshop",
+      "x": 12,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 1,
+      "city": 6,
+      "tile": [
+        80,
+        24
+      ],
+      "type": "bakery",
+      "x": -24,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 378,
+      "event": "build",
+      "team": 2,
+      "city": 15,
+      "tile": [
+        184,
+        110
+      ],
+      "type": "jeweler",
+      "x": -6,
+      "z": 18,
+      "age": 2
+    },
+    {
+      "turn": 379,
+      "event": "build",
+      "team": 3,
+      "city": 16,
+      "tile": [
+        136,
+        84
+      ],
+      "type": "stonewall",
+      "x": 14,
+      "z": 38.5,
+      "age": 2
+    },
+    {
+      "turn": 379,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "battering_ram",
+      "age": 3
+    },
+    {
+      "turn": 379,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "cavalry",
+      "age": 2
+    },
+    {
+      "turn": 379,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "cavalry",
+      "age": 2
+    },
+    {
+      "turn": 379,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 379,
+      "event": "build",
+      "team": 3,
+      "city": 21,
+      "tile": [
+        141,
+        81
+      ],
+      "type": "bakery",
+      "x": 12,
+      "z": -18,
+      "age": 2
+    },
+    {
+      "turn": 379,
+      "event": "build",
+      "team": 0,
+      "city": 11,
+      "tile": [
+        84,
+        104
+      ],
+      "type": "stonewall",
+      "x": 52.5,
+      "z": -7,
+      "age": 3
+    },
+    {
+      "turn": 379,
+      "event": "build",
+      "team": 2,
+      "city": 15,
+      "tile": [
+        184,
+        111
+      ],
+      "type": "bronze_foundry",
+      "x": -18,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 379,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 14,
+      "z": 38.5,
+      "age": 3
+    },
+    {
+      "turn": 379,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "house",
+      "x": -18,
+      "z": -24,
+      "age": 3
+    },
+    {
+      "turn": 379,
+      "event": "build",
+      "team": 0,
+      "city": 28,
+      "tile": [
+        83,
+        99
+      ],
+      "type": "armor_workshop",
+      "x": -24,
+      "z": -24,
+      "age": 3
+    },
+    {
+      "turn": 380,
+      "event": "build",
+      "team": 0,
+      "city": 27,
+      "tile": [
+        87,
+        97
+      ],
+      "type": "stonewall",
+      "x": -49,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 380,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": -38.5,
+      "age": 2
+    },
+    {
+      "turn": 380,
+      "event": "build",
+      "team": 3,
+      "city": 12,
+      "tile": [
+        132,
+        83
+      ],
+      "type": "market",
+      "x": 12,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 380,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        101
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -7,
+      "age": 3
+    },
+    {
+      "turn": 380,
+      "event": "build",
+      "team": 1,
+      "city": 20,
+      "tile": [
+        85,
+        18
+      ],
+      "type": "house",
+      "x": -18,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 380,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "crossbowman",
+      "age": 3
+    },
+    {
+      "turn": 380,
+      "event": "build",
+      "team": 0,
+      "city": 23,
+      "tile": [
+        81,
+        105
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 380,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "cavalry",
+      "age": 2
+    },
+    {
+      "turn": 380,
+      "event": "build",
+      "team": 1,
+      "city": 25,
+      "tile": [
+        90,
+        28
+      ],
+      "type": "bronze_foundry",
+      "x": 12,
+      "z": 18,
+      "age": 2
+    },
+    {
+      "turn": 380,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "battering_ram",
+      "age": 2
+    },
+    {
+      "turn": 380,
+      "event": "build",
+      "team": 2,
+      "city": 7,
+      "tile": [
+        194,
+        111
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 7,
+      "age": 2
+    },
+    {
+      "turn": 380,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 0,
+      "city": 26,
+      "tile": [
+        88,
+        108
+      ],
+      "type": "weaver",
+      "x": -30,
+      "z": 0,
+      "age": 3
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 0,
+      "city": 11,
+      "tile": [
+        84,
+        104
+      ],
+      "type": "stonewall",
+      "x": 52.5,
+      "z": 0,
+      "age": 3
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 0,
+      "city": 19,
+      "tile": [
+        90,
+        102
+      ],
+      "type": "stonewall",
+      "x": 49,
+      "z": 38.5,
+      "age": 3
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "house",
+      "x": 24,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        136,
+        82
+      ],
+      "type": "market",
+      "x": -12,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 0,
+      "city": 23,
+      "tile": [
+        81,
+        105
+      ],
+      "type": "stonewall",
+      "x": -35,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 1,
+      "city": 20,
+      "tile": [
+        86,
+        18
+      ],
+      "type": "smith",
+      "x": -24,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 2,
+      "city": 15,
+      "tile": [
+        184,
+        111
+      ],
+      "type": "smith",
+      "x": -12,
+      "z": -18,
+      "age": 2
+    },
+    {
+      "turn": 381,
+      "event": "build",
+      "team": 3,
+      "city": 18,
+      "tile": [
+        133,
+        88
+      ],
+      "type": "stonewall",
+      "x": 42,
+      "z": -38.5,
+      "age": 2
+    },
+    {
+      "turn": 382,
+      "event": "build",
+      "team": 3,
+      "city": 16,
+      "tile": [
+        136,
+        84
+      ],
+      "type": "stonewall",
+      "x": 21,
+      "z": 38.5,
+      "age": 2
+    },
+    {
+      "turn": 382,
+      "event": "build",
+      "team": 0,
+      "city": 26,
+      "tile": [
+        88,
+        108
+      ],
+      "type": "jeweler",
+      "x": 30,
+      "z": 0,
+      "age": 3
+    },
+    {
+      "turn": 382,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "battering_ram",
+      "age": 3
+    },
+    {
+      "turn": 382,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "cavalry",
+      "age": 2
+    },
+    {
+      "turn": 382,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "infantry",
+      "age": 2
+    },
+    {
+      "turn": 382,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 382,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 21,
+      "z": 38.5,
+      "age": 3
+    },
+    {
+      "turn": 382,
+      "event": "build",
+      "team": 0,
+      "city": 23,
+      "tile": [
+        81,
+        105
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 382,
+      "event": "build",
+      "team": 0,
+      "city": 26,
+      "tile": [
+        88,
+        108
+      ],
+      "type": "silk_weaver",
+      "x": -30,
+      "z": -12,
+      "age": 3
+    },
+    {
+      "turn": 382,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        85,
+        22
+      ],
+      "type": "warehouse",
+      "x": -12,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 382,
+      "event": "build",
+      "team": 1,
+      "city": 13,
+      "tile": [
+        87,
+        24
+      ],
+      "type": "stable",
+      "x": -12,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        92,
+        105
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 7,
+      "age": 3
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 1,
+      "city": 6,
+      "tile": [
+        81,
+        24
+      ],
+      "type": "house",
+      "x": -6,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 3,
+      "city": 16,
+      "tile": [
+        137,
+        83
+      ],
+      "type": "house",
+      "x": 24,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 0,
+      "city": 11,
+      "tile": [
+        84,
+        104
+      ],
+      "type": "stonewall",
+      "x": 52.5,
+      "z": 7,
+      "age": 3
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        136,
+        82
+      ],
+      "type": "smith",
+      "x": 12,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 2,
+      "city": 7,
+      "tile": [
+        195,
+        110
+      ],
+      "type": "house",
+      "x": -6,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 3,
+      "city": 24,
+      "tile": [
+        130,
+        85
+      ],
+      "type": "smelter",
+      "x": 0,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 0,
+      "city": 23,
+      "tile": [
+        81,
+        105
+      ],
+      "type": "stonewall",
+      "x": -28,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 383,
+      "event": "build",
+      "team": 2,
+      "city": 7,
+      "tile": [
+        194,
+        111
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 14,
+      "age": 2
+    },
+    {
+      "turn": 384,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "crossbowman",
+      "age": 3
+    },
+    {
+      "turn": 384,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "infantry",
+      "age": 2
+    },
+    {
+      "turn": 384,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 384,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 384,
+      "event": "build",
+      "team": 1,
+      "city": 6,
+      "tile": [
+        80,
+        24
+      ],
+      "type": "road_depot",
+      "x": -24,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 384,
+      "event": "build",
+      "team": 3,
+      "city": 24,
+      "tile": [
+        130,
+        85
+      ],
+      "type": "siegeworkshop",
+      "x": 24,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 384,
+      "event": "build",
+      "team": 0,
+      "city": 19,
+      "tile": [
+        90,
+        102
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -28,
+      "age": 3
+    },
+    {
+      "turn": 384,
+      "event": "build",
+      "team": 0,
+      "city": 26,
+      "tile": [
+        88,
+        108
+      ],
+      "type": "bronze_foundry",
+      "x": -24,
+      "z": 24,
+      "age": 3
+    },
+    {
+      "turn": 384,
+      "event": "build",
+      "team": 1,
+      "city": 13,
+      "tile": [
+        87,
+        24
+      ],
+      "type": "siegeworkshop",
+      "x": 24,
+      "z": 18,
+      "age": 2
+    },
+    {
+      "turn": 384,
+      "event": "build",
+      "team": 3,
+      "city": 24,
+      "tile": [
+        129,
+        85
+      ],
+      "type": "cartwright",
+      "x": -24,
+      "z": -18,
+      "age": 2
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 0,
+      "city": 27,
+      "tile": [
+        87,
+        97
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": 38.5,
+      "age": 3
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 2,
+      "city": 10,
+      "tile": [
+        187,
+        112
+      ],
+      "type": "smith",
+      "x": -24,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        101
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 0,
+      "age": 3
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 28,
+      "z": 38.5,
+      "age": 3
+    },
+    {
+      "turn": 385,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "battering_ram",
+      "age": 3
+    },
+    {
+      "turn": 385,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "battering_ram",
+      "age": 2
+    },
+    {
+      "turn": 385,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "infantry",
+      "age": 2
+    },
+    {
+      "turn": 385,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 3,
+      "city": 12,
+      "tile": [
+        132,
+        83
+      ],
+      "type": "smith",
+      "x": 24,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 0,
+      "city": 23,
+      "tile": [
+        81,
+        105
+      ],
+      "type": "stonewall",
+      "x": -21,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 0,
+      "city": 26,
+      "tile": [
+        88,
+        108
+      ],
+      "type": "dairy",
+      "x": 24,
+      "z": 24,
+      "age": 3
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 0,
+      "city": 29,
+      "tile": [
+        81,
+        107
+      ],
+      "type": "road_depot",
+      "x": 24,
+      "z": 0,
+      "age": 3
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "academy",
+      "x": 30,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 385,
+      "event": "build",
+      "team": 3,
+      "city": 18,
+      "tile": [
+        133,
+        88
+      ],
+      "type": "stonewall",
+      "x": 49,
+      "z": -38.5,
+      "age": 2
+    },
+    {
+      "turn": 386,
+      "event": "build",
+      "team": 1,
+      "city": 17,
+      "tile": [
+        89,
+        24
+      ],
+      "type": "house",
+      "x": 0,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 386,
+      "event": "build",
+      "team": 2,
+      "city": 7,
+      "tile": [
+        194,
+        111
+      ],
+      "type": "academy",
+      "x": -18,
+      "z": -6,
+      "age": 2
+    },
+    {
+      "turn": 386,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        136,
+        82
+      ],
+      "type": "stable",
+      "x": 12,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 386,
+      "event": "build",
+      "team": 0,
+      "city": 23,
+      "tile": [
+        81,
+        105
+      ],
+      "type": "stonewall",
+      "x": -14,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 387,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "siege_tower",
+      "age": 3
+    },
+    {
+      "turn": 387,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "infantry",
+      "age": 2
+    },
+    {
+      "turn": 387,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "infantry",
+      "age": 2
+    },
+    {
+      "turn": 387,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 387,
+      "event": "build",
+      "team": 0,
+      "city": 11,
+      "tile": [
+        84,
+        104
+      ],
+      "type": "stonewall",
+      "x": 52.5,
+      "z": 14,
+      "age": 3
+    },
+    {
+      "turn": 387,
+      "event": "build",
+      "team": 0,
+      "city": 19,
+      "tile": [
+        90,
+        102
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -7,
+      "age": 3
+    },
+    {
+      "turn": 387,
+      "event": "build",
+      "team": 1,
+      "city": 6,
+      "tile": [
+        80,
+        24
+      ],
+      "type": "smith",
+      "x": -12,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 388,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        92,
+        105
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 14,
+      "age": 3
+    },
+    {
+      "turn": 388,
+      "event": "build",
+      "team": 0,
+      "city": 27,
+      "tile": [
+        87,
+        97
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 388,
+      "event": "build",
+      "team": 2,
+      "city": 10,
+      "tile": [
+        187,
+        112
+      ],
+      "type": "academy",
+      "x": -36,
+      "z": -6,
+      "age": 2
+    },
+    {
+      "turn": 388,
+      "event": "build",
+      "team": 0,
+      "city": 26,
+      "tile": [
+        89,
+        107
+      ],
+      "type": "market",
+      "x": 0,
+      "z": 0,
+      "age": 3
+    },
+    {
+      "turn": 388,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        136,
+        82
+      ],
+      "type": "siegeworkshop",
+      "x": 24,
+      "z": -18,
+      "age": 2
+    },
+    {
+      "turn": 388,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 35,
+      "z": 38.5,
+      "age": 3
+    },
+    {
+      "turn": 388,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "crossbowman",
+      "age": 3
+    },
+    {
+      "turn": 388,
+      "event": "build",
+      "team": 0,
+      "city": 23,
+      "tile": [
+        81,
+        105
+      ],
+      "type": "stonewall",
+      "x": -7,
+      "z": -38.5,
+      "age": 3
+    },
+    {
+      "turn": 388,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "infantry",
+      "age": 2
+    },
+    {
+      "turn": 388,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "infantry",
+      "age": 2
+    },
+    {
+      "turn": 388,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    }
+  ]
+}

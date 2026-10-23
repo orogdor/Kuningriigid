@@ -1,3 +1,4 @@
+import {towerGuardKind} from './ai-development-v128.js';
 // Five persistent individuals per completed tower. Simulation also runs in peace.
 import {wallNodes,wallPath,wallRankPoint} from './wall-walk-v111.js?v=117a';
 const d=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
@@ -6,7 +7,7 @@ export const towerRoof=b=>b.bronzeWall?6.4:b.type==='stonetower'?7.55:7.25;
 export function towerSections(city){return city.economy.buildings.flatMap((t,index)=>tower(t)&&t.ready&&t.hp>0&&!t.disabled?[{index,type:t.type,tower:true,walkable:true,x:t.x,z:t.z,height:towerRoof(t),hp:t.hp,team:city.team}]:[]);}
 export function addTowerGuards(city,state,b){
  b.siegeSections??=[];for(const w of towerSections(city))if(!b.siegeSections.some(n=>n.index===w.index))b.siegeSections.push(w);
- const age=state.ages[city.team]||0,kind=age>=2?'iron_archer':age>=1?'bronze_archer':'archer';
+ const age=state.ages[city.team]||0,kind=towerGuardKind(state,city.team);
  for(const t of towerSections(city)){
   const building=city.economy.buildings[t.index];
   if(building.guardOwner!==city.team){building.guardOwner=city.team;building.towerGuards=Array.from({length:5},(_,slot)=>({slot,hp:20,maxHp:20}));}

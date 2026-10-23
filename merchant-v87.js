@@ -22,7 +22,7 @@ export function merchantRoute(game,from,to,team){
  }
  if(!best.has(end.id))return null;const legs=[];let p=end;while(p.id!==start.id){const edge=prev.get(p.id);if(!edge)return null;legs.unshift(edge.leg);p=edge.from;}return legs.length?legs:null;
 }
-export function tradeDemand(game,city){const need={...cityReserves(city)};for(const[k,n]of Object.entries(city.importRequests||{}))need[k]=Math.max(need[k]||0,n);const age=game.s.ages[city.team],r=city.economy.realms[city.team],status=cityNeeds(city,age);
+export function tradeDemand(game,city){const need={...cityReserves(city)};for(const request of [city.aiImportRequestsV128,city.importRequests])for(const[k,n]of Object.entries(request||{}))need[k]=Math.max(need[k]||0,n);const age=game.s.ages[city.team],r=city.economy.realms[city.team],status=cityNeeds(city,age);
  for(const[k,d]of Object.entries(GOODS))if(d.age<=age)need[k]=d.food?Math.max(4,r.pop*1.2):d.luxury?Math.max(2,r.pop*.3):4;
  if(age>=1)need.pottery=Math.max(3,r.pop*.3);
  // Unaffordable buildings advertise actual material shortages to the network.

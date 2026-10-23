@@ -1,0 +1,72 @@
+{
+  "turn": 308,
+  "cities": 39,
+  "ages": [
+    3,
+    4,
+    3,
+    4
+  ],
+  "fields": 14,
+  "readyFields": 14,
+  "farms": 38,
+  "readyFarms": 38,
+  "idleFarms": 24,
+  "nonFertileIdleFarms": 24,
+  "scouts": 20,
+  "walls": 25,
+  "towers": 9,
+  "teams": [
+    {
+      "team": 0,
+      "name": "Kadaka",
+      "age": 3,
+      "cities": 12,
+      "units": {
+        "scout": 5
+      },
+      "garrisons": [
+        "scout",
+        "scout",
+        "scout"
+      ]
+    },
+    {
+      "team": 1,
+      "name": "Ida",
+      "age": 4,
+      "cities": 10,
+      "units": {
+        "scout": 3,
+        "javelinman": 3
+      },
+      "garrisons": [
+        "scout",
+        "javelinman"
+      ]
+    },
+    {
+      "team": 2,
+      "name": "Põhja",
+      "age": 3,
+      "cities": 6,
+      "units": {
+        "scout": 3
+      },
+      "garrisons": [
+        "scout",
+        "scout"
+      ]
+    },
+    {
+      "team": 3,
+      "name": "Lõuna",
+      "age": 4,
+      "cities": 11,
+      "units": {
+        "scout": 3
+      },
+      "garrisons": []
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import {foodTotal} from './city-needs-v87.js';
 import {BUILDINGS} from './economy.js';
 // A small, explicit foundation. Optional industries never spend the last
 // materials reserved for the first available link in this chain.
-export const FOUNDATION_TYPES=new Set(['well','hunter','fisher','lumber','quarry','saw','house','study','mine','coal','smelter']);
+export const FOUNDATION_TYPES=new Set(['well','hunter','fisher','lumber','quarry','saw','house','study','mine','coal','smelter','smith','farm','pasture','forester','bronze_foundry','coppermine','tinmine']);
 export function foundationNeeds(game,city){
  const buildings=game.allBuildings(city),known=game.s.research[city.team]?.known||[],age=game.s.ages[city.team];
  const has=type=>buildings.some(b=>b.type===type&&b.hp>0&&!b.disabled);

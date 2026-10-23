@@ -18,10 +18,13 @@ export function demand(b,definitions){
  return (d?.out||['watchtower','stonetower','guildhall','infirmary','trade_yard','inn','monastery','chapel','keep','gatehouse','siegeworkshop','forester','warehouse','market','harbor','study','scriptorium','academy','university','observatory','polytechnic','laboratory','railstation','airfield'].includes(b.type))?(d?.workers||0):0;
 }
 function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,stock={}){
- if(foodCritical&&['hunter','fisher','bakery'].includes(b.type))return 171;
+ if(foodCritical&&['hunter','fisher','bakery','farm','pasture'].includes(b.type))return 171;
  if(waterCritical&&b.type==='well')return 169;
  const need=(k)=>Math.max(0,eraNeed[k]||0);
  const low=(k,n)=>(stock[k]||0)<n;
+ if(b.type==='forester'&&(scarceWood||low('wood',70)))return 159;
+ if(need('bronze')>0){if(b.type==='bronze_foundry')return 157;if(b.type==='coppermine'&&low('copper',12))return 155;if(b.type==='tinmine'&&low('tin',12))return 154;}
+ if(need('weapons')>0){if(b.type==='smith')return 156;if(b.type==='smelter'&&low('iron',15))return 153;if(b.type==='mine'&&low('ore',15))return 150;if(b.type==='coal'&&low('coal',15))return 149;}
  // Avoid assigning the bulk of the workforce to a factory whose input
  // stock is empty. Work backwards through the entire production chain.
  if(need('machines')>0){
@@ -59,7 +62,7 @@ function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,st
  if(need('bread')>0&&['hunter','fisher','bakery'].includes(b.type))return 157;
  if(need('bread')>0&&['farm','mill'].includes(b.type))return 139;
  // Do not starve the town while shifting workers to industry.
- if(foodCritical&&['hunter','fisher','bakery'].includes(b.type))return 171;
+ if(foodCritical&&['hunter','fisher','bakery','farm','pasture'].includes(b.type))return 171;
  if(waterCritical&&b.type==='well')return 169;
  if(['hunter','fisher','farm','mill','bakery'].includes(b.type))return foodCritical?100:65;
  if(b.type==='well')return waterCritical?95:68;
@@ -81,14 +84,15 @@ export function allocateCity(game,city){
  city.builderCount??=1;const all=game.allBuildings(city);
  const foodCritical=foodTotal(r.resources)<r.pop*2.5,waterCritical=(r.resources.water||0)<r.pop*2;
  const wait=city.team>0?game.s?.research?.[city.team]?.ageWait:null;
- const shortages=wait?wait.missing||{}:{};
+ const shortages={...(wait?wait.missing||{}:{})};if(city.team>0){const age=game.s.ages[city.team];if(age>=1&&(r.resources.bronze||0)<12)shortages.bronze=12-(r.resources.bronze||0);if(age>=2&&(r.resources.weapons||0)<12)shortages.weapons=12-(r.resources.weapons||0);}
  const laborScarce=(r.resources.wood||0)<(shortages.plank>0?30:12);
  const pending=all.some(b=>!b.ready&&!b.disabled&&b.workerLimit!==0);
  const entries=all.filter(b=>b.ready).map(b=>{
   const need=demand(b,game.buildingDefinitions),definition=game.buildingDefinitions[b.type];
   const inputsReady=!definition?.input||canAfford(r.resources,definition.input);
   const outputFull=definition?.out&&game.storageCap&&game.storageUsed&&game.storageUsed(city,definition.out,r.resources)>=game.storageCap(city,definition.out);
-  const want=inputsReady&&!outputFull?Math.max(0,Math.min(need,b.workerLimit??need)):0;
+  const researchIdle=!!game.s?.research?.[city.team]&&!game.s.research[city.team].active&&['study','scriptorium','academy','university','observatory','polytechnic','laboratory','monastery','chapel'].includes(b.type);
+  const want=inputsReady&&!outputFull&&!researchIdle?Math.max(0,Math.min(need,b.workerLimit??need)):0;
   let priority=jobPriority(b,foodCritical,waterCritical,shortages,laborScarce,r.resources);
   if(city.team>0&&FOUNDATION_TYPES.has(b.type))priority+=60;
   if(b.status?.includes('pole ligipääsetavat')||b.status?.includes('maardla puudub'))priority=9;
@@ -97,7 +101,7 @@ export function allocateCity(game,city){
  const builders={};
  if(pending&&city.builderCount>0)entries.push({b:builders,need:city.builderCount,want:city.builderCount,priority:90});
  city.training??=[];const train=city.training[0];
- if(train&&!train.blocked&&train.progress<train.total)entries.push({b:train,need:1,want:Math.max(0,Math.min(1,train.workerLimit??1)),priority:30});
+ if(train&&!train.blocked&&train.progress<train.total)entries.push({b:train,need:1,want:Math.max(0,Math.min(1,train.workerLimit??1)),priority:96});
  // Guarantee a small portion for each operational task, then assign the rest
  // by criticality. Food and water take precedence during shortages.
  entries.sort((a,b)=>b.priority-a.priority);
@@ -105,7 +109,7 @@ export function allocateCity(game,city){
  const emergencyBerries=foodCritical&&!foodSource?Math.min(1,budget*.4,Math.max(0,city.basicJobs?.berries??1)):0;
  let remaining=budget-emergencyBerries;
  const aiFoundation=city.team>0;
- for(const e of entries){const essential=FOUNDATION_TYPES.has(e.b.type)||e.b===builders;const seed=Math.min(e.want,aiFoundation?(essential?.25:0):(wait?.1:.25),remaining);e.b.assigned=seed;remaining-=seed}
+ for(const e of entries){const essential=FOUNDATION_TYPES.has(e.b.type)||e.b===builders||e.b===train;const seed=Math.min(e.want,aiFoundation?(essential?.25:0):(wait?.1:.25),remaining);e.b.assigned=seed;remaining-=seed}
  for(const e of entries){const extra=Math.min(e.want-e.b.assigned,remaining);e.b.assigned+=extra;remaining-=extra}
  for(const e of entries)e.b.efficiency=workerEfficiency(e.b.assigned,e.need);
  for(const b of all.filter(b=>b.ready&&!entries.some(e=>e.b===b))) {b.assigned=0;b.efficiency=0}

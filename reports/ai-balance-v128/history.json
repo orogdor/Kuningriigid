@@ -1,0 +1,338 @@
+[
+  {
+    "turn": 25,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cities": 4,
+    "fields": 0,
+    "farms": 0,
+    "walls": 0,
+    "troops": 4
+  },
+  {
+    "turn": 50,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cities": 4,
+    "fields": 4,
+    "farms": 4,
+    "walls": 0,
+    "troops": 4
+  },
+  {
+    "turn": 75,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cities": 5,
+    "fields": 4,
+    "farms": 4,
+    "walls": 0,
+    "troops": 4
+  },
+  {
+    "turn": 100,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cities": 18,
+    "fields": 6,
+    "farms": 8,
+    "walls": 0,
+    "troops": 4
+  },
+  {
+    "turn": 115,
+    "ages": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "cities": 22,
+    "fields": 8,
+    "farms": 9,
+    "walls": 0,
+    "troops": 12
+  },
+  {
+    "turn": 124,
+    "ages": [
+      1,
+      1,
+      0,
+      0
+    ],
+    "cities": 22,
+    "fields": 9,
+    "farms": 10,
+    "walls": 0,
+    "troops": 25
+  },
+  {
+    "turn": 125,
+    "ages": [
+      1,
+      1,
+      0,
+      0
+    ],
+    "cities": 22,
+    "fields": 9,
+    "farms": 10,
+    "walls": 0,
+    "troops": 27
+  },
+  {
+    "turn": 127,
+    "ages": [
+      1,
+      1,
+      0,
+      1
+    ],
+    "cities": 22,
+    "fields": 10,
+    "farms": 10,
+    "walls": 0,
+    "troops": 28
+  },
+  {
+    "turn": 128,
+    "ages": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "cities": 22,
+    "fields": 10,
+    "farms": 10,
+    "walls": 0,
+    "troops": 29
+  },
+  {
+    "turn": 150,
+    "ages": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "cities": 25,
+    "fields": 10,
+    "farms": 10,
+    "walls": 13,
+    "troops": 41
+  },
+  {
+    "turn": 175,
+    "ages": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "cities": 27,
+    "fields": 11,
+    "farms": 11,
+    "walls": 19,
+    "troops": 77
+  },
+  {
+    "turn": 178,
+    "ages": [
+      2,
+      1,
+      1,
+      1
+    ],
+    "cities": 27,
+    "fields": 11,
+    "farms": 11,
+    "walls": 22,
+    "troops": 80
+  },
+  {
+    "turn": 185,
+    "ages": [
+      2,
+      2,
+      1,
+      1
+    ],
+    "cities": 28,
+    "fields": 11,
+    "farms": 11,
+    "walls": 23,
+    "troops": 84
+  },
+  {
+    "turn": 192,
+    "ages": [
+      2,
+      2,
+      1,
+      2
+    ],
+    "cities": 28,
+    "fields": 11,
+    "farms": 11,
+    "walls": 25,
+    "troops": 88
+  },
+  {
+    "turn": 199,
+    "ages": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "cities": 28,
+    "fields": 11,
+    "farms": 11,
+    "walls": 26,
+    "troops": 90
+  },
+  {
+    "turn": 200,
+    "ages": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "cities": 28,
+    "fields": 11,
+    "farms": 11,
+    "walls": 26,
+    "troops": 90
+  },
+  {
+    "turn": 225,
+    "ages": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "cities": 29,
+    "fields": 12,
+    "farms": 12,
+    "walls": 41,
+    "troops": 95
+  },
+  {
+    "turn": 232,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 29,
+    "fields": 13,
+    "farms": 13,
+    "walls": 49,
+    "troops": 96
+  },
+  {
+    "turn": 250,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 30,
+    "fields": 13,
+    "farms": 13,
+    "walls": 54,
+    "troops": 99
+  },
+  {
+    "turn": 275,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 31,
+    "fields": 13,
+    "farms": 13,
+    "walls": 57,
+    "troops": 102
+  },
+  {
+    "turn": 300,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 31,
+    "fields": 13,
+    "farms": 13,
+    "walls": 62,
+    "troops": 102
+  },
+  {
+    "turn": 325,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 31,
+    "fields": 13,
+    "farms": 13,
+    "walls": 100,
+    "troops": 103
+  },
+  {
+    "turn": 350,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 31,
+    "fields": 13,
+    "farms": 13,
+    "walls": 185,
+    "troops": 103
+  },
+  {
+    "turn": 375,
+    "ages": [
+      3,
+      2,
+      2,
+      2
+    ],
+    "cities": 31,
+    "fields": 13,
+    "farms": 13,
+    "walls": 249,
+    "troops": 103
+  }
+]
