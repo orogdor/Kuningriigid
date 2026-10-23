@@ -38,7 +38,7 @@ export function tickMarketHouseholds(game,city,dt){
  const r=city.economy.realms[city.team];
  for(let index=0;index<houses.length;index++){
   const {ctx,b}=houses[index],id='shopper:'+city.id+':'+ctx.c+':'+ctx.r+':'+ctx.economy.buildings.indexOf(b);
-  if(index>=24)continue;ctx.world.workers??={};let w=contexts.map(c=>c.world.workers?.[id]).find(Boolean);if(!w){const home=game.nav(ctx).nearest(door(b));if(!home)continue;w=ctx.world.workers[id]={...home,c:ctx.c,r:ctx.r,team:city.team,kind:'market_woman',workerKey:id,visible:true,shoppingPhase:'market',carried:0}}
+  if(index>=64)continue;ctx.world.workers??={};let w=contexts.map(c=>c.world.workers?.[id]).find(Boolean);if(!w){const home=game.nav(ctx).nearest(door(b));if(!home)continue;w=ctx.world.workers[id]={...home,c:ctx.c,r:ctx.r,team:city.team,kind:'market_woman',workerKey:id,visible:true,shoppingPhase:'market',carried:0}}
   w.kind='market_woman';w.visible=true;w.team=city.team;w.moving=false;w.working=false;w.action=null;
   // Avoid overfilling households; units are held in each house rather than the city stockpile.
   if(w.shoppingPhase==='home' && w.carried){
