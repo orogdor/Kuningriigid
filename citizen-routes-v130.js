@@ -12,7 +12,6 @@ export class CitizenRoutes{
   if(known?.count>=3){this.stats.reuses++;return known.path.map(p=>({...p}))}
   this.stats.searches++;const path=nav.route(agent,goal);
   if(path?.length){
-   if(!known&&trips.size>=64)trips.delete(trips.keys().next().value);
    trips.set(key,{count:(known?.count||0)+1,path:path.map(p=>({...p}))});
   }
   return path;
@@ -43,7 +42,6 @@ export function citizenWorldRoute(game,agent,target){
   path=game.landPath(agent,target);
   if(!path)return null;
   const points=[{c:agent.c,r:agent.r},...path.map(p=>({c:p.c,r:p.r}))],stamp=worldStamp(game,points);
-  if(!known&&m.trips.size>=64)m.trips.delete(m.trips.keys().next().value);
   m.trips.set(key,{points,stamp,count:known?.stamp===stamp?known.count+1:1});
  }
  const points=[{c:agent.c,r:agent.r},...path.map(p=>({c:p.c,r:p.r}))];

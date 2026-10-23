@@ -1,6 +1,6 @@
 # V130 — elanike õpitud rajad ja linnaalade kontroll
 
-Iga päris linnaelanik õpib sama lähte- ja sihtpunkti vahelise suunatud teekonna kolmel esimesel korral tavalise rajaotsinguga. Edasi kasutab ta kolmandal korral leitud rada. Tagasitee, teised sihtkohad ja teised elanikud õpivad eraldi. Iga elaniku kohta hoitakse kuni 64 hiljutist teekonda; mälu on käitusajal ning mängu uuesti laadides algab õppimine uuesti.
+Iga päris linnaelanik õpib sama lähte- ja sihtpunkti vahelise suunatud teekonna kolmel esimesel korral tavalise rajaotsinguga. Edasi kasutab ta kolmandal korral leitud rada. Tagasitee, teised sihtkohad ja teised elanikud õpivad eraldi. Rajamälu on käitusajal ning mängu uuesti laadides algab õppimine uuesti.
 
 See hõlmab korjajaid, kaevureid, metsatöölisi, põllutöölisi, ehitajaid, tootmishoonete töötajaid, treenereid, turulkäijaid ja kaubakandjaid. Ehitajate ja turulkäijate maailmaruutude vahelise teekonna aktiivne rada säilib samuti, et maailma rajaotsingut ei korrataks igal sammul. Ka seal õpitakse korduv teekond kolm korda.
 
