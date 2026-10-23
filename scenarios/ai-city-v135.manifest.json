@@ -2,13 +2,20 @@
   "version": 135,
   "seed": 135023,
   "turn": 106,
-  "sourceTeam": 2,
-  "cities": 3,
-  "buildings": 31,
+  "sourceTeam": 3,
+  "cities": 5,
+  "buildings": 37,
   "spacingPairs": [
     9,
     9,
-    11
+    9,
+    9,
+    9,
+    9,
+    9,
+    18,
+    9,
+    18
   ],
   "ages": [
     0,
@@ -16,6 +23,6 @@
     0,
     0
   ],
-  "bytes": 384741,
-  "seconds": 40
+  "bytes": 431597,
+  "seconds": 30
 }
