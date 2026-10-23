@@ -68,7 +68,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   if(reservesFoundation(game,city,type))return;
   // While saving for an era, build only a resource-producing dependency,
   // storage, or indispensable housing. No military or cosmetic construction.
-  if(missing&&!CRITICAL_BUILDINGS.has(type)&&!['barracks','archery','stable','armor_workshop','crossbow_range','siegeworkshop'].includes(type))return;
+  if(missing&&!CRITICAL_BUILDINGS.has(type)&&!['barracks','archery','stable','armor_workshop','crossbow_range','siegeworkshop','market','harbor','inn','trade_yard'].includes(type))return;
   possibilities.push({type,priority,reason});
  };
  for(const [i,type] of foundationNeeds(game,city).entries())add(type,220-i,'Linna põhiehitis');
@@ -77,6 +77,16 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  // The first barracks must be built before training can ever occur.
  const defending=game.s.units.filter(u=>u.team===team&&combatUnit(u)&&!u.garrison).length;
  if(defending<Math.min(20,game.s.cities.filter(c=>c.team===team).length*2+age*2+3))for(const [id,priority]of militaryInfrastructure(game,team,city))add(id,priority,'Ajastule vastava sõjaväe varustamine');
+ // V136: every established town needs civic functions, not only production buildings.
+ // A Bronze settlement without a marketplace is still a village; reserve time
+ // for civic construction even during long era-research material shortages.
+ if(age>=1&&r.pop>=5)add('market',169,'Linnakeskuse kauplemine ja toidu jagamine');
+ if(age>=1&&r.pop>=8)add('warehouse',143,'Linnakaupade ja tööriistade ladu');
+ if(age>=1&&r.pop>=10)add('cellar',137,'Elanike ühine toiduvaru');
+ if(age>=3&&r.pop>=11){
+  add('inn',129,'Ajalooline võõrastemaja');
+  add('trade_yard',126,'Kaupmeeste õu');
+ }
  const role=city.economicRole||'trade';
  const roleBuilds={
   food:['farm','pasture','mill','bakery','watermill'],
@@ -170,7 +180,7 @@ export function usefulDistrictTypes(game,team){
  if(game.s.ages[team]>=1&&totals.bronze<16){if(totals.copper<20)deficits.add('coppermine');if(totals.tin<16)deficits.add('tinmine');}
  if(game.s.ages[team]>=2&&totals.ore<15)deficits.add('mine');
  if(game.s.ages[team]>=6&&totals.oil<20)deficits.add('oilwell');
- if(research?.known.includes('shipbuilding')&&!cities.some(c=>game.allBuildings(c).some(b=>b.type==='harbor'&&b.hp>0)))deficits.add('harbor');
+ if(research?.known.includes('shipbuilding'))deficits.add('harbor');
  for(const [type,d] of Object.entries(GOOD_BUILDINGS))if(d.deposit&&d.age<=game.s.ages[team]&&cities.some(c=>cityNeeds(c,game.s.ages[team]).missing))deficits.add(type);
  return deficits;
 }
