@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import {TECHS,techBlock,tickResearch,grantTech} from './research.js?v=125a';
+import {Civilization,createGame} from './civilization-core.js?v=125a';
+import {researchCost,scienceRate} from './science.js';
+import {MAX_AI_CITIES,cityCapacity,settlerPolicy,armyCapacity} from './growth-balance-v125.js';
+import {TECHS_V125,productionReformV125,expandResearchOrderV125} from './technology-reforms-v125.js';
+assert.equal(Object.keys(TECHS_V125).length,26);
+assert.equal(MAX_AI_CITIES,12);
+assert.equal(cityCapacity(300*60,4),12);
+assert.ok(cityCapacity(60*60,1)<cityCapacity(300*60,5));
+assert.ok(armyCapacity(12,5)>armyCapacity(2,1));
+assert.equal(settlerPolicy({time:100*60,age:2,cities:4,pending:2,pop:10,food:100,lastAt:0,hasSettlement:true}).allow,false);
+assert.ok(settlerPolicy({time:260*60,age:4,cities:8,pending:0,pop:14,food:75,lastAt:0,hasSettlement:true}).allow);
+for(const [id,t]of Object.entries(TECHS_V125)){
+ assert.equal(TECHS[id]?.name,t.name,id+' exists in main research');
+ assert.ok(t.age>=0&&t.age<=6);
+ assert.ok(t.requires.every(parent=>TECHS[parent]),id+' has valid parents');
+ assert.ok(t.requires.every(parent=>TECHS[parent].age<=t.age),id+' has time-correct parents');
+ assert.ok(!/[õäöü]/i.test(t.name+' '+t.unlocks),id+' english UI');
+}
+const order=expandResearchOrderV125(['stone_tools','bronze','iron','civics','renaissance','industrialization','modernity']);
+assert.ok(order.indexOf('town_charters')<order.indexOf('renaissance'));
+assert.ok(order.indexOf('factory_logistics')<order.indexOf('modernity'));
+const game=new Civilization(createGame(12501)),s=game.s;
+assert.equal(s.strategyPacingV125,true,'new campaigns have longer pacing');
+for(let i=0;i<8;i++){game.aiTeam(0);game.tick(12)}
+assert.ok(s.cities.some(c=>c.team===0),'AI founds initial town');
+const t=TECHS.stone_tools;
+assert.ok(researchCost(s,t)>t.turns*20,'Research now costs more than V124');
+const r=s.research[0],id=r.active;
+if(!id)r.active='stone_tools';
+const snapshot=JSON.parse(JSON.stringify(s));
+const copy=()=>JSON.parse(JSON.stringify(snapshot));
+const one=copy(),two=copy();
+two.armies.push({...two.armies.find(a=>a.team===0),id:99999});
+tickResearch(one,60);tickResearch(two,60);
+const key=one.research[0].active||id||'stone_tools';
+assert.deepEqual(one.research[0].progress,two.research[0].progress,'Extra army must NEVER add science');
+assert.deepEqual(one.research[0].known,two.research[0].known);
+const sample=copy();
+sample.research[0].known.push('steel_standards','factory_logistics');
+assert.ok(productionReformV125(sample,0,'steelworks',game.buildingDefinitions)>1,'Steel standards improve real factory output');
+console.log('V125 PASS: 26 era-correct researches, tangible factory bonuses, one research tick per faction, adaptive 12-city cap, growth and combat targets.');
