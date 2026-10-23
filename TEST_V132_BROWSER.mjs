@@ -9,7 +9,7 @@ try{
  await page.goto('http://127.0.0.1:8765/?demo=bronze-battle&v=132',{waitUntil:'domcontentloaded',timeout:120000});
  await page.waitForFunction(()=>window.gameDebug&&document.getElementById('menu-status').hidden,{timeout:120000});
  await page.evaluate(()=>{
-  const b=gameDebug.state.battle,own=b.squads.filter(u=>u.team===0&&u.kind==='spearman'),enemy=b.squads.find(u=>u.team===1&&u.kind==='spearman');b.squads=[own[0],own[1],enemy];
+  const b=gameDebug.state.battle,own=b.squads.filter(u=>u.team===0&&u.kind==='bronze_spearman'),enemy=b.squads.find(u=>u.team===1&&u.kind==='bronze_spearman');b.squads=[own[0],own[1],enemy];
   for(const [i,u] of b.squads.entries()){
    const x=i===0?-24:i===1?24:130,z=i===2?100:0;
    for(const m of u.men){m.x+=x-u.x;m.z+=z-u.z;}
