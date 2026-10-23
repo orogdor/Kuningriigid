@@ -27,4 +27,4 @@ export function countyBuildRule(ctx,type,allowed){
 
 // Reserve room for the mature city and its surrounding county, including diagonals.
 export const MIN_CITY_SPACING=17;
-export const citySpacingAllowed=(p,cities)=>cities.every(c=>Math.max(Math.abs(c.c-p.c),Math.abs(c.r-p.r))>=MIN_CITY_SPACING);
+export const citySpacingAllowed=(p,cities,minSpacing=MIN_CITY_SPACING)=>cities.every(c=>Math.max(Math.abs(c.c-p.c),Math.abs(c.r-p.r))>=minSpacing);
