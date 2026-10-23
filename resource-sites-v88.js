@@ -80,11 +80,11 @@ export function coastalPlacement(game,cell,type,p){
  const q=sample(p,(lo+hi)/2),depth=type==='harbor'?8:6;
  if(Math.abs(q.x)>129||Math.abs(q.z)>114)return {error:'Kogu rannahoone peab mahtuma sellele detailkaardile.'};
  for(const u of [-2,0,2]){
-  const land=sample(q,3.5,u),water=sample(q,-3.5,u);
+  const land=sample(q,7.5,u),water=sample(q,-7.5,u);
   const ocean=game.atlasHeight(cell.x+water.x/DETAIL_X,cell.z+water.z/DETAIL_Z)<.7;
   if(height(land.x,land.z)<=.15||height(water.x,water.z)>=0||!ocean)return {error:'Hoone maaosa peab jääma kuivale ja kai merre.'};
  }
- const entry=sample(q,Math.max(9.5,depth+1.5));
+ const entry=sample(q,Math.max(11.5,depth+4));
  if(detailHeight(cell,entry.x,entry.z)<=.2||height(entry.x,entry.z)<=.15)return {error:'Hoone maapoolsele sissepääsule puudub kuiv ligipääs.'};
  return {p:{x:q.x,z:q.z},shoreAngle:Math.atan2(inland.x,inland.z),landEntry:entry,baseY:.22};
 }
@@ -92,6 +92,6 @@ export function coastalSites(game,cell,type){
  let cache=shoreCache.get(game);if(!cache){cache=new Map();shoreCache.set(game,cache);}
  const key=cell.c+':'+cell.r+':'+type;if(cache.has(key))return cache.get(key);
  const result=[],seen=new Set();
- for(let x=-84;x<=84;x+=6)for(let z=-72;z<=72;z+=6){const r=coastalPlacement(game,cell,type,{x,z});if(r.error)continue;const k=Math.round(r.p.x)+':'+Math.round(r.p.z);if(!seen.has(k)){seen.add(k);result.push(r.p);}}
+ for(let x=-120;x<=120;x+=6)for(let z=-108;z<=108;z+=6){const r=coastalPlacement(game,cell,type,{x,z});if(r.error)continue;const k=Math.round(r.p.x)+':'+Math.round(r.p.z);if(!seen.has(k)){seen.add(k);result.push(r.p);}}
  cache.set(key,result);return result;
 }
