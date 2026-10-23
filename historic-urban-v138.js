@@ -80,6 +80,6 @@ export function urbanExpansionEligible(game,parent,p){
   if(!context)return false;
   // A neighbouring street block is dense enough before expansion begins.
   return context.economy.buildings.filter(b=>b.hp>0&&!b.virtual&&
-   ['house','market','well','warehouse','cellar','study','scriptorium'].includes(b.type)).length>=4;
+   ['house','market','well','warehouse','cellar','study','scriptorium'].includes(b.type)).length>=2;
  });
 }
