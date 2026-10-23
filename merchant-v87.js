@@ -26,7 +26,7 @@ export function tradeDemand(game,city){const need={...cityReserves(city)};for(co
  for(const[k,d]of Object.entries(GOODS))if(d.age<=age)need[k]=d.food?Math.max(4,r.pop*1.2):d.luxury?Math.max(2,r.pop*.3):4;
  if(age>=1)need.pottery=Math.max(3,r.pop*.3);
  // Unaffordable buildings advertise actual material shortages to the network.
- for(const b of game.allBuildings(city)){const input=game.buildingDefinitions[b.type]?.input;for(const[k,n]of Object.entries(input||{}))need[k]=Math.max(need[k]||0,n*3);}
+ for(const b of game.allBuildings(city)){const input=game.buildingDefinitions[b.type]?.input;for(const[k,n]of Object.entries(input||{}))need[k]=Math.max(need[k]||0,n*(['steelworks','engineworks','powerplant','refinery'].includes(b.type)?12:4));}
  return {need,status};}
 export function planMerchants(game){let count=0;const towns=game.s.cities.filter(c=>!c.tradeDisabled);for(const to of towns){if(game.s.shipments.filter(c=>c.to===to.id).length>=2)continue;const dst=stock(to),{need}=tradeDemand(game,to),inbound={};for(const c of game.s.shipments.filter(c=>c.to===to.id))for(const[k,n]of Object.entries(c.goods))inbound[k]=(inbound[k]||0)+n;
  const keys=Object.keys(need).sort((a,b)=>((dst[a]||0)+(inbound[a]||0))/need[a]-((dst[b]||0)+(inbound[b]||0))/need[b]);
