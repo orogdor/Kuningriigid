@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {populationCityRadius,grownCityRadius} from './city-area-v142.js';
+import {populationCityRadius,grownCityRadius,nextCityPopulation} from './city-area-v142.js';
 import {countyFootprint,countyTileLimit,countyBuildRule} from './counties-v126.js';
 import {Civilization,createGame} from './civilization-core.js';
 for(const [pop,extent]of [[0,3],[3,3],[7,3],[8,5],[17,5],[18,7],[31,7],[32,9],[49,9],[50,11],[72,13],[98,15]]){
  const radius=populationCityRadius(pop);assert.equal(radius*2+1,extent);
  const tiles=countyFootprint({id:2,c:30,r:30},radius,()=>({land:true}));assert.equal(tiles.length,3*extent*extent);
 }
+for(const [radius,pop]of [[1,8],[2,18],[3,32],[4,50],[5,72]])assert.equal(nextCityPopulation(radius),pop);
 assert.equal(grownCityRadius(4,3),4,'population loss does not erase existing urban territory');
 const g=new Civilization(createGame(12501));for(let i=0;i<8;i++){g.aiTeam(0);g.tick(12)}
 const city=g.s.cities.find(c=>c.team===0);assert.ok(city);
