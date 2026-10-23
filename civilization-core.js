@@ -553,7 +553,34 @@ const science=this.s.research[team];if(!science.active&&this.s.cities.some(c=>c.
  if(this.allBuildings(city).some(b=>!b.ready&&!b.disabled)&&(!city.builderCount||city.builderCount<1))city.builderCount=1;
  // Re-enable essential production, where a halted building is the only supplier.
  if(problems.some(p=>p.level>=3))for(const b of this.allBuildings(city).filter(b=>b.ready&&b.hp>0&&b.disabled&&['well','hunter','fisher','farm','lumber','quarry'].includes(b.type))){b.disabled=false;b.workerLimit=Math.max(1,b.workerLimit||1)}
- if(!science.ageWait&&this.s.time>=((this.s.aiRecruitAt??={})[team]??210)&&this.s.units.filter(u=>u.team===team&&u.hp>0).length<6&&city.economy.realms[team].pop>=9&&(city.training?.length||0)<2){const eraChoices=Object.keys(TROOPS).filter(k=>!SHIPS[k]&&k!=='militia'&&TROOPS[k].age===age).sort((a,b)=>TROOPS[b].dmg-TROOPS[a].dmg);const choices=[...eraChoices,...(age>=6?['motorized']:[]),...(age>=5?['rifleman']:[]),...(age>=4?['musketeer']:[]),'infantry','archer','spearman','axeman','slinger'];const kind=choices.find(k=>{const d=TROOPS[k],tech=UNIT_TECH[k];return k!=='bronze_cavalry'&&!this.obsoleteUnit(team,k)&&age>=d.age&&(!tech||science.known.includes(tech))&&d.requires.every(type=>this.cityReady(city,type))&&canAfford(stock,d.cost)})||'slinger';const result=this.recruit(city,kind);if(result.unit)(this.s.aiRecruitAt??={})[team]=this.s.time+45;}if((!science.ageWait||nationalResourceNeeds(this,team).length>0)&&(this.s.time>650||(age>=2&&this.s.cities.every(c=>c.team!==team||!this.cell(c).deposits.ore))||(age>=6&&!this.s.cities.some(t=>t.team===team&&this.contexts(t).some(x=>this.cell(x)?.deposits.oil))))&&this.s.time-(city.lastSettler||0)>160&&this.s.cities.filter(c=>c.team===team).length<(nationalResourceNeeds(this,team).length?6:4)&&!this.s.settlers.some(a=>a.team===team)&&foodTotal(city.economy.realms[team].resources)>=23){const result=this.recruitSettler(city);if(result.settler)city.lastSettler=this.s.time}}
+ // V125: defend towns and gradually raise standing army capacity as the empire expands.
+ const living=this.s.units.filter(u=>u.team===team&&u.hp>0&&!u.garrison);
+ const desired=armyCapacity(this.s.cities.filter(c=>c.team===team).length,age,
+  this.s.cities.some(c=>c.team!==team&&atWar(this.s,team,c.team)));
+ const nextRecruitAt=(this.s.aiRecruitAt??={})[team]??(this.s.time+90);
+ if(this.s.time>=nextRecruitAt&&living.length<desired&&city.economy.realms[team].pop>=8&&
+   foodTotal(stock)>=Math.max(24,city.economy.realms[team].pop*1.8)&&(city.training?.length||0)<2){
+  const eraChoices=Object.keys(TROOPS).filter(k=>!SHIPS[k]&&k!=='militia'&&TROOPS[k].age===age)
+     .sort((a,b)=>TROOPS[b].dmg-TROOPS[a].dmg);
+  const choices=[...eraChoices,...(age>=6?['motorized']:[]),...(age>=5?['rifleman']:[]),
+   ...(age>=4?['musketeer']:[]),'infantry','archer','spearman','axeman','slinger'];
+  const kind=choices.find(k=>{const d=TROOPS[k],tech=UNIT_TECH[k];
+   return k!=='bronze_cavalry'&&!this.obsoleteUnit(team,k)&&age>=d.age&&
+    (!tech||science.known.includes(tech))&&d.requires.every(type=>this.cityReady(city,type))&&canAfford(stock,d.cost)});
+  if(kind){const result=this.recruit(city,kind);if(result.unit)
+     this.s.aiRecruitAt[team]=this.s.time+(age<=1?85:age<=3?72:58);}
+ }
+ // Cap expansion by elapsed game turns, not by an arbitrary resource-deficit
+ // exception; settlers still need food, people, a valid route and a real build site.
+ const existing=this.s.cities.filter(c=>c.team===team).length;
+ const pending=this.s.settlers.filter(a=>a.team===team).length;
+ const policy=settlerPolicy({time:this.s.time,age,cities:existing,pending,
+   pop:city.economy.realms[team].pop,food:foodTotal(stock),
+   lastAt:(this.s.aiSettlerLastAt??={})[team]||0,
+   hasSettlement:science.known.includes('settlement')});
+ if(policy.allow){const result=this.recruitSettler(city);
+  if(result.settler){this.s.aiSettlerLastAt[team]=this.s.time;city.lastSettler=this.s.time;}}
+}
  const army=activeArmies(this.s,team).sort((a,b)=>armyUnits(this.s,b).length-armyUnits(this.s,a).length)[0]||this.s.armies[team];
  // AI must scout rather than know all opponents' city coordinates from the start.
  if(army.embarked==null&&!army.path.length&&this.s.time>360&&!this.s.cities.some(c=>c.team!==team&&this.visibleNow(team,c))){
