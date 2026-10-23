@@ -16,15 +16,19 @@ export function constrainStep(agent,to,others,open=()=>true){
  for(let f=Math.min(1,.25/len);f<=fraction;f+=.25/len)if(!open(ox+dx*f,oz+dz*f)){fraction=Math.max(0,f-.25/len);break;}
  const x=ox+dx*fraction,z=oz+dz*fraction;if(!open(x,z))return false;agent.x=x;agent.z=z;return fraction>.001;
 }
-export function moveSquad(u,target,dt,speed,nav,squads){
+export function moveSquad(u,target,dt,speed,nav,squads,forwardRoute=false){
  const before={x:u.x,z:u.z};let done=false;if(nav)done=nav.move(u,target,dt,speed);else{const d=Math.hypot(target.x-u.x,target.z-u.z),f=d?Math.min(1,speed*dt/d):0;u.x+=(target.x-u.x)*f;u.z+=(target.z-u.z)*f;done=d<=speed*dt;}
  const to={x:u.x,z:u.z};Object.assign(u,before);const peers=squads.filter(alive),open=nav?((x,z)=>nav.open(x,z)):()=>true;
  // Look along the ordinary terrain route, beyond the blocking formation.
  let goal=target;const path=nav?.cache?.get(u)?.path;
  if(path?.length){goal=to;for(const point of path){if(Math.hypot(point.x-before.x,point.z-before.z)>60||!militaryLineClear(before,point,open,nav.cellSize||1))break;goal=point;}}
  const waypoint=crowdWaypoint(u,goal,peers,open,radius,dt),distance=Math.hypot(waypoint.x-u.x,waypoint.z-u.z);
- const detour=waypoint!==goal,step=Math.min(distance,speed*dt),desired=detour&&distance?{x:u.x+(waypoint.x-u.x)*step/distance,z:u.z+(waypoint.z-u.z)*step/distance}:to;
+ // While staging at a gate, skip a grid snap pointing back along a visible route. It can
+ // alternate with the next node forever when another formation is nearby.
+ const backtracking=(to.x-before.x)*(waypoint.x-before.x)+(to.z-before.z)*(waypoint.z-before.z)<-1e-7;
+ const detour=waypoint!==goal||(forwardRoute&&backtracking&&militaryLineClear(before,waypoint,open,nav?.cellSize||1)),step=Math.min(distance,speed*dt),desired=detour&&distance?{x:u.x+(waypoint.x-u.x)*step/distance,z:u.z+(waypoint.z-u.z)*step/distance}:to;
  u.moving=constrainStep(u,desired,peers,open);
+
  if(Math.hypot(u.x-desired.x,u.z-desired.z)>.01)forgetCrowdRoute(u);
  // A proposed nav step must never consume waypoints the formation did not reach.
  if(nav&&Math.hypot(u.x-to.x,u.z-to.z)>.01)nav.cache?.delete(u);

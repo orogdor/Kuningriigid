@@ -1,0 +1,52 @@
+{
+  "approachAt8Seconds": [
+    {
+      "x": -37.71715728752532,
+      "z": -17.71715728752532,
+      "progress": 22.284637743272523,
+      "pending": true
+    },
+    {
+      "x": -37.59999999999991,
+      "z": -6,
+      "progress": 22.40000000000009,
+      "pending": true
+    },
+    {
+      "x": -37.59999999999991,
+      "z": 6,
+      "progress": 22.40000000000009,
+      "pending": true
+    },
+    {
+      "x": -37.59999999999991,
+      "z": 18,
+      "progress": 22.40000000000009,
+      "pending": true
+    }
+  ],
+  "totalSimulationSeconds": 67.7,
+  "minClearance": 0.020075502171153836,
+  "nearestGateOnly": true,
+  "slowLeader": {
+    "x": -28.80000000000109,
+    "z": 0
+  },
+  "waitingBays": [
+    {
+      "x": -7,
+      "z": -9,
+      "pending": true
+    },
+    {
+      "x": -7,
+      "z": 9,
+      "pending": true
+    },
+    {
+      "x": -7,
+      "z": 17,
+      "pending": true
+    }
+  ]
+}

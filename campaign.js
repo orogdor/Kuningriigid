@@ -32,14 +32,14 @@ export function tickDeployments(camp,units,stats,dt,navigation=null){
  for(const [key,tile]of Object.entries(camp.deployments||{})){
   const [c,r]=key.split(':').map(Number),active=Object.entries(tile).filter(([source])=>{const u=units[Number(source)];return u?.hp>0&&camp.armies.some(a=>a.embarked==null&&a.team===u.team&&(a.id||0)===(u.armyId||0)&&a.c===c&&a.r===r)}),nav=navigation?navigation({c,r}):null;
   const occupants=active.map(([source,p])=>({agent:p,team:units[source].team,radius:squadRadius(units[source])}));
-  const orders=occupants.filter(o=>o.agent.target).map(o=>({...o,goal:o.agent.target})),goals=assignArrivalGoals(orders,occupants,nav),traffic=gateTraffic(orders,nav);
+  const orders=occupants.filter(o=>o.agent.target).map(o=>({...o,goal:o.agent.target})),goals=assignArrivalGoals(orders,occupants,nav),traffic=gateTraffic(orders,nav,occupants);
   // Front-to-back updates let a following formation use the space released
   // by its leader in the same step, including a one-formation gate queue.
   const moving=active.filter(([,p])=>p.target).sort((a,b)=>distance(a[1],goals.get(a[1])||a[1].target)-distance(b[1],goals.get(b[1])||b[1].target));
   for(const [source,p]of moving){
-   const unit=units[source],yieldGoal=traffic.yields.get(p),target=yieldGoal||goals.get(p);if(!target){p.moving=false;continue;}if(traffic.waiting.has(p)&&!yieldGoal){p.moving=false;continue;}p.radius=squadRadius(unit);
+   const unit=units[source],approach=traffic.approaches.get(p),target=approach||goals.get(p);if(!target){p.moving=false;continue;}if(traffic.waiting.has(p)&&!approach){p.moving=false;continue;}p.radius=squadRadius(unit);
    const peers=active.filter(([,q])=>q!==p).map(([i,q])=>({...q,kind:units[i].kind,hp:units[i].hp}));
-   if(moveSquad(p,target,dt,unitStats(stats[unit.kind],unit).speed,nav,peers)&&!traffic.waiting.has(p))p.target=null;
+   if(moveSquad(p,target,dt,unitStats(stats[unit.kind],unit).speed,nav,peers,traffic.hasGates)&&!traffic.waiting.has(p))p.target=null;
   }
  }
 }

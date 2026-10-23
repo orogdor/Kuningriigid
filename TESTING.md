@@ -1,4 +1,4 @@
-# Fast reproducible game testing (V133)
+# Fast reproducible game testing (V134)
 
 Start with the bug, then validate the release:
 
@@ -32,3 +32,5 @@ Automatic release order:
 The browser gate test issues a movement command through the actual command controls, exercises real-time movement, then advances the same movement engine without frame waits. Before/after screenshots and JSON evidence are uploaded separately from the UI evidence. Browser rendering is checked at the end instead of slowing every numerical test. Pages reuses this validation result instead of running the same suites again.
 
 Historical version-specific workflows remain available through workflow_dispatch, rather than launching dozens of duplicate browser checks on every current-source edit. Their scripts and manual campaign/archive workflows are retained. The current automatic suite above includes the existing release regressions.
+
+V134 additionally checks that all formations advance before the first reaches the gate, wait near the entrance behind a slower leader, and only reserve the nearest gate on a route containing two gates.
