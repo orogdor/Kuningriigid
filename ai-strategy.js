@@ -81,7 +81,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  // V136: every established town needs civic functions, not only production buildings.
  // A Bronze settlement without a marketplace is still a village; reserve time
  // for civic construction even during long era-research material shortages.
- if(age>=1&&r.pop>=5)add('market',191,'Ajaloolise linnasüdame oluline turuplats');
+ if(age>=1&&r.pop>=5)add('market',218,'Ajaloolise linnasüdame oluline turuplats');
  if(age>=1&&r.pop>=8)add('warehouse',172,'Kaubanduse ja ehitusmaterjalide põhilaod');
  if(age>=1&&r.pop>=10)add('cellar',168,'Linnakodanike ühine toidukelder');
  if(age>=3&&r.pop>=11){
@@ -90,9 +90,10 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  }
  // Central civic services are not decoration. Ensure every district capital
  // prioritises one operational research, storage, water and market facility.
- if(r.pop>=5)add(game.obsoleteBuilding?.(team,'study')||'study',175,'Teaduse ja hariduse keskne töökoht');
- if(r.pop>=6)for(const type of EDUCATION_TYPES)add(type,157,'Hariduse ja teadmiste levik');
- if(age>=1&&r.pop>=9)add('scriptorium',158,'Ajaloolise linna kirjutuskoda');
+ if(r.pop>=5)add(game.obsoleteBuilding?.(team,'study')||'study',207,'Teaduse ja hariduse keskne töökoht');
+ if(r.pop>=6){const existingEducation=buildings.some(b=>EDUCATION_TYPES.includes(b.type)&&b.hp>0&&!b.disabled);if(!existingEducation)for(const type of ['study','scriptorium','library','school'])add(type,200,'Linna esimene haridusasutus');}
+ if(r.pop>=11)for(const type of ['scriptorium','library','school','academy'])add(type,141,'Hariduse järgmine tase');
+ if(age>=1&&r.pop>=9)add('scriptorium',164,'Ajaloolise linna kirjutuskoda');
  if(age>=1&&r.pop>=12)add('road_depot',126,'Linna peatänavate ja teede korrashoid');
  if(age>=1&&r.pop>=10&&game.cell(city)?.coast)add('harbor',151,'Rannikulinna vajalik sadam');
  const role=city.economicRole||'trade';
@@ -138,14 +139,14 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  }
  const nHouse=housing;
  const desiredHouses=Math.min(70,Math.ceil((r.pop+3)/1.5));
- if(nHouse<desiredHouses&&(stock.wood||0)>=BUILDINGS.house.cost.wood+18){
+ if(nHouse<desiredHouses&&(stock.plank||0)>=BUILDINGS.house.cost.plank&&(stock.stone||0)>=BUILDINGS.house.cost.stone){
   // A town capped at seven residents cannot staff its sawmill, farms,
   // universities or future industry. Housing is productive investment.
   const enoughToInvest=!missing||
    (gaps.plank>35&&(stock.plank||0)>=BUILDINGS.house.cost.plank+12)||
    (gaps.bread>0)||
    (gaps.wood>0&&(stock.wood||0)>=BUILDINGS.house.cost.wood+20);
-  if(enoughToInvest)add('house',r.pop>=capacity-2?165:missing?97:100,'Uued elanikud ainult vajaliku tööjõu jaoks');
+  if(enoughToInvest||capacity<=r.pop+1.5)add('house',r.pop>=capacity-2?216:missing?104:112,'Eluruumid ja järgmise rahvastikukasvu varu');
  }
  const foodCap=game.storageCap(city,'bread'),materialCap=game.storageCap(city,'plank');
  const eraCost=ERA_MATERIALS[science.ageWait?.id]||{};
