@@ -13,7 +13,7 @@ const TYPES={
  food:'hunter fisher farm field pasture mill bakery watermill windmill',
  resources:'lumber forester saw quarry mason claypit pottery_kiln mine coal smelter smith coppermine tinmine bronze_foundry steelworks oilwell refinery nitrate powdermill engineworks',
  military:'barracks archery crossbow_range stable armorer palisade watchtower stonewall stonetower reinforced_wall gatehouse castle keep siegeworkshop harbor',
- science:'study scriptorium academy university printer observatory monastery chapel polytechnic laboratory',
+ science:'library school public_school high_school study scriptorium academy university printer observatory monastery chapel polytechnic laboratory',
  services:'bridge road_depot cartwright guildhall trade_yard tavern railstation powerplant autofactory airfield'
 };
 export function buildingCategory(type){

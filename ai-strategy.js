@@ -1,3 +1,4 @@
+import {EDUCATION_TYPES} from './education-v141.js';
 import {DEFENSE_TYPES} from './ai-defenses-v128.js';
 import {combatUnit,militaryInfrastructure} from './ai-development-v128.js';
 import {foundationNeeds,reservesFoundation} from './ai-foundation-v88.js?v=117a';
@@ -90,6 +91,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  // Central civic services are not decoration. Ensure every district capital
  // prioritises one operational research, storage, water and market facility.
  if(r.pop>=5)add(game.obsoleteBuilding?.(team,'study')||'study',175,'Teaduse ja hariduse keskne töökoht');
+ if(r.pop>=6)for(const type of EDUCATION_TYPES)add(type,157,'Hariduse ja teadmiste levik');
  if(age>=1&&r.pop>=9)add('scriptorium',158,'Ajaloolise linna kirjutuskoda');
  if(age>=1&&r.pop>=12)add('road_depot',126,'Linna peatänavate ja teede korrashoid');
  if(age>=1&&r.pop>=10&&game.cell(city)?.coast)add('harbor',151,'Rannikulinna vajalik sadam');

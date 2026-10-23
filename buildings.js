@@ -42,7 +42,17 @@ function fence(g,x,z,w){for(let i=0;i<=4;i++)box(g,x-w/2+i*w/4,.55,z,.07,1,.07,'
 function compile(root){root.updateMatrixWorld(true);const buckets=new Map();root.traverse(o=>{if(!o.isMesh)return;const geo=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();geo.applyMatrix4(o.matrixWorld);const key=o.material.uuid;if(!buckets.has(key))buckets.set(key,{mat:o.material,geo:[]});buckets.get(key).geo.push(geo)});const result=[];for(const{mat,geo}of buckets.values()){const count=geo.reduce((n,g)=>n+g.attributes.position.count,0),p=new Float32Array(count*3),n=new Float32Array(count*3),uv=new Float32Array(count*2);let off=0;for(const a of geo){const c=a.attributes.position.count;p.set(a.attributes.position.array,off*3);n.set(a.attributes.normal.array,off*3);if(a.attributes.uv)uv.set(a.attributes.uv.array,off*2);off+=c;a.dispose()}const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p,3));g.setAttribute('normal',new T.BufferAttribute(n,3));g.setAttribute('uv',new T.BufferAttribute(uv,2));g.computeBoundingSphere();g.userData.shared=true;result.push({geo:g,material:mat})}root.traverse(o=>{if(o.geometry)o.geometry.dispose()});return result}
 function staticModel(type,team){const key=type+team;if(models.has(key))return models.get(key);const g=new T.Group(),flag=team?'#ac5945':'#4a7288';
 // V60: recognisable historic building silhouettes, sharing the existing batched model pipeline.
-if(type==='claypit'){for(let i=0;i<3;i++)box(g,-.9+i*.7,.22,-.45-i*.15,1.5,.38,2.5,'#a27657','stone');cottage(g,1.3,-.8,1.7,1.6,1.4,'#90704c',true);for(let i=0;i<3;i++)cylinder(g,-1.4+i*.7,.5,1.35,.28,.32,.65,'#bb795a','stone',9);}
+if(['library','school','public_school','high_school'].includes(type)){
+ const library=type==='library',secondary=type==='high_school',industrial=type==='public_school'||secondary;
+ const height=secondary?4.8:industrial?3.8:2.8;
+ box(g,0,height/2,0,6,height,4.6,industrial?'#b58d71':'#c1b69a','stone');
+ gable(g,0,height+.15,0,6.6,5.2,1.5,library?'#8c725b':'#707d8d');
+ for(const x of [-2,-.8,.8,2]){window(g,x,1.8,2.34,.55,.8);if(industrial)window(g,x,3.3,2.34,.55,.75);}
+ box(g,0,.95,2.36,.8,1.9,.12,'#605040','wood');
+ if(library){for(let i=0;i<5;i++)box(g,-1.8+i*.8,.75,2.65,.5,.12,.65,'#c9b992','wood');}
+ else{box(g,0,2.6,2.43,1.2,.55,.15,'#3c5048','wood');if(secondary){box(g,0,height+1.2,0,1.2,1.4,1.2,'#b58d71','stone');cone(g,0,height+2.3,0,1,1.2,'#707d8d',4);}}
+}
+else if(type==='claypit'){for(let i=0;i<3;i++)box(g,-.9+i*.7,.22,-.45-i*.15,1.5,.38,2.5,'#a27657','stone');cottage(g,1.3,-.8,1.7,1.6,1.4,'#90704c',true);for(let i=0;i<3;i++)cylinder(g,-1.4+i*.7,.5,1.35,.28,.32,.65,'#bb795a','stone',9);}
 else if(type==='pottery_kiln'){cottage(g,-1,-.5,2.4,2.3,1.8,'#a7634b',true);cylinder(g,1.1,1,0,.88,1.05,2.1,'#a57458','stone');chimney(g,1.2,-.45,3.6);box(g,1.12,.5,1,.7,.65,.1,'#4d2e27');for(let i=0;i<4;i++)cylinder(g,-1.5+i*.85,.46,1.5,.24,.3,.6,'#d0a07a','stone',10);}
 else if(type==='pasture'){cottage(g,-1.3,-.9,2.5,2,1.75,'#98734e',true);for(let z=-1.8;z<=1.8;z+=1.2){fence(g,1,z,1.8)}for(const x of [-.1,1.6])box(g,x,.9,.1,1.05,.95,.7,'#96704f');for(const x of [-.1,1.6])box(g,x,.5,-.1,.6,.4,.6,'#735b43');cylinder(g,1.3,.3,1.75,.75,.75,.3,'#8c7255','wood');}
 else if(type==='mason'){cottage(g,-1,-.75,2.4,2.2,1.9,'#838782');for(let i=0;i<5;i++)box(g,.4+(i%3)*.8,.28+Math.floor(i/3)*.65,.2, .75,.55,.7,'#b6b6a7','stone');box(g,1.1,.35,1.45,2.2,.65,.8,'#acaba1','stone');beam(g,[.3,1,1.45],[1.7,1,1.45],.12);}

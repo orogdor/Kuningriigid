@@ -1,3 +1,5 @@
+import {cityScience} from './science.js';
+import {EDUCATION_TYPES} from './education-v141.js';
 // V82 shared building inspection for every era. Read-only model + an opt-in
 // owner-only action. All displayed values are derived from real game state.
 const fmt=value=>Number.isFinite(Number(value))?Number(value).toLocaleString('et-EE',{maximumFractionDigits:2}):'—';
@@ -38,8 +40,9 @@ export function describeBuilding(game,city,building,ages=[],names={},definitions
   cost:readable(d.cost,names),
   technology:techUnlocks[building.type]||null,
   position:{x:building.x,z:building.z},
-  researchActivity:building.researchActivity,
-  description:building.type==='field'?'Eraldi põld · '+(building.width||16)+' × '+(building.depth||16)+' ühikut':building.type==='farm'?'Põllutalu · '+(building.farming?.tool||'vajab eraldi põldu')+(building.farming?' · '+building.farming.fields+' põldu · pindala '+building.farming.area+' / tööjõu võimekus '+Math.round(building.farming.capacity):''):building.type==='pasture'?'Loomafarm · kariloomad, liha ja veevajadus':d.out?'Tootmishoone':['study','academy','university','observatory','polytechnic','laboratory','scriptorium'].includes(building.type)?'Teadusasutus':
+  researchActivity:EDUCATION_TYPES.includes(building.type)?undefined:building.researchActivity,
+  science:EDUCATION_TYPES.includes(building.type)?cityScience(home,game.s?.research?.[city.team]?.known||[]):null,
+  description:building.type==='field'?'Eraldi põld · '+(building.width||16)+' × '+(building.depth||16)+' ühikut':building.type==='farm'?'Põllutalu · '+(building.farming?.tool||'vajab eraldi põldu')+(building.farming?' · '+building.farming.fields+' põldu · pindala '+building.farming.area+' / tööjõu võimekus '+Math.round(building.farming.capacity):''):building.type==='pasture'?'Loomafarm · kariloomad, liha ja veevajadus':d.out?'Tootmishoone':['library','school','public_school','high_school','study','academy','university','observatory','polytechnic','laboratory','scriptorium'].includes(building.type)?'Haridusasutus · linna teadus ×1,5 (valmis ja aktiivne)':
    building.type==='house'?'Elamu':building.type==='hall'?'Linna peahoone':'Linnahoone'
  };
 }
@@ -81,6 +84,7 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle}){
    line('Kuluvad ressursid / tsükkel',data.input),
    line('Ehitamise maksumus',data.cost)
   );
+  if(data.science){detail.append(line('Linna baasteadus',fmt(data.science.base)+' / min'),line('Haridusasutused',data.science.institutions+' · ×'+fmt(data.science.educationMultiplier)),line('Avastuste boonus','×'+fmt(data.science.discoveryMultiplier)),line('Linna teadus kokku',fmt(data.science.total)+' / min'));}
   if(data.technology)detail.append(line('Avastamine',data.technology));
   if(!data.ready){
    detail.append(line('Ehitusjärgus',data.progress+'%'));

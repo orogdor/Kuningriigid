@@ -46,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: [traffic, interface, ai-city, ai-city-v136, ai-city-v137, ai-city-v138, ai-city-v139]
+        profile: [science, traffic, interface, ai-city, ai-city-v136, ai-city-v137, ai-city-v138, ai-city-v139]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -56,7 +56,9 @@ jobs:
           echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
       - run: |
           python3 -m http.server 8765 >/tmp/game-http.log 2>&1 &
-          if [ '${{ matrix.profile }}' = traffic ]; then
+          if [ '${{ matrix.profile }}' = science ]; then
+            node TEST_V141_BROWSER.mjs
+          elif [ '${{ matrix.profile }}' = traffic ]; then
             node TEST_V133_BROWSER.mjs
           elif [ '${{ matrix.profile }}' = ai-city-v139 ]; then
             node TEST_V139_BROWSER.mjs
@@ -83,6 +85,7 @@ jobs:
             artifacts-v137/
             artifacts-v138/
             artifacts-v139/
+            artifacts-v141/
   publish:
     needs: [traffic, regression, browser]
     uses: ./.github/workflows/avaldamine.yml

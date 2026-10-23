@@ -4,7 +4,7 @@ import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-
 const hash=(a,b,seed=0)=>{const t=Math.sin(a*127.1+b*311.7+seed*74.7)*43758.5453;return t-Math.floor(t);};
 const sqr=x=>x*x;
 const snap=x=>Math.round(x*2)/2;
-const CIVIC=new Set(['market','study','scriptorium','warehouse','cellar','guildhall','chapel','temple','townhall','inn','keep']);
+const CIVIC=new Set(['market','library','school','public_school','high_school','study','scriptorium','warehouse','cellar','guildhall','chapel','temple','townhall','inn','keep']);
 const INDUSTRIAL=new Set(['saw','mason','pottery_kiln','bronze_foundry','smith','smelter','barracks','archery']);
 const RURAL=new Set(['farm','pasture','field','hunter','lumber','quarry','forester','well','fisher']);
 export const V138_BUILD_MARGIN=8; // only keep a roof-width of setback; allow plots at all four tile edges
@@ -81,6 +81,6 @@ export function urbanExpansionEligible(game,parent,p){
   if(!context)return false;
   // A neighbouring street block is dense enough before expansion begins.
   return context.economy.buildings.filter(b=>b.hp>0&&!b.virtual&&
-   ['house','market','well','warehouse','cellar','study','scriptorium'].includes(b.type)).length>=2;
+   ['house','market','well','warehouse','cellar','library','school','public_school','high_school','study','scriptorium'].includes(b.type)).length>=2;
  });
 }

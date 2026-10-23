@@ -12,8 +12,8 @@ assert.equal(TROOPS.spearman.population,1);assert.equal(TROOPS.cavalry.populatio
 assert.ok(BUILDINGS.barracks.cost.wood<63);assert.equal(BUILDINGS.farm.workers,2);
 assert.equal(towerGuardKind({ages:[6],research:[{known:['modernity']}]},0),'modern_infantry');
 assert.equal(towerGuardKind({ages:[4],research:[{known:['firearms']}]},0),'musketeer');
-assert.equal(readyForNextEra({ages:[2],units:[{team:0,kind:'scout',hp:100}]},0,TROOPS),false);
-const ironTopics=Object.keys(TECHS).filter(id=>TECHS[id].age===2),held={ages:[2],units:[],research:[{known:ironTopics.slice(0,Math.ceil(ironTopics.length/2))}]};assert.equal(allowAIResearch(held,0,'philosophy',TROOPS,TECHS),false);assert.equal(allowAIResearch(held,0,'smithing',TROOPS,TECHS),true);assert.equal(allowAIResearch(held,0,'civics',TROOPS,TECHS),false);
+assert.equal(readyForNextEra({ages:[2],units:[{team:0,kind:'scout',hp:100}]},0,TROOPS),true);
+const ironTopics=Object.keys(TECHS).filter(id=>TECHS[id].age===2),held={ages:[2],units:[],research:[{known:ironTopics.slice(0,Math.ceil(ironTopics.length/2))}]};assert.equal(allowAIResearch(held,0,'philosophy',TROOPS,TECHS),true);assert.equal(allowAIResearch(held,0,'smithing',TROOPS,TECHS),true);assert.equal(allowAIResearch(held,0,'civics',TROOPS,TECHS),true);
 const layout=defenseLayout();assert.equal(layout.filter(x=>x.type==='gatehouse').length,2);
 assert.ok(layout.some(x=>x.wallAxis===1)&&layout.some(x=>x.wallAxis===0));
 const world={resources:[],revision:0,workers:{}},gate={type:'gatehouse',x:0,z:0,hp:700,ready:true};

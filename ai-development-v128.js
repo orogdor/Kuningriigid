@@ -1,28 +1,10 @@
 import {troopRole} from './military-v88.js?v=117a';
 const originalBuildings=new Map(),originalUnits=new Map();
 export const combatUnit=u=>u.hp>0&&!['scout','militia','transport','warship'].includes(u.kind);
-export function readyForNextEra(state,team,troops){
- const age=state.ages[team],units=state.units.filter(u=>u.team===team&&combatUnit(u));
- const minimum=[1,3,5,7,9,10,0][age]||0;
- const current=units.filter(u=>(troops[u.kind]?.age??0)>=age).length;
- const modernMinimum=age<6?Math.max([1,2,2,3,3,4,0][age]||0,Math.ceil(units.length*.35)):0;
- // V140: after organized medieval armies exist, scientific progress cannot
- // be deadlocked solely because the AI has not upgraded every field unit.
- // Real combat squads and all research/material era costs remain necessary.
- return units.length>=minimum&&(age>=3||current>=modernMinimum);
-}
-export function allowAIResearch(state,team,id,troops,techs){
- const age=state.ages[team],d=techs[id];if(!d)return false;
- if(d.age>age)return readyForNextEra(state,team,troops);
- if(d.age<age||age>=3)return true; // V140: current-era scholarly prerequisites must stay researchable in medieval+ periods
- const known=state.research[team].known,topics=Object.keys(techs).filter(k=>techs[k].age===age);
- const current=state.units.filter(u=>u.team===team&&combatUnit(u)&&(troops[u.kind]?.age??0)>=age).length;
- const total=state.units.filter(u=>u.team===team&&combatUnit(u)).length,needed=age<6?Math.max([1,2,2,3,3,4,0][age]||0,Math.ceil(total*.35)):0;
- if(current>=needed||known.filter(k=>techs[k]?.age===age).length<Math.ceil(topics.length/2))return true;
- // Pause optional research at the middle of an era while its basic army
- // and production chain catch up. Essential military inputs never get locked.
- return new Set(['warfare','archery','stone_tools','learning','hunting','water','agriculture','bronze','copper_tin','woodworking','masonry','iron','smelting','smithing','armor_craft','crossbows','knighthood','gunpowder','firearms','industrialization','steelmaking','rifles','modernity','combustion','petroleum']).has(id);
-}
+// Compatibility exports: military readiness never gates research or era entry.
+// Actual prerequisites, research points and era material payments live in research.js.
+export function readyForNextEra(){return true;}
+export function allowAIResearch(state,team,id,troops,techs){return !!techs[id];}
 export function applyDevelopmentBalance(buildings,troops){
  const factors={farm:.62,barracks:.55,archery:.6,stable:.65,smith:.7,smelter:.8,mill:.8,bakery:.8,warehouse:.8,cellar:.8,armor_workshop:.7,crossbow_range:.7,siegeworkshop:.7,palisade:.38,stonewall:.4,watchtower:.55,stonetower:.55,gatehouse:.5,reinforced_wall:.5};
  for(const [id,factor]of Object.entries(factors)){

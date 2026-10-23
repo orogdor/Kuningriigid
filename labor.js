@@ -15,7 +15,7 @@ export function demand(b,definitions){
  if(b.disabled||b.virtual||b.hp<=0)return 0;
  if(!b.ready)return 1;
  const d=definitions[b.type];
- return (d?.out||['watchtower','stonetower','guildhall','infirmary','trade_yard','inn','monastery','chapel','keep','gatehouse','siegeworkshop','forester','warehouse','market','harbor','study','scriptorium','academy','university','observatory','polytechnic','laboratory','railstation','airfield'].includes(b.type))?(d?.workers||0):0;
+ return (d?.out||['watchtower','stonetower','guildhall','infirmary','trade_yard','inn','monastery','chapel','keep','gatehouse','siegeworkshop','forester','warehouse','market','harbor','library','school','public_school','high_school','study','scriptorium','academy','university','observatory','polytechnic','laboratory','railstation','airfield'].includes(b.type))?(d?.workers||0):0;
 }
 function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,stock={}){
  if(foodCritical&&['hunter','fisher','bakery','farm','pasture'].includes(b.type))return 171;
@@ -70,7 +70,7 @@ function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,st
  if(b.type==='watchtower'||b.type==='stonetower')return foodCritical||waterCritical?30:74;
  if(b.type==='warehouse')return 38;
  if(b.type==='market')return 42;
- if(['study','scriptorium','academy','university','observatory','polytechnic','laboratory'].includes(b.type))return foodCritical||waterCritical?35:61;
+ if(['library','school','public_school','high_school','study','scriptorium','academy','university','observatory','polytechnic','laboratory'].includes(b.type))return foodCritical||waterCritical?35:61;
  if(['keep','gatehouse','infirmary'].includes(b.type))return foodCritical?22:72;
  if(['guildhall','trade_yard','inn','monastery','chapel','siegeworkshop'].includes(b.type))return foodCritical?20:56;
  if(b.type==='forester')return 35;
@@ -91,7 +91,7 @@ export function allocateCity(game,city){
   const need=demand(b,game.buildingDefinitions),definition=game.buildingDefinitions[b.type];
   const inputsReady=!definition?.input||canAfford(r.resources,definition.input);
   const outputFull=definition?.out&&game.storageCap&&game.storageUsed&&game.storageUsed(city,definition.out,r.resources)>=game.storageCap(city,definition.out);
-  const researchIdle=!!game.s?.research?.[city.team]&&!game.s.research[city.team].active&&['study','scriptorium','academy','university','observatory','polytechnic','laboratory','monastery','chapel'].includes(b.type);
+  const researchIdle=!!game.s?.research?.[city.team]&&!game.s.research[city.team].active&&['library','school','public_school','high_school','study','scriptorium','academy','university','observatory','polytechnic','laboratory','monastery','chapel'].includes(b.type);
   const want=inputsReady&&!outputFull&&!researchIdle?Math.max(0,Math.min(need,b.workerLimit??need)):0;
   let priority=jobPriority(b,foodCritical,waterCritical,shortages,laborScarce,r.resources);
   if(city.team>0&&FOUNDATION_TYPES.has(b.type))priority+=60;

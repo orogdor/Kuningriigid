@@ -5,7 +5,7 @@ export function cityInfillRank(parent,ctx,type,game){
  const x=ctx.c-parent.c,z=ctx.r-parent.r,dist=Math.abs(x)+Math.abs(z);
  const root=built(parent),homes=root.filter(b=>b.type==='house').length;
  const local=built(ctx),localHomes=local.filter(b=>b.type==='house').length;
- const openCivic=['market','warehouse','cellar','study','scriptorium','well'].includes(type);
+ const openCivic=['market','warehouse','cellar','library','school','public_school','high_school','study','scriptorium','well'].includes(type);
  // All unique public buildings start close to the old town hall.
  if(type!=='house'&&openCivic)return dist*75+(dist===0?0:local.length>0?12:32);
  // Keep residents within a connected urban fabric; never found multiple
@@ -28,7 +28,7 @@ export function cityInfillRank(parent,ctx,type,game){
 }
 export function coreFoodAndServices(buildings,age){
  const active=new Set((buildings||[]).filter(b=>b.hp>0&&!b.disabled).map(b=>b.type));
- const priority=age>=1?['market','warehouse','cellar','study','scriptorium','well']:
+ const priority=age>=1?['market','warehouse','cellar','library','school','public_school','high_school','study','scriptorium','well']:
                           ['study','well','house'];
  return priority.filter(type=>!active.has(type));
 }

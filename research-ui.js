@@ -17,7 +17,7 @@ export function renderResearchUI(game,{choose,queue,remove,details=true}){
   allDone?'Kõik tehnoloogiad uuritud':r.queue?.length?'Järjekorras: '+(techBlock(r,r.queue[0])||TECHS[r.queue[0]]?.name):hasCity?'Vali uurimisteema':'Raja esmalt linn';
  status.textContent='⚗ '+pretty(rate)+' teadust/min · '+summary;
  if(!details)return;
- title.textContent=summary+' · '+pretty(rate)+' teaduspunkti/min · tempo: '+tempoName(s)+'. Teadus sõltub elanikest ja õpetlastest.';
+ title.textContent=summary+' · '+pretty(rate)+' teaduspunkti/min · tempo: '+tempoName(s)+'. 1 elanik = 1 teadust/min. Iga valmis aktiivne haridusasutus korrutab linna teaduse ×1,5; avastused lisavad boonuseid.';
  const pause=document.getElementById('pauseresearch');pause.disabled=!active&&!r.queue?.length;pause.textContent=r.paused?'Jätka uurimist':'Peata uurimine · edenemine säilib';
  if(document.getElementById('researchpanel').hidden)return;
  const stamp=JSON.stringify([r.known,active,r.queue,hasCity,s.ages[0],r.paused,Object.values(TECHS).map(t=>researchCost(s,t))]);
