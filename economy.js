@@ -105,7 +105,7 @@ if(Math.floor(s.time/60)>before)for(const team of s.realms.map((_,i)=>i)){
  const growth=env.marketFoodGrowth?.(team,r)||{multiplier:1,varieties:[],bonus:0};r.marketFoodVarietiesV137=growth.varieties.length;r.marketFoodBonusV137=growth.bonus;r.growthNeed=(2.3+r.pop*.28)*(env.growthFactor||1)/Math.max(1,growth.multiplier);
  if(supplied){
    r.shortageTurns=0;
-   if(r.pop<cap){
+   if(r.pop<Math.floor(cap)){
      const reserves=(r.resources.bread>=r.pop*2&&r.resources.water>=r.pop*1.5)?1.2:1;
      r.growthProgress+=reserves;
      if(r.growthProgress>=r.growthNeed){r.growthProgress-=r.growthNeed;r.pop++;log(s,team,'Linna tuli uus elanik');}
