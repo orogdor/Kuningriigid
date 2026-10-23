@@ -1,0 +1,60 @@
+name: V144 Medieval City Simulation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/make-ai-medieval-v144.mjs'
+      - '.github/workflows/medieval-v144.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: v144-medieval-run
+  cancel-in-progress: false
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Validate V143 and prior game rules
+        run: |
+          node --check scripts/make-ai-medieval-v144.mjs
+          node --check civilization.js
+          node scripts/test.mjs rules --jobs 2
+      - name: Run original AI to the middle of Medieval Age
+        run: node scripts/make-ai-medieval-v144.mjs
+      - name: Validate generated test state
+        run: |
+          test -s scenarios/ai-medieval-v144.json
+          node --input-type=module -e "import fs from 'node:fs'; const s=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v144.json')); const t=s.medievalTestV144; if(!t||s.ages[0]!==3||!s.cities.some(c=>c.id===t.targetCityId&&c.team===0))process.exit(1);console.log('MEDIEVAL STATE VERIFIED',t)"
+      - name: Verify browser on phone and computer
+        run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          python3 -m http.server 8765 >/tmp/v144-http.log 2>&1 &
+          node TEST_V144_BROWSER.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v144-medieval-analysis
+          path: |
+            scenarios/ai-medieval-v144.manifest.json
+            artifacts-v144/
+            artifacts-tests/
+      - name: Save reproducible AI state and analysis
+        run: |
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git add scenarios/ai-medieval-v144.json scenarios/ai-medieval-v144.manifest.json
+          git commit -m 'V144: verified mid-medieval AI snapshot and city analysis'
+          git push origin HEAD:main
+  publish:
+    needs: simulate
+    uses: ./.github/workflows/avaldamine.yml
+    with:
+      validated: true
