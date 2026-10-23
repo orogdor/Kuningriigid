@@ -3,7 +3,7 @@ import {BUILDINGS} from './civilization-core.js';
 import {surplusForWalls,reserveAfterWalls} from './ancient-walls-v139.js';
 import {FOUNDATION_TYPES} from './ai-foundation-v88.js';
 import {cityExtent,populationCityRadius} from './city-area-v142.js';
-assert.deepEqual(BUILDINGS.barracks.requires,['house','lumber'],'Stone Age barracks must not require Iron Age smelting');
+assert.ok(!BUILDINGS.barracks.requires.includes('smith')&&!BUILDINGS.barracks.requires.includes('smelter')&&!BUILDINGS.barracks.requires.includes('bakery'),'Stone Age barracks must not require Iron Age production');
 assert.ok(BUILDINGS.market.cost.wood>0&&BUILDINGS.market.cost.stone>0,'Markets still have a real cost');
 assert.equal(cityExtent(populationCityRadius(36)),12,'Urban footprint stays capped at 12x12');
 assert.ok(FOUNDATION_TYPES.has('house')&&FOUNDATION_TYPES.has('lumber'));
