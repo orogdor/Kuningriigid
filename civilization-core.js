@@ -1,4 +1,4 @@
-import {findAIFieldSite} from './ai-rural-v143.js';
+import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
 import {allocateTerritory} from './territory-v143.js';
 import {urbanExpansionFits,grownCityRadius} from './city-area-v142.js';
 import {installGameRevisions,citySummary,cityContexts,cityLookup,navigationRevision,resourcesNear,buildingsNear} from './perf-state-v131.js';
@@ -595,7 +595,7 @@ export class Civilization{
  const existing=buildings.filter(b=>b.type===type&&b.hp>0&&!b.disabled);
  // A new district must replace genuinely exhausted supply, not create
  // arbitrarily many mines/quarries that consume the entire workforce.
- if(existing.filter(b=>!b.ready||!b.status?.includes('pole ligipääsetavat')&&!b.status?.includes('Ootab eraldi')).length>=2||!canAfford(parent.economy.realms[parent.team].resources,BUILDINGS[type].cost))continue;if(existing.some(b=>!b.disabled&&!/pole ligipääsetavat|Ootab eraldi/.test(b.status||'')))continue;if((BUILD_AGE[type]||0)>this.s.ages[parent.team]||(BUILD_TECH[type]&&!this.s.research[parent.team].known.includes(BUILD_TECH[type])))continue;const dep={...Object.fromEntries(Object.entries(GOOD_BUILDINGS).map(([k,d])=>[k,d.deposit])),hunter:'game',fisher:'coast',well:'water',quarry:'stone',lumber:'wood',farm:'grain',coppermine:'copper',tinmine:'tin',claypit:'clay',mine:'ore',oilwell:'oil',harbor:'coast'}[type],tiles=[];
+ if(!canAfford(parent.economy.realms[parent.team].resources,BUILDINGS[type].cost)||existing.some(b=>!ruralSourceExhausted(this,parent,b)))continue;if((BUILD_AGE[type]||0)>this.s.ages[parent.team]||(BUILD_TECH[type]&&!this.s.research[parent.team].known.includes(BUILD_TECH[type])))continue;const dep={...Object.fromEntries(Object.entries(GOOD_BUILDINGS).map(([k,d])=>[k,d.deposit])),hunter:'game',fisher:'coast',well:'water',quarry:'stone',lumber:'wood',farm:'grain',coppermine:'copper',tinmine:'tin',claypit:'clay',mine:'ore',oilwell:'oil',harbor:'coast'}[type],tiles=[];
  // Keep ordinary core construction in charge while a real local site exists.
  // Only move production outwards when the inner tile cannot provide it.
  const localDeposit=dep==='coast'?isShore(this,parent):this.cell(parent)?.deposits[dep];

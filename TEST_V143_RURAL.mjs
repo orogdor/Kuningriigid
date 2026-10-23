@@ -4,15 +4,16 @@ import {Civilization,BUILDINGS} from './civilization-core.js';
 import {FOOD_KEYS} from './economy.js';
 import {findAIFieldSite} from './ai-rural-v143.js';
 function fixture(){const g=new Civilization(JSON.parse(fs.readFileSync('scenarios/ai-modern-v140.json')));const home=g.s.cities.find(c=>c.team===0);g.s.cities=[home];g.transferCity(home,1);g.s.ages[1]=6;g.s.research[1]=structuredClone(g.s.research[0]);g.s.winner=null;for(const ctx of g.contexts(home))ctx.economy.buildings=ctx.economy.buildings.filter(b=>b.ready||b.virtual);const stock=home.economy.realms[1].resources;for(const k of Object.keys(stock))stock[k]=3000;g.refreshTerritory();return {g,home,stock,tiles:g.constructionArea(home).tiles.map(p=>g.cell(p)).filter(p=>p.land&&!p.mountain)};}
-for(const countyOnly of [false,true]){
+for(const [countyOnly,spentLocal] of [[false,false],[true,false],[true,true],[true,'unstaffed']]){
  const {g,home,stock,tiles}=fixture();
  const target=tiles.find(t=>Math.max(Math.abs(t.c-home.c),Math.abs(t.r-home.r))>=3&&g.landPath(home,t,home.team)&&(!countyOnly||g.isCountyTile(t,home))&&t.deposits.ore&&!g.contextAt(t,false)?.economy.buildings.some(b=>!b.virtual&&b.hp>0));assert.ok(target,'real distant ore deposit exists');
  for(const ctx of g.contexts(home))ctx.economy.buildings=ctx.economy.buildings.filter(b=>b.type!=='mine');
  for(const tile of tiles)if(tile!==target)tile.deposits.ore=0;
+ if(spentLocal){const spent=home.world.resources.find(r=>r.kind==='ore');assert.ok(spent);spent.removed=true;spent.amount=0;g.cell(home).deposits.ore=1;home.economy.buildings.push({type:'mine',x:spent.x,z:spent.z,depositId:spent.id,hp:350,ready:true,team:1,status:spentLocal==='unstaffed'?'Ootab tööjõudu':'Maardla on ammendunud'});}
  stock.ore=0;g.aiDistricts();
  const ctx=g.contextAt(target,false),mine=ctx?.economy.buildings.find(b=>b.type==='mine'&&b.hp>0);
  assert.ok(mine,'AI really orders a mine on the remote owned deposit');assert.equal(mine.ready,false);assert.ok(stock.wood<3000,'normal construction costs paid');
- console.log('V143 REMOTE MINE PASS',JSON.stringify({distance:Math.max(Math.abs(target.c-home.c),Math.abs(target.r-home.r)),rural:g.isCountyTile(target,home)}));
+ console.log('V143 REMOTE MINE PASS',JSON.stringify({distance:Math.max(Math.abs(target.c-home.c),Math.abs(target.r-home.r)),rural:g.isCountyTile(target,home),spentLocal}));
 }
 {
  const {g,home,stock,tiles}=fixture();

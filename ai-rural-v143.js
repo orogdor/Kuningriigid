@@ -1,3 +1,4 @@
+import {MINERAL_BUILDINGS} from './resource-sites-v88.js';
 import {DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 import {AI_FIELD_WIDTH,AI_FIELD_DEPTH,validateField} from './farming-v127.js';
 import {detailHeight} from './world-details.js';
@@ -14,4 +15,11 @@ export function findAIFieldSite(game,ctx,farm=null){
   if(hi-lo<=1.8)return p;
  }
  return null;
+}
+
+export function ruralSourceExhausted(game,parent,b){
+ if(!b.ready)return false;
+ const kind=MINERAL_BUILDINGS[b.type];
+ if(kind){const ctx=game.contexts(parent).find(ctx=>ctx.economy.buildings.includes(b));if(ctx){const site=ctx.world.resources.find(r=>r.kind===kind&&(b.depositId==null||r.id===b.depositId));return !site||site.removed||site.amount<=0;}}
+ return /pole ligipääsetavat|Ootab eraldi|ammend/.test(b.status||'');
 }
