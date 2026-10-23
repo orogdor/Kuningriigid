@@ -58,7 +58,7 @@ export function validateField(ctx,p,passable){
  if(Math.abs(p.x)+width/2>72||Math.abs(p.z)+depth/2>62)return 'Põld peab mahtuma ühele detailkaardile.';
  for(let x=-width/2;x<=width/2;x+=2)for(let z=-depth/2;z<=depth/2;z+=2)if(!passable(p.x+x,p.z+z))return 'Kogu põld peab olema kuival ja ligipääsetaval maal.';
  for(const b of ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0)){
-  const d=b.type==='field'?fieldSize(b):{width:12,depth:12};
+  const d=b.type==='field'?fieldSize(b):b.type==='market'?{width:24,depth:23}:{width:12,depth:12};
   if(Math.abs(b.x-p.x)<(width+d.width)/2+1&&Math.abs(b.z-p.z)<(depth+d.depth)/2+1)return 'Põld kattub teise põllu või hoonega.';
  }
  if(ctx.world.resources.some(r=>r.depositSite&&!r.removed&&fieldContains(p,r,3)))return 'Maardla peale ei saa põldu rajada.';
