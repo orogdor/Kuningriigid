@@ -2,7 +2,7 @@ name: V139 Wall Resources Audit
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/v139-wall-audit.yml', 'scripts/report-v139-defenses.mjs']
+    paths: ['.github/workflows/v139-wall-audit.yml', 'scripts/report-v139-defenses.mjs', 'scripts/diagnose-wall-sites-v139.mjs']
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -14,3 +14,4 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: 22}
       - run: node scripts/report-v139-defenses.mjs
+      - run: node scripts/diagnose-wall-sites-v139.mjs
