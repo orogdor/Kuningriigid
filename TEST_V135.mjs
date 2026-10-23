@@ -24,7 +24,7 @@ const town={c:50,r:50,radius:2,id:3},districts=[];for(let dx=-2;dx<=2;dx++)for(l
 const ordered=historicalDistrictOrder(town,districts);assert.deepEqual({c:ordered[0].c,r:ordered[0].r},{c:50,r:50});
 assert.ok(ordered.findIndex(p=>p.c===52&&p.r===52)>ordered.findIndex(p=>p.c===51&&p.r===50),'rounded growth before far diagonal corners');
 const existing=new Civilization(JSON.parse(fs.readFileSync('scenarios/iron-ai-v129.json'))),city=existing.s.cities[0];
-const sites=existing.buildingSites(city,'house');assert.ok(sites.length>0&&sites.length<250);
+const sites=existing.buildingSites(city,'house');assert.ok(sites.length>75&&sites.length<700,'the current detailed historic-city map exposes many safe parcel candidates');
 assert.deepEqual(sites,historicalBuildingPlots(city,existing.parentCity(city),'house',existing.s.seed+existing.parentCity(city).id*31),'live engine uses current V138 geometry; V135 historical generator remains independently deterministic');
 assert.ok(existing.buildingSites(city,'quarry').length>=0,'deposit special-case remains supported');
 console.log('V135 PASS: 9-tile AI spacing, 17-tile player spacing, deterministic curved plots, central density, historical district order, real engine integration');
