@@ -582,7 +582,9 @@ export class Civilization{
     if(this.buildRule(ctx,type)){if(expanding&&!previousExpansion)delete ctx.urbanExpansionV138;continue;}
     const candidates=this.buildingSites(ctx,type);
     const cursor=(ctx.aiPlotCursorV138?.[type]||0);
-    const batch=nextPlotBatch(candidates,cursor,48);
+    const inner=urban&&type==='house'&&ctx.c===city.c&&ctx.r===city.r&&houses<V139_CORE_HOUSES?
+     candidates.filter(p=>Math.hypot(p.x-city.economy.buildings[0].x,p.z-city.economy.buildings[0].z)<=70).slice(0,140):[];
+    const batch=[...inner,...nextPlotBatch(candidates,cursor,48).filter(p=>!inner.some(q=>q.x===p.x&&q.z===p.z))];
     (ctx.aiPlotCursorV138??={})[type]=cursor+batch.length;
     let succeeded=false;
     for(const p of batch){
@@ -696,7 +698,10 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
    const score=p=>historicalSiteScore(h,p,next,ctx.economy.buildings,deposits);
    // V138 candidates already follow a continuous ancient street plan. Scan
    // successive batches so no district edge remains permanently unreachable.
-   const plotCursor=(ctx.aiPlotCursorV138?.[next]||0),batch=nextPlotBatch(spots,plotCursor,96);
+   const plotCursor=(ctx.aiPlotCursorV138?.[next]||0);
+   const centerFirst=isHousing&&ctx.c===city.c&&ctx.r===city.r&&existingHomes<V139_CORE_HOUSES?
+    spots.filter(p=>Math.hypot(p.x-city.economy.buildings[0].x,p.z-city.economy.buildings[0].z)<=70).slice(0,140):[];
+   const batch=[...centerFirst,...nextPlotBatch(spots,plotCursor,96).filter(p=>!centerFirst.some(q=>p.x===q.x&&p.z===q.z))];
    (ctx.aiPlotCursorV138??={})[next]=plotCursor+batch.length;
    for(const p of batch){
     const check=this.previewBuild(ctx,next,p);if(check.error)continue;
