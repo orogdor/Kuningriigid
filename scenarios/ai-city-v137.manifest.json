@@ -3,23 +3,23 @@
   "roster": [
     {
       "team": 1,
-      "cities": 9,
-      "buildings": 242,
+      "cities": 7,
+      "buildings": 241,
       "markets": 6,
       "harbors": 2,
-      "houses": 73,
+      "houses": 71,
       "fields": 4,
       "ages": 5
     },
     {
       "team": 2,
       "cities": 5,
-      "buildings": 182,
-      "markets": 4,
+      "buildings": 195,
+      "markets": 5,
       "harbors": 0,
       "houses": 65,
-      "fields": 2,
-      "ages": 5
+      "fields": 3,
+      "ages": 4
     },
     {
       "team": 3,
@@ -198,9 +198,9 @@
   "ages": [
     5,
     5,
-    5,
+    4,
     0
   ],
-  "bytes": 3399294,
+  "bytes": 3473100,
   "seconds": 347
 }
