@@ -1,0 +1,543 @@
+{
+  "passed": false,
+  "cases": 8,
+  "failures": 8,
+  "wallSeconds": 9.436090099,
+  "reports": [
+    {
+      "id": "shared-city-goal",
+      "passed": false,
+      "failure": "no progress/oscillation for 15 simulation seconds",
+      "simulationSeconds": 49.95,
+      "wallSeconds": 1.389655113,
+      "minClearance": 0.020120591078605088,
+      "maxZ": 14,
+      "crossed": [],
+      "positions": [
+        {
+          "x": 33,
+          "z": -6.942802794418783,
+          "pending": true
+        },
+        {
+          "x": 35,
+          "z": -0.1171259472276549,
+          "pending": false
+        },
+        {
+          "x": 29.096158415156463,
+          "z": 3.903841584843536,
+          "pending": true
+        },
+        {
+          "x": 29,
+          "z": 10.923899733404115,
+          "pending": true
+        }
+      ],
+      "fixture": {
+        "id": "shared-city-goal",
+        "title": "Four formations ordered to the same city entrance",
+        "goal": {
+          "x": 35,
+          "z": 0
+        },
+        "starts": [
+          [
+            -45,
+            -13.5
+          ],
+          [
+            -45,
+            -4.5
+          ],
+          [
+            -45,
+            4.5
+          ],
+          [
+            -45,
+            13.5
+          ]
+        ],
+        "buildings": [],
+        "maxSeconds": 90
+      }
+    },
+    {
+      "id": "city-gate",
+      "passed": false,
+      "failure": "no progress/oscillation for 15 simulation seconds",
+      "simulationSeconds": 49.95,
+      "wallSeconds": 1.6694008489999999,
+      "minClearance": 0.020005871902976757,
+      "maxZ": 18,
+      "crossed": [
+        2,
+        3
+      ],
+      "positions": [
+        {
+          "x": -2.123548643778651,
+          "z": -5.87645135622135,
+          "pending": true
+        },
+        {
+          "x": -8.991607165429498,
+          "z": -3.9916071654294973,
+          "pending": true
+        },
+        {
+          "x": 34.91091609904653,
+          "z": 0,
+          "pending": false
+        },
+        {
+          "x": 29.991061184644003,
+          "z": -5.008938815355996,
+          "pending": true
+        }
+      ],
+      "fixture": {
+        "id": "city-gate",
+        "title": "Queue through a gate into an inhabited city",
+        "goal": {
+          "x": 35,
+          "z": 0
+        },
+        "starts": [
+          [
+            -45,
+            -18
+          ],
+          [
+            -45,
+            -6
+          ],
+          [
+            -45,
+            6
+          ],
+          [
+            -45,
+            18
+          ]
+        ],
+        "gate": {
+          "x": 0,
+          "halfWidth": 1.5
+        },
+        "buildings": [
+          {
+            "type": "hall",
+            "x": 58,
+            "z": 0
+          },
+          {
+            "type": "house",
+            "x": 26,
+            "z": -18
+          },
+          {
+            "type": "house",
+            "x": 26,
+            "z": 18
+          },
+          {
+            "type": "gatehouse",
+            "x": 0,
+            "z": 0,
+            "wallAxis": 1
+          }
+        ],
+        "maxSeconds": 120
+      }
+    },
+    {
+      "id": "city-street",
+      "passed": false,
+      "failure": "no progress/oscillation for 15 simulation seconds",
+      "simulationSeconds": 49.95,
+      "wallSeconds": 0.9289822980000003,
+      "minClearance": 0.02003484638389974,
+      "maxZ": 15,
+      "crossed": [],
+      "positions": [
+        {
+          "x": 32.66483638426835,
+          "z": -7.335163615731648,
+          "pending": true
+        },
+        {
+          "x": 37.104187029512296,
+          "z": -1.8958129704877005,
+          "pending": true
+        },
+        {
+          "x": 33.0977071317562,
+          "z": 3.902292868243794,
+          "pending": true
+        },
+        {
+          "x": 26.797134882319998,
+          "z": 7,
+          "pending": true
+        }
+      ],
+      "fixture": {
+        "id": "city-street",
+        "title": "Shared destination beyond a street lined with houses",
+        "goal": {
+          "x": 40,
+          "z": 0
+        },
+        "starts": [
+          [
+            -48,
+            -15
+          ],
+          [
+            -48,
+            -5
+          ],
+          [
+            -48,
+            5
+          ],
+          [
+            -48,
+            15
+          ]
+        ],
+        "buildings": [
+          {
+            "type": "house",
+            "x": -12,
+            "z": -12
+          },
+          {
+            "type": "house",
+            "x": -12,
+            "z": 12
+          },
+          {
+            "type": "house",
+            "x": 2,
+            "z": -12
+          },
+          {
+            "type": "house",
+            "x": 2,
+            "z": 12
+          },
+          {
+            "type": "house",
+            "x": 16,
+            "z": -12
+          },
+          {
+            "type": "house",
+            "x": 16,
+            "z": 12
+          },
+          {
+            "type": "hall",
+            "x": 61,
+            "z": 0
+          }
+        ],
+        "maxSeconds": 120
+      }
+    },
+    {
+      "id": "occupied-city-goal",
+      "passed": false,
+      "failure": "no progress/oscillation for 15 simulation seconds",
+      "simulationSeconds": 44.95,
+      "wallSeconds": 0.2855437629999997,
+      "minClearance": 0.020041855797754415,
+      "maxZ": 14,
+      "crossed": [],
+      "positions": [
+        {
+          "x": 25.652287780309734,
+          "z": -9.347712219690262,
+          "pending": true
+        },
+        {
+          "x": 28.65231582635468,
+          "z": -3,
+          "pending": true
+        },
+        {
+          "x": 28.12099186732507,
+          "z": 3.9999058927755233,
+          "pending": true
+        },
+        {
+          "x": 24.809484334670756,
+          "z": 10.19051566532924,
+          "pending": true
+        },
+        {
+          "x": 35,
+          "z": 0,
+          "pending": false
+        }
+      ],
+      "fixture": {
+        "id": "occupied-city-goal",
+        "title": "A parked friendly formation already occupies the city entrance",
+        "goal": {
+          "x": 35,
+          "z": 0
+        },
+        "starts": [
+          [
+            -45,
+            -13.5
+          ],
+          [
+            -45,
+            -4.5
+          ],
+          [
+            -45,
+            4.5
+          ],
+          [
+            -45,
+            13.5
+          ]
+        ],
+        "parked": [
+          [
+            35,
+            0
+          ]
+        ],
+        "buildings": [],
+        "maxSeconds": 90
+      }
+    },
+    {
+      "id": "cavalry-city-goal",
+      "passed": false,
+      "failure": "no progress/oscillation for 15 simulation seconds",
+      "simulationSeconds": 34.95,
+      "wallSeconds": 1.359062175,
+      "minClearance": 0.020376524085268244,
+      "maxZ": 24.837365440327094,
+      "crossed": [],
+      "positions": [
+        {
+          "x": 21.04301222780627,
+          "z": -12.956987772193733,
+          "pending": true
+        },
+        {
+          "x": 35,
+          "z": 0,
+          "pending": false
+        },
+        {
+          "x": 21.691543271287987,
+          "z": 13.308456728712011,
+          "pending": true
+        }
+      ],
+      "fixture": {
+        "id": "cavalry-city-goal",
+        "title": "Mounted formations reserve larger arrival spaces",
+        "kind": "cavalry",
+        "goal": {
+          "x": 35,
+          "z": 0
+        },
+        "starts": [
+          [
+            -48,
+            -25
+          ],
+          [
+            -48,
+            0
+          ],
+          [
+            -48,
+            25
+          ]
+        ],
+        "buildings": [],
+        "maxSeconds": 150
+      }
+    },
+    {
+      "id": "gate-counterflow",
+      "passed": false,
+      "failure": "no progress/oscillation for 15 simulation seconds",
+      "simulationSeconds": 19.950000000000003,
+      "wallSeconds": 0.4955402260000001,
+      "minClearance": 0.02099999999999902,
+      "maxZ": 0,
+      "crossed": [],
+      "positions": [
+        {
+          "x": -7.000999999999992,
+          "z": 0,
+          "pending": true
+        },
+        {
+          "x": 0.020000000000007068,
+          "z": 0,
+          "pending": true
+        }
+      ],
+      "fixture": {
+        "id": "gate-counterflow",
+        "title": "An opposing formation yields before entering a single-file gate",
+        "goal": {
+          "x": 35,
+          "z": 0
+        },
+        "goals": [
+          [
+            35,
+            0
+          ],
+          [
+            -35,
+            0
+          ]
+        ],
+        "starts": [
+          [
+            -15,
+            0
+          ],
+          [
+            8,
+            0
+          ]
+        ],
+        "gate": {
+          "x": 0,
+          "halfWidth": 1.5
+        },
+        "buildings": [
+          {
+            "type": "gatehouse",
+            "x": 0,
+            "z": 0,
+            "wallAxis": 1
+          }
+        ],
+        "maxSeconds": 120
+      }
+    },
+    {
+      "id": "chariot-city-goal",
+      "passed": false,
+      "failure": "every ordered formation must arrive and clear its order",
+      "simulationSeconds": 150,
+      "wallSeconds": 2.790381413000001,
+      "minClearance": 0.020335399137991317,
+      "maxZ": 27.833829906421162,
+      "crossed": [],
+      "positions": [
+        {
+          "x": 17.137538679122933,
+          "z": -18.862461320877067,
+          "pending": true
+        },
+        {
+          "x": 34.93999999999982,
+          "z": 0,
+          "pending": false
+        },
+        {
+          "x": 17.360971601613585,
+          "z": 18.639028398386415,
+          "pending": true
+        }
+      ],
+      "fixture": {
+        "id": "chariot-city-goal",
+        "title": "chariot formations reserve correctly sized arrival positions",
+        "kind": "chariot",
+        "goal": {
+          "x": 35,
+          "z": 0
+        },
+        "starts": [
+          [
+            -60,
+            -28
+          ],
+          [
+            -60,
+            0
+          ],
+          [
+            -60,
+            28
+          ]
+        ],
+        "buildings": [],
+        "maxSeconds": 150
+      }
+    },
+    {
+      "id": "catapult-city-goal",
+      "passed": false,
+      "failure": "no progress/oscillation for 15 simulation seconds",
+      "simulationSeconds": 69.95,
+      "wallSeconds": 0.4908571549999997,
+      "minClearance": 0.02095794693644315,
+      "maxZ": 8,
+      "crossed": [],
+      "positions": [
+        {
+          "x": 30.807369024517207,
+          "z": -2.192630975482782,
+          "pending": true
+        },
+        {
+          "x": 34.87500000000017,
+          "z": 0,
+          "pending": false
+        },
+        {
+          "x": 32.05965195504617,
+          "z": 3.9403480449538297,
+          "pending": true
+        }
+      ],
+      "fixture": {
+        "id": "catapult-city-goal",
+        "title": "catapult formations reserve correctly sized arrival positions",
+        "kind": "catapult",
+        "goal": {
+          "x": 35,
+          "z": 0
+        },
+        "starts": [
+          [
+            -45,
+            -8
+          ],
+          [
+            -45,
+            0
+          ],
+          [
+            -45,
+            8
+          ]
+        ],
+        "buildings": [],
+        "maxSeconds": 150
+      }
+    }
+  ]
+}

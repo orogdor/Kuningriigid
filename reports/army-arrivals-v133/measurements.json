@@ -1,0 +1,10 @@
+{
+  "baselineFailedCases": 8,
+  "currentPassedCases": 8,
+  "simulationSeconds": 359.55,
+  "movementCaseWallSeconds": 7.683853117000001,
+  "focusedCommandSeconds": 18.177943245999998,
+  "fullValidationSeconds": 70.494953773,
+  "parallelJobs": 2,
+  "note": "Single local measurements, not browser FPS. Browser results are separate workflow artifacts. Full validation measurement predates the last two added arrival fixtures; all current cases run in CI."
+}

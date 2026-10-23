@@ -1,33 +1,52 @@
-name: V132 Army Passing
+name: Fast Game Validation
 on:
   push:
     branches: [main]
-    paths: ['**.js', '**.mjs', 'index.html', 'scenarios/iron-ai-v128.json', 'scenarios/iron-ai-v129.json', '.github/workflows/v128.yml']
+    paths-ignore: ['**.md', 'reports/**', 'V88_*TEST.json', 'V88_*TEST.jsonl.gz']
   workflow_dispatch:
-permissions: {contents: read}
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 concurrency:
-  group: v128-validation
+  group: current-game-validation
   cancel-in-progress: true
 jobs:
-  rules:
+  traffic:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: 22}
-      - run: node TEST_V132.mjs
-      - run: node TEST_V131.mjs
-      - run: node TEST_V130.mjs
-      - run: node TEST_V129.mjs
-      - run: node TEST_V128.mjs
-      - run: node TEST_V127.mjs
-      - run: node TEST_V126.mjs
-      - run: node TEST_V125.mjs
+      - run: node scripts/test.mjs traffic
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: traffic-fast-results
+          path: artifacts-tests/
+  regression:
+    needs: traffic
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node scripts/test.mjs rules --jobs 2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-results
+          path: artifacts-tests/
   browser:
-    needs: rules
+    needs: traffic
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [traffic, interface]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -36,11 +55,21 @@ jobs:
           npm install --no-save playwright
           echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
       - run: |
-          python3 -m http.server 8765 >/tmp/v128-http.log 2>&1 &
-          node TEST_V128_BROWSER.mjs
-          node TEST_V132_BROWSER.mjs
+          python3 -m http.server 8765 >/tmp/game-http.log 2>&1 &
+          if [ '${{ matrix.profile }}' = traffic ]; then
+            node TEST_V133_BROWSER.mjs
+          else
+            node TEST_V128_BROWSER.mjs
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: V128-browser-evidence
-          path: artifacts-v128/
+          name: browser-${{ matrix.profile }}-evidence
+          path: |
+            artifacts-v128/
+            artifacts-v133/
+  publish:
+    needs: [traffic, regression, browser]
+    uses: ./.github/workflows/avaldamine.yml
+    with:
+      validated: true

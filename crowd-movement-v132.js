@@ -3,7 +3,21 @@
 const routes=new WeakMap();
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export function forgetCrowdRoute(agent){routes.delete(agent);}
-export function crowdWaypoint(agent,goal,others,open,radiusOf,dt=.05){
+// Check every crossed navigation cell, including a tiny clipped corner.
+// Distance sampling can miss that corner and repeatedly steer into a post.
+export function militaryLineClear(a,b,open,cellSize=1){
+ if(!open(a.x,a.z)||!open(b.x,b.z))return false;
+ const cuts=[0,1];
+ for(const axis of ['x','z']){
+  const delta=b[axis]-a[axis];if(!delta)continue;
+  const low=Math.min(a[axis],b[axis]),high=Math.max(a[axis],b[axis]);
+  for(let n=Math.floor(low/cellSize+.5)+.5;n*cellSize<high;n++)cuts.push((n*cellSize-a[axis])/delta);
+ }
+ cuts.sort((a,b)=>a-b);
+ for(let i=1;i<cuts.length;i++){const t=(cuts[i-1]+cuts[i])/2;if(!open(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t))return false;}
+ return true;
+}
+export function crowdWaypoint(agent,goal,others,open,radiusOf,dt=.05,cellSize=1){
  const own=radiusOf(agent),peers=others.filter(p=>p!==agent),clear=(a,b)=>{
   const dx=b.x-a.x,dz=b.z-a.z,len2=dx*dx+dz*dz;
   for(const p of peers){const r=own+radiusOf(p)+.04,px=a.x-p.x,pz=a.z-p.z,dot=px*dx+pz*dz;
@@ -11,8 +25,7 @@ export function crowdWaypoint(agent,goal,others,open,radiusOf,dt=.05){
    const t=len2?Math.max(0,Math.min(1,-dot/len2)):0;
    if((px+dx*t)**2+(pz+dz*t)**2<r*r)return false;
   }
-  const n=Math.ceil(Math.sqrt(len2)/.5);for(let i=1;i<=n;i++)if(!open(a.x+dx*i/n,a.z+dz*i/n))return false;
-  return true;
+  return militaryLineClear(a,b,open,cellSize);
  };
  let memo=routes.get(agent);
  if(memo&&distance(memo.goal,goal)>2){routes.delete(agent);memo=null;}

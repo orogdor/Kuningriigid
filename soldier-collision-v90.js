@@ -1,4 +1,4 @@
-import {crowdWaypoint,forgetCrowdRoute} from './crowd-movement-v132.js';
+import {crowdWaypoint,forgetCrowdRoute,militaryLineClear} from './crowd-movement-v132.js';
 import {troopRole} from './military-v88.js?v=117a';
 export const SQUAD_SIZE=12;
 export const soldierCount=u=>['scout','militia','bronze_catapult','catapult'].includes(u.kind)?1:['melee','ranged'].includes(troopRole(u.kind))?24:SQUAD_SIZE;
@@ -21,7 +21,7 @@ export function moveSquad(u,target,dt,speed,nav,squads){
  const to={x:u.x,z:u.z};Object.assign(u,before);const peers=squads.filter(alive),open=nav?((x,z)=>nav.open(x,z)):()=>true;
  // Look along the ordinary terrain route, beyond the blocking formation.
  let goal=target;const path=nav?.cache?.get(u)?.path;
- if(path?.length){goal=to;for(const point of path){if(Math.hypot(point.x-before.x,point.z-before.z)>60||!nav.clear(before,point))break;goal=point;}}
+ if(path?.length){goal=to;for(const point of path){if(Math.hypot(point.x-before.x,point.z-before.z)>60||!militaryLineClear(before,point,open,nav.cellSize||1))break;goal=point;}}
  const waypoint=crowdWaypoint(u,goal,peers,open,radius,dt),distance=Math.hypot(waypoint.x-u.x,waypoint.z-u.z);
  const detour=waypoint!==goal,step=Math.min(distance,speed*dt),desired=detour&&distance?{x:u.x+(waypoint.x-u.x)*step/distance,z:u.z+(waypoint.z-u.z)*step/distance}:to;
  u.moving=constrainStep(u,desired,peers,open);

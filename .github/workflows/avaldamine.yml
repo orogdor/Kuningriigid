@@ -1,11 +1,10 @@
 name: Kuningriigid latest GitHub Pages
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - "**.md"
-      - "V88_*TEST.json"
-      - "V88_*TEST.jsonl.gz"
+  workflow_call:
+    inputs:
+      validated:
+        type: boolean
+        default: false
   workflow_dispatch:
 
 permissions:
@@ -26,60 +25,26 @@ jobs:
     steps:
       - name: Fetch game
         uses: actions/checkout@v4
-      - name: Validate current game without overwriting sources
+      - name: Validate manual publication
+        if: inputs.validated != true
+        run: node scripts/test.mjs full --jobs 2
+      - name: Verify website entry points
         run: |
           test -s index.html
           test -s civilization.js
-          test -s civilization-core.js
-          test -s fortifications.js
           test -s vendor/three.module.js
-          node TEST_V132.mjs
           node --check civilization.js
-          node --check civilization-core.js
-          node --check research.js
-          node --check tech-tree-data-v118.js
-          node --check research-tree-v118.js
-          node --check tech-tree-layout-v119.js
-          node --check research-tree-v119.js
-          node --check build-catalog-v121.js
-          node --check map-gestures-v121.js
-          node --check growth-balance-v125.js
-          node --check technology-reforms-v125.js
-          node --check TEST_V125.mjs
-          node --check research-preview-v123.js
-          node --check detail-scale-v123.js
-          node --check world-details.js
-          node --check battlefield-v88.js
-          node --check continuous-landscape.js
-          node --check continuous-landscape-visual.js
-          node --check landscape-polish-v84.js
-          node --check civilization-core.js
-          node TEST_V132.mjs
-          node --check civilization.js
-          node --check research-ui.js
-          node --check localization.js
-          node --check locale-en-v120.js
-          node --check research-unlocks-en-v120.js
-          node --check era-availability-v116.js
           node --check campaign.js
-          node --check fortifications.js
-          node TEST_V125.mjs
-          node TEST_V123.mjs
-          node TEST_V122.mjs
-          node TEST_V121.mjs
-          node TEST_V120_LOCALE.mjs
-          node TEST_V119.mjs
-          node TEST_V118.mjs
-          node TEST_V117.mjs
-          node TEST_V59.mjs
-          node TEST_V67.mjs
-          node TEST_V68.mjs
+      - name: Prepare website
+        run: |
+          mkdir -p /tmp/game-pages
+          tar --exclude=.git --exclude=node_modules --exclude='artifacts-*' -cf - . | tar -xf - -C /tmp/game-pages
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload website
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.'
+          path: /tmp/game-pages
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4

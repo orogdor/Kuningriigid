@@ -1,3 +1,5 @@
+import {gateTraffic} from './army-gates-v133.js';
+import {assignArrivalGoals} from './army-arrivals-v133.js';
 import {battleDelta} from './battle-pacing-v93.js';
 import {deployHistoricalBattle} from './historical-tactics-v92.js?v=117a';
 import {tickIndividualBattle} from './individual-battle-v91.js?v=117a';
@@ -25,7 +27,22 @@ export function tickBattle(b,dt,stats,tech=0,navigation=null){return tickIndivid
 
 // Local orders live in campaign state, separately for each tile and squad.
 export function deploymentFor(camp,cell,source,unit,index=0){camp.deployments??={};const tile=camp.deployments[cell.c+':'+cell.r]??={};if(!tile[source])tile[source]={x:(unit.team?1:-1)*((rangedTroop(unit.kind)?24:12)+(index%2)*3),z:Math.floor(index/2)*7-4,heading:unit.team?-Math.PI/2:Math.PI/2,target:null};return tile[source]}
-export function tickDeployments(camp,units,stats,dt,navigation=null){if(dt<=0)return;for(const [key,tile]of Object.entries(camp.deployments||{})){const [c,r]=key.split(':').map(Number);const active=Object.entries(tile).filter(([source])=>{const u=units[Number(source)];return u?.hp>0&&camp.armies.some(a=>a.embarked==null&&a.team===u.team&&(a.id||0)===(u.armyId||0)&&a.c===c&&a.r===r)});const nav=navigation?navigation({c,r}):null;for(const [source,p]of active){const unit=units[Number(source)];if(!p.target)continue;p.radius=squadRadius(unit);const peers=active.filter(([,q])=>q!==p).map(([i,q])=>({...q,kind:units[i].kind,hp:units[i].hp}));if(moveSquad(p,p.target,dt,unitStats(stats[unit.kind],unit).speed,nav,peers))p.target=null;}}}
+export function tickDeployments(camp,units,stats,dt,navigation=null){
+ if(dt<=0)return;
+ for(const [key,tile]of Object.entries(camp.deployments||{})){
+  const [c,r]=key.split(':').map(Number),active=Object.entries(tile).filter(([source])=>{const u=units[Number(source)];return u?.hp>0&&camp.armies.some(a=>a.embarked==null&&a.team===u.team&&(a.id||0)===(u.armyId||0)&&a.c===c&&a.r===r)}),nav=navigation?navigation({c,r}):null;
+  const occupants=active.map(([source,p])=>({agent:p,team:units[source].team,radius:squadRadius(units[source])}));
+  const orders=occupants.filter(o=>o.agent.target).map(o=>({...o,goal:o.agent.target})),goals=assignArrivalGoals(orders,occupants,nav),traffic=gateTraffic(orders,nav);
+  // Front-to-back updates let a following formation use the space released
+  // by its leader in the same step, including a one-formation gate queue.
+  const moving=active.filter(([,p])=>p.target).sort((a,b)=>distance(a[1],goals.get(a[1])||a[1].target)-distance(b[1],goals.get(b[1])||b[1].target));
+  for(const [source,p]of moving){
+   const unit=units[source],yieldGoal=traffic.yields.get(p),target=yieldGoal||goals.get(p);if(!target){p.moving=false;continue;}if(traffic.waiting.has(p)&&!yieldGoal){p.moving=false;continue;}p.radius=squadRadius(unit);
+   const peers=active.filter(([,q])=>q!==p).map(([i,q])=>({...q,kind:units[i].kind,hp:units[i].hp}));
+   if(moveSquad(p,target,dt,unitStats(stats[unit.kind],unit).speed,nav,peers)&&!traffic.waiting.has(p))p.target=null;
+  }
+ }
+}
 export function mobilizeCity(b,city){const r=city.economy.realms[city.team],hall=city.economy.buildings.find(h=>h.type==='hall');b.civilianCityId=city.id;for(let i=0;i<Math.min(24,Math.floor(r.pop/2));i++)b.squads.push({source:-1-i,civilian:true,team:city.team,kind:"militia",hp:36,maxHp:36,morale:100,x:hall.x+(i%6-2.5)*2,z:hall.z+Math.floor(i/6)*2+5,heading:0,cool:0,target:null,advance:true});return b}
 export function settleDefenders(b,city){if(b.defendersSettled)return;const losses=b.squads.filter(u=>u.civilian&&u.hp<=0).length;city.economy.realms[city.team].pop=Math.max(0,city.economy.realms[city.team].pop-losses);b.defendersSettled=true}
 export function rememberBattle(camp,b){camp.deployments??={};const tile=camp.deployments[b.cell.c+':'+b.cell.r]??={};for(const u of b.squads)if(!u.civilian&&!u.retreated)tile[u.source]={x:b.field?Math.max(-68,Math.min(68,u.x)):u.x,z:b.field?Math.max(-58,Math.min(58,u.z)):u.z,heading:u.heading||0,target:null}}

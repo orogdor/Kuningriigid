@@ -1,0 +1,298 @@
+[
+  {
+    "id": "shared-city-goal",
+    "title": "Four formations ordered to the same city entrance",
+    "goal": {
+      "x": 35,
+      "z": 0
+    },
+    "starts": [
+      [
+        -45,
+        -13.5
+      ],
+      [
+        -45,
+        -4.5
+      ],
+      [
+        -45,
+        4.5
+      ],
+      [
+        -45,
+        13.5
+      ]
+    ],
+    "buildings": [],
+    "maxSeconds": 90
+  },
+  {
+    "id": "city-gate",
+    "title": "Queue through a gate into an inhabited city",
+    "goal": {
+      "x": 35,
+      "z": 0
+    },
+    "starts": [
+      [
+        -45,
+        -18
+      ],
+      [
+        -45,
+        -6
+      ],
+      [
+        -45,
+        6
+      ],
+      [
+        -45,
+        18
+      ]
+    ],
+    "gate": {
+      "x": 0,
+      "halfWidth": 1.5
+    },
+    "buildings": [
+      {
+        "type": "hall",
+        "x": 58,
+        "z": 0
+      },
+      {
+        "type": "house",
+        "x": 26,
+        "z": -18
+      },
+      {
+        "type": "house",
+        "x": 26,
+        "z": 18
+      },
+      {
+        "type": "gatehouse",
+        "x": 0,
+        "z": 0,
+        "wallAxis": 1
+      }
+    ],
+    "maxSeconds": 120
+  },
+  {
+    "id": "city-street",
+    "title": "Shared destination beyond a street lined with houses",
+    "goal": {
+      "x": 40,
+      "z": 0
+    },
+    "starts": [
+      [
+        -48,
+        -15
+      ],
+      [
+        -48,
+        -5
+      ],
+      [
+        -48,
+        5
+      ],
+      [
+        -48,
+        15
+      ]
+    ],
+    "buildings": [
+      {
+        "type": "house",
+        "x": -12,
+        "z": -12
+      },
+      {
+        "type": "house",
+        "x": -12,
+        "z": 12
+      },
+      {
+        "type": "house",
+        "x": 2,
+        "z": -12
+      },
+      {
+        "type": "house",
+        "x": 2,
+        "z": 12
+      },
+      {
+        "type": "house",
+        "x": 16,
+        "z": -12
+      },
+      {
+        "type": "house",
+        "x": 16,
+        "z": 12
+      },
+      {
+        "type": "hall",
+        "x": 61,
+        "z": 0
+      }
+    ],
+    "maxSeconds": 120
+  },
+  {
+    "id": "occupied-city-goal",
+    "title": "A parked friendly formation already occupies the city entrance",
+    "goal": {
+      "x": 35,
+      "z": 0
+    },
+    "starts": [
+      [
+        -45,
+        -13.5
+      ],
+      [
+        -45,
+        -4.5
+      ],
+      [
+        -45,
+        4.5
+      ],
+      [
+        -45,
+        13.5
+      ]
+    ],
+    "parked": [
+      [
+        35,
+        0
+      ]
+    ],
+    "buildings": [],
+    "maxSeconds": 90
+  },
+  {
+    "id": "cavalry-city-goal",
+    "title": "Mounted formations reserve larger arrival spaces",
+    "kind": "cavalry",
+    "goal": {
+      "x": 35,
+      "z": 0
+    },
+    "starts": [
+      [
+        -48,
+        -25
+      ],
+      [
+        -48,
+        0
+      ],
+      [
+        -48,
+        25
+      ]
+    ],
+    "buildings": [],
+    "maxSeconds": 150
+  },
+  {
+    "id": "gate-counterflow",
+    "title": "An opposing formation yields before entering a single-file gate",
+    "goal": {
+      "x": 35,
+      "z": 0
+    },
+    "goals": [
+      [
+        35,
+        0
+      ],
+      [
+        -35,
+        0
+      ]
+    ],
+    "starts": [
+      [
+        -15,
+        0
+      ],
+      [
+        8,
+        0
+      ]
+    ],
+    "gate": {
+      "x": 0,
+      "halfWidth": 1.5
+    },
+    "buildings": [
+      {
+        "type": "gatehouse",
+        "x": 0,
+        "z": 0,
+        "wallAxis": 1
+      }
+    ],
+    "maxSeconds": 120
+  },
+  {
+    "id": "chariot-city-goal",
+    "title": "chariot formations reserve correctly sized arrival positions",
+    "kind": "chariot",
+    "goal": {
+      "x": 35,
+      "z": 0
+    },
+    "starts": [
+      [
+        -60,
+        -28
+      ],
+      [
+        -60,
+        0
+      ],
+      [
+        -60,
+        28
+      ]
+    ],
+    "buildings": [],
+    "maxSeconds": 150
+  },
+  {
+    "id": "catapult-city-goal",
+    "title": "catapult formations reserve correctly sized arrival positions",
+    "kind": "catapult",
+    "goal": {
+      "x": 35,
+      "z": 0
+    },
+    "starts": [
+      [
+        -45,
+        -8
+      ],
+      [
+        -45,
+        0
+      ],
+      [
+        -45,
+        8
+      ]
+    ],
+    "buildings": [],
+    "maxSeconds": 150
+  }
+]

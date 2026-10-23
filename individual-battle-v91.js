@@ -1,3 +1,4 @@
+import {assignArrivalGoals} from './army-arrivals-v133.js';
 import {crowdWaypoint,forgetCrowdRoute} from './crowd-movement-v132.js';
 import {tickTowerGuards,persistTowerGuards} from './tower-garrison-v117.js?v=117a';
 import {tickSiegeSupply,siegeSupplyGoal,tickTowerBallistas} from './siege-support-v115.js?v=117a';
@@ -11,7 +12,7 @@ import {meleeReach,soldierBodyRadius} from './combat-contact-v96.js';
 import {FORMATIONS,updateFormations,worldSlot,turnTowards,formationAttackReady,clearShot} from './formations-v94.js?v=117a';
 import {allowedDeployment} from './battle-pacing-v93.js';
 import {horseKind,isBow,usesArrows,tacticalStats,initializeTactics,updateMorale,tacticalGoal,tacticalDamage,shotHits} from './historical-tactics-v92.js?v=117a';
-import {soldierCount,constrainStep} from './soldier-collision-v90.js?v=101a';
+import {soldierCount,squadRadius,constrainStep} from './soldier-collision-v90.js?v=101a';
 import {troopRole,rangedTroop} from './military-v88.js?v=117a';
 import {unitStats} from './army-experience-v88.js';
 import {isSiegeUnit,siegeDamage} from './medieval-v62.js?v=117a';
@@ -93,13 +94,16 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
  const insert=m=>{const k=key(m.x,m.z),list=bins.get(k)||[];list.push(m);bins.set(k,list);};for(const p of agents)if(!p.u.guardPost)insert(p.m);
  const nearby=m=>{const list=[],x=Math.floor(m.x/8),z=Math.floor(m.z/8);for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++)list.push(...(bins.get((x+dx)+':'+(z+dz))||[]).filter(p=>p.hp>0&&!p.escaped));return list;};
  const open=nav?((x,z)=>nav.open(x,z)):()=>true;
+ const arrivalOccupants=squads.map(u=>({agent:u,team:u.team,radius:u.guardPost ? .34 : squadRadius(u)}));
+ const arrivalOrders=arrivalOccupants.filter(o=>o.agent.manualOrder&&o.agent.target&&!o.agent.routing&&!o.agent.guardPost).map(o=>({...o,goal:o.agent.target}));
+ const arrivalGoals=assignArrivalGoals(arrivalOrders,arrivalOccupants,nav);
  // A squad anchor supplies marching waypoints only; it neither attacks nor
  // owns health. Close combat is resolved independently at each man's position.
  for(const u of squads){const foes=squads.filter(v=>v.team!==u.team),ordered=foes.find(v=>u.attackTargetSource!=null&&v.source===u.attackTargetSource),nearest=ordered||committedOpponent(u,foes)||(b.fortress?.hp>0&&b.fortress.team!==u.team?b.fortress:null),a=tacticalStats(stats[u.kind],u),anchor=u.anchor??={x:u.x,z:u.z};u.moving=false;if(u.wallClimb&&!u.routing)continue;if(u.siegeBuildingId!=null&&!u.routing){if(!(b.siegeWorks||[]).some(w=>w.id===u.siegeBuildingId&&(w.ready||w.kind==='camp')&&!w.destroyed))u.anchor={x:u.x,z:u.z};continue;}if(b.pursuitStoppedTeam===u.team&&!u.routing&&!(horseKind(u)&&foes.some(v=>v.routing&&!v.retreated&&dist(u,v)<50&&Math.abs(v.x)<185&&Math.abs(v.z)<158))){u.anchor={x:u.x,z:u.z};continue;}
-  let goal=u.manualOrder&&u.target?u.target:siegeSupplyGoal(b,u);
+  let goal=u.manualOrder&&u.target?(arrivalGoals.get(u)||u.anchor||u):siegeSupplyGoal(b,u);
   if(!goal&&nearest&&(u.routing||u.manualOrder||u.attackTargetSource!=null||((u.combatMode??'auto')!=='manual'&&(u.team!==0||u.advance||u.civilian||horseKind(u)||u.team===0||dist(u,nearest)<30))))goal=siegeAssaultGoal(b,u)||marchingGoal(u,nearest,tacticalGoal(u,nearest,squads,b,a,nav));
   if(goal&&(!u.guardPost||u.routing)){const lead=dist(anchor,u),maxLead=u.kind==='chariot'?15:horseKind(u)?12:3;const ahead=(anchor.x-u.x)*(goal.x-anchor.x)+(anchor.z-u.z)*(goal.z-anchor.z)>0;const marchSpeed=lead>maxLead&&ahead?0:a.speed;const marchDistance=dist(anchor,goal),marchHeading=Math.atan2(goal.x-anchor.x,goal.z-anchor.z);if(nav)nav.move(anchor,goal,dt,marchSpeed*(1-(u.men.reduce((n,m)=>n+m.fatigue,0)/u.men.length)*.0025));else{const d=dist(anchor,goal),f=d?Math.min(1,marchSpeed*dt/d):0;anchor.x+=(goal.x-anchor.x)*f;anchor.z+=(goal.z-anchor.z)*f;}if(marchDistance>.1)u.heading=u.fixedFacing??turnTowards(u.heading||0,(u.kind==='chariot'&&u.chariotPhase!=='shoot'?marchHeading:!u.manualOrder&&!u.routing&&nearest?Math.atan2(nearest.x-u.x,nearest.z-u.z):marchHeading),dt,(FORMATIONS[u.formation]||FORMATIONS.line).turn);}
-  if(u.manualOrder&&u.target&&dist(u,u.target)<2){u.manualOrder=false;u.target=null;}
+  if(u.manualOrder&&u.target&&arrivalGoals.has(u)&&dist(u,arrivalGoals.get(u))<2){u.manualOrder=false;u.target=null;}
  }
  for(const actor of agents){const {m,u}=actor;if(m.hp<=0||m.escaped||u.retreated||(u.wallClimb&&!u.routing))continue;const a=tacticalStats(stats[u.kind],u),count=u.menCount||soldierCount(u);if(m.routing&&!u.routing)a.speed/=(FORMATIONS[u.formation]||FORMATIONS.line).speed;if(u.kind==='dragoon'&&m.dismounted)a.speed*=.58;if(stoneThrower(u)&&m.catapultReloadVersion!==104){if(m.cool>0)m.cool*=3;m.catapultReloadVersion=104;}m.cool=Math.max(0,m.cool-dt);m.wasMoving=!!m.moving;m.moving=false;
   let enemy=null,best=Infinity,threat=null,threatDistance=Infinity;for(const p of enemies.get(u.team)||[]){if(p.m.hp<=0||p.m.escaped||p.u.retreated)continue;if(u.attackTargetSource!=null&&p.u.source!==u.attackTargetSource)continue;
@@ -126,7 +130,7 @@ export function tickIndividualBattle(b,dt,stats,tech=0,nav=null){
   if(m.routing||u.routing)goal=nav?.escapeGoal?nav.escapeGoal(m,u.battleSide,threat):(m.escapeTarget??=retreatPoint(m,u.battleSide,threat));
   else if(!u.manualOrder&&((u.combatMode??'auto')!=='manual'||u.attackTargetSource!=null)){const form=FORMATIONS[u.formation]||FORMATIONS.line;if(u.formationManual&&u.formation==='skirmish'&&m.ammo>0&&d<range*.35)goal={x:m.x-u.battleSide*7,z:m.z};else if(!form.hold){if(isBow(u)&&m.ammo>0&&m.weapon!=='sword'){if(u.formationManual&&u.formation==='skirmish'&&d<range*.3)goal={x:m.x-u.battleSide*3,z:m.z};}else if(d<9&&dist(m,anchor)<10)goal=target;}}
   if(u.resupplyCamp||u.siegeBuildingId!=null)goal=worldSlot(u,m,u.men.filter(n=>n.hp>0&&!n.escaped).length);
-  goal=(u.resupplyCamp||u.siegeBuildingId!=null)?goal:keepAdvance(u,m,goal,d,target);if(m.yieldGoal&&m.yieldUntil>b.elapsed&&dist(m,m.yieldGoal)>.3)goal=m.yieldGoal;if(nav?.waypoint)goal=nav.waypoint(m,goal,b.elapsed);goal=crowdWaypoint(m,goal,nearby(m),open,p=>p.radius??.34,dt);const old={x:m.x,z:m.z},bin=bins.get(key(m.x,m.z));if(bin)bin.splice(bin.indexOf(m),1);const peers=nearby(m),length=dist(m,goal),step=Math.min(length,a.speed*(m.routing?1.1:1)*(1-m.fatigue*.0025)*dt),f=length?step/length:0,dx=(goal.x-m.x)*f,dz=(goal.z-m.z)*f;
+  goal=(u.resupplyCamp||u.siegeBuildingId!=null)?goal:keepAdvance(u,m,goal,d,target);if(m.yieldGoal&&m.yieldUntil>b.elapsed&&dist(m,m.yieldGoal)>.3)goal=m.yieldGoal;if(nav?.waypoint)goal=nav.waypoint(m,goal,b.elapsed);goal=crowdWaypoint(m,goal,nearby(m),open,p=>p.radius??.34,dt,nav?.cellSize||1);const old={x:m.x,z:m.z},bin=bins.get(key(m.x,m.z));if(bin)bin.splice(bin.indexOf(m),1);const peers=nearby(m),length=dist(m,goal),step=Math.min(length,a.speed*(m.routing?1.1:1)*(1-m.fatigue*.0025)*dt),f=length?step/length:0,dx=(goal.x-m.x)*f,dz=(goal.z-m.z)*f;
   const walkOpen=(u.guardPost&&u.routing&&!open(m.x,m.z))?()=>true:open;m.moving=constrainStep(m,{x:m.x+dx,z:m.z+dz},peers,walkOpen);
   if(dist(old,m)<step*.2&&length>.2){for(const angle of [.7,-.7,1.3,-1.3]){const co=Math.cos(angle),si=Math.sin(angle);if(constrainStep(m,{x:m.x+dx*co-dz*si,z:m.z+dx*si+dz*co},peers,open)&&dist(old,m)>step*.2){m.moving=true;break;}}}
   if(length>.3&&dist(old,m)<step*.2){m.blockedFor=(m.blockedFor||0)+dt;if(m.blockedFor>.4)forgetCrowdRoute(m);if(m.blockedFor>.6){const vectors=[{x:0,z:step},{x:0,z:-step},{x:step,z:0},{x:-step,z:0},...[2.1,-2.1,Math.PI].map(a=>({x:dx*Math.cos(a)-dz*Math.sin(a),z:dx*Math.sin(a)+dz*Math.cos(a)}))];for(const v of vectors){if(constrainStep(m,{x:m.x+v.x,z:m.z+v.z},peers,walkOpen)&&dist(old,m)>step*.2){const d=Math.hypot(v.x,v.z)||1,space=m.radius>1?7:3;m.yieldGoal={x:m.x+v.x/d*space,z:m.z+v.z/d*space};m.yieldUntil=b.elapsed+2;m.moving=true;m.blockedFor=0;break;}}}}else m.blockedFor=0;
