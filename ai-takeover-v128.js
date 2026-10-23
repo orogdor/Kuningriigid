@@ -25,7 +25,7 @@ export function takeOverAI(input,sourceTeam=1){
  return s;
 }
 export async function loadIronAITest(fetcher=fetch){
- const response=await fetcher('./scenarios/iron-ai-v128.json?v=128a');
+ const response=await fetcher('./scenarios/iron-ai-v129.json?v=129a');
  if(!response.ok)throw Error('Rauaaja AI testsalvestust ei saanud laadida ('+response.status+').');
  return takeOverAI(await response.json(),1);
 }

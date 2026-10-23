@@ -101,7 +101,27 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  }
  const territories=new T.Group(),routes=new T.Group();group.add(territories,routes);let previous='',lastRoute='';
  function disposeGroup(g){for(const o of [...g.children]){o.geometry?.dispose();o.material?.dispose();g.remove(o)}}
- function territory(state){game.refreshTerritory();const stamp=state.cities.map(c=>[c.id,c.team,c.c,c.r,c.radius].join(':')).join('|');if(stamp===previous)return;previous=stamp;disposeGroup(territories);const owner=new Map();for(const cell of game.cells){const city=game.territoryOwner(cell);if(city)owner.set(cell.r*COLS+cell.c,city.team)}for(const team of [0,1,2,3]){const edges=[],fill=[];const color=['#79b9b0','#cc765d','#ab92d0','#d4b858'][team];for(const cell of game.cells){if(owner.get(cell.r*COLS+cell.c)!==team)continue;for(const[dc,dr,dx,dz]of [[-1,0,-25,-25],[1,0,25,-25],[0,-1,-25,-25],[0,1,-25,25]]){const n=cell.c+dc,m=cell.r+dr;if(n>=0&&n<COLS&&m>=0&&m<ROWS&&owner.get(m*COLS+n)===team)continue;const x=cell.x+dx,z=cell.z+dz,vx=dc===0?50:0,vz=dr===0?50:0;for(let i=0;i<10;i++){const ax=x+vx*i/10,az=z+vz*i/10,bx=x+vx*(i+1)/10,bz=z+vz*(i+1)/10;edges.push(ax,height(ax,az)+.85,az,bx,height(bx,bz)+.85,bz)}}for(let z=-25;z<25;z+=10)for(let x=-25;x<25;x+=10){const a=[cell.x+x,cell.z+z],b=[a[0]+10,a[1]],c=[a[0],a[1]+10],d=[a[0]+10,a[1]+10];for(const q of [a,c,b,b,c,d])fill.push(q[0],height(...q)+.16,q[1])}}const mesh=new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(fill,3)),new T.MeshBasicMaterial({color,transparent:true,opacity:.075,depthWrite:false,side:T.DoubleSide}));territories.add(mesh,new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(edges,3)),new T.LineBasicMaterial({color,transparent:true,opacity:.88})))}}
+ function territory(state){
+  game.refreshTerritory();const stamp=game.territoryStamp+':'+(state.visionRevision||0);
+  if(stamp===previous)return;previous=stamp;disposeGroup(territories);
+  for(const team of [0,1,2,3])for(const rural of [true,false]){
+   const edges=[],fill=[],color=rural?['#b6ce75','#dba082','#bca3d6','#dfcc87'][team]:['#69d4c3','#e77e64','#ac87e2','#ead06b'][team];
+   for(const cell of game.cells){
+    const city=game.territory.get(cell.c+':'+cell.r);
+    if(!city||city.team!==team||!game.seen(0,cell)||game.isCountyTile(cell,city)!==rural)continue;
+    for(const[dc,dr,dx,dz]of [[-1,0,-25,-25],[1,0,25,-25],[0,-1,-25,-25],[0,1,-25,25]]){
+     const p={c:cell.c+dc,r:cell.r+dr},other=game.territory.get(p.c+':'+p.r);
+     if(other?.id===city.id&&game.isCountyTile(p,city)===rural)continue;
+     const x=cell.x+dx,z=cell.z+dz,vx=dc===0?50:0,vz=dr===0?50:0;
+     for(let i=0;i<10;i++){const ax=x+vx*i/10,az=z+vz*i/10,bx=x+vx*(i+1)/10,bz=z+vz*(i+1)/10;edges.push(ax,height(ax,az)+.9,az,bx,height(bx,bz)+.9,bz)}
+    }
+    for(let z=-25;z<25;z+=10)for(let x=-25;x<25;x+=10){const a=[cell.x+x,cell.z+z],b=[a[0]+10,a[1]],c=[a[0],a[1]+10],d=[a[0]+10,a[1]+10];for(const q of [a,c,b,b,c,d])fill.push(q[0],height(...q)+.18,q[1])}
+   }
+   const mesh=new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(fill,3)),new T.MeshBasicMaterial({color,transparent:true,opacity:rural?.15:.29,depthWrite:false,side:T.DoubleSide}));
+   mesh.name=rural?'county area':'urban area';
+   const line=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(edges,3)),new T.LineBasicMaterial({color,transparent:true,opacity:rural?.95:.9}));line.name=rural?'county border':'urban border';territories.add(mesh,line);
+  }
+ }
  function route(state,mover){const path=mover?.path||[],stamp=(mover?.c??'')+':'+(mover?.r??'')+JSON.stringify(path);if(stamp===lastRoute)return;lastRoute=stamp;disposeGroup(routes);if(!path.length)return;const tiles=[mover,...path],points=[];for(let i=1;i<tiles.length;i++){const a=center(tiles[i-1].c,tiles[i-1].r),b=center(tiles[i].c,tiles[i].r);for(let j=0;j<10;j++){const x=a.x+(b.x-a.x)*j/10,z=a.z+(b.z-a.z)*j/10;points.push(new T.Vector3(x,height(x,z)+2,z))}}const end=center(path.at(-1).c,path.at(-1).r);points.push(new T.Vector3(end.x,height(end.x,end.z)+2,end.z));const line=new T.Line(new T.BufferGeometry().setFromPoints(points),new T.LineDashedMaterial({color:'#f4d48b',dashSize:5,gapSize:3,transparent:true,opacity:1,depthTest:false}));line.computeLineDistances();routes.add(line);const dots=new T.InstancedMesh(new T.RingGeometry(2,3,12),new T.MeshBasicMaterial({color:'#fae4a4',side:T.DoubleSide,depthTest:false,depthWrite:false}),path.length);path.forEach((p,i)=>{const q=center(p.c,p.r);dummy.position.set(q.x,height(q.x,q.z)+2,q.z);dummy.rotation.set(-Math.PI/2,0,0);dummy.scale.set(1,1,1);dummy.updateMatrix();dots.setMatrixAt(i,dummy.matrix)});routes.add(dots)}
 
  return {group,territory,route,roads,routes,waveLines,peaks:peaks.length,shoreSegments:shore.length/6,nature};

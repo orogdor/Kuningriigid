@@ -1,3 +1,4 @@
+import {citySpacingAllowed} from './counties-v126.js';
 import {balanceUnitDefinitions} from './unit-balance-v99.js';
 import {UNIT_GRADES,troopCost} from './military-v88.js?v=117a';
 import {canAfford,spendResources} from './economy.js';
@@ -241,7 +242,7 @@ function aiColonialVoyage(game,ship,settler){
  for(let dr=-radius;dr<=radius;dr+=2)for(let dc=-radius;dc<=radius;dc+=2){
   const c=game.cell({c:ship.c+dc,r:ship.r+dr});
   if(!c?.land||c.mountain||game.territoryOwner(c))continue;
-  if(game.s.cities.some(t=>Math.abs(t.c-c.c)+Math.abs(t.r-c.r)<5))continue;
+  if(!citySpacingAllowed(c,game.s.cities))continue;
   for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
    const water={c:c.c+dx,r:c.r+dz};
    if(!seaAllowed(game,ship.team,water))continue;

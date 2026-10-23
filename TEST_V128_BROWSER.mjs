@@ -15,6 +15,9 @@ try{
   assert.equal(state.age,2);assert.equal(state.takeover.sourceTeam,1);assert.ok(state.ownCities>0&&state.ownCombat>=2);assert.equal(state.view,'local');assert.equal(state.menuHidden,true);
   assert.equal(state.main,'original-save-sentinel');assert.equal(state.backup,'backup-save-sentinel');
   await page.screenshot({path:`${out}/takeover-${mobile?'mobile':'desktop'}.png`});
+  await page.locator('#maptoggle').click();
+  await page.waitForFunction(()=>window.gameDebug.view()==='world');
+  await page.screenshot({path:`${out}/counties-${mobile?'mobile':'desktop'}.png`});
   await page.locator('#pause').click();
   await page.waitForFunction(time=>window.gameDebug.state.time>time+.1,state.time,{timeout:15000});
   await page.locator('#pause').click();

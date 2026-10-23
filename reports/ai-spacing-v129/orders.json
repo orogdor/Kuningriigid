@@ -1,0 +1,7882 @@
+{
+  "seed": 12501,
+  "violations": [],
+  "events": [
+    {
+      "turn": 1,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 1,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 1,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 1,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 1,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "lumber",
+      "x": 6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 1,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "lumber",
+      "x": -6,
+      "z": 12,
+      "age": 0
+    },
+    {
+      "turn": 2,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "lumber",
+      "x": -24,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 2,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "lumber",
+      "x": 6,
+      "z": 12,
+      "age": 0
+    },
+    {
+      "turn": 2,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "house",
+      "x": -18,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 2,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "house",
+      "x": -18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 2,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "house",
+      "x": -18,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 2,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "house",
+      "x": -18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 12,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "quarry",
+      "x": 18,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 12,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "quarry",
+      "x": -18,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 12,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        24
+      ],
+      "type": "quarry",
+      "x": 18,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 12,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "quarry",
+      "x": -18,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 12,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 12,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 12,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 23,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "lumber",
+      "x": 18,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 30,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        112
+      ],
+      "type": "farm",
+      "x": -36,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 30,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "farm",
+      "x": -36,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 30,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "farm",
+      "x": -6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 30,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        26
+      ],
+      "type": "farm",
+      "x": -36,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 31,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "field",
+      "x": -64,
+      "z": -48,
+      "age": 0
+    },
+    {
+      "turn": 35,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "house",
+      "x": -30,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 36,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "field",
+      "x": -64,
+      "z": -48,
+      "age": 0
+    },
+    {
+      "turn": 37,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        112
+      ],
+      "type": "field",
+      "x": -64,
+      "z": -48,
+      "age": 0
+    },
+    {
+      "turn": 37,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        26
+      ],
+      "type": "field",
+      "x": -64,
+      "z": -48,
+      "age": 0
+    },
+    {
+      "turn": 47,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 53,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "hunter",
+      "x": 6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 56,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "hunter",
+      "x": 6,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 57,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "hunter",
+      "x": -30,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 58,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "hunter",
+      "x": 18,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 64,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "house",
+      "x": -18,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 64,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "house",
+      "x": -30,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 64,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "house",
+      "x": -30,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 69,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "house",
+      "x": -30,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 76,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 76,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "lumber",
+      "x": 12,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 79,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "study",
+      "x": -30,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 79,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "hunter",
+      "x": 18,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 80,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "quarry",
+      "x": -18,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 81,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "house",
+      "x": -18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 82,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "study",
+      "x": -6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 82,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "well",
+      "x": -18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 82,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "lumber",
+      "x": 24,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 83,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 83,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 83,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "lumber",
+      "x": -36,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 83,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "lumber",
+      "x": 0,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 85,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "study",
+      "x": -6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 86,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "lumber",
+      "x": 6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 86,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "hunter",
+      "x": 6,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 87,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "study",
+      "x": -6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 87,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "study",
+      "x": -6,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 87,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "lumber",
+      "x": -24,
+      "z": 12,
+      "age": 0
+    },
+    {
+      "turn": 87,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "study",
+      "x": -30,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 87,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "house",
+      "x": -18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 87,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "house",
+      "x": -18,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 87,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "farm",
+      "x": -30,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 88,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "study",
+      "x": -6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 88,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "study",
+      "x": -6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 89,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "lumber",
+      "x": -12,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 89,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "hunter",
+      "x": -12,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 89,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "claypit",
+      "x": -9,
+      "z": 36,
+      "age": 0
+    },
+    {
+      "turn": 90,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "claypit",
+      "x": -36,
+      "z": 9,
+      "age": 0
+    },
+    {
+      "turn": 90,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "farm",
+      "x": -30,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 90,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "study",
+      "x": -18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 90,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 90,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "farm",
+      "x": -6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 91,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "house",
+      "x": -30,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 91,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "lumber",
+      "x": 24,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 91,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "field",
+      "x": -64,
+      "z": -48,
+      "age": 0
+    },
+    {
+      "turn": 91,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "field",
+      "x": -64,
+      "z": -48,
+      "age": 0
+    },
+    {
+      "turn": 91,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "pottery_kiln",
+      "x": -6,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 91,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "lumber",
+      "x": -12,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 91,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "pottery_kiln",
+      "x": -6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 92,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "quarry",
+      "x": 18,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 92,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "hunter",
+      "x": -24,
+      "z": 12,
+      "age": 0
+    },
+    {
+      "turn": 93,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 94,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "quarry",
+      "x": -18,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 94,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "house",
+      "x": -30,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 94,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "study",
+      "x": -30,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 94,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "study",
+      "x": -18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 95,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "study",
+      "x": -6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 97,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "house",
+      "x": -30,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 97,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 97,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "hunter",
+      "x": -12,
+      "z": 12,
+      "age": 0
+    },
+    {
+      "turn": 97,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "lumber",
+      "x": 0,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 97,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        149,
+        78
+      ],
+      "type": "quarry",
+      "x": -18,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 97,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "well",
+      "x": -30,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 97,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "mason",
+      "x": -18,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 97,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "lumber",
+      "x": -6,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 98,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "hunter",
+      "x": 18,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 98,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "mason",
+      "x": 18,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 98,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "lumber",
+      "x": -6,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 98,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "claypit",
+      "x": 27,
+      "z": -9,
+      "age": 0
+    },
+    {
+      "turn": 99,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 99,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "study",
+      "x": -30,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 100,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "claypit",
+      "x": -18,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 100,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "house",
+      "x": -18,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 100,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "barracks",
+      "x": 6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 100,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "pottery_kiln",
+      "x": -18,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 100,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "claypit",
+      "x": -9,
+      "z": -36,
+      "age": 0
+    },
+    {
+      "turn": 100,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "barracks",
+      "x": 18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 100,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "claypit",
+      "x": -27,
+      "z": 9,
+      "age": 0
+    },
+    {
+      "turn": 100,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "lumber",
+      "x": 6,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 101,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "claypit",
+      "x": 36,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 101,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "barracks",
+      "x": 6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 101,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        112
+      ],
+      "type": "claypit",
+      "x": -9,
+      "z": -45,
+      "age": 0
+    },
+    {
+      "turn": 101,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "claypit",
+      "x": -54,
+      "z": 18,
+      "age": 0
+    },
+    {
+      "turn": 101,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "study",
+      "x": -18,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 102,
+      "event": "recruit",
+      "team": 0,
+      "city": 4,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 102,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        69,
+        85
+      ],
+      "type": "quarry",
+      "x": -18,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 102,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "house",
+      "x": -18,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 102,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "pottery_kiln",
+      "x": -30,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 102,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "field",
+      "x": -64,
+      "z": -48,
+      "age": 0
+    },
+    {
+      "turn": 102,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "pottery_kiln",
+      "x": -30,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 103,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "mason",
+      "x": -30,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 103,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "pottery_kiln",
+      "x": -6,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 104,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 104,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 104,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "quarry",
+      "x": 18,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 105,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "lumber",
+      "x": 6,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 105,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "house",
+      "x": -6,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 105,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "barracks",
+      "x": -6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 105,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 106,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "house",
+      "x": -6,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 106,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "pottery_kiln",
+      "x": -6,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 106,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "mason",
+      "x": -12,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 106,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "house",
+      "x": 6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 106,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "pottery_kiln",
+      "x": -18,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 107,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 107,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 108,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "mason",
+      "x": 6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 108,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "house",
+      "x": -30,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 108,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "mason",
+      "x": -6,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 108,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "mason",
+      "x": -24,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 109,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "mason",
+      "x": 6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 109,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "mason",
+      "x": -6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 109,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 109,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "mason",
+      "x": -6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 110,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "mason",
+      "x": -18,
+      "z": 12,
+      "age": 0
+    },
+    {
+      "turn": 110,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "mason",
+      "x": 6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 110,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "claypit",
+      "x": 9,
+      "z": -45,
+      "age": 0
+    },
+    {
+      "turn": 111,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 111,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "barracks",
+      "x": -30,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 111,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "barracks",
+      "x": 6,
+      "z": -12,
+      "age": 0
+    },
+    {
+      "turn": 111,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "barracks",
+      "x": -30,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 111,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "house",
+      "x": -6,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 112,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "house",
+      "x": -30,
+      "z": -24,
+      "age": 0
+    },
+    {
+      "turn": 112,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "barracks",
+      "x": -30,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 112,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "barracks",
+      "x": -12,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 112,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "pottery_kiln",
+      "x": -30,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 112,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "barracks",
+      "x": 6,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 113,
+      "event": "recruit",
+      "team": 0,
+      "city": 3,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 113,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "barracks",
+      "x": -30,
+      "z": -6,
+      "age": 0
+    },
+    {
+      "turn": 113,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "house",
+      "x": 0,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 113,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "barracks",
+      "x": -6,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 113,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "house",
+      "x": -6,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 114,
+      "event": "recruit",
+      "team": 0,
+      "city": 4,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 115,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 115,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 115,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "mason",
+      "x": -6,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 116,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "saw",
+      "x": 18,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 116,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "saw",
+      "x": 6,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 116,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "saw",
+      "x": 6,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 116,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "saw",
+      "x": 0,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 116,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "saw",
+      "x": -18,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 116,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "vegetable_garden",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 117,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "bronze_foundry",
+      "x": 12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 117,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "tinmine",
+      "x": -54,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 117,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 117,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 117,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "house",
+      "x": 6,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 118,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "barracks",
+      "x": -30,
+      "z": 0,
+      "age": 0
+    },
+    {
+      "turn": 118,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "pottery_kiln",
+      "x": -18,
+      "z": 6,
+      "age": 0
+    },
+    {
+      "turn": 118,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "house",
+      "x": 18,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 119,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 119,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 119,
+      "event": "recruit",
+      "team": 3,
+      "city": 8,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 120,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "house",
+      "x": 18,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 120,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 121,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 121,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 121,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "pasture",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 121,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "pasture",
+      "x": 18,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 121,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "pasture",
+      "x": 18,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 121,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "pasture",
+      "x": 12,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 122,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "archery",
+      "x": 6,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 122,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "archery",
+      "x": 24,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 122,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "archery",
+      "x": -6,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 122,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "hunter",
+      "x": -6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 122,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 122,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 122,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 122,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "house",
+      "x": 6,
+      "z": -18,
+      "age": 0
+    },
+    {
+      "turn": 123,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "pasture",
+      "x": -30,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 124,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "archery",
+      "x": 0,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 124,
+      "event": "recruit",
+      "team": 1,
+      "city": 9,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 124,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 124,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 124,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        104,
+        119
+      ],
+      "type": "archery",
+      "x": 24,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 125,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "house",
+      "x": 24,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 126,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 126,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 126,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "slinger",
+      "age": 0
+    },
+    {
+      "turn": 126,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "saw",
+      "x": -12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 126,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "saw",
+      "x": -36,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 126,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        24
+      ],
+      "type": "coppermine",
+      "x": 9,
+      "z": 45,
+      "age": 1
+    },
+    {
+      "turn": 126,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        87,
+        41
+      ],
+      "type": "coppermine",
+      "x": -18,
+      "z": 45,
+      "age": 1
+    },
+    {
+      "turn": 126,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        87,
+        41
+      ],
+      "type": "tinmine",
+      "x": -36,
+      "z": 9,
+      "age": 1
+    },
+    {
+      "turn": 127,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "saw",
+      "x": 6,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 128,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "axeman",
+      "age": 0
+    },
+    {
+      "turn": 128,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        82,
+        25
+      ],
+      "type": "tinmine",
+      "x": 36,
+      "z": 9,
+      "age": 1
+    },
+    {
+      "turn": 128,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "bronze_foundry",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        84
+      ],
+      "type": "lumber",
+      "x": 12,
+      "z": 24,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "saw",
+      "x": 6,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "saw",
+      "x": 6,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "vegetable_garden",
+      "x": -36,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        149,
+        78
+      ],
+      "type": "coppermine",
+      "x": -18,
+      "z": 45,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        149,
+        80
+      ],
+      "type": "tinmine",
+      "x": -9,
+      "z": -36,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        78
+      ],
+      "type": "vegetable_garden",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        152,
+        80
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "vegetable_garden",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 129,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        138,
+        97
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 130,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "saw",
+      "x": -30,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 130,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 131,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "saw",
+      "x": 18,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 131,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        188,
+        112
+      ],
+      "type": "coppermine",
+      "x": 27,
+      "z": -18,
+      "age": 1
+    },
+    {
+      "turn": 131,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        192,
+        111
+      ],
+      "type": "tinmine",
+      "x": -9,
+      "z": -45,
+      "age": 1
+    },
+    {
+      "turn": 132,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "house",
+      "x": -30,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 132,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "house",
+      "x": 6,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 132,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        135,
+        64
+      ],
+      "type": "coppermine",
+      "x": -27,
+      "z": 9,
+      "age": 1
+    },
+    {
+      "turn": 133,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "saw",
+      "x": -6,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 133,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "bronze_foundry",
+      "x": -6,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 133,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "bronze_foundry",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 133,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "saw",
+      "x": -30,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 133,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "pasture",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 133,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "pasture",
+      "x": -6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 134,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "bronze_foundry",
+      "x": 6,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 134,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "barracks",
+      "x": 6,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 134,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "bronze_foundry",
+      "x": 12,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 135,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "house",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 135,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "palisade",
+      "x": -49,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 135,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        64
+      ],
+      "type": "tinmine",
+      "x": 36,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 136,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "palisade",
+      "x": -42,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 136,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "pasture",
+      "x": 6,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 137,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "archery",
+      "x": 6,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 137,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "bronze_foundry",
+      "x": 12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 137,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "palisade",
+      "x": -35,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 137,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "coppermine",
+      "x": -36,
+      "z": 18,
+      "age": 1
+    },
+    {
+      "turn": 137,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        112
+      ],
+      "type": "house",
+      "x": 24,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 137,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "cartwright",
+      "x": -12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 137,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "mason",
+      "x": 12,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 138,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        84
+      ],
+      "type": "cartwright",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 138,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "cartwright",
+      "x": -6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 138,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "cartwright",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 138,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "palisade",
+      "x": -28,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 138,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "coppermine",
+      "x": -27,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 138,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        64
+      ],
+      "type": "vegetable_garden",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 138,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        65
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 139,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "palisade",
+      "x": -21,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 139,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "archery",
+      "x": 6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 140,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "palisade",
+      "x": -14,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 140,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "bronze_foundry",
+      "x": 6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 140,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        111
+      ],
+      "type": "tinmine",
+      "x": 0,
+      "z": -45,
+      "age": 1
+    },
+    {
+      "turn": 141,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "palisade",
+      "x": -7,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 141,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "lumber",
+      "x": -24,
+      "z": 18,
+      "age": 1
+    },
+    {
+      "turn": 142,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 7,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 142,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "archery",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 143,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "archery",
+      "x": 6,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 143,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "archery",
+      "x": -6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 143,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        84
+      ],
+      "type": "house",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 145,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "tinmine",
+      "x": 27,
+      "z": 9,
+      "age": 1
+    },
+    {
+      "turn": 146,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        84
+      ],
+      "type": "forester",
+      "x": 0,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 146,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "forester",
+      "x": 6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 146,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "forester",
+      "x": 12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 147,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "forester",
+      "x": 0,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 148,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        84
+      ],
+      "type": "warehouse",
+      "x": 0,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 148,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "warehouse",
+      "x": 0,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 148,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "warehouse",
+      "x": 18,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 148,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "bronze_foundry",
+      "x": 18,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 148,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "house",
+      "x": 6,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 148,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "archery",
+      "x": 18,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 149,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "mill",
+      "x": 12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 149,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "pasture",
+      "x": -36,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 150,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "mill",
+      "x": -18,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 152,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "cartwright",
+      "x": 18,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 153,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "pasture",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 153,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "bronze_foundry",
+      "x": 18,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 153,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "vegetable_garden",
+      "x": 18,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 153,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "bronze_foundry",
+      "x": -30,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 154,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 154,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "warehouse",
+      "x": -24,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 154,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "house",
+      "x": 24,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 157,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        24
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 157,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "vegetable_garden",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 157,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        41
+      ],
+      "type": "vegetable_garden",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 157,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        87,
+        42
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 158,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 158,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "house",
+      "x": 18,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 159,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "house",
+      "x": -12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 159,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        81
+      ],
+      "type": "archery",
+      "x": 6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 159,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "bronze_foundry",
+      "x": 18,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 160,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "cartwright",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 161,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 14,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 161,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 162,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        15
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 162,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "house",
+      "x": 0,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 162,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "bronze_foundry",
+      "x": -6,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 162,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 163,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 163,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        84
+      ],
+      "type": "house",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 163,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        104,
+        17
+      ],
+      "type": "forester",
+      "x": 24,
+      "z": 18,
+      "age": 1
+    },
+    {
+      "turn": 164,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 164,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "warehouse",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 164,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 165,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "bakery",
+      "x": 0,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 165,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "forester",
+      "x": 24,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 165,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "warehouse",
+      "x": 6,
+      "z": -18,
+      "age": 1
+    },
+    {
+      "turn": 165,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "house",
+      "x": 18,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 166,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 166,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "house",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 166,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "cartwright",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 166,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        86,
+        104
+      ],
+      "type": "house",
+      "x": 0,
+      "z": 24,
+      "age": 1
+    },
+    {
+      "turn": 166,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 166,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "pasture",
+      "x": -36,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 167,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "warehouse",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 168,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 168,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 21,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 168,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 169,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "archery",
+      "x": 6,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 169,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        25
+      ],
+      "type": "mill",
+      "x": 18,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 169,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 169,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "pasture",
+      "x": 18,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 170,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "cellar",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 170,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 170,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "house",
+      "x": 0,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 171,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "bronze_foundry",
+      "x": 0,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 171,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 171,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "pasture",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 172,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 172,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 28,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 172,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "road_depot",
+      "x": 0,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 172,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "bakery",
+      "x": 6,
+      "z": 18,
+      "age": 1
+    },
+    {
+      "turn": 172,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "scriptorium",
+      "x": 0,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 173,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "scriptorium",
+      "x": 6,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 173,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "scriptorium",
+      "x": 0,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 173,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 173,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -49,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 173,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        82,
+        24
+      ],
+      "type": "road_depot",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 173,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 174,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        82,
+        24
+      ],
+      "type": "scriptorium",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 174,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "scriptorium",
+      "x": 6,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 174,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        112
+      ],
+      "type": "vegetable_garden",
+      "x": 18,
+      "z": 18,
+      "age": 1
+    },
+    {
+      "turn": 175,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 35,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 175,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 175,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "scriptorium",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 175,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "warehouse",
+      "x": -12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 175,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 176,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "house",
+      "x": 24,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 176,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "scriptorium",
+      "x": 0,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 176,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "forester",
+      "x": 18,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 176,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "road_depot",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 177,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 177,
+      "event": "recruit",
+      "team": 2,
+      "city": 6,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 177,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 177,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "pasture",
+      "x": 6,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 178,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "market",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 178,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 178,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "house",
+      "x": -12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 178,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 179,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 42,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 179,
+      "event": "recruit",
+      "team": 2,
+      "city": 6,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 179,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 179,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "house",
+      "x": -12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 179,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "cellar",
+      "x": -12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 180,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "mill",
+      "x": 18,
+      "z": -18,
+      "age": 1
+    },
+    {
+      "turn": 180,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "cellar",
+      "x": -36,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 180,
+      "event": "recruit",
+      "team": 1,
+      "city": 9,
+      "kind": "bronze_archer",
+      "age": 1
+    },
+    {
+      "turn": 181,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 181,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 181,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 182,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "road_depot",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 182,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 49,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 182,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 182,
+      "event": "recruit",
+      "team": 3,
+      "city": 8,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 183,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "archery",
+      "x": 12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 183,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -35,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 184,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "house",
+      "x": 6,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 184,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 185,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "road_depot",
+      "x": 18,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 185,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "weaver",
+      "x": -12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 185,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -28,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 186,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -49,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 186,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 186,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "cellar",
+      "x": 0,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 186,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "mill",
+      "x": 12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 187,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -49,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 187,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -21,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 187,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "market",
+      "x": 12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 188,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 188,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "road_depot",
+      "x": 24,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 188,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "warehouse",
+      "x": 18,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 189,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "mill",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 189,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 189,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "house",
+      "x": 12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 189,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -14,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 189,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        86,
+        121
+      ],
+      "type": "house",
+      "x": 18,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 190,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 190,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "scriptorium",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 190,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "road_depot",
+      "x": 0,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 190,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "warehouse",
+      "x": 12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 190,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "scriptorium",
+      "x": 12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 191,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "forester",
+      "x": 18,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 191,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -7,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 191,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 1
+    },
+    {
+      "turn": 192,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -35,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 192,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        133,
+        64
+      ],
+      "type": "warehouse",
+      "x": 24,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 192,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        82,
+        24
+      ],
+      "type": "bakery",
+      "x": 0,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 193,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "market",
+      "x": 24,
+      "z": -6,
+      "age": 1
+    },
+    {
+      "turn": 193,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 7,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 193,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "stonewall",
+      "x": -49,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 194,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 195,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 14,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 195,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        64
+      ],
+      "type": "cellar",
+      "x": 0,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 196,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -28,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 196,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        79
+      ],
+      "type": "market",
+      "x": 18,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 197,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "cellar",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 198,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 21,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 198,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "house",
+      "x": 0,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 198,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 199,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -21,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 201,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 28,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 201,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "house",
+      "x": 12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 201,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "cartwright",
+      "x": 0,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 201,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        86,
+        42
+      ],
+      "type": "forester",
+      "x": 24,
+      "z": 6,
+      "age": 1
+    },
+    {
+      "turn": 202,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -14,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 203,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        64
+      ],
+      "type": "market",
+      "x": -12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        82,
+        24
+      ],
+      "type": "coal",
+      "x": 0,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_axeman",
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        87,
+        41
+      ],
+      "type": "mine",
+      "x": 0,
+      "z": 27,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        26
+      ],
+      "type": "orchard",
+      "x": -36,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        84,
+        24
+      ],
+      "type": "gem_mine",
+      "x": -45,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        102,
+        16
+      ],
+      "type": "orchard",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        18
+      ],
+      "type": "gem_mine",
+      "x": 18,
+      "z": -36,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        88,
+        42
+      ],
+      "type": "gem_mine",
+      "x": 18,
+      "z": -18,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "coal",
+      "x": -12,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 35,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 1,
+      "city": 9,
+      "tile": [
+        87,
+        41
+      ],
+      "type": "coal",
+      "x": 0,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 204,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "house",
+      "x": 0,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 205,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        83,
+        24
+      ],
+      "type": "mine",
+      "x": 11.52180712822883,
+      "z": 5.843333476113912,
+      "age": 2
+    },
+    {
+      "turn": 205,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -7,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 205,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 205,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "bronze_axeman",
+      "age": 2
+    },
+    {
+      "turn": 206,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "cellar",
+      "x": 0,
+      "z": 24,
+      "age": 1
+    },
+    {
+      "turn": 206,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "weaver",
+      "x": 12,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 207,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 42,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 207,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "warehouse",
+      "x": -12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 208,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "smelter",
+      "x": 12,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 208,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 7,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 208,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 208,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "bakery",
+      "x": 24,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 209,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        149,
+        78
+      ],
+      "type": "coal",
+      "x": 0,
+      "z": -6,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "coal",
+      "x": -24,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        134,
+        81
+      ],
+      "type": "orchard",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        134,
+        82
+      ],
+      "type": "gem_mine",
+      "x": 27,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        64
+      ],
+      "type": "mine",
+      "x": -0.6454192428964234,
+      "z": 14.752431593005895,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        150,
+        78
+      ],
+      "type": "mine",
+      "x": -2.524375419743592,
+      "z": 22.172534587589325,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        149,
+        79
+      ],
+      "type": "orchard",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        141,
+        98
+      ],
+      "type": "orchard",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "gem_mine",
+      "x": 27,
+      "z": 9,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "coal",
+      "x": -12,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        64
+      ],
+      "type": "coal",
+      "x": 0,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 209,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "house",
+      "x": -24,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 210,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 49,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 210,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "bakery",
+      "x": 12,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 210,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "forester",
+      "x": -24,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 210,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "bronze_axeman",
+      "age": 2
+    },
+    {
+      "turn": 211,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "jeweler",
+      "x": 0,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 211,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 14,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 211,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -35,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 211,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "jeweler",
+      "x": 0,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 212,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "market",
+      "x": -12,
+      "z": 24,
+      "age": 1
+    },
+    {
+      "turn": 213,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        135,
+        64
+      ],
+      "type": "orchard",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 213,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        65
+      ],
+      "type": "gem_mine",
+      "x": 9,
+      "z": -45,
+      "age": 2
+    },
+    {
+      "turn": 213,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "smelter",
+      "x": 0,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 213,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -49,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 214,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 21,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 214,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -28,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 214,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "smith",
+      "x": 0,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 215,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "road_depot",
+      "x": 12,
+      "z": -24,
+      "age": 1
+    },
+    {
+      "turn": 216,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 217,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "house",
+      "x": 24,
+      "z": -6,
+      "age": 2
+    },
+    {
+      "turn": 217,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 28,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 217,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -21,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 218,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "lumber",
+      "x": -24,
+      "z": 24,
+      "age": 1
+    },
+    {
+      "turn": 218,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "smith",
+      "x": -12,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 219,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -35,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 220,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 35,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 220,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -14,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 221,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "smelter",
+      "x": 12,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 222,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -28,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 223,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "stable",
+      "x": 24,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 223,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -7,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 224,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 42,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 224,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "house",
+      "x": -12,
+      "z": -12,
+      "age": 1
+    },
+    {
+      "turn": 224,
+      "event": "build",
+      "team": 1,
+      "city": 2,
+      "tile": [
+        82,
+        24
+      ],
+      "type": "smelter",
+      "x": 12,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 225,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": 7,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 225,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -21,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": 14,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 227,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 2
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        110
+      ],
+      "type": "mine",
+      "x": 18,
+      "z": 18,
+      "age": 2
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        193,
+        112
+      ],
+      "type": "orchard",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        191,
+        111
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        111
+      ],
+      "type": "mine",
+      "x": 18,
+      "z": -18,
+      "age": 2
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "coal",
+      "x": -12,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        192,
+        111
+      ],
+      "type": "gem_mine",
+      "x": -27,
+      "z": -45,
+      "age": 2
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        111
+      ],
+      "type": "quarry",
+      "x": -18,
+      "z": -18,
+      "age": 2
+    },
+    {
+      "turn": 227,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "coal",
+      "x": 12,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 228,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "house",
+      "x": 12,
+      "z": 12,
+      "age": 1
+    },
+    {
+      "turn": 228,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": 49,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 228,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 7,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 228,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "bronze_axeman",
+      "age": 2
+    },
+    {
+      "turn": 229,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        111
+      ],
+      "type": "vegetable_garden",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 230,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": 21,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 230,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "stable",
+      "x": -24,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 230,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        112
+      ],
+      "type": "orchard",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 231,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 14,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 232,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -28,
+      "age": 1
+    },
+    {
+      "turn": 232,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        175,
+        111
+      ],
+      "type": "smelter",
+      "x": 24,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 232,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        173,
+        111
+      ],
+      "type": "flax_farm",
+      "x": -36,
+      "z": -24,
+      "age": 2
+    },
+    {
+      "turn": 233,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": 28,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 234,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "stonewall",
+      "x": -49,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 234,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 21,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 234,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 235,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 236,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -21,
+      "age": 1
+    },
+    {
+      "turn": 236,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": 35,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 236,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 236,
+      "event": "build",
+      "team": 2,
+      "city": 6,
+      "tile": [
+        174,
+        111
+      ],
+      "type": "gem_mine",
+      "x": 36,
+      "z": -18,
+      "age": 2
+    },
+    {
+      "turn": 237,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 28,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 238,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 238,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -14,
+      "age": 1
+    },
+    {
+      "turn": 239,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": 42,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 239,
+      "event": "build",
+      "team": 1,
+      "city": 7,
+      "tile": [
+        103,
+        17
+      ],
+      "type": "house",
+      "x": -24,
+      "z": -12,
+      "age": 2
+    },
+    {
+      "turn": 240,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 35,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 241,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "stonewall",
+      "x": -35,
+      "z": -38.5,
+      "age": 2
+    },
+    {
+      "turn": 242,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 242,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -7,
+      "age": 1
+    },
+    {
+      "turn": 242,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": 49,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 243,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 42,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 244,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 244,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "house",
+      "x": -24,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 244,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 244,
+      "event": "build",
+      "team": 2,
+      "city": 0,
+      "tile": [
+        190,
+        111
+      ],
+      "type": "smelter",
+      "x": 12,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 245,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -49,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 245,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 245,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "house",
+      "x": 18,
+      "z": 18,
+      "age": 1
+    },
+    {
+      "turn": 245,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "stonewall",
+      "x": -28,
+      "z": -38.5,
+      "age": 2
+    },
+    {
+      "turn": 246,
+      "event": "recruit",
+      "team": 2,
+      "city": 6,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 246,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        149,
+        78
+      ],
+      "type": "smelter",
+      "x": -12,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 246,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": 49,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 247,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 248,
+      "event": "recruit",
+      "team": 2,
+      "city": 6,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 248,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 7,
+      "age": 1
+    },
+    {
+      "turn": 248,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -42,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 248,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        98
+      ],
+      "type": "stonewall",
+      "x": -21,
+      "z": -38.5,
+      "age": 2
+    },
+    {
+      "turn": 249,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        64
+      ],
+      "type": "smelter",
+      "x": 12,
+      "z": 0,
+      "age": 2
+    },
+    {
+      "turn": 249,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 249,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "gatehouse",
+      "x": 0,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 249,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -28,
+      "age": 1
+    },
+    {
+      "turn": 249,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 250,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 14,
+      "age": 1
+    },
+    {
+      "turn": 250,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "stonewall",
+      "x": -35,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 250,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 251,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -35,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 251,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -21,
+      "age": 1
+    },
+    {
+      "turn": 252,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 252,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 253,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 253,
+      "event": "build",
+      "team": 0,
+      "city": 4,
+      "tile": [
+        87,
+        83
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": 21,
+      "age": 1
+    },
+    {
+      "turn": 253,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "stonewall",
+      "x": -28,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 253,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -14,
+      "age": 1
+    },
+    {
+      "turn": 254,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 254,
+      "event": "build",
+      "team": 0,
+      "city": 5,
+      "tile": [
+        87,
+        122
+      ],
+      "type": "stonewall",
+      "x": -28,
+      "z": 38.5,
+      "age": 1
+    },
+    {
+      "turn": 254,
+      "event": "recruit",
+      "team": 3,
+      "city": 1,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 255,
+      "event": "build",
+      "team": 0,
+      "city": 12,
+      "tile": [
+        70,
+        86
+      ],
+      "type": "stonewall",
+      "x": -21,
+      "z": -38.5,
+      "age": 1
+    },
+    {
+      "turn": 255,
+      "event": "build",
+      "team": 3,
+      "city": 11,
+      "tile": [
+        149,
+        78
+      ],
+      "type": "academy",
+      "x": 12,
+      "z": -6,
+      "age": 2
+    },
+    {
+      "turn": 255,
+      "event": "build",
+      "team": 3,
+      "city": 13,
+      "tile": [
+        139,
+        97
+      ],
+      "type": "academy",
+      "x": -12,
+      "z": 24,
+      "age": 2
+    },
+    {
+      "turn": 255,
+      "event": "build",
+      "team": 0,
+      "city": 3,
+      "tile": [
+        87,
+        105
+      ],
+      "type": "stonewall",
+      "x": -52.5,
+      "z": -7,
+      "age": 1
+    },
+    {
+      "turn": 255,
+      "event": "build",
+      "team": 0,
+      "city": 10,
+      "tile": [
+        103,
+        118
+      ],
+      "type": "house",
+      "x": -24,
+      "z": 0,
+      "age": 1
+    },
+    {
+      "turn": 255,
+      "event": "recruit",
+      "team": 1,
+      "city": 2,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 255,
+      "event": "recruit",
+      "team": 2,
+      "city": 0,
+      "kind": "javelinman",
+      "age": 2
+    },
+    {
+      "turn": 255,
+      "event": "build",
+      "team": 3,
+      "city": 1,
+      "tile": [
+        133,
+        82
+      ],
+      "type": "academy",
+      "x": 12,
+      "z": 12,
+      "age": 2
+    },
+    {
+      "turn": 255,
+      "event": "build",
+      "team": 3,
+      "city": 8,
+      "tile": [
+        134,
+        64
+      ],
+      "type": "academy",
+      "x": -12,
+      "z": -12,
+      "age": 2
+    }
+  ]
+}

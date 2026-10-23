@@ -1,8 +1,8 @@
-name: V128 Balanced AI and Iron Age Takeover
+name: V129 Counties and Iron Age Takeover
 on:
   push:
     branches: [main]
-    paths: ['**.js', '**.mjs', 'index.html', 'scenarios/iron-ai-v128.json', '.github/workflows/v128.yml']
+    paths: ['**.js', '**.mjs', 'index.html', 'scenarios/iron-ai-v128.json', 'scenarios/iron-ai-v129.json', '.github/workflows/v128.yml']
   workflow_dispatch:
 permissions: {contents: read}
 concurrency:
@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: 22}
+      - run: node TEST_V129.mjs
       - run: node TEST_V128.mjs
       - run: node TEST_V127.mjs
       - run: node TEST_V126.mjs

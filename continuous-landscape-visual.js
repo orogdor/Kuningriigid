@@ -14,7 +14,7 @@ const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z
 const elev=(game,x,z,view)=>surface(game,x,z,view);
 const pos=(game,x,z,y,view,tile)=>({...field(game,x,z,view,tile),y:projectHeight(y,view)});
 function join(pts,game,scope,tile,kind,level=1){
- const isRiver=kind==='river',wBase=isRiver?0:[0,4.4,5.5,7.4,9.4][level],out=[];
+ const isRiver=kind==='river',wBase=isRiver?0:[0,.65,.9,1.2,1.55][level],out=[];
  for(let i=0;i<pts.length;i++){
   const p=pts[i],before=pts[Math.max(0,i-1)],after=pts[Math.min(pts.length-1,i+1)];
   const tX=after.x-before.x,tZ=after.z-before.z,d=Math.hypot(tX,tZ)||1;

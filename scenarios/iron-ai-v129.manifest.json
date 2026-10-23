@@ -1,0 +1,155 @@
+{
+  "version": "V129",
+  "turn": 256,
+  "ironDiscoveries": "9/17",
+  "sha256": "21627cdf623374a58366fee4820a742050673d2a153f2f53ecb09c97bd4236de",
+  "bytes": 1918781,
+  "target": {
+    "team": 1,
+    "cities": 3,
+    "combatSquads": 13,
+    "ironSquads": 5
+  },
+  "cities": [
+    {
+      "id": 0,
+      "name": "Põhjaküla 1",
+      "team": 2,
+      "c": 191,
+      "r": 112,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 1,
+      "name": "Lõunaküla 1",
+      "team": 3,
+      "c": 133,
+      "r": 81,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 2,
+      "name": "Idaküla 1",
+      "team": 1,
+      "c": 83,
+      "r": 25,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 3,
+      "name": "Kadakaküla 1",
+      "team": 0,
+      "c": 87,
+      "r": 105,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 4,
+      "name": "Kadakaküla 2",
+      "team": 0,
+      "c": 87,
+      "r": 83,
+      "urban": 8,
+      "county": 19,
+      "nearest": 17
+    },
+    {
+      "id": 5,
+      "name": "Kadakaküla 3",
+      "team": 0,
+      "c": 87,
+      "r": 122,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 6,
+      "name": "Põhjaküla 2",
+      "team": 2,
+      "c": 174,
+      "r": 112,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 7,
+      "name": "Idaküla 2",
+      "team": 1,
+      "c": 104,
+      "r": 17,
+      "urban": 9,
+      "county": 18,
+      "nearest": 21
+    },
+    {
+      "id": 8,
+      "name": "Lõunaküla 2",
+      "team": 3,
+      "c": 133,
+      "r": 64,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 9,
+      "name": "Idaküla 3",
+      "team": 1,
+      "c": 86,
+      "r": 42,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 10,
+      "name": "Kadakaküla 4",
+      "team": 0,
+      "c": 104,
+      "r": 119,
+      "urban": 8,
+      "county": 19,
+      "nearest": 17
+    },
+    {
+      "id": 11,
+      "name": "Lõunaküla 3",
+      "team": 3,
+      "c": 150,
+      "r": 79,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 12,
+      "name": "Kadakaküla 5",
+      "team": 0,
+      "c": 70,
+      "r": 86,
+      "urban": 9,
+      "county": 18,
+      "nearest": 17
+    },
+    {
+      "id": 13,
+      "name": "Lõunaküla 4",
+      "team": 3,
+      "c": 139,
+      "r": 98,
+      "urban": 8,
+      "county": 19,
+      "nearest": 17
+    }
+  ]
+}
