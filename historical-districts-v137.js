@@ -1,7 +1,7 @@
 // V137 - historically plausible development across the *entire* owned town/county.
 // No artificial structures: every selection still runs normal technology, material,
 // terrain, collision, navigation and builder access checks.
-export const DISTRICT_PLAN_VERSION=137;
+export const DISTRICT_PLAN_VERSION=138;
 const hash=(a,b,c=0)=>{const n=Math.sin(a*127.1+b*311.7+c*19.19)*43758.5453;return n-Math.floor(n)};
 export function historicalTilePlan(city,tile,urban,age=0){
  if(!tile?.land||tile.mountain)return [];
@@ -41,5 +41,8 @@ export function historicalTilePriority(city,tile,urban,buildings=0){
  // Empty residential plots in the core are most urgent; rural fields and
  // resource sites follow. Keep vacant rocky patches as natural landscape.
  const useful=Number(!!dep.grain||!!dep.wood||!!dep.stone||!!dep.game||!!dep.water||!!tile.coast);
- return (urban?30:useful?18:8)-buildings*33-d*.35+hash(tile.c,tile.r,city.id||0)*.7;
+ // A real ancient city infills its occupied residential block before founding
+ // another isolated square. On 225x195 detail tiles allow 20+ roofs per block.
+ const core=urban?(buildings>0?52-Math.abs(buildings-12)*1.3:33):useful?18:8;
+ return core-d*.65+hash(tile.c,tile.r,city.id||0)*.7;
 }
