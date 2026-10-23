@@ -12,5 +12,5 @@ for(const city of game.s.cities.filter(c=>c.team===0)){
   if(!res.error)ok++;
   if(statuses.length<6)statuses.push({slot:[slot.x,slot.z,slot.type],error:reason});
  }
- console.log('WALL_SITE_V139 '+JSON.stringify({name:city.name,slots:plan.slots.length,ok,errors,examples:statuses,stock:city.economy.realms[0].resources}));
+ console.log('WALL_SITE_V139 '+JSON.stringify({name:city.name,slots:plan.slots.length,ok,errors,examples:statuses,stock:city.economy.realms[0].resources,planType:plan.slots[0]?.type,techKnown:game.s.research[0]?.known.filter(x=>x.includes('fortif')),required:game.buildingDefinitions[plan.slots[0]?.type]?.cost,buildRule:game.buildRule(city,plan.slots[0]?.type)}));
 }
