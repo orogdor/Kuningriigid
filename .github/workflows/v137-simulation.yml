@@ -5,6 +5,9 @@ on:
     paths:
       - '.github/workflows/v137-simulation.yml'
       - 'scripts/make-ai-city-v137.mjs'
+      - 'civilization-core.js'
+      - 'ai-strategy.js'
+      - 'economy.js'
   workflow_dispatch:
 permissions:
   contents: write
