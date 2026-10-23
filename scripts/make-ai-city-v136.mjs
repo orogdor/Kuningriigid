@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {Civilization,createGame} from '../civilization-core.js';
 import {takeOverAI} from '../ai-takeover-v128.js';
-import {AI_CITY_SPACING} from '../historical-city-v136.js';
+import {AI_CITY_SPACING} from '../historical-city-v135.js';
 const seed=136023,limit=Number(process.env.V136_TURNS||245),started=Date.now();
 const game=new Civilization(createGame(seed));
 for(let turn=1;turn<=limit;turn++){
