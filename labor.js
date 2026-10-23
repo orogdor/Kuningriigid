@@ -20,6 +20,8 @@ export function demand(b,definitions){
 function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,stock={}){
  if(foodCritical&&['hunter','fisher','bakery','farm','pasture'].includes(b.type))return 171;
  if(waterCritical&&b.type==='well')return 169;
+ // V147: without real stonecutters, unlocked medieval walls and gates stall.
+ if(b.type==='mason'&&(stock.cutstone||0)<75&&(stock.stone||0)>=4)return 123;
  const need=(k)=>Math.max(0,eraNeed[k]||0);
  const low=(k,n)=>(stock[k]||0)<n;
  if(b.type==='forester'&&(scarceWood||low('wood',70)))return 159;
