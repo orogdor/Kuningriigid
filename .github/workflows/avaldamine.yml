@@ -42,6 +42,9 @@ jobs:
           node --check research-tree-v119.js
           node --check build-catalog-v121.js
           node --check map-gestures-v121.js
+          node --check growth-balance-v125.js
+          node --check technology-reforms-v125.js
+          node --check TEST_V125.mjs
           node --check research-preview-v123.js
           node --check detail-scale-v123.js
           node --check world-details.js
@@ -58,6 +61,7 @@ jobs:
           node --check era-availability-v116.js
           node --check campaign.js
           node --check fortifications.js
+          node TEST_V125.mjs
           node TEST_V123.mjs
           node TEST_V122.mjs
           node TEST_V121.mjs
