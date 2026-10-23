@@ -1,0 +1,38 @@
+name: V138 Ancient AI Cities Simulation
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v138-simulation.yml'
+      - 'scripts/make-ai-city-v138.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: v138-ancient-sim
+  cancel-in-progress: true
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node TEST_V138.mjs
+      - name: Simulate authentic settlement planning
+        run: node scripts/make-ai-city-v138.mjs
+      - name: Check ancient streets
+        run: |
+          node -e "const m=require('./scenarios/ai-city-v138.manifest.json');console.log(JSON.stringify({roster:m.roster,density:m.density}));if(m.roster.reduce((s,r)=>s+r.houses,0)<20||!m.density.some(x=>x.nearEdge>0))process.exit(1)"
+      - name: Publish test save
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scenarios/ai-city-v138.json scenarios/ai-city-v138.manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "V138: publish naturally constructed ancient towns with edge-to-edge city blocks"
+            git pull --rebase -X theirs origin main
+            git push origin HEAD:main
+          fi
