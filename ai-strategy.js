@@ -7,7 +7,7 @@ import {RESOURCE_BUILDINGS} from './settlement-ai-v88.js?v=125a';
 import {GOOD_BUILDINGS,cityNeeds} from './city-needs-v87.js';
 // V45: needs-led AI. Decisions are pure so the reasoning can be tested without a renderer.
 import {ERA_MATERIALS,ageDeficit,edibleSupply} from './era-economy.js';
-import {BUILDINGS} from './economy.js';
+import {BUILDINGS,canAfford} from './economy.js';
 export const RESOURCE_CHAINS={
  wood:['lumber'],stone:['quarry'],bread:['hunter','fisher','farm','mill','bakery'],
  water:['well'],grain:['farm'],plank:['lumber','saw'],ore:['mine'],coal:['coal'],
@@ -139,7 +139,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  }
  const nHouse=housing;
  const desiredHouses=Math.min(70,Math.ceil((r.pop+3)/1.5));
- if(nHouse<desiredHouses&&(stock.plank||0)>=BUILDINGS.house.cost.plank&&(stock.stone||0)>=BUILDINGS.house.cost.stone){
+ if(nHouse<desiredHouses&&canAfford(stock,BUILDINGS.house.cost)){
   // A town capped at seven residents cannot staff its sawmill, farms,
   // universities or future industry. Housing is productive investment.
   const enoughToInvest=!missing||
