@@ -4,7 +4,7 @@ const hash=(seed,n)=>{const t=Math.sin(seed*17.71+n*7.47)*43758.5;return t-Math.
 const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
 export function surplusForWalls(stock,pop,waiting=0){
  const food=(stock.bread||0)+(stock.meat||0)+(stock.fish||0)+(stock.grain||0)+(stock.berries||0)+(stock.vegetables||0);
- return pop>=12&&waiting<=2&&(stock.gold||0)>=120&&
+ return pop>=12&&waiting<=3&&(stock.gold||0)>=120&&
  (stock.wood||0)>=100&&(stock.stone||0)>=30&&
  (stock.water||0)>=pop*1.5&&food>=pop*2;
 }
