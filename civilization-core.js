@@ -527,7 +527,7 @@ export class Civilization{
   if(this.s.time<(city.aiNextTerritoryBuildV137||0))return;
   city.aiNextTerritoryBuildV137=this.s.time+90;
   const age=this.s.ages[city.team],area=this.constructionArea(city),r=city.economy.realms[city.team];
-  if(!area||area.pending.length>=1||(r.resources.wood||0)<28)return; // V145: reserve the city queue for housing, markets and basic services
+  if(!area||area.pending.length>=2||(r.resources.wood||0)<28)return; // V145: reserve the city queue for housing, markets and basic services
   const usableFood=[...FOOD_KEYS].reduce((sum,k)=>sum+(r.resources[k]||0),0);
   const workingSites=area.buildings.filter(b=>b.ready&&b.hp>0&&!b.disabled&&(BUILDINGS[b.type]?.workers||0)>0).length;
   if(r.pop<8||usableFood<r.pop*2||r.resources.water<r.pop*1.3||workingSites>r.pop*1.5+4)return; // development must not starve the core
