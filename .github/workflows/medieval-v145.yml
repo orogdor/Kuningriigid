@@ -66,6 +66,9 @@ jobs:
           git config user.name 'github-actions[bot]'
           git add scenarios/ai-medieval-v145.json scenarios/ai-medieval-v145.manifest.json
           git commit -m 'V145: verified mid-medieval AI snapshot and city analysis'
+          # Rebase the generated, tested snapshot onto newer main changes.
+          git fetch origin main
+          git rebase -X theirs origin/main
           git push origin HEAD:main
   publish:
     needs: simulate
