@@ -50,7 +50,7 @@ if(['library','school','public_school','high_school'].includes(type)){
  for(const x of [-2,-.8,.8,2]){window(g,x,1.8,2.34,.55,.8);if(industrial)window(g,x,3.3,2.34,.55,.75);}
  box(g,0,.95,2.36,.8,1.9,.12,'#605040','wood');
  if(library){for(let i=0;i<5;i++)box(g,-1.8+i*.8,.75,2.65,.5,.12,.65,'#c9b992','wood');}
- else{box(g,0,2.6,2.43,1.2,.55,.15,'#3c5048','wood');if(secondary){box(g,0,height+1.2,0,1.2,1.4,1.2,'#b58d71','stone');cone(g,0,height+2.3,0,1,1.2,'#707d8d',4);}}
+ else{box(g,0,2.6,2.43,1.2,.55,.15,'#3c5048','wood');if(secondary){box(g,0,height+1.8,0,1.4,1.8,1.4,'#b58d71','stone');window(g,0,height+2.2,.74,.45,.45);cone(g,0,height+3.3,0,1.15,1.4,'#707d8d',4);}}
 }
 else if(type==='claypit'){for(let i=0;i<3;i++)box(g,-.9+i*.7,.22,-.45-i*.15,1.5,.38,2.5,'#a27657','stone');cottage(g,1.3,-.8,1.7,1.6,1.4,'#90704c',true);for(let i=0;i<3;i++)cylinder(g,-1.4+i*.7,.5,1.35,.28,.32,.65,'#bb795a','stone',9);}
 else if(type==='pottery_kiln'){cottage(g,-1,-.5,2.4,2.3,1.8,'#a7634b',true);cylinder(g,1.1,1,0,.88,1.05,2.1,'#a57458','stone');chimney(g,1.2,-.45,3.6);box(g,1.12,.5,1,.7,.65,.1,'#4d2e27');for(let i=0;i<4;i++)cylinder(g,-1.5+i*.85,.46,1.5,.24,.3,.6,'#d0a07a','stone',10);}

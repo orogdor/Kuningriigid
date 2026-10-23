@@ -33,7 +33,7 @@ try{
    const ground=new T.Mesh(new T.PlaneGeometry(70,55),new T.MeshStandardMaterial({color:'#819069'}));ground.rotation.x=-Math.PI/2;ground.position.y=-.05;scene.add(ground);
    const types=['library','school','public_school','high_school'];
    for(let i=0;i<types.length;i++){const model=createBuildingModel(types[i]);model.position.set(mobile?(i%2)*11-5.5:i*10-15,0,mobile?Math.floor(i/2)*12-6:0);scene.add(model);if(!model.children.length)throw Error('Missing model '+types[i]);}
-   const camera=new T.PerspectiveCamera(45,innerWidth/innerHeight,.1,200);camera.position.set(mobile?21:15,mobile?36:25,mobile?38:39);camera.lookAt(0,1,0);renderer.render(scene,camera);
+   const camera=new T.PerspectiveCamera(45,innerWidth/innerHeight,.1,200);camera.position.set(mobile?25:15,mobile?45:25,mobile?52:39);camera.lookAt(0,1,0);renderer.render(scene,camera);
   },mobile);
   await page.screenshot({path:`${out}/education-${mobile?'mobile':'desktop'}.png`});
   assert.deepEqual(errors,[]);results.push({...result,mobile,errors});await context.close();
