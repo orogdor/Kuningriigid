@@ -1,0 +1,37 @@
+name: V139 Real AI Ancient City Test
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v139-simulation.yml'
+      - 'scripts/make-ai-city-v139.mjs'
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency:
+  group: v139-city-demo
+  cancel-in-progress: true
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node TEST_V139.mjs
+      - run: node scripts/make-ai-city-v139.mjs
+      - name: Validate saved, real AI town
+        run: |
+          test -s scenarios/ai-city-v139.json
+          node -e "const m=require('./scenarios/ai-city-v139.manifest.json'); console.log(JSON.stringify({roster:m.roster,oldTowns:m.historicMetrics})); if(m.version!==139||m.roster.reduce((n,x)=>n+x.houses,0)<25)process.exit(1)"
+      - name: Publish interactive test game
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scenarios/ai-city-v139.json scenarios/ai-city-v139.manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "V139: publish actual compact historical AI towns with defensive walls"
+            git pull --rebase -X theirs origin main
+            git push origin HEAD:main
+          fi
