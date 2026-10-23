@@ -12,7 +12,7 @@ permissions:
   id-token: write
 concurrency:
   group: v144-medieval-run
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   simulate:
     runs-on: ubuntu-latest
@@ -25,7 +25,10 @@ jobs:
         run: |
           node --check scripts/make-ai-medieval-v144.mjs
           node --check civilization.js
-          node scripts/test.mjs rules --jobs 2
+          node TEST_V143.mjs
+          node TEST_V143_RURAL.mjs
+          node TEST_V142.mjs
+          node TEST_V141.mjs
       - name: Run original AI to the middle of Medieval Age
         run: node scripts/make-ai-medieval-v144.mjs
       - name: Validate generated test state
@@ -37,6 +40,7 @@ jobs:
           npm install --no-save playwright
           echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
           python3 -m http.server 8765 >/tmp/v144-http.log 2>&1 &
+          node TEST_V143_BROWSER.mjs
           node TEST_V144_BROWSER.mjs
       - uses: actions/upload-artifact@v4
         if: always()
