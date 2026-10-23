@@ -168,9 +168,9 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  possibilities.sort((a,b)=>b.priority-a.priority);
  return possibilities[0]||null;
 }
-export function usefulDistrictTypes(game,team){
+export function usefulDistrictTypes(game,team,localCity=null){
  const research=game.s.research[team];
- const cities=game.s.cities.filter(c=>c.team===team);
+ const cities=localCity?[localCity]:game.s.cities.filter(c=>c.team===team);
  if(!cities.length)return new Set();
  const needs=research?.ageWait?ageDeficit(game.s,team,research.ageWait.id):{};
  // Districts are expensive. Extend territory only when the existing town

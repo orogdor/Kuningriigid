@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {allocateTerritory} from './territory-v143.js';
+import {populationCityRadius,cityExtent,urbanExpansionFits} from './city-area-v142.js';
+import {urbanTile} from './counties-v126.js';
+const make=(id,c,pop,team=0)=>({id,c,r:20,team,economy:{realms:Array.from({length:4},()=>({pop}))},districts:{}});
+const land=p=>p.c>=0&&p.r>=0&&p.c<80&&p.r<80?{...p,land:true}:null;
+const radius=c=>populationCityRadius(c.economy.realms[c.team].pop);
+const a=make(1,20,4),b=make(2,29,9);
+const old=allocateTerritory([a,b],land,radius);assert.equal(old.territory.get('26:20')?.id,2);
+a.economy.realms[0].pop=36;
+const next=allocateTerritory([b,a],land,radius);assert.equal(next.territory.get('26:20')?.id,1,'larger domestic city absorbs empty peripheral land');
+assert.equal(next.territory.get('29:20')?.id,2,'smaller city center remains intact');
+for(const c of [a,b]){const tiles=[...next.urban.get(c.id)].map(k=>k.split(':').map(Number));assert.ok(Math.max(...tiles.map(p=>p[0]))-Math.min(...tiles.map(p=>p[0]))<12);assert.ok(Math.max(...tiles.map(p=>p[1]))-Math.min(...tiles.map(p=>p[1]))<12);assert.ok([...next.territory.values()].filter(t=>t.id===c.id).length<=3*cityExtent(radius(c))**2);}
+b.districts['26:20']={economy:{buildings:[{type:'mine',hp:100,ready:true}]}};assert.equal(allocateTerritory([a,b],land,radius).territory.get('26:20')?.id,2,'existing buildings are preserved');
+const coast=make(3,20,9);const coastal=p=>{const c=land(p);return c?{...c,land:p.c>=20}:null;};
+const fallback=allocateTerritory([coast],coastal,radius);let target=0;for(let r=14;r<=26;r++)for(let c=14;c<=26;c++)if(urbanTile(coast,{c,r},3))target++;
+assert.equal(fallback.urban.get(3).size,target,'missing coastal plots are replaced with nearest available land');
+assert.ok([...fallback.urban.get(3)].every(k=>Number(k.split(':')[0])>=20),'urban territory stays on land');
+const foreign=make(4,29,9,1),foreignPlan=allocateTerritory([a,foreign],land,radius);assert.equal(foreignPlan.territory.get('29:20')?.team,1,'population growth cannot capture a foreign city');
+assert.deepEqual([...allocateTerritory([a,b],land,radius).territory].map(([k,c])=>[k,c.id]),[...allocateTerritory([b,a],land,radius).territory].map(([k,c])=>[k,c.id]),'stable city ordering');
+a.districts['40:20']={urbanExpansionV138:true};assert.equal(urbanExpansionFits(a,next.urban.get(a.id)),false,'old suburb flags cannot exceed 12x12');
+console.log('V143 PASS: 12x12 maximum, larger domestic towns, protected buildings/centers, coastal fallback, stable ownership');

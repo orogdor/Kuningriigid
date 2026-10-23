@@ -1,4 +1,3 @@
-import {populationCityRadius} from './city-area-v142.js';
 // Runtime revisions only. No enumerable cache fields enter V4 saves.
 const fields=new WeakMap(),arrays=new WeakMap(),tiles=new WeakMap(),cityOwners=new WeakMap();
 const readMethods=new Set(['filter','find','findIndex','some','every','map','flatMap','forEach','reduce','reduceRight','slice','join','includes','indexOf','lastIndexOf','at','values','keys','entries',Symbol.iterator]);
@@ -79,7 +78,7 @@ export function installGameRevisions(game){
   for(const field of ['id','team','c','r','radius'])observeField(city,field,changed);
   const context=d=>{if(d?.world&&d?.economy)trackTile(d.world,d.economy,changed)};
   context(city);observeDistricts(city,changed,context);
-  observeArray(city.economy,'realms',[],changed,r=>observeField(r,'pop',changed,populationCityRadius));
+  observeArray(city.economy,'realms',[],changed,r=>observeField(r,'pop',changed));
  }
  observeArray(game.s,'cities',[],()=>{perf.areaRevision++;perf.lookup=null},register);
 }

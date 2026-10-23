@@ -1,11 +1,12 @@
+import {cityExtent,cityEnvelopeContains} from './city-area-v142.js';
 // A county includes its urban area and has at most three times its tile count.
 export const COUNTY_BUILDING_LIMIT=3;
-export const countyTileLimit=radius=>3*(2*radius+1)**2;
-export const countySearchRadius=radius=>Math.ceil((Math.sqrt(3)*(2*radius+1)-1)/2);
+export const countyTileLimit=radius=>3*cityExtent(radius)**2;
+export const countySearchRadius=radius=>Math.ceil((Math.sqrt(3)*cityExtent(radius)-1)/2);
 // V136: a town's developed core is a compact, winding oval rather than a square.
 export function urbanTile(city,p,radius){
- const dx=p.c-city.c,dz=p.r-city.r;
- if(Math.abs(dx)>radius||Math.abs(dz)>radius)return false;
+ const extent=cityExtent(radius);if(!cityEnvelopeContains(city,p,extent))return false;
+ const offset=extent%2===0?.5:0,dx=p.c-city.c-offset,dz=p.r-city.r-offset;
  if(dx===0||dz===0)return true; // retain road corridors and cardinal growth arms
  const angle=Math.atan2(dz,dx),seed=(city.id??city.c*7+city.r*11)*.71;
  const contour=1+.085*Math.sin(angle*3+seed)+.055*Math.cos(angle*5+seed*.73);

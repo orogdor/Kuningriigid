@@ -1,4 +1,6 @@
-import {grownCityRadius} from './city-area-v142.js';
+import {findAIFieldSite} from './ai-rural-v143.js';
+import {allocateTerritory} from './territory-v143.js';
+import {urbanExpansionFits,grownCityRadius} from './city-area-v142.js';
 import {installGameRevisions,citySummary,cityContexts,cityLookup,navigationRevision,resourcesNear,buildingsNear} from './perf-state-v131.js';
 import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js';
 import {applyDevelopmentBalance,combatUnit,militaryChoices,readyForNextEra,allowAIResearch} from './ai-development-v128.js';
@@ -375,27 +377,15 @@ export class Civilization{
  disembark(ship,p){return disembark(this,ship,p)}
  radius(city){const pop=city.economy.realms[city.team].pop;return city.radius=grownCityRadius(city.radius,pop)}
  countyRadius(city){return countySearchRadius(this.radius(this.parentCity(city)))}
- isCountyTile(p,parent=this.territoryOwner(p)){return !!parent&&!urbanTile(parent,p,this.radius(parent))&&!parent.districts?.[tileKey(p)]?.urbanExpansionV138}
+ isCountyTile(p,parent=this.territoryOwner(p)){return !!parent&&!(this.urbanTerritory?.get(parent.id)?.has(tileKey(p))??urbanTile(parent,p,this.radius(parent)))&&!(parent.districts?.[tileKey(p)]?.urbanExpansionV138&&urbanExpansionFits(parent,this.urbanTerritory?.get(parent.id)))}
  countySlots(ctx){return {used:countyBuildingCount(ctx),limit:3}}
  refreshTerritory(){
   if(this._perf&&this.territoryStamp!=null&&this._perf.areaBuilt===this._perf.areaRevision)return;
   if(this._perf){for(const c of this.s.cities)this.radius(c);this._perf.areaBuilt=this._perf.areaRevision;this._perf.stats.territoryBuilds++;}
-  const stamp=this._perf?'revision:'+this._perf.areaRevision:'county126:'+this.s.cities.map(c=>[c.id,c.team,c.c,c.r,this.radius(c),Object.entries(c.districts||{}).filter(([,d])=>d.economy.buildings.some(b=>!b.virtual&&b.hp>0)).map(([k])=>k).join(',')].join(':')).join('|');
+  const stamp=this._perf?'revision:'+this._perf.areaRevision:'county126:'+this.s.cities.map(c=>[c.id,c.team,c.c,c.r,this.radius(c),c.economy.realms[c.team].pop,Object.entries(c.districts||{}).filter(([,d])=>d.economy.buildings.some(b=>!b.virtual&&b.hp>0)).map(([k])=>k).join(',')].join(':')).join('|');
   if(stamp===this.territoryStamp)return;this.territoryStamp=stamp;
-  const candidates=new Map();
-  for(const city of this.s.cities)for(const p of countyFootprint(city,this.radius(city),p=>p.c>=0&&p.c<COLS&&p.r>=0&&p.r<ROWS?this.cell(p):null)){
-   const key=tileKey(p);if(!candidates.has(key))candidates.set(key,[]);candidates.get(key).push(city);
-  }
-  this.territory=new Map();
-  for(const [key,cities] of candidates){
-   const [c,r]=key.split(':').map(Number),p={c,r},exact=this.cityAt(p);
-   // Urban territory takes precedence over a neighbouring rural county.
-   const urban=cities.filter(t=>urbanTile(t,p,this.radius(t))),pool=urban.length?urban:cities;
-   const built=pool.find(t=>t.districts?.[key]?.economy.buildings.some(b=>!b.virtual&&b.hp>0));
-   if(exact||built){this.territory.set(key,exact||built);continue}
-   const sorted=pool.map(city=>({city,d:(city.c-c)**2+(city.r-r)**2})).sort((a,b)=>a.d-b.d||a.city.id-b.city.id);
-   if(sorted.length===1||sorted[0].d<sorted[1].d||sorted[0].city.team===sorted[1].city.team)this.territory.set(key,sorted[0].city);
-  }
+  const allocation=allocateTerritory(this.s.cities,p=>p.c>=0&&p.c<COLS&&p.r>=0&&p.r<ROWS?this.cell(p):null,c=>this.radius(c));
+  this.territory=allocation.territory;this.urbanTerritory=allocation.urban;
  }
  territoryOwner(p){if(!this.cell(p))return null;this.refreshTerritory();return this.territory.get(tileKey(p))||null}
  parentCity(ctx){return ctx.districtOf==null?ctx:cityLookup(this)?.ids.get(ctx.districtOf)||this.s.cities.find(c=>c.id===ctx.districtOf)}
@@ -565,6 +555,7 @@ export class Civilization{
   for(const item of [...tiles.slice(cursor),...tiles.slice(0,cursor)]){
    if(++examined>9)break;
    const {cell,urban}=item;
+   if(!this.landPath(city,cell,city.team))continue;
    const mayExpand=item.canExpand;
    const types=historicalTilePlan(city,cell,urban||mayExpand,age);
    for(const type of types){
@@ -589,6 +580,7 @@ export class Civilization{
     (ctx.aiPlotCursorV138??={})[type]=cursor+batch.length;
     let succeeded=false;
     for(const p of batch){
+     if(type==='farm'&&(this.isCountyTile(ctx,city)&&this.countySlots(ctx).used>=2||!findAIFieldSite(this,ctx,p)))continue;
      if(this.previewBuild(ctx,type,p).error)continue;
      if(this.build(ctx,type,p).building){city.aiTerritoryBuiltV137=(city.aiTerritoryBuiltV137||0)+1;succeeded=true;break;}
     }
@@ -598,25 +590,27 @@ export class Civilization{
   }
  }
 
- aiDistricts(){for(const parent of this.s.cities.filter(c=>c.team>0)){const buildings=this.allBuildings(parent);for(const type of ['hunter','fisher','well','quarry','lumber','farm','coppermine','tinmine','claypit','mine','oilwell','harbor',...Object.keys(GOOD_BUILDINGS).filter(k=>GOOD_BUILDINGS[k].deposit)]){
- const needed=usefulDistrictTypes(this,parent.team);
+ aiDistricts(){for(const parent of this.s.cities.filter(c=>c.team>0)){const area=this.constructionArea(parent);if(area.pending.length>=3)continue;const buildings=this.allBuildings(parent),needed=usefulDistrictTypes(this,parent.team,parent);for(const type of ['hunter','fisher','well','quarry','lumber','farm','coppermine','tinmine','claypit','mine','oilwell','harbor',...Object.keys(GOOD_BUILDINGS).filter(k=>GOOD_BUILDINGS[k].deposit)]){
  if(needed&&!needed.has(type))continue;
  const existing=buildings.filter(b=>b.type===type&&b.hp>0&&!b.disabled);
  // A new district must replace genuinely exhausted supply, not create
  // arbitrarily many mines/quarries that consume the entire workforce.
- if(existing.length>=2||!canAfford(parent.economy.realms[parent.team].resources,BUILDINGS[type].cost))continue;if(buildings.some(b=>b.type===type&&b.status!=='Lähedal pole ligipääsetavat toorainet'))continue;if((BUILD_AGE[type]||0)>this.s.ages[parent.team]||(BUILD_TECH[type]&&!this.s.research[parent.team].known.includes(BUILD_TECH[type])))continue;const dep={...Object.fromEntries(Object.entries(GOOD_BUILDINGS).map(([k,d])=>[k,d.deposit])),hunter:'game',fisher:'coast',well:'water',quarry:'stone',lumber:'wood',farm:'grain',coppermine:'copper',tinmine:'tin',claypit:'clay',mine:'ore',oilwell:'oil',harbor:'coast'}[type],tiles=[];
+ if(existing.filter(b=>!b.ready||!b.status?.includes('pole ligipääsetavat')&&!b.status?.includes('Ootab eraldi')).length>=2||!canAfford(parent.economy.realms[parent.team].resources,BUILDINGS[type].cost))continue;if(existing.some(b=>!b.disabled&&!/pole ligipääsetavat|Ootab eraldi/.test(b.status||'')))continue;if((BUILD_AGE[type]||0)>this.s.ages[parent.team]||(BUILD_TECH[type]&&!this.s.research[parent.team].known.includes(BUILD_TECH[type])))continue;const dep={...Object.fromEntries(Object.entries(GOOD_BUILDINGS).map(([k,d])=>[k,d.deposit])),hunter:'game',fisher:'coast',well:'water',quarry:'stone',lumber:'wood',farm:'grain',coppermine:'copper',tinmine:'tin',claypit:'clay',mine:'ore',oilwell:'oil',harbor:'coast'}[type],tiles=[];
+ // Keep ordinary core construction in charge while a real local site exists.
+ // Only move production outwards when the inner tile cannot provide it.
+ const localDeposit=dep==='coast'?isShore(this,parent):this.cell(parent)?.deposits[dep];
+ if(localDeposit&&!this.buildRule(parent,type)&&this.buildingSites(parent,type).slice(0,24).some(p=>!this.previewBuild(parent,type,p).error&&(type!=='farm'||findAIFieldSite(this,parent,p))))continue;
  // Search only the parent county bounds rather than the entire world.
- const span=this.countyRadius(parent);
- for(let rr=Math.max(0,parent.r-span);rr<=Math.min(ROWS-1,parent.r+span);rr++)for(let cc=Math.max(0,parent.c-span);cc<=Math.min(COLS-1,parent.c+span);cc++){
-  const p=this.cell({c:cc,r:rr});
+ for(const q of this.constructionArea(parent).tiles){
+  const p=this.cell(q);
   if(!p?.land||this.cityAt(p)||this.territoryOwner(p)?.id!==parent.id)continue;
   if(dep==='coast'?!isShore(this,p):!p.deposits[dep])continue;
   tiles.push(p);
  }
- tiles.sort((a,b)=>Math.abs(a.c-parent.c)+Math.abs(a.r-parent.r)-Math.abs(b.c-parent.c)-Math.abs(b.r-parent.r));for(const tile of tiles){const actualKind={lumber:'tree',quarry:'stone',hunter:'game',mine:'ore',oilwell:'oil'}[type];
+ tiles.sort((a,b)=>Math.abs(a.c-parent.c)+Math.abs(a.r-parent.r)-Math.abs(b.c-parent.c)-Math.abs(b.r-parent.r));for(const tile of tiles){if(!this.landPath(parent,tile,parent.team))continue;const actualKind={lumber:'tree',quarry:'stone',hunter:'game',mine:'ore',oilwell:'oil',coppermine:'copper',tinmine:'tin',claypit:'clay'}[type];
  if(actualKind&&!this.localWorld(tile).resources.some(r=>r.kind===actualKind&&!r.removed&&(r.amount||0)>0))continue;
  const ctx=this.contextAt(tile,true);
- if(this.buildRule(ctx,type)||ctx.economy.buildings.some(b=>!b.virtual&&b.type===type))continue;let built=false;for(const p of this.buildingSites(ctx,type)){if(this.build(ctx,type,p).building){built=true;break}}if(built)break}}}}
+ if(this.buildRule(ctx,type)||ctx.economy.buildings.some(b=>!b.virtual&&b.type===type&&b.hp>0))continue;if(type==='farm'&&this.isCountyTile(ctx,parent)&&this.countySlots(ctx).used>=2)continue;let built=false;for(const p of this.buildingSites(ctx,type)){if(type==='farm'&&!findAIFieldSite(this,ctx,p))continue;const check=this.previewBuild(ctx,type,p);if(check.error)continue;const nav=this.nav(ctx),from=nav.nearest(door(ctx.economy.buildings[0]),9),to=nav.nearest(check.landEntry||door({...p,type}),9);if(!from||!to||!nav.reachable(from,to))continue;if(this.build(ctx,type,p).building){built=true;break}}if(built)break}if(this.constructionArea(parent).pending.length>=3)break;}}}
 
  ai(){for(const team of [1,2,3]){this.aiTeam(team);aiNavy(this,team)}this.aiDistricts()}
  ensureFarmFields(team){
@@ -625,10 +619,7 @@ export class Civilization{
    if(ctx.economy.buildings.some(b=>b.type==='field'&&b.hp>0))continue;
    if(!this.canBuildNow(ctx,'field')||this.s.time<(ctx.nextFieldSearchV127||0))continue;
    ctx.nextFieldSearchV127=this.s.time+60;
-   let done=false;
-   for(let x=-44;x<=44&&!done;x+=12)for(let z=-32;z<=32&&!done;z+=12){
-    if(this.build(ctx,'field',{x,z,width:AI_FIELD_WIDTH,depth:AI_FIELD_DEPTH}).building)done=true;
-   }
+   const field=findAIFieldSite(this,ctx);if(field)this.build(ctx,'field',field);
   }
  }
  aiTeam(team){

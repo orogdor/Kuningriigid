@@ -1,3 +1,4 @@
+import {DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 export const FIELD_MIN=8,FIELD_MAX=64, AI_FIELD_WIDTH=48, AI_FIELD_DEPTH=32; // 6 x old 16×16 area
 export function fieldRect(a,b){
  const width=Math.round(Math.abs(a.x-b.x)/2)*2,depth=Math.round(Math.abs(a.z-b.z)/2)*2;
@@ -55,7 +56,7 @@ export function farmWork(game,ctx,farm,dt){
 export function validateField(ctx,p,passable){
  const {width,depth}=fieldSize(p);
  if(!Number.isFinite(p.x)||!Number.isFinite(p.z)||!Number.isFinite(width)||!Number.isFinite(depth)||width<FIELD_MIN||depth<FIELD_MIN||width>FIELD_MAX||depth>FIELD_MAX)return 'Põllu küljed peavad olema 8–64 ühikut. Lohista väiksem ristkülik.';
- if(Math.abs(p.x)+width/2>72||Math.abs(p.z)+depth/2>62)return 'Põld peab mahtuma ühele detailkaardile.';
+ if(Math.abs(p.x)+width/2>DETAIL_HALF_X-4||Math.abs(p.z)+depth/2>DETAIL_HALF_Z-4)return 'Põld peab mahtuma ühele detailkaardile.';
  for(let x=-width/2;x<=width/2;x+=2)for(let z=-depth/2;z<=depth/2;z+=2)if(!passable(p.x+x,p.z+z))return 'Kogu põld peab olema kuival ja ligipääsetaval maal.';
  for(const b of ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0)){
   const d=b.type==='field'?fieldSize(b):b.type==='market'?{width:24,depth:23}:{width:12,depth:12};
