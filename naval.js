@@ -233,16 +233,15 @@ export function autoExploreNavy(game){
 // are required. Colonization never teleports units or reveals the whole map.
 function aiColonialVoyage(game,ship,settler){
  const home=game.s.cities.find(c=>c.team===ship.team);
- if(!home||ship.path.length||!game.s.research[ship.team].known.includes('shipbuilding'))return false;
+ if(!home||ship.path.length||!game.s.research[ship.team].known.includes('shipbuilding')||
+    (ship.colonialRetryAt||0)>game.s.time)return false;
+ ship.colonialRetryAt=game.s.time+150;
  const destinations=[];
  const radius=game.s.research[ship.team].known.includes('ocean_sailing')?48:28;
  for(let dr=-radius;dr<=radius;dr+=2)for(let dc=-radius;dc<=radius;dc+=2){
   const c=game.cell({c:ship.c+dc,r:ship.r+dr});
   if(!c?.land||c.mountain||game.territoryOwner(c))continue;
   if(game.s.cities.some(t=>Math.abs(t.c-c.c)+Math.abs(t.r-c.r)<5))continue;
-  // New city still must pass all normal founding checks after disembarking.
-  const candidate={...settler,c:c.c,r:c.r,landed:true,path:[],localTarget:null,embarked:null};
-  if(![-18,-6,6,18].some(x=>[-18,-6,6,18].some(z=>!game.siteRule(candidate,{x,z}))))continue;
   for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
    const water={c:c.c+dx,r:c.r+dz};
    if(!seaAllowed(game,ship.team,water))continue;
@@ -252,7 +251,11 @@ function aiColonialVoyage(game,ship,settler){
   }
  }
  destinations.sort((a,b)=>a.score-b.score);
- for(const place of destinations.slice(0,24)){
+ for(const place of destinations.slice(0,28)){
+  // Expensive detailed site checks are limited to the most promising coast,
+  // rather than hundreds of cells every planning tick.
+  const candidate={...settler,c:place.shore.c,r:place.shore.r,landed:true,path:[],localTarget:null,embarked:null};
+  if(![-18,-6,6,18].some(x=>[-18,-6,6,18].some(z=>!game.siteRule(candidate,{x,z}))))continue;
   const route=seaPath(game,ship,place.water);
   if(!route)continue;
   ship.path=route;ship.landing=place.shore;ship.targetKind='colonization';
