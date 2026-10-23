@@ -84,7 +84,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  const hasCivic=buildings.some(b=>b.type==='market'&&b.ready&&b.hp>0);
  if(age>=1&&r.pop>=11&&hasCivic&&edibleSupply(stock)>=r.pop*2.3&&
     (stock.stone||0)>=45){
-  if((stock.cutstone||0)<26)add('mason',215,'Kiviraidur linnamüüri rajamiseks');
+  if((stock.cutstone||0)<26&&!buildings.some(b=>b.type==='mason'&&b.hp>0))add('mason',r.pop>=14?251:215,'Kiviraidur linnamüüri rajamiseks');
   if(!buildings.some(b=>b.type==='barracks'&&b.hp>0))add('barracks',201,'Kodanike ja linnamüüri kaitsjate väljaõpe');
  }
  // V136: every established town needs civic functions, not only production buildings.
