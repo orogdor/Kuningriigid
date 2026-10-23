@@ -4,30 +4,30 @@
     {
       "team": 1,
       "cities": 7,
-      "buildings": 214,
+      "buildings": 210,
       "markets": 3,
       "harbors": 3,
       "houses": 57,
-      "fields": 5,
+      "fields": 7,
       "ages": 2
     },
     {
       "team": 2,
       "cities": 5,
-      "buildings": 150,
-      "markets": 1,
-      "harbors": 1,
-      "houses": 48,
-      "fields": 7,
+      "buildings": 144,
+      "markets": 0,
+      "harbors": 2,
+      "houses": 47,
+      "fields": 4,
       "ages": 1
     },
     {
       "team": 3,
       "cities": 9,
-      "buildings": 249,
-      "markets": 4,
+      "buildings": 245,
+      "markets": 7,
       "harbors": 2,
-      "houses": 47,
+      "houses": 46,
       "fields": 9,
       "ages": 2
     }
@@ -36,8 +36,8 @@
     {
       "name": "Lõunaküla 1",
       "owned": 27,
-      "developed": 8,
-      "ruralDeveloped": 5,
+      "developed": 9,
+      "ruralDeveloped": 6,
       "planned": 3,
       "homes": 10,
       "foodGrowthBonus": 0
@@ -45,8 +45,8 @@
     {
       "name": "Lõunaküla 2",
       "owned": 27,
-      "developed": 6,
-      "ruralDeveloped": 2,
+      "developed": 7,
+      "ruralDeveloped": 3,
       "planned": 2,
       "homes": 8,
       "foodGrowthBonus": 0
@@ -54,29 +54,29 @@
     {
       "name": "Lõunaküla 3",
       "owned": 27,
-      "developed": 7,
-      "ruralDeveloped": 4,
-      "planned": 3,
+      "developed": 6,
+      "ruralDeveloped": 3,
+      "planned": 2,
       "homes": 8,
       "foodGrowthBonus": 0.25
     },
     {
       "name": "Lõunaküla 4",
       "owned": 27,
-      "developed": 6,
+      "developed": 7,
       "ruralDeveloped": 3,
-      "planned": 0,
-      "homes": 5,
-      "foodGrowthBonus": 0
+      "planned": 1,
+      "homes": 6,
+      "foodGrowthBonus": 0.25
     },
     {
       "name": "Lõunaküla 5",
       "owned": 27,
-      "developed": 7,
-      "ruralDeveloped": 3,
+      "developed": 8,
+      "ruralDeveloped": 4,
       "planned": 2,
-      "homes": 10,
-      "foodGrowthBonus": 0
+      "homes": 9,
+      "foodGrowthBonus": 0.25
     },
     {
       "name": "Lõunaküla 6",
@@ -99,10 +99,10 @@
     {
       "name": "Lõunaküla 8",
       "owned": 27,
-      "developed": 4,
-      "ruralDeveloped": 2,
+      "developed": 6,
+      "ruralDeveloped": 3,
       "planned": 0,
-      "homes": 2,
+      "homes": 1,
       "foodGrowthBonus": 0
     },
     {
@@ -112,14 +112,14 @@
       "ruralDeveloped": 2,
       "planned": 0,
       "homes": 1,
-      "foodGrowthBonus": 0
+      "foodGrowthBonus": 0.25
     }
   ],
   "seed": 136023,
   "turn": 246,
   "sourceTeam": 3,
   "cities": 9,
-  "buildings": 249,
+  "buildings": 245,
   "spacingPairs": [
     9,
     9,
@@ -127,35 +127,35 @@
     9,
     18,
     18,
-    18,
     10,
+    18,
     18,
     9,
     17,
     9,
     18,
-    27,
     9,
+    27,
     10,
     9,
     27,
     18,
-    9,
     19,
+    9,
     9,
     17,
     9,
-    19,
     9,
+    19,
     26,
     9,
+    18,
     10,
     18,
-    18,
-    36,
     9,
-    18,
+    36,
     10,
+    18,
     28
   ],
   "ages": [
@@ -164,6 +164,6 @@
     1,
     0
   ],
-  "bytes": 2863314,
-  "seconds": 122
+  "bytes": 3018538,
+  "seconds": 132
 }
