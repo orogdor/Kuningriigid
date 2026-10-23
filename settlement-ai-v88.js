@@ -22,6 +22,11 @@ export function specializeNewCity(game,city,missing){
  const cell=game.cell(city),resources=missing.filter(k=>k==='fish'?isShore(game,cell):cell.deposits[k]);
  resources.sort((a,b)=>(weight[b]||18)-(weight[a]||18));
  city.resourceSpecialization=resources;
+ // Specialist towns can trade complementary goods instead of all constructing
+ // the same industries. A role is derived from actual deposits/coast.
+ const terrain=game.cell(city),d=terrain?.deposits||{},water=isShore(game,terrain);
+ city.economicRole=d.oil?'energy':d.ore||d.coal?'industry':
+   d.grain||d.game?'food':water?'port':d.wood?'timber':'trade';
  // Existing national merchants carry the actual goods; import requests do
  // not credit a destination until its caravan physically arrives.
  for(const other of game.s.cities.filter(c=>c.team===city.team&&c.id!==city.id)){
