@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/v138-simulation.yml'
       - 'scripts/make-ai-city-v138.mjs'
+      - 'civilization-core.js'
+      - 'historic-urban-v138.js'
   workflow_dispatch:
 permissions:
   contents: write
