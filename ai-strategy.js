@@ -51,7 +51,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  const gaps=science.ageWait?ageDeficit(game.s,team,science.ageWait.id):{};
  const missing=Object.keys(gaps).length>0;
  const housing=game.allBuildings(city).filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
- const capacity=4+housing*3;
+ const capacity=4+housing*1.5;
  const possibilities=[],visiting=new Set();
  const add=(type,priority,reason)=>{
   if(excluded.has(type)||DEFENSE_TYPES.has(type))return;
@@ -129,7 +129,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   }
  }
  const nHouse=housing;
- if(nHouse<24&&r.pop>=capacity-1&&edibleSupply(stock)>=Math.max(5,r.pop*1.2)&&stock.water>=Math.max(5,r.pop*.9)){
+ if(nHouse<48&&r.pop>=Math.floor(capacity)-1&&edibleSupply(stock)>=Math.max(5,r.pop*1.2)&&stock.water>=Math.max(5,r.pop*.9)){
   // A town capped at seven residents cannot staff its sawmill, farms,
   // universities or future industry. Housing is productive investment.
   const enoughToInvest=!missing||
