@@ -22,7 +22,7 @@ for(turn=1;turn<=maxTurns;turn++){
   const row=snapshot(turn);history.push(row);console.log('V145 PROGRESS',JSON.stringify(row));lastLog=turn;
  }
  if(medievalAt!=null&&turn>=medievalAt+midwayTurns){stopReason='30 turns after first AI entered Medieval Age';break;}
- if(medievalAt!=null&&[1,2,3].some(t=>game.s.ages[t]>=4)){stopReason='Renaissance reached before the 30-turn target';break;}
+ // Complete the same 30-turn Medieval window even if another AI advances early.
  if(game.s.winner!=null){stopReason='Victory before target';break;}
  if(Date.now()-started>1350000){stopReason='22.5-minute simulation ceiling';break;}
 }
