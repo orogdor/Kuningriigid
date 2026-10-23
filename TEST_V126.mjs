@@ -28,8 +28,8 @@ ctx.economy.buildings[1].hp=0;
 assert.equal(g.countySlots(ctx).used,2);
 assert.doesNotMatch(g.buildRule(ctx,'well'),/kuni 3/,'destroyed building frees a slot');
 city.economy.realms[0].pop=64;g.refreshTerritory();
-assert.equal(g.radius(city),4);
-assert.ok([...g.territory.values()].filter(c=>c.id===city.id).length<=243);
+assert.equal(g.radius(city),5);
+assert.ok([...g.territory.values()].filter(c=>c.id===city.id).length<=countyTileLimit(5));
 // Save/load retains districts, stock and the limit without resetting the game.
 const restored=new Civilization(JSON.parse(JSON.stringify(g.s)));
 const saved=restored.s.cities.find(c=>c.id===city.id);

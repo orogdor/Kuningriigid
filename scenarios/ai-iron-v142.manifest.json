@@ -1,0 +1,168 @@
+{
+  "version": 142,
+  "success": true,
+  "seed": 142023,
+  "sourceTeam": 1,
+  "turn": 139,
+  "source": "Fresh game; normal AI economy, research and construction; no injected buildings, technologies or resources",
+  "age": 2,
+  "seconds": 109,
+  "history": [
+    {
+      "turn": 20,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "seconds": 9
+    },
+    {
+      "turn": 40,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "seconds": 16
+    },
+    {
+      "turn": 60,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 3,
+      "seconds": 23
+    },
+    {
+      "turn": 80,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cities": 6,
+      "seconds": 30
+    },
+    {
+      "turn": 100,
+      "ages": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "cities": 10,
+      "seconds": 45
+    },
+    {
+      "turn": 120,
+      "ages": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "cities": 14,
+      "seconds": 76
+    },
+    {
+      "turn": 139,
+      "ages": [
+        0,
+        2,
+        1,
+        1
+      ],
+      "cities": 16,
+      "seconds": 109
+    }
+  ],
+  "cities": [
+    {
+      "id": 2,
+      "name": "Idaküla 1",
+      "c": 108,
+      "r": 26,
+      "pop": 11,
+      "radius": 2,
+      "extent": 5,
+      "ownedTiles": 75,
+      "buildings": 27
+    },
+    {
+      "id": 3,
+      "name": "Idaküla 2",
+      "c": 110,
+      "r": 17,
+      "pop": 8,
+      "radius": 2,
+      "extent": 5,
+      "ownedTiles": 40,
+      "buildings": 19
+    },
+    {
+      "id": 4,
+      "name": "Idaküla 3",
+      "c": 99,
+      "r": 26,
+      "pop": 7,
+      "radius": 1,
+      "extent": 3,
+      "ownedTiles": 27,
+      "buildings": 18
+    },
+    {
+      "id": 6,
+      "name": "Idaküla 4",
+      "c": 107,
+      "r": 35,
+      "pop": 5,
+      "radius": 1,
+      "extent": 3,
+      "ownedTiles": 27,
+      "buildings": 13
+    },
+    {
+      "id": 7,
+      "name": "Idaküla 5",
+      "c": 117,
+      "r": 32,
+      "pop": 5,
+      "radius": 1,
+      "extent": 3,
+      "ownedTiles": 27,
+      "buildings": 12
+    },
+    {
+      "id": 11,
+      "name": "Idaküla 6",
+      "c": 101,
+      "r": 16,
+      "pop": 5,
+      "radius": 1,
+      "extent": 3,
+      "ownedTiles": 27,
+      "buildings": 10
+    },
+    {
+      "id": 15,
+      "name": "Idaküla 7",
+      "c": 108,
+      "r": 44,
+      "pop": 4,
+      "radius": 1,
+      "extent": 3,
+      "ownedTiles": 27,
+      "buildings": 3
+    }
+  ]
+}

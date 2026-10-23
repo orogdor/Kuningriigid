@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const args=process.argv.slice(2),profile=args[0]||'traffic',get=name=>args.includes(name)?args[args.indexOf(name)+1]:null;
 const out=get('--report')||`artifacts-tests/${profile}.json`,jobs=Math.max(1,Math.min(8,Number(get('--jobs'))||Math.min(2,availableParallelism()))),start=performance.now(),results=[];
-const rules=[141,140,139,138,137,136,'136_HARBOR',135,125,126,127,128,129,130,131,132,123,122,121,'120_LOCALE',119,118,117,59,67,68].map(v=>[`TEST_V${v}.mjs`]);
+const rules=[142,141,140,139,138,137,136,'136_HARBOR',135,125,126,127,128,129,130,131,132,123,122,121,'120_LOCALE',119,118,117,59,67,68].map(v=>[`TEST_V${v}.mjs`]);
 const focused=[['tests/traffic-v133/run.mjs','--report','artifacts-tests/traffic-cases.json'],['TEST_V133.mjs'],['TEST_V134.mjs']];
 const syntax=['urban-infill-v139.js','ancient-walls-v139.js','ai-city-demo-v139.js','historic-urban-v138.js','city-growth-v137.js','historical-districts-v137.js','ai-city-demo-v137.js','historical-city-v135.js','ai-city-demo-v135.js','civilization.js','civilization-core.js','campaign.js','army-arrivals-v133.js','army-gates-v133.js','army-traffic-demo-v133.js'].map(f=>['--check',f]);
 async function run(command){

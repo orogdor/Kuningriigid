@@ -1,3 +1,4 @@
+import {grownCityRadius} from './city-area-v142.js';
 import {installGameRevisions,citySummary,cityContexts,cityLookup,navigationRevision,resourcesNear,buildingsNear} from './perf-state-v131.js';
 import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js';
 import {applyDevelopmentBalance,combatUnit,militaryChoices,readyForNextEra,allowAIResearch} from './ai-development-v128.js';
@@ -372,7 +373,7 @@ export class Civilization{
  sail(ship,to){const path=seaPath(this,ship,to);if(!path)return 'Seda mereteed ei saa veel läbida. Varased laevad peavad hoiduma ranniku lähedale.';ship.path=path;return ''}
  embark(ship,kind,armyId=0){return embark(this,ship,kind,armyId)}
  disembark(ship,p){return disembark(this,ship,p)}
- radius(city){const pop=city.economy.realms[city.team].pop;return city.radius=Math.min(4,Math.max(city.radius||1,pop>=64?4:pop>=48?3:pop>=32?2:1))}
+ radius(city){const pop=city.economy.realms[city.team].pop;return city.radius=grownCityRadius(city.radius,pop)}
  countyRadius(city){return countySearchRadius(this.radius(this.parentCity(city)))}
  isCountyTile(p,parent=this.territoryOwner(p)){return !!parent&&!urbanTile(parent,p,this.radius(parent))&&!parent.districts?.[tileKey(p)]?.urbanExpansionV138}
  countySlots(ctx){return {used:countyBuildingCount(ctx),limit:3}}
