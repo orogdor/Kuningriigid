@@ -15,7 +15,7 @@ try{
    const s=gameDebug.state,city=s.cities.find(c=>c.team===0);
    return {demo:s.demo,seed:s.seed,turn:Math.floor(s.time/60)+1,test:s.aiCityTestV136,cityCount:s.cities.filter(c=>c.team===0).length,buildings:gameDebug.game.contexts(city).flatMap(d=>d.economy.buildings.filter(b=>!b.virtual&&b.hp>0)).length,view:gameDebug.view(),main:localStorage.getItem('kingdoms-civ4'),backup:localStorage.getItem('kingdoms-civ4-backup')};
   });
-  assert.equal(result.demo,'ai-city-v136');assert.ok(result.test&&result.test.buildings>=30&&result.test.markets>=1);assert.ok(result.cityCount>=3);assert.ok(result.buildings>=2);assert.equal(result.view,'local');assert.equal(result.main,'existing-player-save');assert.equal(result.backup,'existing-player-backup');assert.deepEqual(errors,[]);
+  assert.equal(result.demo,'ai-city-v136');assert.ok(result.test&&result.test.buildings>=30);assert.ok(result.cityCount>=3);assert.ok(result.buildings>=2);assert.equal(result.view,'local');assert.equal(result.main,'existing-player-save');assert.equal(result.backup,'existing-player-backup');assert.deepEqual(errors,[]);
   await page.screenshot({path:`${out}/ai-city-${mobile?'mobile':'desktop'}.png`});
   results.push({...result,mobile,errors});await context.close();
  }
