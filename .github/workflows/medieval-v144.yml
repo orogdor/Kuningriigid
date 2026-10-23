@@ -38,7 +38,9 @@ jobs:
       - name: Verify browser on phone and computer
         run: |
           npm install --no-save playwright
-          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          export CHROME_PATH="$(command -v google-chrome)"
+          test -x "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
           python3 -m http.server 8765 >/tmp/v144-http.log 2>&1 &
           node TEST_V143_BROWSER.mjs
           node TEST_V144_BROWSER.mjs
@@ -48,6 +50,7 @@ jobs:
           name: v144-medieval-analysis
           path: |
             scenarios/ai-medieval-v144.manifest.json
+            scenarios/ai-medieval-v144.json
             artifacts-v144/
             artifacts-tests/
       - name: Save reproducible AI state and analysis
