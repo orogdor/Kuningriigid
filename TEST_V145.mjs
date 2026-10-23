@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {BUILDINGS} from './economy.js';
+import {surplusForWalls,reserveAfterWalls} from './ancient-walls-v139.js';
+import {FOUNDATION_TYPES} from './ai-foundation-v88.js';
+import {cityExtent,populationCityRadius} from './city-area-v142.js';
+assert.deepEqual(BUILDINGS.barracks.requires,['house','lumber'],'Stone Age barracks must not require Iron Age smelting');
+assert.ok(BUILDINGS.market.cost.wood>0&&BUILDINGS.market.cost.stone>0,'Markets still have a real cost');
+assert.equal(cityExtent(populationCityRadius(36)),12,'Urban footprint stays capped at 12x12');
+assert.ok(FOUNDATION_TYPES.has('house')&&FOUNDATION_TYPES.has('lumber'));
+const healthy={wood:120,stone:100,plank:60,water:100,gold:200,bread:90};
+assert.ok(surplusForWalls(healthy,12,1),'Healthy 12-person settlement may start walls');
+assert.ok(reserveAfterWalls(healthy,BUILDINGS.palisade.cost),'Constructing walls must leave material reserves');
+assert.ok(!surplusForWalls({...healthy,wood:20},12,1),'No free walls when timber is exhausted');
+assert.ok(!surplusForWalls({...healthy,bread:0},12,1),'No walls at the expense of hunger');
+console.log('V145 BALANCE PASS: age-correct barracks, real costs, 12x12 cap, fortified town reserves');
