@@ -17,7 +17,7 @@ export function planAIDefenses(game,team,city){
  const all=game.allBuildings(city);
  const residents=all.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
  const services=all.filter(b=>['well','market','warehouse','study','scriptorium'].includes(b.type)&&b.ready&&b.hp>0).length;
- if(residents<5||services<2||!surplusForWalls(stock,realm.pop,waiting))return;
+ if(residents<4||services<2||!surplusForWalls(stock,realm.pop,waiting))return;
  const local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
  // Store the initial historical old-town perimeter in the save; it must not
  // move with each added house. Outer suburbs may grow beyond these walls.
