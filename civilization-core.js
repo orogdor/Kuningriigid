@@ -549,8 +549,11 @@ export class Civilization{
    return {cell,ctx,n,urban,score:cell?historicalTilePriority(city,cell,urban,n):-Infinity};
   }).filter(o=>o.cell?.land&&!o.cell.mountain&&o.n<(o.urban?4:2))
     .sort((a,b)=>b.score-a.score);
+  // Rotate through the entire county over time; never reconsider only the nine easiest cells.
+  const cursor=(city.aiTerritoryCursorV137||0)%Math.max(1,tiles.length);
+  city.aiTerritoryCursorV137=cursor+9;
   let examined=0;
-  for(const item of tiles){
+  for(const item of [...tiles.slice(cursor),...tiles.slice(0,cursor)]){
    if(++examined>9)break;
    const {cell,urban}=item;
    const types=historicalTilePlan(city,cell,urban,age);
