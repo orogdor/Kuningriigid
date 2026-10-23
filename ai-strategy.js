@@ -70,6 +70,13 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  };
  for(const [i,type] of foundationNeeds(game,city).entries())add(type,220-i,'Linna põhiehitis');
  for(const resource of city.resourceSpecialization||[])add(RESOURCE_BUILDINGS[resource],139,'Puuduva riigiressursi tootmine');
+ // War production is an economic workstream, not a last-priority luxury.
+ // The first barracks must be built before training can ever occur.
+ const defending=game.s.units.filter(u=>u.team===team&&u.hp>0&&!u.garrison).length;
+ if(age>=1&&defending<Math.min(12,game.s.cities.filter(c=>c.team===team).length*2+3)){
+   add('barracks',163,'Raise a standing defense force');
+   if(age>=2)add('stable',88,'Train mobile border scouts');
+ }
  const role=city.economicRole||'trade';
  const roleBuilds={
   food:['farm','pasture','mill','bakery','watermill'],
