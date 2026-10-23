@@ -40,6 +40,16 @@ assert.ok(old.some(p=>p.x>90&&p.z>40),'engine uses V138 plot planner all the way
 const count=game.allBuildings(city).length;
 game.developOwnedCityTiles(city);
 assert.ok(game.allBuildings(city).length>=count,'AI expansion should never erase existing houses');
+const countyNeighbor=game.constructionArea(city).tiles.find(p=>game.isCountyTile(p,city)&&game.cell(p)?.land&&!game.cell(p)?.mountain);
+if(countyNeighbor){
+ const ctx=game.contextAt(countyNeighbor,true),previous=!!ctx.urbanExpansionV138;
+ const denied=game.buildRule(ctx,'house');
+ assert.match(denied,/Maakonnas/,'a rural district normally rejects city housing');
+ ctx.urbanExpansionV138=true;
+ const newlyAllowed=game.buildRule(ctx,'house');
+ assert.doesNotMatch(newlyAllowed,/Maakonnas/,'contiguous urban conversion permits homes on the next owned square');
+ if(!previous)delete ctx.urbanExpansionV138;
+}
 assert.ok(Number.isFinite(city.aiTerritoryCursorV137));
 const candidate=area.tiles.find(p=>Math.abs(p.c-city.c)+Math.abs(p.r-city.r)===2&&game.cell(p)?.land);
 if(candidate){const ctx=game.contextAt(candidate,true);const before=ctx.urbanExpansionV138||false;game.isCountyTile(candidate,city);assert.equal(!!ctx.urbanExpansionV138,before,'reading city ownership never mutates urbanization');}
