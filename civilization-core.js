@@ -528,6 +528,10 @@ const science=this.s.research[team];if(!science.active&&this.s.cities.some(c=>c.
  // A usable production chain is more important than a fixed construction list.
  // Decisions include affordability, terrain restrictions, available labour,
  // era material reserves, and the prerequisites of each missing resource.
+ // Planning a distant city's next construction only every 36 game seconds
+ // avoids 12-town empires recomputing thousands of building-site paths per frame.
+ if(this.s.time>=(city.aiNextBuildCheck||0)){
+  city.aiNextBuildCheck=this.s.time+36;
  const excluded=new Set(Object.entries(city.aiPlacementRetry||{}).filter(([,until])=>until>this.s.time).map(([type])=>type));
  for(let attempt=0;attempt<6;attempt++){
   const decision=selectAIBuild(this,team,city,excluded);if(!decision)break;
@@ -546,6 +550,8 @@ const science=this.s.research[team];if(!science.active&&this.s.cities.some(c=>c.
    if(this.build(city,next,p).building){built=true;break;}
   }
   if(built){city.aiPlacementRetry={};break;}excluded.add(next);(city.aiPlacementRetry??={})[next]=this.s.time+15;
+ }
+
  }
  const stock=city.economy.realms[team].resources;
  const problems=cityProblems(this,city);city.aiDiagnostics=problems.slice(0,3).map(x=>x.text);
