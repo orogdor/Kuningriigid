@@ -9,7 +9,7 @@ const FOOTPRINTS=Object.freeze({
  steelworks:[5.4,5.3],engineworks:[5.4,5.3],polytechnic:[5.4,5.3],
  railstation:[5.6,6.0],printer:[5.5,5.3],powdermill:[5.5,5.3],
  inn:[6,5], trade_yard:[5,6], siegeworkshop:[5,6], smelter:[5,6], smith:[5,6], coal:[5,6], mine:[5,6], watermill:[6,5], hall:[5.6,5.0],house:[4,3.6],warehouse:[5.6,5],cellar:[5,4.4],
- market:[5.5,5.1],study:[5,5],lumber:[4.8,5],quarry:[4.6,5],
+ market:[11,10.2],study:[5,5],lumber:[4.8,5],quarry:[4.6,5],
  hunter:[4.6,5],fisher:[4.9,4.6],farm:[4.8,5],well:[3.2,3.2],
  barracks:[5,5],harbor:[5.3,8.3],saw:[5,5],mill:[4.8,5],
  bakery:[5,5],archery:[5,5],forester:[4.8,5],claypit:[4.7,4.4],
@@ -43,7 +43,7 @@ export const door=b=>{
  const size=buildingClearance(b);
  return {x:b.x,z:b.z+(size?.rz||2.5)+1.15};
 };
-export function clearFootprint(world,b){let changed=false;for(const r of world.resources)if(['tree','berry'].includes(r.kind)&&!r.removed&&Math.abs(r.x-b.x)<Math.max(3.6,b.navWidth||0)+.5&&Math.abs(r.z-b.z)<Math.max(3.5,b.navDepth||0)+.5){r.removed=true;r.cleared=true;r.amount=0;changed=true}if(changed)world.revision=(world.revision||0)+1;return changed}
+export function clearFootprint(world,b){const size=buildingClearance(b);let changed=false;for(const r of world.resources)if(['tree','berry'].includes(r.kind)&&!r.removed&&Math.abs(r.x-b.x)<Math.max(3.6,size?.rx||0)+.5&&Math.abs(r.z-b.z)<Math.max(3.5,size?.rz||0)+.5){r.removed=true;r.cleared=true;r.amount=0;changed=true}if(changed)world.revision=(world.revision||0)+1;return changed}
 export class Navigation{
 constructor(world,passable,buildings=()=>[],bounds={}){this.world=world;this.revisionSource=bounds.revision;world.heat??={};world.heatLast??={};world.trailTime??=0;world.revision??=0;this.passable=passable;this.buildings=buildings;this.minX=bounds.minX??-72;this.minZ=bounds.minZ??-62;this.w=bounds.w??145;this.h=bounds.h??125;this.n=this.w*this.h;
 const previous=world.navBounds||{minX:-72,minZ:-62,w:145,h:125};
