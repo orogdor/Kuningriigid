@@ -129,7 +129,8 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   }
  }
  const nHouse=housing;
- if(nHouse<48&&r.pop>=Math.floor(capacity)-1&&edibleSupply(stock)>=Math.max(5,r.pop*1.2)&&stock.water>=Math.max(5,r.pop*.9)){
+ const desiredHouses=Math.min(70,Math.ceil((r.pop+3)/1.5));
+ if(nHouse<desiredHouses&&(stock.wood||0)>=BUILDINGS.house.cost.wood+18){
   // A town capped at seven residents cannot staff its sawmill, farms,
   // universities or future industry. Housing is productive investment.
   const enoughToInvest=!missing||
