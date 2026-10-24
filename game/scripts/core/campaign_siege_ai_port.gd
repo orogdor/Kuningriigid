@@ -32,8 +32,10 @@ static func equip(state: Dictionary,battle: Dictionary) -> Dictionary:
     var attacker: int = int(siege.get("attacker_team",-1))
     if attacker < 1 or attacker == int(campaign.get("player_team",0)):
         return result # The player's military remains under player control.
-    if bool(siege.get("ai_craft_done",false)):
+    if bool(siege.get("ai_craft_done",false)) or not bool(siege.get("ai_supply_required",false)):
         return result
+    if float(siege.get("supply_wood",0.0)) < Siege.LADDER_WOOD:
+        return result # Never order AI works against another city's warehouse.
     siege["ai_craft_done"] = true
     var squads: Array = _eligible_squads(battle)
     if squads.is_empty():
