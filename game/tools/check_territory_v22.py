@@ -29,5 +29,5 @@ assert 'v131_godot_preview_v14.json' in preview
 assert 'Territory.advance_worksites(city,dt)' in preview
 assert '_create_county_worksites(towns[owner_index])' in detail
 assert '_run_rule_checks()' not in main.split('func _ready() -> void:',1)[1].split('func _setup_lighting()',1)[0]
-assert all(k in tests for k in ['v22-no-overseas-claim','v22-city-urban-fallback','v22-rural-worksite-saveable'])
+assert all(k in tests for k in ['v22-no-overseas-claim','v34-surrounded-city-fallback-keeps-core-and-county','v22-rural-worksite-saveable'])
 print('PASS: V2.2 territory/building/demo wiring, 658+ prepared GDScript assertions, backwards-compatible load paths; Godot runtime NOT tested')
