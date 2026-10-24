@@ -3,6 +3,7 @@ extends RefCounted
 ## individual-battle-v91.js, tactics, formations, siege, projectiles or retreat.
 const Military = preload("res://scripts/core/military_port.gd")
 const XP = preload("res://scripts/core/army_experience_port.gd")
+const IndividualBattle = preload("res://scripts/core/individual_battle_port.gd")
 
 static func _locate_army(state: Dictionary,id: int) -> Dictionary:
     for a in state.get("armies",[]):
@@ -90,5 +91,5 @@ static func detect_encounter(state: Dictionary) -> bool:
             if float(a.get("retreat_until",0.0)) > float(state.get("seconds",0.0)) or float(b.get("retreat_until",0.0)) > float(state.get("seconds",0.0)):
                 continue
             if int(a["team"]) != int(b["team"]) and int(a["c"]) == int(b["c"]) and int(a["r"]) == int(b["r"]) and not Military.units_for(state,a).is_empty() and not Military.units_for(state,b).is_empty():
-                return bool(start(state,int(a["id"]),int(b["id"])).get("ok",false))
+                return bool((IndividualBattle.start(state,int(a["id"]),int(b["id"])) if bool(state.get("campaign",{}).get("active",false)) else start(state,int(a["id"]),int(b["id"]))).get("ok",false))
     return false

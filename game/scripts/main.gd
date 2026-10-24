@@ -10,6 +10,7 @@ const BuildVersion = preload("res://scripts/core/build_version_port.gd")
 const CampaignPlay = preload("res://scripts/core/campaign_play_port.gd")
 const CityFounding = preload("res://scripts/core/city_founding_port.gd")
 const SettlerCampaign = preload("res://scripts/core/settler_campaign_port.gd")
+const CampaignWar = preload("res://scripts/core/campaign_war_port.gd")
 const SettlerView = preload("res://scripts/adapters/native_settler_view.gd")
 const EconomyPort = preload("res://scripts/core/economy_port.gd")
 const ResearchPort = preload("res://scripts/core/research_port.gd")
@@ -205,6 +206,10 @@ const MOBILE_MENU_ACTIONS = [
     ["Kampaania", "SAADA ASUTAJA valitud ruudule", "campaign_found_city"],
     ["Kampaania", "Asutamise tingimused", "campaign_founding_info"],
     ["Kampaania", "Asutajate teekonnad", "campaign_settlers"],
+    ["Kampaania", "Ehita sõjaväelaager", "campaign_barracks"],
+    ["Kampaania", "Värba odamees", "campaign_train"],
+    ["Kampaania", "SAADA ARMEE valitud ruudule", "campaign_army_move"],
+    ["Kampaania", "Sõjaväe ülevaade", "campaign_army_info"],
     ["Kampaania", "Vali järgmine uurimus", "campaign_research"],
     ["Kampaania", "Ehita elamu", "campaign_house"],
     ["Kampaania", "Ehita metsamaja", "campaign_lumber"],
@@ -444,6 +449,12 @@ func _campaign_end_turn() -> void:
             local_streets.clear()
     Territory.rebuild(preview_state,land,true)
     var ai_expansion: Dictionary = SettlerCampaign.ai_expand(preview_state,land)
+    # Military operations use actual building, training and world-graph costs.
+    # Unfortified towns need two consecutive unopposed occupation turns.
+    var occupation: Dictionary = CampaignWar.occupy_unfortified(preview_state)
+    var army_build: Dictionary = CampaignWar.ai_recruit(preview_state,shared_landscape)
+    var army_orders: Dictionary = CampaignWar.ai_march(preview_state,world_trade_nav)
+    CampaignPlay.evaluate(preview_state)
     Territory.reconcile_worksites(preview_state,land,heights)
     _build_counties()
     if bool(result.get("ok",false)):
@@ -462,7 +473,7 @@ func _campaign_end_turn() -> void:
             heights,local_streets if street_nav_on else null,
             preview_state.get("detail_bridges",{}),shared_landscape)
     var report: Dictionary = result.get("status",{})
-    status_label.text = str(report.get("message","Käik lõpetatud")) + (" • rajati %d linna" % int(travel["founded"]) if int(travel["founded"]) > 0 else "") + (" • AI saatis %d asutajat" % int(ai_expansion["started"]) if int(ai_expansion["started"]) > 0 else "")
+    status_label.text = str(report.get("message","Käik lõpetatud")) + (" • rajati %d linna" % int(travel["founded"]) if int(travel["founded"]) > 0 else "") + (" • AI saatis %d asutajat" % int(ai_expansion["started"]) if int(ai_expansion["started"]) > 0 else "") + (" • vallutati %d linna" % int(occupation["captured"]) if int(occupation["captured"]) > 0 else "") + (" • AI värbas %d" % int(army_build["trained"]) if int(army_build["trained"]) > 0 else "") + (" • AI marssis %d" % int(army_orders["ordered"]) if int(army_orders["ordered"]) > 0 else "")
     _update_labels()
 
 func _campaign_founding_info() -> void:
@@ -488,6 +499,52 @@ func _campaign_found_city() -> void:
     _refresh_settlers()
     var saved: bool = PreviewSim.save_preview(preview_state,CampaignPlay.SAVE_PATH)
     status_label.text = str(sent.get("reason","Asutaja on teel")) + (" • salvestatud" if saved else " • salvestamine ebaõnnestus")
+    _update_labels()
+
+func _campaign_train_spearman() -> void:
+    if not CampaignPlay.is_running(preview_state) or not CampaignPlay.owns_city(preview_state,city_index):
+        status_label.text = "Värvata saab ainult oma linnas käimasolevas kampaanias."
+        return
+    var result: Dictionary = Military.train(preview_state,city_index,"spearman","standard")
+    status_label.text = "VÄRBAMINE: "+str(result.get("reason",""))
+    if bool(result.get("ok",false)):
+        PreviewSim.save_preview(preview_state,CampaignPlay.SAVE_PATH)
+    _update_labels()
+
+func _campaign_move_army() -> void:
+    if not CampaignPlay.is_running(preview_state):
+        status_label.text = "Alusta kõigepealt kampaaniat."
+        return
+    if mobile_view != "world":
+        status_label.text = "Armee saatmiseks ava MAAILM ja vali sihtruut."
+        return
+    var player_team: int = int(preview_state["campaign"]["player_team"])
+    var city: Dictionary = preview_state["cities"][city_index] if CampaignPlay.owns_city(preview_state,city_index) else {}
+    var best: Dictionary = {}
+    var distance: int = 999999
+    for army in preview_state.get("armies",[]):
+        if int(army.get("team",-1)) != player_team or Military.units_for(preview_state,army).is_empty():
+            continue
+        var dist: int = absi(int(army["c"])-int(city.get("c",int(army["c"]))))+absi(int(army["r"])-int(city.get("r",int(army["r"]))))
+        if dist < distance:
+            best = army
+            distance = dist
+    if best.is_empty():
+        status_label.text = "Sul ei ole veel armeed. Ehita sõjaväelaager ja värba odamees."
+        return
+    var result: Dictionary = Military.command_move(preview_state,int(best["id"]),selected.x,selected.y,world_trade_nav)
+    status_label.text = "MARSS: "+str(result.get("reason",""))
+    if bool(result.get("ok",false)):
+        PreviewSim.save_preview(preview_state,CampaignPlay.SAVE_PATH)
+        if is_instance_valid(army_view):
+            army_view.refresh(preview_state,heights)
+    _update_labels()
+
+func _campaign_army_info() -> void:
+    if not CampaignPlay.is_active(preview_state):
+        status_label.text = "Alusta esmalt kampaania."
+        return
+    status_label.text = CampaignWar.report(preview_state,int(preview_state["campaign"]["player_team"]))+" • AI värbamisi "+str(int(preview_state.get("ai_military_recruit_orders",0)))+" • AI marsse "+str(int(preview_state.get("ai_military_march_orders",0)))
     _update_labels()
 
 func _campaign_info() -> void:
@@ -866,7 +923,7 @@ func _menu_action(action_id: String) -> void:
         if restricted:
             status_label.text = "Kampaanias ei saa demodega mänguseisu muuta. Kasuta kampaania menüüd."
             return
-        if action_id.begins_with("build_") or action_id.begins_with("county_") or action_id in ["research","recruit","city_gate_toggle","campaign_research","campaign_house","campaign_lumber"]:
+        if action_id.begins_with("build_") or action_id.begins_with("county_") or action_id in ["research","recruit","city_gate_toggle","campaign_research","campaign_house","campaign_lumber","campaign_barracks","campaign_train"]:
             if not CampaignPlay.owns_city(preview_state,city_index):
                 status_label.text = "Selle linna omanik on teine riik. Vali oma linn."
                 return
@@ -878,6 +935,10 @@ func _menu_action(action_id: String) -> void:
         "campaign_found_city": _campaign_found_city()
         "campaign_founding_info": _campaign_founding_info()
         "campaign_settlers": _campaign_settlers_info()
+        "campaign_barracks": _preview_build("barracks")
+        "campaign_train": _campaign_train_spearman()
+        "campaign_army_move": _campaign_move_army()
+        "campaign_army_info": _campaign_army_info()
         "campaign_research": _preview_research()
         "campaign_house": _preview_build("house")
         "campaign_lumber": _preview_build("lumber")

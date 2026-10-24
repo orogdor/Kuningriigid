@@ -135,7 +135,7 @@ static func occupy_unfortified(state: Dictionary) -> Dictionary:
                 defended = true
             elif units >= MIN_ATTACK_UNITS:
                 occupants[army_team] = maxi(int(occupants.get(army_team,0)),units)
-        if defended or occupants.is_empty() or Fort.fortified(city,home):
+        if defended or occupants.is_empty() or not city.get("fortification",{}).get("tiles",[]).is_empty():
             progress.erase(key)
             continue
         var attacker: int = -1
