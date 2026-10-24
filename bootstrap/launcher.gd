@@ -1,7 +1,8 @@
 extends Control
 ## Small immutable launcher. Never preload game scripts before mounting a patch.
-## Source: https://github.com/orogdor/Kuningriigid-Godot (public GitHub Releases).
-const RELEASES_API: String = "https://api.github.com/repos/orogdor/Kuningriigid-Godot/releases/latest"
+## Experimental Godot PCKs are published as prereleases of the existing repo.
+## This can move to a dedicated Godot repository without changing the pack format.
+const RELEASES_API: String = "https://api.github.com/repos/orogdor/Kuningriigid/releases?per_page=20"
 const GAME_SCENE: String = "res://scenes/Main.tscn"
 const SEED_PACK: String = "res://seed/game.pck"
 const OTA_DIR: String = "user://ota/"
@@ -163,18 +164,29 @@ func _on_http_completed(result: int, status: int, _headers: PackedStringArray, b
 
 func _parse_release(body: PackedByteArray) -> void:
     var parsed: Variant = JSON.parse_string(body.get_string_from_utf8())
-    if not (parsed is Dictionary):
+    if not (parsed is Array):
         busy=false
         _start_game("GitHubi vastus oli vigane. Kasutan eelmist versiooni.")
         return
-    proposed_tag = str(parsed.get("tag_name", ""))
+    var release: Dictionary = {}
+    for candidate in parsed:
+        if candidate is Dictionary and not bool(candidate.get("draft", false)):
+            var tag: String = str(candidate.get("tag_name", ""))
+            if tag.begins_with("godot-dev-"):
+                release = candidate
+                break
+    if release.is_empty():
+        busy=false
+        _start_game("Godoti eelväljalaset ei leitud. Kasutan olemasolevat versiooni.")
+        return
+    proposed_tag = str(release.get("tag_name", ""))
     if proposed_tag == "" or proposed_tag == active_tag:
         busy=false
         _start_game("Mäng on ajakohane.")
         return
     proposed_url=""
     proposed_digest=""
-    var assets: Array = parsed.get("assets", [])
+    var assets: Array = release.get("assets", [])
     var pack_bytes: int = 0
     for asset in assets:
         if not (asset is Dictionary):
@@ -185,7 +197,7 @@ func _parse_release(body: PackedByteArray) -> void:
             pack_bytes=int(asset.get("size", 0))
             break
     # A SHA-256 digest from the GitHub Releases API is required, never skip this check.
-    if not proposed_url.begins_with("https://github.com/orogdor/Kuningriigid-Godot/releases/download/") or not proposed_digest.begins_with("sha256:") or proposed_digest.length() != 71:
+    if not proposed_url.begins_with("https://github.com/orogdor/Kuningriigid/releases/download/godot-dev-") or not proposed_digest.begins_with("sha256:") or proposed_digest.length() != 71:
         busy=false
         _start_game("Uuel versioonil puudub kontrollitud PCK. Kasutan eelmist versiooni.")
         return
