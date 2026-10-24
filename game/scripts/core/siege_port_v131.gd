@@ -13,6 +13,7 @@ const LADDER_WOOD: float = 18.0
 const LADDER_SECONDS: float = 30.0
 const GUARDS_PER_TOWER: int = 5
 const GUARD_PATROL_SPEED: float = 2.0
+const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
 
 static func profile(kind: String) -> Dictionary:
     return PROFILES.get(kind, {})
@@ -43,6 +44,51 @@ static func build_fixture(attacker_team: int, defender_team: int) -> Dictionary:
         "breaches":0,"structural_hits":0,"guard_patrol_steps":0,"gate_open":false,
         "next_work_id":1,"last_guard_plan":-1.0,"keep_hp":600.0,"keep_max_hp":600.0,
         "captured":false,"occupation_seconds":0.0,"tower_assaults":0,"ram_hits":0,"wall_melee_hits":0,"version":17}
+
+static func from_city(city: Dictionary,tile: Vector2i,attacker_team: int,defender_team: int) -> Dictionary:
+    # Convert a saved, paid city palisade into a real battle obstacle.
+    # Keep the existing V131 siege collision/projectile/guard mechanics.
+    if not CityFortifications.fortified(city,tile):
+        return {}
+    if int(city.get("team",-1)) != defender_team or attacker_team == defender_team:
+        return {}
+    var siege: Dictionary = build_fixture(attacker_team,defender_team)
+    var fort: Dictionary = city.get("fortification",{})
+    var integrity: Dictionary = fort.get("integrity",{})
+    var prefix: String = "%d:%d:" % [tile.x,tile.y]
+    for section in siege["sections"]:
+        var kind: String = String(section.get("type",""))
+        if kind == "stonewall":
+            section["type"] = "palisade"
+            section["height"] = float(profile("palisade")["height"])
+            section["max_hp"] = float(profile("palisade")["hp"])
+        elif kind == "stonetower":
+            section["type"] = "palisade_tower"
+            section["height"] = 5.4
+            section["max_hp"] = 520.0
+            section["cover"] = .55
+        elif kind == "gatehouse":
+            section["height"] = 4.8
+            section["max_hp"] = 500.0
+            section["cover"] = .55
+        var key: String = prefix+str(int(section["index"]))
+        section["source_key"] = key
+        section["hp"] = clampf(float(integrity.get(key,section["max_hp"])),0.0,float(section["max_hp"]))
+        section["breached"] = float(section["hp"]) <= .0001
+    var gate_id: String = CityFortifications.tile_key(tile.x,tile.y)
+    var saved_gates: Dictionary = fort.get("gates_open",{})
+    siege["gate_open"] = bool(saved_gates.get(gate_id,false))
+    for section in siege["sections"]:
+        if String(section.get("type","")) == "gatehouse" and float(section["hp"]) <= .0001:
+            siege["gate_open"] = true
+            break
+    siege["linked_city"] = true
+    siege["city_c"] = tile.x
+    siege["city_r"] = tile.y
+    siege["city_team"] = defender_team
+    siege["city_id"] = int(city.get("id",-1))
+    siege["version"] = 37
+    return siege
 
 static func _dist(a: Dictionary,b: Dictionary) -> float:
     return Vector2(float(a.get("x",0.0)),float(a.get("z",0.0))).distance_to(Vector2(float(b.get("x",0.0)),float(b.get("z",0.0))))
@@ -90,6 +136,8 @@ static func ground_open(siege: Dictionary, x: float, z: float, radius: float = .
     if siege.is_empty():
         return true
     for s in active_sections(siege):
+        if bool(siege.get("gate_open",false)) and String(s.get("type","")) == "gatehouse":
+            continue
         var half_x: float = 1.05 if int(s["axis"]) == 1 else 2.15
         var half_z: float = 2.15 if int(s["axis"]) == 1 else 1.05
         if bool(s.get("tower",false)):
@@ -109,6 +157,8 @@ static func shot_blocked(siege: Dictionary, from: Dictionary, target: Dictionary
     if l2 < .0001:
         return false
     for wall in active_sections(siege):
+        if bool(siege.get("gate_open",false)) and String(wall.get("type","")) == "gatehouse":
+            continue
         var center := Vector2(float(wall["x"]),float(wall["z"]))
         var t: float = clampf((center-a).dot(d)/l2,0.0,1.0)
         if t < .03 or t > .97:
@@ -163,7 +213,7 @@ static func artillery_target(battle: Dictionary, squad: Dictionary) -> Dictionar
         return {}
     var gate: Dictionary = {}
     for wall in active_sections(siege):
-        if String(wall["type"]) == "gatehouse":
+        if String(wall["type"]) == "gatehouse" and not bool(siege.get("gate_open",false)):
             gate = wall
             break
     if not gate.is_empty():
