@@ -14,7 +14,7 @@ assert 'native_detail_tile.refresh_movers(preview_state["cities"][detail_index],
 assert 'func _create_city_roads(town: Dictionary,navigator)' in detail
 assert 'navigator.route(town,0,index)' in detail
 assert 'Cargo.building_position(town,i)' in detail
-assert 'city_to_detail(town,Cargo.building_position(town,i))' in detail
+assert 'Layout.site_in_tile(town,site,current_tile)*SITE_SCALE' in detail
 assert '_add_multi(body_mesh,group["wall"]' in detail
 assert 'func refresh_movers(town: Dictionary,shipments: Array' in detail
 assert 'for agent in town.get("citizens",{}).values()' in detail
