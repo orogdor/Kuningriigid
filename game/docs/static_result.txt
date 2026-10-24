@@ -1,0 +1,8 @@
+STATIC PACKAGE CHECKS: PASS
+59 core + 26 V125 research entries; 285 runtime test assertions (not executed); 14 sampled towns with spacing >=17
+Direct GDScript port modules: 28
+NOTE: GDScript syntax and Godot/Android runtime UNTESTED
+V0.9 CITIZEN/BUILDER INTEGRATION: PASS (static only)
+V1.1 SAME-STATE WORLD TRADE: PASS (static only)
+V1.2 MILITARY RECRUITMENT, GRID MARCH AND COMBAT PREVIEW: PASS (static only)
+PASS: 44 GDScript files structurally scanned for matching delimiters, duplicate functions, existing preloads; 285 test cases prepared. NOT compiled.

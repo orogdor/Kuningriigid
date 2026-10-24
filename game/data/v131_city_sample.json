@@ -1,0 +1,21 @@
+{
+  "source": "orogdor/Kuningriigid/scenarios/iron-ai-v129.manifest.json",
+  "note": "V129 rauaaja testseisu 14 linna. V131 kasutab sama testseisu optimeerimisvõrdluses, kuid see EI ole kogu V131 salvestus.",
+  "turn": 256,
+  "cities": [
+    {"id":0,"team":2,"c":191,"r":112,"name":"Põhjaküla 1"},
+    {"id":1,"team":3,"c":133,"r":81,"name":"Lõunaküla 1"},
+    {"id":2,"team":1,"c":83,"r":25,"name":"Idaküla 1"},
+    {"id":3,"team":0,"c":87,"r":105,"name":"Kadakaküla 1"},
+    {"id":4,"team":0,"c":87,"r":83,"name":"Kadakaküla 2"},
+    {"id":5,"team":0,"c":87,"r":122,"name":"Kadakaküla 3"},
+    {"id":6,"team":2,"c":174,"r":112,"name":"Põhjaküla 2"},
+    {"id":7,"team":1,"c":104,"r":17,"name":"Idaküla 2"},
+    {"id":8,"team":3,"c":133,"r":64,"name":"Lõunaküla 2"},
+    {"id":9,"team":1,"c":86,"r":42,"name":"Idaküla 3"},
+    {"id":10,"team":0,"c":104,"r":119,"name":"Kadakaküla 4"},
+    {"id":11,"team":3,"c":150,"r":79,"name":"Lõunaküla 3"},
+    {"id":12,"team":0,"c":70,"r":86,"name":"Kadakaküla 5"},
+    {"id":13,"team":3,"c":139,"r":98,"name":"Lõunaküla 4"}
+  ]
+}

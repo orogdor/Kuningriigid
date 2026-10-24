@@ -1,0 +1,16 @@
+{
+  "source_repo": "orogdor/Kuningriigid",
+  "source_commit": "26562368f56a32616651a266ed2d8c87f06d43d1",
+  "preset": "earth",
+  "seed": 131,
+  "width": 220,
+  "height": 165,
+  "display_scale": 0.145,
+  "format": "K131 + 3x uint32 + float32 scale + 36300x (float32 height, int32 downstream index, float32 width metres, uint8 ford)",
+  "river_threshold": 37,
+  "legacy_fixture_extra_protected_city_sites": 14,
+  "sha256": "4c13c851eef410a4b914064b5d83ebd73857c6020de653212a2150b0ac063dc2",
+  "river_cells": 601,
+  "ford_cells": 32,
+  "land_cells": 10223
+}
