@@ -49,6 +49,8 @@ jobs:
               json.dump(info, file, ensure_ascii=False)
           print("Embedded pack version:", info["tag"])
           PY_VERSION
+          cp game/data/build_info.json bootstrap/seed_build.json
+          test -s bootstrap/seed_build.json
           echo 'Building editable GitHub branch source, not the old compressed v3.3 snapshot.'
       - name: Static validations
         shell: bash

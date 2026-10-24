@@ -5,6 +5,7 @@ extends Control
 const RELEASES_API: String = "https://api.github.com/repos/orogdor/Kuningriigid/releases?per_page=20"
 const GAME_SCENE: String = "res://scenes/Main.tscn"
 const SEED_PACK: String = "res://seed/game.pck"
+const SEED_INFO: String = "res://seed_build.json"
 const OTA_DIR: String = "user://ota/"
 const STATE_FILE: String = "user://ota/installed.json"
 const AGENT: String = "Kuningriigid-Godot-OTA/1.0"
@@ -28,7 +29,32 @@ var staged_pack: String = ""
 var staged_tag: String = ""
 var staged_hash: String = ""
 
+static func version_number(tag: String) -> int:
+    if not tag.begins_with("godot-dev-"):
+        return -1
+    var suffix: String = tag.trim_prefix("godot-dev-")
+    return int(suffix) if suffix.is_valid_int() and int(suffix) >= 0 else -1
+
+static func tag_from_json(path: String) -> String:
+    var f: FileAccess = FileAccess.open(path,FileAccess.READ)
+    if f == null:
+        return ""
+    var value: Variant = JSON.parse_string(f.get_as_text())
+    return str(value.get("tag","")) if value is Dictionary else ""
+
+func _seed_version() -> String:
+    return tag_from_json(SEED_INFO)
+
+func _choose_embedded_seed() -> bool:
+    var bundled: int = version_number(_seed_version())
+    var previous: int = version_number(str(_state().get("tag","")))
+    # The new APK is the floor: a saved OTA from a previous install must not
+    # override a newer PCK shipped inside the APK (including old "seed" tags).
+    return bundled >= 0 and bundled > previous
+
 func _ready() -> void:
+    if DisplayServer.has_feature(DisplayServer.FEATURE_ORIENTATION):
+        DisplayServer.screen_set_orientation(DisplayServer.SCREEN_SENSOR_LANDSCAPE)
     _make_interface()
     var abs_dir: String = ProjectSettings.globalize_path(OTA_DIR)
     var create_error: Error = DirAccess.make_dir_recursive_absolute(abs_dir)
@@ -38,10 +64,17 @@ func _ready() -> void:
     _prune_old_downloads()
     _store_latest("",false)
     # Loading the pack occurs before any code or scene from the game is loaded.
-    if not _mount_saved():
-        if not _mount_seed():
-            _show_error("Mängu algpakett puudub. Paigalda GitHub Releasesi APK uuesti.")
-            return
+    var prefer_bundled: bool = _choose_embedded_seed()
+    var mounted: bool = false
+    if prefer_bundled:
+        mounted = _mount_seed()
+    else:
+        mounted = _mount_saved()
+        if not mounted:
+            mounted = _mount_seed()
+    if not mounted:
+        _show_error("Mängu algpakett puudub. Paigalda GitHub Releasesi APK uuesti.")
+        return
     start_button.disabled = false
     _refresh_versions()
     _set_status("Kontrollin GitHubist uuendusi…")
@@ -110,10 +143,10 @@ func _make_interface() -> void:
 func _pack_version() -> String:
     var file: FileAccess = FileAccess.open("res://data/build_info.json",FileAccess.READ)
     if file == null:
-        return active_tag if active_tag != "" else "teadmata"
+        return active_tag if active_tag != "" else _seed_version()
     var parsed: Variant = JSON.parse_string(file.get_as_text())
     if parsed is Dictionary:
-        return str(parsed.get("tag",active_tag))
+        return str(parsed.get("tag",active_tag if active_tag != "" else _seed_version()))
     return active_tag if active_tag != "" else "teadmata"
 
 func _store_latest(tag: String,checked: bool) -> void:
@@ -128,7 +161,7 @@ func _refresh_versions() -> void:
     if is_instance_valid(latest_label):
         latest_label.text = "Viimane GitHubis: "+(proposed_tag if proposed_tag!="" else "kontrollimata")
         if proposed_tag != "":
-            latest_label.text += ("  ✓ UUSIM" if proposed_tag==_pack_version() else "  • UUENDUS SAADAVAL")
+            latest_label.text += ("  ✓ UUSIM" if version_number(_pack_version()) >= version_number(proposed_tag) and version_number(_pack_version()) >= 0 else "  • UUENDUS SAADAVAL")
 
 func _set_status(message: String) -> void:
     if is_instance_valid(info):
@@ -184,7 +217,10 @@ func _mount_seed() -> bool:
     if not ProjectSettings.load_resource_pack(ProjectSettings.globalize_path(target),true):
         return false
     active_pack=target
-    active_tag="seed"
+    active_tag=_seed_version()
+    if version_number(active_tag) < 0:
+        active_tag="seed"
+    _store_state(active_tag,target,FileAccess.get_sha256(target))
     return true
 
 func _on_http_completed(result: int, status: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
@@ -223,7 +259,7 @@ func _parse_release(body: PackedByteArray) -> void:
         return
     _store_latest(proposed_tag,true)
     _refresh_versions()
-    if proposed_tag == active_tag or proposed_tag == _pack_version():
+    if version_number(proposed_tag) <= version_number(_pack_version()) and version_number(_pack_version()) >= 0:
         busy=false
         _start_game("Mäng on ajakohane.")
         return
@@ -329,7 +365,7 @@ func _open_scene() -> void:
         return
     # Last-resort recovery from a saved PCK that was previously valid but is
     # no longer compatible. Bootstrap's original seed remains in the APK.
-    if active_tag != "seed" and _mount_seed():
+    if active_pack != OTA_DIR+"seed.pck" and _mount_seed():
         _store_state("seed", active_pack, FileAccess.get_sha256(active_pack))
         call_deferred("_open_scene")
         return

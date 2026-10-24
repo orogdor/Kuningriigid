@@ -288,6 +288,8 @@ const MOBILE_MENU_ACTIONS = [
 ]
 
 func _ready() -> void:
+    if DisplayServer.has_feature(DisplayServer.FEATURE_ORIENTATION):
+        DisplayServer.screen_set_orientation(DisplayServer.SCREEN_SENSOR_LANDSCAPE)
     _setup_lighting()
     _setup_camera()
     _setup_ui()

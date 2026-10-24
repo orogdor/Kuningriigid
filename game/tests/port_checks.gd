@@ -956,6 +956,7 @@ static func run() -> Dictionary:
     _check(results,"v36-no-duplicate-wall-cost",not bool(CityFortifications.build_next(castle_city).get("ok",false)))
     _check(results,"v36-saved-wall-json",JSON.parse_string(JSON.stringify(castle_city["fortification"])) is Dictionary)
     # V3.9 persistent build version, reliable offline status, update detection.
+    _check(results,"v40-landscape-screen-config",int(ProjectSettings.get_setting("display/window/handheld/orientation",4))==4)
     _check(results,"v39-version-valid-tag",BuildVersion.release_number("godot-dev-70")==70)
     _check(results,"v39-version-rejects-garbage",BuildVersion.release_number("Godot 1.8")==-1)
     _check(results,"v39-version-rejects-non-number",BuildVersion.release_number("godot-dev-x")==-1)
