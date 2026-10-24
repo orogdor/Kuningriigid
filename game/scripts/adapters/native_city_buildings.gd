@@ -1,5 +1,6 @@
 extends Node3D
 const Cargo = preload("res://scripts/core/cargo_port.gd")
+const Layout = preload("res://scripts/core/city_layout_port.gd")
 ## Mobile-friendly native GeometryInstance3D demonstration of town placement.
 ## The building list is from PreviewSim; geometry/locations are PROXIES, not
 ## the historical V131 detailed city mesh or actual worker path layout.
@@ -32,8 +33,11 @@ func refresh(towns: Array, heights: PackedFloat32Array) -> void:
                 grouped[key] = {"kind":kind,"ready":ready,"transforms":[]}
             # World and detail map now share a SINGLE saved building lot.
             var world_site: Vector2 = Cargo.building_position(town,index)
-            var x: float = world_site.x
-            var z: float = world_site.y
+            # V3.5 parcels are 10m proxy units but the atlas is 1 unit/tile.
+            # Use a single explicit transform for both main-map and detail.
+            var atlas_site: Vector2 = Layout.site_on_atlas(town,world_site)
+            var x: float = atlas_site.x
+            var z: float = atlas_site.y
             var angle: float = float(index) * .27
             var base_x: int = clampi(int(x),0,219)
             var base_z: int = clampi(int(z),0,164)
