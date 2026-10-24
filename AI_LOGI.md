@@ -238,3 +238,27 @@ Muudetud on ainult välimust. Mänguandmed, kaart ja salvestused on samad.
 - PASS: `TEST_V48` (uuendatud V152 jaoks: kuni 9 liiki ja asulamudel), `TEST_V88_EXPLORATION_UI`, `TEST_V143_BROWSER`, `TEST_V148`, `TEST_V149_BROWSER`, `TEST_V152`.
 - Mudelite eelvaade: `artifacts-v152/models.html?m=nature` või `?m=city` (kaust on gitignore'is).
 - Versioonid: `index.html` / `boot-v83.js` → `?v=152a`; `landscape-v149.js?v=152a`; `world-models-v152.js?v=152a`; `atlas-biomes-v47.js?v=152a`.
+
+## V153 – detailkaardi kõrgused sujuvaks (Claude, 2026-10-24)
+
+Kasutaja: „Kõrguste vahe detailkaardil on nagu ümmargused lained, mitte sujuv.“
+Muudetud on ainult visuaalset kõrgust (`continuous-landscape.js`). Mängu enda detailkõrgused (`world-details.js` `detailHeight`, küpsetatud kõrgused) ja kaardiandmed on samad.
+
+### Põhjus
+- `baseHeight()` lisas siinuspõhiseid mustreid: `crest`, `fold`, `spine`, `fracture`, `ledge` ja eriti `coastal` (sin⁴ ribad kõigil madalikel kõrgusega 3…21 m). Need kordusid korrapäraselt ja detailkaardil (4,5× suurendus) paistsid need ümarate kontsentriliste lainetena.
+- `game.atlasHeight` on smoothstep-bilineaarne interpolatsioon, millel on iga 50 m ruudu keskel tasane koht. Tulemuseks olid astmelised kühmud ehk terrassid.
+
+### Parandus
+- Uus `smoothAtlasHeight(game,x,z)`: kuup-B-splain 4×4 ruudu kõrgusest (C2-sujuv, ei tee üle- ega alavisset). Meretaseme lähedal (|h| < 1,5…5,5) sulandub see tagasi algsesse kõrgusse, et rannajooned jääksid paika.
+- `baseHeight()`:
+  - madalikul domeeni-väänatud õrn lainjus (±1,3 m, rannad tasased);
+  - mägedes *ridged multifractal* müra (3 oktaavi `game.smooth`-iga) ja katkendlikud astangud. Korduvaid siinusmustreid enam pole.
+- Jõe veetase (`prep` → `waterHeight`) kasutab samuti `smoothAtlasHeight`-i.
+- Kõrgusjaotus jäi peaaegu samaks (seeme 142023):
+  - mäed p5/p50/p95: 56/94/144 → 60/94/139;
+  - madalik: 4/19/66 → 3/18/65.
+  Lumepiir ja kaljuvärvid töötavad endiselt.
+- `index.html`: `continuous-landscape.js` → `?v=153a`.
+
+### Testid
+PASS: `TEST_V67`, `TEST_V48`, `TEST_V152`, `TEST_V88_EXPLORATION_UI`, `TEST_V149_BROWSER`, `TEST_V143_BROWSER`, `TEST_V151_BROWSER`.

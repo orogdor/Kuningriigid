@@ -35,8 +35,8 @@ function prep(game){
    const p=cellAt(minX,minZ),q=cellAt(maxX,maxZ);
    const cc0=p?.c??clamp(Math.floor((minX+650)/50),0,COLS-1),cc1=q?.c??clamp(Math.floor((maxX+650)/50),0,COLS-1);
    const rr0=p?.r??clamp(Math.floor((minZ+550)/50),0,ROWS-1),rr1=q?.r??clamp(Math.floor((maxZ+550)/50),0,ROWS-1);
-   a.waterHeight??=Math.max(.86,game.atlasHeight(a.x,a.z)-(2.4+Math.min(2.1,a.width*.20)));
-   b.waterHeight??=Math.max(.86,game.atlasHeight(b.x,b.z)-(2.4+Math.min(2.1,b.width*.20)));
+   a.waterHeight??=Math.max(.86,smoothAtlasHeight(game,a.x,a.z)-(2.4+Math.min(2.1,a.width*.20)));
+   b.waterHeight??=Math.max(.86,smoothAtlasHeight(game,b.x,b.z)-(2.4+Math.min(2.1,b.width*.20)));
    // A ford belongs to the upstream river cell. Its shallow bed runs across
    // the water, with a short upstream/downstream transition to deep channel.
    const seg={a,b,ford:!!e.c.ford&&!e.c.bridge,fordX:e.c.x,fordZ:e.c.z,
@@ -102,34 +102,46 @@ export function riverNear(game,x,z){
  }
  return {distance:nearest,width,waterHeight,fordStrength};
 }
+// V153: the map cell heights are interpolated with a cubic B-spline (C2 smooth, no flat spot on
+// every cell centre, no overshoot), and relief detail comes from domain-warped fractal noise.
+// Earlier sine "ridges", "folds" and coastal ledges repeated regularly and showed on the detail
+// map as round concentric waves. Visual height only: gameplay uses its own baked detail heights.
+const cellSamples=new WeakMap();
+function samples(game){
+ let a=cellSamples.get(game);if(a)return a;a=new Float32Array(COLS*ROWS);
+ game.cells.forEach((c,i)=>{a[i]=c.land?(c.river&&!c.bridge?Math.max(4,c.h-3.5):Math.max(5,c.h)):Math.min(-6,c.h);});
+ cellSamples.set(game,a);return a;
+}
+const bs=t=>{const t2=t*t,t3=t2*t;return [(1-3*t+3*t2-t3)/6,(4-6*t2+3*t3)/6,(1+3*t+3*t2-3*t3)/6,t3/6];};
+export function smoothAtlasHeight(game,x,z){
+ if(!Number.isFinite(x)||!Number.isFinite(z))return -15;
+ const a=samples(game),fx=(x+650)/S-.5,fz=(z+550)/S-.5,c=Math.floor(fx),r=Math.floor(fz),wu=bs(fx-c),wv=bs(fz-r);
+ let h=0;
+ for(let j=0;j<4;j++){const rr=r-1+j;let row=0;for(let i=0;i<4;i++){const cc=c-1+i;row+=wu[i]*(cc<0||cc>=COLS||rr<0||rr>=ROWS?-15:a[rr*COLS+cc]);}h+=wv[j]*row;}
+ // keep coastlines where the cells put them: blend toward the original height near sea level
+ const o=game.atlasHeight(x,z),k=smooth((Math.abs(o)-1.5)/4);
+ return o+(h-o)*k;
+}
+const n2=(game,x,z)=>game.smooth(x,z);
+const ridged=v=>{const r=1-Math.abs(2*v-1);return r*r;};
 export function baseHeight(game,x,z){
- const h=game.atlasHeight(x,z);
- // Connected mountainous relief, a smooth scalar field — not individual
- // rocks, peaks, cones or local patches with incompatible boundaries.
+ const h=smoothAtlasHeight(game,x,z);
+ // warped coordinates break any regular pattern
+ const wx=x+(n2(game,x/97+11.3,z/97+4.1)-.5)*70,wz=z+(n2(game,x/97+31.7,z/97+52.9)-.5)*70;
+ // gentle rolling ground on the lowlands (beaches stay flat)
+ const lowland=smooth((h-2.5)/5)*(1-smooth((h-22)/14));
+ const roll=((n2(game,wx/150+3.1,wz/150+7.7)-.5)*2.6+(n2(game,wx/52+19,wz/52+23)-.5)*1.1)*lowland;
+ // mountains: ridged multifractal crests, gullies and broken scarps
  const steep=smooth((h-18)/19);
- const fold=Math.sin(x*.033+Math.sin(z*.015)*1.3)*Math.cos(z*.045-Math.sin(x*.014));
- // Ridge systems are actual elevated continuous terrain, not grey material
- // patches. Two frequencies create mountain crests and steep rock faces.
- const crest=Math.pow(1-Math.abs(Math.sin(x*.052+Math.cos(z*.018)*1.4)*Math.cos(z*.048-x*.011)),2);
- const ridge=(12+25*crest+5.5*Math.max(0,fold))*steep;
-// V69: mountain scarps are real shared 3D elevation. Narrow crests make
-// broken cliffs, with the same metres projected into both map views.
-const jagged=.5+.5*Math.sin(x*.079+Math.cos(z*.043)*1.5)*Math.cos(z*.061-x*.023);
-const scarp=steep*smooth((crest-.16)/.59)*(6.8+8.2*Math.pow(Math.max(0,jagged),2));
-// Intermittent broken coastal ledges (not a continuous seawall).
-const coastal=(smooth((h-3.2)/4)*(1-smooth((h-15)/6)))*4.5*
- Math.pow(Math.max(0,Math.sin(x*.061+z*.029+Math.sin(z*.031))),4);
- // Sloping continental shelf: the underwater seabed is visibly BELOW the
- // sea surface even where riverbeds descend toward the coast.
+ let relief=0;
+ if(steep>0){
+  const r1=ridged(n2(game,wx/165+71,wz/165+13)),r2=ridged(n2(game,wx/72+5,wz/72+91)),r3=ridged(n2(game,wx/31+43,wz/31+27));
+  const scarp=smooth((r2-.55)/.18)*(6+10*r1);
+  relief=steep*(18+50*r1+30*r2*(.35+.65*r1)+9*r3*(.4+.6*r2)+scarp);
+ }
  const sub=Math.max(0,.72-h);
  const oceanFloor=sub?(2.5*smooth(sub/7)+sub*.10):0;
- // Folded rock ridges and eroded gullies are a single height field in both
- // views. A broad ridge supports smaller crags; no independent scaled rocks.
- const spine=1-Math.abs(Math.sin(x*.046+Math.sin(z*.019)*1.2)*Math.cos(z*.039-x*.014));
- const fracture=Math.abs(Math.sin(x*.16+z*.075+Math.sin(z*.083)*.65));
- const ledge=Math.sin((h+ridge)*.57+Math.sin(x*.037+z*.023));
- const fractured=steep*(spine*12+smooth((spine-.55)/.035)*20+smooth((spine-.82)/.030)*24+Math.pow(fracture,1.4)*6+ledge*2.1);
- return h+ridge+scarp+fractured+coastal-oceanFloor;
+ return h+roll+relief-oceanFloor;
 }
 export function worldElevation(game,x,z){
  const base=baseHeight(game,x,z),{distance:d,width:w,waterHeight,fordStrength=0}=riverNear(game,x,z);
