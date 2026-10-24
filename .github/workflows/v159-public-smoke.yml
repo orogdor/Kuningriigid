@@ -55,7 +55,7 @@ jobs:
               await page.waitForTimeout(25000);
               const diag=await page.evaluate(()=>({readyState:document.readyState,location:location.href,title:document.title,hasGameDebug:!!window.gameDebug,menuHidden:document.getElementById('menu-status')?.hidden,menuStatus:document.getElementById('menu-status')?.textContent?.slice(0,400),scripts:[...document.scripts].map(s=>s.src).slice(-10)}));
               console.log('PUBLIC LIVE DIAGNOSTIC',JSON.stringify(diag),'ERRORS',JSON.stringify(errors));
-              await page.waitForFunction(()=>window.gameDebug&&!document.getElementById('menu-status').hidden,null,{timeout:12000});
+              await page.waitForFunction(()=>window.gameDebug&&document.getElementById('menu-status').hidden,null,{timeout:12000});
               const result=await page.evaluate(()=>({demo:gameDebug.state.demo,test:gameDebug.state.medievalTestV159,city:gameDebug.activeCity()?.id,view:gameDebug.view()}));
               assert.equal(result.demo,'ai-medieval-v159');assert.equal(result.test.turn,189);assert.equal(result.city,result.test.targetCityId);assert.equal(result.view,'local');assert.deepEqual(errors,[]);
               console.log('PUBLIC BROWSER PASS',mobile?'mobile':'desktop',JSON.stringify({turn:result.test.turn,city:result.test.targetCityName}));
