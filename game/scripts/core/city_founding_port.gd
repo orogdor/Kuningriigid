@@ -67,12 +67,21 @@ static func found(state: Dictionary,land: PackedByteArray,team: int,loc: Vector2
     if not bool(selected.get("ok",false)):
         return selected
     var parent: Dictionary = state["cities"][int(selected["parent_index"])]
-    var new_id: int = 0
-    for old in state["cities"]:
-        new_id = maxi(new_id,int(old.get("id",-1))+1)
     # All checks above are read-only; deduct only after route/site validated.
     Economy.spend_resources(parent["resources"],FOUNDING_COST)
     parent["pop"] = int(parent["pop"])-SETTLERS
+    return complete_reserved(state,land,team,loc,int(parent["id"]),selected["route"].size())
+
+static func complete_reserved(state: Dictionary,land: PackedByteArray,team: int,loc: Vector2i,parent_id: int,route_length: int) -> Dictionary:
+    # Called only once by a settler that has physically reached its final tile.
+    # Do not charge or remove citizens twice: the dispatch already paid for
+    # those, with all original checks validated before departure.
+    var site: Dictionary = valid_site(state,land,loc)
+    if not bool(site.get("ok",false)):
+        return site
+    var new_id: int = 0
+    for old in state["cities"]:
+        new_id = maxi(new_id,int(old.get("id",-1))+1)
     var stock: Dictionary = Economy.start_resources()
     for key in stock:
         stock[key] = float(SUPPLIES.get(key,0.0))
@@ -92,7 +101,7 @@ static func found(state: Dictionary,land: PackedByteArray,team: int,loc: Vector2
     if not state.has("founding_log"):
         state["founding_log"] = []
     state["founding_log"].append({"id":new_id,"team":team,"c":loc.x,"r":loc.y,
-        "parent_id":int(parent["id"]),"route_length":selected["route"].size(),
+        "parent_id":parent_id,"route_length":route_length,
         "turn":int(state.get("campaign",{}).get("turn",0))})
     return {"ok":true,"index":next_index,"id":new_id,"reason":"Asutatud %s (%d,%d). %d elanikku kolis uude linna." % [
         str(city["name"]),loc.x,loc.y,SETTLERS]}
