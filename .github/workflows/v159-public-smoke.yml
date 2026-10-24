@@ -1,0 +1,57 @@
+name: V159 live HTTPS and takeover smoke
+on:
+  push:
+    branches: [ci-v159-public-smoke-20261024]
+    paths: ['.github/workflows/v159-public-smoke.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-v159:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify deployed V159 save is publicly accessible
+        run: |
+          set -e
+          for i in $(seq 1 40); do
+            if curl --fail --location --silent --show-error --max-time 15 "https://orogdor.github.io/Kuningriigid/scenarios/ai-medieval-v159.json?check=${GITHUB_RUN_ID}-${i}" -o /tmp/live-v159.json; then
+              if node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const s=JSON.parse(fs.readFileSync('/tmp/live-v159.json','utf8')),t=s.medievalTestV159;
+          if(s.demo!=='ai-medieval-v159'||!t||t.medievalAt+30!==t.turn||s.ages[0]<3||!s.cities.some(c=>c.id===t.targetCityId&&c.team===0))process.exit(1);
+          console.log('PUBLIC V159 SAVE VERIFIED',t.turn,s.cities.length,t.targetCityName);
+          NODE
+              then break; fi
+            fi
+            if [ "$i" -eq 40 ]; then echo "PUBLIC V159 SAVE NOT AVAILABLE" >&2; exit 1; fi
+            sleep 5
+          done
+      - name: Install browser tester
+        run: npm install --no-save playwright
+      - name: Verify V159 public game link on mobile and desktop
+        run: |
+          cat > /tmp/v159-live-browser.mjs <<'NODE'
+          import assert from 'node:assert/strict';
+          import {chromium} from '/home/runner/work/Kuningriigid/Kuningriigid/node_modules/playwright/index.mjs';
+          const browser=await chromium.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+          try{
+            for(const mobile of [false,true]){
+              const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});
+              await context.addInitScript(()=>localStorage.setItem('kingdoms-quality','low'));
+              const page=await context.newPage(),errors=[];
+              page.on('pageerror',e=>errors.push(e.message));
+              await page.goto('https://orogdor.github.io/Kuningriigid/?v=159-20261024&demo=ai-medieval-v159',{waitUntil:'domcontentloaded',timeout:150000});
+              await page.waitForFunction(()=>window.gameDebug&&!document.getElementById('menu-status').hidden,{timeout:150000});
+              const result=await page.evaluate(()=>({demo:gameDebug.state.demo,test:gameDebug.state.medievalTestV159,city:gameDebug.activeCity()?.id,view:gameDebug.view()}));
+              assert.equal(result.demo,'ai-medieval-v159');assert.equal(result.test.turn,189);assert.equal(result.city,result.test.targetCityId);assert.equal(result.view,'local');assert.deepEqual(errors,[]);
+              console.log('PUBLIC BROWSER PASS',mobile?'mobile':'desktop',JSON.stringify({turn:result.test.turn,city:result.test.targetCityName}));
+              await context.close();
+            }
+          }finally{await browser.close();}
+          NODE
+          node /tmp/v159-live-browser.mjs
