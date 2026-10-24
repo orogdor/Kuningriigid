@@ -893,9 +893,9 @@ static func run() -> Dictionary:
     _check(results,"v21-layout-stable-on-recheck",CityLayout.position(lot_fixture,1)==first_site)
     _check(results,"v21-layout-cargo-sharing",Cargo.building_position(lot_fixture,1)==first_site)
     var street_fixture = StreetNav.new()
-    var street_path: Array = street_fixture.route(lot_fixture,0,2)
-    _check(results,"v21-layout-road-finds-market",not street_path.is_empty())
-    _check(results,"v21-layout-road-not-through-buildings",street_fixture.path_points_are_clear(lot_fixture,street_path))
+    var layout_street_path: Array = street_fixture.route(lot_fixture,0,2)
+    _check(results,"v21-layout-road-finds-market",not layout_street_path.is_empty())
+    _check(results,"v21-layout-road-not-through-buildings",street_fixture.path_points_are_clear(lot_fixture,layout_street_path))
     var copied_fixture: Dictionary = lot_fixture.duplicate(true)
     _check(results,"v21-layout-json-persistence",CityLayout.position(copied_fixture,2)==CityLayout.position(lot_fixture,2))
     var lot_result: Dictionary = CityLayout.find_free_site(lot_fixture,"house",[
@@ -1120,7 +1120,7 @@ static func run() -> Dictionary:
     atlas_heights.resize(220*165)
     for rr in range(165):
         for cc in range(220):
-            atlas_heights[rr*220+cc] = 2.65-float(rr)*.007
+            atlas_heights[rr*220+cc] = 2.65-float(rr)*.020
     var atlas = SharedLandscape.new()
     atlas.configure(atlas_heights)
     _check(results,"v26-rivers-generated-from-atlas",atlas.segments.size()>100)
