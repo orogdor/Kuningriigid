@@ -1,6 +1,6 @@
 // Only a genuine V147 AI test snapshot is accepted; player saves are untouched.
 export async function loadAIMedievalV147(fetcher=fetch){
- const r=await fetcher('./scenarios/ai-medieval-v147.json?v=144a');
+ const r=await fetcher('./scenarios/ai-medieval-v147.json?v=147-fixed-20261024');
  if(!r.ok)throw Error('Keskaja AI testsalvestuse laadimine ebaõnnestus: '+r.status);
  const s=await r.json();
  const t=s.medievalTestV147,city=s.cities?.find(c=>c.id===t?.targetCityId);
