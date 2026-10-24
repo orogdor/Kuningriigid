@@ -1,5 +1,19 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.6 / mitme linna sõjaväe-AI ja korraga mitu rinnet (Dev 102, 2026-10-24)
+
+- `campaign_war_port.gd`: erinevates AI linnades ehitatakse makstud sõjaväelaagreid ja värvatakse sama käigu jooksul, kuni 3 värbamiskäsku riigi kohta; kogu riigi värbamismaht kasvab linnade arvuga, ülempiiriga 12 elusat üksust. Iga ehitus- ja väljaõppekäsk läbib olemasoleva elanikkonna, teaduse, hinnakirja ning ressursside kontrolli.
+- Vähemalt kolme üksusega linnakaitsjate armeest eraldatakse ühe sõduri garnison. Ülejäänud vähemalt kaks üksust saavad ründekäsu. Kaks üksust ühe AI linna varases proovikampaanias jäävad varasema Dev 96 käitumisega ühilduvaks, kuid mitme linna AI jätab ilma kohaliku garnisonita 2-üksuselise väe tugevnemist ootama.
+- Sõjakäikude plaan määrab **kuni 3 iseseisvat rinnet riigi kohta**, eelistab teistest ründearmeedest erinevaid vaenlaslinnu, proovib läbitavat maailmakaardi marsruuti ja väldib liikumiskäskude kordamist. Kohtumise hetkel võivad muud armeed strateegilist liikumist jätkata; aktiivses lahingus osalevatele armeedele uut käsku ei anta.
+- Armee `strategic_role`, `campaign_target_city`, `home_city_id`, garrisoni stats ning tee on salvestatavad, mitte pelgalt kuvaolek.
+- Uued testid: mitme linna päriselt tasuline ehitus ja värbamine, 3 samaaegse strateegilise rinde eraldi sihtkohad, kodulinna alles jäänud garnisonid, lahinguga paralleelne AI käskude jagamine, korduvkäskude vältimine ning salvestus/laadimine.
+- CI **850/850** Godoti regressiooni roheline; headless import, bootstrap PCK smoke test ning Android APK ehitus edukad. CI https://github.com/orogdor/Kuningriigid/actions/runs/40117310059
+- Väljalase: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-102
+- **Hinnanguline valmidus ~63%** (töömahu hinnang; eelmisel etapil 61%).
+
+**Järgmised kitsaskohad:** samaaegsete strateegiliste sõjakäikude puhul on taktikalise võitluse mootoris endiselt vaid üks aktiivne lahing. Garnisonide pikaajaline hooldus, suure sõjajõu koondamine, ressursiteede sõjaline kaitse, diplomaatia ning AI vägede tagasikutsumine vallutatud linnadest vajavad järgmisi etappe. Testid ei tõenda Androidi pärisseadme jõudlust ega OTA õnnestumist igas telefonis.
+
+
 ## V4.5 / Dev97 arendusetapp, avaldatud Godot Dev 100 (2026-10-24)
 
 - `campaign_siege_port.gd`: kampaanias kindlustatud linnale kohale jõudnud vähemalt kahe vaenlase üksuse vastu kutsutakse vajadusel päris erakorraline mobiliseeritud odamees. Garnison maksab **1 elaniku, 8 puitu ja 2 kivi**; tasuta kloonarmeesid ei teki.
