@@ -13,6 +13,7 @@ const Era = preload("res://scripts/core/era_economy_port.gd")
 const Tech125 = preload("res://scripts/core/research_v125_port.gd")
 const Preview = preload("res://scripts/core/preview_sim_port.gd")
 const CampaignPlay = preload("res://scripts/core/campaign_play_port.gd")
+const CityFounding = preload("res://scripts/core/city_founding_port.gd")
 const Build = preload("res://scripts/core/building_rules_port.gd")
 const Labor = preload("res://scripts/core/labor_port.gd")
 const PreviewAI = preload("res://scripts/core/preview_ai_port.gd")
@@ -52,6 +53,51 @@ const BattleSurface = preload("res://scripts/core/battle_surface_v131.gd")
 
 static func run() -> Dictionary:
     var results: Array = []
+    # V4.2: founding is connected, population/resource-paid and persistent.
+    var founding_map := PackedByteArray()
+    founding_map.resize(Campaign.COLS*Campaign.ROWS)
+    founding_map.fill(1)
+    var settlers_state: Dictionary = Preview.initialize([
+        {"id":0,"c":20,"r":20,"team":0,"name":"Algus"},
+        {"id":1,"c":80,"r":60,"team":1,"name":"Vastane"}])
+    Territory.rebuild(settlers_state,founding_map,true)
+    var origin: Dictionary = settlers_state["cities"][0]
+    origin["pop"] = 9
+    origin["resources"]["wood"] = 75.0
+    origin["resources"]["stone"] = 25.0
+    origin["resources"]["bread"] = 50.0
+    origin["resources"]["water"] = 30.0
+    var wanted := Vector2i(40,20)
+    var before_resources: Dictionary = origin["resources"].duplicate(true)
+    _check(results,"v42-early-found-requires-settlement-tech",not bool(CityFounding.found(settlers_state,founding_map,0,wanted).get("ok",false)))
+    settlers_state["teams"][0]["known"]["settlement"] = true
+    _check(results,"v42-reject-same-tile",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(20,20)).get("ok",false)))
+    _check(results,"v42-reject-too-close",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(30,20)).get("ok",false)))
+    _check(results,"v42-reject-existing-rival-core",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(80,60)).get("ok",false)))
+    _check(results,"v42-reject-invalid-tile",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(-1,20)).get("ok",false)))
+    _check(results,"v42-reject-too-distant",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(100,120)).get("ok",false)))
+    _check(results,"v42-rejection-does-not-spend",origin["resources"]==before_resources)
+    var isolated_map: PackedByteArray = founding_map.duplicate()
+    for r in range(Campaign.ROWS):
+        isolated_map[Campaign.index(31,r)] = 0
+    _check(results,"v42-no-teleport-through-sea",not bool(CityFounding.found(settlers_state,isolated_map,0,wanted).get("ok",false)))
+    var founded: Dictionary = CityFounding.found(settlers_state,founding_map,0,wanted)
+    _check(results,"v42-founding-success",bool(founded.get("ok",false)) and settlers_state["cities"].size()==3)
+    _check(results,"v42-founding-parent-moves-three-residents",int(origin["pop"])==6 and int(settlers_state["cities"][2]["pop"])==3)
+    _check(results,"v42-founding-pays-actual-cost",is_equal_approx(float(origin["resources"]["wood"]),20.0) and is_equal_approx(float(origin["resources"]["stone"]),9.0))
+    _check(results,"v42-new-town-start-stock",is_equal_approx(float(settlers_state["cities"][2]["resources"]["wood"]),25.0))
+    _check(results,"v42-new-city-hall-built",str(settlers_state["cities"][2]["buildings"][0]["type"])=="hall")
+    _check(results,"v42-new-city-unique-id",int(settlers_state["cities"][2]["id"])==2)
+    _check(results,"v42-founding-log-stores-route",int(settlers_state["founding_log"][0]["route_length"])>=20)
+    _check(results,"v42-repeat-same-tile-does-not-charge",not bool(CityFounding.found(settlers_state,founding_map,0,wanted).get("ok",false)) and is_equal_approx(float(origin["resources"]["wood"]),20.0))
+    Territory.rebuild(settlers_state,founding_map,true)
+    _check(results,"v42-new-town-owns-core",Territory.owner_at(settlers_state,40,20)==2)
+    var extra_saved: bool = Preview.save_preview(settlers_state,"user://v42_founding_regression.json")
+    var extra_loaded: Dictionary = Preview.load_preview([{"id":0,"c":20,"r":20,"team":0,"name":"Algus"},{"id":1,"c":80,"r":60,"team":1,"name":"Vastane"}],"user://v42_founding_regression.json")
+    _check(results,"v42-founded-city-survives-save-load",extra_saved and extra_loaded.get("cities",[]).size()==3)
+    _check(results,"v42-founding-log-survives-save-load",extra_loaded.get("founding_log",[]).size()==1)
+    if FileAccess.file_exists("user://v42_founding_regression.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v42_founding_regression.json"))
     # V4.1 playable early campaign: original economic engine remains authoritative.
     var campaign_cities: Array = [
         {"id":0,"team":0,"c":20,"r":20,"name":"Alguslinn"},

@@ -296,8 +296,22 @@ static func load_preview(manifest_cities: Array,path: String = "user://v131_godo
     file.close()
     if not (data is Dictionary) or not data.has("cities") or not data.has("teams"):
         return {}
-    if data["cities"].size() != manifest_cities.size():
+    # Campaigns may have founded real additional settlements. Accept a
+    # longer save, but verify that the original immutable map-city identities
+    # and coordinates still match. This rejects unrelated or corrupt saves.
+    if data["cities"].size() < manifest_cities.size():
         return {}
+    var identity: Dictionary = {}
+    for i in range(manifest_cities.size()):
+        var base: Dictionary = manifest_cities[i]
+        var stored: Dictionary = data["cities"][i]
+        if int(base.get("id",-1)) != int(stored.get("id",-2)) or int(base["c"]) != int(stored.get("c",-1)) or int(base["r"]) != int(stored.get("r",-1)):
+            return {}
+    for stored in data["cities"]:
+        var id: int = int(stored.get("id",-1))
+        if id < 0 or identity.has(id):
+            return {}
+        identity[id] = true
     # JSON dictionary keys are strings; convert team indexing to integers.
     var teams: Dictionary = {}
     for team in range(4):

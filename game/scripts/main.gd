@@ -8,6 +8,7 @@ const Territory = preload("res://scripts/core/territory_port.gd")
 const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
 const BuildVersion = preload("res://scripts/core/build_version_port.gd")
 const CampaignPlay = preload("res://scripts/core/campaign_play_port.gd")
+const CityFounding = preload("res://scripts/core/city_founding_port.gd")
 const EconomyPort = preload("res://scripts/core/economy_port.gd")
 const ResearchPort = preload("res://scripts/core/research_port.gd")
 const PortChecks = preload("res://tests/port_checks.gd")
@@ -198,6 +199,8 @@ const MOBILE_MENU_ACTIONS = [
     ["Kampaania", "LÕPETA KÄIK (+1)", "campaign_turn"],
     ["Kampaania", "Kampaania seis ja edetabel", "campaign_info"],
     ["Kampaania", "Järgmine minu linn", "campaign_city"],
+    ["Kampaania", "ASUTA LINN valitud kaardiruudule", "campaign_found_city"],
+    ["Kampaania", "Asutamise tingimused", "campaign_founding_info"],
     ["Kampaania", "Vali järgmine uurimus", "campaign_research"],
     ["Kampaania", "Ehita elamu", "campaign_house"],
     ["Kampaania", "Ehita metsamaja", "campaign_lumber"],
@@ -445,6 +448,40 @@ func _campaign_end_turn() -> void:
             preview_state.get("detail_bridges",{}),shared_landscape)
     var report: Dictionary = result.get("status",{})
     status_label.text = str(report.get("message","Käik lõpetatud"))
+    _update_labels()
+
+func _campaign_founding_info() -> void:
+    if not CampaignPlay.is_running(preview_state):
+        status_label.text = "Alusta esmalt kampaania."
+        return
+    var attempt: Dictionary = CityFounding.choose_parent(preview_state,land,0,selected)
+    status_label.text = ("SIIN SAAB ASUTADA: " if bool(attempt.get("ok",false)) else "EI SAA ASUTADA: ") + str(attempt.get("reason","Vaja 6 elanikku, asunduse avastust, ressursse ja 17 ruudu vahemaad. Asutamiskulu: 55 puitu, 16 kivi, 18 toitu, 12 vett."))
+    _update_labels()
+
+func _campaign_found_city() -> void:
+    if not CampaignPlay.is_running(preview_state):
+        status_label.text = "Linnade asutamine töötab ainult käimasolevas kampaanias."
+        return
+    if mobile_view != "world":
+        status_label.text = "Vali kõigepealt MAAILM ja puuduta sobivat maatükki."
+        return
+    var new_city: Dictionary = CityFounding.found(preview_state,land,int(preview_state["campaign"]["player_team"]),selected)
+    if not bool(new_city.get("ok",false)):
+        status_label.text = "ASUTAMINE: "+str(new_city.get("reason","Ei saa asutada"))
+        return
+    city_index = int(new_city["index"])
+    Territory.rebuild(preview_state,land,true)
+    Territory.reconcile_worksites(preview_state,land,heights)
+    _configure_fine_navigation()
+    _build_counties()
+    _build_cities()
+    _refresh_building_proxies()
+    if is_instance_valid(local_streets):
+        local_streets.clear()
+    if is_instance_valid(army_view):
+        army_view.refresh(preview_state,heights)
+    var saved: bool = PreviewSim.save_preview(preview_state,CampaignPlay.SAVE_PATH)
+    status_label.text = str(new_city.get("reason","Asundus rajatud")) + (" • salvestatud" if saved else " • salvestamine ebaõnnestus")
     _update_labels()
 
 func _campaign_info() -> void:
@@ -832,6 +869,8 @@ func _menu_action(action_id: String) -> void:
         "campaign_turn": _campaign_end_turn()
         "campaign_info": _campaign_info()
         "campaign_city": _select_next_city()
+        "campaign_found_city": _campaign_found_city()
+        "campaign_founding_info": _campaign_founding_info()
         "campaign_research": _preview_research()
         "campaign_house": _preview_build("house")
         "campaign_lumber": _preview_build("lumber")
