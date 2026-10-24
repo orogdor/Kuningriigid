@@ -992,7 +992,7 @@ static func run() -> Dictionary:
     mapped_wall = Siege.from_city(saved_castle,tower_cell,0,1)
     _check(results,"v37-unfortified-tile-no-siege",Siege.from_city(saved_castle,Vector2i(43,45),0,1).is_empty())
     _check(results,"v37-fortified-tile-builds-siege",not mapped_wall.is_empty() and bool(mapped_wall.get("linked_city",false)))
-    _check(results,"v37-siege-has-four-towers",Siege.tower_nodes(mapped_wall).size()==4)
+    _check(results,"v37-shared-perimeter-has-two-west-corner-towers",Siege.tower_nodes(mapped_wall).size()==2)
     _check(results,"v37-siege-uses-wooden-wall",String(mapped_wall["sections"][0]["type"])=="palisade")
     _check(results,"v37-siege-gate-blocks-entry",not Siege.ground_open(mapped_wall,10.0,0.0,.34))
     _check(results,"v37-no-same-side-attack",Siege.from_city(saved_castle,tower_cell,1,1).is_empty())
@@ -1016,8 +1016,18 @@ static func run() -> Dictionary:
     Military.add_unit(linked_state,linked_defender,"bronze_archer")
     var automatic_siege: Dictionary = IndividualBattle.start(linked_state,int(linked_attacker["id"]),int(linked_defender["id"]))
     _check(results,"v37-armies-trigger-paid-city-siege",bool(automatic_siege.get("ok",false)) and bool(linked_state["individual_battle"].get("linked_city_siege",false)))
-    _check(results,"v37-real-siege-twenty-guards",int(linked_state["individual_battle"].get("siege",{}).get("guard_count",0))==20)
+    _check(results,"v37-real-shared-perimeter-guards",int(linked_state["individual_battle"].get("siege",{}).get("guard_count",0))==10)
     _check(results,"v37-native-battle-json-roundtrip",JSON.parse_string(JSON.stringify(linked_state["individual_battle"]["siege"])) is Dictionary)
+    var solo_city: Dictionary = border_fort.duplicate(true)
+    solo_city["fortification"]["tiles"] = [[44,45]]
+    var solo_siege: Dictionary = Siege.from_city(solo_city,Vector2i(44,45),0,1)
+    _check(results,"v38-solo-palisade-still-four-towers",Siege.tower_nodes(solo_siege).size()==4)
+    # Run through the actual finished-battle state update, rather than just
+    # calling the pure city-capture helper.
+    linked_state["individual_battle"]["siege"]["captured"] = true
+    IndividualBattle.tick(linked_state,0.12)
+    _check(results,"v38-actual-battle-finish-changes-flag",linked_state["individual_battle"].is_empty() and int(linked_state["cities"][1]["team"])==0)
+    _check(results,"v38-actual-conquest-logged",int(linked_state.get("city_captures",0))==1 and not linked_state["battle_log"].is_empty())
     # V3.5: core-first building placement extends only into owned urban cells.
     var extended_city: Dictionary = {"c":110,"r":80,"pop":36,"buildings":[
         {"type":"hall","ready":true,"hp":1200.0,"site_x":110.5,"site_z":80.5}],
