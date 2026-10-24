@@ -62,12 +62,18 @@ for(const seed of [17,12345,20261018]){
   const localRoad=local.children.find(c=>c.name==='continuous road pavement').geometry;
   assert.ok(worldRoad.index&&localRoad.index,'roads have welded vertices across adjacent segments');
   const W=worldRoad.attributes.position,L=localRoad.attributes.position;
-  const wa=worldRoad.index.getX(0),wb=worldRoad.index.getX(1),la=localRoad.index.getX(0),lb=localRoad.index.getX(1);
-  // Centerlines retain the world projection; tactical road widths intentionally do not scale 3x.
-  assert.ok(Math.abs((L.getX(la)+L.getX(lb))/2-((W.getX(wa)+W.getX(wb))/2-orig.x)*DETAIL_X)<.002);
-  assert.ok(Math.abs(L.getY(la)-(W.getY(wa)-.7)*.30)<.002);
-  assert.ok(Math.abs((L.getZ(la)+L.getZ(lb))/2-((W.getZ(wa)+W.getZ(wb))/2-orig.z)*DETAIL_Z)<.002);
-  assert.ok(Math.abs(Math.hypot(L.getX(la)-L.getX(lb),L.getZ(la)-L.getZ(lb))-detailWorldRoadWidth(edges[0].level))<.002);
+  // V149/V150 road ribbons have four cross-section vertices:
+  // outside verge, inside-left, inside-right, outside verge. Verify the
+  // actual ROAD CENTRE, not the midpoint of the old first triangle indices.
+  const verges=!!worldRoad.getAttribute('aLevel');
+  const wa=verges?1:worldRoad.index.getX(0),wb=verges?2:worldRoad.index.getX(1);
+  const la=verges?1:localRoad.index.getX(0),lb=verges?2:localRoad.index.getX(1);
+  const wcx=(W.getX(wa)+W.getX(wb))/2,wcz=(W.getZ(wa)+W.getZ(wb))/2;
+  const lcx=(L.getX(la)+L.getX(lb))/2,lcz=(L.getZ(la)+L.getZ(lb))/2;
+  assert.ok(Math.abs(lcx-(wcx-orig.x)*DETAIL_X)<.002,'same world/detail road centre X');
+  assert.ok(Math.abs(L.getY(la)-(W.getY(wa)-.7)*.30)<.002,'matching world/detail road elevation');
+  assert.ok(Math.abs(lcz-(wcz-orig.z)*DETAIL_Z)<.002,'same world/detail road centre Z');
+  assert.ok(Math.abs(Math.hypot(L.getX(la)-L.getX(lb),L.getZ(la)-L.getZ(lb))-detailWorldRoadWidth(edges[0].level))<.002,'tactical road width unchanged');
   disposeNetwork(network);disposeNetwork(local);
  }
  console.log('V67',seed,{watersheds:edges.length,detailRiverTriangles:detail.userData.riverVertexCount/3,fullRiverTriangles:world.userData.riverVertexCount/3});
