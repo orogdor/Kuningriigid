@@ -64,6 +64,8 @@ jobs:
           grep -q 'var street_path: Array = street_fixture.route' game/tests/port_checks.gd
           sed -i '895,897s/street_path/layout_street_path/g' game/tests/port_checks.gd
           grep -q 'var layout_street_path: Array = street_fixture.route' game/tests/port_checks.gd
+          grep -q 'Vector3(width,.12,DEPTH)' game/scripts/adapters/native_detail_tile.gd
+          sed -i 's/Vector3(width,.12,DEPTH)/Vector3(width,.12,TILE_DEPTH)/' game/scripts/adapters/native_detail_tile.gd
       - name: Staatilised kontrollid
         if: steps.source.outputs.ready == 'true'
         shell: bash
