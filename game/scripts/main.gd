@@ -457,6 +457,7 @@ func _campaign_end_turn() -> void:
     var occupation: Dictionary = CampaignWar.occupy_unfortified(preview_state)
     var blockades: Dictionary = CampaignWar.advance_blockades(preview_state)
     var army_build: Dictionary = CampaignWar.ai_recruit(preview_state,shared_landscape)
+    var defensive_orders: Dictionary = CampaignWar.recall_threatened(preview_state,world_trade_nav)
     var army_orders: Dictionary = CampaignWar.ai_march(preview_state,world_trade_nav)
     CampaignPlay.evaluate(preview_state)
     Territory.reconcile_worksites(preview_state,land,heights)
@@ -477,7 +478,7 @@ func _campaign_end_turn() -> void:
             heights,local_streets if street_nav_on else null,
             preview_state.get("detail_bridges",{}),shared_landscape)
     var report: Dictionary = result.get("status",{})
-    status_label.text = str(report.get("message","Käik lõpetatud")) + (" • rajati %d linna" % int(travel["founded"]) if int(travel["founded"]) > 0 else "") + (" • AI saatis %d asutajat" % int(ai_expansion["started"]) if int(ai_expansion["started"]) > 0 else "") + (" • vallutati %d linna" % int(occupation["captured"]) if int(occupation["captured"]) > 0 else "") + (" • blokaadiga alistus %d" % int(blockades["surrendered"]) if int(blockades["surrendered"]) > 0 else "") + (" • garnisoni kutsuti %d" % (int(siege_before["levied"])+int(siege_after["levied"])) if int(siege_before["levied"])+int(siege_after["levied"]) > 0 else "") + (" • algas piiramine" if int(siege_before["engagements"])+int(siege_after["engagements"]) > 0 else "") + (" • AI värbas %d" % int(army_build["trained"]) if int(army_build["trained"]) > 0 else "") + (" • AI marssis %d" % int(army_orders["ordered"]) if int(army_orders["ordered"]) > 0 else "")
+    status_label.text = str(report.get("message","Käik lõpetatud")) + (" • rajati %d linna" % int(travel["founded"]) if int(travel["founded"]) > 0 else "") + (" • AI saatis %d asutajat" % int(ai_expansion["started"]) if int(ai_expansion["started"]) > 0 else "") + (" • vallutati %d linna" % int(occupation["captured"]) if int(occupation["captured"]) > 0 else "") + (" • blokaadiga alistus %d" % int(blockades["surrendered"]) if int(blockades["surrendered"]) > 0 else "") + (" • garnisoni kutsuti %d" % (int(siege_before["levied"])+int(siege_after["levied"])) if int(siege_before["levied"])+int(siege_after["levied"]) > 0 else "") + (" • algas piiramine" if int(siege_before["engagements"])+int(siege_after["engagements"]) > 0 else "") + (" • AI värbas %d" % int(army_build["trained"]) if int(army_build["trained"]) > 0 else "") + (" • AI marssis %d" % int(army_orders["ordered"]) if int(army_orders["ordered"]) > 0 else "") + (" • AI tõi kaitseks tagasi %d" % int(defensive_orders["recalled"]) if int(defensive_orders["recalled"]) > 0 else "")
     _update_labels()
 
 func _campaign_founding_info() -> void:
