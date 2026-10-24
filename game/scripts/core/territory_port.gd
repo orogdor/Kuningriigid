@@ -12,16 +12,13 @@ const MAX_WORKSITES_PER_TILE: int = 3
 const RESOURCE_TYPES: Array[String] = ["lumber","farm","quarry","mine"]
 
 static func urban_radius(population: int) -> int:
-    # Start 3x3; 32 residents -> 9x9; cap at 11x11 <= 12x12.
-    if population >= 48:
-        return 5
-    if population >= 32:
-        return 4
-    if population >= 14:
-        return 3
-    if population >= 6:
-        return 2
-    return 1
+    # V153 city-area-v142.js: populationCityRadius(pop).
+    # 3 -> 3x3, 9 -> 7x7, 25 -> 11x11, 36+ -> 12x12.
+    return mini(MAX_URBAN_SIDE / 2, maxi(1, floori(sqrt(float(maxi(0,pop))))))
+
+static func urban_side(population: int) -> int:
+    # V153 cityExtent(radius): never allow a 13x13 built-up area.
+    return mini(MAX_URBAN_SIDE, 2*urban_radius(population)+1)
 
 static func tile_key(c: int,r: int) -> String:
     return "%d:%d" % [c,r]
@@ -88,7 +85,9 @@ static func rebuild(state: Dictionary, land: PackedByteArray,force: bool = false
         var city: Dictionary = cities[i]
         var center := Vector2i(int(city["c"]),int(city["r"]))
         var radius: int = int(city["territory_radius"])
-        var area: int = (2*radius+1)*(2*radius+1)
+        var side: int = urban_side(int(city.get("pop",3)))
+        var area: int = side*side
+        city["territory_side"] = side
         var tiles: Array = county_lists[i]
         tiles.sort_custom(func(a,b):
             var da: int = (int(a[0])-center.x)*(int(a[0])-center.x)+(int(a[1])-center.y)*(int(a[1])-center.y)
@@ -132,11 +131,29 @@ static func rebuild(state: Dictionary, land: PackedByteArray,force: bool = false
             return da < db if da != db else (int(a[1]) < int(b[1]) if int(a[1]) != int(b[1]) else int(a[0]) < int(b[0]))
         )
         var urban: Array = []
+        # The coastline and competing cities may shift the allocation. Enforce
+        # the 12x12 MAXIMUM ACTUAL bounding box, not merely tile count.
+        var min_c: int = center.x
+        var max_c: int = center.x
+        var min_r: int = center.y
+        var max_r: int = center.y
         for p in tiles:
             if urban.size() >= area:
                 break
-            urban.append(p)
-            zones[tile_key(int(p[0]),int(p[1]))] = "urban"
+            var c: int = int(p[0])
+            var r: int = int(p[1])
+            var low_c: int = mini(min_c,c)
+            var high_c: int = maxi(max_c,c)
+            var low_r: int = mini(min_r,r)
+            var high_r: int = maxi(max_r,r)
+            if high_c-low_c >= side or high_r-low_r >= side:
+                continue
+            urban.append([c,r])
+            zones[tile_key(c,r)] = "urban"
+            min_c = low_c
+            max_c = high_c
+            min_r = low_r
+            max_r = high_r
         city["territory_urban"] = urban
         city["territory_county"] = tiles.duplicate(true)
     state["territory_owners"] = owners
