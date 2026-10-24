@@ -3,63 +3,45 @@
   "roster": [
     {
       "team": 1,
-      "cities": 5,
-      "buildings": 199,
-      "markets": 3,
+      "cities": 4,
+      "buildings": 151,
+      "markets": 1,
       "harbors": 0,
       "ages": 3
     },
     {
       "team": 2,
       "cities": 3,
-      "buildings": 171,
+      "buildings": 189,
       "markets": 3,
       "harbors": 0,
       "ages": 5
     },
     {
       "team": 3,
-      "cities": 7,
-      "buildings": 243,
-      "markets": 5,
+      "cities": 8,
+      "buildings": 193,
+      "markets": 0,
       "harbors": 0,
-      "ages": 5
+      "ages": 2
     }
   ],
   "seed": 136023,
   "turn": 246,
-  "sourceTeam": 3,
-  "cities": 7,
-  "buildings": 243,
+  "sourceTeam": 2,
+  "cities": 3,
+  "buildings": 189,
   "spacingPairs": [
     9,
-    9,
-    12,
-    21,
-    17,
-    19,
-    17,
-    12,
-    21,
-    26,
-    10,
-    9,
-    12,
-    9,
-    27,
-    9,
-    18,
-    18,
-    17,
-    23,
-    36
+    14,
+    16
   ],
   "ages": [
     5,
     3,
-    5,
-    0
+    0,
+    2
   ],
-  "bytes": 2398025,
-  "seconds": 226
+  "bytes": 3905816,
+  "seconds": 189
 }
