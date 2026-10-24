@@ -63,6 +63,12 @@ jobs:
         run: |
           set -euo pipefail
           python3 game/tools/run_qa_checks.py 2>&1 | tee dist/logs/01-static.txt
+      - name: Diagnostika - testide skripti s	ntaks
+        shell: bash
+        run: |
+          set +e
+          godot --headless --path game --check-only --script res://tests/port_checks.gd 2>&1 | tee dist/logs/01b-portchecks.txt
+          exit 0
       - name: Godoti parser ja import
         if: steps.source.outputs.ready == 'true'
         shell: bash
