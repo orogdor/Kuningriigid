@@ -343,6 +343,20 @@ static func run() -> Dictionary:
         int(large_siege["ordered"])==1 and int(large_siege["garrisons"])==1 and Military.units_for(stronghold_state,strike).size()==4 and siege_guard_count==1)
     _check(results,"v47-siege-target-and-path-remain-persistent",
         int(strike.get("campaign_target_city",-1))==0 and strike["path"].size()>0)
+    var reinforced_state: Dictionary = Preview.initialize(stronghold_manifest)
+    reinforced_state["campaign"] = {"active":true,"player_team":0,"turn":20,"result":"playing"}
+    reinforced_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[30,20]]}
+    var veteran_guard: Dictionary = Military.create_army(reinforced_state,1,20,20)
+    veteran_guard["strategic_role"] = "garrison"
+    for index in range(5):
+        Military.add_unit(reinforced_state,veteran_guard,"spearman")
+    var veteran_siege: Dictionary = CampaignWar.ai_march(reinforced_state,strategic_nav)
+    var remaining_guard: int = 0
+    for unit in reinforced_state["armies"]:
+        if String(unit.get("strategic_role","")) == "garrison":
+            remaining_guard += Military.units_for(reinforced_state,unit).size()
+    _check(results,"v47-trained-garrison-redeploys-without-duplicate-troops",
+        int(veteran_siege["ordered"])==1 and int(veteran_siege["garrisons"])==1 and Military.units_for(reinforced_state,veteran_guard).size()==4 and remaining_guard==1 and reinforced_state["military_units"].size()==5)
     var rescue_manifest: Array = [
         {"id":0,"team":0,"c":80,"r":20,"name":"Vaenlase linn"},
         {"id":1,"team":1,"c":20,"r":20,"name":"Ohustatud kodu"}]
