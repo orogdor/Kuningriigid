@@ -4,6 +4,7 @@ import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-
 import {ancientStreetSpace,historicalBuildingPlots,nextPlotBatch,urbanExpansionEligible} from './historic-urban-v138.js';
 import {historicalTilePriority} from './historical-districts-v137.js';
 import {Civilization} from './civilization-core.js';
+import {urbanExpansionFits} from './city-area-v142.js';
 const town={id:4,c:48,r:57},seed=138043;
 const core=historicalBuildingPlots(town,town,'house',seed);
 assert.ok(core.length>75,'town should have enough candidate parcels to fill an entire detail square');
@@ -47,7 +48,12 @@ if(countyNeighbor){
  assert.match(denied,/Maakonnas/,'a rural district normally rejects city housing');
  ctx.urbanExpansionV138=true;
  const newlyAllowed=game.buildRule(ctx,'house');
- assert.doesNotMatch(newlyAllowed,/Maakonnas/,'contiguous urban conversion permits homes on the next owned square');
+ // V143 caps a city at a genuine 12x12 footprint, even with legacy V138
+ // manual expansion flags. A V137 snapshot may already occupy the maximum.
+ if(urbanExpansionFits(city,game.urbanTerritory?.get(city.id)))
+   assert.doesNotMatch(newlyAllowed,/Maakonnas/,'adjacent city growth remains possible under the 12x12 cap');
+ else
+   assert.match(newlyAllowed,/Maakonnas/,'legacy growth flags cannot bypass the V143 maximum city size');
  if(!previous)delete ctx.urbanExpansionV138;
 }
 assert.ok(Number.isFinite(city.aiTerritoryCursorV137));
