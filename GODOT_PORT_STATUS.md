@@ -1,5 +1,19 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V3.5 / mitme detailruuduga linn (2026-10-24)
+
+- Hooneid paigutatakse esmalt olemasolevasse linnasüdame detailruutu; kui seal pole ruumi, otsib linn järgmise sobiva vaba krundi enda `territory_urban` ruutudelt.
+- Salvestatud `site_x/site_z` väljad säilivad. `CityLayout.site_tile`, `site_in_tile` ja `site_on_atlas` teisendavad samu krundiasukohti maailma- ja detailkaardil.
+- `native_detail_tile.gd` kuvab linnahooned nüüd ka linnasüdamest väljapoole jääval linnaruudul; tootmis- ja maakonnahoonete pildikiht säilib.
+- `native_city_buildings.gd` kasutab sama kaardiprojektsiooni.
+- `district_street_nav.gd` loob ruudupõhised AStarGrid2D tänavakaardid ja ühendab need omavahel tänavaportaalide kaudu. Selle kaudu saavad `local_street_nav.gd` töötajad ja veosed liikuda ka naaberruudu majani.
+- Uutes linnaruuduosades joonistatakse kaks peateed; jõest blokeeritud lõik jäetakse sillata katmata.
+- Regressioonitestid: `666/666`; Godoti skriptide import, PCK smoke-käivitus ja Androidi debug APK eksport õnnestusid GitHub Actionsis.
+- Kinnitatud väljalase: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-45
+- **Kogupordi hinnanguline valmidus: ligikaudu 38%**, võrreldes veebimängu V153 kõigi süsteemidega. Tegemist on projekti ulatuse hinnanguga, mitte automaatse mõõdikuga.
+
+**Piirangud:** Mitme ruuduga linna mudel on praegu funktsionaalne osaport. Ajalooliselt täpne krunditüüpide tsoonide planeerimine, terviklik tänavavõrgustiku kujunemine kasutusest, mitme ruudu linnamüürid ja V153 täis-AI vajavad edasist portimist. Telefonis automaatse `.pck` uuendamise toimimine ja jõudlus on jätkuvalt kasutajapoolse testi ootel.
+
 ## V3.4 / V153 linnapiirkond (2026-10-24)
 
 - V153 `city-area-v142.js` mudeli järgi kasvab linnapiirkonna raadius rahvaarvu ruutjuurega: 3 elanikku → 3×3; 9 → 7×7; 16 → 9×9; 25 → 11×11; 36+ → maksimaalselt 12×12.
@@ -19,14 +33,14 @@
 - Godoti mänguprojekt: `game/` (Godot 4); Androidi APK ja PCK-käivitaja: `bootstrap/`.
 - Varasemad `godot-upload/v33/*.txt` osad jäävad arhiiviks, kuid uus CI ehitab **päris, muudetavatest failidest**.
 - Androidi CI: `.github/workflows/godot-apk-test.yml`.
-- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40093388831
-- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-34
+- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40095058141
+- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-45
 - Väljalasked luuakse `godot-dev-<workflow run number>` märgendiga *prerelease* ainult siis, kui regressioonitestid läbivad kontrolli.
 
 ## Kontrollitud (Godot 4.7.2 CI konteiner)
 
 - Pythoni staatilised testid ja GDScripti impordikontroll läbitud.
-- `V131_REGRESSION: 657/657` läbitud 2026-10-24.
+- `V131_REGRESSION: 666/666` läbitud 2026-10-24.
 - `game.pck` loomine ja `BOOTSTRAP_SMOKE_PASS` läbitud.
 - Androidi debug-APK edukalt eksporditud ja GitHubi avaldatud.
 - **Mitte kontrollitud:** päris Android-telefoni FPS, puutejuhtimine, seadmesse paigaldamine, võrgust PCK allalaadimine ja taaskäivituse andmete ühilduvus.
