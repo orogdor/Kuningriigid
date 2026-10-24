@@ -319,6 +319,72 @@ static func run() -> Dictionary:
         theater_saved and theater_loaded.get("armies",[]).size()==6 and int(theater_loaded.get("ai_garrison_assignments",0))==3)
     if FileAccess.file_exists("user://v46_multifront.json"):
         DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v46_multifront.json"))
+    # Dev 103: strongholds need larger real attacking formations.
+    var stronghold_manifest: Array = [
+        {"id":0,"team":0,"c":30,"r":20,"name":"Muuridega vaenlane"},
+        {"id":1,"team":1,"c":20,"r":20,"name":"Rundaja kodu"}]
+    var stronghold_state: Dictionary = Preview.initialize(stronghold_manifest)
+    stronghold_state["campaign"] = {"active":true,"player_team":0,"turn":19,"result":"playing"}
+    stronghold_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[30,20]]}
+    var strike: Dictionary = Military.create_army(stronghold_state,1,20,20)
+    for index in range(3):
+        Military.add_unit(stronghold_state,strike,"spearman")
+    var small_siege: Dictionary = CampaignWar.ai_march(stronghold_state,strategic_nav)
+    _check(results,"v47-three-troops-do-not-suicide-against-walled-city",
+        int(small_siege["ordered"])==0 and strike["path"].is_empty())
+    Military.add_unit(stronghold_state,strike,"spearman")
+    Military.add_unit(stronghold_state,strike,"spearman")
+    var large_siege: Dictionary = CampaignWar.ai_march(stronghold_state,strategic_nav)
+    var siege_guard_count: int = 0
+    for unit in stronghold_state["armies"]:
+        if String(unit.get("strategic_role","")) == "garrison":
+            siege_guard_count += Military.units_for(stronghold_state,unit).size()
+    _check(results,"v47-stronghold-needs-four-troops-and-home-guard",
+        int(large_siege["ordered"])==1 and int(large_siege["garrisons"])==1 and Military.units_for(stronghold_state,strike).size()==4 and siege_guard_count==1)
+    _check(results,"v47-siege-target-and-path-remain-persistent",
+        int(strike.get("campaign_target_city",-1))==0 and strike["path"].size()>0)
+    var rescue_manifest: Array = [
+        {"id":0,"team":0,"c":80,"r":20,"name":"Vaenlase linn"},
+        {"id":1,"team":1,"c":20,"r":20,"name":"Ohustatud kodu"}]
+    var rescue_state: Dictionary = Preview.initialize(rescue_manifest)
+    rescue_state["campaign"] = {"active":true,"player_team":0,"turn":20,"result":"playing"}
+    var rescue_guard: Dictionary = Military.create_army(rescue_state,1,20,20)
+    Military.add_unit(rescue_state,rescue_guard,"spearman")
+    rescue_guard["strategic_role"] = "garrison"
+    var rescue_strike: Dictionary = Military.create_army(rescue_state,1,50,20)
+    Military.add_unit(rescue_state,rescue_strike,"spearman")
+    Military.add_unit(rescue_state,rescue_strike,"spearman")
+    var rescue_old_order: Dictionary = Military.command_move(rescue_state,int(rescue_strike["id"]),80,20,strategic_nav)
+    rescue_strike["strategic_role"] = "attack"
+    rescue_strike["campaign_target_city"] = 0
+    var rescue_enemy: Dictionary = Military.create_army(rescue_state,0,23,20)
+    for index in range(3):
+        Military.add_unit(rescue_state,rescue_enemy,"spearman")
+    var rescue_first: Dictionary = CampaignWar.recall_threatened(rescue_state,strategic_nav)
+    _check(results,"v47-relief-cancels-outbound-offensive",
+        bool(rescue_old_order.get("ok",false)) and int(rescue_first["recalled"])==1 and str(rescue_strike["strategic_role"])=="relief" and int(rescue_strike.get("defense_city_id",-1))==1)
+    _check(results,"v47-relief-orders-real-return-route",
+        rescue_strike.get("path",[]).size()>0 and int(rescue_strike["path"][-1][0])==20 and int(rescue_strike["path"][-1][1])==20)
+    _check(results,"v47-relief-is-idempotent-and-not-redeployed",
+        int(CampaignWar.recall_threatened(rescue_state,strategic_nav)["recalled"])==0 and int(CampaignWar.ai_march(rescue_state,strategic_nav)["ordered"])==0)
+    var saved_relief: bool = Preview.save_preview(rescue_state,"user://v47_relief.json")
+    var loaded_relief: Dictionary = Preview.load_preview(rescue_manifest,"user://v47_relief.json")
+    _check(results,"v47-defense-role-and-route-survive-save",
+        saved_relief and int(loaded_relief.get("ai_defense_recalls",0))==1 and str(loaded_relief["armies"][1].get("strategic_role",""))=="relief" and loaded_relief["armies"][1]["path"].size()>0)
+    if FileAccess.file_exists("user://v47_relief.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v47_relief.json"))
+    # With the threat gone, the relieved army can return to the reserve pool.
+    rescue_enemy["c"] = 100
+    rescue_strike["c"] = 20
+    rescue_strike["r"] = 20
+    rescue_strike["path"] = []
+    var released_army: Dictionary = CampaignWar.recall_threatened(rescue_state,strategic_nav)
+    _check(results,"v47-relief-releases-after-threat-disappears",
+        int(released_army["released"])==1 and str(rescue_strike.get("strategic_role",""))=="reserve")
+    rescue_enemy["c"] = 23
+    var holding: Dictionary = CampaignWar.ai_march(rescue_state,strategic_nav)
+    _check(results,"v47-endangered-city-keeps-reserve-soldiers",
+        int(holding["ordered"])==0 and rescue_strike["path"].is_empty())
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
