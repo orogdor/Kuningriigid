@@ -205,6 +205,7 @@ var county_demo_was_paused: bool = false
 const MENU_CATEGORIES: Array[String] = ["Kampaania", "Testid", "Linn ja ehitus", "Majandus", "Armee", "Piiramine", "Juhtimine ja salvestus"]
 const MOBILE_MENU_ACTIONS = [
     ["Kampaania", "ALUSTA UUT KAMPAANIAT", "campaign_start"],
+    ["Kampaania", "PIKK MÄNG: KIVIAJAST MOODSANI (600 KÄIKU)", "campaign_long_start"],
     ["Kampaania", "LÕPETA KÄIK (+1)", "campaign_turn"],
     ["Kampaania", "Kampaania seis ja edetabel", "campaign_info"],
     ["Kampaania", "Järgmine minu linn", "campaign_city"],
@@ -257,6 +258,15 @@ const MOBILE_MENU_ACTIONS = [
     ["Linn ja ehitus", "Turg", "build_market"],
     ["Linn ja ehitus", "Kaev", "build_well"],
     ["Linn ja ehitus", "Talu", "build_farm"],
+    ["Linn ja ehitus", "Veski", "build_mill"],
+    ["Linn ja ehitus", "Pagariäri", "build_bakery"],
+    ["Linn ja ehitus", "Rauakaevandus", "build_mine"],
+    ["Linn ja ehitus", "Söepõletaja", "build_coal"],
+    ["Linn ja ehitus", "Rauasulatus", "build_smelter"],
+    ["Linn ja ehitus", "Relvasepp", "build_smith"],
+    ["Linn ja ehitus", "Terasesulatus (tööstusajastu)", "build_steelworks"],
+    ["Linn ja ehitus", "Masinatehas (tööstusajastu)", "build_machine_shop"],
+    ["Linn ja ehitus", "Materjaliladu", "build_warehouse"],
     ["Linn ja ehitus", "Maakonna mets", "county_lumber"],
     ["Linn ja ehitus", "Maakonna põld", "county_farm"],
     ["Linn ja ehitus", "Maakonna kivimurd", "county_quarry"],
@@ -398,7 +408,7 @@ func _manual_check_version() -> void:
     status_label.text = "Kontrollin uusimat Godoti versiooni GitHubist…"
     _check_latest_version()
 
-func _start_campaign() -> void:
+func _start_campaign(long_campaign: bool = false) -> void:
     # Reset ALL preview fixtures; campaign actions spend genuine resources.
     # The original sample map is an early 4-faction scenario, NOT the V153 map.
     wall_demo_backup = {}
@@ -410,7 +420,7 @@ func _start_campaign() -> void:
     # from the previously viewed save.
     roads = {}
     preview_state["world_roads"] = roads
-    var start: Dictionary = CampaignPlay.begin(preview_state,0)
+    var start: Dictionary = CampaignPlay.begin(preview_state,0,long_campaign)
     if not bool(start.get("ok",false)):
         status_label.text = str(start.get("reason","Kampaania avamine ebaõnnestus"))
         return
@@ -431,7 +441,7 @@ func _start_campaign() -> void:
     _refresh_settlers()
     if is_instance_valid(local_streets):
         local_streets.clear()
-    status_label.text = "KIVIAJA KAMPAANIA: juhid sinist riiki. Ehita majad/toidutootmine, vali Uuri ja lõpeta käigud."
+    status_label.text = ("PIKK TSIVIILKAMPAANIA: 600 käiku, eesmärk moodne ajastu ja 100 elanikku. Loo linnad, majandus, tööstus ja uurimistöö." if long_campaign else "KIVIAJA KAMPAANIA: juhid sinist riiki. Ehita majad/toidutootmine, vali Uuri ja lõpeta käigud.")
     _update_labels()
 
 func _campaign_end_turn() -> void:
@@ -1020,6 +1030,7 @@ func _menu_action(action_id: String) -> void:
                 return
     match action_id:
         "campaign_start": _start_campaign()
+        "campaign_long_start": _start_campaign(true)
         "campaign_turn": _campaign_end_turn()
         "campaign_info": _campaign_info()
         "campaign_city": _select_next_city()
@@ -1074,6 +1085,15 @@ func _menu_action(action_id: String) -> void:
         "build_market": _preview_build("market")
         "build_well": _preview_build("well")
         "build_farm": _preview_build("farm")
+        "build_mill": _preview_build("mill")
+        "build_bakery": _preview_build("bakery")
+        "build_mine": _preview_build("mine")
+        "build_coal": _preview_build("coal")
+        "build_smelter": _preview_build("smelter")
+        "build_smith": _preview_build("smith")
+        "build_steelworks": _preview_build("steelworks")
+        "build_machine_shop": _preview_build("machine_shop")
+        "build_warehouse": _preview_build("warehouse")
         "county_lumber": _build_county_worksite("lumber")
         "county_farm": _build_county_worksite("farm")
         "county_quarry": _build_county_worksite("quarry")
