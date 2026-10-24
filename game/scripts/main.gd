@@ -227,6 +227,7 @@ const MOBILE_MENU_ACTIONS = [
     ["Linn ja ehitus", "Maakonna kaevandus", "county_mine"],
     ["Linn ja ehitus", "Linna maa-ala info", "territory_info"],
     ["Linn ja ehitus", "Ehita puitvall (pronks)", "build_city_wall"],
+    ["Linn ja ehitus", "Ava / sulge linnavärav", "city_gate_toggle"],
     ["Linn ja ehitus", "Suur linn: 80 hoonet / 40 inimest", "stress_80"],
     ["Linn ja ehitus", "Suur linn: 160 hoonet / 100 inimest", "stress_160"],
     ["Linn ja ehitus", "Taasta linn (lõpeta katse)", "stress_reset"],
@@ -703,6 +704,7 @@ func _menu_action(action_id: String) -> void:
         "wall_demo": _start_wall_demo()
         "wall_demo_reset": _stop_wall_demo()
         "build_city_wall": _build_city_wall()
+        "city_gate_toggle": _toggle_city_gate()
         "stress_80": _start_city_stress(80,40)
         "stress_160": _start_city_stress(160,100)
         "stress_reset": _stop_city_stress()
@@ -1248,8 +1250,10 @@ func _siege_battle_demo() -> void:
         return
     Military.setup(preview_state)
     var town: Dictionary = preview_state["cities"][city_index]
-    var team: int = int(town["team"])
-    var defender: int = (team+1)%4
+    var home_team: int = int(town["team"])
+    var built_wall: bool = CityFortifications.fortified(town,Vector2i(int(town["c"]),int(town["r"])))
+    var team: int = (home_team+1)%4 if built_wall else home_team
+    var defender: int = home_team if built_wall else (home_team+1)%4
     var x: int = int(town["c"])
     var z: int = int(town["r"])
     var attack_army: Dictionary = Military.create_army(preview_state,team,x,z)
@@ -1267,9 +1271,11 @@ func _siege_battle_demo() -> void:
         return
     var battle: Dictionary = preview_state["individual_battle"]
     # Isolated fixture stock: enough for ladder, camp, tower and ram.
-    town["resources"]["wood"] = maxf(320.0,float(town["resources"].get("wood",0.0)))
-    battle["siege"] = Siege.build_fixture(team,defender)
-    var guards: int = Siege.attach_guards(battle)
+    if battle.get("siege",{}).is_empty():
+        town["resources"]["wood"] = maxf(320.0,float(town["resources"].get("wood",0.0)))
+        battle["siege"] = Siege.build_fixture(team,defender)
+        Siege.attach_guards(battle)
+    var guards: int = int(battle["siege"].get("guard_count",0))
     for squad in battle["squads"]:
         if int(squad["unit_id"]) == int(catapult["id"]):
             squad["army_level"] = 10
@@ -1292,7 +1298,7 @@ func _siege_battle_demo() -> void:
     _update_camera()
     battle_view.refresh(preview_state)
     paused = false
-    status_label.text = "PRONKSLINNA KATSE: 4 torni, %d kaitsjat, 700 HP värav. Redel 30s / 18 puitu." % guards
+    status_label.text = ("EHITATUD LINNAVALLI PIIRAMINE: %d kaitsjat; kahjustused salvestuvad linnale." if built_wall else "PRONKSLINNA KATSE: 4 torni, %d kaitsjat, 700 HP värav. Redel 30s / 18 puitu.") % guards
     _update_labels()
 
 func _siege_build_ladder() -> void:
@@ -2373,6 +2379,24 @@ func _build_county_worksite(kind: String) -> void:
     if bool(result.get("ok",false)) and mobile_view == "detail":
         var site: Dictionary = result["site"]
         _open_detail_tile(Vector2i(int(site["c"]),int(site["r"])))
+    _update_labels()
+
+func _toggle_city_gate() -> void:
+    if preview_state.is_empty() or city_index < 0 or city_index >= preview_state.get("cities",[]).size():
+        return
+    if not preview_state.get("individual_battle",{}).is_empty():
+        status_label.text = "Käimasoleva lahingu ajal ei saa linnamenüüst väravat muuta"
+        return
+    var city: Dictionary = preview_state["cities"][city_index]
+    var cell := Vector2i(int(city.get("c",0)),int(city.get("r",0)))
+    var currently_open: bool = CityFortifications.gate_is_open(city,cell)
+    if not CityFortifications.set_gate(city,cell,not currently_open):
+        status_label.text = "Selle linna südames ei ole ehitatud puitvalli"
+        return
+    preview_state["revision"] = int(preview_state.get("revision",0))+1
+    if mobile_view == "detail":
+        native_detail_tile.show_tile(detail_tile_coords,preview_state.get("cities",[]),heights,local_streets if street_nav_on else null,preview_state.get("detail_bridges",{}),shared_landscape)
+    status_label.text = "Linnavärav AVATUD" if not currently_open else "Linnavärav SULETUD"
     _update_labels()
 
 func _build_city_wall() -> void:
