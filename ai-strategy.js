@@ -59,11 +59,20 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   if(type==='farm'&&!game.cell(city)?.deposits.grain)return;
   if(type==='house'){if(buildings.some(b=>b.type==='house'&&!b.ready&&b.hp>0))return;}
   else if(hasWorkingSource(buildings,type)){
-   const foodExpansion=['hunter','fisher'].includes(type)&&r.pop>=5&&edibleSupply(stock)<r.pop*3&&!buildings.some(b=>['hunter','fisher','farm','bakery'].includes(b.type)&&!b.ready&&b.hp>0&&!b.disabled);
-   if(!foodExpansion)return;
+   const foodExpansion=['hunter','fisher','farm'].includes(type)&&r.pop>=5&&edibleSupply(stock)<r.pop*(age===1?4:3)&&
+     !buildings.some(b=>b.type===type&&!b.ready&&b.hp>0&&!b.disabled);
+   const woodExpansion=type==='lumber'&&age>=1&&r.pop>=16&&(stock.wood||0)<r.pop*2&&
+     !buildings.some(b=>b.type==='lumber'&&!b.ready&&b.hp>0&&!b.disabled);
+   const quarryExpansion=type==='quarry'&&age>=1&&r.pop>=18&&(stock.stone||0)<r.pop*2&&
+     !buildings.some(b=>b.type==='quarry'&&!b.ready&&b.hp>0&&!b.disabled);
+   if(!foodExpansion&&!woodExpansion&&!quarryExpansion)return;
   }
   // Prevent the AI from wasting a whole town's labour on repeated quarries.
-  if(['quarry','lumber','hunter','fisher','well','farm'].includes(type)&&buildings.filter(b=>b.type===type&&b.hp>0).length>=(['hunter','fisher'].includes(type)?3:2))return;
+  if(['quarry','lumber','hunter','fisher','well','farm'].includes(type)){
+   const count=buildings.filter(b=>b.type===type&&b.hp>0).length;
+   const max=(['hunter','fisher','farm'].includes(type)&&r.pop>=18)?3:2;
+   if(count>=max)return;
+  }
   if(type==='harbor'&&buildings.some(b=>b.type==='harbor'&&b.hp>0))return;
   if(!eligible(game,city,type)){if(!game.buildRule(city,type)){city.aiImportRequestsV128??={};for(const [k,n]of Object.entries(BUILDINGS[type]?.cost||{}))if((stock[k]||0)<n+4)city.aiImportRequestsV128[k]=Math.max(city.aiImportRequestsV128[k]||0,n+4);}if(!visiting.has(type)){visiting.add(type);for(const dep of BUILDINGS[type]?.requires||[])if(!game.cityReady(city,dep))add(dep,priority+.5,'Eeltingimus: '+type);visiting.delete(type);}return;}
   if(reservesFoundation(game,city,type))return;

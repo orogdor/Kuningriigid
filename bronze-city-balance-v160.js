@@ -1,5 +1,5 @@
 // Population and infrastructure, never troops, determine Bronze town development.
-export const MIN_BRONZE_TURNS_V160=80;
+export const MIN_BRONZE_TURNS_V160=90;
 export const BRONZE_FORTIFY_POP_V160=18;
 export const BRONZE_FULL_WALL_POP_V160=25;
 export function bronzePhaseTurns(state,team){
