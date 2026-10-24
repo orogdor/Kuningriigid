@@ -165,6 +165,8 @@ const CityStress = preload("res://scripts/core/city_stress_port.gd")
 const CityLayout = preload("res://scripts/core/city_layout_port.gd")
 var city_stress_backup: Dictionary = {}
 var territory_demo_index: int = -1
+var wall_demo_backup: Dictionary = {}
+var wall_demo_was_paused: bool = false
 var territory_demo_pop: int = 0
 var territory_demo_was_paused: bool = false
 var city_stress_index: int = -1
@@ -190,6 +192,8 @@ const MOBILE_MENU_ACTIONS = [
     ["Testid", "Kaubanduse demo", "trade"],
     ["Testid", "Armee demo", "army_demo"],
     ["Testid", "Piiride demo: 36 elanikku (12×12)", "territory_demo"],
+    ["Testid", "Pronkslinna vallide demo", "wall_demo"],
+    ["Testid", "Taasta vallide demo", "wall_demo_reset"],
     ["Testid", "Taasta piiride demo", "territory_reset"],
     ["Testid", "Maakonna veod: demo", "county_demo"],
     ["Testid", "Maakonna sisendveod: demo", "county_inputs"],
@@ -696,6 +700,8 @@ func _menu_action(action_id: String) -> void:
         "county_quarry": _build_county_worksite("quarry")
         "county_mine": _build_county_worksite("mine")
         "territory_info": _show_territory_info()
+        "wall_demo": _start_wall_demo()
+        "wall_demo_reset": _stop_wall_demo()
         "build_city_wall": _build_city_wall()
         "stress_80": _start_city_stress(80,40)
         "stress_160": _start_city_stress(160,100)
@@ -2392,6 +2398,49 @@ func _show_territory_info() -> void:
     status_label.text = "%s: %d elanikku, linn %dx%d (%d ruutu), maakond %d ruutu, tootmiskohad %d" % [String(city["name"]),int(city["pop"]),int(city.get("territory_side",Territory.urban_side(int(city.get("pop",3))))),int(city.get("territory_side",Territory.urban_side(int(city.get("pop",3))))),city.get("territory_urban",[]).size(),city.get("territory_county",[]).size(),city.get("county_worksites",[]).size()]
     _update_labels()
 
+func _start_wall_demo() -> void:
+    if preview_state.is_empty() or city_index < 0 or city_index >= preview_state.get("cities",[]).size():
+        return
+    if city_stress_index >= 0 or territory_demo_index >= 0 or not county_demo_backup.is_empty():
+        status_label.text = "Lõpeta eelmine linnakatse enne vallide proovi"
+        return
+    if not wall_demo_backup.is_empty():
+        _stop_wall_demo()
+    wall_demo_backup = preview_state.duplicate(true)
+    wall_demo_was_paused = paused
+    paused = true
+    var city: Dictionary = preview_state["cities"][city_index]
+    city["pop"] = maxi(18,int(city.get("pop",3)))
+    city["age"] = maxi(1,int(city.get("age",0)))
+    city["resources"]["wood"] = maxf(100.0,float(city["resources"].get("wood",0.0)))
+    city["resources"]["stone"] = maxf(40.0,float(city["resources"].get("stone",0.0)))
+    Territory.rebuild(preview_state,land,true)
+    CityLayout.ensure_positions(city)
+    var result: Dictionary = CityFortifications.build_next(city)
+    preview_state["revision"] = int(preview_state.get("revision",0))+1
+    _build_counties()
+    _refresh_building_proxies()
+    _open_detail_tile(Vector2i(int(city["c"]),int(city["r"])))
+    status_label.text = "AJUTINE PRONKSLINN: %s. Vallid ei kahjustu veel lahingus. Vali Taasta vallide demo." % str(result.get("reason","Katse ei õnnestunud"))
+    _update_labels()
+
+func _stop_wall_demo() -> void:
+    if wall_demo_backup.is_empty():
+        status_label.text = "Vallide demo pole käivitatud"
+        return
+    preview_state = wall_demo_backup
+    wall_demo_backup = {}
+    paused = wall_demo_was_paused
+    Territory.rebuild(preview_state,land,true)
+    Territory.reconcile_worksites(preview_state,land,heights)
+    _configure_fine_navigation()
+    _build_counties()
+    _refresh_building_proxies()
+    if mobile_view == "detail":
+        native_detail_tile.show_tile(detail_tile_coords,preview_state.get("cities",[]),heights,local_streets if street_nav_on else null,preview_state.get("detail_bridges",{}),shared_landscape)
+    status_label.text = "Vallide demoseis taastatud; algne linn ja ressursid säilivad"
+    _update_labels()
+
 func _start_territory_demo() -> void:
     if not county_demo_backup.is_empty():
         status_label.text = "Lõpeta esmalt maakonnakatse."
@@ -2686,6 +2735,9 @@ func _preview_research() -> void:
     _update_labels()
 
 func _preview_save() -> void:
+    if not wall_demo_backup.is_empty():
+        status_label.text = "Vallide demo on ajutine. Taasta demo enne salvestamist."
+        return
     if not county_demo_backup.is_empty():
         status_label.text = "Maakonnakatse on ajutine. Taasta demo enne salvestamist."
         return
@@ -2698,6 +2750,8 @@ func _preview_save() -> void:
     status_label.text = "KATSESEIS SALVESTATUD: user://v131_godot_preview_v25.json" if PreviewSim.save_preview(preview_state) else "Salvestamine ei õnnestunud"
 
 func _preview_load() -> void:
+    if not wall_demo_backup.is_empty():
+        _stop_wall_demo()
     if not county_demo_backup.is_empty():
         _stop_county_demo()
     bridge_test_tile = Vector2i(-1,-1)
@@ -2751,6 +2805,9 @@ func _toggle_preview_ai() -> void:
     _update_labels()
 
 func _fast_forward_preview() -> void:
+    if not wall_demo_backup.is_empty():
+        status_label.text = "Taasta vallide demo enne aja edasikerimist"
+        return
     if territory_demo_index >= 0:
         status_label.text = "Taasta piiride demo enne aja edasikerimist"
         return
