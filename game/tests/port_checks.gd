@@ -36,6 +36,8 @@ const BattleTerrain = preload("res://scripts/core/battle_terrain_v131.gd")
 const Siege = preload("res://scripts/core/siege_port_v131.gd")
 const DetailTile = preload("res://scripts/adapters/native_detail_tile.gd")
 const CityLayout = preload("res://scripts/core/city_layout_port.gd")
+const CityPlanning = preload("res://scripts/core/city_planning_port.gd")
+const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
 const CityStress = preload("res://scripts/core/city_stress_port.gd")
 const Territory = preload("res://scripts/core/territory_port.gd")
 const CountyLogistics = preload("res://scripts/core/county_logistics_port.gd")
@@ -917,6 +919,40 @@ static func run() -> Dictionary:
     _check(results,"v21-stress-is-explicit",bool(stress_fixture.get("stress_fixture",false)))
     _check(results,"v21-detail-house-scales",DetailTile.TILE_WIDTH==225.0 and DetailTile.TILE_DEPTH==195.0)
 
+    # V3.6: towns grow actual houses and reserve denser civic/housing blocks.
+    _check(results,"v36-house-target-no-five-cap",CityPlanning.housing_target(40)>5)
+    _check(results,"v36-house-target-small-town",CityPlanning.housing_target(3)==1)
+    _check(results,"v36-civic-zoning",CityPlanning.zone("market")=="civic")
+    _check(results,"v36-home-zoning",CityPlanning.zone("house")=="housing")
+    _check(results,"v36-farm-on-rural-zoning",CityPlanning.zone("farm")=="rural")
+    _check(results,"v36-workshops-zoning",CityPlanning.zone("smelter")=="industry")
+    var planned_housing_city: Dictionary = {"c":70,"r":70,"pop":40,"age":1,
+        "resources":Economy.start_resources(),
+        "buildings":[{"type":"hall","ready":true,"hp":1200.0},{"type":"saw","ready":true,"hp":350.0}]}
+    planned_housing_city["resources"]["bread"] = 180.0
+    planned_housing_city["resources"]["water"] = 180.0
+    planned_housing_city["resources"]["plank"] = 90.0
+    planned_housing_city["resources"]["stone"] = 90.0
+    _check(results,"v36-ai-expands-housing-when-full",PreviewAI.choose_building(planned_housing_city,{"stone_tools":true},0)=="house")
+    var young_city: Dictionary = {"age":0,"pop":18,"c":30,"r":30,"resources":Economy.start_resources(),
+        "buildings":[{"type":"hall","ready":true,"hp":1200.0}]}
+    var young_before: float = float(young_city["resources"]["wood"])
+    _check(results,"v36-no-stone-age-palisades",not bool(CityFortifications.build_next(young_city).get("ok",false)))
+    _check(results,"v36-reject-without-resource-charge",is_equal_approx(float(young_city["resources"]["wood"]),young_before))
+    var castle_city: Dictionary = {"c":44,"r":45,"age":1,"pop":18,
+        "resources":{"wood":100.0,"stone":40.0},
+        "territory_urban":[[44,45],[45,45]],
+        "buildings":[
+            {"type":"hall","ready":true,"hp":1200.0,"site_x":44.5,"site_z":45.5},
+            {"type":"house","ready":true,"hp":350.0,"site_x":44.5+CityLayout.TILE_PITCH_X+2.0,"site_z":45.5+2.0}]}
+    var first_wall: Dictionary = CityFortifications.build_next(castle_city)
+    _check(results,"v36-paid-first-palisade",bool(first_wall.get("ok",false)) and CityFortifications.fortified(castle_city,Vector2i(44,45)))
+    _check(results,"v36-palisade-spends-stone-and-wood",is_equal_approx(float(castle_city["resources"]["wood"]),35.0) and is_equal_approx(float(castle_city["resources"]["stone"]),20.0))
+    var second_wall: Dictionary = CityFortifications.build_next(castle_city)
+    _check(results,"v36-paid-neighbor-wall",bool(second_wall.get("ok",false)) and CityFortifications.fortified(castle_city,Vector2i(45,45)))
+    _check(results,"v36-neighbor-tile-charges-again",is_equal_approx(float(castle_city["resources"]["wood"]),0.0) and is_equal_approx(float(castle_city["resources"]["stone"]),8.0))
+    _check(results,"v36-no-duplicate-wall-cost",not bool(CityFortifications.build_next(castle_city).get("ok",false)))
+    _check(results,"v36-saved-wall-json",JSON.parse_string(JSON.stringify(castle_city["fortification"])) is Dictionary)
     # V3.5: core-first building placement extends only into owned urban cells.
     var extended_city: Dictionary = {"c":110,"r":80,"pop":36,"buildings":[
         {"type":"hall","ready":true,"hp":1200.0,"site_x":110.5,"site_z":80.5}],
