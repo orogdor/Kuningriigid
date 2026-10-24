@@ -4,6 +4,7 @@ extends RefCounted
 ## Costs and passengers are debited at dispatch, not at settlement.
 const Founding = preload("res://scripts/core/city_founding_port.gd")
 const Territory = preload("res://scripts/core/territory_port.gd")
+const Economy = preload("res://scripts/core/economy_port.gd")
 const Campaign = preload("res://scripts/core/campaign_port.gd")
 const STEP_PER_TURN: int = 3
 const AI_EXPAND_INTERVAL: int = 8
@@ -21,7 +22,7 @@ static func dispatch(state: Dictionary,land: PackedByteArray,team: int,destinati
             return {"ok":false,"reason":"Sellesse ruutu on juba asutaja teel"}
     var parent: Dictionary = state["cities"][int(result["parent_index"])]
     # Deduct before movement. Only use this source when all constraints hold.
-    Founding.Economy.spend_resources(parent["resources"],Founding.FOUNDING_COST)
+    Economy.spend_resources(parent["resources"],Founding.FOUNDING_COST)
     parent["pop"] = int(parent["pop"])-Founding.SETTLERS
     var route: Array = []
     for cell in result["route"]:
