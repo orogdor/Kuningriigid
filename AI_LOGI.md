@@ -262,3 +262,41 @@ Muudetud on ainult visuaalset kõrgust (`continuous-landscape.js`). Mängu enda 
 
 ### Testid
 PASS: `TEST_V67`, `TEST_V48`, `TEST_V152`, `TEST_V88_EXPLORATION_UI`, `TEST_V149_BROWSER`, `TEST_V143_BROWSER`, `TEST_V151_BROWSER`.
+
+## V154 – uued hoonemudelid detailkaardil (Claude, 2026-10-24)
+
+Kasutaja: „Tee hoonetele uued ilusad 3D-mudelid, et need oleksid silmaga eristatavad. Linnas kõige rohkem kasutatud majadele tee erinevaid variatsioone, et vaheldust oleks piisavalt ja ei jääks korduvat tunnet.“
+Muudetud on ainult välimust. Hooneandmed, jalajäljed (`navigation.js` `FOOTPRINTS`), uksed, tootmine ja salvestused on samad.
+
+### Uus fail `town-models-v154.js`
+- Iga mudel ehitatakse koodis üheks ühendatud võrguks. Pöörlevad osad (tuuleveski tiivad) on eraldi pivot-sõlmes `root.userData.animations` all ja suits on `root.userData.smoke`, nii et `buildings.js` `animateBuilding` töötab muutmata.
+- Üks jagatud materjal `TOWN_MATERIAL`: tipuvärv + atribuut `aMat` (materjalikanal). Varjutaja joonistab mustri objektiruumis:
+  - krohv, lauad, palgid, müüritis, tellis, katusekivid, roog, kiltkivi;
+  - klaas (madal karedus), metall, palk/tala, muld, lehestik, riie.
+  Tekstuure ei laadita.
+- Majad `createTownModelV154('house', team, age, seed)` – variandid ajastu järgi:
+  - kiviaeg 8: ümaronn, nahktelk, kaksikonn, madal onn; lõkkease, kuivatusrestid, potid;
+  - pronksi- ja rauaaeg 12: vitspunutis/savi, rehielamu, ümarmaja, palkmaja, juurdeehitis, aidaga; ilmed vahelduvad, rauaajal kivisokkel;
+  - keskaeg 16: 1–3 korrust, sõrestik + krohv, esiletõstetud ülemine korrus, kivist alumine korrus, kivi-/kiltkivi-/roogkatus, viil tänava poole või küljele, katuseakna, korstna, kuuri, varikatusega;
+  - renessanss 16: Hansa-stiilis kitsad kõrged viilmajad, astmeline / kellukakujuline / kolmnurkne viil või kelpkatus, pastelsed fassaadid, valged raamid, erker;
+  - tööstusaeg 12: telliskivist ridamaja, erkeraken, mansardkatus katuseakendega, krohvitud linnamaja, laudisega veranda-maja;
+  - moodne aeg 16: rõdudega kortermaja, aknalindiga maja, paneelmaja, kõrghoone (harva), villa, viilkatuse ja garaažiga pereelamu, telliskivist kortermaja.
+  Iga variandi sees juhib seemne põhine `rng` mõõte, värvipaletti, aknaluuke, korstnat, lisaehitisi ja pisiasju (tünnid, kastid, põõsad, aiad).
+- `buildingSeed(b)` (positsioonist) valib maja variandi, nii et sama maja näeb alati ühesugune välja.
+- Teised hooned (`SIG`, 66 tüüpi koos aliastega) saavad ajastu stiilis kere ja tunnuseseme:
+  - saeveski: saeraam ja lauad; tuuleveski: pöörlevad tiivad (keskajast alates, pronksiajal käsikivi);
+  - pagar: kuppelahi; sepp: avatud ääsi ja alasi; sulatusahi: torn; söemiilid;
+  - kasarmud: harjutusnukud; vibulaskeväli: märklauad; tall: boksid ja koplid; kaev: katusega;
+  - õppehooned: kellatorn / sammaskäik / kuppel; turg: värviliste varikatustega letid;
+  - ladu: suured väravad; kelder: muldkünkas; kõrts: silt, lauad ja latern; kabel: torn;
+  - aiad: eri värvi peenrad; viljapuuaed; tööstushooned: saehambakatus ja korstnad jne.
+- Kasutamata jäävad (vanad mudelid jäävad alles): müürid/väravad/tornid, põld/talu/karjamaa, kaevandused ja kaevanduskohad (`MINERAL_BUILDINGS`), ranna-ehitised (`fisher`, `harbor`), sild ja `keep`.
+
+### Integreerimine
+- `civilization.js` `townBuildingModel(type, team, age, stage, seed)`: kui `createTownModelV154` toetab tüüpi, kasutatakse uut mudelit, muidu vana `createAgeBuilding`. Mõlemad kutsekohad annavad `buildingSeed(b)`.
+- `boot-v83.js` / `index.html` → `?v=154a`.
+- Koormus: keskaja demo 905 → 559 joonistuskutset, kolmnurki umbes sama palju (~0,5M). Moodsa demo kolmnurgad 881k → 904k (+3%), joonistuskutsed 2221 → 901.
+
+### Testid
+- Uus `TEST_V154.mjs`: kõik tüübid ja ajastud ehituvad, kolmnurkade eelarve ja mahtumine krundile, majavariandid on erinevad, müürid ja kaevandused jäävad vanaks, veski animatsioon ainult keskajast alates, brauseris vigu pole ja majad varieeruvad.
+- Eelvaade: `artifacts-v154/town.html?m=houses&age=3`, `?m=types&age=1&labels=1` ja `?m=ages` (gitignore'is).
