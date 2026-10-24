@@ -15,12 +15,12 @@ assert.ok(cityInfillRank(centre,centre,'market',game)<cityInfillRank(centre,east
 assert.deepEqual(coreFoodAndServices([house()],1).slice(0,3),['market','warehouse','cellar']);
 const rich={gold:300,wood:220,stone:150,water:150,bread:90,plank:65};
 assert.equal(surplusForWalls(rich,20,0),true);
-assert.equal(surplusForWalls({...rich,wood:80},20,0),false);
+assert.equal(surplusForWalls({...rich,wood:35},20,0),false,'V146 requires at least 36 wood for optional walls');
 assert.equal(surplusForWalls({...rich,bread:5},20,0),false);
 assert.equal(surplusForWalls(rich,20,7),false);
 assert.equal(reserveAfterWalls(rich,{wood:30,stone:20}),true);
 assert.equal(reserveAfterWalls({...rich,plank:0},{wood:12,stone:2}),true,'wooden palisades do not require a separate plank stockpile');
-assert.equal(reserveAfterWalls({...rich,wood:79},{wood:30}),false);
+assert.equal(reserveAfterWalls({...rich,wood:40},{wood:30}),false,'A wall must leave at least 12 wood in reserve');
 const inner=[house(-30,-19),house(29,18),house(12,-27),house(-14,30)];
 const extents=wallExtents(inner,12),ring=ancientWallPlan(inner,'palisade','watchtower',12);
 assert.equal(ring.gateOpenings,4);
@@ -35,6 +35,7 @@ city.economy.buildings.push({type:'market',hp:350,ready:true},{type:'well',hp:35
 const mock={s:{time:80,seed:13901,ages:[0,1],units:[]},allBuildings:()=>city.economy.buildings,
   buildRule:(ctx,type)=>['stonewall','stonetower'].includes(type)?'locked':'',
   buildingDefinitions:{palisade:{cost:{wood:8}},watchtower:{cost:{wood:12}},gatehouse:{cost:{wood:20}}},
+  previewBuild:()=>({}),
   build:(ctx,type,p)=>{const building={...p,type,hp:350,ready:true};ctx.economy.buildings.push(building);return {building};}};
 planAIDefenses(mock,1,city);
 assert.ok(city.defensePlanV139?.slots?.length>30,'wealthy established town gets wall plan');
