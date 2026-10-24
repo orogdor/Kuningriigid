@@ -1,0 +1,38 @@
+name: Unpack Godot port for continued development
+on:
+  push:
+    branches: [godot-port-development]
+    paths: ['.github/workflows/godot-unpack-sources.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify and unpack Godot 3.3 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat godot-upload/v33/*.txt | base64 -d > /tmp/kuningriigid-godot-v33.zip
+          echo '67f12648bb0aa324e0c4476cd6627806773096b79f01d2b6b0180a918657ba8c  /tmp/kuningriigid-godot-v33.zip' | sha256sum -c -
+          unzip -oq /tmp/kuningriigid-godot-v33.zip -d .
+          test -f game/project.godot
+          test -f bootstrap/project.godot
+          echo "Godot source files:"
+          find game bootstrap -type f | wc -l
+      - name: Commit editable Godot sources to development branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- game bootstrap
+          if git diff --cached --quiet; then
+            echo 'Sources already committed'
+          else
+            git commit -m 'Extract editable Godot 3.3 game and bootstrap source'
+            git push origin HEAD:godot-port-development
+          fi
