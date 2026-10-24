@@ -25,7 +25,7 @@ static func work_priority(kind: String, stock: Dictionary, population: int) -> i
         return 86 if float(stock.get("plank",0.0)) < 50.0 else 65
     if kind in ["study","scriptorium","academy","university","observatory","polytechnic","laboratory"]:
         return 61
-    if kind in ["mine","coal","smelter","smith"]:
+    if kind in ["mine","coal","smelter","smith","steelworks","machine_shop"]:
         return 55
     return 28
 
