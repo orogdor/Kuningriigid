@@ -11,6 +11,7 @@ const CampaignPlay = preload("res://scripts/core/campaign_play_port.gd")
 const CityFounding = preload("res://scripts/core/city_founding_port.gd")
 const SettlerCampaign = preload("res://scripts/core/settler_campaign_port.gd")
 const CampaignWar = preload("res://scripts/core/campaign_war_port.gd")
+const BattleBrief = preload("res://scripts/core/campaign_battle_brief_port.gd")
 const SettlerView = preload("res://scripts/adapters/native_settler_view.gd")
 const EconomyPort = preload("res://scripts/core/economy_port.gd")
 const ResearchPort = preload("res://scripts/core/research_port.gd")
@@ -162,6 +163,10 @@ var menu_actions: GridContainer
 var mobile_view: String = "world"
 var mobile_menu_open: bool = false
 var mobile_status_caption: Label
+var battle_brief_panel: PanelContainer
+var battle_brief_text: Label
+var battle_brief_picker: OptionButton
+var battle_brief_fronts: Array = []
 var native_detail_tile: Node3D
 var world_selection_marker: MeshInstance3D
 var hidden_world_nodes: Array = []
@@ -210,6 +215,7 @@ const MOBILE_MENU_ACTIONS = [
     ["Kampaania", "Värba odamees", "campaign_train"],
     ["Kampaania", "SAADA ARMEE valitud ruudule", "campaign_army_move"],
     ["Kampaania", "Sõjaväe ülevaade", "campaign_army_info"],
+    ["Kampaania", "LAHINGURINDED JA RAPORT", "campaign_battle_brief"],
     ["Kampaania", "Vali järgmine uurimus", "campaign_research"],
     ["Kampaania", "Ehita elamu", "campaign_house"],
     ["Kampaania", "Ehita metsamaja", "campaign_lumber"],
@@ -721,6 +727,7 @@ func _setup_ui() -> void:
     menu_actions.add_theme_constant_override("v_separation",12)
     scroll.add_child(menu_actions)
     _populate_mobile_menu(0)
+    _setup_battle_brief_panel(ui_root)
     detail_nav_buttons = VBoxContainer.new()
     detail_nav_buttons.name = "DetailNeighborNavigation"
     detail_nav_buttons.anchor_left = 1.0
@@ -735,6 +742,84 @@ func _setup_ui() -> void:
     _add_button(detail_nav_buttons,"←",func():_detail_neighbor(-1,0),64)
     _add_button(detail_nav_buttons,"→",func():_detail_neighbor(1,0),64)
     _add_button(detail_nav_buttons,"↓",func():_detail_neighbor(0,1),64)
+
+func _setup_battle_brief_panel(ui_root: Control) -> void:
+    # Landscape-safe, modal-like overlay with touch-sized selection controls.
+    # Does not start or alter combat; fronts and report are read-only.
+    battle_brief_panel = PanelContainer.new()
+    battle_brief_panel.name = "CampaignBattleFrontsPanel"
+    battle_brief_panel.anchor_left = 0.06
+    battle_brief_panel.anchor_right = 0.94
+    battle_brief_panel.anchor_top = 0.12
+    battle_brief_panel.anchor_bottom = 0.88
+    battle_brief_panel.visible = false
+    battle_brief_panel.z_index = 15
+    ui_root.add_child(battle_brief_panel)
+    var column := VBoxContainer.new()
+    column.add_theme_constant_override("separation",9)
+    battle_brief_panel.add_child(column)
+    var heading := Label.new()
+    heading.text = "LAHINGURINDED • RAPORT"
+    heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    heading.add_theme_font_size_override("font_size",24)
+    column.add_child(heading)
+    battle_brief_picker = OptionButton.new()
+    battle_brief_picker.custom_minimum_size.y = 56.0
+    battle_brief_picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    column.add_child(battle_brief_picker)
+    var scroll := ScrollContainer.new()
+    scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+    scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+    column.add_child(scroll)
+    battle_brief_text = Label.new()
+    battle_brief_text.name = "BattleDetailedReport"
+    battle_brief_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    battle_brief_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    battle_brief_text.add_theme_font_size_override("font_size",19)
+    scroll.add_child(battle_brief_text)
+    var controls := HBoxContainer.new()
+    controls.alignment = BoxContainer.ALIGNMENT_CENTER
+    column.add_child(controls)
+    _add_button(controls,"UUENDA",func(): _refresh_battle_brief(),135)
+    _add_button(controls,"NÄITA RUUTU",func(): _focus_battle_brief_front(),175)
+    _add_button(controls,"SULGE",func(): battle_brief_panel.visible = false,130)
+
+func _open_battle_brief() -> void:
+    if not CampaignPlay.is_active(preview_state):
+        status_label.text = "Lahingurinded avanevad kampaania alustamisel."
+        return
+    _refresh_battle_brief()
+    battle_brief_panel.visible = true
+
+func _refresh_battle_brief() -> void:
+    if not is_instance_valid(battle_brief_panel):
+        return
+    battle_brief_fronts = BattleBrief.fronts(preview_state)
+    battle_brief_picker.clear()
+    for index in range(battle_brief_fronts.size()):
+        battle_brief_picker.add_item(BattleBrief.front_label(battle_brief_fronts[index]),index)
+    battle_brief_picker.disabled = battle_brief_fronts.is_empty()
+    battle_brief_text.text = BattleBrief.report(preview_state)
+
+func _focus_battle_brief_front() -> void:
+    var index: int = battle_brief_picker.get_selected_id()
+    if index < 0 or index >= battle_brief_fronts.size():
+        status_label.text = "Praegu ei ole kaardil näidatavat lahingurinnet."
+        return
+    var target: Dictionary = battle_brief_fronts[index]
+    var square := Vector2i(int(target.get("c",-1)),int(target.get("r",-1)))
+    if not DetailTile.tile_valid(square):
+        status_label.text = "Lahingu maailmaruut puudub."
+        return
+    battle_brief_panel.visible = false
+    selected = square
+    _show_world_map()
+    focus = Vector2(float(square.x)+.5,float(square.y)+.5)
+    zoom = 52.0
+    _update_world_selection_marker()
+    _update_camera()
+    status_label.text = BattleBrief.front_label(target)+" • maailmakaardil"
 
 func _add_button(parent: Node,text: String,cb: Callable,min_width: int = 72) -> void:
     var button := Button.new()
@@ -945,6 +1030,7 @@ func _menu_action(action_id: String) -> void:
         "campaign_train": _campaign_train_spearman()
         "campaign_army_move": _campaign_move_army()
         "campaign_army_info": _campaign_army_info()
+        "campaign_battle_brief": _open_battle_brief()
         "campaign_research": _preview_research()
         "campaign_house": _preview_build("house")
         "campaign_lumber": _preview_build("lumber")
