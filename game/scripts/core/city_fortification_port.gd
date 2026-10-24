@@ -67,6 +67,11 @@ static func build_next(city: Dictionary) -> Dictionary:
     return {"ok":true,"reason":"Linnavall rajatud ruudule %d,%d" % [tile.x,tile.y],
         "tile":[tile.x,tile.y],"cost":available["cost"]}
 
+static func segment_hp(city: Dictionary,tile: Vector2i,index: int,maximum: float = 420.0) -> float:
+    var fort: Dictionary = city.get("fortification",{})
+    var key: String = "%d:%d:%d" % [tile.x,tile.y,index]
+    return clampf(float(fort.get("integrity",{}).get(key,maximum)),0.0,maximum)
+
 static func gate_is_open(city: Dictionary,tile: Vector2i) -> bool:
     if not fortified(city,tile):
         return false
@@ -77,6 +82,9 @@ static func set_gate(city: Dictionary,tile: Vector2i,opened: bool) -> bool:
     if not fortified(city,tile):
         return false
     var fort: Dictionary = city["fortification"]
+    # A destroyed gate cannot be shut until it is repaired.
+    if not opened and segment_hp(city,tile,4,500.0) <= .0001:
+        return false
     if not fort.has("gates_open"):
         fort["gates_open"] = {}
     fort["gates_open"][tile_key(tile.x,tile.y)] = opened
