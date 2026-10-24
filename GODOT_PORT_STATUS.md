@@ -1,5 +1,18 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.2 / kampaanias päris uue linna asutamine (2026-10-24)
+
+- `game/scripts/core/city_founding_port.gd`: võimalik rajada oma riigile uus linn kasutaja valitud maailmaruudule, kui `settlement` tehnoloogia on avastatud, valitud maal on läbitav maa, puudub olemasolev territoriaalne omanik, linnade vahe vähemalt 17 ruutu ja asutavast linnast on kuni 40-ruuduline läbitav maismaatee. Minimaalne lähteasula elanikkond **6**, asutamine kolib **3 elanikku**.
+- Ressursikulu on **55 puitu, 16 kivi, 18 ühikut toitu ja 12 vett**, mis arvestatakse maha *lähteasula* varudest; uue linna algvaru **25 puitu, 8 kivi, 10 toitu, 12 vett**, ülejäänud kulu katab uue peahoone ja kolimise. Teadaolevate pakkumiste hinna ja elanike kontroll toimub enne ühegi ressursi mahaarvamist.
+- Uus linn saab püsiva unikaalse ID, linna `team`, `age`, tühjad veod/majanduse seisu, peahoone ja linnaplaani krundi. Rajamislugu (`founding_log`) sisaldab vanemlinna ID-d, pikkust ja käiku. Territooriumi omanikud ja 3D linnanäitajad uuendatakse.
+- Telefoni menüüs **Kampaania → ASUTA LINN valitud kaardiruudule** ning **Asutamise tingimused**; asutamisel tehakse kohene kampaania autosalvestus. Käivitamisel saab hiljem laadida ka **algse manifesti linnade arvust suurema** kontrollitud salvestuse; manifesti olemasolevate linnade ID-d ja koordinaadid peavad olema muutumatud.
+- Regressioonitestid: asustustehnoloogia, 17-ruudu vahe, maa/meri, vastaslinna süda, 40-ruudune läbitavus, pop-3 arvestus, tegelik materjalikulu, tasuta duplikaatasula vältimine, territooriumi kinnistamine ja salvestamise/laadimise säilimine.
+- Kontrollitud CI **786/786**, Androidi APK ja PCK edukas, `BOOTSTRAP_PACK_VERSION: godot-dev-84`: https://github.com/orogdor/Kuningriigid/actions/runs/40113588497
+- Väljalase: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-84
+- Üldpordi hinnanguline valmidus **53%** (subjektiivne töömahu hinnang; päris Androidi UX-i kontroll pole selle CI osana tehtud).
+
+**Järgmine oluline osa:** praegu asutatakse uus linn ühe käsuga pärast maismaaraja ja ressursside kontrolli. See ei ole veel maailmakaardil *füüsiliselt liikuv asutajaüksus*. Järgmises etapis tuleb teha asutaja liikumine, AI oma linnade asutamine ja vastasriikide tõeliselt strateegiline laienemine.
+
 ## V4.1 / esimene päriselt käigupõhine kiviajast pronksiajani kampaania (2026-10-24)
 
 - Uus `campaign_play_port.gd`: 4-riigiline mänguolek, mängijariik 0, konkurentide AI 1–3, üks käik = täpselt **60 mängusekundit**, kampaania vooruarvestus, edetabel, eesmärk, võit/kaotus ning JSON-sõbralik käiguajalugu.
