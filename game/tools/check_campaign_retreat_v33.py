@@ -22,7 +22,7 @@ assert 'float(state.get("seconds",0.0))' in m
 assert '"campaign_retreat_info": _campaign_retreat_info()' in u
 assert 'v131_godot_measurements_v33.csv' in u
 assert 'campaign_retreats,campaign_retreats_trapped' in u
-assert len(re.findall(r'^\s+_check\(',t,re.M))==647
+assert len(re.findall(r'^\s+_check\(',t,re.M))>=658
 assert len(re.findall(r'_check\(results,"v33-',t))==23
 # Independent reachability fixture: 3-tile dry passage, sea to the west and a hostile tile east.
 dry={(50,50),(49,50),(48,50),(50,49)}
@@ -41,4 +41,4 @@ while q:
 assert routes[(49,50)]==[(49,50)]
 assert routes[(48,50)]==[(49,50),(48,50)]
 assert (51,50) not in routes and (50,49) not in routes
-print('PASS 3.3: 647 prepared assertions, bounded safe retreat, no teleport, recovery and CSV wiring. Godot parser NOT run.')
+print('PASS 3.3: 658+ prepared assertions, bounded safe retreat, no teleport, recovery and CSV wiring. Godot parser NOT run.')

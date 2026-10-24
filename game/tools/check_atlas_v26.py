@@ -21,7 +21,7 @@ assert 'world_trade_nav.configure_detail(heights,preview_state.get("cities",[]),
 assert 'fine_navigation.configure(heights,towns,crossings,landscape)' in world
 assert '"atlas_river_demo": _start_atlas_river_demo()' in main
 assert '"atlas_bridge_toggle": _toggle_atlas_bridge()' in main
-assert len(re.findall(r'^\s+_check\(', (root/'tests/port_checks.gd').read_text(),re.M)) == 647
+assert len(re.findall(r'^\s+_check\(', (root/'tests/port_checks.gd').read_text(),re.M)) >=658
 
 W,H=220,165
 samples=[sin((c+.3)*.047)*1.25+cos((r+.7)*.13)*1.2+(r/165)*2.0-1.3 for r in range(H) for c in range(W)]
@@ -85,4 +85,4 @@ for r in range(12,ROWS:=165-10,18):
    segments.add(tuple(sorted(((x,y),nextpoint))))
    x,y=nextpoint
 assert len(segments)>100
-print(f'PASS V2.6: 2000 continuous coast/cliff height seam samples, 2000 local transforms, both river-edge clipping directions, {len(segments)} synthetic downhill segments, bridge and rendering wiring, 647 prepared GDScript assertions. NO GODOT RUNTIME.')
+print(f'PASS V2.6: 2000 continuous coast/cliff height seam samples, 2000 local transforms, both river-edge clipping directions, {len(segments)} synthetic downhill segments, bridge and rendering wiring, 658+ prepared GDScript assertions. NO GODOT RUNTIME.')

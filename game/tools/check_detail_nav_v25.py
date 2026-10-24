@@ -23,7 +23,7 @@ assert '"bridge_demo": _start_bridge_demo()' in main
 assert '"bridge_toggle": _toggle_bridge_demo()' in main
 assert 'preview_state.get("detail_bridges",{})' in main
 assert '_create_test_water_crossing()' in detail
-assert len(re.findall(r'^\s+_check\(',tests,re.M))==647
+assert len(re.findall(r'^\s+_check\(',tests,re.M))>=658
 # Test a numerical analogue of the 45x39 local grid at 5m resolution.
 # Vertical river spans x=-5..5; the 12m crossing at z=0 is the ONLY opening.
 W,H=45,39

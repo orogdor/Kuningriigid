@@ -15,7 +15,7 @@ assert '"large_field"' in v and 'regions: int = 3 if large else 1' in v
 assert 'terrain_search_budget: int = 2 if bool(battle.get("large_battle_test",false)) else 6' in i
 assert 'BattleSurface.half_x(surface)' in i and 'BattleSurface.half_z(surface)' in i
 assert 'retreat_lines' in v and 'overview_lines' in v
-assert len(re.findall(r'^\s+_check\(',t,re.M)) == 647
+assert len(re.findall(r'^\s+_check\(',t,re.M)) >=658
 assert '    if ground_open(data,position.x,position.y,.34):' in b
 assert 'V131 3x3' in m
 print('PASS v3.0: nine-tile surface, routing, UI, 500 troops, renderer, edge, regression fixtures (static only).')

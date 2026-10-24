@@ -7,7 +7,7 @@ logic=(root/'scripts/core/county_logistics_port.gd').read_text()
 detail=(root/'scripts/adapters/native_detail_tile.gd').read_text()
 main=(root/'scripts/main.gd').read_text()
 tests=(root/'tests/port_checks.gd').read_text()
-assert len(re.findall(r'^\s+_check\(',tests,re.M))==647
+assert len(re.findall(r'^\s+_check\(',tests,re.M))>=658
 assert '"direction":"supply"' not in logic or 'supply' in logic
 assert 'site["inputs"] = inputs' in logic
 assert 'Economy.spend_resources(inputs,recipe)' in logic

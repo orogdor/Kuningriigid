@@ -31,7 +31,7 @@ assert 'morale_routs,ordered_retreats,escape_routes,escape_failed_routes,flank_s
 for key in ('morale_routs','ordered_retreats','escape_routes','escape_failed_routes','flank_shocks'):
     assert f'.get("{key}",0)' in u,key
 checks = re.findall(r'^\s+_check\(',t,re.M)
-assert len(checks)==647
+assert len(checks)>=658
 new=re.findall(r'_check\(results,"(v32-[^"]+)"',t)
 assert len(new)==31 and len(new)==len(set(new)),new
 assert 'BattleMorale.initialize(m32_battle)' in t

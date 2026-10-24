@@ -20,7 +20,7 @@ assert 'river_graphics' in view and 'bridge.get("open",false)' in view
 assert '"terrain_battle": _terrain_battle_demo()' in main
 assert 'for i in range(4):\n        Military.add_unit(preview_state,left' in main
 assert 'for i in range(4):' in main and 'terrain_routes' in main and 'terrain_blocked' in main
-assert len(re.findall(r'^\s+_check\(',checks,re.M))==647
+assert len(re.findall(r'^\s+_check\(',checks,re.M))>=658
 assert (root/'docs/PORT_V29_SCOPE.md').exists()
 # 9x9 V131 interpolation in a 64x50 m battlefield, independent Python mirror.
 def elev(grid,x,z):
@@ -45,4 +45,4 @@ assert not river_blocked(0,0,True)
 assert river_blocked(0,11,True)
 # Archive should retain old v2.8 fixture data and new module.
 assert (root/'data/v131_earth_seed131_atlas.bin').stat().st_size>400000
-print('PASS v2.9: module/UI/render paths, bounded battlefield replan, 1000 flat samples, 81 grid nodes, bridge/river checks, 647 GDScript checks PREPARED. No Godot runtime.')
+print('PASS v2.9: module/UI/render paths, bounded battlefield replan, 1000 flat samples, 81 grid nodes, bridge/river checks, 658+ GDScript checks PREPARED. No Godot runtime.')

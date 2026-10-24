@@ -24,11 +24,11 @@ assert '"battlefield_500": _large_battle_demo()' in m
 assert 'terrain_search_budget: int = 2 if bool(battle.get("large_battle_test",false)) else 6' in b
 assert 'return .48' in d and 'return .35' in d and 'return 1.15' in d
 assert 'v131_godot_measurements_v33.csv' in m
-assert len(re.findall(r'^\s+_check\(',t,re.M))==647
+assert len(re.findall(r'^\s+_check\(',t,re.M))>=658
 names=re.findall(r'_check\(results,\s*"([^"]+)"',t)
 new_names=[n for n in names if n.startswith("v31-")]
 assert len(new_names)==len(set(new_names)),[x for x in new_names if new_names.count(x)>1]
 # Existing 24 / 192 / 500 tests, city siege and manual commands remain bound.
 for label in ('"infantry_battle"','"terrain_battle"','"battlefield_500"','"siege"','"formation"','"auto_formation"'):
  assert label in m,label
-print('PASS V3.1 formation module, AI, 500-soldier, manual UI, save/log, missile lanes; 647 prepared assertions (static).')
+print('PASS V3.1 formation module, AI, 500-soldier, manual UI, save/log, missile lanes; 658+ prepared assertions (static).')

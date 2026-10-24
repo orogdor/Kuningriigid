@@ -8,7 +8,7 @@ logic=(root/'scripts/core/county_logistics_port.gd').read_text()
 visual=(root/'scripts/adapters/native_county_logistics_view.gd').read_text()
 detail=(root/'scripts/adapters/native_detail_tile.gd').read_text()
 tests=(root/'tests/port_checks.gd').read_text()
-assert len(re.findall(r'^\s+_check\(',tests,re.M))==647
+assert len(re.findall(r'^\s+_check\(',tests,re.M))>=658
 assert 'CountyLogistics.advance_city(state,city,dt,world_nav)' in sim
 assert 'var remote_cycles: int = Territory.advance_worksites(city,dt)' in sim
 assert 'var accepted: float' in logic and 'stock[good] = float(stock.get(good,0.0))+accepted' in logic
