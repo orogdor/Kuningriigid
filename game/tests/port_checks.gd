@@ -684,6 +684,113 @@ static func run() -> Dictionary:
         report_json is Dictionary and BattleBrief.report(report_json).contains("Langenuid: R0: 11, R1: 7"))
     _check(results,"v52-old-log-without-modern-fields-prints-safely",
         BattleBrief.report({"battle_log":[{"winner":-1}]}).contains("Sõdurikaotuste täpne arv puudub."))
+    # Dev131: civilian technology now has real local industrial recipes
+    # instead of stalling on the Modern Age's steel/machines era gate.
+    var civil_manifest: Array = [
+        {"id":0,"team":0,"c":40,"r":40,"name":"Toostuslinn"},
+        {"id":1,"team":1,"c":80,"r":40,"name":"Naaber"}]
+    var civil_state: Dictionary = Preview.initialize(civil_manifest)
+    var civil_city: Dictionary = civil_state["cities"][0]
+    var civil_stock: Dictionary = civil_city["resources"]
+    civil_stock["plank"] = 150.0
+    civil_stock["stone"] = 140.0
+    civil_stock["iron"] = 100.0
+    civil_stock["coal"] = 100.0
+    civil_stock["bread"] = 200.0
+    civil_stock["water"] = 200.0
+    civil_city["age"] = 5
+    civil_state["teams"][0]["age"] = 5
+    civil_city["buildings"].append_array([
+        {"type":"smelter","ready":true,"hp":350.0},
+        {"type":"smith","ready":true,"hp":350.0}])
+    var locked_factory_stock: Dictionary = civil_stock.duplicate(true)
+    var locked_factory: Dictionary = Preview.build_in_town(civil_state,0,"steelworks")
+    _check(results,"v53-steelworks-locked-until-real-science",
+        not bool(locked_factory.get("ok",false)) and civil_stock==locked_factory_stock)
+    civil_state["teams"][0]["known"]["steelmaking"] = true
+    civil_state["teams"][0]["known"]["steam_engine"] = true
+    var factory_built: Dictionary = Preview.build_in_town(civil_state,0,"steelworks")
+    _check(results,"v53-steelworks-pays-real-iron-plank-and-stone",
+        bool(factory_built.get("ok",false)) and is_equal_approx(float(civil_stock["plank"]),115.0) and is_equal_approx(float(civil_stock["iron"]),82.0) and is_equal_approx(float(civil_stock["stone"]),120.0))
+    var steelworks: Dictionary = civil_city["buildings"][-1]
+    _check(results,"v53-factory-not-instantly-ready-and-is-on-real-plot",
+        not bool(steelworks["ready"]) and steelworks.has("site_x") and CityLayout.check_clear(civil_city))
+    var no_machines_without_steel: Dictionary = Preview.build_in_town(civil_state,0,"machine_shop")
+    _check(results,"v53-no-free-machine-shop-before-steel-production",
+        not bool(no_machines_without_steel.get("ok",false)) and not civil_city["buildings"][-1].get("type","")=="machine_shop")
+    steelworks["ready"] = true
+    steelworks["efficiency"] = 1.0
+    var steel_cycle: int = Production.run_cycle(civil_city,steelworks,63.0)
+    _check(results,"v53-steel-melts-with-real-coal-and-iron-inputs",
+        steel_cycle==1 and is_equal_approx(float(civil_stock["steel"]),3.0) and is_equal_approx(float(civil_stock["iron"]),79.0) and is_equal_approx(float(civil_stock["coal"]),98.0))
+    var steel_batch: int = Production.run_cycle(civil_city,steelworks,63.0*19.0)
+    _check(results,"v53-steel-production-runs-repeated-paid-cycles",
+        steel_batch==19 and is_equal_approx(float(civil_stock["steel"]),60.0) and is_equal_approx(float(civil_stock["iron"]),22.0) and is_equal_approx(float(civil_stock["coal"]),60.0))
+    var machines_built: Dictionary = Preview.build_in_town(civil_state,0,"machine_shop")
+    var machine_shop: Dictionary = civil_city["buildings"][-1]
+    _check(results,"v53-machine-shop-uses-produced-steel-not-cheats",
+        bool(machines_built.get("ok",false)) and is_equal_approx(float(civil_stock["steel"]),48.0) and is_equal_approx(float(civil_stock["plank"]),70.0) and machine_shop.get("type","")=="machine_shop")
+    machine_shop["ready"] = true
+    machine_shop["efficiency"] = 1.0
+    var machinery_runs: int = Production.run_cycle(civil_city,machine_shop,81.0*9.0)
+    _check(results,"v53-machinery-requires-steel-and-planks-per-cycle",
+        machinery_runs==9 and is_equal_approx(float(civil_stock["machines"]),18.0) and is_equal_approx(float(civil_stock["steel"]),30.0) and is_equal_approx(float(civil_stock["plank"]),43.0))
+    Production.run_cycle(civil_city,steelworks,63.0*2.0)
+    var modern_missing: Dictionary = Era.age_deficit([civil_stock],"modernity")
+    _check(results,"v53-real-economy-now-produces-modern-era-resources",
+        modern_missing.is_empty() and is_equal_approx(float(civil_stock["steel"]),36.0) and is_equal_approx(float(civil_stock["machines"]),18.0))
+    var paid_modern: Dictionary = Era.pay_era_cost([civil_stock],"modernity")
+    _check(results,"v53-modern-gate-takes-real-steel-and-machines",
+        bool(paid_modern.get("paid",false)) and is_equal_approx(float(civil_stock["steel"]),1.0) and is_equal_approx(float(civil_stock["machines"]),0.5))
+    _check(results,"v53-civil-factories-and-materials-survive-json",
+        JSON.parse_string(JSON.stringify(civil_city)) is Dictionary and CityLayout.check_clear(civil_city))
+    var civil_ai: Dictionary = {"c":50,"r":50,"pop":3,"age":5,
+        "resources":Economy.start_resources(),"buildings":[{"type":"hall","ready":true,"hp":1200.0}]}
+    civil_ai["resources"]["wood"] = 250.0
+    civil_ai["resources"]["plank"] = 250.0
+    civil_ai["resources"]["stone"] = 250.0
+    civil_ai["resources"]["iron"] = 100.0
+    civil_ai["resources"]["coal"] = 100.0
+    civil_ai["resources"]["steel"] = 0.0
+    civil_ai["resources"]["bread"] = 250.0
+    civil_ai["resources"]["water"] = 250.0
+    for kind in PreviewAI.BUILD_ORDER:
+        if kind in ["steelworks","machine_shop"]:
+            continue
+        civil_ai["buildings"].append({"type":kind,"ready":true,"hp":350.0})
+    _check(results,"v53-civil-ai-prioritizes-next-unbuilt-steelworks",
+        PreviewAI.choose_building(civil_ai,{"steelmaking":true,"steam_engine":true},0)=="steelworks")
+    civil_ai["buildings"].append({"type":"steelworks","ready":true,"hp":350.0})
+    civil_ai["resources"]["steel"] = 20.0
+    _check(results,"v53-civil-ai-can-choose-working-machine-factory",
+        PreviewAI.choose_building(civil_ai,{"steelmaking":true,"steam_engine":true},0)=="machine_shop")
+    var short_civil: Dictionary = Preview.initialize(civil_manifest)
+    var short_start: Dictionary = CampaignPlay.begin(short_civil,0)
+    _check(results,"v53-original-bronze-campaign-kept-unmodified",
+        bool(short_start["ok"]) and str(short_civil["campaign"]["mode"])=="stone_to_bronze" and int(short_civil["campaign"]["turn_limit"])==90 and int(short_civil["campaign"]["goal_age"])==1)
+    var long_civil: Dictionary = Preview.initialize(civil_manifest)
+    var long_start: Dictionary = CampaignPlay.begin(long_civil,0,true)
+    _check(results,"v53-long-civil-campaign-is-separate-opt-in-mode",
+        bool(long_start["ok"]) and str(long_civil["campaign"]["mode"])=="stone_to_modern" and int(long_civil["campaign"]["turn_limit"])==600 and int(long_civil["campaign"]["goal_age"])==6)
+    long_civil["teams"][0]["age"] = 1
+    long_civil["cities"][0]["pop"] = 40
+    _check(results,"v53-reaching-bronze-does-not-end-long-campaign",
+        str(CampaignPlay.evaluate(long_civil)["result"])=="playing")
+    long_civil["campaign"]["turn"] = 91
+    _check(results,"v53-long-game-does-not-stop-at-old-90-turn-limit",
+        str(CampaignPlay.evaluate(long_civil)["result"])=="playing")
+    long_civil["teams"][0]["age"] = 6
+    long_civil["cities"][0]["pop"] = 100
+    _check(results,"v53-modern-goal-achieved-with-real-population",
+        str(CampaignPlay.evaluate(long_civil)["result"])=="won")
+    _check(results,"v53-long-campaign-status-shows-modern-goal",
+        CampaignPlay.text_status(long_civil).contains("ajastu 6") and CampaignPlay.text_status(long_civil).contains("600"))
+    var saved_long: bool = Preview.save_preview(long_civil,"user://v53_long_civilization.json")
+    var loaded_long: Dictionary = Preview.load_preview(civil_manifest,"user://v53_long_civilization.json")
+    _check(results,"v53-long-campaign-mode-and-goal-survive-save-load",
+        saved_long and str(loaded_long.get("campaign",{}).get("mode",""))=="stone_to_modern" and int(loaded_long["campaign"]["goal_age"])==6)
+    if FileAccess.file_exists("user://v53_long_civilization.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v53_long_civilization.json"))
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
