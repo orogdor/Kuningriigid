@@ -15,6 +15,8 @@ permissions:
 jobs:
   android:
     runs-on: ubuntu-latest
+    outputs:
+      tests_ok: ${{ steps.regression.outcome }}
     timeout-minutes: 55
     container:
       image: barichello/godot-ci:4.7.2
@@ -46,6 +48,7 @@ jobs:
           godot --headless --path game --editor --import --quit 2>&1 | tee dist/logs/02-import.txt
           if grep -Ei 'SCRIPT ERROR|Parse Error|Parser Error|Failed to load script' dist/logs/02-import.txt; then exit 1; fi
       - name: Execute Godot tests (experimental, 70s cap)
+        id: regression
         shell: bash
         continue-on-error: true
         timeout-minutes: 2
@@ -126,3 +129,30 @@ jobs:
           name: Kuningriigid-Godot-Dev-test-logs
           path: dist/logs/
           if-no-files-found: warn
+publish_preview:
+    name: Publish tagged Godot OTA prerelease
+    needs: android
+    if: ${{ needs.android.result == 'success' && needs.android.outputs.tests_ok == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Kuningriigid-Godot-Dev-APK
+          path: dist
+      - name: Publish tested APK and game pack
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/Kuningriigid-Godot-Dev.apk
+          test -s dist/game.pck
+          tag="godot-dev-${{ github.run_number }}"
+          gh release create "$tag" dist/Kuningriigid-Godot-Dev.apk dist/game.pck \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
+            --title "Kuningriigid Godot test ${{ github.run_number }}" \
+            --notes "Godot Androidi eelväljalase. Regressioonitestid läbitud; mängu toimimine telefonis vajab kontrolli." \
+            --prerelease
