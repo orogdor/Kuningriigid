@@ -24,7 +24,7 @@ const palette={
  boulders:['#92968d','#858b83','#a9a99a'],sand:['#c5b487','#bfa975']
 };
 function color(arr,idx){return arr[idx%arr.length]}
-import {getWorldModel,WORLD_MODEL_MATERIAL} from './world-models-v152.js?v=152a';
+import {getWorldModel,WORLD_MODEL_MATERIAL} from './world-models-v152.js?v=158a';
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 
 // V48: single batched draw per authored asset. Farther and mobile quality modes
@@ -85,6 +85,6 @@ function addWorldModelInstances(group,name,placements,opts={}){
  const lod=opts.lod||'high',mesh=new T.InstancedMesh(getWorldModel(name,'low'),WORLD_MODEL_MATERIAL,placements.length),dummy=new T.Object3D();
  if(lod!=='low')mesh.userData.lodGeometries={high:getWorldModel(name,lod),low:getWorldModel(name,'low')};
  placements.forEach((p,i)=>{const s=p.scale||1;dummy.position.set(p.x,p.y,p.z);dummy.rotation.set(0,p.rot||0,0);dummy.scale.set(s,s*(.9+((i*.618)%1)*.22),s);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,new T.Color(p.tint||'#ffffff'));});
- mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=false;mesh.receiveShadow=false;mesh.userData.v152Model=name;mesh.name='world '+name;
+ mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=true;mesh.receiveShadow=false;mesh.userData.v152Model=name;mesh.name='world '+name;
  const result=opts.spatialChunks?spatialInstances(mesh):mesh;group.add(result);return result;
 }

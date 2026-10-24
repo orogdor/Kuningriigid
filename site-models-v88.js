@@ -1,5 +1,6 @@
 import * as T from './vendor/three.module.js';
 import {MINERAL_BUILDINGS,COASTAL_BUILDINGS} from './resource-sites-v88.js';
+import {depositGeometry,miningSiteGeometry,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=158a';
 const materials=new Map();
 function material(color){if(!materials.has(color))materials.set(color,new T.MeshStandardMaterial({color,roughness:.86}));return materials.get(color);}
 function mesh(g,geometry,color,x,y,z){const m=new T.Mesh(geometry,material(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m;}
@@ -10,15 +11,17 @@ function disk(g,r,y,c){const m=mesh(g,new T.CircleGeometry(r,24),c,0,y,0);m.rota
 function ring(g,inner,outer,y,c){const m=mesh(g,new T.RingGeometry(inner,outer,24),c,0,y,0);m.rotation.x=-Math.PI/2;return m;}
 const colors={stone:'#a3a49b',ore:'#99674d',copper:'#af7850',tin:'#aab9b7',clay:'#b98a64',gems:'#8377a5',oil:'#4d4940'};
 
+// V158: new soft, vertex-coloured deposit and extraction-site models (world-models-v152.js).
 export function createDepositPile(kind){
  const g=new T.Group();g.userData.mineralDeposit=kind;
- for(let i=0;i<11;i++){const a=i*2.399,r=i===0?0:1.4+(i%3)*.35;const m=mesh(g,new T.DodecahedronGeometry(i===0?1.65:.75+(i%3)*.16,0),colors[kind]||colors.stone,Math.sin(a)*r,i===0?1.0:.45,Math.cos(a)*r);m.rotation.set(i*.3,i*.7,i*.14);}
+ const m=new T.Mesh(depositGeometry(kind),SETTLEMENT_MATERIAL);m.castShadow=true;m.receiveShadow=true;g.add(m);
  return g;
 }
 export function createMiningSite(type,team,age){
  const kind=MINERAL_BUILDINGS[type];if(!kind||type==='oilwell')return null;
  const g=new T.Group(),underground=age>=3&&!['quarry','claypit'].includes(type),modern=age>=5,metal=modern?'#697981':'#79563b';
  Object.assign(g.userData,{buildingType:type,extractionSite:true,underground,age});
+ {const m=new T.Mesh(miningSiteGeometry(type,kind,age),SETTLEMENT_MATERIAL);m.castShadow=true;m.receiveShadow=true;g.add(m);return g;}
  if(underground){
   disk(g,1.65,.12,'#151a1c');ring(g,1.65,2.15,.22,modern?'#939c98':'#8d8270');
   for(const x of [-1.9,1.9])beam(g,[x,.1,-1.2],[x,5.5,-1.2],.19,metal);

@@ -2,8 +2,12 @@
 // Built once in code as small vertex-coloured meshes and shared by all instances,
 // so they cost no downloads and few triangles. Presentation only: no gameplay data changes.
 import * as T from './vendor/three.module.js';
+import {addWind} from './atmosphere-v158.js?v=158a';
 
 export const WORLD_MODEL_MATERIAL=new T.MeshStandardMaterial({vertexColors:true,roughness:.9,metalness:0,side:T.DoubleSide});
+// V158: settlements keep a still copy; trees, shrubs and rocks sway in the wind
+export const SETTLEMENT_MATERIAL=WORLD_MODEL_MATERIAL.clone();
+addWind(WORLD_MODEL_MATERIAL,{strength:.03,from:.35,key:'wind-world'});
 const CACHE=new Map();
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const sst=t=>{t=clamp(t);return t*t*(3-2*t)};
@@ -238,3 +242,53 @@ export function settlementGeometry(team,era,size=1){
   b.part(cyl(.12,.16,1,5),{at:[x,.5,z],color:()=>C('#5b4430')});}
  const g=b.build('settlement_v152_'+key);SETTLEMENT_CACHE.set(key,g);return g;
 }
+
+// ---------------------------------------------------------------- V158 resource sites (detail map)
+// Raw deposits and extraction sites drawn in the same soft, vertex-coloured style as the rest.
+const DEPOSIT={stone:['#8f8d84','#b5b2a6',null],ore:['#5a4034','#8a5a44','#a4472f'],copper:['#6f6252','#8f7a62','#3f8f6e'],tin:['#8d9493','#b8c0bf','#3b3f44'],
+ clay:['#8a5a3c','#b37b55',null],gems:['#7a7884','#a19fab','#9a63d6'],oil:['#1d1c1a','#2c2a27',null]};
+const SITE_CACHE=new Map();
+function stoneColor(k){const [dark,light,vein]=DEPOSIT[k]||DEPOSIT.stone;return (u,w)=>{const n=noise(w.x*3.1,w.y*3.1,w.z*3.1),top=sst(u.y*1.4);
+ let c=mix(C(dark),C(light),n*.6+top*.4);if(vein&&noise(w.x*5.3+9,w.y*5.3,w.z*5.3)>.66)c=mix(c,C(vein),.75);if(top>.6&&k!=='oil'&&k!=='clay')c.lerp(C('#6f7d4f'),sst(noise(w.x*4,1,w.z*4)*1.8-.9)*.5);return c.multiplyScalar(.8+.2*sst(u.y+.6));};}
+function boulders(b,k,n,R,size,seed=0){for(let i=0;i<n;i++){const a=i*2.399+seed,r=i===0?0:R*(.45+hash(i,seed,3)*.55),s=(i===0?size:size*(.4+hash(i,seed,5)*.45));
+ b.part(ico(1,1),{at:[Math.cos(a)*r,s*.38,Math.sin(a)*r],rot:[0,a,0],scale:[s,s*(.55+hash(i,seed,7)*.3),s*(.75+hash(i,seed,9)*.3)],displace:.3,freq:1.5,seed:i+seed*7,weld:false,color:stoneColor(k)});}}
+function siteBox(b,x,y,z,w,h,d,c,ry=0){boxPart(b,x,y,z,w,h,d,c,ry);}
+function siteCyl(b,x,y,z,r,h,c,rx=0,rz=0,seg=8){b.part(cyl(r,r,h,seg),{at:[x,y,z],rot:[rx,0,rz],color:()=>C(c)});}
+function cart(b,x,z,ry,load){b.part(new T.BoxGeometry(1.3,.55,.9),{at:[x,.75,z],rot:[0,ry,0],color:()=>C('#7a5a3a')});
+ b.part(ico(.5,0),{at:[x,1.1,z],rot:[0,ry,0],scale:[1.1,.55,.75],color:stoneColor(load)});
+ for(const s of [-1,1])for(const t of [-1,1])siteCyl(b,x+Math.cos(ry)*s*.45-Math.sin(ry)*t*.5,.3,z-Math.sin(ry)*s*.45-Math.cos(ry)*t*.5,.26,.08,'#3c3a36',0,Math.PI/2);}
+function rails(b,z0,z1,x=0){for(const s of [-.45,.45])siteBox(b,x+s,.02,(z0+z1)/2,.08,.08,Math.abs(z1-z0),'#5d5f60');for(let z=Math.min(z0,z1);z<Math.max(z0,z1);z+=.7)siteBox(b,x,0,z,1.25,.06,.22,'#6b4e33');}
+export function depositGeometry(kind){const key='dep:'+kind;if(SITE_CACHE.has(key))return SITE_CACHE.get(key);const b=new Builder();
+ if(kind==='clay'){b.part(new T.SphereGeometry(2.6,16,6,0,Math.PI*2,0,Math.PI/2),{at:[0,-.05,0],scale:[1,.32,.85],displace:.08,freq:1.2,color:(u,w)=>mix(C('#8a5a3c'),C('#b8805a'),noise(w.x*2,0,w.z*2)).multiplyScalar(.85+.15*sst(u.y))});
+  b.part(new T.CircleGeometry(.9,14),{at:[1.2,.25,.6],rot:[-Math.PI/2,0,0],color:()=>C('#5e4a3a')});}
+ else if(kind==='oil'){b.part(new T.CircleGeometry(2.2,20),{at:[0,.05,0],rot:[-Math.PI/2,0,0],displace:.12,freq:1.5,color:(u,w)=>mix(C('#121110'),C('#2d2a26'),noise(w.x*3,0,w.z*3))});boulders(b,'stone',4,2.4,.6,3);}
+ else{boulders(b,kind,kind==='stone'?9:8,2.0,1.45,kind.length);
+  if(kind==='gems')for(let i=0;i<7;i++){const a=i*.9,r=.6+hash(i,4,4)*.8;b.part(cone(.16,.7+hash(i,2,2)*.5,5),{at:[Math.cos(a)*r,.9+hash(i,3,3)*.4,Math.sin(a)*r],rot:[(hash(i,5,5)-.5)*.8,0,(hash(i,6,6)-.5)*.8],color:()=>C(i%2?'#b07ae6':'#8a5bd0')});}
+  if(kind==='stone')for(let i=0;i<3;i++)siteBox(b,1.8+i*.15,i*.45,1.6,.9,.45,.6,'#b7b3a6',.3*i);}
+ const g=b.build(key);SITE_CACHE.set(key,g);return g;}
+export function miningSiteGeometry(type,kind,age){const key='site:'+type+':'+kind+':'+Math.min(6,age);if(SITE_CACHE.has(key))return SITE_CACHE.get(key);
+ const b=new Builder(),modern=age>=5,timber=modern?'#6d7678':'#6b4e33',underground=age>=3&&!['quarry','claypit'].includes(type);
+ if(type==='quarry'){ // rock face with cut benches, blocks and a crane
+  b.part(ico(1,1),{at:[0,.4,-1.6],scale:[3.6,2.3,1.8],displace:.22,freq:1.2,seed:2,weld:false,color:stoneColor('stone')});
+  for(let i=0;i<3;i++)siteBox(b,-1+i*1.1,0,-.2+i*.1,1.0,1.6-i*.45,1.2,'#b9b5a8');
+  for(let i=0;i<5;i++)siteBox(b,-2.4+(i%3)*1.0,Math.floor(i/3)*.55,1.8,.9,.55,.65,'#bdb8aa',(i%2)*.2);
+  siteCyl(b,2.4,1.9,.2,.1,3.8,timber);b.part(cyl(.07,.07,3.2,6),{at:[1.5,3.4,.2],rot:[0,0,1.1],color:()=>C(timber)});siteCyl(b,.65,2.6,.2,.02,1.6,'#c9b58a');siteBox(b,.65,1.6,.2,.6,.4,.5,'#bdb8aa');
+  cart(b,2.6,2.6,.4,'stone');}
+ else if(type==='claypit'){ // wet pit, clay heaps, bricks drying on pallets
+  b.part(new T.RingGeometry(1.4,3.2,20,1),{at:[0,.08,0],rot:[-Math.PI/2,0,0],color:(u,w)=>mix(C('#7a5038'),C('#9c6b4a'),noise(w.x*2,0,w.z*2))});
+  b.part(new T.CircleGeometry(1.4,18),{at:[0,.06,0],rot:[-Math.PI/2,0,0],color:()=>C('#4c6d70')});
+  for(let i=0;i<3;i++)b.part(new T.SphereGeometry(.7,10,5,0,Math.PI*2,0,Math.PI/2),{at:[-2.4+i*.9,.08,-2.4],scale:[1,.6,1],color:()=>C('#a8704a')});
+  for(let r=0;r<2;r++){siteBox(b,2.6,0,-1+r*1.4,1.6,.12,1.0,'#7a5a3a');for(let i=0;i<8;i++)siteBox(b,2.0+(i%4)*.4,.12+Math.floor(i/4)*.2,-1.25+r*1.4+(i%2)*.4,.32,.18,.22,'#b06a45');}}
+ else{ // mines: tunnel mouth in a hillock, or a headframe for deep mines
+  if(!underground){b.part(new T.SphereGeometry(3.2,16,7,0,Math.PI*2,0,Math.PI/2),{at:[0,0,-1.6],scale:[1,.7,.85],displace:.12,freq:1.3,color:(u,w)=>mix(C('#6f7552'),C('#8d8a6a'),noise(w.x*1.5,w.y,w.z*1.5)).multiplyScalar(.85+.15*sst(u.y))});
+   siteBox(b,0,0,.8,2.0,2.1,.2,'#1a1816');for(const s of [-1,1])siteBox(b,s*1.05,0,.95,.22,2.3,.22,timber);siteBox(b,0,2.2,.95,2.5,.25,.3,timber);
+   rails(b,1,4.2);cart(b,0,3.0,0,kind);}
+  else{for(const s of [-1,1]){b.part(cyl(.11,.13,6.2,6),{at:[s*1.3,3.0,-1.4],rot:[0,0,-s*.14],color:()=>C(timber)});b.part(cyl(.09,.09,5.4,6),{at:[s*1.1,2.6,-.2],rot:[.45,0,-s*.1],color:()=>C(timber)});}
+   siteBox(b,0,5.8,-1.4,2.8,.25,.3,timber);b.part(new T.TorusGeometry(.75,.08,6,16),{at:[0,6.3,-1.4],color:()=>C('#454a4c')});
+   siteBox(b,-2.6,0,1.2,2.2,2.6,2.0,modern?'#8a9497':'#9a5a44');b.part(new T.BoxGeometry(1,1,1),{at:[-2.6,3.4,1.2],scale:[2.4,1.6,2.2],color:()=>C('#5b6168')});siteCyl(b,-3.4,3.8,.5,.3,4.6,modern?'#7d8588':'#8a4c3a');
+   rails(b,-.6,4.2);cart(b,0,2.8,0,kind);}
+  // spoil heap of the mined rock
+  b.part(new T.ConeGeometry(1.4,1.1,9),{at:[3.0,.55,-1.0],displace:.15,freq:2,color:stoneColor(kind)});}
+ // tool shed (all sites)
+ siteBox(b,3.1,0,2.9,1.4,1.1,1.1,modern?'#7c898a':'#97754c');b.part(new T.BoxGeometry(1,1,1),{at:[3.1,1.2,2.9],rot:[0,0,0],scale:[1.6,.12,1.3],color:()=>C('#5b4a3a')});
+ const g=b.build(key);SITE_CACHE.set(key,g);return g;}

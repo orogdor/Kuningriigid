@@ -5,8 +5,10 @@
 // one draw call per kind. Presentation only.
 import * as T from './vendor/three.module.js';
 import {DETAIL_TILE_X,DETAIL_TILE_Z} from './detail-scale-v123.js';
+import {addWind} from './atmosphere-v158.js?v=158a';
 
 const MAT=new T.MeshStandardMaterial({vertexColors:true,roughness:.95,metalness:0,side:T.DoubleSide});
+addWind(MAT,{strength:.35,from:.05,key:'wind-ground'});
 const GEO=new Map();
 const hash=(a,b,c)=>{const s=Math.sin(a*127.1+b*311.7+c*74.7)*43758.5453;return s-Math.floor(s);};
 function vnoise(x,z,seed){const ix=Math.floor(x),iz=Math.floor(z),fx=x-ix,fz=z-iz,u=fx*fx*(3-2*fx),v=fz*fz*(3-2*fz),h=(a,b)=>hash(ix+a,iz+b,seed);

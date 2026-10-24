@@ -5,6 +5,7 @@
 // Everything is procedural in the shaders (no texture downloads); geometry counts stay the same.
 import * as T from './vendor/three.module.js';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
+import {CLOUD_TIME} from './atmosphere-v158.js?v=158a';
 
 export const LANDSCAPE_TIME={value:0};
 const tick=()=>{LANDSCAPE_TIME.value=performance.now()/1000;};
@@ -45,10 +46,11 @@ export function terrainMaterial(scope='world',tile=null){
  const map=worldMapping(scope,tile),detail=scope!=='world';
  material.onBeforeCompile=shader=>{
   if(!detail)shader.uniforms.uT157Cult={value:CULTIVATION.texture};
+  shader.uniforms.uT158Cloud=CLOUD_TIME;
   inject(shader,{
    vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':''),
    vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':''),
-   fragHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;':'uniform sampler2D uT157Cult;'),
+   fragHead:'uniform float uT158Cloud;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;':'uniform sampler2D uT157Cult;'),
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);
@@ -122,6 +124,10 @@ export function terrainMaterial(scope='world',tile=null){
  float snowLine=118.0+nBroad*22.0;
  float snow=smoothstep(snowLine,snowLine+12.0,elev)*(1.0-smoothstep(.40,.68,slope+nFine*.1));
  col=mix(col,vec3(.84,.86,.90)*(.95+nFine*.06),snow);
+ // V158 drifting cloud shadows (same world-space clouds in both views)
+ vec2 cw=lp*.0035+vec2(uT158Cloud*.010,uT158Cloud*.004);
+ float cloud=smoothstep(.52,.78,l149n(cw)*.65+l149n(cw*2.3+4.0)*.35);
+ col*=1.0-cloud*.16;
  diffuseColor.rgb=col;`});
   shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n roughnessFactor=1.0;');
   if(detail)shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>

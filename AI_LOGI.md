@@ -402,3 +402,43 @@ Muudetud on ainult välimust. Mänguloogika, teede võrk, navigeerimine ja salve
 - Uus `TEST_V157.mjs`: teede kesktelg on kruntidest väljas (≤ 2% punkte; keskaeg 1/1047, moodne aeg 3/627) ja karavan on detailkaardil nähtav.
 - PASS: `TEST_V67`, `TEST_V156`, `TEST_V154`, `TEST_V149_BROWSER`, `TEST_V143_BROWSER`, `TEST_V88_EXPLORATION_UI`, `TEST_V151_BROWSER`, `TEST_V152`, `TEST_V123_UI`, `TEST_V133_BROWSER`.
 - Debug: `gameDebug.v157()` → `{roads, plots, travellers}`.
+
+## V158 – valgus, atmosfäär, sildid, elu, meri ja vanad mudelid (Claude, 2026-10-24)
+
+Kasutaja palus parandada „mis veel hoiab välimust tagasi“ nimekirja. Muudetud on ainult välimust.
+
+### Valgus ja atmosfäär – `atmosphere-v158.js` (uus)
+- Varasem valgustus (poolkera + 2 suunavalgust) on asendatud:
+  - soe päike, mille varjukast järgib kaamera fookust (varem oli detailkaardi varjukast fikseeritud ±85 ühikut keskel, seega mujal varje polnud);
+  - poolkeravalgus ja nõrk täitevalgus;
+  - ACES-toonivastendus (säritus 1,02).
+- Gradientiga taevakuppel mõlemas stseenis. Detailkaardil on kauge maa „seelik“ (RingGeometry 330…5200, y −1,4), mis hajub udusse. Seelik on rannikul merevärvi (`setSkirt`).
+- Maailmakaardil heidavad puud, metsad ja asulad varje, kui zoom < 480 ja kvaliteet ei ole „low“. Varjukaardile renderdatakse ainult lähedased tükid.
+- Pilvede varjud: mõlema vaate maastikuvarjutajas `uT158Cloud` (`CLOUD_TIME`), samad maailmaruumi pilved.
+- `addWind(material)`: puud, põõsad ja rohi õõtsuvad tuules (instantsi asukohast faas). Asulad kasutavad liikumatut `SETTLEMENT_MATERIAL`-i.
+- `createBirds()`: väikesed linnuparved liuglevad fookuse kohal mõlemas vaates.
+
+### Meri – `sea-v158.js` (uus)
+- `seaMaterial`: värv sügavuse järgi (`aDepth` maailmameetrites), virvendus + päikesepeegeldus (normaali kalle), rannalained ja vaht.
+- Maailmakaardi meretasand kasutab seda (`aDepth = .72 − atlasHeight`).
+- **Detailkaardil polnud varem merepinda üldse** (meri oli hallikasroheline maapind). Nüüd tekib rannikuruutudel `createDetailSea` (tasand meretasemel, sügavus kohalikust maapinnast).
+
+### Linnasildid (`atlas-style.js` `cityBanner`)
+- Väike tume ümarate nurkadega silt: meeskonnavärvi kilp, nimi ja „👥 elanikud“. Ekraanil on see püsiva suurusega (`sizeAttenuation:false`), seega ei kata enam lähivaates linna. Eestikeelset „el. / elanikku“ teksti pole.
+
+### Vanad mudelid uueks
+- Maardlad (`createDepositPile`) on `world-models-v152.js` `depositGeometry`: kivi, raud (roostepunased sooned), vask (roheline malahhiit), tina, savi (madal küngas + loik), vääriskivid (lillad kristallid), nafta (tõrvalomp).
+- Kaevanduskohad (`createMiningSite`) on `miningSiteGeometry`:
+  - karjäär: kaljusein astangute, plokkide, kraana ja vankriga;
+  - kaevandus: tunnelisuu künkas, rööpad ja maagivanker; sügav kaevandus (aeg ≥ 3): pukktorn ratta, masinamaja ja korstnaga;
+  - saviauk: märg auk, savihunnikud ja kuivavad tellised;
+  - kõigil on rusukuhi ja tööriistakuur.
+  `userData` lipud (`extractionSite`, `underground`…) jäid samaks.
+- Talu (`createFarmhouseModel`) ja põld (`createFieldModel`) on `town-models-v154.js` `farmhouseGeometry` / `fieldGeometry`: talumaja ajastu stiilis, küün, heinakuhjad, aed, joogiküna, vanker; põld vagude, viljaridade ja aiaga.
+
+### Versioonid
+`civilization.js?v=158b`, `atlas-style` → 158b, `landscape-v149.js?v=158a`, `world-models-v152.js?v=158a`, `ground-detail-v156.js?v=158a`, `site-models-v88.js?v=158a`, `farm-visuals-v127.js?v=158a`, `town-models-v154.js?v=158a` (kõik importijad sama spetsifikaatoriga).
+
+### Testid
+- PASS: `TEST_V48`, `TEST_V152`, `TEST_V154`, `TEST_V156`, `TEST_V67`, `TEST_V149_BROWSER`, `TEST_V143_BROWSER`, `TEST_V88_EXPLORATION_UI`, `TEST_V151_BROWSER`, `TEST_V157`, `TEST_V123_UI`, `TEST_V148_BROWSER`.
+- `TEST_V88_SITES` kukub läbi ka ilma selle muudatuseta, sh V152 kõrgustega (rannakrundi kõrguse kontroll) – see ei ole V158 regressioon.

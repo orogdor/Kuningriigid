@@ -1,11 +1,12 @@
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 import * as T from './vendor/three.module.js';
-import {smoothBiomeColor,farmlandTint,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=157a';
+import {smoothBiomeColor,farmlandTint,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=158a';
 import {createMountainOutcrops} from './landscape-polish-v84.js?v=85a';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
-import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=152a';
-import {settlementGeometry,getWorldModel,WORLD_MODEL_MATERIAL} from './world-models-v152.js?v=152a';
+import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=158a';
+import {settlementGeometry,getWorldModel,WORLD_MODEL_MATERIAL,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=158a';
+import {seaMaterial} from './sea-v158.js?v=158a';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=85a';
 import {surface,riverNear} from './continuous-landscape.js?v=85a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
@@ -62,8 +63,8 @@ export function atlasColor(game,x,z,h){
 }
 export function createAtlasDecor(game,scene,quality='medium'){const group=new T.Group();scene.add(group);const height=(x,z)=>Math.max(.7,surface(game,x,z,'world'));const material=c=>new T.MeshStandardMaterial({color:c,roughness:1});
  // One ocean mesh uses depth-dependent color, showing shelves and deep water.
- const geo=new T.PlaneGeometry(WORLD_WIDTH+200,WORLD_DEPTH+200,COLS*2,ROWS*2);geo.rotateX(-Math.PI/2);geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=game.atlasHeight(x,z),t=Math.max(0,Math.min(1,(-h+.8)/26)),shore=Math.pow(1-t,3),c=new T.Color('#5fa8aa').lerp(new T.Color('#102d4e'),Math.pow(t,.7));c.lerp(new T.Color('#9ac6b5'),shore*.33);c.multiplyScalar(.94+game.smooth(x/130+80,z/130+56)*.10);colors.push(c.r,c.g,c.b)}geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));const water=new T.Mesh(geo,new T.MeshStandardMaterial({vertexColors:true,roughness:.42,metalness:.18,transparent:true,opacity:.84,depthWrite:false}));water.position.y=.72;water.userData.water=true;group.add(water);group.userData.water=water;
- const shore=[];for(let z=ORIGIN_Z;z<ORIGIN_Z+WORLD_DEPTH;z+=10)for(let x=ORIGIN_X;x<ORIGIN_X+WORLD_WIDTH;x+=10){const points=[[x,z],[x+10,z],[x+10,z+10],[x,z+10]],hits=[];for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],ha=game.atlasHeight(...a)-.8,hb=game.atlasHeight(...b)-.8;if((ha>0)!==(hb>0)){const t=ha/(ha-hb);hits.push([a[0]+(b[0]-a[0])*t,1.04,a[1]+(b[1]-a[1])*t])}}if(hits.length===2)shore.push(...hits[0],...hits[1])}group.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(shore,3)),new T.LineBasicMaterial({color:'#dbeddf',transparent:true,opacity:.35})));
+ const geo=new T.PlaneGeometry(WORLD_WIDTH+200,WORLD_DEPTH+200,COLS*2,ROWS*2);geo.rotateX(-Math.PI/2);geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=game.atlasHeight(x,z),t=Math.max(0,Math.min(1,(-h+.8)/26)),shore=Math.pow(1-t,3),c=new T.Color('#5fa8aa').lerp(new T.Color('#102d4e'),Math.pow(t,.7));c.lerp(new T.Color('#9ac6b5'),shore*.33);c.multiplyScalar(.94+game.smooth(x/130+80,z/130+56)*.10);colors.push(c.r,c.g,c.b)}geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));{const d=new Float32Array(p.count);for(let i=0;i<p.count;i++)d[i]=.72-game.atlasHeight(p.getX(i),p.getZ(i));geo.setAttribute('aDepth',new T.BufferAttribute(d,1));}const water=new T.Mesh(geo,seaMaterial({scale:1}));water.position.y=.72;water.userData.water=true;group.add(water);group.userData.water=water;
+ const shore=[];for(let z=ORIGIN_Z;z<ORIGIN_Z+WORLD_DEPTH;z+=10)for(let x=ORIGIN_X;x<ORIGIN_X+WORLD_WIDTH;x+=10){const points=[[x,z],[x+10,z],[x+10,z+10],[x,z+10]],hits=[];for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],ha=game.atlasHeight(...a)-.8,hb=game.atlasHeight(...b)-.8;if((ha>0)!==(hb>0)){const t=ha/(ha-hb);hits.push([a[0]+(b[0]-a[0])*t,1.04,a[1]+(b[1]-a[1])*t])}}if(hits.length===2)shore.push(...hits[0],...hits[1])}group.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(shore,3)),new T.LineBasicMaterial({color:'#dbeddf',transparent:true,opacity:.12})));
  // Sparse ocean strokes give water scale without animated shader cost.
  const waves=[];for(const cell of game.cells)if(!cell.land&&!cell.coast&&game.noise(cell.c,cell.r+77)>.88){const x=cell.x,z=cell.z;for(let i=0;i<5;i++){const a=x-14+i*6,b=a+6;waves.push(a,.84,z+Math.sin(i*.9)*2,b,.84,z+Math.sin((i+1)*.9)*2)}}const waveLines=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(waves,3)),new T.LineBasicMaterial({color:'#91c1bd',transparent:true,opacity:.11}));group.add(waveLines);group.userData.waveLines=waveLines;
  // Continuous terrain relief replaces separate rock instances.
@@ -176,8 +177,23 @@ function cityMat(c,metal=false){const k=c+metal;if(!cityMaterials.has(k))cityMat
 function cityGeom(key,fn){if(!cityGeometries.has(key)){const g=fn();g.userData.shared=true;cityGeometries.set(key,g)}return cityGeometries.get(key)}
 export function createCityMiniature(team,age){
  // V152: one merged, era-specific settlement model (pitched-roof houses, landmark, lanes, walls).
- const g=new T.Group(),mesh=new T.Mesh(settlementGeometry(team,Math.max(0,Math.min(6,age|0))),WORLD_MODEL_MATERIAL);
- mesh.castShadow=false;mesh.receiveShadow=false;mesh.userData.modelName='settlement_v152';g.add(mesh);
+ const g=new T.Group(),mesh=new T.Mesh(settlementGeometry(team,Math.max(0,Math.min(6,age|0))),SETTLEMENT_MATERIAL);
+ mesh.castShadow=true;mesh.receiveShadow=true;mesh.userData.modelName='settlement_v152';g.add(mesh);
  g.userData.age=age;return g;
 }
-export function cityBanner(name,team){const canvas=document.createElement('canvas');canvas.width=384;canvas.height=80;const ctx=canvas.getContext('2d');ctx.fillStyle=['#183f40ee','#623e32ee','#443954ee','#5b5030ee'][team];ctx.fillRect?.(0,5,384,66);ctx.strokeStyle=['#a8cab4','#d49a7e','#b7a1d4','#dec783'][team];ctx.lineWidth=3;ctx.strokeRect?.(2,7,380,62);ctx.fillStyle='#f3ead1';ctx.font='600 38px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(name,192,40);const texture=new T.CanvasTexture(canvas),sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:false,transparent:true}));sprite.scale.set(96,20,1);return sprite}
+// V158: compact city label – dark rounded plate, team-coloured shield, name and population,
+// constant size on screen (sizeAttenuation off) so it never covers the town when zoomed in.
+export function cityBanner(name,team){
+ const m=/^(.*?)\s*·\s*(\d+)\s*(?:el\.|elanikku|residents)?\s*$/.exec(name),title=m?m[1]:name,pop=m?m[2]:'';
+ const canvas=document.createElement('canvas');canvas.width=520;canvas.height=104;const ctx=canvas.getContext('2d');
+ const team_=['#4f9a92','#c0634a','#8a6cc0','#c9a43a'][team]||'#4f9a92';
+ if(ctx.roundRect){ctx.fillStyle='rgba(12,26,28,.86)';ctx.beginPath();ctx.roundRect(4,12,512,80,40);ctx.fill();ctx.strokeStyle='rgba(230,199,126,.75)';ctx.lineWidth=3;ctx.stroke();}
+ else if(ctx.fillRect){ctx.fillStyle='rgba(12,26,28,.86)';ctx.fillRect(4,12,512,80);}
+ // team shield
+ if(ctx.beginPath){ctx.fillStyle=team_;ctx.beginPath();ctx.moveTo(30,30);ctx.lineTo(70,30);ctx.lineTo(70,58);ctx.quadraticCurveTo?.(70,76,50,84);ctx.quadraticCurveTo?.(30,76,30,58);ctx.closePath?.();ctx.fill();ctx.strokeStyle='rgba(255,240,200,.8)';ctx.lineWidth=2.5;ctx.stroke();}
+ if(ctx.fillText){let size=38;ctx.font='600 '+size+'px Georgia,serif';const maxW=pop?330:410;while(ctx.measureText&&ctx.measureText(title).width>maxW&&size>22){size-=2;ctx.font='600 '+size+'px Georgia,serif';}
+  ctx.fillStyle='#f4ead2';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(title,88,53);
+  if(pop){ctx.font='600 30px Inter,Arial,sans-serif';ctx.textAlign='right';ctx.fillStyle='#e6c77e';ctx.fillText('👥 '+pop,496,54);}}
+ const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=4;
+ const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:false,transparent:true,sizeAttenuation:false}));
+ sprite.scale.set(.21,.042,1);sprite.center.set(.5,0);sprite.renderOrder=40;sprite.userData.v158Label=true;return sprite}

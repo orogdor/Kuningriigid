@@ -1,17 +1,19 @@
 import * as T from './vendor/three.module.js';
+import {farmhouseGeometry,fieldGeometry,meshV158} from './town-models-v154.js?v=158a';
 const mats=new Map();
 const mat=color=>{if(!mats.has(color))mats.set(color,new T.MeshStandardMaterial({color,roughness:.92}));return mats.get(color)};
 function box(g,x,y,z,w,h,d,color){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat(color));m.position.set(x,y,z);m.castShadow=h>.4;m.receiveShadow=true;g.add(m);return m;}
 function roof(g,y,color){const m=new T.Mesh(new T.ConeGeometry(4.6,2,4),mat(color));m.rotation.y=Math.PI/4;m.position.set(0,y,0);m.scale.z=.8;g.add(m);}
 export function createFieldModel(){
  const g=new T.Group();g.userData.buildingType='field';
+ g.add(meshV158(fieldGeometry()));return g;
  box(g,0,.06,0,16,.12,16,'#6b4e30');
  for(let z=-7;z<=7;z+=2){box(g,0,.16,z,15,.13,.7,'#927341');for(let x=-7;x<=7;x+=2)box(g,x,.5,z,.22,.65,.18,'#bba957');}
  for(const x of [-8,8])for(const z of [-8,8])box(g,x,.5,z,.12,1,.12,'#8e7955');
  return g;
 }
 export function createFarmhouseModel(age=0){
- const g=new T.Group();box(g,0,1.6,0,5,3.2,4,age>=2?'#c4b48d':'#9c8055');roof(g,4,age>=3?'#7c6552':'#a28b55');
+ const g=new T.Group();g.add(meshV158(farmhouseGeometry(age)));return g;box(g,0,1.6,0,5,3.2,4,age>=2?'#c4b48d':'#9c8055');roof(g,4,age>=3?'#7c6552':'#a28b55');
  box(g,0,.9,2.03,1.1,1.8,.12,'#4f4030');box(g,1.5,1.9,2.07,.8,.8,.08,'#749195');
  for(let i=0;i<3;i++)box(g,-3,.4+i*.18,1+i*.35,1,.7,.6,'#b39a67');
  return g;

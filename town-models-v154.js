@@ -491,3 +491,34 @@ export function createTownModelV154(type,team=0,age=0,seed=0){
 // stable per-building seed from its position
 export function buildingSeed(b){const x=Math.round((b?.x||0)*10),z=Math.round((b?.z||0)*10);let h=(x*73856093)^(z*19349663)^((b?.id||0)*83492791);h=Math.imul(h^(h>>>13),0x5bd1e995);return (h^(h>>>15))>>>0;}
 export const TOWN_TYPES_V154=()=>['house',...Object.keys(SIG).filter(k=>SIG[k])];
+
+// ---------------------------------------------------------------- V158 farm and field
+const FARM_CACHE=new Map();
+const hash=(a,b,c)=>{const v=Math.sin(a*127.1+b*311.7+c*74.7)*43758.5453;return v-Math.floor(v);};
+export function farmhouseGeometry(age=0){
+ const key='farm|'+Math.max(0,Math.min(6,age|0));if(FARM_CACHE.has(key))return FARM_CACHE.get(key);
+ const b=new B(),era=ERA(age),r=rng(9001+era);
+ // farmhouse
+ if(era===0){cyl(b,-1.2,0,-.6,1.7,1.8,1.3,'#8d7352',M.plaster,12);cone(b,-1.2,1.3,-.6,2.2,2.4,'#a58a52',M.thatch,12);}
+ else body(b,era,r,{w:4.6,d:3.6,x:-1.2,z:-.9,roof:'gable',axis:'x',style:era===1?0:1});
+ // barn
+ const barnC=era>=5?'#8e3f32':era>=3?'#7a5a3a':'#8a6c48';
+ box(b,2.4,0,-1.6,2.6,2.2,3.0,barnC,M.boards);gable(b,2.4,2.2,-1.6,2.6,3.0,1.6,era>=3?'#5b4a3a':'#a08452',era>=3?M.boards:M.thatch,{axis:'z',over:.3,gableC:barnC,gableM:M.boards});
+ box(b,2.4,0,-.08,1.3,1.6,.08,'#4e3a28',M.boards);
+ // yard: hay, fence, cart, water trough
+ hay(b,3.2,1.6,.7);hay(b,2.2,2.3,.55);
+ fenceLine(b,-3.6,3.3,3.6,3.3,'#8a6c48',.8);fenceLine(b,-3.6,1.4,-3.6,3.3,'#8a6c48',.8);
+ box(b,-1.6,0,2.4,1.4,.4,.5,'#7a5a3a',M.boards);box(b,-1.6,.32,2.4,1.2,.06,.35,'#4c6d70',M.glass);
+ if(era>=2)cart(b,.6,2.2,.3);
+ const g=b.geometry();FARM_CACHE.set(key,g);return g;
+}
+export function fieldGeometry(){
+ if(FARM_CACHE.has('field'))return FARM_CACHE.get('field');
+ const b=new B();
+ box(b,0,0,0,16,.12,16,'#6b4e30',M.dirt);
+ for(let i=0;i<14;i++){const z=-6.9+i*1.06;box(b,0,.12,z,15.2,.16,.5,'#7a5a38',M.dirt);
+  for(let k=0;k<6;k++){const x=-6.4+k*2.56,h=.45+hash(i,k,3)*.25;box(b,x,.2,z,2.4,h,.42,hash(i,k,7)>.15?'#b9a24e':'#9aa84e',M.thatch);}}
+ for(const [x0,z0,x1,z1] of [[-8,-8,8,-8],[-8,8,8,8],[-8,-8,-8,8],[8,-8,8,8]])fenceLine(b,x0,z0,x1,z1,'#8a6c48',.6);
+ const g=b.geometry();FARM_CACHE.set('field',g);return g;
+}
+export function meshV158(geo){const m=new T.Mesh(geo,TOWN_MATERIAL);m.castShadow=true;m.receiveShadow=true;return m;}
