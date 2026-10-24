@@ -1,5 +1,19 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V5.1 / Godot Dev 127 – mitme rinde salvestatav lahingujärjekord (2026-10-24)
+
+- Uus `campaign_battle_queue_port.gd`: kogub eri maailmaruutude vastasarmeede kokkupõrked kuni 32 kirjena püsivasse `pending_battles` järjekorda ka ajal, mil üks `individual_battle` juba käib. Järjekord on deterministlik (maailmarea/veeru ning armee ID järgi), väldib ühe armee samaaegset topeltkaasamist ja peatab ootel armeede maailmakaardi marsi just nende kokkupõrkekohal.
+- Uue taktikalise lahingu algust kontrollitakse olemasoleva `IndividualBattle.start` kaudu ainult siis, kui eelmine lahing on lõppenud. Enne käivitamist kinnitab süsteem, et mõlemad armeed on endiselt vastasriikidest, samal maailmaruudul, elus ning mitte taganemisel. Vananenud järjekorrakanded jäetakse välja – nende eest ei anta tasuta võite, üksuseid ega vallutusi.
+- `individual_battle_port.gd`: pärast päris lahingu lõppu saab 30-sekundilise lahingusse taassiseneva pausi ainult kaks osalenud armeed; teiste rindelõikude ootel lahingud ei pea ülemaailmse pausi lõppu ootama. Lahingu XP, kahjud, taganemine, müüride kahjustamine ja vallutamine töötavad endiselt olemasoleva simulatsiooniga.
+- `battle_preview_port.gd` ja `preview_sim_port.gd`: kampaania kokkupõrgete tuvastus ja järjekorra teenindamine toimuvad igal simuleeritud aja sammul, sealhulgas käimasoleva lahingu ajal. Vanad sünteetilised benchmark-lahingud jäävad eraldi, muutmata. Varasemad salvestused saavad puuduvate järjekorraväljade korral automaatselt tühja järjekorra.
+- `main.gd`: kampaania ja sõjaväe info näitavad järjekorras ootavate lahingute arvu. Uued automaattestid kontrollivad 3 eri rinde järjekorda, liikuvate armeede paigalhoidmist, mängu salvestamist, kahe tõelise lahingu algust/lõppu, teiste rinnete cooldown'i sõltumatust, hävinud armeede aegunud kohtumise tühistamist ja vanade salvestuste ühilduvust.
+- GitHub Actions edukas, **902/902 regressioonitesti** + Godoti import, Android APK eksport ja PCK bootstrap smoke test: https://github.com/orogdor/Kuningriigid/actions/runs/40121257125
+- Avaldatud: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-127
+- Pordi **hinnanguline valmidus ~73%**, enne ~71%.
+
+**Piirang:** korraga arvutatakse üks päris taktikaline lahing; teised on järjekorras, mitte mitmel protsessoril samaaegselt simuleeritavad. Lahingujärjekord ei lisa veel kasutajale mitme paralleelse lahingukaardi vahel valimise graafilist menüüd; päris Androidi seadmel kontrollimine on jätkuvalt vajalik. Järgmine sobiv etapp: mobiilne lahingujärjekorra vaade, iga lahingu üksikasjalikum strateegiline raport ning mitme armee kaasamine ühte suuremasse kokkupõrkesse.
+
+
 ## V5.0 / Godot Dev 121 – päriselt liikuvad ja haavatavad piiramiskonvoid (2026-10-24)
 
 - `campaign_siege_supply_port.gd`: AI kindlustatud linna taktikalise lahingu alguses valitakse tema enda linnast **läbitav maismaatee** piiramiskohale. Sobiva varu korral saadetakse kuni 93 puitu, säilitades saatval linnal vähemalt 25. Lähtekoha varu väheneb väljasaatmisel ning lahinguplatsile saab materjal alles päris liikumise järel (2 mängusekundit/maailmaruut). Kui sobivat teed või varu pole, tasuta materjali ei teki.
