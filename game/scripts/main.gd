@@ -188,7 +188,7 @@ const MOBILE_MENU_ACTIONS = [
     ["Testid", "Turu demo", "market"],
     ["Testid", "Kaubanduse demo", "trade"],
     ["Testid", "Armee demo", "army_demo"],
-    ["Testid", "Piiride demo: 32 elanikku", "territory_demo"],
+    ["Testid", "Piiride demo: 36 elanikku (12×12)", "territory_demo"],
     ["Testid", "Taasta piiride demo", "territory_reset"],
     ["Testid", "Maakonna veod: demo", "county_demo"],
     ["Testid", "Maakonna sisendveod: demo", "county_inputs"],
@@ -2371,7 +2371,7 @@ func _show_territory_info() -> void:
         return
     Territory.rebuild(preview_state,land)
     var city: Dictionary = preview_state["cities"][city_index]
-    status_label.text = "%s: %d elanikku, linn %dx%d (%d ruutu), maakond %d ruutu, tootmiskohad %d" % [String(city["name"]),int(city["pop"]),2*int(city.get("territory_radius",1))+1,2*int(city.get("territory_radius",1))+1,city.get("territory_urban",[]).size(),city.get("territory_county",[]).size(),city.get("county_worksites",[]).size()]
+    status_label.text = "%s: %d elanikku, linn %dx%d (%d ruutu), maakond %d ruutu, tootmiskohad %d" % [String(city["name"]),int(city["pop"]),int(city.get("territory_side",Territory.urban_side(int(city.get("pop",3))))),int(city.get("territory_side",Territory.urban_side(int(city.get("pop",3))))),city.get("territory_urban",[]).size(),city.get("territory_county",[]).size(),city.get("county_worksites",[]).size()]
     _update_labels()
 
 func _start_territory_demo() -> void:
@@ -2387,11 +2387,11 @@ func _start_territory_demo() -> void:
     territory_demo_pop = int(preview_state["cities"][city_index].get("pop",3))
     territory_demo_was_paused = paused
     paused = true
-    preview_state["cities"][city_index]["pop"] = 32
+    preview_state["cities"][city_index]["pop"] = 36
     Territory.rebuild(preview_state,land,true)
     Territory.reconcile_worksites(preview_state,land,heights)
     _build_counties()
-    status_label.text = "PIIRIDE DEMO: 32 elanikku, 9×9 linnapiirkond. Majandus peatatud. Taasta piirid!"
+    status_label.text = "PIIRIDE DEMO: 36 elanikku, kuni 12×12 linnapiirkond. Majandus peatatud. Taasta piirid!"
     _update_labels()
 
 func _stop_territory_demo() -> void:
