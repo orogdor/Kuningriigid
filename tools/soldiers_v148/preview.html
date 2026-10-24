@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V148 sõdurid</title>
+<style>
+ html,body{margin:0;height:100%;background:#cfd6d2;font:13px system-ui,sans-serif}
+ #ui{position:fixed;left:8px;top:8px;background:#fffd;padding:6px 8px;border-radius:6px;z-index:2}
+ #ui select,#ui button{font:inherit}
+ canvas{display:block}
+ .label{position:absolute;transform:translate(-50%,0);font:600 11px system-ui;color:#222;background:#fff9;padding:1px 4px;border-radius:3px;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="ui">
+ <label>Allikas <select id="src"><option value="pack">mängu pakk</option><option value="glb">GLB-failid</option></select></label>
+ <label>Animatsioon <select id="anim"><option>idle</option><option>walk</option><option>run</option><option>attack</option><option>hit</option><option>death</option><option>brace</option><option>shield_wall</option></select></label>
+ <label>Vaade <select id="view"><option>front</option><option>side</option><option>back</option><option>three</option></select></label>
+ <button id="pause">Paus</button>
+</div>
+<script type="module">
+// Model viewer for the V148 soldiers. Query: ?src=pack|glb&anim=idle&view=front&t=0.3&kinds=a,b&lod=high|low&cols=7
+import * as T from '../../vendor/three.module.js';
+const q=new URLSearchParams(location.search);
+if(q.get('lod'))try{localStorage.setItem('kingdoms-quality',q.get('lod')==='low'?'low':'high')}catch{}
+const {V148_KINDS,createV148Soldier,animateV148Soldier}=await import('../../soldier-models-v148.js?v='+Date.now());
+const src=q.get('src')||'pack',animName=q.get('anim')||'idle',view=q.get('view')||'front',fixedT=q.has('t')?+q.get('t'):null;
+for(const [id,val] of [['src',src],['anim',animName],['view',view]])document.getElementById(id).value=val;
+for(const id of ['src','anim','view'])document.getElementById(id).onchange=()=>{q.set(id,document.getElementById(id).value);location.search=q};
+const kinds=(q.get('kinds')||V148_KINDS.join(',')).split(',').filter(Boolean);
+const renderer=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.setPixelRatio(Math.min(2,devicePixelRatio));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;document.body.append(renderer.domElement);
+const scene=new T.Scene();scene.background=new T.Color('#cfd6d2');
+// same lights as the game (civilization.js)
+scene.add(new T.HemisphereLight(0xf0f1e0,0x45574a,1.55));const fill=new T.DirectionalLight(0xb4d3df,.52);fill.position.set(-6,4,-5);scene.add(fill);const sun=new T.DirectionalLight(0xffe4be,2.15);sun.position.set(4,9,7);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-30,right:30,top:30,bottom:-30});scene.add(sun);
+const floor=new T.Mesh(new T.PlaneGeometry(200,200),new T.MeshStandardMaterial({color:'#b9bfae',roughness:1}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+const cols=+(q.get('cols')||Math.min(7,kinds.length)),gap=+(q.get('gap')||2.4),rowGap=+(q.get('rowgap')||4.2);
+const figures=[];
+const colors=['#276bd1','#c43d43','#9271ce','#d2a12e'];
+// ---- minimal GLB loader (skinned) so the exported files can be inspected with the same lights
+async function loadGLB(url){
+ const buf=await (await fetch(url)).arrayBuffer(),dv=new DataView(buf),jl=dv.getUint32(12,true);
+ const g=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,20,jl))),bin=buf.slice(20+jl+8);
+ const C={5121:Uint8Array,5123:Uint16Array,5125:Uint32Array,5126:Float32Array},N={SCALAR:1,VEC2:2,VEC3:3,VEC4:4,MAT4:16};
+ const acc=i=>{const a=g.accessors[i],v=g.bufferViews[a.bufferView];return new C[a.componentType](bin,v.byteOffset+(a.byteOffset||0),a.count*N[a.type]);};
+ const nodes=g.nodes.map(n=>{const o=n.mesh!=null?null:new T.Bone();if(o){o.name=n.name;if(n.translation)o.position.fromArray(n.translation);if(n.rotation)o.quaternion.fromArray(n.rotation);}return o;});
+ g.nodes.forEach((n,i)=>(n.children||[]).forEach(c=>nodes[i].add(nodes[c])));
+ const root=new T.Group();root.add(nodes[0]);
+ const skin=g.skins[0],bones=skin.joints.map(j=>nodes[j]),ibm=acc(skin.inverseBindMatrices),inv=bones.map((b,i)=>new T.Matrix4().fromArray(ibm,i*16));
+ const skeleton=new T.Skeleton(bones,inv);
+ const mats=g.materials.map(m=>new T.MeshStandardMaterial({vertexColors:true,color:new T.Color().fromArray(m.pbrMetallicRoughness.baseColorFactor),metalness:m.pbrMetallicRoughness.metallicFactor,roughness:m.pbrMetallicRoughness.roughnessFactor}));
+ g.nodes.forEach(n=>{if(n.mesh==null)return;for(const p of g.meshes[n.mesh].primitives){const geo=new T.BufferGeometry(),a=p.attributes;geo.setAttribute('position',new T.BufferAttribute(acc(a.POSITION),3));geo.setAttribute('normal',new T.BufferAttribute(acc(a.NORMAL),3));geo.setAttribute('color',new T.BufferAttribute(acc(a.COLOR_0),3));geo.setAttribute('skinIndex',new T.BufferAttribute(acc(a.JOINTS_0),4));geo.setAttribute('skinWeight',new T.BufferAttribute(acc(a.WEIGHTS_0),4));geo.setIndex(new T.BufferAttribute(acc(p.indices),1));const sm=new T.SkinnedMesh(geo,mats[p.material]);sm.name=n.name;sm.castShadow=true;sm.bind(skeleton,new T.Matrix4());sm.frustumCulled=false;root.add(sm);if(['swordWeapon','mountedGun'].includes(n.name))sm.visible=false;}});
+ const clips=g.animations.map(an=>new T.AnimationClip(an.name,-1,an.channels.map(c=>{const s=an.samplers[c.sampler],name=g.nodes[c.target.node].name;const times=acc(s.input),vals=acc(s.output);return c.target.path==='rotation'?new T.QuaternionKeyframeTrack(name+'.quaternion',times,vals):new T.VectorKeyframeTrack(name+'.position',times,vals);})));
+ return {root,clips,json:g};
+}
+for(let i=0;i<kinds.length;i++){
+ const kind=kinds[i],x=(i%cols-(cols-1)/2)*gap,z=-Math.floor(i/cols)*rowGap,color=colors[(q.get('color')|0)%4];
+ let fig;
+ if(src==='glb'){const {root,clips}=await loadGLB('../../models-v148/glb/'+kind+'.glb?'+Date.now());root.position.set(x,0,z);scene.add(root);const mixer=new T.AnimationMixer(root);const clip=clips.find(c=>c.name===animName)||clips.find(c=>c.name==='idle');const action=mixer.clipAction(clip);action.play();fig={kind,root,mixer,clip};}
+ else{const holder=new T.Group();scene.add(holder);const root=createV148Soldier(holder,x,z,color,kind,q.get('grade')||'standard');fig={kind,root};}
+ figures.push(fig);
+}
+const camera=new T.PerspectiveCamera(+(q.get('fov')||28),innerWidth/innerHeight,.1,400);
+const rows=Math.ceil(kinds.length/cols),w=cols*gap,h=rows*rowGap;
+const dist=+(q.get('dist')||Math.max(w*1.15,h*1.4,4.5)/(2*Math.tan(camera.fov*Math.PI/360))*1.05);
+const cy=+(q.get('cy')||1.0),cz=-(rows-1)*rowGap/2;
+const dir={front:[0,.18,1],side:[1,.18,0],back:[0,.18,-1],three:[.7,.35,.75]}[view];
+camera.position.set(dir[0]*dist,cy+dir[1]*dist,cz+dir[2]*dist);camera.lookAt(0,cy,cz);
+if(view==='side'){camera.position.set(dist,cy+.18*dist,cz);camera.lookAt(0,cy,cz);}
+let paused=false;document.getElementById('pause').onclick=()=>paused=!paused;
+const clock=new T.Clock();let time=0;
+function frame(){
+ const dt=clock.getDelta();if(!paused)time+=dt;
+ for(const f of figures){
+  if(f.mixer){f.mixer.setTime(fixedT!=null?fixedT*f.clip.duration:time);continue;}
+  const clip=f.root.userData.rig.def.clips[animName];
+  if(['idle','walk','run'].includes(animName)){const tt=fixedT!=null?fixedT*(clip?.d||1):time;animateV148Soldier(f.root,tt,animName!=='idle',false);}
+  else if(animName==='attack'){animateV148Soldier(f.root,0,false,{phase:fixedT!=null?fixedT:(time%1.2)/0.7,weapon:null});}
+  else if(['brace','shield_wall'].includes(animName)){animateV148Soldier(f.root,0,false,{phase:-1,formation:animName==='brace'?'spear_wall':'shield_wall',formed:1});}
+  else if(clip){const rig=f.root.userData.rig,fr=clip.f[Math.min(clip.f.length-1,Math.floor((fixedT??((time%clip.d)/clip.d))*clip.f.length))];for(const b in fr.r){const g=rig.bones[b];if(g)g.rotation.set(...fr.r[b]);}for(const b in fr.t){const g=rig.bones[b];if(g){const p=g.userData.restPosition;g.position.set(p.x+fr.t[b][0],p.y+fr.t[b][1],p.z+fr.t[b][2]);}}}
+ }
+ renderer.render(scene,camera);requestAnimationFrame(frame);
+}
+frame();
+window.__ready=true;
+</script>
+</body>
+</html>

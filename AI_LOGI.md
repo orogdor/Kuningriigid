@@ -1,0 +1,123 @@
+# AI tööloki – Kuningriigid
+
+See fail on mõeldud teistele tehisintellektidele (nt ChatGPT) ja inimestele, kes jätkavad sama projektiga.
+Iga AI lisab oma töö kohta uue kirje faili lõppu. Uusim kirje on alati viimane.
+Kirjuta lühidalt: mis muutus, millised failid, kuidas testida, mis jäi pooleli.
+
+---
+
+## 2026-10-24 · Claude (Anthropic) · V148 – uued sõdurite 3D-mudelid ja animatsioonid
+
+### Ülesanne (kasutaja sõnadega kokku võetud)
+- Teha sõduritele uued, ilusamad ja realistlikumad 3D-mudelid quad-töövoos (nagu V48–V50 "mudeliruudud").
+- Teha sõduritele uued animatsioonid.
+- Mudelid teha **ühikute kirjelduste järgi** (nimi, ajastu, relv, roll), mitte vanade mudelite kuju järgi.
+- Kontrollida, et mudelid oleksid anatoomiliselt korrektsed ja korralikud GLB-failid.
+- **Muud mängus mitte muuta.**
+
+### Mis tehti
+- 28 sõdurit said uue mudeli: scout, militia, slinger, spearman, axeman, archer, bronze_spearman, bronze_axeman,
+  bronze_archer, bronze_cavalry, infantry, cavalry, iron_archer, javelinman, man_at_arms, halberdier, crossbowman,
+  knight, heavy_cavalry, pikeman, arquebusier, musketeer, cuirassier, rifleman, line_infantry, dragoon,
+  modern_infantry, rocket_team. Ratsaväel on uus anatoomiline hobune koos sadula, valjaste ja jalustega
+  (rüütlil vapikattega sõjaratsu).
+- Iga ühiku kirjeldus, millest mudel tehti, on failis `tools/soldiers_v148/roster.py` (`DESCRIPTIONS`)
+  ja `models-v148/manifest.json`.
+- Animatsioonid: `idle`, `walk`, `run`, `attack`, `hit`, `death`; vajadusel `attack_sword` (vibu-/ristvibumehe
+  mõõgaga), `attack_gun` (ratsanik tulirelvaga), `brace` (odasein), `shield_wall` (kilbisein),
+  `dismounted` ja `dismounted_attack` (ratsalaskur jala).
+- **Muutmata jäid:** masinad ja meeskonnaga relvad (sõjavanker, katapuldid, müürilõhkuja, piiramistorn,
+  välisuurtükk, vintraudne suurtükk, kuulipilduja meeskond, tank, motoriseeritud jalavägi), tsiviilisikud ja
+  töölised, mängureeglid, lahinguloogika ja salvestused. Need kasutavad endiselt vanu mudeleid ja koodi.
+
+### Muudetud olemasolevad failid (ainult need kolm)
+1. `visuals.js` – `createSoldier()` suunab V148-ga sõdurid uude moodulisse,
+   `animateSoldier()` kutsub `animateV148Soldier()`, kui `rig.v148` on tõene. Vana kood jäi alles varuvariandiks.
+2. `index.html` – import-map: `./visuals.js` ja `./visuals.js?v=117a` → `./visuals.js?v=148a` (puhvri värskendus).
+3. `AI_LOGI.md` – see fail (uus).
+
+### Uued failid
+| Fail | Sisu |
+|---|---|
+| `soldier-models-v148.js` | Mängu runtime: laeb mudelipaki, ehitab luustiku ja geomeetria, mängib klippe. |
+| `models-v148/soldiers-v148-high.bin` | Detailne pakk (graafika "high", arvuti vaikimisi). |
+| `models-v148/soldiers-v148-low.bin` | Kerge pakk (graafika "medium" ja "low", telefoni vaikimisi). |
+| `models-v148/glb/<kind>.glb` | 28 GLB-faili (glTF 2.0, skelett + skin + kõik animatsioonid). Blender/Godot/three.js. |
+| `models-v148/manifest.json` | Kirjeldused, quad-arvud, klippide nimekiri, kontrollide tulemused. |
+| `tools/soldiers_v148/*.py` | Generaator (Python 3 + numpy + scipy). Vt allpool. |
+| `tools/soldiers_v148/preview.html` | Mudelivaataja: mängu pakk või GLB-failid, iga animatsioon, eri vaated. |
+| `TEST_V148.mjs` | Node-test: pakid, luud, liigeste piirid, GLB päised, kontrollid. |
+| `TEST_V148_BROWSER.mjs` | Brauseritest: kümme V124 lahingut (kiviaeg … moodne aeg), vead, animatsioon. |
+| `MUUDATUSED_V148.md` | Lühike muudatuste kokkuvõte eesti keeles. |
+
+### Kuidas mudelid on tehtud (arhitektuur)
+- Ühikud: meetrid, +Y üles, kuju vaatab +Z suunas, tegelase vasak pool on +X (glTF tava).
+- Mees 1,76 m, 7,5 pea pikkust. Õlaliigesed 0,372 m vahega, puusaliigesed 0,18 m, õlavars 0,30 m, küünarvars 0,265 m.
+  Rusikas ulatub reie keskele.
+- Kõik pinnad on quad-loftid (`geom.py`). Iga osa on kinnine ja ühtlaselt väljapoole suunatud ruumala; see on kontrollitud.
+- Luustik (sama nimi mängus ja GLB-s): `root, body, chest, head, upperArm_L/R, forearm_L/R, hand_L/R,
+  thigh_L/R, shin_L/R`. Hobusel on lisaks `horse, horseNeck, horseHead, horseTail, horseLeg_FL/FR/HL/HR,
+  horseShin_FL/FR/HL/HR`.
+  Iga tipp kuulub täpselt ühele luule (jäik skin, kaal 1). Mängu vana rig-liides `body, head, arms, legs, horseLegs`
+  on säilinud, nii et teised failid (nt `village-life-v76.js`) töötavad edasi.
+- **Relvad määravad poosi:** igas võtmepoosis on kirjas, kus relv on. Käed lahendatakse pöördkinemaatikaga
+  (`ik.py`, scipy least_squares, anatoomilised liigeste piirid). Seetõttu hoiavad kahekäerelvad (hellebard, piik,
+  musket, ristvibu, granaadiheitja) päriselt mõlemas käes.
+- Jalad on maas lahendatud, mitte arvatud: igas kõnni-, jooksu- ja rünnakukaadris arvutatakse jala madalaim
+  punkt ja puusad nihutatakse nii, et toetav jalg on täpselt maapinnal. Hobusel kehtib sama kabjade kohta.
+- Värvid: tipuvärvid ja kaks materjali (`cloth`, `metal`). Värvid `TEAM`, `TEAM_D` ja `TEAM_L` asendatakse mängus
+  armee värviga. GLB-s on eraldi materjal `team_color`; muuda selle `baseColorFactor` väärtust.
+- Klassid (`grade`): `elite` lisab sildiga `elite` osad, `mobilized` eemaldab sildiga `armor` osad.
+  Peade variandid (habe, juuksed) on siltidega `v0/v1/v2` ja valitakse sõduri asukoha järgi.
+- Mängupakk (`KSV1`): 8-baidine päis, JSON ja binaar. Positsioonid on int16 (1/8000 m), normaalid int8 ja
+  indeksid uint16. Iga tükk on kirjeldatud kujul `[bone, group, tags, mat, color, posOffset, nrmOffset, vertCount, idxOffset, idxCount]`.
+  Klipid on JSON-is: `{d: kestus, loop, f: [{r: {luu: [x,y,z] Euler XYZ}, t: {luu: [dx,dy,dz]}}]}`.
+- Runtime (`soldier-models-v148.js`) kasutab top-level awaiti. Kui pakki ei saa laadida (nt Node-testid),
+  kasutatakse automaatselt vanu mudeleid.
+- Lülitatavad relvagrupid: `bowWeapon`, `swordWeapon`, `swordSheath`, `mountedGun`, `sideWeapon`.
+
+### Mudelite uuesti genereerimine
+```
+python3 tools/soldiers_v148/generate.py            # kõik 28 (≈4 min, paralleelselt)
+python3 tools/soldiers_v148/generate.py knight     # ETTEVAATUST: kirjutab pakid üle ainult nende ühikutega
+python3 tools/soldiers_v148/tune.py thrust gun bow # pöördkinemaatika ulatuvuse kiirkontroll stiilide kaupa
+```
+Generaator kontrollib automaatselt:
+- kinnised ja väljapoole suunatud võrgud;
+- pikkus ja pea proportsioon;
+- käte ulatus ja sümmeetria;
+- põlve, küünarnuki, randme, puusa ja õla piirid igas kaadris;
+- jalgade ja kapjade maapinnakontakt;
+- ratsaniku istumine sadulas ja jalad jalustes;
+- käte täpsus relval;
+- range glTF 2.0 struktuurikontroll (aktsessorid, min/max, kaalud, liigesed, animatsioonide ajad, kvaternioonid).
+
+Tulemus on failis `models-v148/manifest.json` väljal `checks` (`"ok"`).
+
+### Testimine
+```
+python3 -m http.server 8765 --bind 127.0.0.1     # repo juurkaustas
+node TEST_V148.mjs
+CHROME_PATH=... node TEST_V148_BROWSER.mjs       # vajab playwrighti
+# vaataja: http://127.0.0.1:8765/tools/soldiers_v148/preview.html?anim=attack&view=three
+#          lisa &src=glb, et näha GLB-faile, &lod=low kerge paki jaoks, &kinds=knight,musketeer
+```
+
+### Mõõdetud tulemused
+- `TEST_V148.mjs`: PASS. 28 mudelit ja 183 klippi; kõik generaatori kontrollid "ok".
+- `TEST_V148_BROWSER.mjs`: vt `MUUDATUSED_V148.md`. Lahingud avanevad uute mudelitega, need animeeruvad ja
+  lehel pole vigu.
+- Quad-arvud ühe kuju kohta: jalaväelane umbes 2500–4000 (high) ja 1500–2400 (low); ratsanik koos hobusega
+  4700–6900 / 2900–4300.
+- Kolmnurgad 480 mehega keskaja lahingus: vanad mudelid umbes 0,96 milj.; V148 high umbes 3,4 milj.;
+  V148 low umbes 1,8 milj. Joonistuskutseid on 228 (vanadel 38), sest iga luu ja materjal on eraldi
+  instantsitud võrk.
+
+### Teadaolevad piirangud ja ideed edasiseks
+- Lahingus on soovituslik mõõta FPS-i päris telefonis. Kui see on madal, vähenda `rig.py` → `Model.n()` LOD1
+  segmente või ühenda `cloth` ja `metal` üheks materjaliks (joonistuskutsed väheneksid umbes poole võrra).
+- Vibunöör ei veni tõmbamisel (jäik geomeetria).
+- Riietus on jäik luu küljes (seelikud ei deformeeru); kõndimisel võivad jalad seelikust veidi läbi minna.
+- GLB-s on ainult `standard` klass ja pea variant `v0`. Eliit/mobiliseeritud ja teised pead on ainult mängupakis.
+- Generaatori osaline käivitus kirjutab pakid üle. Lõpus käivita alati kõik ühikud.
+- Seda versiooni pole GitHubi lükatud. Kasutaja otsustab, millal avaldada.
