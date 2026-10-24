@@ -1,5 +1,18 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V5.2 / Godot Dev 130 – mobiilne lahingujärjekorra ülevaade ja tegelik lahinguraport (2026-10-24)
+
+- `campaign_battle_brief_port.gd`: uus lugemiseks mõeldud raportimoodul loetleb aktiivse lahingu ja kuni 32 ootel mitme rinde kokkupõrget koos koordinaatide, armee ID-de, päris riiginumbrite ja tegelike elusate üksuste arvuga. Annab kokkuvõtte kampaania registreeritud, aegunud ja lõpetatud lahingutest.
+- Viimase lahingu kokkuvõte kasutab ainult olemasolevat `battle_log` salvestatud tulemust: maailma koordinaadid, võitja, mehed alguses/reservis, langenud riikide kaupa, noole/kivi laskude ja tabamuste hulk, lahingu sammud, taganemised, linnavallutus ning piiramisstaatistika (müüri läbimurded ja rammilöögid). Kui andmeid pole, kuvatakse seda ausalt, mitte ei genereerita väljamõeldud arve.
+- `game/scripts/main.gd`: kampaania mobiilmenüüs **LAHINGURINDED JA RAPORT**. Puuteekraanisõbralik ülekate: keskel 88% laiusest keritav tekst, rinde valik `OptionButton` kaudu ning kolm vähemalt 60 px kõrgust nuppu `UUENDA`, `NÄITA RUUTU` (valitud rinde maailmaruudule) ja `SULGE`. Paneel ei muuda lahingut ega loo uusi üksusi.
+- 11 uut regressioonitesti: aktiivse ja ootel rinde täpsed andmed, maailmakaardi koordinaatide vormindamine, korrektse tühja/vanema raporti käitumine, päris kaotused/saagid, müürikahjud, viimase võidu detailid, lahingulogi JSON-salvestatavus ja raporti kõrvalmõjudeta toimimine.
+- Godot Actions **913/913 regressioonitesti**, Android APK eksport, Godoti import, PCK bootstrap: https://github.com/orogdor/Kuningriigid/actions/runs/40122154925
+- Avaldatud Dev 130 APK ja PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-130
+- Pordi **hinnanguline valmidus ~75%**, eelmine ~73%.
+
+**Veel tegemisel:** mitme samal maailmaruudul osaleva eraldi armee ühendamine tõeliseks üheks suureks taktikaliseks kokkupõrkeks, mobiilsete lahingute reaalaja valiku graafika, täielik simultaanne taktikaline lahinguarvutus, Androidi pärisseadme visuaal-/jõudlustestid. Uue UI automaattestid katavad GDScripti kompileerimise ja andmete vormindamise, mitte päris seadme puuteergonoomika.
+
+
 ## V5.1 / Godot Dev 127 – mitme rinde salvestatav lahingujärjekord (2026-10-24)
 
 - Uus `campaign_battle_queue_port.gd`: kogub eri maailmaruutude vastasarmeede kokkupõrked kuni 32 kirjena püsivasse `pending_battles` järjekorda ka ajal, mil üks `individual_battle` juba käib. Järjekord on deterministlik (maailmarea/veeru ning armee ID järgi), väldib ühe armee samaaegset topeltkaasamist ja peatab ootel armeede maailmakaardi marsi just nende kokkupõrkekohal.
