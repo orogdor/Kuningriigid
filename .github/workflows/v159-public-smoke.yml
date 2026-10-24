@@ -43,10 +43,10 @@ jobs:
             for(const mobile of [false,true]){
               const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});
               await context.addInitScript(()=>localStorage.setItem('kingdoms-quality','low'));
-              const page=await context.newPage(),errors=[];
-              page.on('pageerror',e=>errors.push(e.message));
+              const page=await context.newPage(),errors=[];page.setDefaultTimeout(180000);
+              page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>console.log('REQUEST FAILED',r.url(),r.failure()?.errorText));
               await page.goto('https://orogdor.github.io/Kuningriigid/?v=159-20261024&demo=ai-medieval-v159',{waitUntil:'domcontentloaded',timeout:150000});
-              await page.waitForFunction(()=>window.gameDebug&&!document.getElementById('menu-status').hidden,{timeout:150000});
+              await page.waitForFunction(()=>window.gameDebug&&!document.getElementById('menu-status').hidden,null,{timeout:180000});
               const result=await page.evaluate(()=>({demo:gameDebug.state.demo,test:gameDebug.state.medievalTestV159,city:gameDebug.activeCity()?.id,view:gameDebug.view()}));
               assert.equal(result.demo,'ai-medieval-v159');assert.equal(result.test.turn,189);assert.equal(result.city,result.test.targetCityId);assert.equal(result.view,'local');assert.deepEqual(errors,[]);
               console.log('PUBLIC BROWSER PASS',mobile?'mobile':'desktop',JSON.stringify({turn:result.test.turn,city:result.test.targetCityName}));
