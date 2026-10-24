@@ -38,14 +38,28 @@ static func choose_building(city: Dictionary, known: Dictionary, unfinished: int
             if String(b.get("type","")) == kind:
                 count += 1
         var target: int = 1
-        if kind == "lumber" or kind == "farm" or kind == "hunter":
-            target = 2 if int(city.get("pop",3)) >= 6 else 1
-        if kind == "hunter" and foods < float(pop) * 2.5:
-            target = maxi(target,2)
-        if kind == "well" and float(stock.get("water",0)) < float(pop) * 2.0:
-            target = 2
-        if kind == "house":
+        # Population-scaled real production instead of the old hard ceiling
+        # of TWO farms, TWO hunters and TWO wells per entire city. Larger
+        # urban populations must expand their producing districts as well.
+        if kind == "lumber":
+            target = maxi(2 if pop >= 6 else 1,ceili(float(pop)/36.0))
+        elif kind == "farm":
+            target = maxi(2 if pop >= 6 else 1,ceili(float(pop)/23.0))
+        elif kind == "hunter":
+            target = maxi(2 if pop >= 6 else 1,ceili(float(pop)/28.0))
+        elif kind == "well":
+            target = maxi(1,ceili(float(pop)/24.0))
+        elif kind == "saw":
+            target = maxi(1,ceili(float(pop)/45.0))
+        elif kind == "house":
             target = CityPlanning.housing_target(pop)
+        # One extra food/water producer is a *paid* resilience reserve,
+        # only when supplies have actually run critically low.
+        if kind == "hunter" and foods < float(pop)*2.5:
+            target = maxi(target,2 if pop < 12 else ceili(float(pop)/23.0))
+        if kind == "well" and float(stock.get("water",0.0)) < float(pop)*2.0:
+            target = maxi(target,2 if pop < 12 else ceili(float(pop)/20.0))
+        target = mini(target,32) # Avoid runaway construction in corrupted saves.
         if count >= target:
             continue
         if BuildingRules.build_error(kind,city,known,unfinished).is_empty():
