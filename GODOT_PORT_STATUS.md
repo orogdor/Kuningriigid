@@ -1,5 +1,15 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.0 / Androidi rõhtasend ja vananenud PCK tagasilaadimise tõke (2026-10-24)
+
+- Telefoni kuvatõrke põhjus oli `window/handheld/orientation=1` nii käivitaja kui mängu `project.godot` failis. See oli Godoti **portrait** režiim ja andis telefoni ekraanil suure musta ala ning 1280×720 horisontaalse mänguriba. Mõlemas projektis nüüd `orientation=4` ehk `SENSOR_LANDSCAPE`, lisaks kutsub Androidis ka käivitaja ja mäng `DisplayServer.screen_set_orientation` sama väärtusega.
+- **Vana PCK ei tohi üle kirjutada uuemat paigaldatud APK-d.** `bootstrap/seed_build.json` jääb APK püsivaks andmefailiks, genereeritakse CI-s täpselt sama `godot-dev-N` numbriga mis APK sees `seed/game.pck`. Käivitaja võrdleb seed-i numbrit `user://ota/installed.json` numbriga *enne* ühegi PCK laadimist. Kui APK on uuem, valib algpaketi ja kirjutab uue tarkvara numbri salvestatud olekusse. Kui OTA on uuem, säilitab paigaldatud OTA.
+- Käivitaja kuvab paigaldatud numbrit ja kontrollitud viimast GitHubi numbrit; mängu ülaribal on alati `godot-dev-N` ja `UUSIM / UUENDUS / KONTROLLIMATA` olek. Paketi/seed-i identsete numbrite kontroll ning `orientation=4` kontroll lisati `bootstrap/tests/pck_smoke.gd` skripti.
+- **Kontrollitud: 742/742** Godoti regressioonitesti, PCK smoke-test, Androidi debug APK eksport ja GitHubi eelväljalase.
+- Väljalase: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-75
+- CI: https://github.com/orogdor/Kuningriigid/actions/runs/40110973016
+- **Seadme Android-manifesti ekraanisuunda ja telefoni tegelikku pööramist ei ole eraldi füüsilisel Androidil kontrollitud.** Selle paranduse nägemiseks tuleb üks kord installida uus APK, sest ekraani pööramist määrab Androidi rakenduse käivitaja, mitte ainult OTA kaudu uuendatav PCK.
+
 ## V3.9 / alati nähtav versioon ja reaalajas uuenduse kontroll (2026-10-24)
 
 - GitHub Actions kirjutab **iga PCK sisse reaalse koostu numbri** `game/data/build_info.json`: `godot-dev-<run_number>`, commit ja koostamise aja; sama mängupakett lisatakse uude Androidi APK-sse.
