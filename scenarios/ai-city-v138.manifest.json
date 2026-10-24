@@ -4,231 +4,184 @@
     {
       "team": 1,
       "cities": 7,
-      "buildings": 230,
-      "markets": 4,
+      "buildings": 244,
+      "markets": 5,
       "harbors": 0,
-      "houses": 85,
-      "fields": 2,
-      "ages": 5
+      "houses": 75,
+      "fields": 3,
+      "ages": 3
     },
     {
       "team": 2,
-      "cities": 7,
-      "buildings": 227,
-      "markets": 3,
+      "cities": 6,
+      "buildings": 216,
+      "markets": 2,
       "harbors": 0,
-      "houses": 57,
-      "fields": 4,
-      "ages": 4
+      "houses": 69,
+      "fields": 2,
+      "ages": 3
     },
     {
       "team": 3,
-      "cities": 9,
-      "buildings": 248,
-      "markets": 5,
+      "cities": 5,
+      "buildings": 133,
+      "markets": 0,
       "harbors": 0,
-      "houses": 90,
-      "fields": 4,
+      "houses": 46,
+      "fields": 3,
       "ages": 4
     }
   ],
   "landUse": [
     {
-      "name": "Lõunaküla 1",
-      "owned": 67,
-      "developed": 4,
-      "ruralDeveloped": 0,
-      "planned": 2,
-      "homes": 15,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Lõunaküla 2",
-      "owned": 181,
-      "developed": 2,
+      "name": "Idaküla 1",
+      "owned": 286,
+      "developed": 5,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 21,
-      "foodGrowthBonus": 0.2
-    },
-    {
-      "name": "Lõunaküla 3",
-      "owned": 115,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 10,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Lõunaküla 4",
-      "owned": 231,
-      "developed": 6,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 11,
+      "homes": 18,
       "foodGrowthBonus": 0.25
     },
     {
-      "name": "Lõunaküla 5",
-      "owned": 147,
-      "developed": 5,
+      "name": "Idaküla 2",
+      "owned": 363,
+      "developed": 4,
       "ruralDeveloped": 0,
       "planned": 1,
+      "homes": 16,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 3",
+      "owned": 44,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 4,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 4",
+      "owned": 86,
+      "developed": 4,
+      "ruralDeveloped": 0,
+      "planned": 3,
+      "homes": 12,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 5",
+      "owned": 73,
+      "developed": 4,
+      "ruralDeveloped": 0,
+      "planned": 0,
       "homes": 9,
       "foodGrowthBonus": 0
     },
     {
-      "name": "Lõunaküla 6",
-      "owned": 72,
-      "developed": 3,
+      "name": "Idaküla 6",
+      "owned": 35,
+      "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 7,
-      "foodGrowthBonus": 0
+      "foodGrowthBonus": 0.2
     },
     {
-      "name": "Lõunaküla 7",
-      "owned": 147,
-      "developed": 4,
+      "name": "Idaküla 7",
+      "owned": 100,
+      "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 8,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Lõunaküla 8",
-      "owned": 147,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 6,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Lõunaküla 9",
-      "owned": 18,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 3,
+      "homes": 9,
       "foodGrowthBonus": 0
     }
   ],
   "density": [
     {
-      "city": "Lõunaküla 1",
-      "nearEdge": 1,
+      "city": "Idaküla 1",
+      "nearEdge": 3,
+      "expanded": 0,
+      "urbanBuildings": 82,
+      "urbanTiles": 91
+    },
+    {
+      "city": "Idaküla 2",
+      "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 67,
-      "urbanTiles": 58
+      "urbanTiles": 90
     },
     {
-      "city": "Lõunaküla 2",
+      "city": "Idaküla 3",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 11,
+      "urbanTiles": 37
+    },
+    {
+      "city": "Idaküla 4",
       "nearEdge": 2,
       "expanded": 0,
-      "urbanBuildings": 62,
-      "urbanTiles": 92
+      "urbanBuildings": 22,
+      "urbanTiles": 59
     },
     {
-      "city": "Lõunaküla 3",
+      "city": "Idaküla 5",
       "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 20,
-      "urbanTiles": 60
-    },
-    {
-      "city": "Lõunaküla 4",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 24,
-      "urbanTiles": 58
-    },
-    {
-      "city": "Lõunaküla 5",
-      "nearEdge": 1,
       "expanded": 0,
       "urbanBuildings": 20,
       "urbanTiles": 35
     },
     {
-      "city": "Lõunaküla 6",
+      "city": "Idaküla 6",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 25,
+      "urbanTiles": 35
+    },
+    {
+      "city": "Idaküla 7",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 14,
-      "urbanTiles": 36
-    },
-    {
-      "city": "Lõunaküla 7",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 13,
-      "urbanTiles": 35
-    },
-    {
-      "city": "Lõunaküla 8",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 16,
-      "urbanTiles": 36
-    },
-    {
-      "city": "Lõunaküla 9",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 8,
-      "urbanTiles": 18
+      "urbanTiles": 37
     }
   ],
   "seed": 138023,
   "turn": 246,
-  "sourceTeam": 3,
-  "cities": 9,
-  "buildings": 248,
+  "sourceTeam": 1,
+  "cities": 7,
+  "buildings": 244,
   "spacingPairs": [
     9,
     10,
-    15,
-    11,
-    13,
-    22,
-    24,
-    15,
-    9,
+    19,
     14,
+    11,
     20,
-    22,
-    31,
-    23,
-    20,
-    9,
-    18,
+    10,
+    19,
+    12,
     20,
     29,
-    14,
-    18,
     9,
-    18,
+    12,
     20,
+    22,
     9,
-    9,
-    9,
-    11,
-    18,
-    9,
-    9,
-    27,
-    18,
-    24,
-    15,
-    12
+    29,
+    25,
+    25,
+    34,
+    9
   ],
   "ages": [
-    4,
-    5,
-    4,
-    0
+    3,
+    0,
+    3,
+    4
   ],
-  "bytes": 4289543,
-  "seconds": 213
+  "bytes": 5813514,
+  "seconds": 255
 }
