@@ -387,6 +387,9 @@ func _start_campaign() -> void:
     territory_demo_index = -1
     city_stress_index = -1
     preview_state = PreviewSim.initialize(cities)
+    # A new campaign must not inherit trade roads, armies or demo constructions
+    # from the previously viewed save.
+    roads = {}
     preview_state["world_roads"] = roads
     var start: Dictionary = CampaignPlay.begin(preview_state,0)
     if not bool(start.get("ok",false)):
@@ -404,6 +407,7 @@ func _start_campaign() -> void:
     _configure_fine_navigation()
     _build_counties()
     _build_cities()
+    _build_roads()
     _refresh_building_proxies()
     if is_instance_valid(local_streets):
         local_streets.clear()
