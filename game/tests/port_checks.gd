@@ -399,6 +399,59 @@ static func run() -> Dictionary:
     var holding: Dictionary = CampaignWar.ai_march(rescue_state,strategic_nav)
     _check(results,"v47-endangered-city-keeps-reserve-soldiers",
         int(holding["ordered"])==0 and rescue_strike["path"].is_empty())
+    # Dev 110: a three-unit army cannot breach a walled city, but two
+    # paid home-city detachments can rally into a five-unit army before
+    # leaving one home defender and marching four units to the fortress.
+    var rally_manifest: Array = [
+        {"id":0,"team":0,"c":35,"r":20,"name":"Muurilinn"},
+        {"id":1,"team":1,"c":20,"r":20,"name":"Koonduslinn"},
+        {"id":2,"team":1,"c":20,"r":28,"name":"Abilinn"}]
+    var rally_state: Dictionary = Preview.initialize(rally_manifest)
+    rally_state["campaign"] = {"active":true,"player_team":0,"turn":24,"result":"playing"}
+    rally_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[35,20]]}
+    var rally_leader: Dictionary = Military.create_army(rally_state,1,20,20)
+    var rally_donor: Dictionary = Military.create_army(rally_state,1,20,28)
+    for ix in range(3):
+        Military.add_unit(rally_state,rally_leader,"spearman")
+        Military.add_unit(rally_state,rally_donor,"spearman")
+    var total_before: int = rally_state["military_units"].size()
+    _check(results,"v48-unrallied-armies-cannot-attack-fort",
+        int(CampaignWar.ai_march(rally_state,strategic_nav)["ordered"])==0)
+    var rally_dispatch: Dictionary = CampaignWar.rally_for_sieges(rally_state,strategic_nav)
+    var moving_rally: Dictionary = {}
+    for squad in rally_state["armies"]:
+        if String(squad.get("strategic_role","")) == "rally":
+            moving_rally = squad
+            break
+    _check(results,"v48-physical-rally-orders-real-route",
+        int(rally_dispatch["dispatched"])==1 and moving_rally.get("path",[]).size()>0)
+    _check(results,"v48-rally-troops-paid-and-source-guard-retained",
+        rally_state["military_units"].size()==total_before and Military.units_for(rally_state,rally_leader).size()==3 and Military.units_for(rally_state,rally_donor).size()==1 and Military.units_for(rally_state,moving_rally).size()==2)
+    _check(results,"v48-rally-orders-are-idempotent",
+        int(CampaignWar.rally_for_sieges(rally_state,strategic_nav)["dispatched"])==0 and rally_state["military_units"].size()==total_before)
+    var rally_saved: bool = Preview.save_preview(rally_state,"user://v48_rally.json")
+    var rally_loaded: Dictionary = Preview.load_preview(rally_manifest,"user://v48_rally.json")
+    _check(results,"v48-rally-roles-and-waypoints-survive-json",
+        rally_saved and rally_loaded.get("armies",[]).size()==3 and rally_loaded["armies"][2].get("path",[]).size()>0 and str(rally_loaded["armies"][2].get("strategic_role",""))=="rally")
+    if FileAccess.file_exists("user://v48_rally.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v48_rally.json"))
+    Military.advance(rally_state,60.0,strategic_nav)
+    _check(results,"v48-convoy-really-reaches-assembly-city",
+        moving_rally.get("path",[]).is_empty() and int(moving_rally.get("c",-1))==20 and int(moving_rally.get("r",-1))==20)
+    var joined: Dictionary = CampaignWar.rally_for_sieges(rally_state,strategic_nav)
+    _check(results,"v48-arriving-units-join-leader-exactly-once",
+        int(joined["merged"])==2 and Military.units_for(rally_state,rally_leader).size()==5 and rally_state["military_units"].size()==total_before)
+    var siege_departure: Dictionary = CampaignWar.ai_march(rally_state,strategic_nav)
+    var remaining_in_assembly: int = 0
+    for stack in rally_state["armies"]:
+        if int(stack.get("team",-1)) == 1 and int(stack.get("c",-1))==20 and int(stack.get("r",-1))==20 and str(stack.get("strategic_role",""))=="garrison":
+            remaining_in_assembly += Military.units_for(rally_state,stack).size()
+    _check(results,"v48-four-unit-siege-marches-with-home-guard",
+        int(siege_departure["ordered"])==1 and int(siege_departure["garrisons"])==1 and Military.units_for(rally_state,rally_leader).size()==4 and remaining_in_assembly==1)
+    _check(results,"v48-two-city-guards-and-attack-force-conserve-all-six",
+        rally_state["military_units"].size()==total_before and int(rally_state.get("ai_rally_merged_units",0))==2)
+    _check(results,"v48-no-second-siege-march-or-rally-after-dispatch",
+        int(CampaignWar.ai_march(rally_state,strategic_nav)["ordered"])==0 and int(CampaignWar.rally_for_sieges(rally_state,strategic_nav)["dispatched"])==0)
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
