@@ -1,13 +1,14 @@
-name: Kuningriigid Godot 3.3 Android APK
+name: Kuningriigid Godot editable port Android
 on:
   push:
-    branches: [godot-apk-test]
+    branches: [godot-port-development]
     paths:
-      - 'godot-upload/v33/**'
+      - 'game/**'
+      - 'bootstrap/**'
       - '.github/workflows/godot-apk-test.yml'
   workflow_dispatch:
 concurrency:
-  group: godot-apk-test
+  group: godot-port-development-build
   cancel-in-progress: true
 permissions:
   contents: read
@@ -19,39 +20,16 @@ jobs:
       image: barichello/godot-ci:4.7.2
     steps:
       - uses: actions/checkout@v4
-      - name: Reconstruct uploaded Godot 3.3
+      - name: Use directly editable Godot source
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p dist/logs
-          cat godot-upload/v33/*.txt | base64 -d > /tmp/kingdom-godot.zip
-          echo '67f12648bb0aa324e0c4476cd6627806773096b79f01d2b6b0180a918657ba8c  /tmp/kingdom-godot.zip' | sha256sum -c -
-          unzip -oq /tmp/kingdom-godot.zip -d .
-          test -f game/project.godot
-          test -f bootstrap/project.godot
-      - name: Python prerequisite and proven Godot source compatibility fixes
-        shell: bash
-        run: |
-          set -euo pipefail
-          if ! command -v python3 >/dev/null 2>&1; then
-            apt-get update -qq
-            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3
-          fi
-          # Fix pre-existing 3.2 duplicate local variable and wrong depth constant.
-          sed -i '895,898s/street_path/layout_street_path/g' game/tests/port_checks.gd
-          sed -i 's/Vector3(width,.12,DEPTH)/Vector3(width,.12,TILE_DEPTH)/g' game/scripts/adapters/native_detail_tile.gd
-          # Fixture river threshold from the previously successful Godot build.
-          sed -i '1122s/\.007/\.020/' game/tests/port_checks.gd
-          # A deterministic downhill test sample must be steep enough to contain rivers.
-          sed -i 's/2.65-float(rr)\*\.007/2.65-float(rr)*.020/g' game/tests/port_checks.gd
-          grep -Fq '2.65-float(rr)*.020' game/tests/port_checks.gd
+          test -s game/project.godot
+          test -s bootstrap/project.godot
+          test -s game/tests/port_checks.gd
           python3 --version
-      - name: Enable Android texture compression
-        shell: bash
-        run: |
-          set -euo pipefail
-          printf '\n[rendering]\ntextures/vram_compression/import_etc2_astc=true\n' >> bootstrap/project.godot
-          grep -q 'textures/vram_compression/import_etc2_astc=true' bootstrap/project.godot
+          echo 'Building editable GitHub branch source, not the old compressed v3.3 snapshot.'
       - name: Static validations
         shell: bash
         run: |
@@ -121,11 +99,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          godot --headless --path bootstrap --export-debug Android "$GITHUB_WORKSPACE/dist/Kuningriigid-Android-v33.apk" 2>&1 | tee dist/logs/07-android.txt
-          test -s dist/Kuningriigid-Android-v33.apk
+          godot --headless --path bootstrap --export-debug Android "$GITHUB_WORKSPACE/dist/Kuningriigid-Godot-Dev.apk" 2>&1 | tee dist/logs/07-android.txt
+          test -s dist/Kuningriigid-Godot-Dev.apk
           python3 - <<'PYAPK'
           from zipfile import ZipFile
-          with ZipFile('dist/Kuningriigid-Android-v33.apk') as z:
+          with ZipFile('dist/Kuningriigid-Godot-Dev.apk') as z:
               assert z.testzip() is None
               assert 'AndroidManifest.xml' in z.namelist()
           PYAPK
@@ -133,14 +111,14 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: Kuningriigid-Android-3-3
+          name: Kuningriigid-Godot-Dev-APK
           path: |
-            dist/Kuningriigid-Android-v33.apk
+            dist/Kuningriigid-Godot-Dev.apk
             dist/game.pck
       - name: Diagnostic logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Godot-3-3-build-logs
+          name: Kuningriigid-Godot-Dev-test-logs
           path: dist/logs/
           if-no-files-found: warn
