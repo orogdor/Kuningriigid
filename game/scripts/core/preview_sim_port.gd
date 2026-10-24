@@ -13,6 +13,7 @@ const Tech125 = preload("res://scripts/core/research_v125_port.gd")
 const BuildingRules = preload("res://scripts/core/building_rules_port.gd")
 const Labor = preload("res://scripts/core/labor_port.gd")
 const PreviewAI = preload("res://scripts/core/preview_ai_port.gd")
+const ResearchPlanner = preload("res://scripts/core/research_planner_port.gd")
 const Demographics = preload("res://scripts/core/demographics_port.gd")
 const Production = preload("res://scripts/core/production_port.gd")
 const Cargo = preload("res://scripts/core/cargo_port.gd")
@@ -109,10 +110,18 @@ static func research_next(state: Dictionary, team: int) -> Dictionary:
     var known: Dictionary = team_state["known"]
     var available: Array = Research.available(known)
     var chosen := ""
-    for id in RESEARCH_ORDER:
-        if id in available:
-            chosen = id
-            break
+    # In the extended civilian campaign, the player receives the same
+    # prerequisite-aware goal ordering as AI rather than an arbitrary
+    # dictionary-order fallback after the Bronze tutorial's 12 technologies.
+    if str(state.get("campaign",{}).get("mode","")) == "stone_to_modern":
+        var planned: String = ResearchPlanner.next_goal(known)
+        if planned in available:
+            chosen = planned
+    if chosen.is_empty():
+        for id in RESEARCH_ORDER:
+            if id in available:
+                chosen = id
+                break
     if chosen.is_empty() and not available.is_empty():
         chosen = String(available[0])
     if chosen.is_empty():
