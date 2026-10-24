@@ -5,11 +5,13 @@ extends RefCounted
 ## Four-connected routing avoids diagonal corner cutting.
 const Cargo = preload("res://scripts/core/cargo_port.gd")
 const CityLayout = preload("res://scripts/core/city_layout_port.gd")
+const DistrictStreets = preload("res://scripts/adapters/district_street_nav.gd")
 const CELL: float = 0.25
 const SIDE: int = 96
 const HALF: float = SIDE * CELL * 0.5
 
 var landscape = null
+var district_streets = DistrictStreets.new()
 var cached: Dictionary = {}
 var grid_builds: int = 0
 var requests: int = 0
@@ -18,6 +20,7 @@ var failures: int = 0
 
 func clear() -> void:
     cached.clear()
+    district_streets.clear()
 
 func _key(city: Dictionary) -> String:
     return "%s:%s:%s" % [str(city.get("team",0)),str(city.get("c",0)),str(city.get("r",0))]
@@ -112,6 +115,14 @@ func _nearest_free(grid: AStarGrid2D, p: Vector2i) -> Vector2i:
 
 func route(city: Dictionary, from_index: int, to_index: int) -> Array:
     requests += 1
+    var home := Vector2i(int(city.get("c",0)),int(city.get("r",0)))
+    var depart: Vector2 = entry_position(city,from_index)
+    var arrive: Vector2 = entry_position(city,to_index)
+    if CityLayout.site_tile(city,depart) != home or CityLayout.site_tile(city,arrive) != home:
+        var remote: Array = district_streets.route(city,depart,arrive,landscape,signature(city))
+        if remote.is_empty():
+            failures += 1
+        return remote
     var grid: AStarGrid2D = _ensure(city)
     var id: String = "%d:%d" % [from_index,to_index]
     var record: Dictionary = cached[_key(city)]
@@ -139,6 +150,13 @@ func route(city: Dictionary, from_index: int, to_index: int) -> Array:
 
 func route_from_position(city: Dictionary, current: Vector2, to_index: int) -> Array:
     requests += 1
+    var home := Vector2i(int(city.get("c",0)),int(city.get("r",0)))
+    var arriving: Vector2 = entry_position(city,to_index)
+    if CityLayout.site_tile(city,current) != home or CityLayout.site_tile(city,arriving) != home:
+        var remote: Array = district_streets.route(city,current,arriving,landscape,signature(city))
+        if remote.is_empty():
+            failures += 1
+        return remote
     var grid: AStarGrid2D = _ensure(city)
     var destination: Vector2 = entry_position(city,to_index)
     var a: Vector2i = _nearest_free(grid,_cell(city,current))
