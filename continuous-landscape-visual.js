@@ -4,7 +4,7 @@ import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
 import * as T from './vendor/three.module.js';
-import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=150a';
+import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=152a';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
 import {riverNear,localToWorld} from './continuous-landscape.js?v=123a';
 import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
@@ -75,6 +75,7 @@ function riverFlow(game,x,z){
  }
  return dir;
 }
+const mouthBlend=(game,x,z)=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(x,z)-.30)/3.7));return t*t*(3-2*t);};
 function visible(tile,path,radius=110){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
@@ -95,7 +96,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   const key=gx+','+gz;if(nodes.has(key))return nodes.get(key);
   const x=gx*step,z=gz*step,near=riverNear(game,x,z),w=near.width||1;
   const distance=Math.min(100,near.distance);
-  const p={x,z,d:distance-w,outer:distance-w*1.40,shore:1.12-game.atlasHeight(x,z),width:w};nodes.set(key,p);return p;
+  const p={x,z,d:distance-w,outer:distance-w*1.40,shore:.30-game.atlasHeight(x,z),width:w};nodes.set(key,p);return p;
  };
  const clip=(polygon,key,invert=false)=>{
   const result=[];for(let i=0;i<polygon.length;i++){
@@ -106,7 +107,10 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  };
  const emit=(polygon,array,isWater)=>{
   const points=polygon.map(p=>{
-   const y=isWater?riverNear(game,p.x,p.z).waterHeight||.86:surface(game,p.x,p.z)+.10;
+   // V152: rivers run on through the beach into the sea; near the mouth the surface settles just above
+   // sea level and its colour fades to the shallow-sea tone, so it flows into the sea instead of stopping at the shore.
+   let y=isWater?riverNear(game,p.x,p.z).waterHeight||.86:surface(game,p.x,p.z)+.10;
+   if(isWater){const m=mouthBlend(game,p.x,p.z);if(m<1)y=.78+(y-.78)*m;}
    return {...field(game,p.x,p.z,scope,tile),y:projectHeight(y,scope)};
   });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
  };
@@ -148,11 +152,11 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
   return Math.pow(1-t,1.6)*.80;
  }});
- const deep=new T.Color('#1d4a57'),shallowCol=new T.Color('#4f7f74');
+ const deep=new T.Color('#1d4a57'),shallowCol=new T.Color('#4f7f74'),seaCol=new T.Color('#62a6a3');
  const waterMesh=buffers(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
   const edge=Math.min(1,near.distance/Math.max(1,near.width));
-  return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
+  return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,1-mouthBlend(game,p.x,p.z)).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
  }});
  if(waterMesh){
   waterMesh.material.dispose();waterMesh.material=waterMaterial(scope,tile);animate(waterMesh);

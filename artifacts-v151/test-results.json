@@ -1,0 +1,30 @@
+[
+  {
+    "demo": "ai-medieval-v151",
+    "age": 3,
+    "turn": 153,
+    "cityId": 2,
+    "targetId": 2,
+    "name": "Idaküla 1",
+    "view": "local",
+    "population": 16,
+    "saved": "untouched-save",
+    "backup": "untouched-backup",
+    "mobile": false,
+    "errors": []
+  },
+  {
+    "demo": "ai-medieval-v151",
+    "age": 3,
+    "turn": 153,
+    "cityId": 2,
+    "targetId": 2,
+    "name": "Idaküla 1",
+    "view": "local",
+    "population": 16,
+    "saved": "untouched-save",
+    "backup": "untouched-backup",
+    "mobile": true,
+    "errors": []
+  }
+]

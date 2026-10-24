@@ -259,7 +259,7 @@ export function smoothBiomeColor(game,x,z,key,baseFn,out=new T.Color()){
 // Farmland on fertile (grain) cells: a patchwork of long strip fields in wheat, stubble and
 // green crops, painted into the terrain colour (replaces the old flat yellow rectangles).
 const wheat=new T.Color('#b9a45f'),stubble=new T.Color('#9a8a5a'),crop=new T.Color('#7f9a52'),fallow=new T.Color('#8a7a58');
-export function farmlandTint(game,cell,x,z,color,strength=.55){
+export function farmlandTint(game,cell,x,z,color,strength=.34){
  if(!cell?.land||!cell.deposits?.grain||cell.mountain)return color;
  const cx=cell.x+8,cz=cell.z-11,dx=x-cx,dz=z-cz;
  const reach=19+game.smooth(cell.c*.7+3,cell.r*.7+9)*8;

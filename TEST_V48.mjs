@@ -22,14 +22,14 @@ const tree=new T.Group();addTree(tree,0,0,0,5,1);assert(tree.children[0].userDat
 const game=new Civilization(createGame(101));
 for(const quality of ['low','medium','high']){
  const g=new T.Group(),biome=createAtlasBiomeDetail(game,g,quality);
- assert(biome.instances>100 && g.children.length<=5);
- assert(g.children.every(mesh=>mesh.isInstancedMesh));
+ assert(biome.instances>100 && g.children.length<=9); // V152: up to nine world species
+ assert(g.children.every(mesh=>mesh.isInstancedMesh||mesh.userData.spatialBatch));
  console.log('Quality',quality,biome.instances,'trees/rocks,',g.children.length,'draw calls');
 }
 for(let age=0;age<=6;age++){
  const m=createCityMiniature(0,age);
  assert(m.userData.age===age);
- if(age===3)assert(m.children.some(x=>x.userData.modelName==='market_1000_3'));
+ assert(m.children.some(x=>x.userData.modelName==='settlement_v152')); // V152 settlement replaces V46/V48 pieces
 }
 const scene=new T.Scene(),world=createAtlasDecor(game,scene,'low');
 assert(world.nature.instances>100);

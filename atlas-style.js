@@ -1,10 +1,11 @@
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 import * as T from './vendor/three.module.js';
-import {smoothBiomeColor,farmlandTint,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=150a';
+import {smoothBiomeColor,farmlandTint,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=152a';
 import {createMountainOutcrops} from './landscape-polish-v84.js?v=85a';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
-import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=86a';
+import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=152a';
+import {settlementGeometry,getWorldModel,WORLD_MODEL_MATERIAL} from './world-models-v152.js?v=152a';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=85a';
 import {surface,riverNear} from './continuous-landscape.js?v=85a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
@@ -72,10 +73,10 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  const fields=game.cells.filter(c=>c.deposits.grain),
        plots=new T.InstancedMesh(new T.PlaneGeometry(17,12),material('#b9aa60'),fields.length),
        rocks=game.cells.filter(c=>c.deposits.stone&&c.biome!=='hills'),
-       stones=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),material('#a4a98e'),rocks.length);
+       stones=new T.InstancedMesh(getWorldModel('rock','low'),WORLD_MODEL_MATERIAL,rocks.length);if(quality!=='low')stones.userData.lodGeometries={high:getWorldModel('rock','high'),low:getWorldModel('rock','low')};
  // V150: fields are painted into the terrain as strip-field patchwork (farmlandTint); no flat plates.
  plots.count=0;
- rocks.forEach((a,i)=>{dummy.position.set(a.x-10,height(a.x-10,a.z)+2,a.z);dummy.rotation.set(0,i*1.4,0);dummy.scale.set(3.5,2.4,3);dummy.updateMatrix();stones.setMatrixAt(i,dummy.matrix)});
+ rocks.forEach((a,i)=>{dummy.position.set(a.x-10,height(a.x-10,a.z)-.2,a.z);dummy.rotation.set(0,i*1.4,0);dummy.scale.set(3.2,3.4,3.2);dummy.updateMatrix();stones.setMatrixAt(i,dummy.matrix)});
  group.add(spatialInstances(plots),spatialInstances(stones));
  const nature=createAtlasBiomeDetail(game,group,quality);
  // All tributaries and banks are one connected world-space 3D network.
@@ -125,28 +126,44 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
   for(const {team,rural,cells,cities} of groups.values()){
    const color=rural?['#b6ce75','#dba082','#bca3d6','#dfcc87'][team]:['#69d4c3','#e77e64','#ac87e2','#ead06b'][team];
    const fillData=regionFill(cellRegion(cells)),fill=[],rgba=[];
-   for(let i=0;i<fillData.alpha.length;i++){const x=fillData.pos[i*2],z=fillData.pos[i*2+1];fill.push(x,height(x,z)+.18,z);rgba.push(1,1,1,fillData.alpha[i]);}
+   for(let i=0;i<fillData.alpha.length;i++){const x=fillData.pos[i*2],z=fillData.pos[i*2+1];fill.push(x,height(x,z)+.45,z);rgba.push(1,1,1,fillData.alpha[i]);}
    const edges=[];
    for(const keys of cities.values()){const seg=regionContour(cellRegion(keys));for(let i=0;i<seg.length;i+=4)edges.push(seg[i],height(seg[i],seg[i+1])+.9,seg[i+1],seg[i+2],height(seg[i+2],seg[i+3])+.9,seg[i+3]);}
    const geo=new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(fill,3)).setAttribute('color',new T.Float32BufferAttribute(rgba,4));
-   const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({color,vertexColors:true,transparent:true,opacity:rural?.15:.29,depthWrite:false,side:T.DoubleSide}));
+   const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({color,vertexColors:true,transparent:true,opacity:rural?.15:.29,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-8}));
    mesh.name=rural?'county area':'urban area';
    const line=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(edges,3)),new T.LineBasicMaterial({color,transparent:true,opacity:rural?.95:.9}));line.name=rural?'county border':'urban border';territories.add(mesh,line);
   }
-  // Country outlines: thick terrain-following ribbons along the rounded contour.
-  const national=[[],[],[],[]],underlay=[];
+  // V152: country borders read as a map border, not as a river: a dashed line (cream edge, team core)
+  // plus a soft team-coloured glow that fades inwards from the border.
+  const national=[[],[],[],[]],underlay=[],glow=[[],[],[],[]];
+  const quad=(vertices,p,q,r,t)=>vertices.push(...p,...r,...q,...q,...r,...t);
   for(const [team,keys] of teams){
-   const seg=regionContour(cellRegion(keys),5);
+   const region=cellRegion(keys),seg=regionContour(region,5);
    for(let i=0;i<seg.length;i+=4){
     const ax=seg[i],az=seg[i+1],bx=seg[i+2],bz=seg[i+3],len=Math.hypot(bx-ax,bz-az)||1,nx=-(bz-az)/len,nz=(bx-ax)/len;
-    for(const [vertices,half,lift] of [[underlay,4.3,1.15],[national[team],3,1.22]]){
-     const ex=(bx-ax)/len*half*.5,ez=(bz-az)/len*half*.5;
-     const pt=(x,z,side)=>{const X=x+nx*half*side,Z=z+nz*half*side;return [X,height(X,Z)+lift,Z];};
-     const p=pt(ax-ex,az-ez,-1),q=pt(ax-ex,az-ez,1),r=pt(bx+ex,bz+ez,-1),t=pt(bx+ex,bz+ez,1);vertices.push(...p,...r,...q,...q,...r,...t);
+    const mx=(ax+bx)/2,mz=(az+bz)/2,side=region.field(mx+nx*3,mz+nz*3)>=region.field(mx-nx*3,mz-nz*3)?1:-1;
+    // glow: alpha 1 at the line, 0 eleven metres inside (alpha stored in the 4th colour channel)
+    const g=glow[team],w=11*side,ex=(bx-ax)/len*.6,ez=(bz-az)/len*.6;
+    const A=[ax-ex,az-ez],B=[bx+ex,bz+ez];
+    g.push(A[0],height(A[0],A[1])+.55,A[1],1, B[0],height(B[0],B[1])+.55,B[1],1, A[0]+nx*w,height(A[0]+nx*w,A[1]+nz*w)+.55,A[1]+nz*w,0,
+           A[0]+nx*w,height(A[0]+nx*w,A[1]+nz*w)+.55,A[1]+nz*w,0, B[0],height(B[0],B[1])+.55,B[1],1, B[0]+nx*w,height(B[0]+nx*w,B[1]+nz*w)+.55,B[1]+nz*w,0);
+    // dashes: every 5 m contour piece becomes a 3 m dash
+    const dx=(bx-ax)*.2,dz=(bz-az)*.2;
+    for(const [vertices,half,lift] of [[underlay,2.3,1.15],[national[team],1.35,1.22]]){
+     const pt=(x,z,sd)=>{const X=x+nx*half*sd,Z=z+nz*half*sd;return [X,height(X,Z)+lift,Z];};
+     quad(vertices,pt(ax+dx,az+dz,-1),pt(ax+dx,az+dz,1),pt(bx-dx,bz-dz,-1),pt(bx-dx,bz-dz,1));
     }
    }
   }
-  for(const [i,vertices]of [underlay,...national].entries())if(vertices.length){const mesh=new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(vertices,3)),new T.MeshBasicMaterial({color:i===0?'#172126':['#65e8df','#ff9977','#c6a0ff','#ffe277'][i-1],side:T.DoubleSide,transparent:true,opacity:1,depthWrite:false,depthTest:false,polygonOffset:true,polygonOffsetFactor:-3}));mesh.name=i===0?'national border outline':'national border '+(i-1);mesh.renderOrder=i===0?14:15;territories.add(mesh);}
+  const teamColor=['#3fd2c6','#ff8a66','#b98cff','#ffd75e'];
+  for(const [team,v] of glow.entries())if(v.length){
+   const pos=[],col=[],c=new T.Color(teamColor[team]);for(let i=0;i<v.length;i+=4){pos.push(v[i],v[i+1],v[i+2]);col.push(c.r,c.g,c.b,v[i+3]);}
+   const mesh=new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(pos,3)).setAttribute('color',new T.Float32BufferAttribute(col,4)),
+    new T.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:.42,side:T.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-8}));
+   mesh.name='national border glow '+team;mesh.renderOrder=13;territories.add(mesh);
+  }
+  for(const [i,vertices]of [underlay,...national].entries())if(vertices.length){const mesh=new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(vertices,3)),new T.MeshBasicMaterial({color:i===0?'#f4ecd4':teamColor[i-1],side:T.DoubleSide,transparent:true,opacity:i===0?.85:1,depthWrite:false,depthTest:false}));mesh.name=i===0?'national border outline':'national border '+(i-1);mesh.renderOrder=i===0?14:15;territories.add(mesh);}
 
  }
  function route(state,mover){const path=mover?.path||[],stamp=(mover?.c??'')+':'+(mover?.r??'')+JSON.stringify(path);if(stamp===lastRoute)return;lastRoute=stamp;disposeGroup(routes);if(!path.length)return;const tiles=[mover,...path],points=[];for(let i=1;i<tiles.length;i++){const a=center(tiles[i-1].c,tiles[i-1].r),b=center(tiles[i].c,tiles[i].r);for(let j=0;j<10;j++){const x=a.x+(b.x-a.x)*j/10,z=a.z+(b.z-a.z)*j/10;points.push(new T.Vector3(x,height(x,z)+2,z))}}const end=center(path.at(-1).c,path.at(-1).r);points.push(new T.Vector3(end.x,height(end.x,end.z)+2,end.z));const line=new T.Line(new T.BufferGeometry().setFromPoints(points),new T.LineDashedMaterial({color:'#f4d48b',dashSize:5,gapSize:3,transparent:true,opacity:1,depthTest:false}));line.computeLineDistances();routes.add(line);const dots=new T.InstancedMesh(new T.RingGeometry(2,3,12),new T.MeshBasicMaterial({color:'#fae4a4',side:T.DoubleSide,depthTest:false,depthWrite:false}),path.length);path.forEach((p,i)=>{const q=center(p.c,p.r);dummy.position.set(q.x,height(q.x,q.z)+2,q.z);dummy.rotation.set(-Math.PI/2,0,0);dummy.scale.set(1,1,1);dummy.updateMatrix();dots.setMatrixAt(i,dummy.matrix)});routes.add(dots)}
@@ -158,31 +175,9 @@ const cityMaterials=new Map(),cityGeometries=new Map();
 function cityMat(c,metal=false){const k=c+metal;if(!cityMaterials.has(k))cityMaterials.set(k,new T.MeshStandardMaterial({color:c,roughness:metal?.45:.91,metalness:metal?.2:0}));return cityMaterials.get(k)}
 function cityGeom(key,fn){if(!cityGeometries.has(key)){const g=fn();g.userData.shared=true;cityGeometries.set(key,g)}return cityGeometries.get(key)}
 export function createCityMiniature(team,age){
- const g=new T.Group(),accent=['#5a8584','#ad715d','#9585b3','#ad995b'][team];
- const put=(shape,x,y,z,w,h,d,color)=>{const geo=shape==='cone'?cityGeom('city-cone',()=>new T.ConeGeometry(1,1,6)):shape==='tower'?cityGeom('city-tower',()=>new T.CylinderGeometry(1,1,1,8)):cityGeom('city-box',()=>new T.BoxGeometry(1,1,1));const m=new T.Mesh(geo,cityMat(color,age>=5));m.position.set(x,y,z);m.scale.set(w,h,d);m.castShadow=false;g.add(m);return m};
- put('cube',0,.32,0,27,.55,25,age>=5?'#8a9998':'#8c8e79');
- if(age===0){for(let i=0;i<7;i++){const x=(i%3-1)*7.5,z=(Math.floor(i/3)-1)*7.7,hh=i===1?7.5:3.8;put('tower',x,hh/2,z,2.4,hh,2.4,'#b5a27d');put('cone',x,hh+2,z,3.7,4,3.7,i===1?accent:'#8a6947')}
-  for(let j=0;j<8;j++)put('cube',-11+j*2.6,.9,12,.35,1.2,.5,'#71573c');
- }else if(age<=2){for(let i=0;i<8;i++){const x=(i%4-1.5)*6.1,z=(Math.floor(i/4)-.5)*9.1,h=i===1?11:age===2?5.5+((i*7)%4):4.5+((i*3)%4);put('cube',x,h/2,z,4.4,h,5,'#b7ac91');put('cone',x,h+1.6,z,3.8,3.4,3.8,i%3===0?accent:'#7b6651');put('cube',x,h*.52,2.65+z,.85,1.2,.12,'#485f68')}
-  if(age>=2){for(let x of [-12,12])put('tower',x,5,0,2.4,10,2.4,'#96978e');put('cube',0,2.4,-12,25,3.4,.8,'#9b998c')}
- }else if(age<=4){for(let i=0;i<9;i++){const x=(i%3-1)*8,z=(Math.floor(i/3)-1)*8,h=(i===4?13:5+((i*5)%5))*(age>=4?1.15:1);put('cube',x,h/2,z,5.1,h,5,'#beb7a0');put('cone',x,h+2,z,4.2,4,4.2,i===4?accent:'#806c59');for(let k=0;k<2;k++)put('cube',x-1.2+k*2.4,h*.65,z+2.58,.5,.8,.12,'#758f94')}
-  for(let x of [-12,12]){put('tower',x,6,0,2.8,12,2.8,'#9c9c92');put('cone',x,13.5,0,3.2,4,3.2,accent)}
- }else if(age===5){for(let i=0;i<8;i++){const x=(i%4-1.5)*6.5,z=(Math.floor(i/4)-.5)*10,h=4+(i*3)%6;put('cube',x,h/2,z,5.8,h,6.2,i%2?'#a4aaa6':'#7e8b8a');put('cube',x,h+.1,z,6,.45,6.5,'#55646c');if(i%3===0)put('tower',x+2,h+5,z-1,.55,10,.55,'#817d76')}
-  for(let x of [-9,9])put('cube',x,.35,0,1.2,.25,25,'#46575e');
- }else {for(let i=0;i<9;i++){const x=(i%3-1)*8,z=(Math.floor(i/3)-1)*8,h=(i===4?18:6+(i*7)%10);put('cube',x,h/2,z,5.4,h,5.1,i%2?'#8fa6ad':'#a8b6ba');put('cube',x,h*.60,z+2.63,4.8,.23,.14,'#3b596a');put('cube',x,h+.2,z,5.6,.4,5.5,'#6f8185')}
-  for(const z of [-12,12])put('cube',0,.12,z,27,.15,1,'#596b73');
- }
- // Authored source quad meshes: visible at city scale with the original age-specific skyline kept intact.
- const accentModel=(name,x,z,scale,rot=0)=>{const model=createV48Mesh(name,scale);model.position.set(x,.5,z);model.rotation.y=rot;model.castShadow=false;g.add(model)};
- if(age<=3){
-  accentModel('timber_house_1000_3',-9,7,1.75,.25);
-  accentModel('timber_house_1000_3',8,7,1.55,-.25);
-  if(age>=1)accentModel('market_1000_3',0,7.5,1.65);
- }else if(age===4){
-  accentModel('timber_house_1000_3',-9,7,1.65,.1);
-  accentModel('market_1000_3',7,6,1.7,.3);
-  accentModel('windmill_1000_3',-11,-8,2.2);
- }
+ // V152: one merged, era-specific settlement model (pitched-roof houses, landmark, lanes, walls).
+ const g=new T.Group(),mesh=new T.Mesh(settlementGeometry(team,Math.max(0,Math.min(6,age|0))),WORLD_MODEL_MATERIAL);
+ mesh.castShadow=false;mesh.receiveShadow=false;mesh.userData.modelName='settlement_v152';g.add(mesh);
  g.userData.age=age;return g;
 }
 export function cityBanner(name,team){const canvas=document.createElement('canvas');canvas.width=384;canvas.height=80;const ctx=canvas.getContext('2d');ctx.fillStyle=['#183f40ee','#623e32ee','#443954ee','#5b5030ee'][team];ctx.fillRect?.(0,5,384,66);ctx.strokeStyle=['#a8cab4','#d49a7e','#b7a1d4','#dec783'][team];ctx.lineWidth=3;ctx.strokeRect?.(2,7,380,62);ctx.fillStyle='#f3ead1';ctx.font='600 38px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(name,192,40);const texture=new T.CanvasTexture(canvas),sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:false,transparent:true}));sprite.scale.set(96,20,1);return sprite}

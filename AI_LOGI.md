@@ -206,3 +206,35 @@ PASS: `TEST_V88_EXPLORATION_UI`, `TEST_V149_BROWSER` (high + low), `TEST_V143_BR
 - Biomi sulandumise laius: väänamise amplituud `*46` / `*12` failis `smoothBiomeColor`.
 - Udu serva pehmus: `smoothstep(.30,.62,seen)` ja väänamine `*38.0` / `*10.0` failis `refreshFogCover`.
 - Ruudustiku nähtavus: `fadeAtlasGrid` failis `civilization.js`.
+
+## V152 – jõesuudmed, virvendus, uued maailmakaardi mudelid (Claude, 2026-10-24)
+
+Märkus: ChatGPT kasutas samal päeval nime V151 (keskaja I test), seega on see Claude'i töö nimega V152.
+
+Kasutaja: „Jõgi ei jõua mereni, maa-ala värv virvendab. Maakera kaart nõuab uusi ilusamaid 3D mudeleid.“
+Muudetud on ainult välimust. Mänguandmed, kaart ja salvestused on samad.
+
+### Virvendus (põhjus ja parandus)
+- Põhjus: kaamera `near=.1` ja `far=20000`. Maailmakaardi kauguselt lahutas sügavuspuhver ainult umbes 0,6 m, mistõttu maastik, meri, jõekaldad ja territooriumi täide z-võitlesid (z-fighting). Lisaks liikus merepind igal kaadril ±0,045 m üles-alla ja rannajoon „roomas“.
+- Parandus: `civilization.js` → `fitDepthRange()` (enne `renderer.render`), `camera.near = clamp(zoom*.04, .1, 40)`. Merepind on nüüd paigal (`y=.72`). Territooriumi täide on `+.45` kõrgusel ja kasutab `polygonOffset`-i.
+- Kontrollitud kaadrite erinevuspildiga: vanal maal oli müra, uuel ainult servad.
+
+### Jõesuudmed
+- `continuous-landscape-visual.js`: vee lõikepiir on `shore=.30-atlasHeight` (enne 1.12). Funktsioon `mouthBlend()` (atlasHeight .30…4.0) laseb veepinna suudme juures meretasemele (`.78`) ja segab värvi madala mere tooniga (`seaCol '#62a6a3'`). Nii voolab jõgi merre ega lõpe rannas.
+- Riigipiirid (`atlas-style.js` `territory()`) nägid välja nagu tumedate kallastega türkiissinine jõgi. Nüüd on need kriipsjoon (kreemjas serv + meeskonna värv) ja sissepoole hajuv meeskonnavärvi helk. Nimed `national border N` ja `national border outline` on alles (V143 test).
+
+### Uued mudelid – `world-models-v152.js` (uus fail)
+- Protseduurilised tipuvärvidega mudelid, ehitatakse koodis ja neid jagavad kõik instantsid: `oak`, `lime`, `birch`, `pine`, `spruce`, `palm`, `cactus`, `rock`, `shrub`. Igal on LOD `high/medium/low`; kolmnurkade eelarve on testis.
+- `settlementGeometry(team, era)` – üks ühendatud linnamudel ajastu kohta (0–6): viilkatusega majad (aeg 0: koonusekujulised onnid), keskne maamärk (pikkmaja / tempel / kirik koos torniga / vabrik korstnatega / kõrghooned), tänavaristi, puitpalissaad või kivimüür tornidega. Meeskonna värv on maamärgil ja mõnel katusel.
+- `atlas-biomes-v47.js` kasutab V152 liike biomi järgi segatuna, lisatud on põõsad ja puudele väike värvivariatsioon.
+- `civilization.js`: vana V46 metsa koonused/dodekaeedrid on asendatud V152 kuuse/männi/tamme/pärna/kasega.
+- `atlas-style.js`: kivimaardlate kivid on V152 `rock`; `createCityMiniature` kasutab `settlementGeometry`-t.
+- `spatial-batches-v86.js`: valikuline LOD (`mesh.userData.lodGeometries={high,low}`). Fookuse lähedal (zoom < 640) olevad tükid saavad detailse mudeli, kaugemad kerge. `updateSpatialBatches(zoom, focus)`.
+- Koormus (kõrge kvaliteet, ai-iron-v143): kaugvaade 2,85M → 2,30M kolmnurka, keskmine 2,81M → 2,94M, lähivaade 2,64M → 2,57M. Joonistuskutseid on vähem.
+- `landscape-v149.js` `farmlandTint` vaikimisi tugevus .55 → .34 (lähivaates olid kollased laigud).
+
+### Testid
+- Uus `TEST_V152.mjs` (Node mudelikontroll + brauser: V152 mudelid on maailmakaardil, vigu pole, near-tasand järgib suumi).
+- PASS: `TEST_V48` (uuendatud V152 jaoks: kuni 9 liiki ja asulamudel), `TEST_V88_EXPLORATION_UI`, `TEST_V143_BROWSER`, `TEST_V148`, `TEST_V149_BROWSER`, `TEST_V152`.
+- Mudelite eelvaade: `artifacts-v152/models.html?m=nature` või `?m=city` (kaust on gitignore'is).
+- Versioonid: `index.html` / `boot-v83.js` → `?v=152a`; `landscape-v149.js?v=152a`; `world-models-v152.js?v=152a`; `atlas-biomes-v47.js?v=152a`.

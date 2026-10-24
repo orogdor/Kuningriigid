@@ -17,9 +17,17 @@ export function spatialInstances(source,size=600){
   mesh.frustumCulled=typeof mesh.computeBoundingSphere==='function';mesh.computeBoundingSphere?.();near.add(mesh);
  }
  source.visible=false;group.add(source,near);group.userData.instanceCount=source.count;
- group.userData.chunkCount=near.children.length;batches.add({source,near});return group;
+ group.userData.chunkCount=near.children.length;batches.add({source,near,size,lod:source.userData.lodGeometries||null});return group;
 }
-export function updateSpatialBatches(zoom){
+// V152: optional level of detail. Chunks near the camera focus use the detailed model, the rest
+// (and everything when zoomed out) the light one. Only a geometry reference changes per chunk.
+export function updateSpatialBatches(zoom,focus=null){
  const far=zoom>3000;
- for(const {source,near} of batches){source.visible=far;near.visible=!far;}
+ for(const {source,near,size,lod} of batches){source.visible=far;near.visible=!far;
+  if(!lod||far)continue;
+  const radius=Math.max(420,zoom*1.1);
+  for(const mesh of near.children){const [cx,cz]=mesh.userData.spatialCell.split(':').map(Number);
+   const x=(cx+.5)*size,z=(cz+.5)*size,d=focus?Math.hypot(x-focus.x,z-focus.z):Infinity;
+   const geo=zoom<640&&d<radius+size*.7?lod.high:lod.low;if(mesh.geometry!==geo)mesh.geometry=geo;}
+ }
 }
