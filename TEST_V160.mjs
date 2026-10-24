@@ -12,6 +12,13 @@ assert.equal(prosperousTownGrowth({...base,stock:{...stock,grain:0,meat:0,fish:0
 assert.equal(prosperousTownGrowth({...base,age:0}),1,'Stone economy unchanged');
 assert.equal(BUILD_AGE.gatehouse,1,'Bronze gates must be legal');
 import {BUILDINGS} from './civilization-core.js';
+for(const type of ['house','market','mason','stonewall','stonetower','gatehouse','farm','lumber']){
+ assert.ok(BUILDINGS[type],type+' exists');
+ for(const [resource,cost] of Object.entries(BUILDINGS[type].cost||{}))
+  assert.ok(Number.isFinite(cost)&&cost>=0,type+' has finite, nonnegative '+resource+' cost: '+cost);
+}
+assert.equal(BUILDINGS.house.cost.wood,12,'V137 half-price timber homes preserved');
+assert.equal(BUILDINGS.house.cost.plank,undefined,'No imaginary plank price on wooden homes');
 assert.ok(BUILDINGS.stonewall.time<=20,'Bronze stonewall construction completes within a small fraction of a turn');
 assert.ok(BUILDINGS.gatehouse.cost.cutstone<13,'Bronze gates do not consume all dressed stone');
 assert.equal(BUILD_TECH.gatehouse,'stone_fortifications','gates require masonry technology');
