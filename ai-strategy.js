@@ -90,7 +90,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  // V136: every established town needs civic functions, not only production buildings.
  // A Bronze settlement without a marketplace is still a village; reserve time
  // for civic construction even during long era-research material shortages.
- if(age>=1&&r.pop>=5)add('market',244,'Ajaloolise linnasüdame oluline turuplats');
+ if(age>=1&&r.pop>=6)add('market',Math.min(275,245+(r.pop>=10?20:0)),'Esimene turg, kui toidu- ja ehitusvaru lubab');
  if(age>=1&&r.pop>=8)add('warehouse',172,'Kaubanduse ja ehitusmaterjalide põhilaod');
  if(age>=1&&r.pop>=10)add('cellar',168,'Linnakodanike ühine toidukelder');
  if(age>=3&&r.pop>=11){
