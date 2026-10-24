@@ -44,7 +44,7 @@ static func exposed_corner(city: Dictionary,tile: Vector2i,xsign: int,zsign: int
     if not fortified(city,tile):
         return false
     var sides: Array = exposed_sides(city,tile)
-    return sides.has("west" if xsign < 0 else "east") or sides.has("north" if zsign < 0 else "south")
+    return sides.has("west" if xsign < 0 else "east") and sides.has("north" if zsign < 0 else "south")
 
 static func developed_tiles(city: Dictionary) -> Array:
     var home := Vector2i(int(city.get("c",0)),int(city.get("r",0)))

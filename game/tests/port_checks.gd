@@ -958,7 +958,8 @@ static func run() -> Dictionary:
     _check(results,"v38-two-adjacent-tiles-six-outside-edges",CityFortifications.perimeter_edges(castle_city).size()==6)
     _check(results,"v38-west-tile-no-east-wall",not CityFortifications.exposed_sides(castle_city,Vector2i(44,45)).has("east"))
     _check(results,"v38-east-tile-no-west-wall",not CityFortifications.exposed_sides(castle_city,Vector2i(45,45)).has("west"))
-    _check(results,"v38-north-corners-keep-towers",CityFortifications.exposed_corner(castle_city,Vector2i(44,45),1,-1))
+    _check(results,"v38-no-duplicate-tower-at-internal-joint",not CityFortifications.exposed_corner(castle_city,Vector2i(44,45),1,-1))
+    _check(results,"v38-outermost-corner-towers",CityFortifications.exposed_corner(castle_city,Vector2i(44,45),-1,-1) and CityFortifications.exposed_corner(castle_city,Vector2i(45,45),1,-1))
     var border_fort: Dictionary = castle_city.duplicate(true)
     border_fort["team"] = 1
     var eastern_siege: Dictionary = Siege.from_city(border_fort,Vector2i(45,45),0,1)
