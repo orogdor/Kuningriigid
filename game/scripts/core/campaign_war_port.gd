@@ -7,6 +7,7 @@ const Preview = preload("res://scripts/core/preview_sim_port.gd")
 const Fort = preload("res://scripts/core/city_fortification_port.gd")
 const CampaignSiege = preload("res://scripts/core/campaign_siege_port.gd")
 const CampaignDefense = preload("res://scripts/core/campaign_defense_port.gd")
+const CampaignRally = preload("res://scripts/core/campaign_rally_port.gd")
 const CAMPAIGN_AI_FIRST_TURN: int = 10
 const CAMPAIGN_ATTACK_FIRST_TURN: int = 18
 const MIN_ATTACK_UNITS: int = 2
@@ -167,7 +168,7 @@ static func ai_march(state: Dictionary,world_nav) -> Dictionary:
             continue
         if not ongoing.is_empty() and int(army.get("id",-1)) in [int(ongoing.get("army_a",-1)),int(ongoing.get("army_b",-1))]:
             continue
-        if String(army.get("strategic_role","")) == "relief":
+        if String(army.get("strategic_role","")) in ["relief","rally","assembly"]:
             continue
         if String(army.get("strategic_role","")) == "garrison" and Military.units_for(state,army).size() < 3:
             continue # Trained reinforcements may grow an old guard into a new field army.
@@ -188,7 +189,14 @@ static func ai_march(state: Dictionary,world_nav) -> Dictionary:
             if cities_owned > 1:
                 continue # Keep both until the third trained soldier arrives.
         var reserved: Dictionary = reservations.get(team,{})
-        for option in _candidates(state,team,point,reserved):
+        var choices: Array = _candidates(state,team,point,reserved)
+        var rally_target: int = int(army.get("rally_target_city_id",-1))
+        if rally_target >= 0:
+            for index in range(choices.size()):
+                if int(choices[index]["city"].get("id",-1)) == rally_target:
+                    choices.push_front(choices.pop_at(index))
+                    break
+        for option in choices:
             var city: Dictionary = option["city"]
             var dest := Vector2i(int(city["c"]),int(city["r"]))
             var siege_minimum: int = 4 if Fort.fortified(city,dest) else MIN_ATTACK_UNITS
@@ -208,6 +216,7 @@ static func ai_march(state: Dictionary,world_nav) -> Dictionary:
                 state["ai_garrison_assignments"] = int(state.get("ai_garrison_assignments",0))+1
                 state["revision"] = int(state.get("revision",0))+1
             army["strategic_role"] = "attack"
+            army.erase("rally_target_city_id")
             army["campaign_target_city"] = int(city.get("id",-1))
             reserved[str(int(city["id"]))] = int(reserved.get(str(int(city["id"])),0))+1
             reservations[team] = reserved
@@ -276,6 +285,9 @@ static func occupy_unfortified(state: Dictionary) -> Dictionary:
         captured += 1
     state["city_occupation_progress"] = progress
     return {"captured":captured}
+
+static func rally_for_sieges(state: Dictionary,world_nav) -> Dictionary:
+    return CampaignRally.advance(state,world_nav)
 
 static func recall_threatened(state: Dictionary,world_nav) -> Dictionary:
     return CampaignDefense.recall(state,world_nav)
