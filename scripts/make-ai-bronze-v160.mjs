@@ -13,7 +13,13 @@ const metrics=(turn)=>{
    stonewall:kind('stonewall'),gatehouse:kind('gatehouse'),stonetower:kind('stonetower'),
    defenses:buildings.filter(b=>['stonewall','gatehouse','stonetower','palisade','watchtower'].includes(b.type)).length,
    planSlots:plan?.slots?.length||0,ready:buildings.filter(b=>b.ready).length,
-   water:Math.round(stock.water||0),stone:Math.round(stock.stone||0),wood:Math.round(stock.wood||0)};
+   water:Math.round(stock.water||0),stone:Math.round(stock.stone||0),wood:Math.round(stock.wood||0),
+   plank:Math.round(stock.plank||0),cutstone:Math.round(stock.cutstone||0),
+   food:Math.round((stock.grain||0)+(stock.meat||0)+(stock.fish||0)+(stock.bread||0)+(stock.berries||0)),
+   growthMultiplier:Math.round((city.economy.realms[team].growthNeed||0)*10)/10,
+   masonReady:buildings.some(b=>b.type==='mason'&&b.ready),builders:city.builderCount||0,
+   waiting:buildings.filter(b=>!b.ready).length,
+   wallReason:city.aiDefenseDiagnosticV146?.reason||'not-assessed'};
  }).sort((a,b)=>b.pop-a.pop);
  return {turn,ages:game.s.ages.slice(1),cities:cities.length,population:cities.reduce((s,c)=>s+c.pop,0),
   largest:cities[0]||null,markets:cities.filter(c=>c.markets>0).length,
@@ -32,7 +38,7 @@ for(let turn=1;turn<=maxTurns;turn++){
  }
  if(turn%20===0||Object.values(bronzeAt).includes(turn)||Object.values(ironAt).includes(turn)){
   const s=metrics(turn);snapshots.push(s);
-  console.log('V160 BRONZE',JSON.stringify({turn,ages:s.ages,population:s.population,cities:s.cities,largest:s.largest&&{name:s.largest.name,pop:s.largest.pop,walls:s.largest.stonewall,gates:s.largest.gatehouse},marketCities:s.markets}));
+  console.log('V160 BRONZE',JSON.stringify({turn,ages:s.ages,population:s.population,cities:s.cities,largest:s.largest&&{name:s.largest.name,pop:s.largest.pop,walls:s.largest.stonewall,gates:s.largest.gatehouse,cutstone:s.largest.cutstone,plank:s.largest.plank,food:s.largest.food,reason:s.largest.wallReason,waiting:s.largest.waiting},marketCities:s.markets}));
  }
  if(Object.keys(ironAt).length>=1&&turn>=Math.min(...Object.values(ironAt))+5)break;
 }
