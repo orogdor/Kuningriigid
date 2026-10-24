@@ -24,10 +24,11 @@ def write_pack(path, header, blob):
     js = json.dumps(header, separators=(',', ':')).encode()
     while (8 + len(js)) % 4:
         js += b' '
+    raw = struct.pack('<II', 0x3156534B, len(js)) + js + bytes(blob)   # 'KSV1'
+    import gzip
     with open(path, 'wb') as f:
-        f.write(struct.pack('<II', 0x3156534B, len(js)))   # 'KSV1'
-        f.write(js)
-        f.write(bytes(blob))
+        # gzip-wrapped; the game unpacks it with DecompressionStream (static hosts do not compress .bin)
+        f.write(gzip.compress(raw, 9, mtime=0))
 
 
 def build_kind(kind):

@@ -14,7 +14,10 @@ let PACK = null, BLOB = null;
 try {
   const res = await fetch(new URL('./models-v148/soldiers-v148-' + LOD + '.bin?v=148a', import.meta.url));
   if (!res.ok) throw Error('HTTP ' + res.status);
-  const buf = await res.arrayBuffer(), view = new DataView(buf);
+  let buf = await res.arrayBuffer();
+  if (new Uint8Array(buf, 0, 2)[0] === 0x1f && new Uint8Array(buf, 0, 2)[1] === 0x8b)
+    buf = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+  const view = new DataView(buf);
   if (view.getUint32(0, true) !== MAGIC) throw Error('bad soldier pack');
   const len = view.getUint32(4, true);
   PACK = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 8, len)));

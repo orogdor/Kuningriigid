@@ -69,7 +69,7 @@ Kirjuta lühidalt: mis muutus, millised failid, kuidas testida, mis jäi pooleli
   armee värviga. GLB-s on eraldi materjal `team_color`; muuda selle `baseColorFactor` väärtust.
 - Klassid (`grade`): `elite` lisab sildiga `elite` osad, `mobilized` eemaldab sildiga `armor` osad.
   Peade variandid (habe, juuksed) on siltidega `v0/v1/v2` ja valitakse sõduri asukoha järgi.
-- Mängupakk (`KSV1`): 8-baidine päis, JSON ja binaar. Positsioonid on int16 (1/8000 m), normaalid int8 ja
+- Mängupakk on gzip-iga pakitud (≈1,1 MB high / 0,65 MB low; mäng pakib lahti `DecompressionStream`-iga). Lahtipakitud sisu (`KSV1`): 8-baidine päis, JSON ja binaar. Positsioonid on int16 (1/8000 m), normaalid int8 ja
   indeksid uint16. Iga tükk on kirjeldatud kujul `[bone, group, tags, mat, color, posOffset, nrmOffset, vertCount, idxOffset, idxCount]`.
   Klipid on JSON-is: `{d: kestus, loop, f: [{r: {luu: [x,y,z] Euler XYZ}, t: {luu: [dx,dy,dz]}}]}`.
 - Runtime (`soldier-models-v148.js`) kasutab top-level awaiti. Kui pakki ei saa laadida (nt Node-testid),

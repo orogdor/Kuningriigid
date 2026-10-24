@@ -1,6 +1,7 @@
 // V148: new soldier models and animations (data checks, runs in Node without a browser).
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import zlib from 'node:zlib';
 
 const manifest = JSON.parse(fs.readFileSync('models-v148/manifest.json', 'utf8'));
 const expected = ['scout', 'militia', 'slinger', 'spearman', 'axeman', 'archer', 'bronze_spearman', 'bronze_axeman', 'bronze_archer',
@@ -9,7 +10,9 @@ const expected = ['scout', 'militia', 'slinger', 'spearman', 'axeman', 'archer',
 assert.deepEqual(Object.keys(manifest.models).sort(), [...expected].sort(), 'every soldier kind has a V148 model');
 
 function readPack(path) {
-  const buf = fs.readFileSync(path), ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), dv = new DataView(ab);
+  let buf = fs.readFileSync(path);
+  if (buf[0] === 0x1f && buf[1] === 0x8b) buf = zlib.gunzipSync(buf);
+  const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), dv = new DataView(ab);
   assert.equal(dv.getUint32(0, true), 0x3156534B, path + ' magic');
   const len = dv.getUint32(4, true), header = JSON.parse(new TextDecoder().decode(new Uint8Array(ab, 8, len)));
   return { header, blob: ab.slice(8 + len) };
