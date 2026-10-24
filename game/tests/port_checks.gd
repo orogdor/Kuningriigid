@@ -764,6 +764,33 @@ static func run() -> Dictionary:
     civil_ai["resources"]["steel"] = 20.0
     _check(results,"v53-civil-ai-can-choose-working-machine-factory",
         PreviewAI.choose_building(civil_ai,{"steelmaking":true,"steam_engine":true},0)=="machine_shop")
+    var big_food_city: Dictionary = {"c":40,"r":42,"pop":80,"age":3,
+        "resources":Economy.start_resources(),
+        "buildings":[{"type":"hall","ready":true,"hp":1200.0},{"type":"lumber","ready":true,"hp":350.0},{"type":"quarry","ready":true,"hp":350.0}]}
+    big_food_city["resources"]["wood"] = 220.0
+    big_food_city["resources"]["plank"] = 220.0
+    big_food_city["resources"]["stone"] = 220.0
+    big_food_city["resources"]["bread"] = 0.0
+    for ix in range(2):
+        big_food_city["buildings"].append({"type":"hunter","ready":true,"hp":350.0})
+    _check(results,"v53-large-city-does-not-cap-hunters-at-two",
+        PreviewAI.choose_building(big_food_city,{"hunting":true,"agriculture":true,"water":true},0)=="hunter")
+    var big_water_city: Dictionary = {"c":41,"r":43,"pop":80,"age":3,
+        "resources":Economy.start_resources(),
+        "buildings":[{"type":"hall","ready":true,"hp":1200.0},{"type":"quarry","ready":true,"hp":350.0},
+            {"type":"hunter","ready":true,"hp":350.0},{"type":"hunter","ready":true,"hp":350.0},
+            {"type":"hunter","ready":true,"hp":350.0},{"type":"hunter","ready":true,"hp":350.0},
+            {"type":"well","ready":true,"hp":350.0},{"type":"well","ready":true,"hp":350.0}]}
+    big_water_city["resources"]["bread"] = 250.0
+    big_water_city["resources"]["water"] = 0.0
+    big_water_city["resources"]["wood"] = 250.0
+    big_water_city["resources"]["stone"] = 250.0
+    _check(results,"v53-large-city-builds-more-than-two-real-wells",
+        PreviewAI.choose_building(big_water_city,{"hunting":true,"water":true},0)=="well")
+    var city_housing_target: int = CityPlanning.housing_target(80)
+    _check(results,"v53-80-resident-city-requires-real-houses",
+        city_housing_target>=26)
+
     var short_civil: Dictionary = Preview.initialize(civil_manifest)
     var short_start: Dictionary = CampaignPlay.begin(short_civil,0)
     _check(results,"v53-original-bronze-campaign-kept-unmodified",
