@@ -41,7 +41,7 @@ import {atWar,setRelation,relation,blockMerchants} from './diplomacy-v87.js';
 import {cityNeeds,nationalStock,foodTotal,GOODS} from './city-needs-v87.js';
 import {spatialInstances,updateSpatialBatches} from './spatial-batches-v86.js?v=86a';
 import {automaticUIRefreshDue} from './gameplay-flow-v86.js?v=86a';
-import {landscapeMaterial} from './landscape-material-v85.js?v=123a';
+import {terrainMaterial,mountainShade,smoothedOverview,trailMaterial,bakeRelief} from './landscape-v149.js?v=149a';
 import {createDetailBorders} from './detail-borders-v85.js?v=126a';
 import {mountainTint,createMountainOutcrops,createBridgeBuilding,crossingFrame} from './landscape-polish-v84.js?v=123a';
 import {CommandVisuals} from './command-visuals.js';
@@ -152,7 +152,7 @@ function updateBuildingInfo(){
 }
 // The overview mesh has a coarse vertex spacing. Conservatively open the
 // channel at neighbouring vertices so it cannot roof over a narrow river.
-function atlasTerrainHeight(x,z){return overviewSurface(game,x,z,50/(quality==='low'?2:3))}
+function atlasTerrainHeight(x,z){const spacing=50/(quality==='low'?2:3);return smoothedOverview((a,b)=>overviewSurface(game,a,b,spacing),x,z,spacing)}
 
 function terrain(scene,cell=null){const world=!cell,battle=!world&&!!s.battle,geo=new T.PlaneGeometry(world?WORLD_WIDTH:battle?1800:675,world?WORLD_DEPTH:battle?1560:585,world?COLS*(quality==='low'?2:3):(quality==='high'?450:quality==='low'?180:300),world?ROWS*(quality==='low'?2:3):(quality==='high'?390:quality==='low'?156:260));geo.rotateX(-Math.PI/2);if(battle)geo.translate(DETAIL_HALF_X,0,DETAIL_HALF_Z);if(world)geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=world?atlasTerrainHeight(x,z):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
  const color=world?atlasColor(game,x,z,h):new T.Color(
@@ -168,10 +168,10 @@ for(let i=0;i<p.count;i++){
  const rocky=at&&game.cell(at)?.mountain;if(!rocky||height<1)continue;
  const wx=world?x:cell.x+x/DETAIL_X,wz=world?z:cell.z+z/DETAIL_Z,wy=world?height:height/.30+.7;
  const nx=norm.getX(i)*(world?1:DETAIL_X),ny=norm.getY(i)*(world?1:.30),nz=norm.getZ(i)*(world?1:DETAIL_Z);
- const shade=mountainTint(new T.Color(colors[i*3],colors[i*3+1],colors[i*3+2]),wx,wz,wy,ny/(Math.hypot(nx,ny,nz)||1));
+ const shade=mountainShade(new T.Color(colors[i*3],colors[i*3+1],colors[i*3+2]),wx,wz,wy,ny/(Math.hypot(nx,ny,nz)||1));
  colors[i*3]=shade.r;colors[i*3+1]=shade.g;colors[i*3+2]=shade.b;
 }
-geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));const mesh=new T.Mesh(geo,landscapeMaterial('terrain',world?'world':'detail',cell));mesh.receiveShadow=true;mesh.userData.terrain=true;scene.add(mesh);if(!world){
+geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));bakeRelief(geo,world?{ring:1}:{ring:4,hScale:DETAIL_X,vScale:.30});const mesh=new T.Mesh(geo,terrainMaterial(world?'world':'detail',cell));mesh.receiveShadow=true;mesh.userData.terrain=true;scene.add(mesh);if(!world){
  const seaGeo=new T.PlaneGeometry(battle?1800:675,battle?1560:585,quality==='low'?32:64,quality==='low'?28:56);seaGeo.rotateX(-Math.PI/2);if(battle)seaGeo.translate(DETAIL_HALF_X,0,DETAIL_HALF_Z);
  const v=seaGeo.attributes.position,colors=[];
  for(let i=0;i<v.count;i++){
@@ -344,7 +344,7 @@ function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory
  for(const [key,model]of unitModels)if(key.startsWith('ballista:')&&(!battle||!(battle.ballistaShots||[]).some(s=>key==='ballista:'+s.id))){people.remove(model);unitModels.delete(key);}
  for(const [key,model] of unitModels)if(key.startsWith('siege:'))model.visible=!!battle&&(battle.siegeWorks||[]).some(w=>key==='siege:'+w.id&&!w.destroyed);
  soldierBatch??=new SoldierBatch(people);soldierBatch.update([...unitModels].filter(([key])=>key.startsWith('unit:')).map(([,model])=>model));
- const feedbackSquads=battle?.individualVersion===1?squads.filter(u=>!u.reserve).flatMap(u=>(u.men||[]).filter(m=>!m.escaped).map(m=>({...m,source:m.id,team:u.team,kind:u.kind,retreated:u.retreated,projectile:m.projectile}))):squads;const selectedFeedback=feedbackSquads.find(m=>m.source===selectedSoldierId),selectedSquadFeedback=battle&&!selectedFeedback&&selectedUnit&&!selectedUnit.retreated&&!selectedUnit.reserve?{...selectedUnit,source:'selected-squad:'+selectedUnit.source,shot:null,projectile:null,attackTime:null}:null;const visibleFeedback=selectedSquadFeedback?[...feedbackSquads,selectedSquadFeedback]:feedbackSquads;battleFeedback.update(visibleFeedback,selectedFeedback||selectedSquadFeedback||selectedUnit,battle,TROOPS);if(battle)return;if(!localTrails){localTrails=new T.InstancedMesh(new T.CircleGeometry(.65,7),new T.MeshBasicMaterial({color:'#ffffff',transparent:true,opacity:.90,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-3}),4096);localTrails.count=0;localTrails.rotation.x=0;environment.add(localTrails)}if(lastTrailTime>=0&&lastTrailNavVersion===nav.version&&s.time-lastTrailTime<(lastTrailChanges===world.trailChanges?10:2))return;lastTrailTime=s.time;lastTrailChanges=world.trailChanges;lastTrailNavVersion=nav.version;const dummy=new T.Object3D(),roadColors=['#000000','#b3a07e','#c1a781','#a49b8a','#8b9693'];let count=0;
+ const feedbackSquads=battle?.individualVersion===1?squads.filter(u=>!u.reserve).flatMap(u=>(u.men||[]).filter(m=>!m.escaped).map(m=>({...m,source:m.id,team:u.team,kind:u.kind,retreated:u.retreated,projectile:m.projectile}))):squads;const selectedFeedback=feedbackSquads.find(m=>m.source===selectedSoldierId),selectedSquadFeedback=battle&&!selectedFeedback&&selectedUnit&&!selectedUnit.retreated&&!selectedUnit.reserve?{...selectedUnit,source:'selected-squad:'+selectedUnit.source,shot:null,projectile:null,attackTime:null}:null;const visibleFeedback=selectedSquadFeedback?[...feedbackSquads,selectedSquadFeedback]:feedbackSquads;battleFeedback.update(visibleFeedback,selectedFeedback||selectedSquadFeedback||selectedUnit,battle,TROOPS);if(battle)return;if(!localTrails){localTrails=new T.InstancedMesh(new T.CircleGeometry(.85,10),trailMaterial(true),4096);localTrails.count=0;localTrails.rotation.x=0;environment.add(localTrails)}if(lastTrailTime>=0&&lastTrailNavVersion===nav.version&&s.time-lastTrailTime<(lastTrailChanges===world.trailChanges?10:2))return;lastTrailTime=s.time;lastTrailChanges=world.trailChanges;lastTrailNavVersion=nav.version;const dummy=new T.Object3D(),roadColors=['#000000','#b3a07e','#c1a781','#a49b8a','#8b9693'];let count=0;
  const spots=Object.keys(world.heat||{}).map(key=>({key:Number(key),heat:nav.roadStrength(Number(key))})).filter(e=>nav.roadLevel(e.key)>0&&nav.open(nav.point(e.key).x,nav.point(e.key).z)).sort((a,b)=>b.heat-a.heat).slice(0,4096);
  for(const{key,heat}of spots){const {x,z}=nav.point(key),level=nav.roadLevel(key);dummy.position.set(x,ground(activeTile,x,z)+.24,z);dummy.rotation.set(-Math.PI/2,0,0);dummy.scale.setScalar([.4,.82,1.06,1.26,1.5][level]);dummy.updateMatrix();localTrails.setMatrixAt(count,dummy.matrix);localTrails.setColorAt(count,new T.Color(roadColors[level]));count++}
  localTrails.count=count;localTrails.instanceMatrix.needsUpdate=true;if(localTrails.instanceColor)localTrails.instanceColor.needsUpdate=true;localTrails.computeBoundingSphere();if(localTrailLinks){environment.remove(localTrailLinks);localTrailLinks.traverse(o=>{o.geometry?.dispose();o.material?.dispose()})}localTrailLinks=createDetailTrailLinks(spots,nav,(x,z)=>ground(activeTile,x,z));environment.add(localTrailLinks);

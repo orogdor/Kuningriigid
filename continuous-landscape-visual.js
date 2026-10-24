@@ -4,7 +4,7 @@ import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
 import * as T from './vendor/three.module.js';
-import {landscapeMaterial} from './landscape-material-v85.js?v=123a';
+import {waterMaterial,roadMaterial,animate} from './landscape-v149.js';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
 import {riverNear,localToWorld} from './continuous-landscape.js?v=123a';
 import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
@@ -14,13 +14,14 @@ const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z
 const elev=(game,x,z,view)=>surface(game,x,z,view);
 const pos=(game,x,z,y,view,tile)=>({...field(game,x,z,view,tile),y:projectHeight(y,view)});
 function join(pts,game,scope,tile,kind,level=1){
- const isRiver=kind==='river',wBase=isRiver?0:[0,.65,.9,1.2,1.55][level],out=[];
+ // V149: atlas roads are drawn wider so they read at map scale (centre lines are unchanged).
+ const isRiver=kind==='river',wBase=isRiver?0:[0,1.25,1.6,2.0,2.5][level],out=[];
  for(let i=0;i<pts.length;i++){
   const p=pts[i],before=pts[Math.max(0,i-1)],after=pts[Math.min(pts.length-1,i+1)];
   const tX=after.x-before.x,tZ=after.z-before.z,d=Math.hypot(tX,tZ)||1;
   const nx=-tZ/d,nz=tX/d,width=isRiver?p.width:scope==='detail'?detailWorldRoadWidth(level)/2/Math.hypot(nx*DETAIL_X,nz*DETAIL_Z):wBase;
   const left={x:p.x+nx*width,z:p.z+nz*width},right={x:p.x-nx*width,z:p.z-nz*width};
-  const outer=isRiver?width+Math.max(1.4,width*.32)*(1+.24*Math.sin(p.x*.17+p.z*.13)):width*1.23;
+  const outer=isRiver?width+Math.max(1.4,width*.32)*(1+.24*Math.sin(p.x*.17+p.z*.13)):width*1.6;
   const outerL={x:p.x+nx*outer,z:p.z+nz*outer},outerR={x:p.x-nx*outer,z:p.z-nz*outer};
   const waterHeight=Math.max(.85,baseHeight(game,p.x,p.z)-(2.4+Math.min(2.1,p.width*.20)));
   const innerY=isRiver?projectHeight(waterHeight,scope):elev(game,p.x,p.z,scope)+(scope==='world'?1.32:.396);
@@ -38,7 +39,7 @@ function join(pts,game,scope,tile,kind,level=1){
 }
 function tri(arr,a,b,c){V(arr,a);V(arr,b);V(arr,c)}
 function strip(arr,a,b,c,d){tri(arr,a,b,c);tri(arr,c,b,d)}
-function buffers(vertices,color,{standard=false,opacity=1,shade=null}={}){
+function buffers(vertices,color,{standard=false,opacity=1,shade=null,alpha=null}={}){
  if(!vertices.length)return null;
  // Weld shared vertices into an indexed mesh. Consecutive river/road
  // sections now share actual vertices and normals, instead of separate
@@ -54,11 +55,25 @@ function buffers(vertices,color,{standard=false,opacity=1,shade=null}={}){
  const geo=new T.BufferGeometry();
  geo.setAttribute('position',new T.Float32BufferAttribute(unique,3));
  geo.setIndex(indices);geo.computeVertexNormals();geo.computeBoundingSphere();
- const tint=new T.Color(color),vertexColors=new Float32Array(unique.length);
- for(let i=0;i<vertexColors.length;i+=3){const c=shade?shade(unique[i],unique[i+1],unique[i+2]):tint;vertexColors[i]=c.r;vertexColors[i+1]=c.g;vertexColors[i+2]=c.b}
- geo.setAttribute('color',new T.Float32BufferAttribute(vertexColors,3));
- const mat=standard?new T.MeshStandardMaterial({vertexColors:true,roughness:.55,metalness:.10,transparent:opacity!==1,opacity,side:T.DoubleSide,depthWrite:opacity===1}):new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
+ const tint=new T.Color(color),stride=alpha?4:3,vertexColors=new Float32Array(unique.length/3*stride);
+ for(let i=0,j=0;i<unique.length;i+=3,j+=stride){const c=shade?shade(unique[i],unique[i+1],unique[i+2]):tint;vertexColors[j]=c.r;vertexColors[j+1]=c.g;vertexColors[j+2]=c.b;if(alpha)vertexColors[j+3]=alpha(unique[i],unique[i+1],unique[i+2])}
+ geo.setAttribute('color',new T.Float32BufferAttribute(vertexColors,stride));
+ const mat=standard?new T.MeshStandardMaterial({vertexColors:true,roughness:alpha?.95:.55,metalness:alpha?0:.10,transparent:opacity!==1||!!alpha,opacity,side:T.DoubleSide,depthWrite:opacity===1&&!alpha}):new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  return new T.Mesh(geo,mat);
+}
+
+// V149: downstream direction of the nearest river segment (edges run from a cell to riverTo).
+const flowIndex=new WeakMap();
+function riverFlow(game,x,z){
+ let index=flowIndex.get(game);
+ if(!index){index=new Map();for(const e of getRivers(game))for(let i=1;i<e.points.length;i++){const a=e.points[i-1],b=e.points[i];
+  const key=Math.floor((a.x+b.x)/2/40)+':'+Math.floor((a.z+b.z)/2/40),list=index.get(key)||[];list.push([a,b]);index.set(key,list)}flowIndex.set(game,index)}
+ const cx=Math.floor(x/40),cz=Math.floor(z/40);let best=Infinity,dir={x:1,z:0};
+ for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++)for(const [a,b] of index.get((cx+dx)+':'+(cz+dz))||[]){
+  const vx=b.x-a.x,vz=b.z-a.z,l=vx*vx+vz*vz||1,t=Math.max(0,Math.min(1,((x-a.x)*vx+(z-a.z)*vz)/l)),d=Math.hypot(a.x+vx*t-x,a.z+vz*t-z);
+  if(d<best){best=d;const n=Math.sqrt(l);dir={x:vx/n,z:vz/n}}
+ }
+ return dir;
 }
 function visible(tile,path,radius=110){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
@@ -123,15 +138,35 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   }
   shallowCrossings++;
  }
- const bankMesh=buffers(banks,'#b2a68a',{standard:true}),waterMesh=buffers(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
-  const p=scope==='world'?{x,z}:localToWorld(tile,x,z),near=riverNear(game,p.x,p.z);
-  const shallow=Math.min(1,near.distance/Math.max(1,near.width));
-  return new T.Color('#245d73').lerp(new T.Color('#76b6ae'),Math.pow(shallow,2)*.68).multiplyScalar(.96+.04*Math.sin(p.x*.11+p.z*.07));
+ // V149: wet, dark mud at the waterline that dries and fades into the surrounding land.
+ const toWorld=(x,z)=>scope==='world'?{x,z}:localToWorld(tile,x,z);
+ const mud=new T.Color('#5a523f'),damp=new T.Color('#6e6a4c');
+ const bankMesh=buffers(banks,'#6e6a4c',{standard:true,shade:(x,y,z)=>{
+  const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
+  return mud.clone().lerp(damp,t).multiplyScalar(.92+.16*Math.sin(p.x*.37+Math.sin(p.z*.29)*2));
+ },alpha:(x,y,z)=>{
+  const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
+  return Math.pow(1-t,1.6)*.80;
  }});
- if(waterMesh){waterMesh.material.dispose();waterMesh.material=landscapeMaterial('water',scope,tile);}
+ const deep=new T.Color('#1d4a57'),shallowCol=new T.Color('#4f7f74');
+ const waterMesh=buffers(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
+  const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
+  const edge=Math.min(1,near.distance/Math.max(1,near.width));
+  return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
+ }});
+ if(waterMesh){
+  waterMesh.material.dispose();waterMesh.material=waterMaterial(scope,tile);animate(waterMesh);
+  const pos=waterMesh.geometry.attributes.position,flow=new Float32Array(pos.count*2),shore=new Float32Array(pos.count);
+  for(let i=0;i<pos.count;i++){
+   const p=toWorld(pos.getX(i),pos.getZ(i)),f=riverFlow(game,p.x,p.z);
+   const near=riverNear(game,p.x,p.z),speed=Math.max(.45,Math.min(1.35,1.5-(near.width||3)*.09));
+   flow[i*2]=f.x*speed;flow[i*2+1]=f.z*speed;shore[i]=Math.max(0,Math.min(1,near.distance/Math.max(.5,near.width)));
+  }
+  waterMesh.geometry.setAttribute('aFlow',new T.BufferAttribute(flow,2));waterMesh.geometry.setAttribute('aShore',new T.BufferAttribute(shore,1));
+ }
  const shallowMesh=buffers(fordShoals,'#aaa47e',{standard:false,opacity:.40});
  if(shallowMesh){shallowMesh.name='shallow walkable ford shoals';shallowMesh.renderOrder=11;group.add(shallowMesh)}
- if(bankMesh){bankMesh.name='continuous river banks';group.add(bankMesh)}
+ if(bankMesh){bankMesh.name='continuous river banks';bankMesh.renderOrder=8;group.add(bankMesh)}
  if(waterMesh){waterMesh.name='continuous water surface';waterMesh.renderOrder=9;group.add(waterMesh)}
  group.userData.riverEdges=riverCount;
  group.userData.shallowFordCount=shallowCrossings;
@@ -144,22 +179,29 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
 }
 export function createUnifiedRoadNetwork(game,scope='world',tile=null){
  const group=new T.Group();group.name='V67 continuous road graph';group.userData.roadNetwork=true;
- const beds=[],verges=[],ruts=[];
- let roads=0;
+ // V149: one lit ribbon per road (soft verge | bed | soft verge) with across/along UVs; the
+ // surface (ruts, gravel, cobbles, flagstones) is drawn by the road shader from the road level.
+ const pos=[],uv=[],lvl=[],index=[];
+ let roads=0,beds=0;
  for(const edge of roadNetwork(game)){
   if(!visible(tile,edge.points))continue;
   const xs=join(edge.points,game,scope,tile,'road',edge.level);
-   for(let i=1;i<xs.length;i++){
-   const a=xs[i-1],b=xs[i];
-   strip(beds,a.l,a.r,b.l,b.r);
-   strip(verges,a.ol,a.l,b.ol,b.l);strip(verges,a.r,a.or,b.r,b.or);
+  let along=0,base=pos.length/3;
+  for(let i=0;i<xs.length;i++){
+   if(i){const p=edge.points[i],q=edge.points[i-1];along+=Math.hypot(p.x-q.x,p.z-q.z);}
+   const x=xs[i];
+   for(const [v,u] of [[x.ol,-1.5],[x.l,-1],[x.r,1],[x.or,1.5]]){pos.push(v.x,v.y,v.z);uv.push(u,along);lvl.push(edge.level)}
+   if(i){const r0=base+(i-1)*4,r1=base+i*4;for(let k=0;k<3;k++)index.push(r0+k,r0+k+1,r1+k,r1+k,r0+k+1,r1+k+1);beds+=2}
   }
   roads++;
  }
- const verge=buffers(verges,'#675d4d',{opacity:.87}),road=buffers(beds,'#b7a080',{opacity:.98});
- if(verge){verge.name='continuous road verge';group.add(verge)}
- if(road){road.name='continuous road pavement';road.renderOrder=10;group.add(road)}
- group.userData.detailWidthRatio=scope==='detail'?2:null;group.userData.roadEdges=roads;group.userData.roadVertexCount=beds.length/3;
+ if(pos.length){
+  const geo=new T.BufferGeometry();
+  geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));
+  geo.setAttribute('aLevel',new T.Float32BufferAttribute(lvl,1));geo.setIndex(index);geo.computeVertexNormals();geo.computeBoundingSphere();
+  const road=new T.Mesh(geo,roadMaterial(scope,tile));road.name='continuous road pavement';road.renderOrder=10;road.receiveShadow=true;group.add(road);
+ }
+ group.userData.detailWidthRatio=scope==='detail'?2:null;group.userData.roadEdges=roads;group.userData.roadVertexCount=beds*3;
  return group;
 }
 export function disposeNetwork(group){

@@ -121,3 +121,62 @@ CHROME_PATH=... node TEST_V148_BROWSER.mjs       # vajab playwrighti
 - GLB-s on ainult `standard` klass ja pea variant `v0`. Eliit/mobiliseeritud ja teised pead on ainult mängupakis.
 - Generaatori osaline käivitus kirjutab pakid üle. Lõpus käivita alati kõik ühikud.
 - Seda versiooni pole GitHubi lükatud. Kasutaja otsustab, millal avaldada.
+
+---
+
+## 2026-10-24 · Claude (Anthropic) · V149 – jõed, teed ja mäed ilusamaks (maailma- ja detailkaart)
+
+### Ülesanne
+Teha jõed, teed ja mäed maailmakaardil ja detailkaardil võimalikult realistlikuks, ilma et ressursikasutus liiga palju kasvaks.
+
+### Põhimõte
+Muudeti **ainult välimust**. Jõgede ja teede keskjooned, maastiku kõrgused, navigatsioon, ehituskohad ja salvestused jäid samaks
+(`continuous-landscape.js`, `world-geography.js` ja `landscape-shared.js` jäid puutumata). Tekstuure ei laadita alla, kõik on protseduuriline
+varjutaja. Kolmnurkade arv jäi samaks ja teede joonistuskutseid on vähem (üks võrk kahe asemel).
+
+### Uus fail
+- `landscape-v149.js`:
+  - `terrainMaterial` – mägede kalju, rusukalded, alpiniit ja lumi kalde ja kõrguse järgi; detailkaardil lisaks lähivaate tera
+    ja kivikesed, mis kaovad kaugelt vaadates (`fwidth`), et vältida virvendust.
+  - `waterMaterial` – voolusuunas liikuvad lainetused, sügavusvärv, vahutriibud madalikul ja helgid; aeg tuleb ühisest
+    `LANDSCAPE_TIME`-ist, mida uuendab `onBeforeRender`.
+  - `roadMaterial` – teetase 1 = roopaline pinnastee, 2 = kruus, 3 = munakivi, 4 = kiviplaatidest maantee; servad sulavad pehmelt maastikku.
+  - `trailMaterial` – tallatud rajad pehmete servadega.
+  - `mountainShade` – mäeruutude tipuvärv.
+  - `smoothedOverview` – maailmakaardi mäetippude kerge silumine, et mäeharjad ei oleks sakilised.
+  - `bakeRelief` – org ja nõod tumedamad, harjad heledamad; arvutatakse üks kord võrgu ehitamisel.
+
+### Muudetud failid
+- `civilization.js`:
+  - impordib `landscape-v149.js` (vana `landscape-material-v85.js` jäi alles, aga seda enam ei kasutata);
+  - `atlasTerrainHeight` kasutab `smoothedOverview`-d;
+  - `mountainTint` asemel on `mountainShade`;
+  - maastik saab `bakeRelief`-i ja `terrainMaterial`-i;
+  - `localTrails` kasutab `trailMaterial(true)`-d.
+- `continuous-landscape-visual.js`:
+  - vee materjal ja atribuudid `aFlow` (voolusuund lähima jõelõigu järgi) ning `aShore`;
+  - kaldad on märjad ja tumedad ning sulavad tipu-alfaga maastikku;
+  - teed on üks valgustatud riba UV-ga (risti −1,5…1,5, piki meetrites) ja atribuudiga `aLevel`;
+  - maailmakaardi teed on laiemaks joonistatud.
+- `detail-roads.js` – raja ribad saavad UV ja `trailMaterial`-i, segmendid kattuvad veidi, et rada oleks ühtlane.
+- `boot-v83.js` ja `index.html` – puhvri värskendus (`civilization.js?v=149a`, import-mapis `continuous-landscape-visual` ja `detail-roads` → `?v=149a`).
+
+### Testid
+- `TEST_V149_BROWSER.mjs` (uus) on PASS nii high kui ka low graafikaga: maailma- ja detailkaart kasutavad V149 varjutajaid ja lehel pole vigu.
+- Varasemad testid on endiselt PASS: `TEST_V143_BROWSER`, `TEST_V147`, `TEST_V147_BROWSER`, `TEST_V148`, `TEST_V148_BROWSER` (lahingud #1 ja #6).
+- Laadimisaeg tarkvaralise graafikaga: umbes 12,2 s → 12,9 s (+5%, sh varjutajate kompileerimine).
+
+### Häälestamine
+Värvid ja piirid on `landscape-v149.js` GLSL-plokkides:
+- lumepiir: `snowLine=118`;
+- kalju algus: `rockAt`;
+- alpiniit: 70–105 m;
+- teede värvid: `dirt`, `rock`;
+- vesi: `deep` ja `shallowCol` failis `continuous-landscape-visual.js`.
+
+Maastiku kõrgused on mägedes umbes 54–158 (mediaan 94) ja madalikul mediaan 17.
+
+### Teadaolevad piirangud
+- Detailkaardi udu (`T.Fog('#b7c9bd',260,700)`) teeb kõrged mäed kaugelt heledamaks. Seda ei muudetud, sest see on mängu üldine välimus.
+- Vana `landscape-material-v85.js` jäi faili alles, kuid seda enam ei kasutata.
+- Seda versiooni pole GitHubi lükatud.
