@@ -160,8 +160,6 @@ balanceUnitDefinitions(TROOPS);
 applyDevelopmentBalance(BUILDINGS,TROOPS);
 // V160: houses are small, repeated investments; keep the half-capacity per home.
 // Stone walls spend real dressed stone but no longer consume an entire timber supply.
-BUILDINGS.house.cost.plank=Math.ceil(BUILDINGS.house.cost.plank*.68);
-BUILDINGS.house.cost.stone=Math.ceil(BUILDINGS.house.cost.stone*.83);
 BUILDINGS.house.time=Math.ceil(BUILDINGS.house.time*.85);
 BUILDINGS.mason.cost.wood=Math.ceil(BUILDINGS.mason.cost.wood*.7);
 BUILDINGS.mason.cost.stone=Math.ceil(BUILDINGS.mason.cost.stone*.75);
