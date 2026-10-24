@@ -13,6 +13,7 @@ const Era = preload("res://scripts/core/era_economy_port.gd")
 const Tech125 = preload("res://scripts/core/research_v125_port.gd")
 const Preview = preload("res://scripts/core/preview_sim_port.gd")
 const CampaignPlay = preload("res://scripts/core/campaign_play_port.gd")
+const CampaignWar = preload("res://scripts/core/campaign_war_port.gd")
 const CityFounding = preload("res://scripts/core/city_founding_port.gd")
 const SettlerCampaign = preload("res://scripts/core/settler_campaign_port.gd")
 const Build = preload("res://scripts/core/building_rules_port.gd")
@@ -99,6 +100,91 @@ static func run() -> Dictionary:
     _check(results,"v42-founding-log-survives-save-load",extra_loaded.get("founding_log",[]).size()==1)
     if FileAccess.file_exists("user://v42_founding_regression.json"):
         DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v42_founding_regression.json"))
+    # V4.4 paid strategic military and genuine tactical campaign encounters.
+    var war_state: Dictionary = Preview.initialize([
+        {"id":0,"team":0,"c":60,"r":20,"name":"Kaitselinn"},
+        {"id":1,"team":1,"c":38,"r":20,"name":"Väepealik"}])
+    war_state["campaign"] = {"active":true,"player_team":0,"turn":10,"result":"playing"}
+    war_state["teams"][1]["known"]["warfare"] = true
+    var war_home: Dictionary = war_state["cities"][1]
+    war_home["pop"] = 12
+    war_home["resources"]["wood"] = 260.0
+    war_home["resources"]["stone"] = 190.0
+    war_home["resources"]["bread"] = 160.0
+    war_home["resources"]["water"] = 180.0
+    var war_wood_before: float = float(war_home["resources"]["wood"])
+    var first_build: Dictionary = CampaignWar.ai_recruit(war_state)
+    _check(results,"v44-war-ai-builds-barracks-with-war-tech",int(first_build["built"])==1 and war_home["buildings"].size()==2)
+    _check(results,"v44-ai-barracks-really-spends-materials",float(war_home["resources"]["wood"])<war_wood_before)
+    _check(results,"v44-ai-barracks-not-instantly-ready",not bool(war_home["buildings"][1]["ready"]))
+    var no_duplicate_build: Dictionary = CampaignWar.ai_recruit(war_state)
+    _check(results,"v44-no-duplicate-pending-barracks",int(no_duplicate_build["built"])==0 and war_home["buildings"].size()==2)
+    war_home["buildings"][1]["ready"] = true
+    war_home["buildings"][1]["hp"] = 350.0
+    war_home["pop"] = 12
+    war_state["campaign"]["turn"] = 11
+    var recruit_one: Dictionary = CampaignWar.ai_recruit(war_state)
+    _check(results,"v44-ai-trains-through-military-queue",int(recruit_one["trained"])==1 and war_home["training"].size()==1)
+    _check(results,"v44-ai-recruit-debits-population",int(war_home["pop"])==11)
+    Preview.tick(war_state,60.0)
+    _check(results,"v44-army-unit-after-real-training-tick",int(war_state.get("military_trained",0))==1 and Military.units_for(war_state,war_state["armies"][0]).size()==1)
+    war_state["campaign"]["turn"] = 12
+    var recruit_two: Dictionary = CampaignWar.ai_recruit(war_state)
+    _check(results,"v44-ai-trains-second-unit",int(recruit_two.get("trained",0))==1)
+    Preview.tick(war_state,60.0)
+    _check(results,"v44-garrison-two-genuine-units",Military.units_for(war_state,war_state["armies"][0]).size()==2)
+    var strategic_nav = WorldTradeNav.new()
+    strategic_nav.configure(founding_map)
+    _check(results,"v44-too-early-to-declare-attack",int(CampaignWar.ai_march(war_state,strategic_nav)["ordered"])==0)
+    war_state["campaign"]["turn"] = 18
+    var ai_march_order: Dictionary = CampaignWar.ai_march(war_state,strategic_nav)
+    _check(results,"v44-ai-marches-to-rival-city",int(ai_march_order["ordered"])==1 and war_state["armies"][0]["path"].size()>0)
+    _check(results,"v44-ai-target-memo",int(war_state["armies"][0].get("campaign_target_city",-1))==0)
+    _check(results,"v44-ai-keeps-existing-legal-route",int(CampaignWar.ai_march(war_state,strategic_nav)["ordered"])==0)
+    var army_save: bool = Preview.save_preview(war_state,"user://v44_campaign_army.json")
+    var army_load: Dictionary = Preview.load_preview([
+        {"id":0,"team":0,"c":60,"r":20,"name":"Kaitselinn"},
+        {"id":1,"team":1,"c":38,"r":20,"name":"Väepealik"}],"user://v44_campaign_army.json")
+    _check(results,"v44-army-route-and-recruits-persist",army_save and army_load.get("armies",[]).size()==1 and army_load["armies"][0].get("path",[]).size()>0 and int(army_load.get("ai_military_recruit_orders",0))==2)
+    if FileAccess.file_exists("user://v44_campaign_army.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v44_campaign_army.json"))
+    var battlefield_state: Dictionary = Preview.initialize([
+        {"id":0,"team":0,"c":20,"r":20,"name":"Kaitse"},
+        {"id":1,"team":1,"c":30,"r":20,"name":"Rünnak"}])
+    battlefield_state["campaign"] = {"active":true,"player_team":0,"turn":20,"result":"playing"}
+    var battle_army_a: Dictionary = Military.create_army(battlefield_state,0,25,20)
+    var battle_army_b: Dictionary = Military.create_army(battlefield_state,1,25,20)
+    Military.add_unit(battlefield_state,battle_army_a,"spearman")
+    Military.add_unit(battlefield_state,battle_army_b,"spearman")
+    var actual_fight: bool = BattlePreview.detect_encounter(battlefield_state)
+    _check(results,"v44-campaign-engagement-starts-real-tactical-battle",actual_fight and not battlefield_state.get("individual_battle",{}).is_empty())
+    _check(results,"v44-campaign-not-using-benchmark-attrition",battlefield_state.get("active_battle",{}).is_empty())
+    var occupation_state: Dictionary = Preview.initialize([
+        {"id":0,"team":0,"c":20,"r":20,"name":"Avatud linn"},
+        {"id":1,"team":1,"c":35,"r":20,"name":"Vallutaja"}])
+    occupation_state["campaign"] = {"active":true,"player_team":0,"turn":30,"result":"playing"}
+    var attacker: Dictionary = Military.create_army(occupation_state,1,20,20)
+    Military.add_unit(occupation_state,attacker,"spearman")
+    Military.add_unit(occupation_state,attacker,"spearman")
+    var first_occupation: Dictionary = CampaignWar.occupy_unfortified(occupation_state)
+    _check(results,"v44-city-requires-two-occupation-turns",int(first_occupation["captured"])==0 and int(occupation_state["cities"][0]["team"])==0)
+    _check(results,"v44-first-occupation-tracked",int(occupation_state["city_occupation_progress"]["0"]["turns"])==1)
+    var second_occupation: Dictionary = CampaignWar.occupy_unfortified(occupation_state)
+    _check(results,"v44-unfortified-garrisonless-city-changes-owner",int(second_occupation["captured"])==1 and int(occupation_state["cities"][0]["team"])==1)
+    _check(results,"v44-city-keeps-buildings-on-occupation",occupation_state["cities"][0]["buildings"].size()==1)
+    _check(results,"v44-city-occupation-logs-once",occupation_state["conquests"].size()==1 and str(occupation_state["conquests"][0]["mode"])=="undefended_occupation")
+    _check(results,"v44-no-duplicate-occupation",int(CampaignWar.occupy_unfortified(occupation_state)["captured"])==0)
+    var fortified_state: Dictionary = Preview.initialize([
+        {"id":0,"team":0,"c":20,"r":20,"name":"Vallilinn"},
+        {"id":1,"team":1,"c":35,"r":20,"name":"Sõjavägi"}])
+    fortified_state["campaign"] = {"active":true,"player_team":0,"turn":30,"result":"playing"}
+    fortified_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[20,20]]}
+    var sieging: Dictionary = Military.create_army(fortified_state,1,20,20)
+    Military.add_unit(fortified_state,sieging,"spearman")
+    Military.add_unit(fortified_state,sieging,"spearman")
+    CampaignWar.occupy_unfortified(fortified_state)
+    CampaignWar.occupy_unfortified(fortified_state)
+    _check(results,"v44-fortified-city-requires-real-siege",int(fortified_state["cities"][0]["team"])==0 and int(fortified_state.get("city_captures",0))==0)
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
