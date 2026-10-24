@@ -17,6 +17,7 @@ const FOOTPRINTS: Dictionary = {
     "quarry":Vector2(1.1,1.0),"mine":Vector2(1.1,1.0),"coal":Vector2(1.1,1.0),
     "well":Vector2(.42,.42),"barracks":Vector2(1.2,1.0),
     "saw":Vector2(1.2,1.0),"mill":Vector2(1.2,1.0),
+    "steelworks":Vector2(1.8,1.55),"machine_shop":Vector2(1.75,1.4),
     "warehouse":Vector2(1.1,1.0),"cellar":Vector2(1.0,.88),
     "lumber":Vector2(.85,.85),"hunter":Vector2(.85,.85)
 }
