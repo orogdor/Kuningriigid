@@ -5,7 +5,7 @@ extends RefCounted
 const CIVIC: Array[String] = ["hall","market","study","school","well","bakery","warehouse","cellar","chapel","inn"]
 const RESIDENTIAL: Array[String] = ["house"]
 const RURAL: Array[String] = ["lumber","forester","hunter","fisher","farm","quarry","mine","coal","claypit"]
-const INDUSTRIAL: Array[String] = ["saw","mill","smelter","smith","kiln","foundry"]
+const INDUSTRIAL: Array[String] = ["saw","mill","smelter","smith","kiln","foundry","steelworks","machine_shop"]
 
 static func zone(kind: String) -> String:
     if CIVIC.has(kind):
