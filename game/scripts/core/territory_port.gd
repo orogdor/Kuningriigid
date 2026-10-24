@@ -98,33 +98,35 @@ static func rebuild(state: Dictionary, land: PackedByteArray,force: bool = false
                 return int(a[1]) < int(b[1])
             return int(a[0]) < int(b[0])
         )
-        # A stronger city's claim can swallow nearly every tile near a small
-        # settlement. Search outward for the nearest unclaimed LAND squares,
-        # even if their distance exceeds the default county radius. Never
-        # displace another city's historic centre.
+        # Fill any missing peripheral county area by connected land search.
+        # The previous square-ring fallback could skip a sea barrier and claim
+        # an isolated shore without a road or land connection to the city.
         if tiles.size() < area:
-            var reached: bool = false
-            for ring in range(1,25):
-                for dz in range(-ring,ring+1):
-                    for dx in range(-ring,ring+1):
-                        if maxi(absi(dx),absi(dz)) != ring:
-                            continue
-                        var c: int = center.x+dx
-                        var r: int = center.y+dz
-                        if c < 0 or c >= COLS or r < 0 or r >= ROWS or land[r*COLS+c] == 0:
-                            continue
-                        var nearby_key: String = tile_key(c,r)
-                        if owners.has(nearby_key):
-                            continue
-                        owners[nearby_key] = i
-                        tiles.append([c,r])
-                        if tiles.size() >= area:
-                            reached = true
-                            break
-                    if reached:
+            var frontier: Array[Vector2i] = [center]
+            var visited: Dictionary = {tile_key(center.x,center.y):true}
+            var cursor: int = 0
+            while cursor < frontier.size() and tiles.size() < area:
+                var from: Vector2i = frontier[cursor]
+                cursor += 1
+                for offset in [Vector2i(1,0),Vector2i(-1,0),Vector2i(0,1),Vector2i(0,-1)]:
+                    var next: Vector2i = from+offset
+                    if next.x < 0 or next.x >= COLS or next.y < 0 or next.y >= ROWS:
+                        continue
+                    var near_key: String = tile_key(next.x,next.y)
+                    if visited.has(near_key):
+                        continue
+                    visited[near_key] = true
+                    if land[next.y*COLS+next.x] == 0:
+                        continue
+                    if owners.has(near_key):
+                        if int(owners[near_key]) == i:
+                            frontier.append(next)
+                        continue
+                    owners[near_key] = i
+                    tiles.append([next.x,next.y])
+                    frontier.append(next)
+                    if tiles.size() >= area:
                         break
-                if reached:
-                    break
         tiles.sort_custom(func(a,b):
             var da: int = (int(a[0])-center.x)*(int(a[0])-center.x)+(int(a[1])-center.y)*(int(a[1])-center.y)
             var db: int = (int(b[0])-center.x)*(int(b[0])-center.x)+(int(b[1])-center.y)*(int(b[1])-center.y)
