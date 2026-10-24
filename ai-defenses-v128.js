@@ -45,7 +45,7 @@ export function planAIDefenses(game,team,city){
  const readyHouses=all.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
  const services=all.filter(b=>['well','market','warehouse','study','scriptorium'].includes(b.type)&&b.ready&&b.hp>0).length;
  // Resource-chain dependency must be built before any stone-wall plan.
- if(realm.pop>=11&&readyHouses>=4&&services>=2&&waiting<=2&&
+ if(realm.pop>=11&&readyHouses>=4&&services>=2&&waiting<=3&&
     (stock.water||0)>=realm.pop*1.5&&
     (stock.meat||0)+(stock.fish||0)+(stock.grain||0)+(stock.bread||0)+(stock.berries||0)>=realm.pop*2.5&&
     firstMasonryWorkshop(game,team,city,all,stock))return;
