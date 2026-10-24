@@ -21,5 +21,5 @@ assert.equal(bronzePhaseTurns(state,1),7);
 state.time=60*(40+MIN_BRONZE_TURNS_V160);
 assert.ok(bronzeResearchGoals(state,1,TECHS,goals).includes('iron'),'Iron Age unlocked after Bronze development');
 assert.equal(settlerPolicy({time:80*60,age:1,cities:2,pending:0,pop:17,food:140,lastAt:0,hasSettlement:true}).allow,false,'Bronze villages do not drain growing capital');
-assert.ok(settlerPolicy({time:80*60,age:1,cities:2,pending:0,pop:24,food:140,lastAt:0,hasSettlement:true}).allow,'prosperous capital can settle a third site');
+assert.ok(settlerPolicy({time:80*60,age:1,cities:2,pending:0,pop:32,food:140,lastAt:0,hasSettlement:true}).allow,'mature capital can settle a third site');
 console.log('V160 PASS: accelerated stocked Bronze cities, independent research, Bronze gates, concentration and save-safe timers');

@@ -25,7 +25,7 @@ export function aiResourcePriorities(game,team,city){
  const s=game.s,stock=city.economy.realms[team].resources,pop=city.economy.realms[team].pop||3;
  const needs=s.research[team]?.ageWait?ageDeficit(s,team,s.research[team].ageWait.id):{};
  const targets={
-  bread:Math.max(16,pop*6),water:Math.max(18,pop*5),wood:50,stone:32,
+  bread:Math.max(16,pop*6),water:Math.max(18,pop*5),wood:65,stone:40,
   plank:s.ages[team]>=1?30:0,bronze:s.ages[team]>=1?12:0,weapons:s.ages[team]>=2?12:0,iron:s.ages[team]>=2?18:0,
   coal:s.ages[team]>=2?12:0,gunpowder:s.ages[team]>=4?10:0,
   steel:s.ages[team]>=5?15:0,machines:s.ages[team]>=5?12:0,

@@ -20,7 +20,7 @@ function firstMasonryWorkshop(game,team,city,all,stock){
     all.some(b=>b.type==='mason'&&b.hp>0)||!game.canBuildNow||!game.buildingSites)return false;
  if(!game.canBuildNow(city,'mason'))return false;
  const cost=game.buildingDefinitions.mason.cost;
- if((stock.wood||0)<(cost.wood||0)+20||(stock.stone||0)<(cost.stone||0)+18)return false;
+ if((stock.wood||0)<(cost.wood||0)+7||(stock.stone||0)<(cost.stone||0)+8)return false;
  // Do not synthesize a workshop: use actual placement and resource transactions.
  for(const position of game.buildingSites(city,'mason').slice(0,180)){
   if(game.previewBuild(city,'mason',position).error)continue;
@@ -47,8 +47,8 @@ export function planAIDefenses(game,team,city){
  const services=all.filter(b=>['well','market','warehouse','study','scriptorium'].includes(b.type)&&b.ready&&b.hp>0).length;
  // Resource-chain dependency must be built before any stone-wall plan.
  if(realm.pop>=11&&readyHouses>=4&&services>=2&&waiting<=3&&
-    (stock.water||0)>=realm.pop*1.5&&
-    (stock.meat||0)+(stock.fish||0)+(stock.grain||0)+(stock.bread||0)+(stock.berries||0)>=realm.pop*2.5&&
+    (stock.water||0)>=realm.pop*1.1&&
+    (stock.meat||0)+(stock.fish||0)+(stock.grain||0)+(stock.bread||0)+(stock.berries||0)>=realm.pop*1.6&&
     firstMasonryWorkshop(game,team,city,all,stock))return;
  const eligibility=defenseEligibility({population:realm.pop,readyHouses,services,waiting,stock});
  if(!eligibility.ok){city.aiDefenseDiagnosticV146={reason:eligibility.reason,checkedAt:game.s.time};return;}

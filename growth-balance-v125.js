@@ -9,7 +9,7 @@ export function settlerPolicy({time,age,cities,pending,pop,food,lastAt,hasSettle
  const capacity=cityCapacity(time,age);
  const interval=age<=1?6*60:age<=3?7*60:10*60;
  // Grow a capital and its resource village before financing more settlers.
- const concentrate=(age===0&&cities>=2)||(age===1&&cities>=2&&pop<22);
+ const concentrate=(age===0&&cities>=2)||(age===1&&cities>=2&&pop<30);
  return {capacity,allow:hasSettlement&&cities+pending<capacity&&pending<2&&!concentrate&&
   time>=10*60&&time-(lastAt||0)>=interval&&pop>=(age===1?12:7)&&food>=Math.max(25,pop*2.2),
   interval};

@@ -20,6 +20,6 @@ export function prosperousTownGrowth({age,pop,stock={},marketVarieties=0,housing
  if(age!==1&&age!==2)return 1;
  const food=(stock.bread||0)+(stock.flour||0)*.85+(stock.grain||0)*.7+
   (stock.meat||0)+(stock.fish||0)+(stock.berries||0)+(stock.vegetables||0)+(stock.fruit||0)+(stock.cheese||0);
- if(food<pop*2.5||(stock.water||0)<pop*1.6||housingFree<1)return 1;
- return Math.min(2.3,(age===1?1.75:1.3)+(marketVarieties>=2?.42:0)+(food>=pop*4?.12:0));
+ if(food<pop*1.6||(stock.water||0)<pop*1.1||housingFree<1)return 1;
+ return Math.min(2.5,(age===1?2.05:1.4)+(marketVarieties>=2?.30:0)+(food>=pop*3?.12:0));
 }
