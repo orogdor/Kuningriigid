@@ -1,5 +1,20 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V3.6 / AI linnaplaneering ja pronkslinna puitvallid (2026-10-24)
+
+- `city_planning_port.gd`: deterministlik ajaloolisest V135 planeeringust inspireeritud linnakruntide paigutus. Eraldi tsiviilkeskus, elamukrundid, maa-tootmine, tööstus ja sõjaväehooned. Kõik varasemad maastiku, hoone mõõtude ja kattumise piirangud kehtivad edasi.
+- `CityPlanning.housing_target` eemaldab AI senise viie elamu piiri. Vajalik arv sõltub elanikest ja hoonete mahutavusest; ühtki maja ei looda ilma tegeliku ehituskulu ja ehitusprotsessita.
+- `city_fortification_port.gd`: pronksiajal ja vähemalt 14 elanikuga linnas saab arendatud linnaruudu piirata puitvalliga. Esimese ruudu hind 65 puitu + 20 kivi, järgneva arendatud ruudu hind 35 puitu + 12 kivi. Ressursid arvatakse maha, vallide asukohad salvestatakse; topeltehitamise eest uuesti ei maksta.
+- `native_detail_tile.gd`: ehitatud piirderuudul kuvatakse puitvallid, kesksed väravaavad ja nurgatornid. Ühise müüriga külg külgneva kindlustatud ruudu vahel jäetakse vabaks.
+- `preview_ai_port.gd` võib sobiva vanuse, rahvaarvu, varude ja põhivajaduste puhul valliruute ehitada. See on Godoti *preview AI*, mitte veel V153 tegelik strateegiline linnaplaneerija.
+- Telefoni menüüs **Linn ja ehitus → Ehita puitvall (pronks)**. **Testid → Pronkslinna vallide demo** näitab valli ajutises pronksilinnas ning **Taasta vallide demo** tagastab algse oleku; testimise ajal ei saa ajutist seisu salvestada.
+- Godot 4 skriptikompileerimine, `681/681` regressioonitesti, PCK smoke-testi ja Androidi debug APK eksport on GitHub Actionsis läbitud.
+- Tõend: https://github.com/orogdor/Kuningriigid/actions/runs/40097084516
+- Avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-54
+- **Kogu V153 pordi töömahu hinnanguline valmidus: 41%** (subjektiivne töömahu hinnang, mitte automaatmõõtmine).
+
+**Lahendamata:** puitvallidel puuduvad veel toimivad lahingukokkupõrked, purustatavus ja päriselt avatavad väravad. Hoonete paigutus on ajaloolisest linnamorfoloogiast inspireeritud lähendus, mitte veebiversiooni kõigi era/maardla/ajaloolise planeeringu reeglite täielik port. Telefoni tegelik OTA-uuendus ja jõudlus tuleb kontrollida seadmes.
+
 ## V3.5 / mitme detailruuduga linn (2026-10-24)
 
 - Hooneid paigutatakse esmalt olemasolevasse linnasüdame detailruutu; kui seal pole ruumi, otsib linn järgmise sobiva vaba krundi enda `territory_urban` ruutudelt.
@@ -33,14 +48,14 @@
 - Godoti mänguprojekt: `game/` (Godot 4); Androidi APK ja PCK-käivitaja: `bootstrap/`.
 - Varasemad `godot-upload/v33/*.txt` osad jäävad arhiiviks, kuid uus CI ehitab **päris, muudetavatest failidest**.
 - Androidi CI: `.github/workflows/godot-apk-test.yml`.
-- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40095058141
-- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-45
+- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40097084516
+- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-54
 - Väljalasked luuakse `godot-dev-<workflow run number>` märgendiga *prerelease* ainult siis, kui regressioonitestid läbivad kontrolli.
 
 ## Kontrollitud (Godot 4.7.2 CI konteiner)
 
 - Pythoni staatilised testid ja GDScripti impordikontroll läbitud.
-- `V131_REGRESSION: 666/666` läbitud 2026-10-24.
+- `V131_REGRESSION: 681/681` läbitud 2026-10-24.
 - `game.pck` loomine ja `BOOTSTRAP_SMOKE_PASS` läbitud.
 - Androidi debug-APK edukalt eksporditud ja GitHubi avaldatud.
 - **Mitte kontrollitud:** päris Android-telefoni FPS, puutejuhtimine, seadmesse paigaldamine, võrgust PCK allalaadimine ja taaskäivituse andmete ühilduvus.
