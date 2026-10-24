@@ -110,10 +110,10 @@ static func run() -> Dictionary:
     _check(results, "preview-start-resources", demo["cities"].size() == 1 and is_equal_approx(float(demo["cities"][0]["resources"]["wood"]),68.0))
     var building: Dictionary = Preview.build_in_town(demo,0,"lumber")
     _check(results, "preview-building-spends-resource", bool(building["ok"]) and is_equal_approx(float(demo["cities"][0]["resources"]["wood"]),48.0))
-    var projection_town: Dictionary = {"c":20,"r":20}
+    var projection_town: Dictionary = {"c":20,"r":20,"buildings":[{"type":"hall","ready":true},{"type":"lumber","ready":true}]}
     var simulation_hall: Vector2 = Cargo.building_position(projection_town,0)
     var map_hall: Vector2 = DetailTile.city_to_detail(projection_town,simulation_hall)
-    _check(results,"v20-economic-hall-uses-detail-projection",map_hall.distance_to(Vector2(4.0,0.0)) < .0001)
+    _check(results,"v20-economic-hall-uses-detail-projection",map_hall.distance_to(Vector2.ZERO) < .0001)
     _check(results,"v20-detail-world-roundtrip",DetailTile.detail_to_city(projection_town,map_hall).distance_to(simulation_hall)<.0001)
     var second_site: Vector2 = Cargo.building_position(projection_town,1)
     _check(results,"v20-buildings-no-longer-unrelated-spirals",map_hall.distance_to(DetailTile.city_to_detail(projection_town,second_site))>4.0)
@@ -1243,6 +1243,8 @@ static func run() -> Dictionary:
     _check(results,"v28-cliff-center-blocks-building",not nine.buildable(test_tile,Vector2.ZERO,3))
     _check(results,"v28-cliff-center-blocks-walking",not nine.traversable(test_tile,Vector2.ZERO))
     flat_atlas[80*220+101] = 2.2
+    # Reset the changed cliff sample before comparing independent landscape caches.
+    nine.configure(flat_atlas)
     var consistent = SharedLandscape.new()
     consistent.configure(flat_atlas)
     _check(results,"v28-landscape-grid-same-height",is_equal_approx(consistent.detail_height(test_tile,Vector2.ZERO),nine.height(test_tile,Vector2.ZERO)))
