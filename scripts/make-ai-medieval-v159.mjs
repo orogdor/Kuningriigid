@@ -163,6 +163,6 @@ const lines=[
  '',
  'Andmed pärinevad vahetult simulatsioonist; käivitusfailide regressiooni ja avaliku salvestuse kontroll tuleb läbida GitHub Actionsis.'
 ];
-fs.writeFileSync('RAPORT_V159_KESKAEG.md',lines.join('\\n')+'\\n');
+fs.writeFileSync('RAPORT_V159_KESKAEG.md',lines.join('\n')+'\n');
 console.log('V159 RESULT',JSON.stringify({turn,medievalAt,stopReason,source,selected,byTeam,cityCount:allCities.length,
  totals,comparison,scenarioBytes:fs.statSync('scenarios/ai-medieval-v159.json').size}));

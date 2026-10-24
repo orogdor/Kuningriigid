@@ -9,6 +9,8 @@ on:
       - 'TEST_V139.mjs'
       - 'TEST_V138.mjs'
       - 'TEST_V67.mjs'
+      - 'TEST_V68.mjs'
+      - 'TEST_V142_BROWSER.mjs'
       - 'TEST_V152.mjs'
   workflow_dispatch:
 permissions:
