@@ -31,7 +31,7 @@ static func _enemy_pressure(state: Dictionary,team: int,home: Vector2i) -> Dicti
 static func _committed_relief(state: Dictionary,team: int,city_id: int) -> int:
     var total: int = 0
     for army in state.get("armies",[]):
-        if int(army.get("team",-1)) == team and String(army.get("strategic_role","")) == "relief" and int(army.get("defense_city_id",-1)) == city_id:
+        if int(army.get("team",-1)) == team and String(army.get("strategic_role","")) == "relief" and int(army.get("defense_city_id",-1)) == city_id and not army.get("path",[]).is_empty():
             total += Military.units_for(state,army).size()
     return total
 
@@ -53,6 +53,9 @@ static func _battle_ids(state: Dictionary) -> Array:
     if not old.is_empty():
         return [int(old.get("army_a",-1)),int(old.get("army_b",-1))]
     return []
+
+static func threatened(state: Dictionary,team: int,home: Vector2i) -> bool:
+    return int(_enemy_pressure(state,team,home)["units"]) > 0
 
 static func recall(state: Dictionary,world_nav) -> Dictionary:
     var recalled: int = 0
