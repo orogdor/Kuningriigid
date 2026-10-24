@@ -58,7 +58,13 @@ static func suggest_goods(state: Dictionary,from_city: Dictionary,to_city: Dicti
         var need_b: float = maxf(1.0,float(need.get(b,1.0)))
         var have_a: float = _food_total(target)+inbound_food if a == "bread" else float(target.get(a,0.0))+float(incoming.get(a,0.0))
         var have_b: float = _food_total(target)+inbound_food if b == "bread" else float(target.get(b,0.0))+float(incoming.get(b,0.0))
-        return (need_a-have_a)/need_a > (need_b-have_b)/need_b
+        var shortage_a: float = (need_a-have_a)/need_a
+        var shortage_b: float = (need_b-have_b)/need_b
+        if absf(shortage_a-shortage_b) > EPS:
+            return shortage_a > shortage_b
+        # Equal shortages must not depend on unstable dictionary/sort ordering.
+        # Prioritize basic food and water before raw materials when a cart fills.
+        return GOODS.find(String(a)) < GOODS.find(String(b))
     )
     var result: Dictionary = {}
     var room: float = max_load
