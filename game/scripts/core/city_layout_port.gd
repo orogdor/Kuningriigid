@@ -7,6 +7,9 @@ const LOT_GAP: float = 0.16
 const LIMIT_X: float = 10.65
 const LIMIT_Z: float = 9.10
 const GRID_PITCH: float = 0.88
+# One V131 detail map spans 225x195 metres; plot coordinates are 10m units.
+const TILE_PITCH_X: float = 22.5
+const TILE_PITCH_Z: float = 19.5
 const FOOTPRINTS: Dictionary = {
     "hall":Vector2(1.2,1.05),"house":Vector2(.75,.65),
     "market":Vector2(1.8,1.4),"farm":Vector2(1.1,1.2),
@@ -45,6 +48,68 @@ static func _candidate(gx: int,gz: int) -> Vector2:
     elif gz < 0:
         dz -= .28
     return Vector2(dx,dz)
+
+static func site_tile(city: Dictionary, world_site: Vector2) -> Vector2i:
+    var local: Vector2 = world_site-center(city)
+    return Vector2i(int(city.get("c",0)) + floori((local.x+TILE_PITCH_X*.5)/TILE_PITCH_X),
+        int(city.get("r",0)) + floori((local.y+TILE_PITCH_Z*.5)/TILE_PITCH_Z))
+
+static func site_in_tile(city: Dictionary, world_site: Vector2, tile: Vector2i) -> Vector2:
+    var core: Vector2 = center(city)
+    return world_site-core-Vector2((tile.x-int(city.get("c",0)))*TILE_PITCH_X,
+        (tile.y-int(city.get("r",0)))*TILE_PITCH_Z)
+
+static func site_on_atlas(city: Dictionary, world_site: Vector2) -> Vector2:
+    var core: Vector2 = center(city)
+    return core+Vector2((world_site.x-core.x)/TILE_PITCH_X,
+        (world_site.y-core.y)/TILE_PITCH_Z)
+
+static func _outer_site(city: Dictionary, kind: String, used: Array, landscape = null) -> Dictionary:
+    # Do not extend historic one-tile saves until urban boundaries exist.
+    var territories: Array = city.get("territory_urban",[])
+    var core := Vector2i(int(city.get("c",0)),int(city.get("r",0)))
+    var nearby: Array = []
+    for item in territories:
+        if not (item is Array) or item.size() < 2:
+            continue
+        var tile := Vector2i(int(item[0]),int(item[1]))
+        if tile == core:
+            continue
+        var dx: int = tile.x-core.x
+        var dz: int = tile.y-core.y
+        nearby.append({"tile":tile,"distance":dx*dx+dz*dz})
+    nearby.sort_custom(func(a,b):
+        if int(a["distance"]) != int(b["distance"]):
+            return int(a["distance"]) < int(b["distance"])
+        var left: Vector2i = a["tile"]
+        var right: Vector2i = b["tile"]
+        return left.y < right.y if left.y != right.y else left.x < right.x)
+    for candidate_tile in nearby:
+        var tile: Vector2i = candidate_tile["tile"]
+        var offset: Vector2 = Vector2((tile.x-core.x)*TILE_PITCH_X,
+            (tile.y-core.y)*TILE_PITCH_Z)
+        # Keep the centre's arterial road corridors open in every district.
+        for ring in range(1,13):
+            for gz in range(-ring,ring+1):
+                for gx in range(-ring,ring+1):
+                    if maxi(absi(gx),absi(gz)) != ring or gx == 0 or gz == 0:
+                        continue
+                    var within: Vector2 = _candidate(gx,gz)
+                    if not within_lot(within,kind):
+                        continue
+                    var proposed: Vector2 = offset+within
+                    if landscape != null:
+                        var size: Vector2 = footprint(kind)
+                        if not landscape.buildable_at(tile,within*10.0,maxf(size.x,size.y)*5.0):
+                            continue
+                    var free: bool = true
+                    for parcel in used:
+                        if overlap(proposed,kind,parcel["point"],String(parcel["kind"])):
+                            free = false
+                            break
+                    if free:
+                        return {"ok":true,"point":proposed,"tile":[tile.x,tile.y]}
+    return {"ok":false,"reason":"Linna kõik vabad linnaruudud on ehituseks täis"}
 
 static func find_free_site(city: Dictionary,kind: String,used: Array,landscape = null) -> Dictionary:
     # Ring walk: new urban buildings start next to the civic centre, not on
@@ -85,7 +150,7 @@ static func find_free_site(city: Dictionary,kind: String,used: Array,landscape =
                     break
             if open:
                 return {"ok":true,"point":p}
-    return {"ok":false,"reason":"Linna detailruut on hoonetega täidetud"}
+    return _outer_site(city,kind,used,landscape)
 
 static func ensure_positions(city: Dictionary) -> bool:
     var buildings: Array = city.get("buildings",[])
@@ -133,7 +198,9 @@ static func check_clear(city: Dictionary) -> bool:
             return false
         var pa: Vector2 = position(city,i)-center(city)
         var ka: String = String(a.get("type",""))
-        if not within_lot(pa,ka):
+        # Each plot must fit INSIDE its own detail square, not just the core.
+        var building_tile: Vector2i = site_tile(city,position(city,i))
+        if not within_lot(site_in_tile(city,position(city,i),building_tile),ka):
             return false
         for j in range(i):
             if overlap(pa,ka,position(city,j)-center(city),String(buildings[j].get("type",""))):
