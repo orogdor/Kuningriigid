@@ -4,6 +4,7 @@ extends RefCounted
 const Military = preload("res://scripts/core/military_port.gd")
 const XP = preload("res://scripts/core/army_experience_port.gd")
 const IndividualBattle = preload("res://scripts/core/individual_battle_port.gd")
+const BattleQueue = preload("res://scripts/core/campaign_battle_queue_port.gd")
 
 static func _locate_army(state: Dictionary,id: int) -> Dictionary:
     for a in state.get("armies",[]):
@@ -81,6 +82,8 @@ static func tick(state: Dictionary,dt: float) -> void:
     state["active_battle"] = {}
 
 static func detect_encounter(state: Dictionary) -> bool:
+    if bool(state.get("campaign",{}).get("active",false)):
+        return int(BattleQueue.advance(state)["started"]) > 0
     if not state.get("active_battle",{}).is_empty():
         return false
     var armies: Array = state.get("armies",[])
