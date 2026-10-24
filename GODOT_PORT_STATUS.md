@@ -19,6 +19,21 @@
 
 Esimese mängitava versiooni kuupäev ei ole kinnitatud. Käesolev **47% kogu V153 pordi hinnang** ei ole võrdne 47% valmis kampaaniamänguga. Godoti mobiiliversiooni tegelik toimimine tuleb endiselt kasutaja seadmes üle kontrollida.
 
+## V3.9 / alati nähtav versioon ja uuenduse kontroll (2026-10-24)
+
+- GitHub Actions genereerib iga mängupaketi sisse täpse `game/data/build_info.json` faili. Selles on `godot-dev-<CI number>`, lähteteksti commit ja ehitamise aeg. Nummerdus vastab APK/PCK GitHubi väljalaskemärgisele.
+- Androidi käivitaja näitab paigaldatud mängupaketti ja GitHubis tuvastatud viimast versiooni. Kontrolli nurjumisel ei väideta ekslikult, et versioon on uusim.
+- Godoti mängu **ülaribal on kogu aeg nähtav** `godot-dev-74 | ✓ UUSIM`, `↑ UUENDUS` või `? KONTROLLIMATA` vastavalt viimasele õnnestunud kontrollile. Menüü ülaosas on sama tõeline versioon, mitte vana `Godot 1.8` näidistekst.
+- Mäng ise küsib GitHubi viimast arendusväljalaset nii käivitamisel kui ka seejärel iga 15 minuti tagant; see toimib ka vana Androidi APK-käivitaja peal pärast uue PCK laadimist.
+- Mobiilimenüüsse lisandus `Juhtimine ja salvestus → Kontrolli versiooni`, mis teeb päringu kohe. Kui uuendus on olemas, juhendab mäng rakendust sulgema ja avama.
+- Regressioonitest: **741/741**, sh versioonide võrdlus, võrguühenduseta käitumine, uusima väljalaskega võrdlemine ja ajakohane kasutajaliidese olek. Godoti parser, PCK käivitustest, `BOOTSTRAP_PACK_VERSION: godot-dev-74` ning Android debug APK eksport õnnestusid.
+- GitHub Actions: https://github.com/orogdor/Kuningriigid/actions/runs/40104187846
+- Avaldatud uus APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-74
+- **Portimise hinnanguline valmidus jääb 47% juurde**: versiooni jälgimine parandab kasutusmugavust, kuid ei asenda puuduvaid kampaaniasüsteeme.
+- Esimese päriselt mängitava Stone→Bronze kampaania eraldi kontrollitav plaan: [GODOT_FIRST_PLAYABLE_PLAN_ET.md](GODOT_FIRST_PLAYABLE_PLAN_ET.md).
+
+**Oluline:** uusima väljalaske tähis on õige ainult viimase eduka GitHubi kontrolli hetkel. Internetita näeb käivitatud versiooni alati, kuid värskust ei saa kinnitada. Vanema APK käivitaja ei näita veel uut versiooni käivitusekraanil, kuid `godot-dev-74` mängupaketi **mängusisene** versiooniriba toimib ning kontrollib ise võrku. Uus käivitusekraan eeldab uusima APK paigaldamist.
+
 ## V3.8 / ühine kaitseperimeeter ja linna vallutamine (2026-10-24)
 
 - `city_fortification_port.gd` sisaldab deterministlikku `perimeter_edges` loogikat: iga kindlustatud linnaruudu neli külge võrreldakse naaberruutudega; ühisel sisepiiril ei teki tarbetut müüri.
