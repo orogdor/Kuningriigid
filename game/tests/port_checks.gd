@@ -38,6 +38,7 @@ const CampaignRetreat = preload("res://scripts/core/campaign_retreat_v131.gd")
 const Shots = preload("res://scripts/core/projectile_rules_v131.gd")
 const BattleTerrain = preload("res://scripts/core/battle_terrain_v131.gd")
 const Siege = preload("res://scripts/core/siege_port_v131.gd")
+const SiegeAI = preload("res://scripts/core/campaign_siege_ai_port.gd")
 const DetailTile = preload("res://scripts/adapters/native_detail_tile.gd")
 const CityLayout = preload("res://scripts/core/city_layout_port.gd")
 const CityPlanning = preload("res://scripts/core/city_planning_port.gd")
@@ -452,6 +453,79 @@ static func run() -> Dictionary:
         rally_state["military_units"].size()==total_before and int(rally_state.get("ai_rally_merged_units",0))==2)
     _check(results,"v48-no-second-siege-march-or-rally-after-dispatch",
         int(CampaignWar.ai_march(rally_state,strategic_nav)["ordered"])==0 and int(CampaignWar.rally_for_sieges(rally_state,strategic_nav)["dispatched"])==0)
+    # Dev 114: AI creates *real* paid construction orders inside the
+    # existing linked-wall battle. Progress uses the actual siege engine.
+    var craft_manifest: Array = [
+        {"id":0,"team":0,"c":35,"r":20,"name":"Muurilinn"},
+        {"id":1,"team":1,"c":15,"r":20,"name":"AI varustuslinn"}]
+    var craft_state: Dictionary = Preview.initialize(craft_manifest)
+    craft_state["campaign"] = {"active":true,"player_team":0,"turn":28,"result":"playing"}
+    craft_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[35,20]]}
+    craft_state["cities"][1]["resources"]["wood"] = 160.0
+    var craft_attacker: Dictionary = Military.create_army(craft_state,1,35,20)
+    var craft_defender: Dictionary = Military.create_army(craft_state,0,35,20)
+    Military.add_unit(craft_state,craft_attacker,"spearman")
+    Military.add_unit(craft_state,craft_attacker,"spearman")
+    Military.add_unit(craft_state,craft_defender,"spearman")
+    var craft_started: Dictionary = IndividualBattle.start(craft_state,int(craft_attacker["id"]),int(craft_defender["id"]))
+    var craft_battle: Dictionary = craft_state.get("individual_battle",{})
+    var craft_siege: Dictionary = craft_battle.get("siege",{})
+    _check(results,"v49-ai-crafts-linked-physical-ram-and-ladder",
+        bool(craft_started.get("ok",false)) and craft_siege.get("works",[]).size()==2 and int(craft_siege.get("ai_craft_orders",0))==2)
+    _check(results,"v49-ai-pays-ram-and-ladder-from-real-city-stock",
+        is_equal_approx(float(craft_state["cities"][1]["resources"]["wood"]),87.0) and is_equal_approx(float(craft_siege.get("ai_craft_wood",0.0)),73.0))
+    _check(results,"v49-siege-tools-not-instantaneously-ready",
+        not bool(craft_siege["works"][0]["ready"]) and not bool(craft_siege["works"][1]["ready"]))
+    Siege.tick_assault_works(craft_battle,89.0)
+    _check(results,"v49-ram-time-cost-is-real",
+        not bool(craft_siege["works"][0]["ready"]) and is_equal_approx(float(craft_siege["works"][0]["progress"]),89.0))
+    Siege.tick_assault_works(craft_battle,1.0)
+    Siege.tick_ladders(craft_battle,30.0)
+    _check(results,"v49-ram-and-ladder-ready-only-after-timers",
+        bool(craft_siege["works"][0]["ready"]) and bool(craft_siege["works"][1]["ready"]))
+    _check(results,"v49-no-duplicate-ai-craft-on-repeat",
+        int(SiegeAI.equip(craft_state,craft_battle)["ordered"])==0 and craft_siege["works"].size()==2 and is_equal_approx(float(craft_state["cities"][1]["resources"]["wood"]),87.0))
+    _check(results,"v49-siege-crafting-counts-campaign-events",
+        int(craft_state.get("ai_siege_works",0))==2 and craft_state["military_units"].size()==3)
+    _check(results,"v49-siege-work-jobs-are-json-persistent",
+        JSON.parse_string(JSON.stringify(craft_battle)) is Dictionary and JSON.parse_string(JSON.stringify(craft_state)) is Dictionary)
+    var low_wood_state: Dictionary = Preview.initialize(craft_manifest)
+    low_wood_state["campaign"] = {"active":true,"player_team":0,"turn":28,"result":"playing"}
+    low_wood_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[35,20]]}
+    low_wood_state["cities"][1]["resources"]["wood"] = 5.0
+    var low_ai: Dictionary = Military.create_army(low_wood_state,1,35,20)
+    var low_defender: Dictionary = Military.create_army(low_wood_state,0,35,20)
+    for ix in range(2):
+        Military.add_unit(low_wood_state,low_ai,"spearman")
+    Military.add_unit(low_wood_state,low_defender,"spearman")
+    IndividualBattle.start(low_wood_state,int(low_ai["id"]),int(low_defender["id"]))
+    _check(results,"v49-ai-gets-no-free-siege-works-when-poor",
+        low_wood_state["individual_battle"]["siege"]["works"].is_empty() and is_equal_approx(float(low_wood_state["cities"][1]["resources"]["wood"]),5.0))
+    var open_gate_state: Dictionary = Preview.initialize(craft_manifest)
+    open_gate_state["campaign"] = {"active":true,"player_team":0,"turn":28,"result":"playing"}
+    open_gate_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[35,20]],"gates_open":{"35:20":true}}
+    open_gate_state["cities"][1]["resources"]["wood"] = 170.0
+    var open_ai: Dictionary = Military.create_army(open_gate_state,1,35,20)
+    var open_defender: Dictionary = Military.create_army(open_gate_state,0,35,20)
+    for ix in range(2):
+        Military.add_unit(open_gate_state,open_ai,"spearman")
+    Military.add_unit(open_gate_state,open_defender,"spearman")
+    IndividualBattle.start(open_gate_state,int(open_ai["id"]),int(open_defender["id"]))
+    _check(results,"v49-open-gate-ai-selects-paid-siege-tower",
+        str(open_gate_state["individual_battle"]["siege"]["works"][0]["kind"])=="tower" and is_equal_approx(float(open_gate_state["individual_battle"]["siege"]["works"][0]["duration"]),120.0))
+    var player_siege_state: Dictionary = Preview.initialize([
+        {"id":0,"team":0,"c":15,"r":20,"name":"Mangija"},
+        {"id":1,"team":1,"c":35,"r":20,"name":"Vastane"}])
+    player_siege_state["campaign"] = {"active":true,"player_team":0,"turn":28,"result":"playing"}
+    player_siege_state["cities"][1]["fortification"] = {"style":"palisade","tiles":[[35,20]]}
+    var own_army: Dictionary = Military.create_army(player_siege_state,0,35,20)
+    var other_army: Dictionary = Military.create_army(player_siege_state,1,35,20)
+    for ix in range(2):
+        Military.add_unit(player_siege_state,own_army,"spearman")
+    Military.add_unit(player_siege_state,other_army,"spearman")
+    IndividualBattle.start(player_siege_state,int(own_army["id"]),int(other_army["id"]))
+    _check(results,"v49-player-controls-own-attack-with-no-auto-crafting",
+        player_siege_state["individual_battle"]["siege"]["works"].is_empty() and int(player_siege_state.get("ai_siege_works",0))==0)
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
