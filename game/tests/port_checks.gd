@@ -14,6 +14,7 @@ const Tech125 = preload("res://scripts/core/research_v125_port.gd")
 const Preview = preload("res://scripts/core/preview_sim_port.gd")
 const CampaignPlay = preload("res://scripts/core/campaign_play_port.gd")
 const CityFounding = preload("res://scripts/core/city_founding_port.gd")
+const SettlerCampaign = preload("res://scripts/core/settler_campaign_port.gd")
 const Build = preload("res://scripts/core/building_rules_port.gd")
 const Labor = preload("res://scripts/core/labor_port.gd")
 const PreviewAI = preload("res://scripts/core/preview_ai_port.gd")
@@ -98,6 +99,76 @@ static func run() -> Dictionary:
     _check(results,"v42-founding-log-survives-save-load",extra_loaded.get("founding_log",[]).size()==1)
     if FileAccess.file_exists("user://v42_founding_regression.json"):
         DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v42_founding_regression.json"))
+    # V4.3 physical founders: no instant teleportation / no double charging.
+    var journey_state: Dictionary = Preview.initialize([
+        {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
+        {"id":1,"c":80,"r":60,"team":1,"name":"Teekonna rivaal"}])
+    Territory.rebuild(journey_state,founding_map,true)
+    var journey_parent: Dictionary = journey_state["cities"][0]
+    journey_parent["pop"] = 9
+    journey_parent["resources"]["wood"] = 75.0
+    journey_parent["resources"]["stone"] = 25.0
+    journey_parent["resources"]["bread"] = 50.0
+    journey_parent["resources"]["water"] = 30.0
+    journey_state["teams"][0]["known"]["settlement"] = true
+    var trip: Dictionary = SettlerCampaign.dispatch(journey_state,founding_map,0,Vector2i(40,20))
+    _check(results,"v43-dispatch-valid-land-route",bool(trip.get("ok",false)) and SettlerCampaign.missions(journey_state).size()==1)
+    _check(results,"v43-dispatch-does-not-create-city",journey_state["cities"].size()==2)
+    _check(results,"v43-dispatch-reserves-cost-and-population",int(journey_parent["pop"])==6 and is_equal_approx(float(journey_parent["resources"]["wood"]),20.0))
+    _check(results,"v43-duplicate-destination-rejected",not bool(SettlerCampaign.dispatch(journey_state,founding_map,0,Vector2i(40,20)).get("ok",false)))
+    var first_step: Dictionary = SettlerCampaign.advance_turn(journey_state,founding_map)
+    _check(results,"v43-travels-three-cells-per-turn",int(first_step["moved"])==3 and int(journey_state["settler_missions"][0]["c"])==23)
+    _check(results,"v43-no-early-city-teleport",int(first_step["founded"])==0 and journey_state["cities"].size()==2)
+    var journey_saved: bool = Preview.save_preview(journey_state,"user://v43_trip_regression.json")
+    var journey_loaded: Dictionary = Preview.load_preview([
+        {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
+        {"id":1,"c":80,"r":60,"team":1,"name":"Teekonna rivaal"}],"user://v43_trip_regression.json")
+    _check(results,"v43-pending-founder-survives-json",journey_saved and SettlerCampaign.missions(journey_loaded).size()==1 and int(journey_loaded["settler_missions"][0]["waypoint"])==3)
+    if FileAccess.file_exists("user://v43_trip_regression.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v43_trip_regression.json"))
+    var final_arrival: Dictionary = {}
+    for journey_turn in range(7):
+        final_arrival = SettlerCampaign.advance_turn(journey_loaded,founding_map)
+    _check(results,"v43-arrives-and-founds-after-seven-turns",int(final_arrival.get("founded",0))==1 and journey_loaded["cities"].size()==3)
+    _check(results,"v43-no-pending-after-arrival",SettlerCampaign.missions(journey_loaded).is_empty() and int(journey_loaded.get("founded_cities",0))==1)
+    _check(results,"v43-arrival-does-not-charge-twice",is_equal_approx(float(journey_loaded["cities"][0]["resources"]["wood"]),20.0))
+    _check(results,"v43-arrival-has-founding-route",int(journey_loaded["founding_log"][0]["route_length"])==20)
+    var cancelled_state: Dictionary = Preview.initialize([
+        {"id":0,"c":20,"r":20,"team":0,"name":"Katkestuse kodu"}])
+    Territory.rebuild(cancelled_state,founding_map,true)
+    cancelled_state["teams"][0]["known"]["settlement"] = true
+    cancelled_state["cities"][0]["pop"] = 9
+    cancelled_state["cities"][0]["resources"]["wood"] = 75.0
+    cancelled_state["cities"][0]["resources"]["stone"] = 25.0
+    cancelled_state["cities"][0]["resources"]["bread"] = 50.0
+    cancelled_state["cities"][0]["resources"]["water"] = 30.0
+    var cancellation: Dictionary = SettlerCampaign.dispatch(cancelled_state,founding_map,0,Vector2i(40,20))
+    var blocked_map: PackedByteArray = founding_map.duplicate()
+    blocked_map[Campaign.index(21,20)] = 0
+    var interrupted: Dictionary = SettlerCampaign.advance_turn(cancelled_state,blocked_map)
+    _check(results,"v43-interrupted-route-cancels",bool(cancellation.get("ok",false)) and int(interrupted.get("cancelled",0))==1)
+    _check(results,"v43-interrupted-route-returns-population",int(cancelled_state["cities"][0]["pop"])==9)
+    _check(results,"v43-interrupted-route-refunds-wood",is_equal_approx(float(cancelled_state["cities"][0]["resources"]["wood"]),75.0))
+    var ai_state: Dictionary = Preview.initialize([
+        {"id":0,"c":20,"r":20,"team":0,"name":"Mängija"},
+        {"id":1,"c":62,"r":30,"team":1,"name":"AI1"},
+        {"id":2,"c":112,"r":45,"team":2,"name":"AI2"},
+        {"id":3,"c":162,"r":60,"team":3,"name":"AI3"}])
+    Territory.rebuild(ai_state,founding_map,true)
+    ai_state["campaign"] = {"active":true,"player_team":0,"turn":8,"result":"playing"}
+    for ai_team in range(1,4):
+        var ai_city: Dictionary = ai_state["cities"][ai_team]
+        ai_city["pop"] = 9
+        ai_city["resources"]["wood"] = 180.0
+        ai_city["resources"]["stone"] = 80.0
+        ai_city["resources"]["bread"] = 100.0
+        ai_city["resources"]["water"] = 75.0
+        ai_state["teams"][ai_team]["known"]["settlement"] = true
+    var ai_orders: Dictionary = SettlerCampaign.ai_expand(ai_state,founding_map)
+    _check(results,"v43-ai-orders-independent-settlers",int(ai_orders.get("started",0))==3)
+    _check(results,"v43-ai-does-not-found-instantly",ai_state["cities"].size()==4 and ai_state.get("settler_missions",[]).size()==3)
+    _check(results,"v43-ai-does-not-repeat-orders-same-turn",int(SettlerCampaign.ai_expand(ai_state,founding_map).get("started",0))==0)
+    _check(results,"v43-ai-sends-from-all-three-factions",int(ai_state.get("ai_settlers_sent",0))==3)
     # V4.1 playable early campaign: original economic engine remains authoritative.
     var campaign_cities: Array = [
         {"id":0,"team":0,"c":20,"r":20,"name":"Alguslinn"},
