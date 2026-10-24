@@ -440,17 +440,25 @@ static func start_ladder(state: Dictionary, battle: Dictionary, unit_id: int) ->
             return {"ok":false,"reason":"Redelit saavad ehitada vaid ründavad jalaväelased"}
         if battle.get("siege",{}).get("works",[]).any(func(w): return int(w.get("owner",-1)) == unit_id):
             return {"ok":false,"reason":"Salk juba ehitab redelit"}
+        var via_convoy: bool = bool(siege.get("ai_supply_required",false))
         var city: Dictionary = {}
-        for t in state.get("cities",[]):
-            if int(t["team"]) == int(squad["team"]) and float(t["resources"].get("wood",0.0)) >= LADDER_WOOD:
-                city = t
-                break
-        if city.is_empty():
-            return {"ok":false,"reason":"Redel vajab ründaja linna laost 18 puitu"}
+        if via_convoy:
+            if float(siege.get("supply_wood",0.0)) < LADDER_WOOD:
+                return {"ok":false,"reason":"Redel ootab piiramiskonvoi puitu"}
+        else:
+            for t in state.get("cities",[]):
+                if int(t["team"]) == int(squad["team"]) and float(t["resources"].get("wood",0.0)) >= LADDER_WOOD:
+                    city = t
+                    break
+            if city.is_empty():
+                return {"ok":false,"reason":"Redel vajab ründaja linna laost 18 puitu"}
         var wall: Dictionary = nearest_intact(siege,float(squad["anchor"]["x"]),float(squad["anchor"]["z"]))
         if wall.is_empty():
             return {"ok":false,"reason":"Müür on juba langenud"}
-        city["resources"]["wood"] = float(city["resources"]["wood"])-LADDER_WOOD
+        if via_convoy:
+            siege["supply_wood"] = float(siege["supply_wood"])-LADDER_WOOD
+        else:
+            city["resources"]["wood"] = float(city["resources"]["wood"])-LADDER_WOOD
         siege["wood_spent"] = float(siege["wood_spent"])+LADDER_WOOD
         var id: int = int(siege["next_work_id"])
         siege["next_work_id"] = id+1
@@ -615,14 +623,20 @@ static func start_assault_work(state: Dictionary,battle: Dictionary,unit_id: int
         if (kind == "ram" and String(candidate["type"]) == "gatehouse" and String(wall["type"]) != "gatehouse") or (kind != "ram" and _dist(candidate,actor["anchor"]) < _dist(wall,actor["anchor"])):
             wall = candidate
     var wood: float = RAM_WOOD if kind == "ram" else TOWER_WOOD
+    var via_convoy: bool = bool(siege.get("ai_supply_required",false))
     var supply: Dictionary = {}
-    for city in state.get("cities",[]):
-        if int(city.get("team",-1)) == int(actor["team"]) and float(city["resources"].get("wood",0.0)) >= wood:
-            supply = city
-            break
-    if supply.is_empty():
-        return {"ok":false,"reason":"Vajalik puit puudub: %.0f" % wood}
-    supply["resources"]["wood"] = float(supply["resources"]["wood"])-wood
+    if via_convoy:
+        if float(siege.get("supply_wood",0.0)) < wood:
+            return {"ok":false,"reason":"Piiramismasin ootab varustuskonvoid"}
+        siege["supply_wood"] = float(siege["supply_wood"])-wood
+    else:
+        for city in state.get("cities",[]):
+            if int(city.get("team",-1)) == int(actor["team"]) and float(city["resources"].get("wood",0.0)) >= wood:
+                supply = city
+                break
+        if supply.is_empty():
+            return {"ok":false,"reason":"Vajalik puit puudub: %.0f" % wood}
+        supply["resources"]["wood"] = float(supply["resources"]["wood"])-wood
     siege["wood_spent"] = float(siege.get("wood_spent",0.0))+wood
     var id: int = int(siege.get("next_work_id",1))
     siege["next_work_id"] = id+1
