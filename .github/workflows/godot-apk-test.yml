@@ -23,7 +23,7 @@ jobs:
           mkdir -p dist/logs
           cat godot-upload/v33/*.txt | base64 -d > /tmp/kingdom-godot.zip
           echo '67f12648bb0aa324e0c4476cd6627806773096b79f01d2b6b0180a918657ba8c  /tmp/kingdom-godot.zip' | sha256sum -c -
-          unzip -q /tmp/kingdom-godot.zip -d .
+          unzip -oq /tmp/kingdom-godot.zip -d .
           test -f game/project.godot
           test -f bootstrap/project.godot
       - name: Static validations
