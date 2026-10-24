@@ -61,14 +61,14 @@ static func run() -> Dictionary:
         {"id":0,"c":20,"r":20,"team":0,"name":"Algus"},
         {"id":1,"c":80,"r":60,"team":1,"name":"Vastane"}])
     Territory.rebuild(settlers_state,founding_map,true)
-    var origin: Dictionary = settlers_state["cities"][0]
-    origin["pop"] = 9
-    origin["resources"]["wood"] = 75.0
-    origin["resources"]["stone"] = 25.0
-    origin["resources"]["bread"] = 50.0
-    origin["resources"]["water"] = 30.0
+    var founder_parent: Dictionary = settlers_state["cities"][0]
+    founder_parent["pop"] = 9
+    founder_parent["resources"]["wood"] = 75.0
+    founder_parent["resources"]["stone"] = 25.0
+    founder_parent["resources"]["bread"] = 50.0
+    founder_parent["resources"]["water"] = 30.0
     var wanted := Vector2i(40,20)
-    var before_resources: Dictionary = origin["resources"].duplicate(true)
+    var before_resources: Dictionary = founder_parent["resources"].duplicate(true)
     _check(results,"v42-early-found-requires-settlement-tech",not bool(CityFounding.found(settlers_state,founding_map,0,wanted).get("ok",false)))
     settlers_state["teams"][0]["known"]["settlement"] = true
     _check(results,"v42-reject-same-tile",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(20,20)).get("ok",false)))
@@ -76,20 +76,20 @@ static func run() -> Dictionary:
     _check(results,"v42-reject-existing-rival-core",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(80,60)).get("ok",false)))
     _check(results,"v42-reject-invalid-tile",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(-1,20)).get("ok",false)))
     _check(results,"v42-reject-too-distant",not bool(CityFounding.found(settlers_state,founding_map,0,Vector2i(100,120)).get("ok",false)))
-    _check(results,"v42-rejection-does-not-spend",origin["resources"]==before_resources)
+    _check(results,"v42-rejection-does-not-spend",founder_parent["resources"]==before_resources)
     var isolated_map: PackedByteArray = founding_map.duplicate()
     for r in range(Campaign.ROWS):
         isolated_map[Campaign.index(31,r)] = 0
     _check(results,"v42-no-teleport-through-sea",not bool(CityFounding.found(settlers_state,isolated_map,0,wanted).get("ok",false)))
     var founded: Dictionary = CityFounding.found(settlers_state,founding_map,0,wanted)
     _check(results,"v42-founding-success",bool(founded.get("ok",false)) and settlers_state["cities"].size()==3)
-    _check(results,"v42-founding-parent-moves-three-residents",int(origin["pop"])==6 and int(settlers_state["cities"][2]["pop"])==3)
-    _check(results,"v42-founding-pays-actual-cost",is_equal_approx(float(origin["resources"]["wood"]),20.0) and is_equal_approx(float(origin["resources"]["stone"]),9.0))
+    _check(results,"v42-founding-parent-moves-three-residents",int(founder_parent["pop"])==6 and int(settlers_state["cities"][2]["pop"])==3)
+    _check(results,"v42-founding-pays-actual-cost",is_equal_approx(float(founder_parent["resources"]["wood"]),20.0) and is_equal_approx(float(founder_parent["resources"]["stone"]),9.0))
     _check(results,"v42-new-town-start-stock",is_equal_approx(float(settlers_state["cities"][2]["resources"]["wood"]),25.0))
     _check(results,"v42-new-city-hall-built",str(settlers_state["cities"][2]["buildings"][0]["type"])=="hall")
     _check(results,"v42-new-city-unique-id",int(settlers_state["cities"][2]["id"])==2)
     _check(results,"v42-founding-log-stores-route",int(settlers_state["founding_log"][0]["route_length"])>=20)
-    _check(results,"v42-repeat-same-tile-does-not-charge",not bool(CityFounding.found(settlers_state,founding_map,0,wanted).get("ok",false)) and is_equal_approx(float(origin["resources"]["wood"]),20.0))
+    _check(results,"v42-repeat-same-tile-does-not-charge",not bool(CityFounding.found(settlers_state,founding_map,0,wanted).get("ok",false)) and is_equal_approx(float(founder_parent["resources"]["wood"]),20.0))
     Territory.rebuild(settlers_state,founding_map,true)
     _check(results,"v42-new-town-owns-core",Territory.owner_at(settlers_state,40,20)==2)
     var extra_saved: bool = Preview.save_preview(settlers_state,"user://v42_founding_regression.json")
