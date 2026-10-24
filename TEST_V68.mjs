@@ -8,7 +8,7 @@ assert.ok(START.wood<100&&START.stone<30&&START.bread<40&&START.plank<35,'initia
 assert.ok(RESOURCE_PRODUCTION_MULTIPLIER<1/3,'production slower than old economy');
 console.log('V68 ECONOMY',JSON.stringify({wood:START.wood,plank:START.plank,stone:START.stone,bread:START.bread,water:START.water,gold:START.gold,multiplier:RESOURCE_PRODUCTION_MULTIPLIER}));
 for(const seed of [17,12345,20261018]){
- const g=new Civilization(createGame(seed)),mount=g.cells.find(c=>c.mountain&&c.h>30),sea=g.cells.find(c=>!c.land&&c.h<-.9),edges=getRivers(g);
+ const g=new Civilization(createGame(seed)),mount=g.cells.find(c=>c.mountain&&c.h>30),sea=g.cells.find(c=>!c.land&&c.h< -4)||g.cells.find(c=>!c.land&&c.h<-.9),edges=getRivers(g);
  assert.ok(mount&&sea&&edges.length>200);
  const rock=baseHeight(g,mount.x,mount.z),floor=baseHeight(g,sea.x,sea.z);
  assert.ok(rock>g.atlasHeight(mount.x,mount.z)+8,'mountains must physically protrude from the terrain');

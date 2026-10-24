@@ -43,17 +43,18 @@ jobs:
       - name: Verify first Medieval transition and save continuity
         run: |
           test -s scenarios/ai-medieval-v159.json
+          test -s RAPORT_V159_KESKAEG.md
           test -s scenarios/ai-medieval-v159.manifest.json
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const s=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v159.json','utf8'));
           const m=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v159.manifest.json','utf8'));
           const t=s.medievalTestV159;
-          if(!t||s.demo!=='ai-medieval-v159'||s.ages[0]!==3||t.turn!==m.turn||t.medievalAt!==m.turn)
+          if(!t||s.demo!=='ai-medieval-v159'||s.ages[0]<3||t.turn!==m.turn||t.medievalAt+30!==m.turn)
             throw Error('Invalid Medieval I saved state '+JSON.stringify({t,ages:s.ages}));
           if(!s.cities.some(c=>c.id===t.targetCityId&&c.team===0))
             throw Error('Playable AI town was not transferred');
-          if(m.totalCities<11||m.totals.pop<100||m.turn>350)
+          if(m.totalCities<12||m.totals.pop<150||m.turn>350||m.totals.withMarket<6||m.totals.totalCombatUnits<8)
             throw Error('World stagnated before first Medieval transition '+JSON.stringify({turn:m.turn,cities:m.totalCities,population:m.totals.pop}));
           console.log('MEDIEVAL I VERIFIED',JSON.stringify({turn:m.turn,cities:m.totalCities,population:m.totals.pop,ages:m.byTeam.map(x=>x.age)}));
           NODE
@@ -77,6 +78,7 @@ jobs:
           path: |
             scenarios/ai-medieval-v159.manifest.json
             scenarios/ai-medieval-v159.json
+            RAPORT_V159_KESKAEG.md
             artifacts-v159/
             artifacts-v143/
             artifacts-v148/
@@ -86,8 +88,9 @@ jobs:
         run: |
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git config user.name 'github-actions[bot]'
-          git add scenarios/ai-medieval-v159.json scenarios/ai-medieval-v159.manifest.json
-          git commit -m "V159: tested Claude V150 world at first Medieval Age checkpoint"
+          git add scenarios/ai-medieval-v159.json scenarios/ai-medieval-v159.manifest.json RAPORT_V159_KESKAEG.md
+          git commit -m "V159: validated Claude V158 world at Medieval +30 checkpoint"
+          git reset --hard HEAD
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main

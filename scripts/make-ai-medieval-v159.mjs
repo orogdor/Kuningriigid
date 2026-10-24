@@ -1,0 +1,168 @@
+import fs from 'node:fs';
+import {Civilization,createGame} from '../civilization-core.js';
+import {takeOverAI} from '../ai-takeover-v128.js';
+import {cityExtent} from '../city-area-v142.js';
+
+// Reproducible full AI simulation. Never add resources, buildings or technology.
+const seed=142023,game=new Civilization(createGame(seed)),started=Date.now(),history=[];
+const midwayTurns=30,maxTurns=480;
+const milestoneStats=[];
+let medievalAt=null,firstMedievalTeam=null,stopReason='',turn=0,lastLog=0;
+function snapshot(turn){
+ return {turn,ages:[...game.s.ages],cities:game.s.cities.length,
+  population:game.s.cities.reduce((n,c)=>n+(c.economy.realms[c.team]?.pop||0),0),
+  seconds:Math.round((Date.now()-started)/1000)};
+}
+for(turn=1;turn<=maxTurns;turn++){
+ for(let step=0;step<5;step++)game.tick(12);
+ if(medievalAt==null){
+  const team=[1,2,3].find(t=>game.s.ages[t]>=3);
+  if(team!=null){medievalAt=turn;firstMedievalTeam=team;
+    const marketCounts=game.s.cities.map(c=>game.allBuildings(c).filter(b=>b.type==='market'&&b.hp>0).length);
+    milestoneStats.push({turn,cities:game.s.cities.length,population:game.s.cities.reduce((n,c)=>n+c.economy.realms[c.team].pop,0),markets:marketCounts.reduce((a,b)=>a+b,0),citiesWithMarkets:marketCounts.filter(n=>n>0).length,
+    combatUnits:game.s.units.filter(u=>u.team>=1&&u.hp>0&&!['scout','militia','transport','warship'].includes(u.kind)).length,
+    ages:[...game.s.ages]});
+  }
+ }
+ if(turn%20===0||turn===medievalAt||medievalAt!=null&&turn===medievalAt+midwayTurns){
+  const row=snapshot(turn);history.push(row);console.log('V159 PROGRESS',JSON.stringify(row));lastLog=turn;
+ }
+ if(medievalAt!=null&&turn>=medievalAt+midwayTurns){stopReason='30 full turns after the first nation entered Medieval Age';break;}
+ // Exact transition test: no free technological progress or injected assets.
+ if(game.s.winner!=null){stopReason='Victory before target';break;}
+ if(Date.now()-started>1350000){stopReason='22.5-minute simulation ceiling';break;}
+}
+if(lastLog!==turn){const row=snapshot(turn);history.push(row);console.log('V159 PROGRESS',JSON.stringify(row));}
+const participants=game.s.cities.filter(c=>c.team>=1&&c.team<=3);
+const medievalTeams=[1,2,3].filter(team=>game.s.ages[team]>=3);
+const eligible=participants.filter(c=>medievalTeams.includes(c.team));
+const greatest=(eligible.length?eligible:participants).sort((a,b)=>(b.economy.realms[b.team]?.pop||0)-(a.economy.realms[a.team]?.pop||0)||game.allBuildings(b).length-game.allBuildings(a).length||a.id-b.id)[0];
+if(!greatest||medievalAt==null)throw Error('V159 incomplete: medieval age not reached; '+JSON.stringify({turn,medievalAt,stopReason,history}));
+if(game.s.ages[greatest.team]<3)throw Error('V159 incomplete: no AI town reached Medieval Age');
+const source=greatest.team,selectedId=greatest.id;
+const allCities=game.s.cities.map(c=>{
+ const team=c.team,r=c.economy.realms[team]||{},buildings=game.allBuildings(c).filter(b=>!b.virtual&&b.hp>0),
+ types=Object.fromEntries([...new Set(buildings.map(b=>b.type))].sort().map(type=>[type,buildings.filter(b=>b.type===type).length]));
+ const foodKeys=['fish','meat','grain','bread','vegetables','fruit','berries','milk'];
+ return {id:c.id,name:c.name,team,age:game.s.ages[team],pop:r.pop||0,employed:r.employed||0,
+ radius:game.radius(c),extent:cityExtent(game.radius(c)),ownedTiles:game.constructionArea(c).tiles.length,
+ buildings:buildings.length,ready:buildings.filter(b=>b.ready).length,
+ pending:buildings.filter(b=>!b.ready).length,markets:types.market||0,
+ houses:types.house||0,farms:types.farm||0,fields:types.field||0,
+ mines:(types.mine||0)+(types.quarry||0)+(types.coppermine||0)+(types.tinmine||0),
+ education:(types.study||0)+(types.scriptorium||0)+(types.academy||0)+(types.university||0),
+ buildingTypes:types,
+ defenseStatus:c.aiDefenseDiagnosticV159?.reason||'not-assessed',
+  defenseLock:c.aiDefenseLockedReasonV159||null,
+  defenseAttempts:c.defensePlanV139?.constructed||0,
+  readyDefenses:buildings.filter(b=>b.ready&&['palisade','stonewall','watchtower','stonetower','gatehouse','reinforced_wall'].includes(b.type)).length,
+  masonReady:buildings.some(b=>b.type==='mason'&&b.ready),
+  defenseSlots:c.defensePlanV139?.slots?.length||0,
+  stocks:Object.fromEntries(Object.entries(r.resources||{}).filter(([k,v])=>Number(v)>0).sort((a,b)=>b[1]-a[1]).slice(0,24)),
+ foodSupply:foodKeys.reduce((n,k)=>n+(r.resources?.[k]||0),0)
+ };
+}).sort((a,b)=>b.pop-a.pop||b.buildings-a.buildings||a.id-b.id);
+const selected=allCities.find(c=>c.id===selectedId);
+const state=takeOverAI(game.s,source);
+state.demo='ai-medieval-v159';
+state.medievalTestV159={seed,turn,medievalAt,firstMedievalTeam,midwayTurns,sourceTeam:source,
+ targetCityId:selectedId,targetCityName:greatest.name,
+ source:'Fresh game; original AI economy/research/construction without injected assets'};
+state.cities.sort((a,b)=>(a.id===selectedId?-1:b.id===selectedId?1:0));
+const byTeam=[0,1,2,3].map(team=>({team,age:game.s.ages[team],
+  knownTechnologyIds:game.s.research[team]?.known||[],
+  activeResearch:game.s.research[team]?.active||null,
+  cities:allCities.filter(c=>c.team===team).length,
+  population:allCities.filter(c=>c.team===team).reduce((n,c)=>n+c.pop,0),
+  technologies:game.s.research[team]?.known?.length||0,
+  researchActive:game.s.research[team]?.active||null,
+  resourcesAvailable:game.s.cities.filter(c=>c.team===team).reduce((n,c)=>n+Object.values(c.economy.realms[team].resources||{}).reduce((a,v)=>a+(+v||0),0),0)}));
+
+const totals=allCities.reduce((a,c)=>{for(const key of ['pop','buildings','ready','pending','houses','markets','education','fields','farms','mines'])a[key]=(a[key]||0)+(c[key]||0);return a;},{});
+totals.totalCombatUnits=game.s.units.filter(u=>u.team>=1&&u.hp>0&&!['scout','militia','transport','warship'].includes(u.kind)).length;
+totals.defenseReasons=Object.fromEntries([...new Set(allCities.map(c=>c.defenseStatus))].map(reason=>[reason,allCities.filter(c=>c.defenseStatus===reason).length]));
+totals.withMarket=allCities.filter(c=>c.markets>0).length;
+totals.withEducation=allCities.filter(c=>c.education>0).length;
+totals.withHousing=allCities.filter(c=>c.houses>0).length;
+totals.withDefenses=allCities.filter(c=>['palisade','stonewall','watchtower','stonetower','gatehouse','reinforced_wall'].some(k=>(c.buildingTypes[k]||0)>0)).length;
+totals.readyDefenses=allCities.reduce((n,c)=>n+c.readyDefenses,0);
+totals.masons=allCities.filter(c=>c.masonReady).length;
+totals.defensesByType=Object.fromEntries(['palisade','stonewall','watchtower','stonetower','gatehouse','reinforced_wall'].map(type=>[type,allCities.reduce((n,c)=>n+(c.buildingTypes[type]||0),0)]));
+totals.fortifications=allCities.reduce((n,c)=>n+['palisade','stonewall','watchtower','stonetower','gatehouse','reinforced_wall'].reduce((a,k)=>a+(c.buildingTypes[k]||0),0),0);
+let baseline=null;
+if(fs.existsSync('scenarios/ai-medieval-v151.manifest.json')){
+ const prev=JSON.parse(fs.readFileSync('scenarios/ai-medieval-v151.manifest.json'));
+ const previous=prev.cities||[];
+ const get=k=>previous.reduce((n,c)=>n+(c[k]||0),0);
+ baseline={version:151,turn:prev.turn,totalCities:prev.totalCities,
+  population:get('pop'),buildings:get('buildings'),houses:get('houses'),markets:get('markets'),
+  education:get('education'),farms:get('farms'),mines:get('mines'),
+  withMarket:previous.filter(c=>c.markets>0).length,
+  withEducation:previous.filter(c=>c.education>0).length,
+  withDefenses:previous.filter(c=>['palisade','stonewall','watchtower','stonetower','gatehouse','reinforced_wall'].some(k=>(c.buildingTypes[k]||0)>0)).length,
+  fortifications:previous.reduce((n,c)=>n+['palisade','stonewall','watchtower','stonetower','gatehouse','reinforced_wall'].reduce((a,k)=>a+(c.buildingTypes[k]||0),0),0)};
+}
+const comparison=baseline?Object.fromEntries(Object.entries({
+ population:totals.pop,buildings:totals.buildings,houses:totals.houses,
+ markets:totals.markets,education:totals.education,farms:totals.farms,mines:totals.mines,
+ withMarket:totals.withMarket,withEducation:totals.withEducation,
+ withDefenses:totals.withDefenses,fortifications:totals.fortifications,
+ }).map(([k,v])=>[k,{v151:baseline[k],v159:v,delta:v-baseline[k]}])):null;
+
+const manifest={version:153,success:true,seed,turn,medievalAt,firstMedievalTeam,midwayTurns,stopReason,milestoneStats,
+  baseCommit:'Claude V158 graphics + preserved V153 game balance',
+  stage:'Medieval transition +30 game turns; first Medieval checkpoint at medievalAt',
+  firstMedievalNation:game.s.teams?.[firstMedievalTeam]?.name||`Team ${firstMedievalTeam}`, 
+  elapsedSeconds:Math.round((Date.now()-started)/1000),
+  age:game.s.ages[source],sourceTeam:source,targetCityId:selectedId,
+  largestMedievalCity:selected,largestGlobalCity:allCities[0],
+  totalCities:allCities.length,history,byTeam,totals,baseline,comparison,
+  trade:{ongoingShipments:game.s.shipments?.length||0},
+  military:{armyCounts:[0,1,2,3].map(team=>game.s.armies.filter(a=>a.team===team).length),
+   unitCounts:[0,1,2,3].map(team=>game.s.units.filter(u=>u.team===team).length),
+   combatUnits:[0,1,2,3].map(team=>game.s.units.filter(u=>u.team===team&&u.hp>0&&!['scout','militia','transport','warship'].includes(u.kind)).length),
+   relations:game.s.relations||{}},
+  cities:allCities};
+const districts=new Set(state.cities.flatMap(c=>Object.values(c.districts||{}).map(d=>d.economy)));
+if(game.s.ages[source]<3)throw Error('Test must contain a medieval-or-later AI team');
+fs.mkdirSync('scenarios',{recursive:true});
+fs.writeFileSync('scenarios/ai-medieval-v159.json',JSON.stringify(state,function(k,v){
+ return districts.has(this)&&['realms','resources'].includes(k)?undefined:v;
+}));
+fs.writeFileSync('scenarios/ai-medieval-v159.manifest.json',JSON.stringify(manifest,null,2));
+const lines=[
+ '# Kuningriigid V159 – uus AI testmäng kiviajast keskaega + 30 käiku',
+ '',
+ '- Maailmaseeme: '+seed,
+ '- Esimene keskaeg: käik '+medievalAt+' (riik '+firstMedievalTeam+')',
+ '- Salvestuse käik: '+turn,
+ '- Peatumise põhjus: '+stopReason,
+ '- Linnu / elanikke / hooneid: '+totals.pop+' elanikku, '+allCities.length+' linna, '+totals.buildings+' hoonet',
+ '- Turuga linnu: '+totals.withMarket+'; haridusasutusega linnu: '+totals.withEducation,
+ '- Kaitseehitisi: '+totals.fortifications+' (valmis '+totals.readyDefenses+')',
+ '- Lahinguüksusi: '+totals.totalCombatUnits+'; kaubasaadetisi teel: '+manifest.trade.ongoingShipments,
+ '- Ülevõtmise siht: '+greatest.name+' (ID '+selectedId+', '+selected.pop+' elanikku)',
+ '',
+ '## Riigid',
+ '| Riik | Ajastu | Linnad | Elanikud | Avastused | Lahinguüksused |',
+ '|---|---:|---:|---:|---:|---:|',
+ ...byTeam.filter(t=>t.team>0).map(t=>'| '+t.team+' | '+t.age+' | '+t.cities+' | '+t.population+' | '+t.technologies+' | '+manifest.military.combatUnits[t.team]+' |'),
+ '',
+ '## 10 suurimat linna',
+ '| Linn | Riik | Ajastu | Elanikud | Hooned | Turud | Kaitse |',
+ '|---|---:|---:|---:|---:|---:|---:|',
+ ...allCities.slice(0,10).map(c=>'| '+c.name+' | '+c.team+' | '+c.age+' | '+c.pop+' | '+c.buildings+' | '+c.markets+' | '+c.readyDefenses+' |'),
+ '',
+ '## Vahepunktid',
+ '| Käik | Ajastud | Linnad | Elanikud |',
+ '|---|---|---:|---:|',
+ ...history.map(h=>'| '+h.turn+' | '+h.ages.slice(1).join('/')+' | '+h.cities+' | '+h.population+' |'),
+ '',
+ '## Avatav ülevõtmislink',
+ 'https://orogdor.github.io/Kuningriigid/?v=159-20261024&demo=ai-medieval-v159',
+ '',
+ 'Andmed pärinevad vahetult simulatsioonist; käivitusfailide regressiooni ja avaliku salvestuse kontroll tuleb läbida GitHub Actionsis.'
+];
+fs.writeFileSync('RAPORT_V159_KESKAEG.md',lines.join('\\n')+'\\n');
+console.log('V159 RESULT',JSON.stringify({turn,medievalAt,stopReason,source,selected,byTeam,cityCount:allCities.length,
+ totals,comparison,scenarioBytes:fs.statSync('scenarios/ai-medieval-v159.json').size}));
