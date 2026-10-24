@@ -1,5 +1,24 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V3.9 / alati nähtav versioon ja reaalajas uuenduse kontroll (2026-10-24)
+
+- GitHub Actions kirjutab **iga PCK sisse reaalse koostu numbri** `game/data/build_info.json`: `godot-dev-<run_number>`, commit ja koostamise aja; sama mängupakett lisatakse uude Androidi APK-sse.
+- APK käivitaja näitab paigaldatud versiooni ja viimast GitHubis kinnitatud versiooni. Uuenduse leidmisel jätkub senine SHA-256 kontrolliga PCK laadimine; võrguta kuvatakse **KONTROLLIMATA**, mitte tõendamata "uusim".
+- Godoti mängu ülaribal on alati nähtav versioonitunnus, olek `UUSIM KONTROLLIMISE HETKEL`, `UUENDUS SAADAVAL` või `KONTROLLIMATA`. Mäng ise kontrollib versiooni GitHubist ka siis, kui Androidi käivitaja on vana, ning kontrollib uuesti iga 15 minuti järel.
+- Uusim kontrollitud väljaanne: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-74
+- GitHub Actions CI: https://github.com/orogdor/Kuningriigid/actions/runs/40104187846
+- **741/741** regressioonitesti; test APK/PCK eksporditud ja bootstrap-suitsutest kinnitab `BOOTSTRAP_PACK_VERSION: godot-dev-74`.
+
+### Esimese mängitava kampaania eesmärk (enne kogu V153 porti)
+
+1. **Uus mäng**: riigi valimine ning algse linna/üksuste ja piiride järjepidev salvestatav loomine.
+2. **Ühtne majandus**: elamud, tööjõud, toidu/vee tarneahel, uued linnad, ehitus- ja avastamisjärjekorrad, tõelised kulud.
+3. **Riiklik strateegiline AI**: mitme linna rajamine, kaubandus, tehnoloogia, kaitse ning rünnakuotsused ühe pideva mängu sees.
+4. **Lahingu ja maailmakaardi sünkroniseerimine**: üksuste kaod, ressursid, linnade vallutamine ning kaitserajatiste kahjustused jäävad püsima.
+5. **100–150 käigu kampaaniatest**: mäng algab kiviajast ja jõuab pronksiajani ilma eraldi demo käivitamata; salvestuse uuesti laadimine töötab, võidu/kaotuse tingimus on määratud.
+
+Esimese mängitava versiooni kuupäev ei ole kinnitatud. Käesolev **47% kogu V153 pordi hinnang** ei ole võrdne 47% valmis kampaaniamänguga. Godoti mobiiliversiooni tegelik toimimine tuleb endiselt kasutaja seadmes üle kontrollida.
+
 ## V3.8 / ühine kaitseperimeeter ja linna vallutamine (2026-10-24)
 
 - `city_fortification_port.gd` sisaldab deterministlikku `perimeter_edges` loogikat: iga kindlustatud linnaruudu neli külge võrreldakse naaberruutudega; ühisel sisepiiril ei teki tarbetut müüri.
@@ -80,14 +99,14 @@
 - Godoti mänguprojekt: `game/` (Godot 4); Androidi APK ja PCK-käivitaja: `bootstrap/`.
 - Varasemad `godot-upload/v33/*.txt` osad jäävad arhiiviks, kuid uus CI ehitab **päris, muudetavatest failidest**.
 - Androidi CI: `.github/workflows/godot-apk-test.yml`.
-- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40101999186
-- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-69
+- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40104187846
+- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-74
 - Väljalasked luuakse `godot-dev-<workflow run number>` märgendiga *prerelease* ainult siis, kui regressioonitestid läbivad kontrolli.
 
 ## Kontrollitud (Godot 4.7.2 CI konteiner)
 
 - Pythoni staatilised testid ja GDScripti impordikontroll läbitud.
-- `V131_REGRESSION: 724/724` läbitud 2026-10-24.
+- `V131_REGRESSION: 741/741` läbitud 2026-10-24.
 - `game.pck` loomine ja `BOOTSTRAP_SMOKE_PASS` läbitud.
 - Androidi debug-APK edukalt eksporditud ja GitHubi avaldatud.
 - **Mitte kontrollitud:** päris Android-telefoni FPS, puutejuhtimine, seadmesse paigaldamine, võrgust PCK allalaadimine ja taaskäivituse andmete ühilduvus.
