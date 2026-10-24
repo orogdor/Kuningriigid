@@ -20,10 +20,12 @@ static func capture_after_siege(state: Dictionary,siege: Dictionary) -> Dictiona
     for city in state.get("cities",[]):
         if int(city.get("c",-999)) != home_c or int(city.get("r",-999)) != home_r:
             continue
+        # Some preview test states contain two opposing cities at the same
+        # coordinates. Select the real DEFENDER, not the first coordinate hit.
         if int(city.get("team",-2)) != defender or not Fort.fortified(city,cell):
-            return {"ok":false,"reason":"City is no longer owned or fortified by defender"}
+            continue
         if int(siege.get("city_id",-1)) >= 0 and int(city.get("id",-1)) != int(siege["city_id"]):
-            return {"ok":false,"reason":"Captured city ID mismatch"}
+            continue
         city["team"] = attacker
         # Research and technology belong to the new state, not the old nation.
         var new_team: Dictionary = teams.get(attacker,teams.get(str(attacker),{}))

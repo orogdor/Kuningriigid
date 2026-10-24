@@ -749,6 +749,8 @@ static func _finish(state: Dictionary, battle: Dictionary, world_nav = null) -> 
         for town in state.get("cities",[]):
             if int(town.get("c",-999)) != int(linked.get("city_home_c",linked.get("city_c",-1))) or int(town.get("r",-999)) != int(linked.get("city_home_r",linked.get("city_r",-1))):
                 continue
+            if int(town.get("team",-2)) != int(linked.get("defender_team",-1)):
+                continue
             if CityFortifications.apply_siege_damage(town,linked):
                 state["revision"] = int(state.get("revision",0)) + 1
             break
