@@ -48,6 +48,15 @@ jobs:
           cp -a unpacked/Kuningriigid_Godot_GitHub_OTA/game .
           cp -a unpacked/Kuningriigid_Godot_GitHub_OTA/bootstrap .
           mkdir -p bootstrap/seed
+      - name: Python 3 installimine Godoti konteinerisse
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v python3 >/dev/null 2>&1; then
+            apt-get update -qq
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3
+          fi
+          python3 --version
       - name: Staatilised kontrollid
         if: steps.source.outputs.ready == 'true'
         shell: bash
