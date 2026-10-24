@@ -190,7 +190,7 @@ func _create_test_water_crossing() -> void:
     var axis: String = String(_crossing_info.get("axis","x"))
     var width: float = float(_crossing_info.get("width",5.0))*2.0
     var ribbon := BoxMesh.new()
-    ribbon.size = Vector3(width,.12,DEPTH) if axis == "x" else Vector3(TILE_WIDTH,.12,width)
+    ribbon.size = Vector3(width,.12,TILE_DEPTH) if axis == "x" else Vector3(TILE_WIDTH,.12,width)
     var river_position := Vector3(float(_crossing_info.get("coord",0.0)) if axis == "x" else 0.0,.20,float(_crossing_info.get("coord",0.0)) if axis != "x" else 0.0)
     _add_mesh(ribbon,_material(Color("3889b6",.88),true),CENTER+river_position)
     if bool(_crossing_info.get("bridge",false)):
