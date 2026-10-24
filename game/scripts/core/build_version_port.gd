@@ -3,8 +3,8 @@ extends RefCounted
 ## Offline/local builds stay explicitly unverified; never present an old cached
 ## version number as the latest verified release.
 const PACK_INFO: String = "res://data/build_info.json"
-const RELEASES_API: String = "https://api.github.com/repos/orogdor/Kuningriigid/releases?per_page=20"
 const LAST_CHECK: String = "user://ota/latest.json"
+const RELEASES_API: String = "https://api.github.com/repos/orogdor/Kuningriigid/releases?per_page=20"
 
 static func _json_file(path: String) -> Dictionary:
     var file: FileAccess = FileAccess.open(path,FileAccess.READ)
@@ -22,30 +22,15 @@ static func release_number(tag: String) -> int:
 static func latest_from_releases(releases: Variant) -> String:
     if not (releases is Array):
         return ""
-    var best_number: int = -1
-    var best_tag: String = ""
-    for item in releases:
-        if not (item is Dictionary) or bool(item.get("draft",false)):
+    var best: int = -1
+    for release in releases:
+        if not (release is Dictionary) or bool(release.get("draft",false)):
             continue
-        var tag: String = str(item.get("tag_name",""))
-        var num: int = release_number(tag)
-        if num > best_number:
-            best_tag = tag
-            best_number = num
-    return best_tag
-
-static func save_latest_remote(tag: String) -> bool:
-    if release_number(tag) < 0:
-        return false
-    var folder: String = ProjectSettings.globalize_path("user://ota")
-    if DirAccess.make_dir_recursive_absolute(folder) != OK:
-        return false
-    var f: FileAccess = FileAccess.open(LAST_CHECK,FileAccess.WRITE)
-    if f == null:
-        return false
-    f.store_string(JSON.stringify({
-        "tag":tag,"checked":true,"checked_at":int(Time.get_unix_time_from_system())}))
-    return true
+        var tag: String = str(release.get("tag_name",""))
+        var run: int = release_number(tag)
+        if run > best:
+            best = run
+    return "godot-dev-"+str(best) if best >= 0 else ""
 
 static func compare_tags(installed: String,latest: String) -> int:
     var have: int = release_number(installed)

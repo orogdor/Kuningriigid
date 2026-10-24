@@ -125,6 +125,10 @@ var info_label: Label
 var status_label: Label
 var build_version_label: Label
 var build_version_state: Dictionary = {}
+var build_version_http: HTTPRequest
+var build_version_inflight: bool = false
+var build_version_check_elapsed: float = 0.0
+const BUILD_VERSION_POLL_SECONDS: float = 900.0
 var current_actor_count: int = 150
 var paused: bool = false
 var sim_ticks: int = 0
@@ -285,6 +289,7 @@ func _ready() -> void:
     _setup_lighting()
     _setup_camera()
     _setup_ui()
+    _setup_live_version()
     _load_cities()
     preview_state = PreviewSim.initialize(cities)
     preview_state["world_roads"] = roads
@@ -316,6 +321,36 @@ func _ready() -> void:
     _update_labels()
     # Show available game/test modes immediately on phones instead of only a map.
     _toggle_mobile_menu()
+
+func _setup_live_version() -> void:
+    build_version_http = HTTPRequest.new()
+    build_version_http.timeout = 12.0
+    build_version_http.max_redirects = 4
+    add_child(build_version_http)
+    build_version_http.request_completed.connect(_version_http_completed)
+    _check_latest_version()
+
+func _check_latest_version() -> void:
+    if build_version_inflight or not is_instance_valid(build_version_http):
+        return
+    var error: Error = build_version_http.request(BuildVersion.RELEASES_API,[
+        "User-Agent: Kuningriigid-Godot-Version/1.0",
+        "Accept: application/vnd.github+json"])
+    build_version_inflight = error == OK
+
+func _version_http_completed(result: int,status: int,_headers: PackedStringArray,body: PackedByteArray) -> void:
+    build_version_inflight = false
+    if result != HTTPRequest.RESULT_SUCCESS or status != 200:
+        return # Keep last successfully checked status; offline is not current.
+    var latest: String = BuildVersion.latest_from_releases(JSON.parse_string(body.get_string_from_utf8()))
+    if latest == "":
+        return
+    build_version_state = BuildVersion.status_for(str(BuildVersion._json_file(BuildVersion.PACK_INFO).get("tag","")),{
+        "checked":true,"tag":latest,"checked_at":int(Time.get_unix_time_from_system())})
+    if is_instance_valid(build_version_label):
+        build_version_label.text = BuildVersion.hud_text(build_version_state)
+    if is_instance_valid(mobile_status_caption):
+        mobile_status_caption.text = "Godot V131 osaport | "+BuildVersion.detail_text(build_version_state)
 
 func _setup_lighting() -> void:
     var env := WorldEnvironment.new()
@@ -1993,6 +2028,10 @@ func _assign_route(actor: Dictionary) -> void:
     actor["step"]=1
 
 func _process(delta: float) -> void:
+    build_version_check_elapsed += delta
+    if build_version_check_elapsed >= BUILD_VERSION_POLL_SECONDS:
+        build_version_check_elapsed = 0.0
+        _check_latest_version()
     var ms: float=delta*1000.0
     frame_samples.append(ms)
     if frame_samples.size()>600:

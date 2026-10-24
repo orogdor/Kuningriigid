@@ -970,6 +970,13 @@ static func run() -> Dictionary:
     _check(results,"v39-no-unsupported-offline-latest-claim",not bool(version_offline["verified"]) and str(version_offline["latest"])=="")
     _check(results,"v39-ui-shows-installed-number",BuildVersion.hud_text(version_old).contains("godot-dev-69"))
     _check(results,"v39-buildfile-in-project",BuildVersion.snapshot().has("tag"))
+    _check(results,"v39-releases-picks-highest-not-first",BuildVersion.latest_from_releases([
+        {"tag_name":"godot-dev-62","draft":false},
+        {"tag_name":"godot-dev-71","draft":false},
+        {"tag_name":"godot-dev-99","draft":true},
+        {"tag_name":"web-v153","draft":false}])=="godot-dev-71")
+    _check(results,"v39-release-list-empty-is-unknown",BuildVersion.latest_from_releases([])=="")
+    _check(results,"v39-release-invalid-payload-safe",BuildVersion.latest_from_releases({})=="")
     # V3.8: a shared two-district boundary has no wall on its internal seam.
     _check(results,"v38-two-adjacent-tiles-six-outside-edges",CityFortifications.perimeter_edges(castle_city).size()==6)
     _check(results,"v38-west-tile-no-east-wall",not CityFortifications.exposed_sides(castle_city,Vector2i(44,45)).has("east"))
