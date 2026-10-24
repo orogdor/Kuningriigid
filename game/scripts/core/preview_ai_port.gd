@@ -4,6 +4,7 @@ extends RefCounted
 const Economy = preload("res://scripts/core/economy_port.gd")
 const CityLayout = preload("res://scripts/core/city_layout_port.gd")
 const CityPlanning = preload("res://scripts/core/city_planning_port.gd")
+const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
 const BuildingRules = preload("res://scripts/core/building_rules_port.gd")
 const Research = preload("res://scripts/core/research_port.gd")
 const Planner = preload("res://scripts/core/research_planner_port.gd")
@@ -93,6 +94,14 @@ static func advance(state: Dictionary,landscape = null) -> void:
                 break
         if own_pending:
             continue
+        # AI fortifies developed bronze-era districts only with real surplus.
+        # One tile per planner tick; the same stock pays as manual construction.
+        var stock: Dictionary = city.get("resources",{})
+        if float(stock.get("bread",0.0)) >= float(city.get("pop",3))*1.5 and float(stock.get("water",0.0)) >= float(city.get("pop",3)) and float(stock.get("wood",0.0)) >= 80.0:
+            var wall: Dictionary = CityFortifications.build_next(city)
+            if bool(wall.get("ok",false)):
+                state["revision"] = int(state.get("revision",0)) + 1
+                state["ai_wall_orders"] = int(state.get("ai_wall_orders",0)) + 1
         var kind: String = choose_building(city,teams[team]["known"],pending)
         if kind == "":
             continue
