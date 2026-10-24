@@ -78,3 +78,17 @@ jobs:
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify public V147 save loads successfully (not 404)
+        run: |
+          set -e
+          for attempt in $(seq 1 24); do
+            url="https://orogdor.github.io/Kuningriigid/scenarios/ai-medieval-v147.json?v=147-fixed-20261024&verify=${GITHUB_RUN_ID}-${attempt}"
+            if curl --fail --location --silent --show-error --max-time 15 "$url" --output /tmp/ai-medieval-v147-live.json; then
+              if node --input-type=module -e "import fs from 'node:fs'; const s=JSON.parse(fs.readFileSync('/tmp/ai-medieval-v147-live.json','utf8')); if(s.demo!=='ai-medieval-v147'||!s.medievalTestV147||!s.cities?.length) process.exit(1); console.log('PUBLIC V147 AI SCENARIO PASS',s.medievalTestV147.turn,s.cities.length+' cities')"; then
+                exit 0
+              fi
+            fi
+            sleep 5
+          done
+          echo "Public V147 AI save did not become reachable after deployment" >&2
+          exit 1
