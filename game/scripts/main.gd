@@ -127,6 +127,7 @@ var build_version_label: Label
 var build_version_state: Dictionary = {}
 var build_version_http: HTTPRequest
 var build_version_inflight: bool = false
+var build_version_manual_check: bool = false
 var build_version_check_elapsed: float = 0.0
 const BUILD_VERSION_POLL_SECONDS: float = 900.0
 var current_actor_count: int = 150
@@ -281,6 +282,7 @@ const MOBILE_MENU_ACTIONS = [
     ["Juhtimine ja salvestus", "Lae V131 mudelid", "load_models"],
     ["Juhtimine ja salvestus", "Elanikud sisse / välja", "citizens"],
     ["Juhtimine ja salvestus", "Armeed sisse / välja", "armies"],
+    ["Juhtimine ja salvestus", "Kontrolli versiooni", "check_version"],
     ["Juhtimine ja salvestus", "Salvesta", "save"],
     ["Juhtimine ja salvestus", "Laadi", "load"]
 ]
@@ -340,10 +342,16 @@ func _check_latest_version() -> void:
 
 func _version_http_completed(result: int,status: int,_headers: PackedStringArray,body: PackedByteArray) -> void:
     build_version_inflight = false
+    var requested_by_player: bool = build_version_manual_check
+    build_version_manual_check = false
     if result != HTTPRequest.RESULT_SUCCESS or status != 200:
-        return # Keep last successfully checked status; offline is not current.
+        if requested_by_player:
+            status_label.text = "Versiooni ei saanud praegu GitHubist kontrollida; näidatud versioon jääb kehtima."
+        return
     var latest: String = BuildVersion.latest_from_releases(JSON.parse_string(body.get_string_from_utf8()))
     if latest == "":
+        if requested_by_player:
+            status_label.text = "GitHubist ei leitud kinnitatud Godoti eelväljalaset."
         return
     build_version_state = BuildVersion.status_for(str(BuildVersion._json_file(BuildVersion.PACK_INFO).get("tag","")),{
         "checked":true,"tag":latest,"checked_at":int(Time.get_unix_time_from_system())})
@@ -351,6 +359,13 @@ func _version_http_completed(result: int,status: int,_headers: PackedStringArray
         build_version_label.text = BuildVersion.hud_text(build_version_state)
     if is_instance_valid(mobile_status_caption):
         mobile_status_caption.text = "Godot V131 osaport | "+BuildVersion.detail_text(build_version_state)
+    if requested_by_player:
+        status_label.text = ("Uuendus "+latest+" on olemas. Sulge ja ava rakendus täielikult uuesti." if bool(build_version_state.get("update",false)) else "Versioon kontrollitud: "+BuildVersion.hud_text(build_version_state))
+
+func _manual_check_version() -> void:
+    build_version_manual_check = true
+    status_label.text = "Kontrollin uusimat Godoti versiooni GitHubist…"
+    _check_latest_version()
 
 func _setup_lighting() -> void:
     var env := WorldEnvironment.new()
@@ -714,6 +729,7 @@ func _menu_action(action_id: String) -> void:
         "market": _setup_market_demo()
         "trade": _trade_demo()
         "army_demo": _army_demo()
+        "check_version": _manual_check_version()
         "territory_demo": _start_territory_demo()
         "territory_reset": _stop_territory_demo()
         "county_demo": _start_county_demo()
