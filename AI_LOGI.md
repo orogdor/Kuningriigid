@@ -300,3 +300,39 @@ Muudetud on ainult välimust. Hooneandmed, jalajäljed (`navigation.js` `FOOTPRI
 ### Testid
 - Uus `TEST_V154.mjs`: kõik tüübid ja ajastud ehituvad, kolmnurkade eelarve ja mahtumine krundile, majavariandid on erinevad, müürid ja kaevandused jäävad vanaks, veski animatsioon ainult keskajast alates, brauseris vigu pole ja majad varieeruvad.
 - Eelvaade: `artifacts-v154/town.html?m=houses&age=3`, `?m=types&age=1&labels=1` ja `?m=ages` (gitignore'is).
+
+## V155 – kasutajaliides loogilisemaks ja ilusamaks (Claude, 2026-10-24)
+
+Kasutaja: „Tee UI loogilisemaks ja ilusamaks.“ Kasutaja valikud: liides jääb inglise keelde (V120 otsus), parandada tuleb kõike ühtlaselt.
+Mänguloogika, salvestused ja elementide id-d on samad.
+
+### Keel (ainult inglise keel, ilma eestikeelsete lekete)
+- `localization.js`:
+  - **viga parandatud**: alamstringi regex escape'is kasutati `'\\\\'+c`, mis tekitas kaks kaldkriipsu. Seetõttu ei tõlgitud kunagi ühtegi paari, mille allikas sisaldab `. ( ) + ?` jne (nt „… ▶ jätkab mängu.“). Nüüd on `'\\'+c` ja asendus käib funktsiooniga (`$` sihttekstis on ohutu);
+  - lisatud `locale-en-v155.js` (`ENGLISH_V155_PAIRS`): uuenduse prefiksid (Bronze-Tool, Iron-Tool, Master, Renaissance, Industrial, Modern), kaubahooned ja kaubad, ehitusvihjed, päeviku read („Construction:“, „A new resident arrived“), tööriistavihjed / aria-label'id, lahingukaart, väeliikide nimed, demode pealkirjad ja menüütekstid.
+- Keelevalija (ainult üks valik) on peidetud (`header .game-language`).
+- Skanner (kõik nähtavad tekstid + title / aria-label viies demos ja kõigis paneelides) leiab pärast muudatust ainult linnanimed (nt „Idaküla“).
+
+### Paigutus ja välimus – `ui-v155.css` (laaditakse viimasena)
+- Ühtsed tokenid (`--v155-*`). Kõik HUD-paneelid on ühesuguse klaasja tausta, joone, raadiuse ja varjuga, nuppudel on ühtne stiil.
+- Ülemine riba: ressursikiibid kujul „väärtus /mahutavus + silt“. Riigi kogusumma on vihjes (`title`), mitte „(713)“ numbris.
+  - `civilization.js` kiibi märgistus: `<b>linn</b><em>/cap</em><i>riik</i><small>silt</small>`.
+- Töölauaarvuti tööriistariba (≥ 901×581) on keskel, igal nupul ikoon ja silt. Rühmad on eraldajatega:
+  - World · City;
+  - Build · Research · Army · Explore · Journal;
+  - Help · Menu;
+  - Center · Zoom · Zoom.
+  Järjekord on CSS `order`-iga (DOM ja id-d samad). Ujuv suumipaar on töölaual peidetud (dubleeris). Mobiili V74 riba jäi samaks, ühtlustatud on ainult värvid.
+- Linnapaneel:
+  - pealkiri on ainult linna nimi; uus `#citypanelsub` rida: „11 residents · 147 tiles · Energy town · Iron Age“;
+  - `renderCityHealth()` joonistab nüüd armatuurlaua: 6 näitajat (elanikud + kasvuriba, toit, vesi, töölised, tootlikkus, kaubandus), hoiatused kiipidena ja kokkuklapitavad „City details“ (töökojad, ehitusala, järjekord, linna ulatus „N × N“, maakond, maastik, vajadused, turg, raudtee, õhuvedu). Lahtioleku olek jääb meelde (`renderCityHealth.open`) ja DOM uueneb ainult siis, kui HTML muutub;
+  - `#cityhealth` ja `#laborsummary` on nüüd `div` (sisaldavad ruudustikku).
+- Tööliste vaheleht (`labor-ui.js`): tekstimüüri asemel näitajad (töötab / vaba, leib, vili, puit, kivi, teadus) ja üks märkuserida.
+- Maailmakaardi tegevuspaneel: sulgemisnupp on nurgas, „City Overview“ täislaiuses ja tegevused kahes veerus.
+- Toast / vihjed on ülaosas keskel, külgpaneelidest eemal.
+- Versioonid: `ui-v155.css?v=155a`, `civilization.js?v=155a`, `boot-v83.js?v=155a`, `labor-ui.js?v=155a`, `localization.js?v=155a`.
+
+### Testid
+- PASS: `TEST_V120_LOCALE`, `TEST_V123_UI`, `TEST_V143_BROWSER` (kontrollib „N × N“ `#cityhealth` tekstis), `TEST_V151_BROWSER`, `TEST_V153_BROWSER` ja teised allpool loetletud.
+- Vanad UI-testid (V115–V124 UI) kukkusid läbi juba enne seda muudatust, sest kontrollivad vana versioonipealkirja (`/V117/`, `/Kingdoms V120/`) – need ei ole V155 regressioonid.
+- Täielikult: `TEST_V147_BROWSER`, `TEST_V88_EXPLORATION_UI`, `TEST_V149_BROWSER`, `TEST_V152`, `TEST_V154` PASS.

@@ -1,13 +1,14 @@
 import {ENGLISH_PAIRS} from './locale-en.js?v=97a';
 import {ENGLISH_V120_PAIRS} from './locale-en-v120.js?v=120a';
+import {ENGLISH_V155_PAIRS} from './locale-en-v155.js?v=155a';
 import {TECH_UNLOCKS_EN_V120} from './research-unlocks-en-v120.js?v=120a';
 
 const buildVersion=typeof document!=='undefined'?(document.title.match(/V(\d+)/)?.[1]||'96'):'96';
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
-const english=new Map([...ENGLISH_PAIRS,...ENGLISH_V120_PAIRS]);
+const english=new Map([...ENGLISH_PAIRS,...ENGLISH_V120_PAIRS,...ENGLISH_V155_PAIRS.filter(([a,b])=>a!==b)]);
 const sorted=[...english].filter(([s])=>s.length>=3).sort((a,b)=>b[0].length-a[0].length)
- .map(([source,target])=>({source,target,re:new RegExp('(?<![\\p{L}])'+[...source].map(c=>'.*+?^${}()|[]\\\\'.includes(c)?'\\\\'+c:c).join('')+'(?![\\p{L}])','gu')}));
+ .map(([source,target])=>({source,target,re:new RegExp('(?<![\\p{L}])'+[...source].map(c=>'.*+?^${}()|[]\\'.includes(c)?'\\'+c:c).join('')+'(?![\\p{L}])','gu')}));
 let language='en',binding=[],observer=null;
 const texts=new WeakMap(),attributes=new WeakMap(),helpOriginal=new WeakMap();
 const HELP_EN=[
@@ -35,7 +36,7 @@ export function translateEstonian(v){
  const match=/^(\s*)(.*?)(\s*)$/s.exec(v);
  if(match){const full=english.get(match[2]);if(full!==undefined)return match[1]+full+match[3]}
  let out=v;
- for(const item of sorted)if(out.includes(item.source))out=out.replace(item.re,item.target);
+ for(const item of sorted)if(out.includes(item.source))out=out.replace(item.re,()=>item.target);
  return out;
 }
 function includeField(o,field){if(o&&typeof o[field]==='string')binding.push({o,field,et:o[field]})}

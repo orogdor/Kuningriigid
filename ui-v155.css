@@ -1,0 +1,146 @@
+/* V155 interface pass: one consistent look (tokens, panels, buttons) and a clearer layout.
+   Loaded last; keeps every element id, so game code and tests address the same controls. */
+:root{
+ --v155-bg:#0f2427e8;--v155-bg-solid:#132b2d;--v155-bg-raise:#1a3638;--v155-line:#d9bd7c3d;--v155-line-strong:#d9bd7c80;
+ --v155-gold:#e6c77e;--v155-gold-soft:#e6c77e26;--v155-text:#f1ead6;--v155-muted:#a9b9ad;--v155-good:#8fd3a8;--v155-warn:#f0b866;--v155-bad:#ef8b73;
+ --v155-radius:14px;--v155-shadow:0 10px 30px #0008,0 1px 0 #ffffff0d inset;
+ --v155-font:Inter,"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+}
+body{font-family:var(--v155-font)}
+/* ---------- shared panel and button look */
+#citypanel,#v51insights,#v51cities,#atlaspanel,#atlasoverview,#commandhud,#battlepanel,#settlerpanel,#hud-explore-panel,#hud-tile-resources,#building-inspector,#toast,#tools{
+ background:var(--v155-bg)!important;border:1px solid var(--v155-line)!important;border-radius:var(--v155-radius)!important;
+ box-shadow:var(--v155-shadow)!important;-webkit-backdrop-filter:blur(10px) saturate(1.1);backdrop-filter:blur(10px) saturate(1.1);color:var(--v155-text)}
+#citypanel button,#atlaspanel button,#settlerpanel button,#battlepanel button,#hud-explore-panel button,#building-inspector button,#v51cities button{
+ border-radius:10px;border:1px solid var(--v155-line);background:linear-gradient(#21403f,#183233);color:var(--v155-text);font-family:var(--v155-font);font-weight:600;transition:background .15s,border-color .15s,transform .05s}
+#citypanel button:hover,#atlaspanel button:hover,#settlerpanel button:hover,#battlepanel button:hover,#hud-explore-panel button:hover,#building-inspector button:hover,#v51cities button:hover{border-color:var(--v155-line-strong);background:linear-gradient(#2a4c4a,#1d3a3a)}
+#citypanel button:active,#tools button:active{transform:translateY(1px)}
+.eyebrow{color:var(--v155-gold)!important;letter-spacing:.14em!important;font-size:10px!important;font-weight:700!important;opacity:.85}
+/* language picker has a single choice in the English-only release, so it is hidden */
+header .game-language{display:none!important}
+
+/* ---------- top bar */
+header{background:linear-gradient(180deg,#0c1f22f5,#0f2427e6)!important;border-bottom:1px solid var(--v155-line)!important;box-shadow:0 6px 20px #0006!important}
+header .brand{color:var(--v155-gold)!important;text-shadow:0 1px 0 #000}
+#resources span{background:#ffffff08!important;border:1px solid #ffffff12!important;border-radius:11px!important;transition:background .15s}
+#resources span:hover{background:#ffffff12!important;border-color:var(--v155-line)!important}
+#resources span b{font-weight:700;color:var(--v155-text)}
+#resources span em{font-style:normal;font-weight:500;font-size:.72em;color:var(--v155-muted);margin-left:1px}
+#resources span i{display:none}
+#resources span small{color:var(--v155-muted)!important;letter-spacing:.08em}
+header .time{gap:10px}
+#turn{color:var(--v155-text);font-weight:600;white-space:nowrap}
+#clock{accent-color:var(--v155-gold)}
+#pause{border-radius:12px!important;border:1px solid var(--v155-line-strong)!important;background:linear-gradient(#3b5a45,#25403a)!important;color:#fff4d4!important}
+
+/* ---------- city overview dashboard (rendered by renderCityHealth) */
+#cityhealth{margin:10px 0 4px;padding:0!important;background:none!important;border:0!important;font-size:12px;line-height:1.35;color:var(--v155-text)}
+.v155-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.v155-stat{position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"icon label" "value value" "bar bar" "sub sub";align-items:center;column-gap:5px;
+ padding:7px 8px 7px;border-radius:11px;background:#ffffff09;border:1px solid #ffffff12;min-width:0}
+.v155-stat.warn{border-color:#f0b86680;background:#f0b8661a}
+.v155-stat-icon{grid-area:icon;font-size:13px;line-height:1}
+.v155-stat-label{grid-area:label;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--v155-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v155-stat-value{grid-area:value;font-size:15px;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.v155-stat small{grid-area:sub;font-size:10px;color:var(--v155-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.v155-bar{grid-area:bar;height:4px;border-radius:3px;background:#ffffff14;overflow:hidden;margin-top:5px}
+.v155-bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#7fc59a,#d8c26f)}
+.v155-stat.warn .v155-bar i{background:linear-gradient(90deg,#e59d58,#f0c46a)}
+.v155-alerts{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.v155-alerts span{font-size:11px;font-weight:600;color:#ffe2b0;background:#a8622a40;border:1px solid #f0b86666;border-radius:999px;padding:3px 9px}
+.v155-details{margin-top:8px;border:1px solid #ffffff12;border-radius:11px;background:#00000014}
+.v155-details summary{cursor:pointer;padding:7px 10px;font-weight:600;font-size:11.5px;color:var(--v155-gold);list-style:none}
+.v155-details summary::-webkit-details-marker{display:none}
+.v155-details summary::before{content:"▸";display:inline-block;margin-right:6px;transition:transform .15s}
+.v155-details[open] summary::before{transform:rotate(90deg)}
+.v155-details dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0;padding:0 10px 9px;font-size:11px}
+.v155-details dt{color:var(--v155-muted);white-space:nowrap}
+.v155-details dd{margin:0;color:var(--v155-text);overflow-wrap:anywhere}
+#citypane-info #workforce{display:none}
+#citypane-info #selection{display:block;font:600 17px/1.25 Georgia,serif;color:var(--v155-text);margin-top:2px}
+#citypane-info #detail{color:var(--v155-muted);font-size:11.5px;line-height:1.45;margin:4px 0 0}
+#citypane-info #progression{border:0!important;padding:6px 10px!important;margin-top:8px;border-radius:999px;background:#7a62b524;color:#d9cdf5!important;font-size:11.5px!important;display:inline-block}
+#citypane-info #progression:empty{display:none}
+#citypane-info #progression::before{content:"⚗ ";}
+#citypane-info #actions{display:grid;gap:6px;margin-top:10px}
+#citypane-info #actions button{text-align:left;padding:9px 11px;font-size:12px}
+#citypanel .city-tabs{gap:4px!important;padding:3px!important;border-radius:12px;background:#00000026;border:1px solid #ffffff10}
+#citypanel .city-tabs button{border:0!important;background:transparent!important;color:var(--v155-muted)!important;border-radius:9px!important;font-weight:600!important}
+#citypanel .city-tabs button[aria-selected="true"],#citypanel .city-tabs button.active{background:linear-gradient(#e9cf8a,#c9a75a)!important;color:#1d1a12!important;box-shadow:0 1px 0 #fff6 inset}
+#citypanel .city-panel-heading h2{font-family:Georgia,serif;letter-spacing:.01em}
+
+/* ---------- toolbar: grouped actions with icon + label everywhere */
+#tools button::before,#tools button::after{pointer-events:none}
+@media (min-width:901px) and (min-height:581px){
+ :root{--hud-bottom:84px}
+ #resources{gap:6px!important}
+ #tools{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:12px!important;display:flex!important;align-items:stretch!important;gap:2px!important;
+  padding:6px!important;min-height:0!important;height:auto!important;max-width:calc(100vw - 24px)!important;overflow:visible!important}
+ #tools button{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;
+  min-width:62px!important;max-width:none!important;height:56px!important;min-height:56px!important;padding:4px 8px!important;font-size:0!important;line-height:1!important;
+  border:1px solid transparent!important;border-radius:11px!important;background:transparent!important;color:#f1e2bd!important;white-space:nowrap!important}
+ #tools button:hover{background:#ffffff10!important;border-color:#ffffff14!important}
+ #tools button::before{display:block;font-size:20px;line-height:22px}
+ #tools button::after{display:block;font:600 10.5px/12px var(--v155-font);letter-spacing:.02em;color:#e9dcbc}
+ /* order: navigation · management · info · camera */
+ #tools #maptoggle{order:1} #tools #hud-city{order:2}
+ #tools #hud-build{order:3;margin-left:13px!important;box-shadow:-7px 0 0 -6px #d9bd7c55!important}
+ #tools #techtoggle{order:4} #tools #hud-army{order:5} #tools #hud-explore{order:6} #tools #journal{order:7}
+ #tools [data-tab="help"]{order:8;margin-left:13px!important;box-shadow:-7px 0 0 -6px #d9bd7c55!important} #tools #menubtn{order:9}
+ #tools #home{order:10;margin-left:13px!important;box-shadow:-7px 0 0 -6px #d9bd7c55!important} #tools #zin{order:11} #tools #zout{order:12}
+ #tools #home,#tools #zin,#tools #zout{min-width:44px!important;padding:4px 4px!important}
+ #tools #maptoggle::before{content:"🌍"} #tools #maptoggle::after{content:"World"}
+ #tools #hud-city::before{content:"⌂"} #tools #hud-city::after{content:"City"}
+ #tools #hud-build::before{content:"⚒"} #tools #hud-build::after{content:"Build"}
+ #tools #techtoggle::before{content:"⚗"} #tools #techtoggle::after{content:"Research"}
+ #tools #hud-army::before{content:"⚔"} #tools #hud-army::after{content:"Army"}
+ #tools #hud-explore::before{content:"🧭"} #tools #hud-explore::after{content:"Explore"}
+ #tools #journal::before{content:"📜"} #tools #journal::after{content:"Journal"}
+ #tools [data-tab="help"]::before{content:"?"} #tools [data-tab="help"]::after{content:"Help"}
+ #tools #menubtn::before{content:"☰"} #tools #menubtn::after{content:"Menu"}
+ #tools #home::before{content:"⌖"} #tools #home::after{content:"Center"}
+ #tools #zin::before{content:"+"} #tools #zin::after{content:"Zoom"}
+ #tools #zout::before{content:"−"} #tools #zout::after{content:"Zoom"}
+ body.atlas #tools #maptoggle,body.hud-city-open #tools #hud-city,body.hud-explore-open #tools #hud-explore,
+ body.hud-city-open.hud-building-tab #tools #hud-build,body.hud-city-open.hud-army-tab #tools #hud-army,
+ body:has(#researchpanel:not([hidden])) #tools #techtoggle,body:has(#journalpanel:not([hidden])) #tools #journal{
+  background:linear-gradient(#4b6d52,#335241)!important;border-color:#dbc491a8!important}
+ body.atlas #tools #maptoggle::after,body.hud-city-open #tools #hud-city::after{color:#fff5d6}
+ /* the floating zoom pair duplicates the toolbar on desktop */
+ #hud-zoom-controls{display:none!important}
+
+ /* city panel: clear column on the left between top bar and toolbar */
+ #citypanel{top:calc(var(--hud-top) + 12px)!important;left:12px!important;width:min(380px,calc(100vw - 24px))!important;max-height:calc(100dvh - var(--hud-top) - 108px)!important;padding:14px!important}
+ /* hints and toasts sit centred under the top bar, clear of the side panels */
+ #toast{top:calc(var(--hud-top) + 12px)!important;left:50%!important;transform:translateX(-50%)!important;max-width:min(520px,calc(100vw - 840px))!important;min-width:260px;
+  padding:9px 16px!important;font-size:12.5px!important;line-height:1.4!important;text-align:center}
+ #v51insights{top:calc(var(--hud-top) + 12px)!important;left:12px!important}
+ #hud-resource-toggle{border-radius:999px!important;border:1px solid var(--v155-line-strong)!important;background:var(--v155-bg)!important;color:var(--v155-text)!important;box-shadow:var(--v155-shadow)!important;padding:8px 14px!important;font-weight:600}
+}
+/* phones and small windows keep the V74 bottom bar; only the colours are unified */
+@media (max-width:900px), (max-height:580px){
+ body.atlas #tools,body:not(.atlas) #tools{background:var(--v155-bg)!important;border-color:var(--v155-line)!important}
+ .v155-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .v155-stat{padding:6px}
+ .v155-stat-value{font-size:13px}
+}
+@media (max-width:420px){.v155-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* city panel heading: name plus one line of key facts */
+#citypanel .city-panel-heading h2{margin:2px 0 0!important}
+.v155-sub{margin:3px 0 0;font-size:11.5px;color:var(--v155-muted);line-height:1.35}
+.v155-sub:empty{display:none}
+#laborsummary{margin:2px 0 8px;padding:0!important;background:none!important;border:0!important}
+.v155-note{margin:8px 2px 0;font-size:11px;line-height:1.45;color:var(--v155-muted)}
+#citypane-workers > .muted,#citypane-build > .muted{font-size:11px;color:var(--v155-muted)}
+/* world map action panel: a tidy card with a corner close button and a two-column action grid */
+@media (min-width:901px) and (min-height:581px){
+ #atlaspanel{padding:16px 14px 14px!important;width:min(320px,calc(100vw - 24px))!important}
+ #atlaspanel #hud-close-map{position:absolute!important;top:10px!important;right:10px!important;width:32px!important;height:32px!important;min-height:0!important;padding:0!important;font-size:0!important;border-radius:9px!important;display:flex!important;align-items:center;justify-content:center}
+ #atlaspanel #hud-close-map::before{content:"✕";font-size:14px}
+ #atlaspanel #hud-cities-overview{display:block!important;width:calc(100% - 42px)!important;margin:0 0 10px!important;text-align:left;padding:8px 11px!important}
+ #atlaspanel > .eyebrow{display:block;margin-top:4px}
+ #atlaspanel > h2{margin:2px 0 6px!important;font-family:Georgia,serif}
+ #atlaspanel > #selectsettler,#atlaspanel > #selectarmy,#atlaspanel > #autoexplore,#atlaspanel > #resourceoverlay,#atlaspanel > #inspecttile{display:inline-flex!important;align-items:center;justify-content:center;width:calc(50% - 4px)!important;margin:3px 0!important;min-height:38px;padding:6px 8px!important;font-size:11.5px!important}
+ #atlaspanel > #selectsettler,#atlaspanel > #autoexplore,#atlaspanel > #inspecttile{margin-right:6px!important}
+ #atlaspanel #atlasdetail{font-size:12px;line-height:1.5;color:var(--v155-muted)}
+}
