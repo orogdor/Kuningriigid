@@ -935,6 +935,11 @@ static func run() -> Dictionary:
         extended_city["buildings"].append({"type":"house","hp":350.0,"ready":true,"site_x":saved_outer.x,"site_z":saved_outer.y})
         _check(results,"v35-legacy-core-and-new-house-no-overlap",CityLayout.check_clear(extended_city))
         _check(results,"v35-new-house-save-roundtrip",JSON.parse_string(JSON.stringify(extended_city["buildings"])) is Array)
+        var intertile_streets = StreetNav.new()
+        var intertile_route: Array = intertile_streets.route(extended_city,0,1)
+        _check(results,"v35-worker-path-reaches-new-district",intertile_route.size()>30)
+        _check(results,"v35-worker-route-ends-at-building-door",not intertile_route.is_empty() and Vector2(float(intertile_route[-1][0]),float(intertile_route[-1][1])).distance_to(intertile_streets.entry_position(extended_city,1))<.0001)
+        _check(results,"v35-remote-route-can-be-replanned",not intertile_streets.route_from_position(extended_city,CityLayout.center(extended_city),1).is_empty())
     else:
         for missed in range(5):
             _check(results,"v35-next-building-fixture-%d" % missed,false)
