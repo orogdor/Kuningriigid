@@ -3,7 +3,7 @@ import {detailTrailWidth} from './road-width-v89.js';
 // World edges are projected through the local walkable navigation mesh;
 // local footpaths connect adjacent cells that have accumulated enough traffic.
 import * as T from './vendor/three.module.js';
-import {trailMaterial} from './landscape-v149.js?v=156a';
+import {trailMaterial} from './landscape-v149.js?v=157a';
 import {COLS,ROWS} from './campaign.js';
 import {roadLevel,roadStrength} from './roads.js?v=59';
 import {roadCurve,worldToDetail,segmentTouchesTile} from './landscape-shared.js?v=123a';

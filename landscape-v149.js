@@ -30,6 +30,12 @@ function inject(shader,{vertexHead='',vertexBody='',fragHead='',color=''}){
   .replace('#include <color_fragment>','#include <color_fragment>\n'+color);
 }
 
+// ---------------------------------------------------------------- V157 cultivation mask
+// One texel per map cell (0 wild .. 1 farmed); the world terrain shader draws fields where it is high.
+import {COLS as CULT_COLS,ROWS as CULT_ROWS,ORIGIN_X as CULT_OX,ORIGIN_Z as CULT_OZ,WORLD_WIDTH as CULT_W,WORLD_DEPTH as CULT_D} from './campaign.js';
+export const CULTIVATION=(()=>{const data=new Uint8Array(CULT_COLS*CULT_ROWS),texture=new T.DataTexture(data,CULT_COLS,CULT_ROWS,T.RedFormat);
+ texture.magFilter=texture.minFilter=T.LinearFilter;texture.needsUpdate=true;return {data,texture};})();
+export function setCultivation(values){CULTIVATION.data.set(values);CULTIVATION.texture.needsUpdate=true;}
 // ---------------------------------------------------------------- terrain
 // Mountains: slope- and altitude-driven bare rock with dark fissures, pale scree fans below the
 // cliffs, wind-burnt alpine grass above the tree line and snow fields on gentle high ground.
@@ -38,10 +44,11 @@ export function terrainMaterial(scope='world',tile=null){
  const material=new T.MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0});
  const map=worldMapping(scope,tile),detail=scope!=='world';
  material.onBeforeCompile=shader=>{
+  if(!detail)shader.uniforms.uT157Cult={value:CULTIVATION.texture};
   inject(shader,{
    vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':''),
    vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':''),
-   fragHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;':''),
+   fragHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;':'uniform sampler2D uT157Cult;'),
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);
@@ -50,6 +57,29 @@ export function terrainMaterial(scope='world',tile=null){
  // above ~70 m the grass thins into yellow-grey alpine turf
  float alpine=smoothstep(70.0,105.0,elev+nBroad*18.0);
  land=mix(land,land*vec3(.86,.90,.72)+vec3(.02,.025,.0),alpine*.6);
+ ${detail?'':`// V157 world map: livelier meadows (dry, lush and heath tones at several scales) and a
+ // patchwork of fields, pastures and hedgerows around settlements (cultivation mask per map cell).
+ float wgrass=smoothstep(.0,.05,land.g-land.r)*(1.0-alpine);
+ float hueA=l149n(lp*.011+2.0),hueB=l149n(lp*.034+8.0);
+ land=mix(land,mix(land*vec3(.86,1.0,.86),land*vec3(1.12,1.04,.74)+vec3(.03,.02,.0),smoothstep(.3,.75,hueA)),wgrass*.55);
+ land=mix(land,land*vec3(.92,.86,.96),smoothstep(.62,.80,hueB)*wgrass*.35);
+ land*=1.0+(l149n(lp*.23)-.5)*.10*wgrass;
+ vec2 cuv=vec2((vL149P.x-(${CULT_OX.toFixed(1)}))/${CULT_W.toFixed(1)},(vL149P.z-(${CULT_OZ.toFixed(1)}))/${CULT_D.toFixed(1)});
+ float cult=texture2D(uT157Cult,cuv).r;
+ float farm=smoothstep(.22,.55,cult+(l149n(lp*.05)-.5)*.35)*wgrass*(1.0-smoothstep(.08,.22,1.0-clamp(abs(normalize(vL149N).y),0.0,1.0)));
+ if(farm>.001){
+  float ang=floor(l149h(floor(lp/90.0)+vec2(3.0,1.0))*4.0)*.42;float ca=cos(ang),sa=sin(ang);
+  vec2 fp=vec2(ca*lp.x+sa*lp.y,-sa*lp.x+ca*lp.y),fsz=vec2(17.0,10.5),fq=fp/fsz,fcell=floor(fq),ff=fract(fq);
+  float fh=l149h(fcell+vec2(17.0,3.0));
+  vec3 crop=fh<.26?vec3(.74,.62,.27):fh<.48?vec3(.36,.50,.20):fh<.64?vec3(.42,.31,.20):fh<.84?vec3(.46,.58,.27):vec3(.68,.63,.40);
+  float furrow=.93+.07*sin(fp.x*3.1);crop*=(fh<.26||(fh>=.48&&fh<.64))?furrow:1.0;
+  crop*=.92+l149n(fcell*1.7)*.12;
+  float aaF=1.0-smoothstep(.25,.8,fwidth(fq.x)+fwidth(fq.y));
+  float edge=min(min(ff.x,1.0-ff.x)*fsz.x,min(ff.y,1.0-ff.y)*fsz.y);
+  float hedge=(1.0-smoothstep(.35,1.1,edge))*step(.35,l149h(fcell+vec2(5.0,9.0)))*aaF;
+  land=mix(land,crop,farm*.85);
+  land=mix(land,vec3(.22,.32,.17),hedge*farm*.7);
+ }`}
  ${detail?`// V156 close-up ground, in local detail-map units: meadow hue patches, grass clumps,
  // blade streaks, bare soil, wild-flower specks and pebbles, plus a small bump for relief light.
  // Fine detail fades out where it would alias (fwidth).
@@ -177,7 +207,7 @@ export function roadMaterial(scope='world',tile=null){
    color:`
  float u=vL149U.x,v=vL149U.y,au=abs(u);float lvl=floor(vL149L+.5);
  vec2 wp=vL149P.xz;float n=l149n(wp*${detail?'.9':'.35'}),nf=l149n(wp*${detail?'4.0':'1.2'}+5.0);
- vec3 dirt=vec3(.39,.32,.23)*(.86+n*.22);
+ vec3 dirt=${detail?'vec3(.39,.32,.23)':'vec3(.45,.38,.28)'}*(.86+n*.22);
  vec3 col=dirt;
  if(lvl<1.5){ // dirt track: two wheel ruts, grassy crown
   float rut=smoothstep(.20,.0,abs(au-.55));col*=1.0-rut*.22;
@@ -185,6 +215,9 @@ export function roadMaterial(scope='world',tile=null){
  }else if(lvl<2.5){ // gravel
   col=mix(vec3(.46,.43,.37),vec3(.36,.34,.29),nf)*(.92+n*.12);
   col*=1.0-smoothstep(.20,.0,abs(au-.5))*.10;
+ }else if(${detail?'false':'true'}){ // V157 world map: paved roads read as smooth grey-brown bands, not tiles
+  col=mix(vec3(.47,.44,.38),vec3(.40,.38,.34),nf)*(.93+n*.10);
+  col=mix(col,col*.82,smoothstep(.70,.95,au));
  }else{ // cobbles (3) / flagstones (4)
   vec2 cell=lvl<3.5?vec2(u*3.2,v*${detail?'1.6':'.55'}):vec2(u*1.6,v*${detail?'.8':'.28'});
   cell.x+=floor(cell.y)*.5;

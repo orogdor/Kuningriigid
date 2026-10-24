@@ -4,7 +4,7 @@ import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
 import * as T from './vendor/three.module.js';
-import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=156a';
+import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=157a';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
 import {riverNear,localToWorld} from './continuous-landscape.js?v=123a';
 import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
@@ -15,7 +15,7 @@ const elev=(game,x,z,view)=>surface(game,x,z,view);
 const pos=(game,x,z,y,view,tile)=>({...field(game,x,z,view,tile),y:projectHeight(y,view)});
 function join(pts,game,scope,tile,kind,level=1){
  // V149: atlas roads are drawn wider so they read at map scale (centre lines are unchanged).
- const isRiver=kind==='river',wBase=isRiver?0:[0,1.25,1.6,2.0,2.5][level],out=[];
+ const isRiver=kind==='river',wBase=isRiver?0:[0,.85,1.1,1.4,1.75][level],out=[];
  for(let i=0;i<pts.length;i++){
   const p=pts[i],before=pts[Math.max(0,i-1)],after=pts[Math.min(pts.length-1,i+1)];
   const tX=after.x-before.x,tZ=after.z-before.z,d=Math.hypot(tX,tZ)||1;
@@ -181,18 +181,37 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  group.add(createCrossingNetwork(game,scope,tile,quality));
  return group;
 }
-export function createUnifiedRoadNetwork(game,scope='world',tile=null){
+// V157: on detail maps a road bends around building plots instead of running through them.
+// The centre line is densified in local units, pushed out of every (inflated) plot rectangle and
+// lightly smoothed, a few rounds; points outside the local map are left as they are.
+function steerAroundPlots(points,tile,obstacles,margin){
+ const local=[];for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/.45));
+  for(let k=i===1?0:1;k<=n;k++){const t=k/n,p=worldToLocal(tile,a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t);local.push({x:p.x,z:p.z,width:a.width});}}
+ const inMap=p=>Math.abs(p.x)<360&&Math.abs(p.z)<320;
+ const push=p=>{let moved=false;for(const [cx,cz,rx,rz] of obstacles){const RX=rx+margin,RZ=rz+margin,dx=p.x-cx,dz=p.z-cz;if(Math.abs(dx)>=RX||Math.abs(dz)>=RZ)continue;
+  const ox=RX-Math.abs(dx),oz=RZ-Math.abs(dz);if(ox<oz)p.x=cx+Math.sign(dx||1)*(RX+.05);else p.z=cz+Math.sign(dz||1)*(RZ+.05);moved=true;}return moved;};
+ for(let round=0;round<8;round++){let any=false;for(let i=1;i<local.length-1;i++)if(inMap(local[i])&&push(local[i]))any=true;
+  if(!any&&round>1)break;
+  for(let pass=0;pass<2;pass++)for(let i=1;i<local.length-1;i++){const p=local[i];if(!inMap(p))continue;p.x=p.x*.5+(local[i-1].x+local[i+1].x)*.25;p.z=p.z*.5+(local[i-1].z+local[i+1].z)*.25;}}
+ for(let i=1;i<local.length-1;i++)if(inMap(local[i]))push(local[i]);
+ // thin back out to ~1.3 local units, then back to world coordinates
+ const out=[];let last=null;for(const p of local){if(last&&Math.hypot(p.x-last.x,p.z-last.z)<1.3&&p!==local[local.length-1])continue;const w=localToWorld(tile,p.x,p.z);out.push({x:w.x,z:w.z,width:p.width});last=p;}
+ return out;
+}
+export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=null){
  const group=new T.Group();group.name='V67 continuous road graph';group.userData.roadNetwork=true;
  // V149: one lit ribbon per road (soft verge | bed | soft verge) with across/along UVs; the
  // surface (ruts, gravel, cobbles, flagstones) is drawn by the road shader from the road level.
- const pos=[],uv=[],lvl=[],index=[];
+ const pos=[],uv=[],lvl=[],index=[],centrelines=[];
  let roads=0,beds=0;
  for(const edge of roadNetwork(game)){
   if(!visible(tile,edge.points))continue;
-  const xs=join(edge.points,game,scope,tile,'road',edge.level);
+  const pts=scope!=='world'&&obstacles?.length?steerAroundPlots(edge.points,tile,obstacles,detailWorldRoadWidth(edge.level)*.8+1.2):edge.points;
+  if(scope!=='world'&&tile)centrelines.push(pts.map(p=>worldToLocal(tile,p.x,p.z)));
+  const xs=join(pts,game,scope,tile,'road',edge.level);
   let along=0,base=pos.length/3;
   for(let i=0;i<xs.length;i++){
-   if(i){const p=edge.points[i],q=edge.points[i-1];along+=Math.hypot(p.x-q.x,p.z-q.z);}
+   if(i){const p=pts[i],q=pts[i-1];along+=Math.hypot(p.x-q.x,p.z-q.z);}
    const x=xs[i];
    for(const [v,u] of [[x.ol,-1.5],[x.l,-1],[x.r,1],[x.or,1.5]]){pos.push(v.x,v.y,v.z);uv.push(u,along);lvl.push(edge.level)}
    if(i){const r0=base+(i-1)*4,r1=base+i*4;for(let k=0;k<3;k++)index.push(r0+k,r0+k+1,r1+k,r1+k,r0+k+1,r1+k+1);beds+=2}
@@ -205,7 +224,7 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null){
   geo.setAttribute('aLevel',new T.Float32BufferAttribute(lvl,1));geo.setIndex(index);geo.computeVertexNormals();geo.computeBoundingSphere();
   const road=new T.Mesh(geo,roadMaterial(scope,tile));road.name='continuous road pavement';road.renderOrder=10;road.receiveShadow=true;group.add(road);
  }
- group.userData.detailWidthRatio=scope==='detail'?2:null;group.userData.roadEdges=roads;group.userData.roadVertexCount=beds*3;
+ group.userData.centrelines=centrelines;group.userData.detailWidthRatio=scope==='detail'?2:null;group.userData.roadEdges=roads;group.userData.roadVertexCount=beds*3;
  return group;
 }
 export function disposeNetwork(group){

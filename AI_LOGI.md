@@ -367,3 +367,38 @@ Kasutaja: „Detailkaartidel tundub maapind tühi, igav ja halva tekstuuriga.“
 ### Testid
 Uus `TEST_V156.mjs` (eelarve, teedele ja kruntidele ei kasva midagi, jõgi ja mägi jäävad tühjaks). Brauseritestid on loetletud allpool.
 PASS: `TEST_V156`, `TEST_V67`, `TEST_V149_BROWSER`, `TEST_V143_BROWSER`, `TEST_V88_EXPLORATION_UI`, `TEST_V154`, `TEST_V151_BROWSER`, `TEST_V123_UI`.
+
+## V157 – maailmakaardi maapind, rändajad detailkaardil, teed majadest mööda (Claude, 2026-10-24)
+
+Kasutaja: „Maailmakaardi maa tekstuur on kole ja tühi. Kõik üksused, kaupmehed jne peaksid maailmakaardilt avades olema ka detailkaardil õigel ruudul. Maailmakaardi teed on koledad ja detailkaardil lähevad läbi majade ja muude asjade.“
+Muudetud on ainult välimust. Mänguloogika, teede võrk, navigeerimine ja salvestused on samad.
+
+### Maailmakaardi maapind (`landscape-v149.js` `terrainMaterial`, world)
+- Rohumaa toonid kolmes mõõtkavas: kuivem / lopsakam / nõmm, lisaks peen mustriline variatsioon.
+- **Põllumosaiik asulate ümber**:
+  - uus `CULTIVATION` DataTexture (1 tekseli kohta kaardiruut, lineaarne filter) ja `setCultivation(values)`;
+  - `civilization.js` `refreshCultivation()` (iga `worldSync`, muutub koos `territoryStamp`-iga): linnaala 1, maakond 0,6, mets × 0,35, kõrb × 0,4;
+  - varjutaja joonistab seal põllud (17 × 10,5 m, suund vahetub 90 m piirkondade kaupa): nisu, roheline vili, künnimaa, karjamaa, kõrrepõld, vaod ja hekid. Hekid hajuvad kauguses (`fwidth`).
+- Maailmakaardi teed:
+  - kitsamad (`[0,.85,1.1,1.4,1.75]`);
+  - pinnas pehmema tooniga;
+  - sillutatud tee on sile hallikaspruun riba ilma kivimustrita (maailmavaates nägi muster välja nagu redel).
+
+### Teed detailkaardil (`continuous-landscape-visual.js`)
+- `createUnifiedRoadNetwork(game, scope, tile, obstacles)`: detailvaates kasutab `steerAroundPlots()` tee kesktelge:
+  - tihendab selle ~0,45 m sammuga kohalikesse ühikutesse;
+  - lükkab punktid välja hoonekruntidest (`buildingClearance` + tee poollaius + 1,2);
+  - silub ja kordab kuni 8 korda.
+  Kaardist väljaspool olevaid punkte ei muudeta.
+- `civilization.js` `plotRects(cell)`: aktiivse ja 8 naaberruudu hoonekrundid (müürilõigud välja arvatud). Tee ehitatakse uuesti, kui krundid muutuvad (`roadStamp` sisaldab kruntide templit).
+- Kesktelg on testi jaoks kättesaadav: `group.userData.centrelines`.
+
+### Rändajad detailkaardil (`detail-travellers-v157.js`, uus)
+- Liikvel olevad asunikud (3 inimest pampude ja lipuga), maismaa kaubakaravanid (härg / hobune, vanker kaupade ja meeskonnavärvi kattega, kutsar) ja merekaubalaevad.
+- Asukoht on sama, mis maailmakaardi markeril (`worldTravelSample`), projitseeritud kohalikesse ühikutesse (`worldToLocal`). Rändajad on nähtavad kogu 3 × 3 detailkaardil ja liiguvad sama tempoga. Seisvad rändajad ootavad linnasüdamest veidi eemal.
+- Armeed näidati detailkaardil juba enne (`inspection()` / laagrid). Õhu- ja raudteeveod jäävad ainult maailmakaardile.
+
+### Testid
+- Uus `TEST_V157.mjs`: teede kesktelg on kruntidest väljas (≤ 2% punkte; keskaeg 1/1047, moodne aeg 3/627) ja karavan on detailkaardil nähtav.
+- PASS: `TEST_V67`, `TEST_V156`, `TEST_V154`, `TEST_V149_BROWSER`, `TEST_V143_BROWSER`, `TEST_V88_EXPLORATION_UI`, `TEST_V151_BROWSER`, `TEST_V152`, `TEST_V123_UI`, `TEST_V133_BROWSER`.
+- Debug: `gameDebug.v157()` → `{roads, plots, travellers}`.
