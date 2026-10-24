@@ -48,6 +48,8 @@ jobs:
           cp -a unpacked/Kuningriigid_Godot_GitHub_OTA/game .
           cp -a unpacked/Kuningriigid_Godot_GitHub_OTA/bootstrap .
           mkdir -p bootstrap/seed
+          grep -q '\[rendering\]' bootstrap/project.godot
+          printf '\ntextures/vram_compression/import_etc2_astc=true\n' >> bootstrap/project.godot
       - name: Python 3 installimine Godoti konteinerisse
         shell: bash
         run: |
