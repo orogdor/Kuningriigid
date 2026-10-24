@@ -1029,7 +1029,7 @@ static func run() -> Dictionary:
     IndividualBattle.tick(linked_state,0.12)
     _check(results,"v38-debug-battle-stopped",linked_state["individual_battle"].is_empty())
     var conquest_debug: Dictionary = linked_state["battle_log"][-1].get("city_capture",{}) if not linked_state["battle_log"].is_empty() else {}
-    _check(results,"v38-capture-result-"+String(conquest_debug.get("reason",String(conquest_debug.get("ok","empty")))),bool(conquest_debug.get("ok",false)))
+    _check(results,"v38-capture-result-"+str(conquest_debug.get("reason",conquest_debug.get("ok","empty"))),bool(conquest_debug.get("ok",false)))
     _check(results,"v38-debug-city-owner-updated",int(linked_state["cities"][1]["team"])==0)
     _check(results,"v38-debug-city-capture-count",int(linked_state.get("city_captures",0))==1)
     _check(results,"v38-debug-battle-log-exists",not linked_state["battle_log"].is_empty())
