@@ -6,6 +6,7 @@ const RoadsPort = preload("res://scripts/core/roads_port.gd")
 const CountiesPort = preload("res://scripts/core/counties_port.gd")
 const Territory = preload("res://scripts/core/territory_port.gd")
 const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
+const BuildVersion = preload("res://scripts/core/build_version_port.gd")
 const EconomyPort = preload("res://scripts/core/economy_port.gd")
 const ResearchPort = preload("res://scripts/core/research_port.gd")
 const PortChecks = preload("res://tests/port_checks.gd")
@@ -122,6 +123,8 @@ var sim_accumulator: float = 0.0
 var ui_label: Label
 var info_label: Label
 var status_label: Label
+var build_version_label: Label
+var build_version_state: Dictionary = {}
 var current_actor_count: int = 150
 var paused: bool = false
 var sim_ticks: int = 0
@@ -384,6 +387,15 @@ func _setup_ui() -> void:
     ui_label.add_theme_font_size_override("font_size",16)
     ui_label.text = "Godot"
     bar.add_child(ui_label)
+    build_version_state = BuildVersion.snapshot()
+    build_version_label = Label.new()
+    build_version_label.name = "PersistentBuildVersion"
+    build_version_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    build_version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+    build_version_label.add_theme_font_size_override("font_size",15)
+    build_version_label.custom_minimum_size.x = 310.0
+    build_version_label.text = BuildVersion.hud_text(build_version_state)
+    bar.add_child(build_version_label)
     # Keep legacy information fields for diagnostics, but do not allow their
     # unrestricted long strings to grow or push usable game controls away.
     info_label = Label.new()
@@ -415,7 +427,7 @@ func _setup_ui() -> void:
     _add_button(status_row,"AVA RUUT",func():_open_selected_tile(),145)
     mobile_status_caption = Label.new()
     mobile_status_caption.add_theme_font_size_override("font_size",13)
-    mobile_status_caption.text = "Godot V131 osaport • puudub täielik algne mäng"
+    mobile_status_caption.text = "Godot V131 osaport | "+BuildVersion.detail_text(build_version_state)
     b.add_child(mobile_status_caption)
 
     mobile_menu = PanelContainer.new()
@@ -432,7 +444,7 @@ func _setup_ui() -> void:
     menu_v.add_theme_constant_override("separation",8)
     mobile_menu.add_child(menu_v)
     var title := Label.new()
-    title.text = "KUNINGRIIGID GODOT 1.8 — vali tegevus"
+    title.text = "KUNINGRIIGID • "+str(build_version_state.get("tag","teadmata"))+" — vali tegevus"
     title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     title.add_theme_font_size_override("font_size",22)
     menu_v.add_child(title)

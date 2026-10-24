@@ -19,5 +19,16 @@ func _verify() -> void:
         printerr("BOOTSTRAP_SMOKE_FAIL: game Main.tscn is not loadable")
         quit(1)
         return
+    var build_file: FileAccess = FileAccess.open("res://data/build_info.json",FileAccess.READ)
+    if build_file == null:
+        printerr("BOOTSTRAP_SMOKE_FAIL: missing packed build_info.json")
+        quit(1)
+        return
+    var version: Variant = JSON.parse_string(build_file.get_as_text())
+    if not (version is Dictionary) or not str(version.get("tag","")).begins_with("godot-dev-"):
+        printerr("BOOTSTRAP_SMOKE_FAIL: build does not contain numbered Godot dev tag")
+        quit(1)
+        return
+    print("BOOTSTRAP_PACK_VERSION: "+str(version["tag"]))
     print("BOOTSTRAP_SMOKE_PASS: exported PCK mounted and game scene loaded")
     quit(0)

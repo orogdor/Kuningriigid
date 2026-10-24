@@ -35,6 +35,20 @@ jobs:
             DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3
           fi
           python3 --version
+          mkdir -p game/data
+          python3 - <<'PY_VERSION'
+          import json, os
+          from datetime import datetime, timezone
+          info = {
+              "tag": "godot-dev-" + os.environ["GITHUB_RUN_NUMBER"],
+              "commit": os.environ["GITHUB_SHA"],
+              "built_at": datetime.now(timezone.utc).isoformat(),
+              "channel": "dev",
+          }
+          with open("game/data/build_info.json", "w", encoding="utf-8") as file:
+              json.dump(info, file, ensure_ascii=False)
+          print("Embedded pack version:", info["tag"])
+          PY_VERSION
           echo 'Building editable GitHub branch source, not the old compressed v3.3 snapshot.'
       - name: Static validations
         shell: bash

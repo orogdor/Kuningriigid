@@ -13,6 +13,8 @@ const MAX_PACK_BYTES: int = 536870912 # Do not fill a phone with an unexpectedly
 
 var http: HTTPRequest
 var info: Label
+var installed_label: Label
+var latest_label: Label
 var start_button: Button
 var busy: bool = false
 var stage: String = ""
@@ -34,12 +36,14 @@ func _ready() -> void:
         _show_error("Uuenduste kausta ei saanud avada.")
         return
     _prune_old_downloads()
+    _store_latest("",false)
     # Loading the pack occurs before any code or scene from the game is loaded.
     if not _mount_saved():
         if not _mount_seed():
             _show_error("Mängu algpakett puudub. Paigalda GitHub Releasesi APK uuesti.")
             return
     start_button.disabled = false
+    _refresh_versions()
     _set_status("Kontrollin GitHubist uuendusi…")
     http = HTTPRequest.new()
     http.max_redirects = 8
@@ -82,6 +86,16 @@ func _make_interface() -> void:
     heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     heading.add_theme_font_size_override("font_size", 30)
     centered.add_child(heading)
+    installed_label = Label.new()
+    installed_label.text = "Paigaldatud mäng: kontrollin…"
+    installed_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    installed_label.add_theme_font_size_override("font_size",21)
+    centered.add_child(installed_label)
+    latest_label = Label.new()
+    latest_label.text = "Viimane GitHubis: kontrollimata"
+    latest_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    latest_label.add_theme_font_size_override("font_size",17)
+    centered.add_child(latest_label)
     info = Label.new()
     info.text = "Alustan…"
     info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -92,6 +106,29 @@ func _make_interface() -> void:
     start_button.disabled = true
     start_button.pressed.connect(_skip_and_start)
     centered.add_child(start_button)
+
+func _pack_version() -> String:
+    var file: FileAccess = FileAccess.open("res://data/build_info.json",FileAccess.READ)
+    if file == null:
+        return active_tag if active_tag != "" else "teadmata"
+    var parsed: Variant = JSON.parse_string(file.get_as_text())
+    if parsed is Dictionary:
+        return str(parsed.get("tag",active_tag))
+    return active_tag if active_tag != "" else "teadmata"
+
+func _store_latest(tag: String,checked: bool) -> void:
+    var file: FileAccess = FileAccess.open(OTA_DIR+"latest.json",FileAccess.WRITE)
+    if file != null:
+        file.store_string(JSON.stringify({"tag":tag,"checked":checked,
+            "checked_at":int(Time.get_unix_time_from_system()) if checked else 0}))
+
+func _refresh_versions() -> void:
+    if is_instance_valid(installed_label):
+        installed_label.text = "Paigaldatud: "+_pack_version()
+    if is_instance_valid(latest_label):
+        latest_label.text = "Viimane GitHubis: "+(proposed_tag if proposed_tag!="" else "kontrollimata")
+        if proposed_tag != "":
+            latest_label.text += ("  ✓ UUSIM" if proposed_tag==_pack_version() else "  • UUENDUS SAADAVAL")
 
 func _set_status(message: String) -> void:
     if is_instance_valid(info):
@@ -180,7 +217,13 @@ func _parse_release(body: PackedByteArray) -> void:
         _start_game("Godoti eelväljalaset ei leitud. Kasutan olemasolevat versiooni.")
         return
     proposed_tag = str(release.get("tag_name", ""))
-    if proposed_tag == "" or proposed_tag == active_tag:
+    if not proposed_tag.begins_with("godot-dev-"):
+        busy=false
+        _start_game("Uuenduse versioonitunnus on vigane.")
+        return
+    _store_latest(proposed_tag,true)
+    _refresh_versions()
+    if proposed_tag == active_tag or proposed_tag == _pack_version():
         busy=false
         _start_game("Mäng on ajakohane.")
         return
@@ -243,6 +286,7 @@ func _finish_download() -> void:
     staged_pack=temp_path
     staged_tag=proposed_tag
     staged_hash=expected
+    _refresh_versions()
     _start_game("Uus versioon "+proposed_tag+" on alla laaditud.")
 
 func _skip_and_start() -> void:
@@ -267,6 +311,7 @@ func _start_game(message: String) -> void:
         return
     start_button.disabled=true
     _set_status(message)
+    _refresh_versions()
     call_deferred("_open_scene")
 
 func _open_scene() -> void:
