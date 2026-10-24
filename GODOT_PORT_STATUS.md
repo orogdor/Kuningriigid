@@ -1,5 +1,19 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.7 / Godot Dev 109 – strateegiline linnakaitse ja tugevamad piiramisarmeed (2026-10-24)
+
+- `campaign_defense_port.gd`: AI riik tuvastab oma linna lähikonnas (Manhattani kaugus kuni 7 maailmaruutu) reaalselt elusate vaenlasüksuste surve. Ohu korral hindab linna garnisoni ja juba teel olevate abivägede suurust ning käsib olemasoleval sobival ründearmeel pöörduda linna poole. Käsk on päris maailmakaardi rajaleidmisega ja säilib salvestuses; üksuseid ei looda ega teisaldada silmapilkselt.
+- Tagasi ei kutsuta poolelioleva taktikalise lahingu osalisi, põgenevaid armeesid ega väge, mis juba hõivab vaenlase linna. Samale abiväele ei anta korduvkäsku. Ohu möödumisel saab sihtlinna jõudnud abiväest taas reserv.
+- `campaign_war_port.gd`: ohu all oleva kodulinna vägedel ei lasta lihtsalt uuele ründele lahkuda; piiramisrünnak vajab vähemalt **4 elusat sõjaväeüksust pärast ühe garnisoniüksuse eraldamist**, kindlustamata sihtmärkide puhul jääb 2-üksuseline lävend. AI värbamine võib tõsta kodulinna paigutatud vägede arvu kuni kuue üksuseni; juba olemasolev garnison saab kasvada uueks ründearmeeks, jättes ühe üksuse linna.
+- `main.gd`: strateegiline kaitseplaneerija töötab igal kampaaniakäigul pärast värbamist ja enne uusi rünnakukäske, kuvab tagasikutsutud armeede arvu. Olemasolev Dev 102 mitme rinde AI ning Godoti OTA APK/PCK eristus säilitati.
+- Testid katavad alamehitatud kindlustatud linna rünnaku vältimist, nelja üksusega päris ründekäsku, üksuste jagamise jäävust, abivägede tagasikutsumist ja liikumistee püsivust, duplikaatkäskude vältimist, linnakaitsjate paigalejäämist ning vanasse kampaaniasalvestusse sobivust.
+- Godot Actions CI: **860/860 regressioonitesti**, parser, PCK laadimistest ja Android debug APK eksport läbitud: https://github.com/orogdor/Kuningriigid/actions/runs/40118073210
+- Avaldatud pakett: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-109
+- Pordi **hinnanguline valmidus ~65%** (töömahu hinnang, eelnevalt ~63%).
+
+**Alles tegemisel:** mitme iseseisva *taktikalise* lahingu samaaegne simulatsioon, kahe armee täielik ühendamine teekonnal, arenenud piiramismasinad AI käsul, mitme linna täpne sõjaväeline majandus ja Androidi pärisseadme visuaal-/jõudlustestid. CI kinnitab automaatse testikäigu, mitte kõiki mobiilikasutuse olukordi.
+
+
 ## V4.6 / mitme linna sõjaväe-AI ja korraga mitu rinnet (Dev 102, 2026-10-24)
 
 - `campaign_war_port.gd`: erinevates AI linnades ehitatakse makstud sõjaväelaagreid ja värvatakse sama käigu jooksul, kuni 3 värbamiskäsku riigi kohta; kogu riigi värbamismaht kasvab linnade arvuga, ülempiiriga 12 elusat üksust. Iga ehitus- ja väljaõppekäsk läbib olemasoleva elanikkonna, teaduse, hinnakirja ning ressursside kontrolli.
