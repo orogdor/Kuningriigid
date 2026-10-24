@@ -3,6 +3,7 @@ extends Node3D
 ## world-map cell. V131 scale is exact; map, resource and house geometry
 ## remain deterministic proxies because the full JS terrain is not ported.
 const Cargo = preload("res://scripts/core/cargo_port.gd")
+const Layout = preload("res://scripts/core/city_layout_port.gd")
 const CountyLogistics = preload("res://scripts/core/county_logistics_port.gd")
 const SharedLandscape = preload("res://scripts/core/shared_landscape_v131.gd")
 var _landscape = null
@@ -17,6 +18,7 @@ const SURFACE_STEP_Z: int = 26
 const TEAM_COLORS: Array[Color] = [Color("5eacff"),Color("ed736a"),Color("80d39c"),Color("d5a8f5")]
 var current_tile: Vector2i = Vector2i(-1,-1)
 var town_index: int = -1
+var urban_index: int = -1
 var owner_index: int = -1
 var owner_name: String = ""
 var town_name: String = ""
@@ -68,6 +70,7 @@ func show_tile(cell: Vector2i,towns: Array,heights: PackedFloat32Array,navigator
     _heights = heights
     town_index = city_index_at(towns,cell)
     _has_town = town_index >= 0
+    urban_index = town_index
     owner_index = town_index
     if owner_index < 0:
         for index in range(towns.size()):
@@ -78,7 +81,12 @@ func show_tile(cell: Vector2i,towns: Array,heights: PackedFloat32Array,navigator
                     break
             if owner_index >= 0:
                 break
-    town_name = String(towns[town_index].get("name","Linn")) if _has_town else ""
+    if owner_index >= 0 and not _has_town:
+        for plot in towns[owner_index].get("territory_urban",[]):
+            if int(plot[0]) == cell.x and int(plot[1]) == cell.y:
+                urban_index = owner_index
+                break
+    town_name = String(towns[urban_index].get("name","Linn")) if urban_index >= 0 else ""
     owner_name = String(towns[owner_index].get("name","")) if owner_index >= 0 else ""
     building_sites.clear()
     for previous in _alive_nodes:
@@ -92,17 +100,19 @@ func show_tile(cell: Vector2i,towns: Array,heights: PackedFloat32Array,navigator
     _create_shared_rivers()
     # Register building footprints before distributing trees and rocks.
     # Large towns must never have spruce trunks growing through roofs.
-    if _has_town:
-        _create_town(towns[town_index])
+    if urban_index >= 0:
+        _create_town(towns[urban_index])
     if owner_index >= 0:
         _create_county_worksites(towns[owner_index])
     _create_resources()
     if _has_town:
         _create_city_roads(towns[town_index],navigator)
-    if _has_town or owner_index >= 0:
+    elif urban_index >= 0 and not building_sites.is_empty():
+        _create_district_roads()
+    if urban_index >= 0 or owner_index >= 0:
         _create_moving_layers()
-    if _has_town:
-        refresh_movers(towns[town_index])
+    if urban_index >= 0:
+        refresh_movers(towns[urban_index])
     elif owner_index >= 0:
         refresh_county_movers(towns[owner_index],[])
     visible = true
@@ -110,7 +120,7 @@ func show_tile(cell: Vector2i,towns: Array,heights: PackedFloat32Array,navigator
 func tile_description() -> String:
     var tile_name: String = "%d, %d" % [current_tile.x,current_tile.y]
     var terrain: String = "maismaa" if source_height(_heights,current_tile.x,current_tile.y)>0.0 else "meri"
-    if _has_town:
+    if urban_index >= 0:
         return "%s • %s (%s) • %d hoonet" % [tile_name,town_name,terrain,building_sites.size()]
     if owner_index >= 0:
         return "%s • %s • %s maakond, %d töökohta" % [tile_name,terrain,owner_name,building_sites.size()]
@@ -310,7 +320,10 @@ func _create_town(town: Dictionary) -> void:
     for i in range(buildings.size()):
         var building: Dictionary = buildings[i]
         var kind: String = String(building.get("type","house"))
-        var point: Vector2 = city_to_detail(town,Cargo.building_position(town,i))
+        var site: Vector2 = Cargo.building_position(town,i)
+        if Layout.site_tile(town,site) != current_tile:
+            continue
+        var point: Vector2 = Layout.site_in_tile(town,site,current_tile)*SITE_SCALE
         var x: float = point.x
         var z: float = point.y
         # Buildings outside the current map never get drawn in the wrong tile.
@@ -338,6 +351,8 @@ func _create_town(town: Dictionary) -> void:
         roof_mesh.size = Vector3.ONE
         roof_mesh.material = _material(banner_team)
         _add_multi(roof_mesh,group["roof"],"Roofs_"+String(group["kind"]))
+    if not _has_town:
+        return
     var banner := Label3D.new()
     banner.text = "%s | %d elanikku | %d hoonet" % [town_name,int(town.get("pop",3)),buildings.size()]
     banner.font_size = 36
@@ -415,6 +430,40 @@ func _create_city_roads(town: Dictionary,navigator) -> void:
         var road_mat := _material(Color.WHITE)
         road_mat.vertex_color_use_as_albedo = true
         _add_mesh(mesh_builder.commit(),road_mat,CENTER)
+
+func _create_district_roads() -> void:
+    # Continuous orthogonal streets on added urban detail tiles. Parcels
+    # exclude the two central street bands through gx/gz != 0.
+    # Segments submerged by an atlas river remain unpaved (bridges separately).
+    var tool := SurfaceTool.new()
+    tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+    var drawn: int = 0
+    for axis in range(2):
+        var limit: float = TILE_WIDTH*.5-2.0 if axis == 0 else TILE_DEPTH*.5-2.0
+        var segments: int = ceili(limit/8.0)
+        for n in range(-segments,segments):
+            var t0: float = clampf(float(n)*8.0,-limit,limit)
+            var t1: float = clampf(float(n+1)*8.0,-limit,limit)
+            var a: Vector2 = Vector2(t0,0.0) if axis == 0 else Vector2(0.0,t0)
+            var b: Vector2 = Vector2(t1,0.0) if axis == 0 else Vector2(0.0,t1)
+            if _landscape != null and _landscape.blocked_by_river(current_tile,(a+b)*.5,1.8):
+                continue
+            var normal: Vector2 = Vector2(-1.35,0.0) if axis == 1 else Vector2(0.0,1.35)
+            var aa: Vector2 = a-normal
+            var ab: Vector2 = a+normal
+            var ba: Vector2 = b-normal
+            var bb: Vector2 = b+normal
+            _surface_triangle(tool,Vector3(aa.x,_point_height(aa.x,aa.y)+.10,aa.y),
+                Vector3(ba.x,_point_height(ba.x,ba.y)+.10,ba.y),
+                Vector3(bb.x,_point_height(bb.x,bb.y)+.10,bb.y),Color("a98b61"))
+            _surface_triangle(tool,Vector3(aa.x,_point_height(aa.x,aa.y)+.10,aa.y),
+                Vector3(bb.x,_point_height(bb.x,bb.y)+.10,bb.y),
+                Vector3(ab.x,_point_height(ab.x,ab.y)+.10,ab.y),Color("a98b61"))
+            drawn += 1
+    if drawn > 0:
+        var road_material := _material(Color.WHITE)
+        road_material.vertex_color_use_as_albedo = true
+        _add_mesh(tool.commit(),road_material,CENTER)
 
 func _create_moving_layers() -> void:
     for category in ["builder","worker","market_woman","demo_crowd","cargo","supply"]:
