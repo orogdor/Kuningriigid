@@ -21,7 +21,8 @@ assert len(cities) == 14
 assert min(max(abs(a["c"] - b["c"]), abs(a["r"] - b["r"])) for i, a in enumerate(cities) for b in cities[i+1:]) >= 17
 assert source.count('"age":') == 59
 assert (root / "scripts/core/research_v125_port.gd").read_text().count('"age":') == 26
-assert len(re.findall(r'^\s+_check\(', checks, re.M)) == 647
+assert len(re.findall(r'^\s+_check\(', checks, re.M)) >= 658
+assert 'v34-v153-large-city-144-tiles' in checks
 assert 'CampaignPort.find_path(walkable,src,dst)' in main
 assert 'Territory.rebuild(preview_state,land' in main
 assert 'RoadsPort.record_world_step' in main
