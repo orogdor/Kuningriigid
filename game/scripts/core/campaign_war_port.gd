@@ -167,8 +167,10 @@ static func ai_march(state: Dictionary,world_nav) -> Dictionary:
             continue
         if not ongoing.is_empty() and int(army.get("id",-1)) in [int(ongoing.get("army_a",-1)),int(ongoing.get("army_b",-1))]:
             continue
-        if String(army.get("strategic_role","")) in ["garrison","relief"]:
+        if String(army.get("strategic_role","")) == "relief":
             continue
+        if String(army.get("strategic_role","")) == "garrison" and Military.units_for(state,army).size() < 3:
+            continue # Trained reinforcements may grow an old guard into a new field army.
         var point := Vector2i(int(army["c"]),int(army["r"]))
         if _on_hostile_city(state,team,point):
             continue # Stay for the occupation or linked city siege.
