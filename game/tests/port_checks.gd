@@ -84,6 +84,19 @@ static func run() -> Dictionary:
     _check(results,"v41-save-load-campaign",campaign_save_ok and CampaignPlay.is_active(campaign_load) and int(campaign_load["campaign"]["turn"])==1)
     if FileAccess.file_exists("user://v41_campaign_regression.json"):
         DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v41_campaign_regression.json"))
+    # Twelve subsequent real engine turns: catch stalled AI or broken clock
+    # accumulation rather than accepting only a one-turn menu smoke test.
+    for _cycle in range(12):
+        if not CampaignPlay.is_running(campaign_state):
+            break
+        Preview.tick(campaign_state,CampaignPlay.GAME_SECONDS_PER_TURN)
+        CampaignPlay.finish_turn(campaign_state)
+    _check(results,"v41-thirteen-campaign-turns",int(campaign_state["campaign"]["turn"])==13)
+    _check(results,"v41-thirteen-turns-simulated",is_equal_approx(float(campaign_state["seconds"]),13.0*60.0))
+    _check(results,"v41-thirteen-turns-real-ai-orders",int(campaign_state.get("ai_research_orders",0)) >= 3)
+    _check(results,"v41-economy-across-twelve-turns",int(campaign_state.get("economic_ticks",0))>=48)
+    _check(results,"v41-long-run-history",campaign_state["campaign"]["history"].size()==13)
+    print("V41_CAMPAIGN_LONGRUN: turns=",campaign_state["campaign"]["turn"]," economic_minutes=",campaign_state.get("economic_ticks",0)," ai_research_orders=",campaign_state.get("ai_research_orders",0)," ai_builds=",campaign_state.get("ai_build_orders",0)," populations=",CampaignPlay.standings(campaign_state))
     var victorious: Dictionary = Preview.initialize(campaign_cities)
     CampaignPlay.begin(victorious)
     victorious["teams"][0]["age"] = 1
