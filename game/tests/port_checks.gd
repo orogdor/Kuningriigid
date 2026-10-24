@@ -30,6 +30,7 @@ const Trade = preload("res://scripts/core/trade_network_port.gd")
 const WorldTradeNav = preload("res://scripts/adapters/world_trade_nav.gd")
 const Military = preload("res://scripts/core/military_port.gd")
 const BattlePreview = preload("res://scripts/core/battle_preview_port.gd")
+const BattleQueue = preload("res://scripts/core/campaign_battle_queue_port.gd")
 const IndividualBattle = preload("res://scripts/core/individual_battle_port.gd")
 const BattleDoctrine = preload("res://scripts/core/battle_doctrine_v131.gd")
 const BattleFormations = preload("res://scripts/core/battle_formations_v131.gd")
@@ -584,6 +585,71 @@ static func run() -> Dictionary:
         mid_save and str(mid_load.get("individual_battle",{}).get("siege",{}).get("supply_convoy",{}).get("status",""))=="moving" and int(mid_load["individual_battle"]["siege"]["supply_convoy"]["waypoint"])>0)
     if FileAccess.file_exists("user://v50_siege_transit.json"):
         DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v50_siege_transit.json"))
+    # Dev122: simultaneous collisions are durable, deterministically
+    # scheduled, never cloned and never resolved as fake background damage.
+    var fronts_manifest: Array = [
+        {"id":0,"team":0,"c":10,"r":10,"name":"Esimene riik"},
+        {"id":1,"team":1,"c":90,"r":90,"name":"Teine riik"}]
+    var fronts_state: Dictionary = Preview.initialize(fronts_manifest)
+    fronts_state["campaign"] = {"active":true,"player_team":0,"turn":22,"result":"playing"}
+    var distant_a: Dictionary = Military.create_army(fronts_state,0,70,20)
+    var distant_b: Dictionary = Military.create_army(fronts_state,1,70,20)
+    var middle_a: Dictionary = Military.create_army(fronts_state,0,45,20)
+    var middle_b: Dictionary = Military.create_army(fronts_state,1,45,20)
+    var nearest_a: Dictionary = Military.create_army(fronts_state,0,25,20)
+    var nearest_b: Dictionary = Military.create_army(fronts_state,1,25,20)
+    for force in fronts_state["armies"]:
+        Military.add_unit(fronts_state,force,"spearman")
+    distant_a["path"] = [[71,20]]
+    distant_b["path"] = [[71,20]]
+    middle_a["path"] = [[46,20]]
+    var start_front: bool = BattlePreview.detect_encounter(fronts_state)
+    _check(results,"v51-first-front-selected-by-world-coordinates",
+        start_front and int(fronts_state["individual_battle"]["world_c"])==25 and int(fronts_state["individual_battles_started"])==1)
+    _check(results,"v51-two-remaining-fronts-queued-not-lost",
+        fronts_state["pending_battles"].size()==2 and int(fronts_state["pending_battles"][0]["c"])==45 and int(fronts_state["pending_battles"][1]["c"])==70)
+    _check(results,"v51-queued-armies-stay-at-contact-position",
+        distant_a["path"].is_empty() and distant_b["path"].is_empty() and middle_a["path"].is_empty())
+    _check(results,"v51-do-not-start-simultaneous-second-battle",
+        not BattlePreview.detect_encounter(fronts_state) and fronts_state["pending_battles"].size()==2 and int(fronts_state["individual_battles_started"])==1)
+    var battle_state_saved: bool = Preview.save_preview(fronts_state,"user://v51_battle_queue.json")
+    var battle_state_loaded: Dictionary = Preview.load_preview(fronts_manifest,"user://v51_battle_queue.json")
+    _check(results,"v51-two-front-queue-survives-save-load",
+        battle_state_saved and battle_state_loaded.get("pending_battles",[]).size()==2 and int(battle_state_loaded["pending_battles"][0]["c"])==45)
+    if FileAccess.file_exists("user://v51_battle_queue.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v51_battle_queue.json"))
+    # Finish with the actual IndividualBattle persistence/XP/log pipeline.
+    IndividualBattle._finish(fronts_state,fronts_state["individual_battle"])
+    _check(results,"v51-only-combatants-receive-post-battle-cooldown",
+        float(nearest_a.get("engagement_cooldown_until",0.0))>0.0 and float(middle_a.get("engagement_cooldown_until",0.0))==0.0)
+    var second_front: Dictionary = BattleQueue.advance(fronts_state)
+    _check(results,"v51-independent-front-starts-despite-global-cooldown",
+        int(second_front["started"])==1 and int(fronts_state["individual_battle"]["world_c"])==45 and int(fronts_state["individual_battles_started"])==2)
+    _check(results,"v51-last-front-remains-pending",
+        int(second_front["pending"])==1 and int(fronts_state["pending_battles"][0]["c"])==70)
+    _check(results,"v51-queue-does-not-spawn-combatants",
+        fronts_state["military_units"].size()==6 and int(fronts_state.get("battles_queued_total",0))==3)
+    # Invalidate the third front while the second fights. Its saved ticket
+    # must be discarded, not fought or converted into an imaginary victory.
+    for warrior in Military.units_for(fronts_state,distant_b):
+        warrior["hp"] = 0.0
+    IndividualBattle._finish(fronts_state,fronts_state["individual_battle"])
+    var expired_front: Dictionary = BattleQueue.advance(fronts_state)
+    _check(results,"v51-dead-queued-army-is-revalidated-and-dropped",
+        int(expired_front["discarded"])>=1 and int(expired_front["started"])==0 and fronts_state["pending_battles"].is_empty())
+    _check(results,"v51-two-real-fights-and-zero-phantom-fights",
+        int(fronts_state["individual_battles_started"])==2 and int(fronts_state["individual_battles_finished"])==2 and fronts_state["battle_log"].size()==2)
+    _check(results,"v51-stale-contact-cannot-be-requeued",
+        int(BattleQueue.advance(fronts_state)["started"])==0 and int(fronts_state.get("battles_queue_expired",0))>=1)
+    var reloaded_old: Dictionary = Preview.initialize(fronts_manifest)
+    reloaded_old["campaign"] = {"active":true,"player_team":0,"turn":22,"result":"playing"}
+    reloaded_old.erase("pending_battles")
+    var legacy_saved: bool = Preview.save_preview(reloaded_old,"user://v51_legacy.json")
+    var legacy_loaded: Dictionary = Preview.load_preview(fronts_manifest,"user://v51_legacy.json")
+    _check(results,"v51-old-campaign-saves-get-safe-empty-queue",
+        legacy_saved and legacy_loaded.get("pending_battles",[]).is_empty() and int(legacy_loaded.get("battles_queued_total",0))==0)
+    if FileAccess.file_exists("user://v51_legacy.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v51_legacy.json"))
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
