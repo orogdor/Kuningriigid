@@ -1,19 +1,32 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V3.4 / V153 linnapiirkond (2026-10-24)
+
+- V153 `city-area-v142.js` mudeli järgi kasvab linnapiirkonna raadius rahvaarvu ruutjuurega: 3 elanikku → 3×3; 9 → 7×7; 16 → 9×9; 25 → 11×11; 36+ → maksimaalselt 12×12.
+- Linnapiirkonna tegelik bounding box ei tohi ületada rahvaarvu järgi lubatud külgede pikkust isegi nihkunud või vaidlustatud maakonna korral.
+- Maakonna täiendavad ruudud leitakse mööda maismaad. Otsing võib liikuda läbi naaberriigi maad, kuid ei võta juba omatud ruute üle ega ületa vett.
+- Linnasüda säilib ka siis, kui suurem naaberlinn ümbruskonna hõivab.
+- Mobiilimenüü Testid sisaldab `Piiride demo: 36 elanikku (12×12)` valikut.
+- GitHubi automaattest: `657/657`, GDScripti import ja PCK smoke test OK; Androidi APK ja PCK avaldatud.
+- Avaldatud väljalase: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-34
+- Selle tööetapi lõpus on **kogupordi hinnanguline valmidus umbes 35%**, arvestades veebiversiooni V153 kogu mänguloogikat, mitte ainult projekti kompileeritavust. See hinnang ei ole automaatselt mõõdetud töömahu protsent.
+
+**Oluline piirang:** V153 linnapiirkonna loogika on osaliselt porditud. Linna hoonete täielik ruutudevaheline paigutamine ning uus AI linnaplaneering ei ole veel üks-ühele üle kantud. Telefonis toimivat OTA uuenduse läbiviimist ei ole siin seadmes kontrollitud.
+
 ## Lähtekood ja ehitamine
 
 - Godoti aktiivne arendusharu: `godot-port-development`.
 - Godoti mänguprojekt: `game/` (Godot 4); Androidi APK ja PCK-käivitaja: `bootstrap/`.
 - Varasemad `godot-upload/v33/*.txt` osad jäävad arhiiviks, kuid uus CI ehitab **päris, muudetavatest failidest**.
 - Androidi CI: `.github/workflows/godot-apk-test.yml`.
-- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40092076015
-- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-23
+- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40093388831
+- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-34
 - Väljalasked luuakse `godot-dev-<workflow run number>` märgendiga *prerelease* ainult siis, kui regressioonitestid läbivad kontrolli.
 
 ## Kontrollitud (Godot 4.7.2 CI konteiner)
 
 - Pythoni staatilised testid ja GDScripti impordikontroll läbitud.
-- `V131_REGRESSION: 646/646` läbitud 2026-10-24.
+- `V131_REGRESSION: 657/657` läbitud 2026-10-24.
 - `game.pck` loomine ja `BOOTSTRAP_SMOKE_PASS` läbitud.
 - Androidi debug-APK edukalt eksporditud ja GitHubi avaldatud.
 - **Mitte kontrollitud:** päris Android-telefoni FPS, puutejuhtimine, seadmesse paigaldamine, võrgust PCK allalaadimine ja taaskäivituse andmete ühilduvus.
