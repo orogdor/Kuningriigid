@@ -141,12 +141,13 @@ func route(city: Dictionary,source: Vector2,target: Vector2,landscape = null,sig
     for i in range(tiles.size()):
         var tile: Vector2i = tiles[i]
         var destination: Vector2 = target
+        var portal: Vector2 = Vector2.ZERO
         if i+1 < tiles.size():
             var next: Vector2i = tiles[i+1]
             var d: Vector2i = next-tile
             var offset := Vector2(float(d.x)*Layout.TILE_PITCH_X*.5,float(d.y)*Layout.TILE_PITCH_Z*.5)
             # Street portals are just inside the adjoining tile boundaries.
-            var portal: Vector2 = offset.normalized()*.4
+            portal = offset.normalized()*.4
             destination = _origin(city,tile)+offset-portal
         var part: Array = _path_in_tile(city,tile,position,destination,landscape,signature)
         if part.is_empty():
