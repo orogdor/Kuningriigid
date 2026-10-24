@@ -1,0 +1,112 @@
+name: Godot APK test (telefonist ZIP)
+on:
+  push:
+    branches: [godot-apk-test]
+    paths:
+      - 'Kuningriigid_Godot_GitHub_APK_Ehitus_v2.zip'
+      - '.github/workflows/godot-apk-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    container:
+      image: barichello/godot-ci:4.7.2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Kontrolli projekti ZIP-i olemasolu
+        id: source
+        shell: bash
+        run: |
+          if [[ -s Kuningriigid_Godot_GitHub_APK_Ehitus_v2.zip ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "ZIP on puudu. Laadi Kuningriigid_Godot_GitHub_APK_Ehitus_v2.zip selle haru juurkausta GitHubi veebis."
+          fi
+      - name: Paki Godoti projekt lahti
+        if: steps.source.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p unpacked dist/logs
+          unzip -q Kuningriigid_Godot_GitHub_APK_Ehitus_v2.zip -d unpacked
+          test -s unpacked/Kuningriigid_Godot_GitHub_OTA/game/project.godot
+          test -s unpacked/Kuningriigid_Godot_GitHub_OTA/bootstrap/project.godot
+          cp -a unpacked/Kuningriigid_Godot_GitHub_OTA/game .
+          cp -a unpacked/Kuningriigid_Godot_GitHub_OTA/bootstrap .
+          mkdir -p bootstrap/seed
+      - name: Staatilised kontrollid
+        if: steps.source.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 game/tools/run_qa_checks.py 2>&1 | tee dist/logs/01-static.txt
+      - name: Godoti parser ja import
+        if: steps.source.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path game --editor --import --quit 2>&1 | tee dist/logs/02-import.txt
+          if grep -Ei 'SCRIPT ERROR|Parse Error|Parser Error|Failed to load script' dist/logs/02-import.txt; then exit 1; fi
+      - name: Godoti mängusisesed reeglitestid
+        if: steps.source.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path game --script res://tests/headless_ci.gd 2>&1 | tee dist/logs/03-tests.txt
+          grep -q 'V131_REGRESSION:' dist/logs/03-tests.txt
+          if grep -Ei 'SCRIPT ERROR|Parse Error|Parser Error|V131_TEST_FAILURES' dist/logs/03-tests.txt; then exit 1; fi
+      - name: Ekspordi mängupakett
+        if: steps.source.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path game --export-pack GamePack "$GITHUB_WORKSPACE/dist/game.pck" 2>&1 | tee dist/logs/04-pck.txt
+          test -s dist/game.pck
+          cp dist/game.pck bootstrap/seed/game.pck
+      - name: Kontrolli APK käivitaja ja PCK
+        if: steps.source.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path bootstrap --editor --import --quit 2>&1 | tee dist/logs/05-bootstrap.txt
+          godot --headless --path bootstrap --script res://tests/pck_smoke.gd 2>&1 | tee dist/logs/06-smoke.txt
+          grep -q 'BOOTSTRAP_SMOKE_PASS' dist/logs/06-smoke.txt
+          if grep -Ei 'SCRIPT ERROR|Parse Error|Parser Error|BOOTSTRAP_SMOKE_FAIL' dist/logs/05-bootstrap.txt dist/logs/06-smoke.txt; then exit 1; fi
+      - name: Ehita Android APK
+        if: steps.source.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path bootstrap --export-debug Android "$GITHUB_WORKSPACE/dist/Kuningriigid-Android.apk" 2>&1 | tee dist/logs/07-android.txt
+          test -s dist/Kuningriigid-Android.apk
+          python3 - <<'PYAPK'
+          from zipfile import ZipFile
+          with ZipFile('dist/Kuningriigid-Android.apk') as z:
+              assert z.testzip() is None
+              names=z.namelist()
+              assert 'AndroidManifest.xml' in names
+              assert any(x.startswith('lib/arm64-v8a/') for x in names)
+          print('APK integrity PASS')
+          PYAPK
+      - name: APK ja PCK allalaadimiseks
+        if: steps.source.outputs.ready == 'true' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kuningriigid-Android-APK
+          path: |
+            dist/Kuningriigid-Android.apk
+            dist/game.pck
+          if-no-files-found: error
+      - name: Vealogid ka ebaõnnestumise korral
+        if: always() && steps.source.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Godot-ehituslogid
+          path: dist/logs/
+          if-no-files-found: warn
