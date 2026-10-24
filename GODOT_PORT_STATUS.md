@@ -1,5 +1,19 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V5.0 / Godot Dev 121 – päriselt liikuvad ja haavatavad piiramiskonvoid (2026-10-24)
+
+- `campaign_siege_supply_port.gd`: AI kindlustatud linna taktikalise lahingu alguses valitakse tema enda linnast **läbitav maismaatee** piiramiskohale. Sobiva varu korral saadetakse kuni 93 puitu, säilitades saatval linnal vähemalt 25. Lähtekoha varu väheneb väljasaatmisel ning lahinguplatsile saab materjal alles päris liikumise järel (2 mängusekundit/maailmaruut). Kui sobivat teed või varu pole, tasuta materjali ei teki.
+- Konvoil on salvestatav alguslinn, last, koordinaadid, marsruut, teepunkt, liikumisaeg ja olek `moving/delivered/lost`. Vaenlase elusate vägede poolt hõivatud ja sama ruudu sõbraliku saatjata konvoi hävitatakse, last läheb kaotsi ning see kajastub statistikaväljadel. Sama koorma eest teistkordset mahaarvestust ega tasuta saatmist ei toimu.
+- `individual_battle_port.gd`: AI seotud linnapiiramises tellitakse päris ramm, redel või piiramistorn **alles pärast konvoi saabumist**; töötlemine toimub tavalise simuleeritud `tick` aja jooksul. Mängija olemasolevad käsitsi tellitavad tööd säilivad.
+- `siege_port_v131.gd`: AI piiramistööde puidukulu võetakse ainult lahingukoha eraldatud `supply_wood` varust. Varem ründaja mis tahes kauge linna laovaru otse kasutatav tee on AI puhul eemaldatud.
+- Testid: enne saabumist tasuta töö puudumine; tegelik marsruut ja lähtevaru vähenemine; ramm+redel pärast saabumist; puidu täpne jääk ja ehitusajad; korduvlaadimise vältimine; vaenlase rünnakuga konvoi hävitamine; liikuva ja saabunud konvoi salvestus/laadimine; avatud värava piiramistorn; mängija käsitsi juhtimise säilimine; materjalipuudusel piiramisvahendite puudumine.
+- GitHub Actions **889/889 regressioonikontrolli**, Godoti import, PCK smoke test ja Android debug APK eksport edukad: https://github.com/orogdor/Kuningriigid/actions/runs/40120205548
+- Väljalase: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-121
+- **Godoti pordi hinnanguline valmidus ~71%**, eelnevalt ~69%. Hinnang põhineb teostamata töö mahul, mitte automaatsel mõõtmisel.
+
+**Piirangud:** praegu liigutatakse piiramislahingu alguses üks konvoi; puudub mitme lainena jätkuv varustamine, ratsastatud eskort, konvoi tagasiteekond ning kaotatud varustuse hilisem uuesti hankimine. Kui lahing lõpeb enne konvoi saabumist, ei anta väljasaatmisel kulutatud koormat maagiliselt lähteasulasse tagasi. Mitme paralleelse taktikalise lahingu täielik simulatsioon, pikema kampaania AI ning Androidi pärisseadme test on jätkuvalt tegemata.
+
+
 ## V4.9 / Godot Dev 116 – automaatne päris piiramistehnika AI-le (2026-10-24)
 
 - `campaign_siege_ai_port.gd` seob AI piiramistaktika olemasoleva `Siege.start_ladder` ja `Siege.start_assault_work` mootoriga. AI ehitab kindlustatud linna päris lahingus eelistatult rammi (55 puitu, 90 s), lisaks sobiva salgu abil redeli (18 puitu, 30 s). Juba avatud värava korral oskab kasutada piiramistorni (75 puitu, 120 s), kui ründesalk ja puit on olemas.
