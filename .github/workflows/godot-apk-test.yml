@@ -61,17 +61,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PYFIX'
-          from pathlib import Path
-          p = Path('game/tests/port_checks.gd')
-          s = p.read_text()
-          before = '''    var street_fixture = StreetNav.new()
-    var street_path: Array = street_fixture.route(lot_fixture,0,2)
-    _check(results,"v21-layout-road-finds-market",not street_path.is_empty())
-    _check(results,"v21-layout-road-not-through-buildings",street_fixture.path_points_are_clear(lot_fixture,street_path))'''
-          assert s.count(before) == 1, 'Expected old duplicate variable block'
-          p.write_text(s.replace(before, before.replace('street_path', 'layout_street_path')))
-          PYFIX
+          grep -q 'var street_path: Array = street_fixture.route' game/tests/port_checks.gd
+          sed -i '895,897s/street_path/layout_street_path/g' game/tests/port_checks.gd
+          grep -q 'var layout_street_path: Array = street_fixture.route' game/tests/port_checks.gd
       - name: Staatilised kontrollid
         if: steps.source.outputs.ready == 'true'
         shell: bash
