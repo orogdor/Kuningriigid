@@ -410,6 +410,8 @@ func _create_city_fortifications(town: Dictionary) -> void:
                 _wall_piece(horizontal_span,5.4*clampf(south_hp/420.0,.3,1.0),3.2,section_x,side_z,timber)
     for x_index in range(2):
         for z_index in range(2):
+            if not CityFortifications.exposed_corner(town,current_tile,-1 if x_index == 0 else 1,-1 if z_index == 0 else 1):
+                continue
             var tower_index: int = 16+x_index*2+z_index
             var tower_hp: float = CityFortifications.segment_hp(town,current_tile,tower_index,520.0)
             if tower_hp > 0.0:

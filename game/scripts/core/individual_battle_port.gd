@@ -10,6 +10,7 @@ const Projectiles = preload("res://scripts/core/projectile_rules_v131.gd")
 const Terrain = preload("res://scripts/core/battle_terrain_v131.gd")
 const Siege = preload("res://scripts/core/siege_port_v131.gd")
 const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
+const CityCapture = preload("res://scripts/core/city_capture_port.gd")
 const BattleSurface = preload("res://scripts/core/battle_surface_v131.gd")
 const Formations = preload("res://scripts/core/battle_formations_v131.gd")
 const Morale = preload("res://scripts/core/battle_morale_v131.gd")
@@ -140,14 +141,12 @@ static func start(state: Dictionary, first_id: int, second_id: int) -> Dictionar
     # unfortified towns keep the established preview battle rules unchanged.
     var active: Dictionary = state["individual_battle"]
     for town in state.get("cities",[]):
-        if int(town.get("c",-1)) != int(a["c"]) or int(town.get("r",-1)) != int(a["r"]):
+        var tile: Vector2i = Vector2i(int(a["c"]),int(a["r"]))
+        if not CityFortifications.fortified(town,tile):
             continue
         var defender_team: int = int(town.get("team",-1))
         var attacker_team: int = int(b["team"]) if defender_team == int(a["team"]) else int(a["team"])
         if defender_team != int(a["team"]) and defender_team != int(b["team"]):
-            continue
-        var tile: Vector2i = Vector2i(int(a["c"]),int(a["r"]))
-        if not CityFortifications.fortified(town,tile):
             continue
         var connected: Dictionary = Siege.from_city(town,tile,attacker_team,defender_team)
         if not connected.is_empty():
@@ -742,20 +741,22 @@ static func _finish(state: Dictionary, battle: Dictionary, world_nav = null) -> 
                 killed += int(squad["kills"])
         army["xp"] = XP.reward_xp(float(army.get("xp", 0.0)), damage, killed, won) if not Military.units_for(state, army).is_empty() else 0.0
         army["level"] = XP.army_level(float(army["xp"]))
-    # Remember every surviving breach/gate hit on the original city.
-    # Do not alter national ownership in the partial preview campaign.
+    # Persist damage first; only a completed occupied keep changes allegiance.
+    # Capture before retreat so defeated armies cannot retreat into their
+    # former city. Ordinary field victories do not seize a town.
     var linked: Dictionary = battle.get("siege",{})
     if bool(linked.get("linked_city",false)):
         for town in state.get("cities",[]):
-            if int(town.get("c",-999)) != int(linked.get("city_c",-1)) or int(town.get("r",-999)) != int(linked.get("city_r",-1)):
+            if int(town.get("c",-999)) != int(linked.get("city_home_c",linked.get("city_c",-1))) or int(town.get("r",-999)) != int(linked.get("city_home_r",linked.get("city_r",-1))):
                 continue
             if CityFortifications.apply_siege_damage(town,linked):
                 state["revision"] = int(state.get("revision",0)) + 1
             break
+    var capture_result: Dictionary = CityCapture.capture_after_siege(state,linked)
     var retreats: Array = CampaignRetreat.apply_after_battle(state,battle,winner,world_nav)
     state["battle_log"].append({"retreats":retreats.duplicate(true),"world_c":int(battle.get("world_c",-1)),"world_r":int(battle.get("world_r",-1)),"time":float(state.get("seconds", 0.0)), "mode":"individual_preview_18", "winner":winner,
         "initial_men":int(battle["initial_men"]),"reserve_men":int(battle["reserve_men"]),
-        "casualties":battle["casualties"].duplicate(true), "shots":int(battle["shots"]), "impacts":int(battle.get("impacts",0)), "steps":int(battle["steps"]), "model_tactic_version":19, "terrain_routes":int(battle.get("terrain_routes",0)),"terrain_blocked":int(battle.get("terrain_blocked",0)), "formation_changes":int(battle.get("formation_changes",0)), "archer_repositions":int(battle.get("archer_repositions",0)), "cavalry_flanks":int(battle.get("cavalry_flanks",0)), "friendly_lanes_blocked":int(battle.get("friendly_lanes_blocked",0)), "morale_routs":int(battle.get("morale_routs",0)), "ordered_retreats":int(battle.get("ordered_retreats",0)), "escape_routes":int(battle.get("escape_routes",0)), "escape_failed_routes":int(battle.get("escape_failed_routes",0)), "flank_shocks":int(battle.get("flank_shocks",0)), "stone_shots":int(battle.get("stone_shots",0)), "friendly_rock_hits":int(battle.get("friendly_rock_hits",0)), "missed_arrows":int(battle.get("missed_arrows",0)), "siege": battle.get("siege",{}).duplicate(true),"test_only":true})
+        "casualties":battle["casualties"].duplicate(true), "shots":int(battle["shots"]), "impacts":int(battle.get("impacts",0)), "steps":int(battle["steps"]), "model_tactic_version":19, "terrain_routes":int(battle.get("terrain_routes",0)),"terrain_blocked":int(battle.get("terrain_blocked",0)), "formation_changes":int(battle.get("formation_changes",0)), "archer_repositions":int(battle.get("archer_repositions",0)), "cavalry_flanks":int(battle.get("cavalry_flanks",0)), "friendly_lanes_blocked":int(battle.get("friendly_lanes_blocked",0)), "morale_routs":int(battle.get("morale_routs",0)), "ordered_retreats":int(battle.get("ordered_retreats",0)), "escape_routes":int(battle.get("escape_routes",0)), "escape_failed_routes":int(battle.get("escape_failed_routes",0)), "flank_shocks":int(battle.get("flank_shocks",0)), "stone_shots":int(battle.get("stone_shots",0)), "friendly_rock_hits":int(battle.get("friendly_rock_hits",0)), "missed_arrows":int(battle.get("missed_arrows",0)), "siege": battle.get("siege",{}).duplicate(true),"city_capture":capture_result.duplicate(true),"test_only":not bool(linked.get("linked_city",false))})
     state["battle_cooldown_until"] = float(state.get("seconds", 0.0)) + 30.0
     state["individual_battles_finished"] = int(state.get("individual_battles_finished", 0)) + 1
     state["battles_finished"] = int(state.get("battles_finished", 0)) + 1

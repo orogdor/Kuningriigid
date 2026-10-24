@@ -82,7 +82,33 @@ static func from_city(city: Dictionary,tile: Vector2i,attacker_team: int,defende
         if String(section.get("type","")) == "gatehouse" and float(section["hp"]) <= .0001:
             siege["gate_open"] = true
             break
+    # Shared district edges are internal roads, not extra defensive walls.
+    # Reuse legacy section indexes so saves and demolition stay compatible.
+    var inner: Dictionary = {
+        "west":[0,1,2,3,4],"east":[5,6,7,8,9],
+        "north":[10,12,14],"south":[11,13,15]}
+    var exposed: Array = CityFortifications.exposed_sides(city,tile)
+    for side in inner:
+        if exposed.has(side):
+            continue
+        for index in inner[side]:
+            var segment: Dictionary = siege["sections"][int(index)]
+            segment["hp"] = 0.0
+            segment["breached"] = true
+    for corner_x in range(2):
+        for corner_z in range(2):
+            if CityFortifications.exposed_corner(city,tile,-1 if corner_x == 0 else 1,-1 if corner_z == 0 else 1):
+                continue
+            var idx: int = 16+corner_x*2+corner_z
+            siege["sections"][idx]["hp"] = 0.0
+            siege["sections"][idx]["breached"] = true
+    if not exposed.has("west"):
+        siege["gate_open"] = true # the west side is a joined interior street
+    siege["perimeter_edge_count"] = CityFortifications.perimeter_edges(city).size()
+    siege["district_exposed_sides"] = exposed
     siege["linked_city"] = true
+    siege["city_home_c"] = int(city.get("c",-1))
+    siege["city_home_r"] = int(city.get("r",-1))
     siege["city_c"] = tile.x
     siege["city_r"] = tile.y
     siege["city_team"] = defender_team

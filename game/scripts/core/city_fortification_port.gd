@@ -16,6 +16,36 @@ static func fortified(city: Dictionary,tile: Vector2i) -> bool:
             return true
     return false
 
+static func exposed_sides(city: Dictionary,tile: Vector2i) -> Array:
+    if not fortified(city,tile):
+        return []
+    var sides: Array = []
+    for key in ["west","east","north","south"]:
+        var neighbor: Vector2i = {
+            "west":Vector2i.LEFT,"east":Vector2i.RIGHT,
+            "north":Vector2i.UP,"south":Vector2i.DOWN}[key]
+        if not fortified(city,tile+neighbor):
+            sides.append(key)
+    return sides
+
+static func perimeter_edges(city: Dictionary) -> Array:
+    var tiles: Array = city.get("fortification",{}).get("tiles",[])
+    var ordered: Array = tiles.duplicate(true)
+    ordered.sort_custom(func(a,b):
+        return int(a[1]) < int(b[1]) if int(a[1]) != int(b[1]) else int(a[0]) < int(b[0]))
+    var result: Array = []
+    for point in ordered:
+        var tile := Vector2i(int(point[0]),int(point[1]))
+        for side in exposed_sides(city,tile):
+            result.append({"c":tile.x,"r":tile.y,"side":side})
+    return result
+
+static func exposed_corner(city: Dictionary,tile: Vector2i,xsign: int,zsign: int) -> bool:
+    if not fortified(city,tile):
+        return false
+    var sides: Array = exposed_sides(city,tile)
+    return sides.has("west" if xsign < 0 else "east") or sides.has("north" if zsign < 0 else "south")
+
 static func developed_tiles(city: Dictionary) -> Array:
     var home := Vector2i(int(city.get("c",0)),int(city.get("r",0)))
     var claims: Dictionary = {tile_key(home.x,home.y):true}
