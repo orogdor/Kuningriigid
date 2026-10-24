@@ -180,3 +180,29 @@ Maastiku kõrgused on mägedes umbes 54–158 (mediaan 94) ja madalikul mediaan 
 - Detailkaardi udu (`T.Fog('#b7c9bd',260,700)`) teeb kõrged mäed kaugelt heledamaks. Seda ei muudetud, sest see on mängu üldine välimus.
 - Vana `landscape-material-v85.js` jäi faili alles, kuid seda enam ei kasutata.
 - Seda versiooni pole GitHubi lükatud.
+
+## V150 – maastiku ruudud ära (Claude, 2026-10-24)
+
+Kasutaja soov: „Maastiku ruudud kohutavad – tee need uuesti nii, et maakera tunduks ilusam ja loogilisem.“
+Muudetud on ainult välimust. Mänguandmed (`cell.biome`, jõed, teed, kõrgused, navigeerimine, salvestused) on samad.
+
+### Mis muutus
+- `landscape-v149.js` (lõpus V150 plokk):
+  - `smoothBiomeColor()` – biomi värv sulandub 4 lähima ruudu vahel (smoothstep-bilineaarne, domeeni-väänatud müraga), mere ruute vahele ei võeta. Ruudu servad kaovad ja alad sulavad loomulikult üksteiseks.
+  - `farmlandTint()` – viljaruutudel on kollaste plaatide asemel maalitud põllumosaiik (ribad, kõrred, kesa, hekid), mis hajub servades.
+  - `detailGroundColor()` – detailkaardi maapinna värv tuleb sama sujuva segamise kaudu.
+  - `cellRegion()`, `regionContour()`, `regionFill()` – riigi- ja linnapiirid leitakse sujuvast väljast *marching squares* abil. Piirid on ümarad, mitte trepikujulised.
+- `atlas-style.js` – `atlasColor` kasutab sujuvat segamist ja põllumosaiiki; viljaplaate enam ei joonistata (`plots.count=0`); `territory()` joonistab ümarad täited ja piirijooned.
+- `civilization.js`:
+  - detailkaardi värv tuleb `detailGroundColor()` kaudu;
+  - `refreshFogCover()` – avastamata ala pärgament on nüüd üks tasand, mille läbipaistvust juhib 220×165 „avastatud“ DataTexture (lineaarne filter + väike väänamine). Udu serv on pehme ja rannajoonelaadne, mitte ruuduline. Geomeetria uuid jääb samaks (V88 test) ja uuendused kirjutavad ainult muutunud tekselid;
+  - 50 m ruudustik (`atlasGrid`) on heledam (opacity ≤ .065) ja hajub välja, kui zoom > 180…330. Kaugelt pole ruudustikku näha.
+- Import: kõik kohad kasutavad `./landscape-v149.js?v=150a`; `civilization.js?v=150a`, `atlas-style` ja teised import-mapi kirjed → `?v=150a`.
+
+### Testid
+PASS: `TEST_V88_EXPLORATION_UI`, `TEST_V149_BROWSER` (high + low), `TEST_V143_BROWSER`, `TEST_V148`.
+
+### Häälestamine
+- Biomi sulandumise laius: väänamise amplituud `*46` / `*12` failis `smoothBiomeColor`.
+- Udu serva pehmus: `smoothstep(.30,.62,seen)` ja väänamine `*38.0` / `*10.0` failis `refreshFogCover`.
+- Ruudustiku nähtavus: `fadeAtlasGrid` failis `civilization.js`.

@@ -41,7 +41,7 @@ import {atWar,setRelation,relation,blockMerchants} from './diplomacy-v87.js';
 import {cityNeeds,nationalStock,foodTotal,GOODS} from './city-needs-v87.js';
 import {spatialInstances,updateSpatialBatches} from './spatial-batches-v86.js?v=86a';
 import {automaticUIRefreshDue} from './gameplay-flow-v86.js?v=86a';
-import {terrainMaterial,mountainShade,smoothedOverview,trailMaterial,bakeRelief} from './landscape-v149.js?v=149a';
+import {terrainMaterial,mountainShade,smoothedOverview,trailMaterial,bakeRelief,detailGroundColor} from './landscape-v149.js?v=150a';
 import {createDetailBorders} from './detail-borders-v85.js?v=126a';
 import {mountainTint,createMountainOutcrops,createBridgeBuilding,crossingFrame} from './landscape-polish-v84.js?v=123a';
 import {CommandVisuals} from './command-visuals.js';
@@ -155,12 +155,7 @@ function updateBuildingInfo(){
 function atlasTerrainHeight(x,z){const spacing=50/(quality==='low'?2:3);return smoothedOverview((a,b)=>overviewSurface(game,a,b,spacing),x,z,spacing)}
 
 function terrain(scene,cell=null){const world=!cell,battle=!world&&!!s.battle,geo=new T.PlaneGeometry(world?WORLD_WIDTH:battle?1800:675,world?WORLD_DEPTH:battle?1560:585,world?COLS*(quality==='low'?2:3):(quality==='high'?450:quality==='low'?180:300),world?ROWS*(quality==='low'?2:3):(quality==='high'?390:quality==='low'?156:260));geo.rotateX(-Math.PI/2);if(battle)geo.translate(DETAIL_HALF_X,0,DETAIL_HALF_Z);if(world)geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=world?atlasTerrainHeight(x,z):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
- const color=world?atlasColor(game,x,z,h):new T.Color(
-  h<-.15?'#8b9c91':h<.65?'#dbcba0':
-  mountain&&h>19?'#8d968b':mountain&&h>12?'#878781':
-  mountain&&h>6?'#787e71':
-  h>8?'#77856d':biome==='forest'?'#56774c':
-  biome==='hills'?'#67745d':biome==='beach'?'#c4ad7d':'#92a365');if(!world&&h>.3){const patch=game.smooth((x+cell.c*150)/31+8,(z+cell.r*130)/31+7);color.lerp(new T.Color(patch>.65?'#b8ab76':'#547a4c'),Math.abs(patch-.5)*.28)}color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.18);colors.push(color.r,color.g,color.b)}// V69 cliff strata: colour actual steep mesh faces, not the entire mountain tile.
+ const color=world?atlasColor(game,x,z,h):detailGroundColor(game,cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z,h,mountain);if(!world&&h>.3){const patch=game.smooth((x+cell.c*150)/31+8,(z+cell.r*130)/31+7);color.lerp(new T.Color(patch>.65?'#b8ab76':'#547a4c'),Math.abs(patch-.5)*.28)}color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.18);colors.push(color.r,color.g,color.b)}// V69 cliff strata: colour actual steep mesh faces, not the entire mountain tile.
 geo.computeVertexNormals();const norm=geo.attributes.normal;
 const shale=new T.Color('#484743'),sunRock=new T.Color('#9e9481'),peakSnow=new T.Color('#d9d5c5');
 for(let i=0;i<p.count;i++){
@@ -195,7 +190,9 @@ if(quality!=='low'){
   grid.push(x,Math.max(.7,surface(game,x,z))+.4,z,nx,Math.max(.7,surface(game,nx,z))+.4,z);
  }
 }
-if(grid.length)worldScene.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(grid,3)),new T.LineBasicMaterial({color:'#d5e2c2',transparent:true,opacity:.13})));
+// V150: the 50 m cell grid is only a faint aid when zoomed in; from afar it fades out so the land reads as one landscape.
+const atlasGrid=grid.length?new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(grid,3)),new T.LineBasicMaterial({color:'#e4ead2',transparent:true,opacity:.06,depthWrite:false})):null;if(atlasGrid)worldScene.add(atlasGrid);
+function fadeAtlasGrid(z){if(!atlasGrid)return;const o=.065*Math.max(0,Math.min(1,(330-z)/150));atlasGrid.material.opacity=o;atlasGrid.visible=o>.003;}
 
 function parchmentColor(x,z){const n=game.smooth(x/40+17,z/40+61),grain=game.smooth(x/12+91,z/12+35),c=new T.Color('#c7b488');c.lerp(new T.Color('#dcc7a1'),n*.45);c.lerp(new T.Color('#af9a73'),Math.max(0,grain-.55)*.33);return c}
 const visionDelta=new VisionDelta(s),atlasVisibleColors=atlasLand.geometry.attributes.color.array.slice();
@@ -225,21 +222,38 @@ function sketchTexture(kind){if(fogTextures.has(kind))return fogTextures.get(kin
 function fogCoverTexture(){if(fogTextures.has('cover'))return fogTextures.get('cover');const canvas=document.createElement('canvas');canvas.width=canvas.height=128;const ctx=canvas.getContext('2d');ctx.fillStyle='#d7c195';ctx.fillRect(0,0,128,128);ctx.strokeStyle='rgba(121,96,57,.22)';ctx.lineWidth=2;for(let i=-20;i<140;i+=18){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+30,128);ctx.stroke()}ctx.fillStyle='rgba(255,255,255,.08)';for(let i=0;i<10;i++){ctx.beginPath();ctx.arc(14+i*12,(i*17)%128,10,0,Math.PI*2);ctx.fill()}const tx=new T.CanvasTexture(canvas);fogTextures.set('cover',tx);return tx}
 let fogCoverMesh=null,fogCoverSerial=-1;
 function refreshFogCover(){
+ // V150: one parchment plane whose transparency follows a small "explored" texture (one texel per
+ // map cell). Linear filtering plus a gentle warp gives soft, coastline-like edges to the unknown
+ // instead of a staircase of square tiles. Updates write only the changed texels.
  const delta=visionDelta.update();
  if(!fogCoverMesh){
-  const positions=[],uvs=[],indices=[];
-  for(const [i,cell] of game.cells.entries()){
-   const x=cell.x,z=cell.z,y=120,half=25.4,o=i*4;
-   positions.push(x-half,y,z-half,x+half,y,z-half,x+half,y,z+half,x-half,y,z+half);uvs.push(0,0,1,0,1,1,0,1);
-   indices.push(...(game.seen(0,cell)?[o,o,o,o,o,o]:[o,o+1,o+2,o,o+2,o+3]));
-  }
-  const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));geometry.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geometry.setIndex(indices);geometry.computeBoundingSphere();
-  fogCoverMesh=new T.Mesh(geometry,new T.MeshBasicMaterial({map:fogCoverTexture(),side:T.DoubleSide,depthTest:false,depthWrite:false,toneMapped:false}));fogCoverMesh.renderOrder=900;fogCoverGroup.add(fogCoverMesh);fogCoverSerial=delta.serial;return;
+  const data=new Uint8Array(COLS*ROWS);
+  for(const [i,cell] of game.cells.entries())data[i]=game.seen(0,cell)?255:0;
+  const seenTex=new T.DataTexture(data,COLS,ROWS,T.RedFormat);seenTex.magFilter=seenTex.minFilter=T.LinearFilter;seenTex.needsUpdate=true;
+  const geometry=new T.PlaneGeometry(WORLD_WIDTH+400,WORLD_DEPTH+400,1,1);geometry.rotateX(-Math.PI/2);geometry.translate(WORLD_CENTER_X,120,WORLD_CENTER_Z);
+  const pos=geometry.attributes.position,uv=geometry.attributes.uv;for(let i=0;i<pos.count;i++)uv.setXY(i,pos.getX(i)/50.8,pos.getZ(i)/50.8);
+  const map=fogCoverTexture();map.wrapS=map.wrapT=T.RepeatWrapping;map.needsUpdate=true;
+  const material=new T.MeshBasicMaterial({map,side:T.DoubleSide,transparent:true,depthTest:false,depthWrite:false,toneMapped:false});
+  material.onBeforeCompile=shader=>{
+   shader.uniforms.uSeen={value:seenTex};
+   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 vFogW;').replace('#include <begin_vertex>','#include <begin_vertex>\nvFogW=position.xz;');
+   shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
+ uniform sampler2D uSeen;varying vec2 vFogW;
+ float fogH(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+ float fogN(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(fogH(i),fogH(i+vec2(1,0)),f.x),mix(fogH(i+vec2(0,1)),fogH(i+vec2(1,1)),f.x),f.y);}`)
+    .replace('#include <map_fragment>',`#include <map_fragment>
+ vec2 fw=vFogW+vec2(fogN(vFogW*.021)-.5,fogN(vFogW*.021+17.0)-.5)*38.0+vec2(fogN(vFogW*.08+3.0)-.5,fogN(vFogW*.08+9.0)-.5)*10.0;
+ vec2 su=vec2((fw.x-(${ORIGIN_X.toFixed(1)}))/${WORLD_WIDTH.toFixed(1)},(fw.y-(${ORIGIN_Z.toFixed(1)}))/${WORLD_DEPTH.toFixed(1)});
+ float seen=texture2D(uSeen,su).r;
+ diffuseColor.a*=1.0-smoothstep(.30,.62,seen);
+ diffuseColor.rgb*=.94+.06*smoothstep(.0,.30,seen);`);
+  };
+  fogCoverMesh=new T.Mesh(geometry,material);fogCoverMesh.renderOrder=900;fogCoverMesh.frustumCulled=false;fogCoverMesh.userData.seenTexture=seenTex;fogCoverGroup.add(fogCoverMesh);fogCoverSerial=delta.serial;return;
  }
  if(fogCoverSerial===delta.serial)return;fogCoverSerial=delta.serial;
- const index=fogCoverMesh.geometry.index;
- for(const at of delta.changed){const i=at.r*COLS+at.c,o=i*4;index.array.set(delta.known.has(at.key)?[o,o,o,o,o,o]:[o,o+1,o+2,o,o+2,o+3],i*6);index.addUpdateRange?.(i*6,6);}
- if(delta.changed.length)index.needsUpdate=true;
+ const tex=fogCoverMesh.userData.seenTexture;
+ for(const at of delta.changed){tex.image.data[at.r*COLS+at.c]=delta.known.has(at.key)?255:0;}
+ if(delta.changed.length)tex.needsUpdate=true;
 }
 let fogSketchReady=false,fogSketchSerial=-1;const fogSketchCells=new Map();
 function refreshFogSketches(){
@@ -878,7 +892,7 @@ function refreshAutomaticUI(now){
  if(!automaticUIRefreshDue(now,lastAutomaticUI,lastMenuRevision!==game.uiRevision,editing))return;
  lastAutomaticUI=now;lastMenuRevision=game.uiRevision;renderUI();
 }
-function frame(now){requestAnimationFrame(frame);const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}updateCameraKeys(real);followDetail();if(view==='world'){updateSpatialBatches(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72+Math.sin(s.time*.6)*.045;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12}else{syncLocal();if(!s.battle)villageLife.update(s.time,frameDelta);updateGhost()}updateCommandVisuals();camera.position.set(focus.x+zoom*(view==='world'?.1:.48),zoom*(view==='world'?.76:.78),focus.z+zoom*(view==='world'?.7:.8));camera.lookAt(focus);renderer.render(view==='world'?worldScene:localScene,camera);if(toastTime>0){toastTime-=real;if(toastTime<=0)$('toast').style.display='none'}$('clock').value=s.time%TURN_SECONDS;saveTimer+=real;uiTimer+=real;if(saveTimer>10&&!menuOpen){saveTimer=0;save()}}
+function frame(now){requestAnimationFrame(frame);const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}updateCameraKeys(real);followDetail();if(view==='world'){updateSpatialBatches(zoom);fadeAtlasGrid(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72+Math.sin(s.time*.6)*.045;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12}else{syncLocal();if(!s.battle)villageLife.update(s.time,frameDelta);updateGhost()}updateCommandVisuals();camera.position.set(focus.x+zoom*(view==='world'?.1:.48),zoom*(view==='world'?.76:.78),focus.z+zoom*(view==='world'?.7:.8));camera.lookAt(focus);renderer.render(view==='world'?worldScene:localScene,camera);if(toastTime>0){toastTime-=real;if(toastTime<=0)$('toast').style.display='none'}$('clock').value=s.time%TURN_SECONDS;saveTimer+=real;uiTimer+=real;if(saveTimer>10&&!menuOpen){saveTimer=0;save()}}
 // V51 empire panels and manual saves. No network storage is used.
 function renderV51UI(){
  const tips=$('v51tips');if(tips){tips.replaceChildren();for(const item of actionTips(game,0)){const b=document.createElement('button'),small=document.createElement('small');b.textContent=item.text;small.textContent=item.why;b.append(small);b.onclick=()=>{if(item.city){chosen=game.cell(item.city);openTile(chosen)}else openResearch()};tips.append(b)}}

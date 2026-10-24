@@ -1,5 +1,6 @@
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 import * as T from './vendor/three.module.js';
+import {smoothBiomeColor,farmlandTint,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=150a';
 import {createMountainOutcrops} from './landscape-polish-v84.js?v=85a';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
@@ -42,9 +43,16 @@ function biomeBaseColor(game,cell,h,x,z){
  if((climate.lat??north)>.78&&h>3&&vb!=='desert'&&vb!=='mesa')color.lerp(new T.Color('#d7ddd2'),Math.max(0,((climate.lat??north)-.78)*1.6));
  return color;
 }
+// V150: biome colours blend smoothly between neighbouring cells along warped natural edges
+// (no square tiles); beaches and shallows still follow the real height; grain cells show
+// a patchwork of strip fields painted into the ground.
+const atlasBase=(game,cell,out)=>out.copy(biomeBaseColor(game,cell,10,cell.x,cell.z));
 export function atlasColor(game,x,z,h){
  const c=Math.min(COLS-1,Math.max(0,Math.floor((x-ORIGIN_X)/50))),r=Math.min(ROWS-1,Math.max(0,Math.floor((z-ORIGIN_Z)/50))),cell=game.cells[r*COLS+c];
- let color=biomeBaseColor(game,cell,h,x,z);
+ let color=smoothBiomeColor(game,x,z,'atlas',(cl,out)=>atlasBase(game,cl,out));
+ if(h<.7)color.set(palette.shallow);
+ else if(h<3.4)color.lerp(new T.Color(palette.beach),Math.min(1,(3.4-h)/1.6)*.85);
+ farmlandTint(game,cell,x,z,color);
  // Water is drawn by the real 3D channel. Do not paint the entire 50 m
  // river tile blue; it made square-ended ribbons and polygon patches.
  if(cell?.river){const near=riverNear(game,x,z);if(near.distance<near.width*1.6)color.lerp(new T.Color('#728e74'),.10)}
@@ -65,7 +73,8 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
        plots=new T.InstancedMesh(new T.PlaneGeometry(17,12),material('#b9aa60'),fields.length),
        rocks=game.cells.filter(c=>c.deposits.stone&&c.biome!=='hills'),
        stones=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),material('#a4a98e'),rocks.length);
- fields.forEach((a,i)=>{dummy.position.set(a.x+8,height(a.x+8,a.z-11)+.35,a.z-11);dummy.rotation.set(-Math.PI/2,0,game.noise(i,71)*.3);dummy.scale.set(1,1,1);dummy.updateMatrix();plots.setMatrixAt(i,dummy.matrix)});
+ // V150: fields are painted into the terrain as strip-field patchwork (farmlandTint); no flat plates.
+ plots.count=0;
  rocks.forEach((a,i)=>{dummy.position.set(a.x-10,height(a.x-10,a.z)+2,a.z);dummy.rotation.set(0,i*1.4,0);dummy.scale.set(3.5,2.4,3);dummy.updateMatrix();stones.setMatrixAt(i,dummy.matrix)});
  group.add(spatialInstances(plots),spatialInstances(stones));
  const nature=createAtlasBiomeDetail(game,group,quality);
@@ -104,33 +113,36 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  function territory(state){
   game.refreshTerritory();const stamp=game.territoryStamp+':'+(state.visionRevision||0);
   if(stamp===previous)return;previous=stamp;disposeGroup(territories);
-  for(const team of [0,1,2,3])for(const rural of [true,false]){
-   const edges=[],fill=[],color=rural?['#b6ce75','#dba082','#bca3d6','#dfcc87'][team]:['#69d4c3','#e77e64','#ac87e2','#ead06b'][team];
-   for(const cell of game.cells){
-    const city=game.territory.get(cell.c+':'+cell.r);
-    if(!city||city.team!==team||!game.seen(0,cell)||game.isCountyTile(cell,city)!==rural)continue;
-    for(const[dc,dr,dx,dz]of [[-1,0,-25,-25],[1,0,25,-25],[0,-1,-25,-25],[0,1,-25,25]]){
-     const p={c:cell.c+dc,r:cell.r+dr},other=game.territory.get(p.c+':'+p.r);
-     if(other?.id===city.id&&game.isCountyTile(p,city)===rural)continue;
-     const x=cell.x+dx,z=cell.z+dz,vx=dc===0?50:0,vz=dr===0?50:0;
-     for(let i=0;i<10;i++){const ax=x+vx*i/10,az=z+vz*i/10,bx=x+vx*(i+1)/10,bz=z+vz*(i+1)/10;edges.push(ax,height(ax,az)+.9,az,bx,height(bx,bz)+.9,bz)}
-    }
-    for(let z=-25;z<25;z+=10)for(let x=-25;x<25;x+=10){const a=[cell.x+x,cell.z+z],b=[a[0]+10,a[1]],c=[a[0],a[1]+10],d=[a[0]+10,a[1]+10];for(const q of [a,c,b,b,c,d])fill.push(q[0],height(...q)+.18,q[1])}
-   }
-   const mesh=new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(fill,3)),new T.MeshBasicMaterial({color,transparent:true,opacity:rural?.15:.29,depthWrite:false,side:T.DoubleSide}));
+  // V150: rounded, natural-looking territory shapes (same cells, smooth outline).
+  const groups=new Map(),teams=new Map();
+  for(const cell of game.cells){
+   const city=game.territory.get(cell.c+':'+cell.r);if(!city||!game.seen(0,cell))continue;
+   const rural=!!game.isCountyTile(cell,city),key=city.team+'|'+rural,k=cell.c+':'+cell.r;
+   if(!groups.has(key))groups.set(key,{team:city.team,rural,cells:[],cities:new Map()});
+   const g=groups.get(key);g.cells.push(k);if(!g.cities.has(city.id))g.cities.set(city.id,[]);g.cities.get(city.id).push(k);
+   if(!teams.has(city.team))teams.set(city.team,[]);teams.get(city.team).push(k);
+  }
+  for(const {team,rural,cells,cities} of groups.values()){
+   const color=rural?['#b6ce75','#dba082','#bca3d6','#dfcc87'][team]:['#69d4c3','#e77e64','#ac87e2','#ead06b'][team];
+   const fillData=regionFill(cellRegion(cells)),fill=[],rgba=[];
+   for(let i=0;i<fillData.alpha.length;i++){const x=fillData.pos[i*2],z=fillData.pos[i*2+1];fill.push(x,height(x,z)+.18,z);rgba.push(1,1,1,fillData.alpha[i]);}
+   const edges=[];
+   for(const keys of cities.values()){const seg=regionContour(cellRegion(keys));for(let i=0;i<seg.length;i+=4)edges.push(seg[i],height(seg[i],seg[i+1])+.9,seg[i+1],seg[i+2],height(seg[i+2],seg[i+3])+.9,seg[i+3]);}
+   const geo=new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(fill,3)).setAttribute('color',new T.Float32BufferAttribute(rgba,4));
+   const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({color,vertexColors:true,transparent:true,opacity:rural?.15:.29,depthWrite:false,side:T.DoubleSide}));
    mesh.name=rural?'county area':'urban area';
    const line=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(edges,3)),new T.LineBasicMaterial({color,transparent:true,opacity:rural?.95:.9}));line.name=rural?'county border':'urban border';territories.add(mesh,line);
   }
-  // Country outlines are thick, terrain-following ribbons, independent of
-  // per-city and urban/county boundaries (WebGL lineWidth is not portable).
+  // Country outlines: thick terrain-following ribbons along the rounded contour.
   const national=[[],[],[],[]],underlay=[];
-  for(const [k,city] of game.territory){const [c,r]=k.split(':').map(Number),cell=game.cell({c,r});if(!cell||!game.seen(0,cell))continue;
-   for(const [dc,dr,dx,dz]of [[-1,0,-25,-25],[1,0,25,-25],[0,-1,-25,-25],[0,1,-25,25]]){
-    const other=game.territory.get((c+dc)+':'+(r+dr));if(other?.team===city.team)continue;
-    const x=cell.x+dx,z=cell.z+dz,vx=dc===0?50:0,vz=dr===0?50:0;
-    for(let i=0;i<10;i++)for(const [vertices,half,lift]of [[underlay,4.3,1.15],[national[city.team],3,1.22]]){
-     const pt=(t,side)=>{const X=x+vx*t+(dc?half*side:0),Z=z+vz*t+(dr?half*side:0);return [X,height(X,Z)+lift,Z];};
-     const a=pt(i/10,-1),b=pt(i/10,1),c=pt((i+1)/10,-1),d=pt((i+1)/10,1);vertices.push(...a,...c,...b,...b,...c,...d);
+  for(const [team,keys] of teams){
+   const seg=regionContour(cellRegion(keys),5);
+   for(let i=0;i<seg.length;i+=4){
+    const ax=seg[i],az=seg[i+1],bx=seg[i+2],bz=seg[i+3],len=Math.hypot(bx-ax,bz-az)||1,nx=-(bz-az)/len,nz=(bx-ax)/len;
+    for(const [vertices,half,lift] of [[underlay,4.3,1.15],[national[team],3,1.22]]){
+     const ex=(bx-ax)/len*half*.5,ez=(bz-az)/len*half*.5;
+     const pt=(x,z,side)=>{const X=x+nx*half*side,Z=z+nz*half*side;return [X,height(X,Z)+lift,Z];};
+     const p=pt(ax-ex,az-ez,-1),q=pt(ax-ex,az-ez,1),r=pt(bx+ex,bz+ez,-1),t=pt(bx+ex,bz+ez,1);vertices.push(...p,...r,...q,...q,...r,...t);
     }
    }
   }

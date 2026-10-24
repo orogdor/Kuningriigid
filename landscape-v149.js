@@ -225,3 +225,110 @@ export function bakeRelief(geo,{ring=1,hScale=1,vScale=1,strength=1.15,minY=.9}=
  for(let i=0;i<P.count;i++){C.setX(i,C.getX(i)*out[i]);C.setY(i,C.getY(i)*out[i]);C.setZ(i,C.getZ(i)*out[i]);}
  C.needsUpdate=true;
 }
+
+// ---------------------------------------------------------------- V150: natural biome boundaries
+// Biomes are stored per 50 m map cell (gameplay). For drawing, the colours of the four nearest
+// cells are blended with smooth weights at a domain-warped position, so borders become soft,
+// irregular natural edges instead of square tiles. Sea cells never tint the land.
+import {COLS as V150_COLS,ROWS as V150_ROWS,ORIGIN_X as V150_OX,ORIGIN_Z as V150_OZ} from './campaign.js';
+const biomeCaches=new WeakMap();
+const sstep=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+export function smoothBiomeColor(game,x,z,key,baseFn,out=new T.Color()){
+ let caches=biomeCaches.get(game);if(!caches){caches=new Map();biomeCaches.set(game,caches);}
+ let table=caches.get(key);
+ if(!table){
+  table={rgb:new Float32Array(game.cells.length*3),land:new Uint8Array(game.cells.length)};
+  const c=new T.Color();
+  game.cells.forEach((cell,i)=>{baseFn(cell,c);table.rgb[i*3]=c.r;table.rgb[i*3+1]=c.g;table.rgb[i*3+2]=c.b;table.land[i]=cell.land?1:0;});
+  caches.set(key,table);
+ }
+ // warp the lookup so the blend follows lobes and bays rather than grid lines
+ const wx=x+(game.smooth(x/41+5.3,z/41+9.1)-.5)*46+(game.smooth(x/13+71,z/13+33)-.5)*12;
+ const wz=z+(game.smooth(x/41+41.7,z/41+3.9)-.5)*46+(game.smooth(x/13+19,z/13+87)-.5)*12;
+ const u=(wx-V150_OX)/50-.5,v=(wz-V150_OZ)/50-.5,c0=Math.floor(u),r0=Math.floor(v);
+ const fu=sstep(u-c0),fv=sstep(v-r0);
+ let r=0,g=0,b=0,w=0;
+ for(const [dc,dr,wt] of [[0,0,(1-fu)*(1-fv)],[1,0,fu*(1-fv)],[0,1,(1-fu)*fv],[1,1,fu*fv]]){
+  const c=Math.max(0,Math.min(V150_COLS-1,c0+dc)),rr=Math.max(0,Math.min(V150_ROWS-1,r0+dr)),i=rr*V150_COLS+c;
+  if(!table.land[i]||wt<=0)continue;
+  r+=table.rgb[i*3]*wt;g+=table.rgb[i*3+1]*wt;b+=table.rgb[i*3+2]*wt;w+=wt;
+ }
+ if(w<=1e-6){const c=Math.max(0,Math.min(V150_COLS-1,Math.floor((x-V150_OX)/50))),rr=Math.max(0,Math.min(V150_ROWS-1,Math.floor((z-V150_OZ)/50))),i=rr*V150_COLS+c;return out.setRGB(table.rgb[i*3],table.rgb[i*3+1],table.rgb[i*3+2]);}
+ return out.setRGB(r/w,g/w,b/w);
+}
+// Farmland on fertile (grain) cells: a patchwork of long strip fields in wheat, stubble and
+// green crops, painted into the terrain colour (replaces the old flat yellow rectangles).
+const wheat=new T.Color('#b9a45f'),stubble=new T.Color('#9a8a5a'),crop=new T.Color('#7f9a52'),fallow=new T.Color('#8a7a58');
+export function farmlandTint(game,cell,x,z,color,strength=.55){
+ if(!cell?.land||!cell.deposits?.grain||cell.mountain)return color;
+ const cx=cell.x+8,cz=cell.z-11,dx=x-cx,dz=z-cz;
+ const reach=19+game.smooth(cell.c*.7+3,cell.r*.7+9)*8;
+ const d=Math.hypot(dx*1.15,dz)+ (game.smooth(x/9+2,z/9+5)-.5)*9;
+ const mask=1-sstep((d-reach*.6)/(reach*.4));
+ if(mask<=0)return color;
+ const a=game.noise(cell.c,cell.r+71)*Math.PI,ca=Math.cos(a),sa=Math.sin(a);
+ const along=dx*ca+dz*sa,across=-dx*sa+dz*ca,strip=Math.floor(across/4.2),block=Math.floor(along/16);
+ const pick=game.noise(cell.c*31+strip*7+block*3,cell.r*17+strip+block*11);
+ const field=pick<.3?wheat:pick<.55?crop:pick<.8?stubble:fallow;
+ const edge=Math.min(Math.abs(((across%4.2)+4.2)%4.2-2.1),Math.abs(((along%16)+16)%16-8)*0.26);
+ const hedge=edge<.35?.82:1;
+ return color.lerp(field,mask*strength).multiplyScalar(1-(1-hedge)*mask);
+}
+
+// Detail-map ground colour with the same soft biome edges (the 3x3 neighbourhood of tiles no
+// longer shows square colour seams). h is the detail-projected height used by the old palette.
+const DETAIL_BASE={forest:'#56774c',hills:'#67745d',beach:'#c4ad7d'};
+const detailBase=(cell,out)=>out.set(!cell?.land?'#92a365':cell.mountain?'#7d8274':DETAIL_BASE[cell.biome]||'#92a365');
+const D_WATER=new T.Color('#8b9c91'),D_SAND=new T.Color('#dbcba0'),D_HIGH=new T.Color('#77856d'),D_ROCK=new T.Color('#8a9188');
+export function detailGroundColor(game,wx,wz,h,mountainHere){
+ const color=smoothBiomeColor(game,wx,wz,'detail',detailBase);
+ if(h<-.15)return color.copy(D_WATER);
+ if(h<.65)return color.copy(D_SAND);
+ if(mountainHere&&h>12)color.lerp(D_ROCK,Math.min(1,(h-12)/10)*.6);
+ else if(h>8)color.lerp(D_HIGH,Math.min(1,(h-8)/4)*.7);
+ return color;
+}
+
+// ---------------------------------------------------------------- V150: rounded territory shapes
+// A set of 50 m cells ("c:r" keys) is turned into a smooth indicator field (1 inside, 0 outside,
+// 0.5 exactly on the cell edges, rounded at the corners). Borders are its 0.5 contour (marching
+// squares) and fills fade out along it, so countries and city areas read as natural regions
+// instead of stepped squares. The cell membership itself is unchanged.
+export function cellRegion(keys){
+ const set=new Set(keys);let c0=Infinity,c1=-Infinity,r0=Infinity,r1=-Infinity;
+ for(const k of set){const [c,r]=k.split(':').map(Number);c0=Math.min(c0,c);c1=Math.max(c1,c);r0=Math.min(r0,r);r1=Math.max(r1,r);}
+ const ind=(c,r)=>set.has(c+':'+r)?1:0;
+ const field=(x,z)=>{
+  const u=(x-V150_OX)/50-.5,v=(z-V150_OZ)/50-.5,c=Math.floor(u),r=Math.floor(v),fu=sstep(u-c),fv=sstep(v-r);
+  return ind(c,r)*(1-fu)*(1-fv)+ind(c+1,r)*fu*(1-fv)+ind(c,r+1)*(1-fu)*fv+ind(c+1,r+1)*fu*fv;
+ };
+ const box={x0:V150_OX+(c0-1)*50,x1:V150_OX+(c1+2)*50,z0:V150_OZ+(r0-1)*50,z1:V150_OZ+(r1+2)*50};
+ return {set,field,box,empty:!set.size};
+}
+export function regionContour(region,step=6.25){
+ const out=[];if(region.empty)return out;
+ const {field,box}=region,nx=Math.ceil((box.x1-box.x0)/step),nz=Math.ceil((box.z1-box.z0)/step);
+ const row=new Float32Array((nx+1)*(nz+1));
+ for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++)row[j*(nx+1)+i]=field(box.x0+i*step,box.z0+j*step)-.5;
+ const at=(i,j)=>row[j*(nx+1)+i];
+ for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){
+  const a=at(i,j),b=at(i+1,j),c=at(i+1,j+1),d=at(i,j+1);
+  const x=box.x0+i*step,z=box.z0+j*step,pts=[];
+  const edge=(va,vb,ax,az,bx,bz)=>{if((va>0)!==(vb>0)){const t=va/(va-vb);pts.push([ax+(bx-ax)*t,az+(bz-az)*t]);}};
+  edge(a,b,x,z,x+step,z);edge(b,c,x+step,z,x+step,z+step);edge(c,d,x+step,z+step,x,z+step);edge(d,a,x,z+step,x,z);
+  if(pts.length===2)out.push(pts[0][0],pts[0][1],pts[1][0],pts[1][1]);
+  else if(pts.length===4){out.push(pts[0][0],pts[0][1],pts[1][0],pts[1][1],pts[2][0],pts[2][1],pts[3][0],pts[3][1]);}
+ }
+ return out;
+}
+// Fill triangles (x,z) with a per-vertex alpha that fades out at the rounded border.
+export function regionFill(region,step=10){
+ const pos=[],alpha=[];if(region.empty)return {pos,alpha};
+ const {field,box,set}=region;
+ for(let z=box.z0;z<box.z1;z+=step)for(let x=box.x0;x<box.x1;x+=step){
+  const q=[[x,z],[x+step,z],[x,z+step],[x+step,z+step]],f=q.map(([a,b])=>field(a,b));
+  if(Math.max(...f)<.42)continue;
+  for(const k of [0,2,1,1,2,3]){pos.push(q[k][0],q[k][1]);alpha.push(sstep((f[k]-.40)/.20));}
+ }
+ return {pos,alpha};
+}
