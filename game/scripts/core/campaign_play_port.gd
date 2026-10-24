@@ -3,6 +3,9 @@ extends RefCounted
 ## All production/research/travel still happens in PreviewSim.tick(), never
 ## here: this module owns campaign start, turns, objectives and the scoreboard.
 const GOAL_ERA: int = 1
+const LONG_GOAL_ERA: int = 6
+const LONG_GOAL_POPULATION: int = 100
+const LONG_TURN_LIMIT: int = 600
 const MIN_TOTAL_POPULATION: int = 20
 const TURN_LIMIT: int = 90
 const GAME_SECONDS_PER_TURN: float = 60.0
@@ -16,7 +19,7 @@ static func is_running(state: Dictionary) -> bool:
     var c: Dictionary = state.get("campaign",{})
     return bool(c.get("active",false)) and str(c.get("result","playing")) == "playing"
 
-static func begin(state: Dictionary, player_team: int = PLAYER_TEAM) -> Dictionary:
+static func begin(state: Dictionary, player_team: int = PLAYER_TEAM, long_campaign: bool = false) -> Dictionary:
     var count: int = 0
     for city in state.get("cities",[]):
         if int(city.get("team",-1)) == player_team:
@@ -26,14 +29,14 @@ static func begin(state: Dictionary, player_team: int = PLAYER_TEAM) -> Dictiona
     if not state.get("teams",{}).has(player_team):
         return {"ok":false,"reason":"Selle riigi teadust ei leitud"}
     state["campaign"] = {
-        "active":true,"mode":"stone_to_bronze","player_team":player_team,
-        "turn":0,"turn_limit":TURN_LIMIT,"goal_age":GOAL_ERA,
-        "goal_population":MIN_TOTAL_POPULATION,"result":"playing",
+        "active":true,"mode":"stone_to_modern" if long_campaign else "stone_to_bronze","player_team":player_team,
+        "turn":0,"turn_limit":LONG_TURN_LIMIT if long_campaign else TURN_LIMIT,"goal_age":LONG_GOAL_ERA if long_campaign else GOAL_ERA,
+        "goal_population":LONG_GOAL_POPULATION if long_campaign else MIN_TOTAL_POPULATION,"result":"playing",
         "last_message":"Ehita linnasid, vali uuring ja lõpeta käigud.",
         "history":[],"started_at":float(state.get("seconds",0.0))}
     state["ai_enabled"] = true
     state["revision"] = int(state.get("revision",0))+1
-    return {"ok":true,"reason":"Kampaania alustati. Teised riigid arenevad iga käiguga."}
+    return {"ok":true,"reason":"Pikk kampaania alustati: kiviajast moodsasse aega. Linnad, teadus ja tootmine arenevad igal käigul." if long_campaign else "Kampaania alustati. Teised riigid arenevad iga käiguga."}
 
 static func own_city_index(state: Dictionary, current: int = -1, direction: int = 1) -> int:
     var cities: Array = state.get("cities",[])
@@ -91,7 +94,7 @@ static func evaluate(state: Dictionary) -> Dictionary:
             campaign["last_message"] = "Sinu riigil ei ole enam ühtegi linna."
         elif int(stats["age"]) >= int(campaign["goal_age"]) and int(stats["population"]) >= int(campaign["goal_population"]):
             campaign["result"] = "won"
-            campaign["last_message"] = "VÕIT! Jõudsid pronksiaega ja kasvatasid rahvaarvu vähemalt %d-ni." % int(campaign["goal_population"])
+            campaign["last_message"] = "VÕIT! Jõudsid ajastusse %d ja kasvatasid rahvaarvu vähemalt %d-ni." % [int(campaign["goal_age"]),int(campaign["goal_population"])] if int(campaign["goal_age"]) != GOAL_ERA else "VÕIT! Jõudsid pronksiaega ja kasvatasid rahvaarvu vähemalt %d-ni." % int(campaign["goal_population"])
         elif int(campaign["turn"]) >= int(campaign["turn_limit"]):
             campaign["result"] = "lost"
             campaign["last_message"] = "Käigulimiit täis. Proovi tugevamat toidu-, vee- ja teadusmajandust."
@@ -127,7 +130,7 @@ static func text_status(state: Dictionary) -> String:
     var c: Dictionary = state["campaign"]
     var stats: Dictionary = team_stats(state,int(c["player_team"]))
     var state_text: String = str(c.get("result","playing"))
-    return "KÄIK %d/%d | %s | %d linna | %d elanikku | ajastu %d | siht: pronks + %d elanikku" % [
+    return "KÄIK %d/%d | %s | %d linna | %d elanikku | ajastu %d | siht: ajastu %d + %d elanikku" % [
         int(c["turn"]),int(c["turn_limit"]),state_text,
         int(stats["cities"]),int(stats["population"]),int(stats["age"]),
-        int(c["goal_population"])]
+        int(c.get("goal_age",GOAL_ERA)),int(c["goal_population"])]
