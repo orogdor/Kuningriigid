@@ -11,7 +11,7 @@ const Terrain = preload("res://scripts/core/battle_terrain_v131.gd")
 const Siege = preload("res://scripts/core/siege_port_v131.gd")
 const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
 const CityCapture = preload("res://scripts/core/city_capture_port.gd")
-const SiegeAI = preload("res://scripts/core/campaign_siege_ai_port.gd")
+const SiegeSupply = preload("res://scripts/core/campaign_siege_supply_port.gd")
 const BattleSurface = preload("res://scripts/core/battle_surface_v131.gd")
 const Formations = preload("res://scripts/core/battle_formations_v131.gd")
 const Morale = preload("res://scripts/core/battle_morale_v131.gd")
@@ -164,7 +164,8 @@ static func start(state: Dictionary, first_id: int, second_id: int) -> Dictionar
                         man["x"] = float(man["x"])+shift_x
             Siege.attach_guards(active)
             active["linked_city_siege"] = true
-            SiegeAI.equip(state,active) # AI funds and constructs actual siege implements.
+            if bool(state.get("campaign",{}).get("active",false)) and attacker_team > 0 and attacker_team != int(state.get("campaign",{}).get("player_team",0)):
+                active["siege"]["ai_supply_required"] = true # Pay and physically deliver before building.
         break
     state["individual_battles_started"] = int(state.get("individual_battles_started", 0)) + 1
     return {"ok": true, "reason": "Individuaalne lahing alustas (%d meest, reservis %d)" % [int(active["initial_men"]), reserve_count]}
@@ -770,6 +771,7 @@ static func tick(state: Dictionary, dt: float, world_nav = null) -> void:
     var battle: Dictionary = state.get("individual_battle", {})
     if battle.is_empty() or dt <= 0.0:
         return
+    SiegeSupply.advance(state,battle,dt,world_nav)
     battle["accumulator"] = float(battle.get("accumulator", 0.0)) + dt
     var count: int = 0
     while float(battle["accumulator"]) + .0000001 >= FIXED_STEP and count < MAX_STEPS_PER_TICK:
