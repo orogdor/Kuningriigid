@@ -119,8 +119,10 @@ static func rebuild(state: Dictionary, land: PackedByteArray,force: bool = false
                     if land[next.y*COLS+next.x] == 0:
                         continue
                     if owners.has(near_key):
-                        if int(owners[near_key]) == i:
-                            frontier.append(next)
+                        # Search *through* occupied land to find nearby free
+                        # land for a surrounded smaller town, without stealing
+                        # established neighbour tiles or crossing open water.
+                        frontier.append(next)
                         continue
                     owners[near_key] = i
                     tiles.append([next.x,next.y])
