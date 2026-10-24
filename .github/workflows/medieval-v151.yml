@@ -8,6 +8,7 @@ on:
       - 'TEST_V151_BROWSER.mjs'
       - 'TEST_V139.mjs'
       - 'TEST_V138.mjs'
+      - 'TEST_V67.mjs'
   workflow_dispatch:
 permissions:
   contents: write
