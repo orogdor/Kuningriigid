@@ -2,11 +2,12 @@ extends RefCounted
 ## V2.1 LOCAL BENCHMARK: one stable building parcel for economy, routes and 3D.
 ## This is a dense approximate town plan, NOT the historical V131 town planner.
 ## Site dimensions use atlas-scale proxy units (1 = 10 detail metres).
-const VERSION: int = 21
+const VERSION: int = 36
 const LOT_GAP: float = 0.16
 const LIMIT_X: float = 10.65
 const LIMIT_Z: float = 9.10
 const GRID_PITCH: float = 0.88
+const Planning = preload("res://scripts/core/city_planning_port.gd")
 # One V131 detail map spans 225x195 metres; plot coordinates are 10m units.
 const TILE_PITCH_X: float = 22.5
 const TILE_PITCH_Z: float = 19.5
@@ -132,7 +133,7 @@ static func find_free_site(city: Dictionary,kind: String,used: Array,landscape =
                     var radius: float = maxf(footprint(kind).x,footprint(kind).y)*5.0
                     if not landscape.buildable_at(tile,candidate*10.0,radius):
                         continue
-                var score: float = candidate.length_squared()
+                var score: float = candidate.length() + Planning.candidate_score(kind,candidate,used)
                 # In an otherwise equally near ring, food/resource producers
                 # prefer the outskirts; homes prefer proximity to the hall.
                 if kind in ["farm","quarry","mine","coal","lumber"]:
