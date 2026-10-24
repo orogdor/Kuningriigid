@@ -9,7 +9,7 @@ const BuildingRules = preload("res://scripts/core/building_rules_port.gd")
 const Research = preload("res://scripts/core/research_port.gd")
 const Planner = preload("res://scripts/core/research_planner_port.gd")
 const RESEARCH_ORDER: Array[String] = ["hunting","stone_tools","water","settlement","learning","pottery","agriculture","fishing","warfare","bronze","woodworking","milling","iron","smelting","smithing","civics"]
-const BUILD_ORDER: Array[String] = ["lumber","hunter","quarry","well","study","saw","house","farm","mill","bakery","market","mine","coal","smelter","smith"]
+const BUILD_ORDER: Array[String] = ["lumber","hunter","quarry","well","study","saw","house","farm","mill","bakery","market","mine","coal","smelter","smith","steelworks","machine_shop"]
 
 static func team_research_choice(known: Dictionary) -> String:
     return Planner.next_goal(known)
