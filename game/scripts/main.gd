@@ -5,6 +5,7 @@ const CampaignPort = preload("res://scripts/core/campaign_port.gd")
 const RoadsPort = preload("res://scripts/core/roads_port.gd")
 const CountiesPort = preload("res://scripts/core/counties_port.gd")
 const Territory = preload("res://scripts/core/territory_port.gd")
+const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
 const EconomyPort = preload("res://scripts/core/economy_port.gd")
 const ResearchPort = preload("res://scripts/core/research_port.gd")
 const PortChecks = preload("res://tests/port_checks.gd")
@@ -221,6 +222,7 @@ const MOBILE_MENU_ACTIONS = [
     ["Linn ja ehitus", "Maakonna kivimurd", "county_quarry"],
     ["Linn ja ehitus", "Maakonna kaevandus", "county_mine"],
     ["Linn ja ehitus", "Linna maa-ala info", "territory_info"],
+    ["Linn ja ehitus", "Ehita puitvall (pronks)", "build_city_wall"],
     ["Linn ja ehitus", "Suur linn: 80 hoonet / 40 inimest", "stress_80"],
     ["Linn ja ehitus", "Suur linn: 160 hoonet / 100 inimest", "stress_160"],
     ["Linn ja ehitus", "Taasta linn (lõpeta katse)", "stress_reset"],
@@ -694,6 +696,7 @@ func _menu_action(action_id: String) -> void:
         "county_quarry": _build_county_worksite("quarry")
         "county_mine": _build_county_worksite("mine")
         "territory_info": _show_territory_info()
+        "build_city_wall": _build_city_wall()
         "stress_80": _start_city_stress(80,40)
         "stress_160": _start_city_stress(160,100)
         "stress_reset": _stop_city_stress()
@@ -2364,6 +2367,21 @@ func _build_county_worksite(kind: String) -> void:
     if bool(result.get("ok",false)) and mobile_view == "detail":
         var site: Dictionary = result["site"]
         _open_detail_tile(Vector2i(int(site["c"]),int(site["r"])))
+    _update_labels()
+
+func _build_city_wall() -> void:
+    if preview_state.is_empty() or city_index < 0 or city_index >= preview_state.get("cities",[]).size():
+        return
+    if city_stress_index >= 0:
+        status_label.text = "Puitvalli ehitamiseks lõpeta esmalt sünteetiline linnakatse"
+        return
+    var city: Dictionary = preview_state["cities"][city_index]
+    var result: Dictionary = CityFortifications.build_next(city)
+    status_label.text = String(result.get("reason","Valli ehitus ei õnnestunud"))
+    if bool(result.get("ok",false)):
+        preview_state["revision"] = int(preview_state.get("revision",0))+1
+        if mobile_view == "detail":
+            native_detail_tile.show_tile(detail_tile_coords,preview_state.get("cities",[]),heights,local_streets if street_nav_on else null,preview_state.get("detail_bridges",{}),shared_landscape)
     _update_labels()
 
 func _show_territory_info() -> void:
