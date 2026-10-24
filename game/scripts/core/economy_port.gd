@@ -37,6 +37,10 @@ const BUILDINGS = {
     "barracks":{"name":"Sõjaväelaager","cost":{"wood":45.0,"stone":12.0},"workers":1,"time":30.0,"requires":["hall"]},
     "archery":{"name":"Lasketiir","cost":{"plank":30.0,"stone":15.0},"workers":1,"time":20.0,"requires":["barracks"]},
     "stable":{"name":"Tall","cost":{"plank":45.0,"stone":30.0},"workers":2,"time":25.0,"requires":["barracks","house"]},
+    # Dev131 civilian industry: every resource for Modern Age is produced
+    # from paid local inputs, actual workers and physical cargo transport.
+    "steelworks":{"name":"Terasesulatus","cost":{"plank":35.0,"iron":18.0,"stone":20.0},"workers":3,"time":42.0,"requires":["smelter"],"input":{"iron":3.0,"coal":2.0},"out":"steel","rate":3.0,"cycle":14.0},
+    "machine_shop":{"name":"Masinatehas","cost":{"plank":45.0,"steel":12.0,"stone":18.0},"workers":3,"time":48.0,"requires":["steelworks","smith"],"input":{"steel":2.0,"plank":3.0},"out":"machines","rate":2.0,"cycle":18.0},
     # Original V131 civilization-core.js defines these on top of economy.js.
     # V33 balance for hunter/fisher is included (x1.5 cost, x2.25 build time).
     "hunter":{"name":"Jahimehe onn","cost":{"wood":27.0},"workers":2,"time":36.0,"requires":["hall"],"out":"meat","rate":6.0,"cycle":8.0},
