@@ -11,7 +11,7 @@ assert 'CityLayout.position(city,index)' in (root/'scripts/core/cargo_port.gd').
 assert 'CityLayout.footprint(' in nav
 assert 'CityLayout.ensure_positions(city)' in nav
 assert 'Cargo.building_position(town,i)' in detail
-assert 'city_to_detail(town,Cargo.building_position(town,i))' in detail
+assert 'Layout.site_in_tile(town,site,current_tile)*SITE_SCALE' in detail
 assert 'var body_mesh := BoxMesh.new()' in detail and '_add_multi(body_mesh' in detail
 assert 'func _start_city_stress' in main and 'func _stop_city_stress' in main
 assert '"stress_reset": _stop_city_stress()' in main
