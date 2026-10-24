@@ -39,6 +39,7 @@ const Shots = preload("res://scripts/core/projectile_rules_v131.gd")
 const BattleTerrain = preload("res://scripts/core/battle_terrain_v131.gd")
 const Siege = preload("res://scripts/core/siege_port_v131.gd")
 const SiegeAI = preload("res://scripts/core/campaign_siege_ai_port.gd")
+const SiegeSupply = preload("res://scripts/core/campaign_siege_supply_port.gd")
 const DetailTile = preload("res://scripts/adapters/native_detail_tile.gd")
 const CityLayout = preload("res://scripts/core/city_layout_port.gd")
 const CityPlanning = preload("res://scripts/core/city_planning_port.gd")
@@ -470,10 +471,18 @@ static func run() -> Dictionary:
     var craft_started: Dictionary = IndividualBattle.start(craft_state,int(craft_attacker["id"]),int(craft_defender["id"]))
     var craft_battle: Dictionary = craft_state.get("individual_battle",{})
     var craft_siege: Dictionary = craft_battle.get("siege",{})
+    _check(results,"v50-no-instant-ai-equipment-before-delivery",
+        bool(craft_started.get("ok",false)) and craft_siege.get("works",[]).is_empty() and is_equal_approx(float(craft_state["cities"][1]["resources"]["wood"]),160.0))
+    var scheduled_wood: Dictionary = SiegeSupply.advance(craft_state,craft_battle,1.0,strategic_nav)
+    _check(results,"v50-convoy-real-wood-withdrawal-and-route",
+        int(scheduled_wood["dispatched"])==1 and int(craft_siege["supply_convoy"]["path"].size())>=20 and is_equal_approx(float(craft_state["cities"][1]["resources"]["wood"]),67.0))
+    _check(results,"v50-cannot-craft-while-wood-still-in-transit",
+        craft_siege["works"].is_empty() and int(SiegeAI.equip(craft_state,craft_battle)["ordered"])==0)
+    var arriving_wood: Dictionary = SiegeSupply.advance(craft_state,craft_battle,45.0,strategic_nav)
     _check(results,"v49-ai-crafts-linked-physical-ram-and-ladder",
-        bool(craft_started.get("ok",false)) and craft_siege.get("works",[]).size()==2 and int(craft_siege.get("ai_craft_orders",0))==2)
+        int(arriving_wood["delivered"])==1 and craft_siege.get("works",[]).size()==2 and int(craft_siege.get("ai_craft_orders",0))==2)
     _check(results,"v49-ai-pays-ram-and-ladder-from-real-city-stock",
-        is_equal_approx(float(craft_state["cities"][1]["resources"]["wood"]),87.0) and is_equal_approx(float(craft_siege.get("ai_craft_wood",0.0)),73.0))
+        is_equal_approx(float(craft_state["cities"][1]["resources"]["wood"]),67.0) and is_equal_approx(float(craft_siege.get("supply_wood",0.0)),20.0) and is_equal_approx(float(craft_siege.get("ai_craft_wood",0.0)),73.0))
     _check(results,"v49-siege-tools-not-instantaneously-ready",
         not bool(craft_siege["works"][0]["ready"]) and not bool(craft_siege["works"][1]["ready"]))
     Siege.tick_assault_works(craft_battle,89.0)
@@ -484,7 +493,7 @@ static func run() -> Dictionary:
     _check(results,"v49-ram-and-ladder-ready-only-after-timers",
         bool(craft_siege["works"][0]["ready"]) and bool(craft_siege["works"][1]["ready"]))
     _check(results,"v49-no-duplicate-ai-craft-on-repeat",
-        int(SiegeAI.equip(craft_state,craft_battle)["ordered"])==0 and craft_siege["works"].size()==2 and is_equal_approx(float(craft_state["cities"][1]["resources"]["wood"]),87.0))
+        int(SiegeAI.equip(craft_state,craft_battle)["ordered"])==0 and craft_siege["works"].size()==2 and is_equal_approx(float(craft_state["cities"][1]["resources"]["wood"]),67.0))
     _check(results,"v49-siege-crafting-counts-campaign-events",
         int(craft_state.get("ai_siege_works",0))==2 and craft_state["military_units"].size()==3)
     _check(results,"v49-siege-work-jobs-are-json-persistent",
@@ -511,6 +520,8 @@ static func run() -> Dictionary:
         Military.add_unit(open_gate_state,open_ai,"spearman")
     Military.add_unit(open_gate_state,open_defender,"spearman")
     IndividualBattle.start(open_gate_state,int(open_ai["id"]),int(open_defender["id"]))
+    SiegeSupply.advance(open_gate_state,open_gate_state["individual_battle"],1.0,strategic_nav)
+    SiegeSupply.advance(open_gate_state,open_gate_state["individual_battle"],45.0,strategic_nav)
     _check(results,"v49-open-gate-ai-selects-paid-siege-tower",
         str(open_gate_state["individual_battle"]["siege"]["works"][0]["kind"])=="tower" and is_equal_approx(float(open_gate_state["individual_battle"]["siege"]["works"][0]["duration"]),120.0))
     var player_siege_state: Dictionary = Preview.initialize([
@@ -526,6 +537,53 @@ static func run() -> Dictionary:
     IndividualBattle.start(player_siege_state,int(own_army["id"]),int(other_army["id"]))
     _check(results,"v49-player-controls-own-attack-with-no-auto-crafting",
         player_siege_state["individual_battle"]["siege"]["works"].is_empty() and int(player_siege_state.get("ai_siege_works",0))==0)
+    var convoy_save: bool = Preview.save_preview(open_gate_state,"user://v50_siege_convoy.json")
+    var convoy_loaded: Dictionary = Preview.load_preview(craft_manifest,"user://v50_siege_convoy.json")
+    _check(results,"v50-delivered-convoy-and-equipment-survive-save",
+        convoy_save and str(convoy_loaded.get("individual_battle",{}).get("siege",{}).get("supply_convoy",{}).get("status",""))=="delivered" and convoy_loaded["individual_battle"]["siege"]["works"].size()==2)
+    if FileAccess.file_exists("user://v50_siege_convoy.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v50_siege_convoy.json"))
+    var raid_state: Dictionary = Preview.initialize(craft_manifest)
+    raid_state["campaign"] = {"active":true,"player_team":0,"turn":28,"result":"playing"}
+    raid_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[35,20]]}
+    raid_state["cities"][1]["resources"]["wood"] = 160.0
+    var raider_attack: Dictionary = Military.create_army(raid_state,1,35,20)
+    var raider_defend: Dictionary = Military.create_army(raid_state,0,35,20)
+    for ix in range(2):
+        Military.add_unit(raid_state,raider_attack,"spearman")
+    Military.add_unit(raid_state,raider_defend,"spearman")
+    IndividualBattle.start(raid_state,int(raider_attack["id"]),int(raider_defend["id"]))
+    var raid_battle: Dictionary = raid_state["individual_battle"]
+    var raid_dispatch: Dictionary = SiegeSupply.advance(raid_state,raid_battle,1.0,strategic_nav)
+    var raid_path: Array = raid_battle["siege"]["supply_convoy"]["path"]
+    var raid_point: Array = raid_path[0]
+    var intercept: Dictionary = Military.create_army(raid_state,0,int(raid_point[0]),int(raid_point[1]))
+    Military.add_unit(raid_state,intercept,"spearman")
+    var raid_loss: Dictionary = SiegeSupply.advance(raid_state,raid_battle,3.0,strategic_nav)
+    _check(results,"v50-hostile-army-can-intercept-real-convoy",
+        int(raid_dispatch["dispatched"])==1 and int(raid_loss["lost"])==1 and str(raid_battle["siege"]["supply_convoy"]["status"])=="lost")
+    _check(results,"v50-intercepted-wood-is-not-refunded-or-free-to-spend",
+        raid_battle["siege"]["works"].is_empty() and is_equal_approx(float(raid_state["cities"][1]["resources"]["wood"]),67.0) and is_equal_approx(float(raid_state.get("ai_siege_supply_lost_wood",0.0)),93.0))
+    _check(results,"v50-convoy-is-not-duplicated-after-interception",
+        int(SiegeSupply.advance(raid_state,raid_battle,50.0,strategic_nav)["dispatched"])==0 and int(raid_state.get("ai_siege_supply_sent",0))==1)
+    var mid_state: Dictionary = Preview.initialize(craft_manifest)
+    mid_state["campaign"] = {"active":true,"player_team":0,"turn":28,"result":"playing"}
+    mid_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[35,20]]}
+    mid_state["cities"][1]["resources"]["wood"] = 160.0
+    var mid_attack: Dictionary = Military.create_army(mid_state,1,35,20)
+    var mid_defend: Dictionary = Military.create_army(mid_state,0,35,20)
+    Military.add_unit(mid_state,mid_attack,"spearman")
+    Military.add_unit(mid_state,mid_defend,"spearman")
+    IndividualBattle.start(mid_state,int(mid_attack["id"]),int(mid_defend["id"]))
+    var mid_battle: Dictionary = mid_state["individual_battle"]
+    SiegeSupply.advance(mid_state,mid_battle,1.0,strategic_nav)
+    SiegeSupply.advance(mid_state,mid_battle,10.0,strategic_nav)
+    var mid_save: bool = Preview.save_preview(mid_state,"user://v50_siege_transit.json")
+    var mid_load: Dictionary = Preview.load_preview(craft_manifest,"user://v50_siege_transit.json")
+    _check(results,"v50-in-transit-wood-and-waypoints-save",
+        mid_save and str(mid_load.get("individual_battle",{}).get("siege",{}).get("supply_convoy",{}).get("status",""))=="moving" and int(mid_load["individual_battle"]["siege"]["supply_convoy"]["waypoint"])>0)
+    if FileAccess.file_exists("user://v50_siege_transit.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v50_siege_transit.json"))
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
