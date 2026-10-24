@@ -34,7 +34,7 @@ const BUILDINGS = {
     "coal":{"name":"Söepõletaja","cost":{"wood":25.0,"plank":15.0},"workers":2,"time":20.0,"requires":["bakery"],"input":{"wood":4.0},"out":"coal","rate":5.0,"cycle":10.0},
     "smelter":{"name":"Rauasulatus","cost":{"plank":25.0,"stone":20.0},"workers":3,"time":24.0,"requires":["mine","coal"],"input":{"ore":3.0,"coal":2.0},"out":"iron","rate":3.0,"cycle":12.0},
     "smith":{"name":"Relvasepp","cost":{"plank":30.0,"stone":25.0},"workers":2,"time":24.0,"requires":["smelter"],"input":{"iron":2.0,"plank":1.0},"out":"weapons","rate":2.0,"cycle":12.0},
-    "barracks":{"name":"Kasarm","cost":{"plank":35.0,"stone":25.0},"workers":2,"time":25.0,"requires":["smith","bakery","house"]},
+    "barracks":{"name":"Sõjaväelaager","cost":{"wood":45.0,"stone":12.0},"workers":1,"time":30.0,"requires":["hall"]},
     "archery":{"name":"Lasketiir","cost":{"plank":30.0,"stone":15.0},"workers":1,"time":20.0,"requires":["barracks"]},
     "stable":{"name":"Tall","cost":{"plank":45.0,"stone":30.0},"workers":2,"time":25.0,"requires":["barracks","house"]},
     # Original V131 civilization-core.js defines these on top of economy.js.
