@@ -242,6 +242,83 @@ static func run() -> Dictionary:
         int(blockade_state.get("city_captures",0))==1 and str(blockade_state["conquests"][0]["mode"])=="blockade_surrender")
     _check(results,"dev97-blockade-does-not-conquer-city-twice",
         int(CampaignWar.advance_blockades(blockade_state)["surrendered"])==0)
+    # V4.6: several independent AI cities pay for recruitment in parallel.
+    var multi_recruit: Dictionary = Preview.initialize([
+        {"id":0,"team":0,"c":80,"r":20,"name":"Vastane"},
+        {"id":1,"team":1,"c":20,"r":20,"name":"Pohjalinn"},
+        {"id":2,"team":1,"c":40,"r":20,"name":"Lounalinn"}])
+    multi_recruit["campaign"] = {"active":true,"player_team":0,"turn":10,"result":"playing"}
+    multi_recruit["teams"][1]["known"]["warfare"] = true
+    for supply in multi_recruit["cities"]:
+        if int(supply["team"]) != 1:
+            continue
+        supply["pop"] = 12
+        supply["resources"]["wood"] = 260.0
+        supply["resources"]["stone"] = 190.0
+        supply["resources"]["bread"] = 160.0
+        supply["resources"]["water"] = 180.0
+    var parallel_build: Dictionary = CampaignWar.ai_recruit(multi_recruit)
+    _check(results,"v46-two-ai-cities-fund-separate-barracks",
+        int(parallel_build["built"])==2 and multi_recruit["cities"][1]["buildings"].size()==2 and multi_recruit["cities"][2]["buildings"].size()==2)
+    for ai_city_index in [1,2]:
+        multi_recruit["cities"][ai_city_index]["buildings"][1]["ready"] = true
+        multi_recruit["cities"][ai_city_index]["buildings"][1]["hp"] = 350.0
+    var parallel_train: Dictionary = CampaignWar.ai_recruit(multi_recruit)
+    _check(results,"v46-two-ai-cities-recruit-simultaneously",
+        int(parallel_train["trained"])==2 and multi_recruit["cities"][1]["training"].size()==1 and multi_recruit["cities"][2]["training"].size()==1)
+    Preview.tick(multi_recruit,60.0)
+    _check(results,"v46-multicity-paid-recruits-really-exist",
+        int(multi_recruit.get("military_trained",0))==2 and multi_recruit["armies"].size()==2)
+    # Test fixtures below bypass costs only for creating known army compositions.
+    # The previous two assertions cover actual economy-funded recruitment.
+    var theater_manifest: Array = [
+        {"id":0,"team":0,"c":30,"r":20,"name":"Vaenlane A"},
+        {"id":1,"team":0,"c":50,"r":20,"name":"Vaenlane B"},
+        {"id":2,"team":0,"c":70,"r":20,"name":"Vaenlane C"},
+        {"id":3,"team":1,"c":20,"r":20,"name":"AI linn A"},
+        {"id":4,"team":1,"c":40,"r":20,"name":"AI linn B"},
+        {"id":5,"team":1,"c":60,"r":20,"name":"AI linn C"}]
+    var theater_state: Dictionary = Preview.initialize(theater_manifest)
+    theater_state["campaign"] = {"active":true,"player_team":0,"turn":18,"result":"playing"}
+    var leader_id: int = -1
+    for city_index in [3,4,5]:
+        var origin_city: Dictionary = theater_state["cities"][city_index]
+        var strike_army: Dictionary = Military.create_army(theater_state,1,int(origin_city["c"]),int(origin_city["r"]))
+        if leader_id < 0:
+            leader_id = int(strike_army["id"])
+        for unit_index in range(3):
+            Military.add_unit(theater_state,strike_army,"spearman")
+    theater_state["individual_battle"] = {"army_a":leader_id,"army_b":-1}
+    var during_fight: Dictionary = CampaignWar.ai_march(theater_state,strategic_nav)
+    _check(results,"v46-independent-fronts-march-while-one-battle-active",
+        int(during_fight["ordered"])==2 and int(during_fight["garrisons"])==2)
+    theater_state["individual_battle"] = {}
+    var after_fight: Dictionary = CampaignWar.ai_march(theater_state,strategic_nav)
+    _check(results,"v46-returned-army-opens-third-front",
+        int(after_fight["ordered"])==1 and int(after_fight["garrisons"])==1)
+    var front_count: int = 0
+    var garrison_count: int = 0
+    var targets: Dictionary = {}
+    var safe_guards: bool = true
+    for group in theater_state["armies"]:
+        var number: int = Military.units_for(theater_state,group).size()
+        if str(group.get("strategic_role","")) == "attack":
+            front_count += 1
+            targets[str(int(group.get("campaign_target_city",-1)))] = true
+            safe_guards = safe_guards and number==2 and group.get("path",[]).size()>0
+        elif str(group.get("strategic_role","")) == "garrison":
+            garrison_count += 1
+            safe_guards = safe_guards and number==1 and group.get("path",[]).is_empty()
+    _check(results,"v46-three-distinct-target-cities-selected",front_count==3 and targets.size()==3)
+    _check(results,"v46-each-home-has-one-saved-defender",
+        garrison_count==3 and safe_guards and int(theater_state.get("ai_garrison_assignments",0))==3)
+    _check(results,"v46-idempotent-strategic-planning",int(CampaignWar.ai_march(theater_state,strategic_nav)["ordered"])==0)
+    var theater_saved: bool = Preview.save_preview(theater_state,"user://v46_multifront.json")
+    var theater_loaded: Dictionary = Preview.load_preview(theater_manifest,"user://v46_multifront.json")
+    _check(results,"v46-three-fronts-and-guards-survive-save-load",
+        theater_saved and theater_loaded.get("armies",[]).size()==6 and int(theater_loaded.get("ai_garrison_assignments",0))==3)
+    if FileAccess.file_exists("user://v46_multifront.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v46_multifront.json"))
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
