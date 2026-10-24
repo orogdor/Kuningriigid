@@ -14,7 +14,7 @@ const RESOURCE_TYPES: Array[String] = ["lumber","farm","quarry","mine"]
 static func urban_radius(population: int) -> int:
     # V153 city-area-v142.js: populationCityRadius(pop).
     # 3 -> 3x3, 9 -> 7x7, 25 -> 11x11, 36+ -> 12x12.
-    return mini(MAX_URBAN_SIDE / 2, maxi(1, floori(sqrt(float(maxi(0,pop))))))
+    return mini(MAX_URBAN_SIDE / 2, maxi(1, floori(sqrt(float(maxi(0,population))))))
 
 static func urban_side(population: int) -> int:
     # V153 cityExtent(radius): never allow a 13x13 built-up area.
