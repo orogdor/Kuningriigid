@@ -40,11 +40,11 @@ for(let turn=1;turn<=maxTurns;turn++){
   const s=metrics(turn);snapshots.push(s);
   console.log('V160 BRONZE',JSON.stringify({turn,ages:s.ages,population:s.population,cities:s.cities,largest:s.largest&&{name:s.largest.name,pop:s.largest.pop,walls:s.largest.stonewall,gates:s.largest.gatehouse,cutstone:s.largest.cutstone,plank:s.largest.plank,food:s.largest.food,reason:s.largest.wallReason,waiting:s.largest.waiting},marketCities:s.markets}));
  }
- if(Object.keys(ironAt).length>=1&&turn>=Math.min(...Object.values(ironAt))+5)break;
+ if(Object.keys(ironAt).length>=1&&turn>=Math.min(...Object.values(ironAt))+40)break;
 }
-const final=snapshots.at(-1),largestBronze=snapshots.filter(s=>s.ages.includes(1)).reduce((best,s)=>!best||s.largest?.pop>best.largest?.pop?s:best,null);
+const final=snapshots.at(-1),largestBronze=snapshots.flatMap(s=>s.citiesDetail.filter(c=>c.age===1)).sort((a,b)=>b.pop-a.pop)[0]||null;
 const result={seed:142023,bronzeAt,ironAt,elapsedSeconds:Math.round((Date.now()-started)/1000),
- maxTurns,final,largestBronze:largestBronze?.largest||null,snapshots};
+ maxTurns,final,largestBronze,snapshots};
 fs.mkdirSync('artifacts-v160',{recursive:true});
 fs.writeFileSync('artifacts-v160/bronze-report.json',JSON.stringify(result,null,2));
 const lines=[
