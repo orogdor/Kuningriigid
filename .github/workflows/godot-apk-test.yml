@@ -46,6 +46,116 @@ jobs:
           sed -i 's/2.65-float(rr)\*\.007/2.65-float(rr)*.020/g' game/tests/port_checks.gd
           grep -Fq '2.65-float(rr)*.020' game/tests/port_checks.gd
           python3 --version
+      - name: Enable Android ETC2/ASTC compression for bootstrap export
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCONF'
+          from pathlib import Path
+          import re
+          p = Path('bootstrap/project.godot')
+          s = p.read_text(encoding='utf-8')
+          key = 'textures/vram_compression/import_etc2_astc'
+          if re.search(r'(?m)^' + re.escape(key) + r'\s*=', s):
+              s = re.sub(r'(?m)^' + re.escape(key) + r'\s*=.*        shell: bash
+        run: |
+          set -euo pipefail
+          python3 game/tools/run_qa_checks.py 2>&1 | tee dist/logs/01-static.txt
+      - name: Godot import and parser check
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path game --editor --import --quit 2>&1 | tee dist/logs/02-import.txt
+          if grep -Ei 'SCRIPT ERROR|Parse Error|Parser Error|Failed to load script' dist/logs/02-import.txt; then exit 1; fi
+      - name: Execute Godot tests (experimental, 70s cap)
+        shell: bash
+        continue-on-error: true
+        timeout-minutes: 2
+        run: |
+          set -uo pipefail
+          timeout 70s godot --headless --path game --script res://tests/headless_ci.gd 2>&1 | tee dist/logs/03-tests.txt
+          result=${PIPESTATUS[0]}
+          if [[ "$result" -ne 0 ]]; then
+            echo "::warning::Regression suite is not green (exit $result). APK will be experimental."
+            exit 1
+          fi
+          grep -q 'V131_REGRESSION:' dist/logs/03-tests.txt || exit 1
+          if grep -Ei 'SCRIPT ERROR|Parse Error|Parser Error|V131_TEST_FAILURES' dist/logs/03-tests.txt; then exit 1; fi
+      - name: Export game pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path game --export-pack GamePack "$GITHUB_WORKSPACE/dist/game.pck" 2>&1 | tee dist/logs/04-pck.txt
+          test -s dist/game.pck
+          mkdir -p bootstrap/seed
+          cp dist/game.pck bootstrap/seed/game.pck
+      - name: Verify bootstrap scene and game PCK
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path bootstrap --editor --import --quit 2>&1 | tee dist/logs/05-bootstrap.txt
+          godot --headless --path bootstrap --script res://tests/pck_smoke.gd 2>&1 | tee dist/logs/06-smoke.txt
+          grep -q BOOTSTRAP_SMOKE_PASS dist/logs/06-smoke.txt
+      - name: Set up Godot Android export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          dest="${HOME}/.local/share/godot/export_templates/4.7.2.stable"
+          mkdir -p "$dest"
+          if [[ ! -s "$dest/android_debug.apk" ]]; then
+            source_template=$(find /root /opt /usr/local /usr/share /github/home -type f -name android_debug.apk -print -quit 2>/dev/null || true)
+            [[ -n "$source_template" ]] || { echo "Android export templates missing"; exit 1; }
+            source_dir=$(dirname "$source_template")
+            cp "$source_dir/android_debug.apk" "$dest/android_debug.apk"
+            cp "$source_dir/android_release.apk" "$dest/android_release.apk"
+          fi
+          ls -lh "$dest/android_debug.apk" "$dest/android_release.apk"
+          mkdir -p "${HOME}/.config/godot"
+          if [[ -s /root/.config/godot/editor_settings-4.7.tres ]]; then
+            cp /root/.config/godot/editor_settings-4.7.tres "${HOME}/.config/godot/editor_settings-4.7.tres"
+          else
+            printf '[gd_resource type="EditorSettings" format=3]\n[resource]\n' > "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/android_sdk_path = "/usr/lib/android-sdk"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/debug_keystore = "/root/debug.keystore"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/debug_keystore_user = "androiddebugkey"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/debug_keystore_pass = "android"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+          fi
+      - name: Export Android debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path bootstrap --export-debug Android "$GITHUB_WORKSPACE/dist/Kuningriigid-Android-v33.apk" 2>&1 | tee dist/logs/07-android.txt
+          test -s dist/Kuningriigid-Android-v33.apk
+          python3 - <<'PYAPK'
+          from zipfile import ZipFile
+          with ZipFile('dist/Kuningriigid-Android-v33.apk') as z:
+              assert z.testzip() is None
+              assert 'AndroidManifest.xml' in z.namelist()
+          PYAPK
+      - name: Downloadable APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kuningriigid-Android-3-3
+          path: |
+            dist/Kuningriigid-Android-v33.apk
+            dist/game.pck
+      - name: Diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Godot-3-3-build-logs
+          path: dist/logs/
+          if-no-files-found: warn
+, key + '=true', s)
+          elif '[rendering]' in s:
+              s = s.replace('[rendering]', '[rendering]\n' + key + '=true', 1)
+          else:
+              s += '\n[rendering]\n' + key + '=true\n'
+          p.write_text(s, encoding='utf-8')
+          assert key + '=true' in p.read_text(encoding='utf-8')
+          PYCONF
       - name: Static validations
         shell: bash
         run: |
