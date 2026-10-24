@@ -127,7 +127,9 @@ static func run() -> Dictionary:
     if FileAccess.file_exists("user://v43_trip_regression.json"):
         DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v43_trip_regression.json"))
     var final_arrival: Dictionary = {}
-    for journey_turn in range(7):
+    # The first step already covered three of twenty tiles: six more turns
+    # bring the actual arrival. A seventh turn is *after* settlement.
+    for journey_turn in range(6):
         final_arrival = SettlerCampaign.advance_turn(journey_loaded,founding_map)
     _check(results,"v43-arrives-and-founds-after-seven-turns",int(final_arrival.get("founded",0))==1 and journey_loaded["cities"].size()==3)
     _check(results,"v43-no-pending-after-arrival",SettlerCampaign.missions(journey_loaded).is_empty() and int(journey_loaded.get("founded_cities",0))==1)
