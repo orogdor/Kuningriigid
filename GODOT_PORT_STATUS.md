@@ -1,5 +1,20 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.3 / liikuvad asutajad ja AI riikide laienemine (2026-10-24)
+
+- `settler_campaign_port.gd`: päris kampaania asutamisülesanded `settler_missions` (JSON-püsiv), iga käik 3 **kõrvuti olevat maismaaruutu**, teekond kuni 40 ruutu. Ressursid ning kolm elanikku võetakse lähteasulast asutaja teele saatmisel. Uus linn luuakse **alles pärast asutaja päriselt sihtkohta jõudmist**, ilma varusid topelt kulutamata.
+- `native_settler_view.gd`: iga asutaja on mängu maailmakaardil nähtav riigivärvilise kerge 3D silindermarkerina; kuvamine värskendatakse iga käiguga ja salvestusest laadimisel.
+- Telefoni kategoorias **Kampaania → SAADA ASUTAJA valitud ruudule** ja **Asutajate teekonnad**. Uus asutaja, tema marsruut, käigupikkus, lähteasula, riik ja asukoht säilitatakse eraldi kampaaniasalvestuses.
+- Asustamise sihtkoha hõivamisel või läbimatu kaardiruudu korral asutaja ülesanne tühistatakse. Kui lähteasula kuulub endiselt samale riigile, tagastatakse 3 elanikku ja asutamise ressursid (mitte vallutatud vaenlaslinnale).
+- `CityFounding.complete_reserved` on ühine linnaks muutmise teekond, mida saab kasutada pärast asutaja kohalejõudmist ja mis ei arva topelt maha juba tasutud varusid.
+- AI jaoks `SettlerCampaign.ai_expand`: proovib igal 8. käigul, alates käigust 8, saata riikides 1–3 kuni ühe uue asutaja riigi kohta, eeldusel et `settlement` on avastatud ning sobiv asutav linn ja kuiva maa tee eksisteerivad. Üks riik ei saada samal ajal mitut asutajat.
+- Kontrollitud **804/804** Godoti regressioonitesti, sh poole teekonna pealt salvestus/laadimine, 20 ruudu läbimine seitsme käiguga, asutamise puudumine enne saabumist, blokeeritud tee ja kulude hüvitus ning kõigi kolme AI riigi asutajakäsud. Androidi debug APK eksport, PCK laadimistest ja eelväljalaske avaldamine läbitud.
+- CI: https://github.com/orogdor/Kuningriigid/actions/runs/40114413987
+- GitHubi uus versioon: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-91
+- **Hinnanguline kogu pordi valmidus ~56%** (töömahul põhinev hinnang, mitte automaatmõõdetud funktsioonide protsent).
+
+**Piirangud:** asutajad on lihtsustatud käsukampaania (mitte veel taktikalises lahingus osalevad üksused). Liikumine on hetkel käikude kaupa nähtav, ilma kaaderhaaval vaheanimatsioonita. Teel olevad üksused ei kasuta veel täielikku varude, diplomaatia, ilmastiku ja sõjalise eskortimise süsteemi. AI hakkab laienema ainult siis, kui tema linnade majandus ja teadus seda tegelikult võimaldavad. Riikliku maakasutuse ja ajaloolise strateegilise asustuse tasakaalu peab pikemas mängus edasi katsetama.
+
 ## V4.2 / kampaanias päris uue linna asutamine (2026-10-24)
 
 - `game/scripts/core/city_founding_port.gd`: võimalik rajada oma riigile uus linn kasutaja valitud maailmaruudule, kui `settlement` tehnoloogia on avastatud, valitud maal on läbitav maa, puudub olemasolev territoriaalne omanik, linnade vahe vähemalt 17 ruutu ja asutavast linnast on kuni 40-ruuduline läbitav maismaatee. Minimaalne lähteasula elanikkond **6**, asutamine kolib **3 elanikku**.
