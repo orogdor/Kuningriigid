@@ -208,6 +208,7 @@ const MOBILE_MENU_ACTIONS = [
     ["Kampaania", "PIKK MÄNG: KIVIAJAST MOODSANI (600 KÄIKU)", "campaign_long_start"],
     ["Kampaania", "LÕPETA KÄIK (+1)", "campaign_turn"],
     ["Kampaania", "Kampaania seis ja edetabel", "campaign_info"],
+    ["Kampaania", "LINNADE JA MAJANDUSE RAPORT", "campaign_economy_info"],
     ["Kampaania", "Järgmine minu linn", "campaign_city"],
     ["Kampaania", "SAADA ASUTAJA valitud ruudule", "campaign_found_city"],
     ["Kampaania", "Asutamise tingimused", "campaign_founding_info"],
@@ -580,6 +581,36 @@ func _campaign_info() -> void:
             int(entry["team"]),int(entry["cities"]),int(entry["population"]),int(entry["age"])])
     status_label.text = CampaignPlay.text_status(preview_state)+" | "+", ".join(summary)
     _update_labels()
+
+func _campaign_economy_info() -> void:
+    if not CampaignPlay.is_active(preview_state):
+        status_label.text = "Alusta esmalt kampaania."
+        return
+    _close_mobile_menu()
+    _refresh_battle_brief()
+    battle_brief_picker.clear()
+    battle_brief_picker.disabled = true
+    var team: int = int(preview_state["campaign"]["player_team"])
+    var rows: PackedStringArray = ["LINNAD JA MAJANDUS",CampaignPlay.text_status(preview_state),""]
+    for city in preview_state.get("cities",[]):
+        if int(city.get("team",-1)) != team:
+            continue
+        var stock: Dictionary = city.get("resources",{})
+        var building_count: int = city.get("buildings",[]).size()
+        rows.append("%s (%d,%d) | elanikke %d | hooneid %d" % [
+            str(city.get("name","Linn")),int(city.get("c",0)),int(city.get("r",0)),
+            int(city.get("pop",0)),building_count])
+        rows.append("  Puit %.0f | kivi %.0f | vesi %.0f | toit %.0f" % [
+            float(stock.get("wood",0)),float(stock.get("stone",0)),
+            float(stock.get("water",0)),float(stock.get("food",0))])
+    var research: Dictionary = preview_state.get("teams",{}).get(team,{})
+    rows.append("")
+    rows.append("TEADUS | käimas: %s | progress %.1f | ajastu %d" % [
+        str(research.get("active","puudub")),float(research.get("progress",0.0)),int(research.get("age",0))])
+    rows.append("KAUBANDUS | teele saadetud %d | kohale jõudnud %d" % [
+        int(preview_state.get("trade_dispatched",0)),int(preview_state.get("trade_arrived",0))])
+    battle_brief_text.text = "\n".join(rows)
+    battle_brief_panel.visible = true
 
 func _setup_lighting() -> void:
     var env := WorldEnvironment.new()
@@ -1033,6 +1064,7 @@ func _menu_action(action_id: String) -> void:
         "campaign_long_start": _start_campaign(true)
         "campaign_turn": _campaign_end_turn()
         "campaign_info": _campaign_info()
+        "campaign_economy_info": _campaign_economy_info()
         "campaign_city": _select_next_city()
         "campaign_found_city": _campaign_found_city()
         "campaign_founding_info": _campaign_founding_info()
