@@ -920,9 +920,15 @@ static func run() -> Dictionary:
     # V2.2 territory and county production: no Godot startup side effects.
     _check(results,"v22-city-radius-start-3x3",Territory.urban_radius(3)==1)
     _check(results,"v22-radius-six-pop-5x5",Territory.urban_radius(6)==2)
-    _check(results,"v22-city-radius-32-9x9",Territory.urban_radius(32)==4)
-    _check(results,"v22-maximum-side-11",Territory.urban_radius(999)*2+1<=Territory.MAX_URBAN_SIDE)
+    _check(results,"v34-v153-city-pop32-11x11",Territory.urban_radius(32)==5 and Territory.urban_side(32)==11)
+    _check(results,"v34-v153-maximum-12x12",Territory.urban_side(999)==12 and Territory.urban_side(999)<=Territory.MAX_URBAN_SIDE)
     _check(results,"v22-radius-monotonic",Territory.urban_radius(16)>=Territory.urban_radius(6))
+    # V3.4: compare Godot urban extent directly with web V153.
+    _check(results,"v34-v153-city-pop9-7x7",Territory.urban_radius(9)==3 and Territory.urban_side(9)==7)
+    _check(results,"v34-v153-city-pop16-9x9",Territory.urban_radius(16)==4 and Territory.urban_side(16)==9)
+    _check(results,"v34-v153-city-pop25-11x11",Territory.urban_radius(25)==5 and Territory.urban_side(25)==11)
+    _check(results,"v34-v153-city-pop36-12x12",Territory.urban_radius(36)==6 and Territory.urban_side(36)==12)
+    _check(results,"v34-v153-city-side-monotonic",Territory.urban_side(36)>=Territory.urban_side(32) and Territory.urban_side(999)==12)
     var county_land := PackedByteArray()
     county_land.resize(Territory.COLS*Territory.ROWS)
     county_land.fill(1)
@@ -936,7 +942,24 @@ static func run() -> Dictionary:
     _check(results,"v22-core-ownership-protected",Territory.owner_at(county_state,50,50)==0 and Territory.owner_at(county_state,54,50)==1)
     _check(results,"v22-large-city-wins-intersection",Territory.owner_at(county_state,52,50)==1)
     _check(results,"v22-urban-is-county-subset",town_a["territory_urban"].size()<=town_a["territory_county"].size() and town_b["territory_urban"].size()<=town_b["territory_county"].size())
-    _check(results,"v22-urban-within-side-limit",town_b["territory_urban"].size()<=81)
+    var largest_urban: Dictionary = {"cities":[{"name":"Suurlinna proov","team":0,"c":110,"r":80,"pop":36,"county_worksites":[] }],"revision":1}
+    _check(results,"v34-v153-large-city-allocates",Territory.rebuild(largest_urban,county_land,true))
+    var big_tiles: Array = largest_urban["cities"][0]["territory_urban"]
+    _check(results,"v34-v153-large-city-side-saved",int(largest_urban["cities"][0].get("territory_side",0))==12)
+    _check(results,"v34-v153-large-city-144-tiles",big_tiles.size()==144)
+    var low_x: int = 220
+    var high_x: int = 0
+    var low_y: int = 165
+    var high_y: int = 0
+    for pt in big_tiles:
+        low_x = mini(low_x,int(pt[0]))
+        high_x = maxi(high_x,int(pt[0]))
+        low_y = mini(low_y,int(pt[1]))
+        high_y = maxi(high_y,int(pt[1]))
+    _check(results,"v34-v153-urban-real-bounds",high_x-low_x<12 and high_y-low_y<12)
+    _check(results,"v34-v153-city-core-remains-urban",big_tiles.has([110,80]))
+    _check(results,"v34-v153-urban-json-roundtrip",JSON.parse_string(JSON.stringify(big_tiles)) is Array)
+    _check(results,"v22-urban-within-side-limit",town_b["territory_urban"].size()<=121)
     _check(results,"v22-no-rebuild-when-unchanged",not Territory.rebuild(county_state,county_land))
     town_a["pop"] = 50
     _check(results,"v22-rebuild-after-population-growth",Territory.rebuild(county_state,county_land))
