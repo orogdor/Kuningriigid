@@ -1,5 +1,18 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.8 / Dev 113 – mitmest linnast koonduvad päris piiramisarmeed (2026-10-24)
+
+- `campaign_rally_port.gd`: kui AI-l on kindlustatud vastaselinn käeulatuses, kuid koduarmee on alla 4 üksuse (või vajab pärast kodugarnisoni jätmist täiendust), valib ta liitlaste teise linna olemasoleva doonorarmee. Donorist suunatakse osa päriselt juba värvatud üksusi eraldi marssivasse koondusüksusse, jättes linnale vähemalt 1 kaitseüksuse.
+- Koondusüksus peab läbima tegeliku, läbitava maa marsruudi. Üksused liidetakse juhtarmee alla alles sama maailmaruudu saavutamisel, seega vahepealset teleporti ega tasuta sõjaväge ei teki. Juhtarmee säilitab koondumise ajal oleku `assembly`, abiarmee `rally`, mõlemad ja sihtlinn kirjutatakse tavalisse salvestusse. Lahingus osalevaid armeesid ei ühendata.
+- Koondatud vägi saab käsu algselt valitud kindlustatud linnale; kui liitumise järel on vähemalt 5 sõdurit ja kodulinnas puudub teine garnison, jäetakse üks sõdur linna ning vähemalt 4 üksust saadetakse piirama. Senine kolme samaaegse strateegilise rinde ja tegelike taktikaliste piiramiste mootor säilib.
+- Uued testid tõestavad 3+3 üksuse juhtumi: lähteasula garnisoni jääb 1 sõdur, koonduslinna garnisoni 1, 4 liigub linnapiiramisele; kõigi kuue samaaegne summa säilib, koondusvägi läbib reaalse maailma marsruudi ja salvestus säilitab keskse ülesande.
+- GitHub CI: **870/870 regressioonikontrolli**, Godoti parser, Android APK ehitus ja PCK bootstrap testi läbimine: https://github.com/orogdor/Kuningriigid/actions/runs/40118763677
+- Avaldatud APK ja mängupakett: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-113
+- Üldpordi **hinnanguline valmidus ~67%**, varasem ~65%; protsent on teostamata töö hinnang, mitte automaatne mõõdik.
+
+**Alles töös:** korraga mitme taktikalise lahingu simulatsioon, koondusüksuste ümberplaneerimine ootamatu ründaja/kaotatud juhtarmee korral, AI varustus ja logistika pikematel sõjakäikudel, piiramismasinate täielik AI tootmine ning päris Androidi jõudlus. Automaattestid ei kinnita kasutaja seadme OTA värskendust.
+
+
 ## V4.7 / Godot Dev 109 – strateegiline linnakaitse ja tugevamad piiramisarmeed (2026-10-24)
 
 - `campaign_defense_port.gd`: AI riik tuvastab oma linna lähikonnas (Manhattani kaugus kuni 7 maailmaruutu) reaalselt elusate vaenlasüksuste surve. Ohu korral hindab linna garnisoni ja juba teel olevate abivägede suurust ning käsib olemasoleval sobival ründearmeel pöörduda linna poole. Käsk on päris maailmakaardi rajaleidmisega ja säilib salvestuses; üksuseid ei looda ega teisaldada silmapilkselt.
