@@ -988,7 +988,7 @@ static func run() -> Dictionary:
     Territory.reconcile_worksites(county_state,county_land,county_heights)
     var rural_site: Dictionary = town_a["county_worksites"][0] if not town_a["county_worksites"].is_empty() else {}
     _check(results,"v22-rescued-site-or-suspended",not rural_site.is_empty() and (Territory.owner_at(county_state,int(rural_site.get("c",-1)),int(rural_site.get("r",-1)))==0 or bool(rural_site.get("suspended",false))))
-    _check(results,"v22-city-urban-fallback",town_a["territory_urban"].size()>=3)
+    _check(results,"v34-surrounded-city-fallback-keeps-core-and-county",town_a["territory_urban"].has([50,50]) and town_a["territory_urban"].size()<=Territory.urban_side(3)*Territory.urban_side(3) and town_a["territory_county"].size()>=Territory.urban_side(3)*Territory.urban_side(3))
     town_a["idle_workers"] = 1.0
     _check(results,"v22-rural-idle-worker-tick",Territory.advance_worksites(town_a,1.0)>=0)
 
