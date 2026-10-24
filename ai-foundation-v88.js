@@ -40,9 +40,10 @@ export function reservesFoundation(game,city,type){
     (stock.stone||0)-(cost.stone||0)>=18)return false;
  // A growing Bronze/Medieval town may fund its first market without
  // dismantling the remaining wood/stone reserve needed for survival.
- if(type==='market'&&game.s.ages[city.team]>=1&&realm.pop>=5&&
+ if(type==='market'&&game.s.ages[city.team]>=1&&realm.pop>=6&&
     !buildings.some(b=>b.type==='market'&&b.hp>0)&&
-    (stock.wood||0)>=Math.max(80,(cost.wood||0)+30)&&
-    (stock.stone||0)>=Math.max(40,(cost.stone||0)+15))return false;
+    foodTotal(stock)>=realm.pop*2.5&&(stock.water||0)>=realm.pop*1.3&&
+    (stock.wood||0)-(cost.wood||0)>=18&&
+    (stock.stone||0)-(cost.stone||0)>=12)return false;
  return missing.some(need=>Object.entries(BUILDINGS[need].cost).some(([key,n])=>(stock[key]||0)-(cost[key]||0)<n));
 }
