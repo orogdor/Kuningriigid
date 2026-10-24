@@ -20,7 +20,7 @@ export function armyCapacity(ownCities,age,atWar=false){
  return Math.min(44,Math.max(6,3+ownCities*2+age*2+(atWar?7:0)));
 }
 export function knowledgeCostFactor(age){
- return [1.28,2.8,3.3,3.9,4.4,5.0,5.6][Math.max(0,Math.min(6,age||0))];
+ return [.92,2.8,3.3,3.9,4.4,5.0,5.6][Math.max(0,Math.min(6,age||0))];
 }
 export function knowledgeCityMultiplier(n){
  // More cities are useful, but cannot double a civilization's research rate

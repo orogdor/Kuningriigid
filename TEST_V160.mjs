@@ -11,6 +11,9 @@ assert.equal(prosperousTownGrowth({...base,housingFree:0}),1,'no growth cheat wi
 assert.equal(prosperousTownGrowth({...base,stock:{...stock,grain:0,meat:0,fish:0,bread:0}}),1,'no growth cheat without food');
 assert.equal(prosperousTownGrowth({...base,age:0}),1,'Stone economy unchanged');
 assert.equal(BUILD_AGE.gatehouse,1,'Bronze gates must be legal');
+import {BUILDINGS} from './civilization-core.js';
+assert.ok(BUILDINGS.stonewall.time<=20,'Bronze stonewall construction completes within a small fraction of a turn');
+assert.ok(BUILDINGS.gatehouse.cost.cutstone<13,'Bronze gates do not consume all dressed stone');
 assert.equal(BUILD_TECH.gatehouse,'stone_fortifications','gates require masonry technology');
 const state={time:60*47,ages:[0,1],research:[{}, {completed:[{id:'bronze',time:60*40}]}]};
 const goals=['writing','storage','commerce','stone_fortifications','iron','civics'];
