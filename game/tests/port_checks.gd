@@ -185,6 +185,63 @@ static func run() -> Dictionary:
     CampaignWar.occupy_unfortified(fortified_state)
     CampaignWar.occupy_unfortified(fortified_state)
     _check(results,"v44-fortified-city-requires-real-siege",int(fortified_state["cities"][0]["team"])==0 and int(fortified_state.get("city_captures",0))==0)
+    # Dev 97: a fortified city must not become an immortal no-garrison
+    # state. Real hostile armies trigger a paid citizen militia and
+    # the existing tactical siege/keep capture path (not a fake win).
+    var fortified_home: Dictionary = fortified_state["cities"][0]
+    fortified_home["pop"] = 10
+    fortified_home["resources"]["wood"] = 90.0
+    fortified_home["resources"]["stone"] = 40.0
+    var levy_pop_before: int = int(fortified_home["pop"])
+    var levy_wood_before: float = float(fortified_home["resources"]["wood"])
+    var muster: Dictionary = CampaignWar.prepare_city_sieges(fortified_state)
+    _check(results,"dev97-emergency-garrison-costs-real-population",
+        int(muster["levied"])==1 and int(fortified_home["pop"])==levy_pop_before-1)
+    _check(results,"dev97-garrison-equipment-is-not-free",
+        is_equal_approx(float(fortified_home["resources"]["wood"]),levy_wood_before-8.0))
+    _check(results,"dev97-armies-enter-real-linked-siege",
+        int(muster["engagements"])==1 and bool(fortified_state.get("individual_battle",{}).get("siege",{}).get("linked_city",false)))
+    _check(results,"dev97-siege-has-real-mustered-soldier",
+        int(fortified_state.get("city_garrisons_mustered",0))==1 and fortified_state["military_units"].size()==3)
+    _check(results,"dev97-no-garrison-duplication-during-battle",
+        int(CampaignWar.prepare_city_sieges(fortified_state)["levied"])==0)
+    _check(results,"dev97-siege-state-survives-json-roundtrip",
+        JSON.parse_string(JSON.stringify(fortified_state["individual_battle"])) is Dictionary)
+    fortified_state["individual_battle"]["siege"]["captured"] = true
+    IndividualBattle._finish(fortified_state,fortified_state["individual_battle"])
+    _check(results,"dev97-only-occupied-keep-changes-city-owner",
+        int(fortified_home["team"])==1 and int(fortified_state.get("city_captures",0))==1)
+    _check(results,"dev97-siege-conquest-logged-and-saved",
+        fortified_state.get("conquests",[]).size()==1 and fortified_state.get("battle_log",[]).size()==1)
+    var blockade_state: Dictionary = Preview.initialize([
+        {"id":0,"team":0,"c":20,"r":20,"name":"Väsinud vallilinn"},
+        {"id":1,"team":1,"c":35,"r":20,"name":"Piiraja"}])
+    blockade_state["campaign"] = {"active":true,"player_team":0,"turn":1,"result":"playing"}
+    blockade_state["cities"][0]["fortification"] = {"style":"palisade","tiles":[[20,20]]}
+    blockade_state["cities"][0]["pop"] = 3
+    blockade_state["cities"][0]["resources"]["wood"] = 0.0
+    blockade_state["cities"][0]["resources"]["stone"] = 0.0
+    var blockade_army: Dictionary = Military.create_army(blockade_state,1,20,20)
+    Military.add_unit(blockade_state,blockade_army,"spearman")
+    Military.add_unit(blockade_state,blockade_army,"spearman")
+    _check(results,"dev97-no-phantom-troops-in-exhausted-city",
+        int(CampaignWar.prepare_city_sieges(blockade_state)["levied"])==0)
+    for siege_turn in range(1,6):
+        blockade_state["campaign"]["turn"] = siege_turn
+        CampaignWar.advance_blockades(blockade_state)
+    _check(results,"dev97-blockade-cannot-bypass-wall-immediately",
+        int(blockade_state["cities"][0]["team"])==0)
+    var block_same_turn: Dictionary = CampaignWar.advance_blockades(blockade_state)
+    _check(results,"dev97-blockade-cannot-tick-twice-in-one-turn",
+        int(block_same_turn["surrendered"])==0 and int(blockade_state["city_blockade_progress"]["0"]["turns"])==5)
+    blockade_state["campaign"]["turn"] = 6
+    var surrender: Dictionary = CampaignWar.advance_blockades(blockade_state)
+    _check(results,"dev97-exhausted-city-surrenders-after-six-full-turns",
+        int(surrender["surrendered"])==1 and int(blockade_state["cities"][0]["team"])==1)
+    _check(results,"dev97-blockade-conquest-is-differentiated-from-battle",
+        int(blockade_state.get("city_captures",0))==1 and str(blockade_state["conquests"][0]["mode"])=="blockade_surrender")
+    _check(results,"dev97-blockade-does-not-conquer-city-twice",
+        int(CampaignWar.advance_blockades(blockade_state)["surrendered"])==0)
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
