@@ -823,7 +823,7 @@ func _menu_action(action_id: String) -> void:
         if restricted:
             status_label.text = "Kampaanias ei saa demodega mänguseisu muuta. Kasuta kampaania menüüd."
             return
-        if action_id.begins_with("build_") or action_id.begins_with("county_") or action_id in ["research","recruit","city_gate_toggle"]:
+        if action_id.begins_with("build_") or action_id.begins_with("county_") or action_id in ["research","recruit","city_gate_toggle","campaign_research","campaign_house","campaign_lumber"]:
             if not CampaignPlay.owns_city(preview_state,city_index):
                 status_label.text = "Selle linna omanik on teine riik. Vali oma linn."
                 return
