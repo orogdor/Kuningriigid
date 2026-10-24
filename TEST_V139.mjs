@@ -15,7 +15,7 @@ assert.ok(cityInfillRank(centre,centre,'market',game)<cityInfillRank(centre,east
 assert.deepEqual(coreFoodAndServices([house()],1).slice(0,3),['market','warehouse','cellar']);
 const rich={gold:300,wood:220,stone:150,water:150,bread:90,plank:65};
 assert.equal(surplusForWalls(rich,20,0),true);
-assert.equal(surplusForWalls({...rich,wood:16},20,0),false,'V160 masonry budget needs at least 17 wood for optional walls');
+assert.equal(surplusForWalls({...rich,wood:13},20,0),false,'V160 masonry budget retains at least 14 wood for paid walls');
 assert.equal(surplusForWalls({...rich,bread:5},20,0),false);
 assert.equal(surplusForWalls(rich,20,7),false);
 assert.equal(reserveAfterWalls(rich,{wood:30,stone:20}),true);

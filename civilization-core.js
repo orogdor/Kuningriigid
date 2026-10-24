@@ -744,7 +744,7 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
   this.s.cities.some(c=>c.team!==team&&atWar(this.s,team,c.team)));
  const schedule=this.s.aiRecruitAt??={};
  const nextRecruitAt=schedule[team]??=210;
- if(this.s.time>=nextRecruitAt&&city.economy.realms[team].pop>=10&&
+ if(this.s.time>=nextRecruitAt&&city.economy.realms[team].pop>=(age===1?28:10)&&
    foodTotal(stock)>=Math.max(24,city.economy.realms[team].pop*2)&&(city.training?.length||0)<2){
   const choices=militaryChoices(this,team,city,TROOPS,UNIT_TECH);
   const kind=choices.find(k=>{const d=TROOPS[k],tech=UNIT_TECH[k];

@@ -5,7 +5,7 @@ import {GOODS} from './city-needs-v87.js';
 // Material payments are atomic; partial payments are never deducted.
 export const ERA_TECHS={bronze:1,iron:2,civics:3,renaissance:4,industrialization:5,modernity:6};
 export const ERA_MATERIALS={
- bronze:{wood:45,stone:35,bread:17.5},
+ bronze:{wood:35,stone:25,bread:15},
  iron:{plank:50,stone:50,bread:30},
  civics:{iron:20,plank:75,bread:50},
  renaissance:{iron:35,plank:85},
