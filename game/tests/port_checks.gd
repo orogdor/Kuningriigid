@@ -917,6 +917,28 @@ static func run() -> Dictionary:
     _check(results,"v21-stress-is-explicit",bool(stress_fixture.get("stress_fixture",false)))
     _check(results,"v21-detail-house-scales",DetailTile.TILE_WIDTH==225.0 and DetailTile.TILE_DEPTH==195.0)
 
+    # V3.5: core-first building placement extends only into owned urban cells.
+    var extended_city: Dictionary = {"c":110,"r":80,"pop":36,"buildings":[
+        {"type":"hall","ready":true,"hp":1200.0,"site_x":110.5,"site_z":80.5}],
+        "territory_urban":[[110,80],[111,80]]}
+    var blocked_core: Array = []
+    for rz in range(-7,8):
+        for rx in range(-7,8):
+            blocked_core.append({"point":Vector2(float(rx)*1.6,float(rz)*1.6),"kind":"market"})
+    var outer_site: Dictionary = CityLayout.find_free_site(extended_city,"house",blocked_core)
+    _check(results,"v35-next-city-tile-offered",bool(outer_site.get("ok",false)))
+    if bool(outer_site.get("ok",false)):
+        var saved_outer: Vector2 = CityLayout.center(extended_city)+outer_site["point"]
+        _check(results,"v35-new-house-on-east-urban-tile",CityLayout.site_tile(extended_city,saved_outer)==Vector2i(111,80))
+        _check(results,"v35-world-projection-east-next-tile",floori(CityLayout.site_on_atlas(extended_city,saved_outer).x)==111)
+        _check(results,"v35-outer-site-inside-plot",CityLayout.within_lot(CityLayout.site_in_tile(extended_city,saved_outer,Vector2i(111,80)),"house"))
+        extended_city["buildings"].append({"type":"house","hp":350.0,"ready":true,"site_x":saved_outer.x,"site_z":saved_outer.y})
+        _check(results,"v35-legacy-core-and-new-house-no-overlap",CityLayout.check_clear(extended_city))
+        _check(results,"v35-new-house-save-roundtrip",JSON.parse_string(JSON.stringify(extended_city["buildings"])) is Array)
+    else:
+        for missed in range(5):
+            _check(results,"v35-next-building-fixture-%d" % missed,false)
+
     # V2.2 territory and county production: no Godot startup side effects.
     _check(results,"v22-city-radius-start-3x3",Territory.urban_radius(3)==1)
     _check(results,"v22-radius-six-pop-5x5",Territory.urban_radius(6)==2)
