@@ -2,7 +2,7 @@ import {loadIronCityV143} from './ai-iron-demo-v143.js';
 import {loadAIMedievalV144} from './ai-medieval-demo-v144.js';
 import {loadAIMedievalV145} from './ai-medieval-demo-v145.js';
 import {loadAIMedievalV146} from './ai-medieval-demo-v146.js';
-import {loadAIMedievalV147} from './ai-medieval-demo-v147.js';
+import {loadAIMedievalV147} from './ai-medieval-demo-v147.js?v=147b';
 import {cityExtent,nextCityPopulation} from './city-area-v142.js';
 import {loadIronCityV142} from './ai-iron-demo-v142.js';
 import {loadArmyTrafficTest} from './army-traffic-demo-v133.js';
