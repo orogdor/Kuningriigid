@@ -1,6 +1,7 @@
 import {canAfford} from './economy.js';
 import {combatUnit} from './ai-development-v128.js';
 import {ancientWallPlan,surplusForWalls,reserveAfterWalls} from './ancient-walls-v139.js';
+import {BRONZE_FORTIFY_POP_V160,BRONZE_FULL_WALL_POP_V160} from './bronze-city-balance-v160.js';
 
 export const DEFENSE_TYPES=new Set(['palisade','stonewall','reinforced_wall','gatehouse','watchtower','stonetower']);
 // Keep the old export for battle scenes and saved projects.
@@ -39,8 +40,8 @@ export function defenseEligibility({population,readyHouses,services,waiting,stoc
 }
 export function planAIDefenses(game,team,city){
  if(game.s.time<(city.nextDefenseCheckV128||0))return;
- city.nextDefenseCheckV128=game.s.time+42;
  const realm=city.economy.realms[team],stock=realm.resources,all=game.allBuildings(city);
+ city.nextDefenseCheckV128=game.s.time+(realm.pop>=BRONZE_FORTIFY_POP_V160?24:42);
  const waiting=all.filter(b=>b.hp>0&&!b.ready).length;
  const readyHouses=all.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length;
  const services=all.filter(b=>['well','market','warehouse','study','scriptorium'].includes(b.type)&&b.ready&&b.hp>0).length;
@@ -53,7 +54,8 @@ export function planAIDefenses(game,team,city){
  if(!eligibility.ok){city.aiDefenseDiagnosticV146={reason:eligibility.reason,checkedAt:game.s.time};return;}
  // Do not fill an entire city construction queue with decorative walls.
  const existing=all.filter(b=>defendedTypes.has(b.type)&&b.hp>0);
- if(existing.some(b=>!b.ready)){
+ // Larger cities can fund up to two real building sites, not free fortifications.
+ if(existing.filter(b=>!b.ready).length>=(realm.pop>=BRONZE_FORTIFY_POP_V160?2:1)){
   city.aiDefenseDiagnosticV146={reason:'wall-being-built',checkedAt:game.s.time};return;
  }
  const local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
@@ -80,13 +82,13 @@ export function planAIDefenses(game,team,city){
  const walls=slots.filter(s=>!['stonetower','watchtower'].includes(s.type));
  const towers=slots.filter(s=>['stonetower','watchtower'].includes(s.type));
  const hasReadyStone=readyBuilding(local,'stonewall');
- const gates=game.s.ages[team]>=3&&hasReadyStone?[
+ const gates=game.s.ages[team]>=1&&hasReadyStone?[
   {type:'gatehouse',x:0,z:-plan.rz,wallAxis:0},
   {type:'gatehouse',x:0,z:plan.rz,wallAxis:0},
   {type:'gatehouse',x:-plan.rx,z:0,wallAxis:1},
   {type:'gatehouse',x:plan.rx,z:0,wallAxis:1}
  ]:[];
- const candidates=hasReadyStone?[...gates,...towers,...walls]:[...walls,...towers];
+ const candidates=hasReadyStone&&realm.pop>=BRONZE_FORTIFY_POP_V160?[...gates,...walls,...towers]:[...walls,...towers];
  const wallCost=game.buildingDefinitions.stonewall?.cost||{};
  if(!hasReadyStone&&game.s.research?.[team]?.known?.includes('stone_fortifications')&&
     !canAfford(stock,wallCost))city.aiImportRequestsV128={
@@ -114,6 +116,8 @@ export function planAIDefenses(game,team,city){
   plan.nextIndex=(n+1)%Math.max(1,viable.length);
   city.aiDefenseDiagnosticV146={reason:'built',type:slot.type,checkedAt:game.s.time};
   city.aiDefenseDiagnosticV147={reason:'built',type:slot.type,at:game.s.time};
+  city.aiDefenseDiagnosticV160={reason:'built',type:slot.type,at:game.s.time,
+   candidateForFullRing:realm.pop>=BRONZE_FULL_WALL_POP_V160};
   return;
  }
  const reason=Object.entries(reasons).sort((a,b)=>b[1]-a[1])[0]?.[0]||'no-eligible-sites';

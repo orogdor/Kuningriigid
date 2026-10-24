@@ -162,7 +162,7 @@ export function tickResearch(state,dt){
    r.ageWait=null;r.progress[id]=total;r.known.push(id);r.active=null;if(r.v118LegacyActive===id)r.v118LegacyActive=null;
    const time=state.time-(budget/(r.rate/60));
    r.completed.push({id,time});
-   if(id==='bronze')state.ages[team]=Math.max(state.ages[team],1);
+   if(id==='bronze'){state.ages[team]=Math.max(state.ages[team],1);(state.ageStartedAtV160??={})[team]=state.time;}
    if(id==='iron')state.ages[team]=Math.max(state.ages[team],2);
    if(id==='civics')state.ages[team]=Math.max(state.ages[team],3);if(id==='renaissance')state.ages[team]=Math.max(state.ages[team],4);if(id==='industrialization')state.ages[team]=Math.max(state.ages[team],5);if(id==='modernity')state.ages[team]=Math.max(state.ages[team],6);
    events.push({team,id});

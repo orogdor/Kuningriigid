@@ -82,15 +82,15 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  // investment away from housing, food, the first market, or basic science.
  // Mason is a real production prerequisite for the first stone wall.
  const hasCivic=buildings.some(b=>b.type==='market'&&b.ready&&b.hp>0);
- if(age>=1&&r.pop>=11&&hasCivic&&edibleSupply(stock)>=r.pop*2.3&&
+ if(age>=1&&r.pop>=10&&hasCivic&&edibleSupply(stock)>=r.pop*2.3&&
     (stock.stone||0)>=45){
-  if((stock.cutstone||0)<26&&!buildings.some(b=>b.type==='mason'&&b.hp>0))add('mason',r.pop>=14?251:215,'Kiviraidur linnamüüri rajamiseks');
+  if((stock.cutstone||0)<26&&!buildings.some(b=>b.type==='mason'&&b.hp>0))add('mason',r.pop>=14?279:248,'Kiviraidur linnamüüri rajamiseks');
   if(!buildings.some(b=>b.type==='barracks'&&b.hp>0))add('barracks',r.pop>=14?268:243,'Linna esimene kasarm ja väliväe väljaõpe');
  }
  // V136: every established town needs civic functions, not only production buildings.
  // A Bronze settlement without a marketplace is still a village; reserve time
  // for civic construction even during long era-research material shortages.
- if(age>=1&&r.pop>=6)add('market',Math.min(275,245+(r.pop>=10?20:0)),'Esimene turg, kui toidu- ja ehitusvaru lubab');
+ if(age>=1&&r.pop>=6)add('market',Math.min(298,268+(r.pop>=10?24:0)),'Esimene turg ja mitmekesine toit kiirendavad linna kasvu');
  if(age>=1&&r.pop>=8)add('warehouse',172,'Kaubanduse ja ehitusmaterjalide põhilaod');
  if(age>=1&&r.pop>=10)add('cellar',168,'Linnakodanike ühine toidukelder');
  if(age>=3&&r.pop>=11){
@@ -147,7 +147,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   }
  }
  const nHouse=housing;
- const desiredHouses=Math.min(70,Math.ceil((r.pop+3)/1.5));
+ const desiredHouses=Math.min(70,Math.ceil((r.pop+(age===1?8:3))/1.5));
  if(nHouse<desiredHouses&&canAfford(stock,BUILDINGS.house.cost)){
   // A town capped at seven residents cannot staff its sawmill, farms,
   // universities or future industry. Housing is productive investment.
@@ -155,7 +155,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
    (gaps.plank>35&&(stock.plank||0)>=BUILDINGS.house.cost.plank+12)||
    (gaps.bread>0)||
    (gaps.wood>0&&(stock.wood||0)>=BUILDINGS.house.cost.wood+20);
-  if(enoughToInvest||capacity<=r.pop+1.5)add('house',r.pop>=capacity-2?238:missing?104:112,'Eluruumid ja järgmise rahvastikukasvu varu');
+  if(enoughToInvest||capacity<=r.pop+1.5)add('house',r.pop>=capacity-(age===1?6:2)?(age===1?274:238):missing?104:112,'Eluruumid ja järgmise rahvastikukasvu varu');
  }
  const foodCap=game.storageCap(city,'bread'),materialCap=game.storageCap(city,'plank');
  const eraCost=ERA_MATERIALS[science.ageWait?.id]||{};

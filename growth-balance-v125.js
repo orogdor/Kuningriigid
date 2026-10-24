@@ -8,8 +8,10 @@ export function cityCapacity(time,age){
 export function settlerPolicy({time,age,cities,pending,pop,food,lastAt,hasSettlement}){
  const capacity=cityCapacity(time,age);
  const interval=age<=1?6*60:age<=3?7*60:10*60;
- return {capacity,allow:hasSettlement&&cities+pending<capacity&&pending<2&&
-  time>=10*60&&time-(lastAt||0)>=interval&&pop>=7&&food>=Math.max(25,pop*2.2),
+ // Grow a capital and its resource village before financing more settlers.
+ const concentrate=(age===0&&cities>=2)||(age===1&&cities>=2&&pop<22);
+ return {capacity,allow:hasSettlement&&cities+pending<capacity&&pending<2&&!concentrate&&
+  time>=10*60&&time-(lastAt||0)>=interval&&pop>=(age===1?12:7)&&food>=Math.max(25,pop*2.2),
   interval};
 }
 export function armyCapacity(ownCities,age,atWar=false){
@@ -18,7 +20,7 @@ export function armyCapacity(ownCities,age,atWar=false){
  return Math.min(44,Math.max(6,3+ownCities*2+age*2+(atWar?7:0)));
 }
 export function knowledgeCostFactor(age){
- return [2.2,2.8,3.3,3.9,4.4,5.0,5.6][Math.max(0,Math.min(6,age||0))];
+ return [1.28,2.8,3.3,3.9,4.4,5.0,5.6][Math.max(0,Math.min(6,age||0))];
 }
 export function knowledgeCityMultiplier(n){
  // More cities are useful, but cannot double a civilization's research rate

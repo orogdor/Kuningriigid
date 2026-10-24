@@ -15,7 +15,8 @@ export function wallExtents(buildings=[],seed=0){
    !['palisade','stonewall','reinforced_wall','gatehouse','watchtower','stonetower','field','farm','harbor','fisher','quarry','lumber','forester','mine'].includes(b.type));
  const sorted=axis=>inner.map(b=>Math.abs(b[axis]||0)).sort((a,b)=>a-b);
  const x=sorted('x'),z=sorted('z');
- const limit=list=>list.length?list[Math.floor((list.length-1)*.78)]:31;
+ // Put roughly 90% of the dense central plots inside the first historic ring.
+ const limit=list=>list.length?list[Math.floor((list.length-1)*.90)]:31;
  const rx=Math.round(clamp(limit(x)+12,43,91)/7)*7;
  const rz=Math.round(clamp(limit(z)+12,34,77)/7)*7;
  return {rx,rz,cut:14,seed};
