@@ -1,5 +1,21 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V3.8 / ühine kaitseperimeeter ja linna vallutamine (2026-10-24)
+
+- `city_fortification_port.gd` sisaldab deterministlikku `perimeter_edges` loogikat: iga kindlustatud linnaruudu neli külge võrreldakse naaberruutudega; ühisel sisepiiril ei teki tarbetut müüri.
+- `exposed_corner` väldib kõrvutiste linnaruudu piiride sisemisi topelttorne. Üksiku ruudu neli välist nurgatorni säilivad.
+- `native_detail_tile.gd` joonistab välispiiri müürid ja ainult tegelikud välised nurgatornid, kasutades kahjustustega salvestatud müürilõike.
+- `siege_port_v131.gd` arvestab, millised välisseinad on valitud detailruudul olemas; sisemised tänavaühendused on avatud. Piiramislahingul on `city_home_c/r` tunnused, et kaitstud ruut võib olla ka linnasüdame naaberruut.
+- `city_capture_port.gd` muudab pärast *päriselt lõpetatud ja linnaga seotud hõivamist* linna riiki; tavaline välilahing või isoleeritud näidislinnus ei saa riigipiire ümber tõsta. Ehitised, linnavaru ja kindlustused säilivad; eelmise omaniku treeningjärjekord tühjeneb, teadusajastu joondatakse uue riigiga.
+- Vallutuse tulemus märgitakse `conquests`, `city_captures`, `captured_at` ning lahingulogisse. Vanad piiriallokatsioonid märgitakse aegunuks, et `Territory.rebuild` arvutaks uue riigi piirid.
+- Lahingu lõpetamisel salvestatakse müürikahjustused just kaitsjariigi linna, mitte samade koordinaatidega juhuslikku teist katse-linna. Vallutus ei saa topelt arvestust.
+- **GitHub Actionsi regressioonitestid: 724/724**, Godoti skriptide import, PCK-käivitus ja Android APK eksport: edukad.
+- Kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40101999186
+- Avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-69
+- **Hinnanguline V153 Godoti pordi valmidus: 47%**, töömahu üldine hinnang, mitte automaatmõõtmine.
+
+**Järgmised piirangud:** linnaruudud moodustavad ühise nähtava välisperimeetri, kuid tervel maksimaalselt 12×12 linnapiirkonnal ei ole veel ühist suurt 3D lahinguvälja. Linna vallutuse järel vajab tööjõu, kaubanduse, sõjagarnisoni ja UI värvide täielik kooskõlastamine täiendavat tööd. Android-telefoni tegelikku OTA uuendamist ei ole kaugelt kinnitatud.
+
 ## V3.7 / ehitatud linnamüürist päris piiramislahing (2026-10-24)
 
 - `Siege.from_city(city,tile,attacker,defender)` loeb ainult **päriselt ehitatud ja makstud puitvalli** ning loob sellele vastavad V131 piiramislahingu sektsioonid: 4 nurgatorni, läänevärav, välismüürid, 420 HP puitmüüri lõigud, 500 HP värav ja 520 HP puitkaitsetornid.
@@ -64,14 +80,14 @@
 - Godoti mänguprojekt: `game/` (Godot 4); Androidi APK ja PCK-käivitaja: `bootstrap/`.
 - Varasemad `godot-upload/v33/*.txt` osad jäävad arhiiviks, kuid uus CI ehitab **päris, muudetavatest failidest**.
 - Androidi CI: `.github/workflows/godot-apk-test.yml`.
-- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40100370121
-- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-62
+- Viimane kontrollitud CI: https://github.com/orogdor/Kuningriigid/actions/runs/40101999186
+- Viimane avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-69
 - Väljalasked luuakse `godot-dev-<workflow run number>` märgendiga *prerelease* ainult siis, kui regressioonitestid läbivad kontrolli.
 
 ## Kontrollitud (Godot 4.7.2 CI konteiner)
 
 - Pythoni staatilised testid ja GDScripti impordikontroll läbitud.
-- `V131_REGRESSION: 699/699` läbitud 2026-10-24.
+- `V131_REGRESSION: 724/724` läbitud 2026-10-24.
 - `game.pck` loomine ja `BOOTSTRAP_SMOKE_PASS` läbitud.
 - Androidi debug-APK edukalt eksporditud ja GitHubi avaldatud.
 - **Mitte kontrollitud:** päris Android-telefoni FPS, puutejuhtimine, seadmesse paigaldamine, võrgust PCK allalaadimine ja taaskäivituse andmete ühilduvus.
