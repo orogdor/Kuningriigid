@@ -7,7 +7,8 @@ territory=(root/'scripts/core/territory_port.gd').read_text()
 preview=(root/'scripts/core/preview_sim_port.gd').read_text()
 detail=(root/'scripts/adapters/native_detail_tile.gd').read_text()
 tests=(root/'tests/port_checks.gd').read_text()
-assert len(re.findall(r'^\s+_check\(',tests,re.M)) == 647
+assert len(re.findall(r'^\s+_check\(',tests,re.M)) >= 658
+assert 'v34-v153-urban-real-bounds' in tests
 for expected in ['static func urban_radius(', 'static func rebuild(', 'static func build_worksite(',
                  'static func choose_worksite(', 'static func reconcile_worksites(',
                  'static func advance_worksites(', 'static func deposit_kind(']:
@@ -29,4 +30,4 @@ assert 'Territory.advance_worksites(city,dt)' in preview
 assert '_create_county_worksites(towns[owner_index])' in detail
 assert '_run_rule_checks()' not in main.split('func _ready() -> void:',1)[1].split('func _setup_lighting()',1)[0]
 assert all(k in tests for k in ['v22-no-overseas-claim','v22-city-urban-fallback','v22-rural-worksite-saveable'])
-print('PASS: V2.2 territory/building/demo wiring, 647 prepared GDScript assertions, backwards-compatible load paths; Godot runtime NOT tested')
+print('PASS: V2.2 territory/building/demo wiring, 658+ prepared GDScript assertions, backwards-compatible load paths; Godot runtime NOT tested')
