@@ -5,6 +5,8 @@ extends RefCounted
 const Campaign = preload("res://scripts/core/campaign_port.gd")
 const DetailNavigation = preload("res://scripts/core/detail_navigation_port.gd")
 var fine_navigation = DetailNavigation.new()
+# The atlas route planner can be used before the high-resolution terrain loads.
+var detail_ready: bool = false
 var terrain: PackedByteArray = PackedByteArray()
 var cache: Dictionary = {}
 var searches: int = 0
@@ -13,6 +15,7 @@ var unreachable: int = 0
 
 func configure(passable: PackedByteArray) -> void:
     terrain = passable.duplicate()
+    detail_ready = false
     cache.clear()
     searches = 0
     hits = 0
@@ -56,9 +59,16 @@ func is_open(p: Vector2i) -> bool:
 func configure_detail(heights: PackedFloat32Array,towns: Array,crossings: Dictionary = {},landscape = null) -> void:
     # Runtime-only navigation cache: no large grid data in saved games.
     fine_navigation.configure(heights,towns,crossings,landscape)
+    detail_ready = true
 
 func detail_edge(a: Vector2i,b: Vector2i) -> Dictionary:
+    if not detail_ready:
+        # Before detail terrain is configured, preserve legal one-tile atlas
+        # movement. Once configured, fine_navigation.edge() has full authority
+        # to reject steep slopes, rivers and impassable detail crossings.
+        var adjacent: bool = absi(a.x-b.x)+absi(a.y-b.y) == 1
+        return {"ok":adjacent and is_open(a) and is_open(b),"length":1.0,"points":[]}
     return fine_navigation.edge(a,b)
 
 func detail_version() -> int:
-    return fine_navigation.revision
+    return fine_navigation.revision if detail_ready else 0
