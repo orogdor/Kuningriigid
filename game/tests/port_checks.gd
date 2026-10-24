@@ -969,6 +969,9 @@ static func run() -> Dictionary:
     _check(results,"v39-old-release-update-visible",bool(version_old["update"]) and str(version_old["latest"])=="godot-dev-70")
     _check(results,"v39-no-unsupported-offline-latest-claim",not bool(version_offline["verified"]) and str(version_offline["latest"])=="")
     _check(results,"v39-ui-shows-installed-number",BuildVersion.hud_text(version_old).contains("godot-dev-69"))
+    _check(results,"v39-ui-shows-update-warning",BuildVersion.hud_text(version_old).contains("UUENDUS"))
+    _check(results,"v39-ui-shows-verified-status",BuildVersion.hud_text(version_current).contains("UUSIM"))
+    _check(results,"v39-offline-ui-does-not-say-latest",not BuildVersion.hud_text(version_offline).contains("UUSIM"))
     _check(results,"v39-buildfile-in-project",BuildVersion.snapshot().has("tag"))
     _check(results,"v39-releases-picks-highest-not-first",BuildVersion.latest_from_releases([
         {"tag_name":"godot-dev-62","draft":false},

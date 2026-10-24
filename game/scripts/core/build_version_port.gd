@@ -61,8 +61,12 @@ static func snapshot() -> Dictionary:
 
 static func hud_text(data: Dictionary) -> String:
     var installed: String = str(data.get("tag","teadmata"))
-    var status: String = str(data.get("status","KONTROLLIMATA"))
-    return installed+"  |  "+status
+    var short_state: String = "? KONTROLLIMATA"
+    if bool(data.get("update",false)):
+        short_state = "↑ UUENDUS"
+    elif bool(data.get("verified",false)):
+        short_state = "✓ UUSIM"
+    return installed+"  |  "+short_state
 
 static func detail_text(data: Dictionary) -> String:
     var latest: String = str(data.get("latest",""))

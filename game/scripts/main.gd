@@ -428,7 +428,7 @@ func _setup_ui() -> void:
     build_version_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     build_version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
     build_version_label.add_theme_font_size_override("font_size",15)
-    build_version_label.custom_minimum_size.x = 310.0
+    build_version_label.custom_minimum_size.x = 225.0
     build_version_label.text = BuildVersion.hud_text(build_version_state)
     bar.add_child(build_version_label)
     # Keep legacy information fields for diagnostics, but do not allow their
