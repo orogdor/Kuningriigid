@@ -7,6 +7,7 @@ const MIN_TOTAL_POPULATION: int = 20
 const TURN_LIMIT: int = 90
 const GAME_SECONDS_PER_TURN: float = 60.0
 const PLAYER_TEAM: int = 0
+const SAVE_PATH: String = "user://kuningriigid_campaign_v1.json"
 
 static func is_active(state: Dictionary) -> bool:
     return bool(state.get("campaign",{}).get("active",false))

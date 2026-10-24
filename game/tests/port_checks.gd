@@ -12,6 +12,7 @@ const Army = preload("res://scripts/core/army_experience_port.gd")
 const Era = preload("res://scripts/core/era_economy_port.gd")
 const Tech125 = preload("res://scripts/core/research_v125_port.gd")
 const Preview = preload("res://scripts/core/preview_sim_port.gd")
+const CampaignPlay = preload("res://scripts/core/campaign_play_port.gd")
 const Build = preload("res://scripts/core/building_rules_port.gd")
 const Labor = preload("res://scripts/core/labor_port.gd")
 const PreviewAI = preload("res://scripts/core/preview_ai_port.gd")
@@ -51,6 +52,52 @@ const BattleSurface = preload("res://scripts/core/battle_surface_v131.gd")
 
 static func run() -> Dictionary:
     var results: Array = []
+    # V4.1 playable early campaign: original economic engine remains authoritative.
+    var campaign_cities: Array = [
+        {"id":0,"team":0,"c":20,"r":20,"name":"Alguslinn"},
+        {"id":1,"team":1,"c":45,"r":20,"name":"Vastane 1"},
+        {"id":2,"team":2,"c":70,"r":20,"name":"Vastane 2"},
+        {"id":3,"team":3,"c":95,"r":20,"name":"Vastane 3"}]
+    var campaign_state: Dictionary = Preview.initialize(campaign_cities)
+    _check(results,"v41-campaign-refuses-unknown-faction",not bool(CampaignPlay.begin(campaign_state,5).get("ok",false)))
+    var began: Dictionary = CampaignPlay.begin(campaign_state)
+    _check(results,"v41-campaign-start",bool(began.get("ok",false)) and CampaignPlay.is_running(campaign_state))
+    _check(results,"v41-campaign-ai-enabled",bool(campaign_state["ai_enabled"]))
+    _check(results,"v41-player-owns-city",CampaignPlay.owns_city(campaign_state,0))
+    _check(results,"v41-opponent-city-not-controlled",not CampaignPlay.owns_city(campaign_state,1))
+    _check(results,"v41-player-next-city",CampaignPlay.own_city_index(campaign_state,-1)==0)
+    _check(results,"v41-player-only-one-city",CampaignPlay.own_city_index(campaign_state,0)==0)
+    _check(results,"v41-starts-stone-age",int(CampaignPlay.team_stats(campaign_state,0)["age"])==0)
+    var turn_baseline: float = float(campaign_state["seconds"])
+    Preview.tick(campaign_state,CampaignPlay.GAME_SECONDS_PER_TURN)
+    var first_turn: Dictionary = CampaignPlay.finish_turn(campaign_state)
+    _check(results,"v41-first-turn-persisted",bool(first_turn.get("ok",false)) and int(campaign_state["campaign"]["turn"])==1)
+    _check(results,"v41-turn-clock-correct",is_equal_approx(float(campaign_state["seconds"])-turn_baseline,60.0))
+    _check(results,"v41-ai-started-research",int(campaign_state.get("ai_research_orders",0))>0)
+    _check(results,"v41-turn-history",campaign_state["campaign"]["history"].size()==1)
+    var player_score: Dictionary = CampaignPlay.team_stats(campaign_state,0)
+    _check(results,"v41-score-has-own-town",int(player_score["cities"])==1 and int(player_score["population"])>=1)
+    _check(results,"v41-score-four-factions",CampaignPlay.standings(campaign_state).size()==4)
+    _check(results,"v41-campaign-info-shows-turn",CampaignPlay.text_status(campaign_state).contains("KÄIK 1"))
+    var campaign_save_ok: bool = Preview.save_preview(campaign_state,"user://v41_campaign_regression.json")
+    var campaign_load: Dictionary = Preview.load_preview(campaign_cities,"user://v41_campaign_regression.json")
+    _check(results,"v41-save-load-campaign",campaign_save_ok and CampaignPlay.is_active(campaign_load) and int(campaign_load["campaign"]["turn"])==1)
+    if FileAccess.file_exists("user://v41_campaign_regression.json"):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v41_campaign_regression.json"))
+    var victorious: Dictionary = Preview.initialize(campaign_cities)
+    CampaignPlay.begin(victorious)
+    victorious["teams"][0]["age"] = 1
+    victorious["cities"][0]["pop"] = 23
+    _check(results,"v41-win-goal-requires-era-and-pop",str(CampaignPlay.evaluate(victorious)["result"])=="won")
+    _check(results,"v41-after-win-no-extra-turns",not bool(CampaignPlay.finish_turn(victorious).get("ok",false)))
+    var defeated: Dictionary = Preview.initialize(campaign_cities)
+    CampaignPlay.begin(defeated)
+    defeated["cities"][0]["team"] = 1
+    _check(results,"v41-no-cities-loses",str(CampaignPlay.evaluate(defeated)["result"])=="lost")
+    var overtime: Dictionary = Preview.initialize(campaign_cities)
+    CampaignPlay.begin(overtime)
+    overtime["campaign"]["turn"] = CampaignPlay.TURN_LIMIT
+    _check(results,"v41-turn-limit-loses",str(CampaignPlay.evaluate(overtime)["result"])=="lost")
     _check(results, "grid-size", Campaign.COLS * Campaign.ROWS == 36300)
     _check(results, "world-center", Campaign.center(0,0) == Vector2(-625,-525))
     _check(results, "coordinate-roundtrip", Campaign.cell_at(-625,-525) == Vector2i(0,0))

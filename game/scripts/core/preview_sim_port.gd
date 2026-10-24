@@ -272,17 +272,16 @@ static func preview_summary(state: Dictionary, city_index: int) -> String:
         Needs.food_total(stock),float(stock["water"]),city["buildings"].size(),
         String(team_state["active"]),float(team_state["progress"]),float(needs["productivity"]),int(state.get("ai_build_orders",0)),int(state.get("produced_cycles",0)),city.get("cargo",[]).size(),int(state.get("cargo_deliveries",0)),int(state.get("market_deliveries",0)),int(state.get("trade_dispatched",0)),int(state.get("trade_arrived",0))]
 
-static func save_preview(state: Dictionary) -> bool:
-    var file := FileAccess.open("user://v131_godot_preview_v25.json",FileAccess.WRITE)
+static func save_preview(state: Dictionary,path: String = "user://v131_godot_preview_v25.json") -> bool:
+    var file := FileAccess.open(path,FileAccess.WRITE)
     if file == null:
         return false
     file.store_string(JSON.stringify(state))
     file.close()
     return true
 
-static func load_preview(manifest_cities: Array) -> Dictionary:
-    var path := "user://v131_godot_preview_v25.json"
-    if not FileAccess.file_exists(path):
+static func load_preview(manifest_cities: Array,path: String = "user://v131_godot_preview_v25.json") -> Dictionary:
+    if not FileAccess.file_exists(path) and path == "user://v131_godot_preview_v25.json":
         # Read existing preview saves but leave originals untouched.
         for legacy in ["user://v131_godot_preview_v24.json","user://v131_godot_preview_v23.json","user://v131_godot_preview_v22.json","user://v131_godot_preview_v14.json","user://v131_godot_preview_v13.json", "user://v131_godot_preview_v12.json", "user://v131_godot_preview_v11.json","user://v131_godot_preview_v10.json","user://v131_godot_preview_v09.json","user://v131_godot_preview_v08.json","user://v131_godot_preview_v07.json","user://v131_godot_preview_v06.json", "user://v131_godot_preview_v05.json", "user://v131_godot_preview_v02.json"]:
             if FileAccess.file_exists(legacy):

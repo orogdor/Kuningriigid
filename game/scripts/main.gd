@@ -422,6 +422,8 @@ func _campaign_end_turn() -> void:
     PreviewSim.tick(preview_state,CampaignPlay.GAME_SECONDS_PER_TURN,
         local_streets if street_nav_on else null,world_trade_nav,shared_landscape)
     var result: Dictionary = CampaignPlay.finish_turn(preview_state)
+    if bool(result.get("ok",false)):
+        PreviewSim.save_preview(preview_state,CampaignPlay.SAVE_PATH)
     road_time = float(preview_state.get("seconds",road_time))
     if Territory.rebuild(preview_state,land):
         Territory.reconcile_worksites(preview_state,land,heights)
@@ -830,7 +832,7 @@ func _menu_action(action_id: String) -> void:
         "campaign_house": _preview_build("house")
         "campaign_lumber": _preview_build("lumber")
         "campaign_save": _preview_save()
-        "campaign_load": _preview_load()
+        "campaign_load": _preview_load(CampaignPlay.SAVE_PATH)
         "infantry_battle": _show_battle_view()
         "artillery":
             _artillery_battle_demo()
@@ -1163,12 +1165,13 @@ func _tint_material() -> StandardMaterial3D:
 func _build_cities() -> void:
     if is_instance_valid(city_node):
         city_node.queue_free()
+    var towns: Array = preview_state.get("cities",cities)
     var cube := BoxMesh.new()
     cube.size=Vector3(1.5,2.7,1.5)
     cube.material=_tint_material()
-    city_node=_make_multi(cities.size(),cube)
-    for i in range(cities.size()):
-        var city = cities[i]
+    city_node=_make_multi(towns.size(),cube)
+    for i in range(towns.size()):
+        var city = towns[i]
         var c: int = int(city["c"])
         var r: int = int(city["r"])
         city_node.multimesh.set_instance_transform(i,Transform3D(Basis(),Vector3(c+.5,_ground(c,r)*.52+1.45,r+.5)))
@@ -2951,10 +2954,10 @@ func _preview_save() -> void:
     if city_stress_index >= 0:
         status_label.text = "Sünteetilist linnakatset ei salvestata. Vajuta Taasta linn."
         return
-    var saved: bool = PreviewSim.save_preview(preview_state)
+    var saved: bool = PreviewSim.save_preview(preview_state,CampaignPlay.SAVE_PATH if CampaignPlay.is_active(preview_state) else "user://v131_godot_preview_v25.json")
     status_label.text = ("KAMPAANIA SALVESTATUD" if CampaignPlay.is_active(preview_state) else "KATSESEIS SALVESTATUD") if saved else "Salvestamine ei õnnestunud"
 
-func _preview_load() -> void:
+func _preview_load(path: String = "user://v131_godot_preview_v25.json") -> void:
     if not wall_demo_backup.is_empty():
         _stop_wall_demo()
     if not county_demo_backup.is_empty():
@@ -2964,7 +2967,7 @@ func _preview_load() -> void:
         _stop_territory_demo()
     if city_stress_index >= 0:
         _stop_city_stress()
-    var data: Dictionary = PreviewSim.load_preview(cities)
+    var data: Dictionary = PreviewSim.load_preview(cities,path)
     if data.is_empty():
         status_label.text = "Ühilduvat katseolekut ei leitud"
         return
