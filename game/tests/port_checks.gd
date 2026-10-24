@@ -1025,7 +1025,12 @@ static func run() -> Dictionary:
     # Run through the actual finished-battle state update, rather than just
     # calling the pure city-capture helper.
     linked_state["individual_battle"]["siege"]["captured"] = true
+    _check(results,"v38-debug-battle-siege-captured",bool(linked_state["individual_battle"]["siege"].get("captured",false)))
     IndividualBattle.tick(linked_state,0.12)
+    _check(results,"v38-debug-battle-stopped",linked_state["individual_battle"].is_empty())
+    _check(results,"v38-debug-city-owner-updated",int(linked_state["cities"][1]["team"])==0)
+    _check(results,"v38-debug-city-capture-count",int(linked_state.get("city_captures",0))==1)
+    _check(results,"v38-debug-battle-log-exists",not linked_state["battle_log"].is_empty())
     _check(results,"v38-actual-battle-finish-changes-flag",linked_state["individual_battle"].is_empty() and int(linked_state["cities"][1]["team"])==0)
     _check(results,"v38-actual-conquest-logged",int(linked_state.get("city_captures",0))==1 and not linked_state["battle_log"].is_empty())
     # V3.5: core-first building placement extends only into owned urban cells.
