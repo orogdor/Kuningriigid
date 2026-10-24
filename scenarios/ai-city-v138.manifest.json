@@ -3,103 +3,283 @@
   "roster": [
     {
       "team": 1,
-      "cities": 3,
-      "buildings": 117,
-      "markets": 1,
-      "harbors": 0,
-      "houses": 45,
-      "fields": 3,
-      "ages": 3
+      "cities": 11,
+      "buildings": 287,
+      "markets": 5,
+      "harbors": 1,
+      "houses": 67,
+      "fields": 1,
+      "ages": 4
     },
     {
       "team": 2,
-      "cities": 4,
-      "buildings": 109,
-      "markets": 0,
+      "cities": 5,
+      "buildings": 163,
+      "markets": 2,
       "harbors": 0,
-      "houses": 39,
-      "fields": 1,
-      "ages": 2
+      "houses": 50,
+      "fields": 2,
+      "ages": 4
     },
     {
       "team": 3,
-      "cities": 2,
-      "buildings": 76,
-      "markets": 0,
+      "cities": 6,
+      "buildings": 139,
+      "markets": 2,
       "harbors": 0,
-      "houses": 28,
-      "fields": 2,
-      "ages": 1
+      "houses": 52,
+      "fields": 3,
+      "ages": 2
     }
   ],
   "landUse": [
     {
       "name": "Idaküla 1",
-      "owned": 363,
+      "owned": 151,
       "developed": 4,
       "ruralDeveloped": 0,
-      "planned": 1,
-      "homes": 23,
-      "foodGrowthBonus": 0.15000000000000002
+      "planned": 2,
+      "homes": 12,
+      "foodGrowthBonus": 0.30000000000000004
     },
     {
       "name": "Idaküla 2",
-      "owned": 308,
-      "developed": 3,
+      "owned": 363,
+      "developed": 4,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 19,
-      "foodGrowthBonus": 0
+      "foodGrowthBonus": 0.30000000000000004
     },
     {
       "name": "Idaküla 3",
+      "owned": 137,
+      "developed": 4,
+      "ruralDeveloped": 1,
+      "planned": 0,
+      "homes": 8,
+      "foodGrowthBonus": 0.30000000000000004
+    },
+    {
+      "name": "Idaküla 4",
+      "owned": 18,
+      "developed": 3,
+      "ruralDeveloped": 1,
+      "planned": 0,
+      "homes": 3,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 5",
+      "owned": 124,
+      "developed": 5,
+      "ruralDeveloped": 1,
+      "planned": 0,
+      "homes": 5,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 6",
+      "owned": 243,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 9,
+      "foodGrowthBonus": 0.30000000000000004
+    },
+    {
+      "name": "Idaküla 7",
+      "owned": 40,
+      "developed": 4,
+      "ruralDeveloped": 2,
+      "planned": 0,
+      "homes": 2,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 8",
       "owned": 75,
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 3,
       "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 9",
+      "owned": 44,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 3,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 10",
+      "owned": 75,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 2,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 11",
+      "owned": 27,
+      "developed": 3,
+      "ruralDeveloped": 1,
+      "planned": 0,
+      "homes": 1,
+      "foodGrowthBonus": 0
     }
   ],
   "density": [
     {
       "city": "Idaküla 1",
-      "nearEdge": 4,
+      "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 81,
-      "urbanTiles": 91
+      "urbanBuildings": 100,
+      "urbanTiles": 59
     },
     {
       "city": "Idaküla 2",
-      "nearEdge": 1,
+      "nearEdge": 2,
       "expanded": 0,
-      "urbanBuildings": 26,
+      "urbanBuildings": 92,
       "urbanTiles": 90
     },
     {
       "city": "Idaküla 3",
       "nearEdge": 0,
       "expanded": 0,
+      "urbanBuildings": 18,
+      "urbanTiles": 58
+    },
+    {
+      "city": "Idaküla 4",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 6,
+      "urbanTiles": 17
+    },
+    {
+      "city": "Idaküla 5",
+      "nearEdge": 1,
+      "expanded": 0,
+      "urbanBuildings": 12,
+      "urbanTiles": 35
+    },
+    {
+      "city": "Idaküla 6",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 23,
+      "urbanTiles": 60
+    },
+    {
+      "city": "Idaküla 7",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 4,
+      "urbanTiles": 18
+    },
+    {
+      "city": "Idaküla 8",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 7,
+      "urbanTiles": 19
+    },
+    {
+      "city": "Idaküla 9",
+      "nearEdge": 0,
+      "expanded": 0,
       "urbanBuildings": 7,
       "urbanTiles": 17
+    },
+    {
+      "city": "Idaküla 10",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 7,
+      "urbanTiles": 18
+    },
+    {
+      "city": "Idaküla 11",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 3,
+      "urbanTiles": 6
     }
   ],
   "seed": 138023,
   "turn": 246,
   "sourceTeam": 1,
-  "cities": 3,
-  "buildings": 117,
+  "cities": 11,
+  "buildings": 287,
   "spacingPairs": [
+    9,
     10,
-    11,
-    19
+    15,
+    13,
+    18,
+    24,
+    28,
+    61,
+    37,
+    17,
+    10,
+    15,
+    22,
+    18,
+    24,
+    28,
+    61,
+    37,
+    26,
+    9,
+    16,
+    28,
+    14,
+    38,
+    51,
+    47,
+    19,
+    24,
+    33,
+    9,
+    43,
+    46,
+    52,
+    28,
+    12,
+    30,
+    22,
+    67,
+    31,
+    19,
+    42,
+    10,
+    79,
+    19,
+    31,
+    52,
+    37,
+    61,
+    27,
+    89,
+    9,
+    41,
+    98,
+    48,
+    50
   ],
   "ages": [
-    3,
+    4,
     0,
-    2,
-    1
+    4,
+    2
   ],
-  "bytes": 1384228,
-  "seconds": 116
+  "bytes": 3203076,
+  "seconds": 237
 }
