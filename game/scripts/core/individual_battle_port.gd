@@ -152,6 +152,16 @@ static func start(state: Dictionary, first_id: int, second_id: int) -> Dictionar
         var connected: Dictionary = Siege.from_city(town,tile,attacker_team,defender_team)
         if not connected.is_empty():
             active["siege"] = connected
+            # The city's defending team must spawn INSIDE the eastern walls,
+            # regardless of which army was passed as the first argument.
+            if int(a["team"]) == defender_team:
+                for line in active["squads"]:
+                    var side_x: float = 17.0 if int(line["team"]) == defender_team else -17.0
+                    var shift_x: float = side_x-float(line["anchor"]["x"])
+                    line["anchor"]["x"] = side_x
+                    line["side"] = 1 if int(line["team"]) == defender_team else -1
+                    for man in line["men"]:
+                        man["x"] = float(man["x"])+shift_x
             Siege.attach_guards(active)
             active["linked_city_siege"] = true
         break
