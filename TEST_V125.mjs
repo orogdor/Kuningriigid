@@ -26,7 +26,8 @@ assert.equal(s.strategyPacingV125,true,'new campaigns have longer pacing');
 for(let i=0;i<8;i++){game.aiTeam(0);game.tick(12)}
 assert.ok(s.cities.some(c=>c.team===0),'AI founds initial town');
 const t=TECHS.stone_tools;
-assert.ok(researchCost(s,t)>t.turns*20,'Research now costs more than V124');
+assert.ok(researchCost(s,t)>t.turns*10,'Stone research stays nontrivial even with the V160 earlier Bronze entry');
+assert.ok(researchCost(s,{...t,age:1})>researchCost(s,t),'Bronze technologies are costlier than Stone technologies');
 const r=s.research[0],id=r.active;
 if(!id)r.active='stone_tools';
 const snapshot=JSON.parse(JSON.stringify(s));
