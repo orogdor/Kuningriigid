@@ -28,6 +28,10 @@ jobs:
           test -s game/project.godot
           test -s bootstrap/project.godot
           test -s game/tests/port_checks.gd
+          if ! command -v python3 >/dev/null 2>&1; then
+            apt-get update -qq
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3
+          fi
           python3 --version
           echo 'Building editable GitHub branch source, not the old compressed v3.3 snapshot.'
       - name: Static validations
