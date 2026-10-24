@@ -17,8 +17,11 @@ export function wallExtents(buildings=[],seed=0){
  const x=sorted('x'),z=sorted('z');
  // Put roughly 90% of the dense central plots inside the first historic ring.
  const limit=list=>list.length?list[Math.floor((list.length-1)*.90)]:31;
- const rx=Math.round(clamp(limit(x)+12,43,91)/7)*7;
- const rz=Math.round(clamp(limit(z)+12,34,77)/7)*7;
+ // Defensive stone ring surrounds the oldest dense neighbourhood, not the
+ // whole future 12x12 city territory. Keep every segment within a practical
+ // buildable central footprint; suburbs may get a later outer ring.
+ const rx=Math.round(clamp(limit(x)+12,43,63)/7)*7;
+ const rz=Math.round(clamp(limit(z)+12,34,49)/7)*7;
  return {rx,rz,cut:14,seed};
 }
 export function ancientWallPlan(buildings=[],wall='palisade',tower='watchtower',seed=0){
