@@ -3,31 +3,31 @@
   "roster": [
     {
       "team": 1,
-      "cities": 4,
-      "buildings": 96,
-      "markets": 1,
+      "cities": 5,
+      "buildings": 101,
+      "markets": 2,
       "harbors": 0,
-      "houses": 38,
+      "houses": 39,
       "fields": 2,
       "ages": 2
     },
     {
       "team": 2,
       "cities": 5,
-      "buildings": 168,
+      "buildings": 165,
       "markets": 2,
       "harbors": 0,
-      "houses": 46,
-      "fields": 1,
+      "houses": 45,
+      "fields": 3,
       "ages": 3
     },
     {
       "team": 3,
       "cities": 2,
-      "buildings": 129,
+      "buildings": 119,
       "markets": 2,
       "harbors": 0,
-      "houses": 41,
+      "houses": 46,
       "fields": 1,
       "ages": 2
     }
@@ -35,36 +35,36 @@
   "landUse": [
     {
       "name": "Põhjaküla 1",
-      "owned": 363,
-      "developed": 4,
+      "owned": 328,
+      "developed": 5,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 20,
+      "homes": 21,
       "foodGrowthBonus": 0.2
     },
     {
       "name": "Põhjaküla 2",
-      "owned": 243,
-      "developed": 5,
+      "owned": 363,
+      "developed": 4,
       "ruralDeveloped": 0,
-      "planned": 3,
-      "homes": 16,
+      "planned": 0,
+      "homes": 15,
       "foodGrowthBonus": 0.2
     },
     {
       "name": "Põhjaküla 3",
-      "owned": 147,
+      "owned": 39,
       "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 5,
+      "homes": 4,
       "foodGrowthBonus": 0
     },
     {
       "name": "Põhjaküla 4",
-      "owned": 56,
+      "owned": 75,
       "developed": 3,
-      "ruralDeveloped": 1,
+      "ruralDeveloped": 0,
       "planned": 0,
       "homes": 3,
       "foodGrowthBonus": 0
@@ -72,7 +72,7 @@
     {
       "name": "Põhjaküla 5",
       "owned": 75,
-      "developed": 3,
+      "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 2,
@@ -84,35 +84,35 @@
       "city": "Põhjaküla 1",
       "nearEdge": 1,
       "expanded": 0,
-      "urbanBuildings": 88,
+      "urbanBuildings": 81,
       "urbanTiles": 89
     },
     {
       "city": "Põhjaküla 2",
-      "nearEdge": 3,
+      "nearEdge": 1,
       "expanded": 0,
-      "urbanBuildings": 57,
-      "urbanTiles": 58
+      "urbanBuildings": 55,
+      "urbanTiles": 92
     },
     {
       "city": "Põhjaküla 3",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 10,
+      "urbanBuildings": 13,
       "urbanTiles": 37
     },
     {
       "city": "Põhjaküla 4",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 6,
+      "urbanBuildings": 7,
       "urbanTiles": 17
     },
     {
       "city": "Põhjaküla 5",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 5,
+      "urbanBuildings": 6,
       "urbanTiles": 18
     }
   ],
@@ -121,44 +121,43 @@
       "name": "Põhjaküla 1",
       "centreHouses": 15,
       "mainTileHouses": 16,
-      "totalHouses": 20,
-      "walls": 33,
+      "totalHouses": 21,
+      "walls": 26,
       "gates": 1,
-      "wallPlan": 76,
+      "wallPlan": 60,
       "services": {
         "well": 1,
         "study": 1,
-        "scriptorium": 1,
         "market": 1,
+        "scriptorium": 1,
         "warehouse": 1,
         "cellar": 1
       }
     },
     {
       "name": "Põhjaküla 2",
-      "centreHouses": 11,
-      "mainTileHouses": 14,
-      "totalHouses": 16,
-      "walls": 30,
-      "gates": 2,
-      "wallPlan": 60,
+      "centreHouses": 12,
+      "mainTileHouses": 15,
+      "totalHouses": 15,
+      "walls": 25,
+      "gates": 1,
+      "wallPlan": 56,
       "services": {
         "well": 1,
         "market": 1,
-        "scriptorium": 1
+        "scriptorium": 1,
+        "warehouse": 1
       }
     },
     {
       "name": "Põhjaküla 3",
-      "centreHouses": 5,
-      "mainTileHouses": 5,
-      "totalHouses": 5,
+      "centreHouses": 4,
+      "mainTileHouses": 4,
+      "totalHouses": 4,
       "walls": 0,
       "gates": 0,
       "wallPlan": 0,
-      "services": {
-        "well": 1
-      }
+      "services": {}
     },
     {
       "name": "Põhjaküla 4",
@@ -168,7 +167,9 @@
       "walls": 0,
       "gates": 0,
       "wallPlan": 0,
-      "services": {}
+      "services": {
+        "well": 1
+      }
     },
     {
       "name": "Põhjaküla 5",
@@ -185,18 +186,18 @@
   "turn": 201,
   "sourceTeam": 2,
   "cities": 5,
-  "buildings": 168,
+  "buildings": 165,
   "spacingPairs": [
     11,
+    11,
     24,
-    12,
-    15,
-    13,
-    23,
     16,
-    36,
-    29,
-    9
+    22,
+    13,
+    15,
+    35,
+    9,
+    26
   ],
   "ages": [
     3,
@@ -204,6 +205,6 @@
     0,
     2
   ],
-  "bytes": 1715919,
-  "seconds": 141
+  "bytes": 1741177,
+  "seconds": 134
 }
