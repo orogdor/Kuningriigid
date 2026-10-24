@@ -85,7 +85,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  if(age>=1&&r.pop>=11&&hasCivic&&edibleSupply(stock)>=r.pop*2.3&&
     (stock.stone||0)>=45){
   if((stock.cutstone||0)<26&&!buildings.some(b=>b.type==='mason'&&b.hp>0))add('mason',r.pop>=14?251:215,'Kiviraidur linnamüüri rajamiseks');
-  if(!buildings.some(b=>b.type==='barracks'&&b.hp>0))add('barracks',r.pop>=14?245:201,'Kodanike ja linnamüüri kaitsjate väljaõpe');
+  if(!buildings.some(b=>b.type==='barracks'&&b.hp>0))add('barracks',r.pop>=14?268:243,'Linna esimene kasarm ja väliväe väljaõpe');
  }
  // V136: every established town needs civic functions, not only production buildings.
  // A Bronze settlement without a marketplace is still a village; reserve time
