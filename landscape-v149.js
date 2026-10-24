@@ -39,9 +39,9 @@ export function terrainMaterial(scope='world',tile=null){
  const map=worldMapping(scope,tile),detail=scope!=='world';
  material.onBeforeCompile=shader=>{
   inject(shader,{
-   vertexHead:'varying vec3 vL149P;varying vec3 vL149N;',
-   vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`,
-   fragHead:'varying vec3 vL149P;varying vec3 vL149N;',
+   vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':''),
+   vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':''),
+   fragHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;':''),
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);
@@ -50,12 +50,30 @@ export function terrainMaterial(scope='world',tile=null){
  // above ~70 m the grass thins into yellow-grey alpine turf
  float alpine=smoothstep(70.0,105.0,elev+nBroad*18.0);
  land=mix(land,land*vec3(.86,.90,.72)+vec3(.02,.025,.0),alpine*.6);
- ${detail?`// close-up ground grain: tufts, bare soil and small stones (faded out where it would alias)
- float aa=1.0-smoothstep(.35,1.0,fwidth(lp.x*19.0)+fwidth(lp.y*19.0));
- float g1=l149n(lp*7.0),g2=l149n(lp*19.0);
- land*=1.0+((g1-.5)*.16+(g2-.5)*.12)*aa;
- float pebbles=smoothstep(.80,.88,l149n(lp*11.0+3.1))*smoothstep(35.0,65.0,elev)*aa;
- land=mix(land,vec3(.40,.38,.35)*(.9+g2*.2),pebbles*.55);`:''}
+ ${detail?`// V156 close-up ground, in local detail-map units: meadow hue patches, grass clumps,
+ // blade streaks, bare soil, wild-flower specks and pebbles, plus a small bump for relief light.
+ // Fine detail fades out where it would alias (fwidth).
+ vec2 q=vL156L;
+ float aa=1.0-smoothstep(.35,1.1,(fwidth(q.x)+fwidth(q.y))*1.4);
+ float grassy=smoothstep(.0,.05,land.g-land.r)*(1.0-alpine*.5);
+ float mm=l149n(q*.021+3.0)*.6+l149n(q*.052+7.0)*.4;
+ vec3 lush=land*vec3(.84,1.0,.82),dryC=land*vec3(1.13,1.05,.76)+vec3(.035,.02,0.0);
+ land=mix(land,mix(lush,dryC,smoothstep(.38,.74,mm)),grassy*.7);
+ float cl=l149n(q*.55),cl2=l149n(q*1.7+4.0);
+ land*=1.0+((cl-.5)*.30+(cl2-.5)*.22*aa)*grassy;
+ float bl=l149n(q*3.1+1.7)*.55+l149n(q*7.3+5.2)*.45;
+ land*=1.0+(bl-.5)*.30*grassy*aa;
+ float tuft=smoothstep(.55,.75,l149n(q*2.2+9.0));land=mix(land,land*vec3(.80,.95,.70),tuft*grassy*aa*.35);
+ float soil=smoothstep(.80,.90,l149n(q*.048+11.0)*.75+l149n(q*.11+2.0)*.25+(l149n(q*.6)-.5)*.22);
+ vec3 soilC=mix(land,vec3(.40,.32,.22),.75)*(.85+l149n(q*2.3)*.28);
+ land=mix(land,soilC,soil*grassy*.7);
+ vec2 fcell=floor(q*1.3),ff=fract(q*1.3)-.5;float fh=l149h(fcell);
+ float flower=step(.962,fh)*(1.0-smoothstep(.09,.15,length(ff-(vec2(l149h(fcell+3.1),l149h(fcell+7.7))-.5)*.6)));
+ vec3 fc=fh>.988?vec3(.96,.94,.86):fh>.977?vec3(.94,.80,.24):vec3(.68,.52,.86);
+ land=mix(land,fc,flower*grassy*aa*(1.0-soil)*smoothstep(.42,.62,l149n(q*.04+5.0)));
+ float pebbles=smoothstep(.82,.90,l149n(q*2.6+3.1))*aa*(soil*.8+smoothstep(35.0,65.0,elev)+(1.0-grassy)*.4);
+ land=mix(land,vec3(.52,.50,.46)*(.85+cl2*.3),min(1.0,pebbles)*.6);
+ t156Bump=(cl*.7+bl*.35*aa+cl2*.25*aa-soil*.5+pebbles*.6)*grassy+pebbles*.4;`:''}
  // rock appears on steep ground, earlier the higher it is
  float rockAt=mix(.42,.20,smoothstep(30.0,95.0,elev));
  float rock=smoothstep(rockAt-.07,rockAt+.09,slope+(nMid-.5)*.16)*smoothstep(16.0,34.0,elev);
@@ -76,8 +94,14 @@ export function terrainMaterial(scope='world',tile=null){
  col=mix(col,vec3(.84,.86,.90)*(.95+nFine*.06),snow);
  diffuseColor.rgb=col;`});
   shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n roughnessFactor=1.0;');
+  if(detail)shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+ { // V156 bump from the ground pattern (screen-space derivative method)
+  vec3 sp=-vViewPosition,dpx=dFdx(sp),dpy=dFdy(sp);float dhx=dFdx(t156Bump),dhy=dFdy(t156Bump);
+  vec3 r1=cross(dpy,normal),r2=cross(normal,dpx);float det=dot(dpx,r1);
+  vec3 grad=sign(det)*(dhx*r1+dhy*r2);normal=normalize(abs(det)*normal-.32*grad);
+ }`);
  };
- material.customProgramCacheKey=()=>`terrain-v149-${scope}-${tile?.x||0}-${tile?.z||0}`;
+ material.customProgramCacheKey=()=>`terrain-v149-v156-${scope}-${tile?.x||0}-${tile?.z||0}`;
  return material;
 }
 // Vertex tint for mountain cells (called by the terrain builder): forested lower slopes give way

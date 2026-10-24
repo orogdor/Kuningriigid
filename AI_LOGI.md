@@ -336,3 +336,34 @@ Mänguloogika, salvestused ja elementide id-d on samad.
 - PASS: `TEST_V120_LOCALE`, `TEST_V123_UI`, `TEST_V143_BROWSER` (kontrollib „N × N“ `#cityhealth` tekstis), `TEST_V151_BROWSER`, `TEST_V153_BROWSER` ja teised allpool loetletud.
 - Vanad UI-testid (V115–V124 UI) kukkusid läbi juba enne seda muudatust, sest kontrollivad vana versioonipealkirja (`/V117/`, `/Kingdoms V120/`) – need ei ole V155 regressioonid.
 - Täielikult: `TEST_V147_BROWSER`, `TEST_V88_EXPLORATION_UI`, `TEST_V149_BROWSER`, `TEST_V152`, `TEST_V154` PASS.
+
+## V156 – detailkaardi maapind elavamaks (Claude, 2026-10-24)
+
+Kasutaja: „Detailkaartidel tundub maapind tühi, igav ja halva tekstuuriga.“ Muudetud on ainult välimust.
+
+### Maapinna varjutaja (`landscape-v149.js` `terrainMaterial`, ainult detailvaade)
+- Muster on nüüd detailkaardi kohalikes ühikutes (`vL156L = position.xz`), mitte maailmameetrites, nii et peen detail on mängijale nähtavas mõõdus.
+- Kihid:
+  - niiskemad ja kuivemad heinamaa toonilaigud;
+  - rohupuhmad kahes mõõdus ja puhmaste tumedamad tuumad;
+  - peen rohutekstuur;
+  - harvad paljad mullalaigud;
+  - metslillede täpid (valge, kollane, lilla) triivudes;
+  - kivikesed mullal ja kõrgemal.
+- Kõik kehtib ainult „rohelisel“ pinnal (`grassy`: roheline > punane), nii et liiv, kalju, lumi ja vesi jäävad samaks. Peen detail hajub välja, kus see sakiks (`fwidth`).
+- Reljeefivalgus: mustri kõrgusest (`t156Bump`) arvutatakse ekraaniruumi tuletistega normaali kalle (bump), tugevus 0,32.
+- Programmi võti `terrain-v149-v156-…` (V149 testi `terrain` loendus kehtib).
+
+### Uus taimkate `ground-detail-v156.js` (asendab detailvaates `graphics-v46` `createGroundCover`-i)
+- Instantseeritud (1 joonistuskutse liigi kohta):
+  - rohupuhmad (7 kitsenevat kõrt, tipp heledam) ja kõrge rohi;
+  - metslilled kuues värvis (iga värv eraldi partii, et varred jääksid roheliseks);
+  - kivid samblaga, põõsad, sõnajalad;
+  - metsas ja niidul kännud, langenud palgid ja seened.
+- Paigutus on klasterdatud müraväljadega: niidud, lagendikud, lilletriivud, kivised kohad. Biomi järgi: kuival maal kuivem toon ja vähem lilli, mäestikus rohkem kive, metsas rohkem sõnajalgu ja kände.
+- Väldib jõgesid (kõrgus −100), maailmateid (`roadNetwork` → kohalikud lõigud, poollaius tee taseme järgi + 1,4) ja hoonete krunte (`buildingClearance` + 0,5). Uus `groundAvoidance(cell)` asub failis `civilization.js`.
+- Eelarve (kolmnurgad / joonistuskutsed): madal ~35k / 13, keskmine ~100k / 13, kõrge ~200k / 13.
+
+### Testid
+Uus `TEST_V156.mjs` (eelarve, teedele ja kruntidele ei kasva midagi, jõgi ja mägi jäävad tühjaks). Brauseritestid on loetletud allpool.
+PASS: `TEST_V156`, `TEST_V67`, `TEST_V149_BROWSER`, `TEST_V143_BROWSER`, `TEST_V88_EXPLORATION_UI`, `TEST_V154`, `TEST_V151_BROWSER`, `TEST_V123_UI`.

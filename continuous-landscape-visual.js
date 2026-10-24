@@ -4,7 +4,7 @@ import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
 import * as T from './vendor/three.module.js';
-import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=152a';
+import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=156a';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
 import {riverNear,localToWorld} from './continuous-landscape.js?v=123a';
 import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
