@@ -550,6 +550,8 @@ export class Civilization{
  // V137: Every owned detail tile is a potential urban quarter or rural plot.
  // Incremental schedules protect the resource economy and mobile frame times.
  developOwnedCityTiles(city){
+  // Keep saved AI district cursor valid even when scarcity defers this turn.
+  city.aiTerritoryCursorV137??=0;
   if(this.s.time<(city.aiNextTerritoryBuildV137||0))return;
   city.aiNextTerritoryBuildV137=this.s.time+90;
   const age=this.s.ages[city.team],area=this.constructionArea(city),r=city.economy.realms[city.team];
