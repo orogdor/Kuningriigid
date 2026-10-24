@@ -1,5 +1,20 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.1 / esimene päriselt käigupõhine kiviajast pronksiajani kampaania (2026-10-24)
+
+- Uus `campaign_play_port.gd`: 4-riigiline mänguolek, mängijariik 0, konkurentide AI 1–3, üks käik = täpselt **60 mängusekundit**, kampaania vooruarvestus, edetabel, eesmärk, võit/kaotus ning JSON-sõbralik käiguajalugu.
+- Mängija eesmärk selles esimeses vertikaallõigus: jõuda **pronksiaega ja 20 elanikuni** enne 90. käiku, võit kaotatakse oma linnade kadumisel või käigulimiidi täitumisel. Kasutatakse olemasoleva 14-linnalise V129 proovikaardi nelja riiki. Uute linnade asutamise ja kogu V153 juhtimise pariteeti veel ei ole.
+- Telefoni menüüs uus esimene kategooria **Kampaania**, kus saab alustada uut mängu, ehitada oma linnas, valida järgmise uuringu, lõpetada käigu, avada oma järgmise linna, näha nelja riigi punktiseisu, salvestada ja laadida.
+- Käigu lõpetamisel kutsutakse `PreviewSim.tick(state,60.0)`: majandus, inimeste vajadused, tootmine, teadus, AI ehitused/uuringud, kaubandus ja sõjaline liikumine. Demokraamistikust ei võltsita eraldi ressursse ega uudiskäske.
+- Automaatne salvestamine iga käigu järel faili `user://kuningriigid_campaign_v1.json`; varasem `user://v131_godot_preview_v25.json` säilib eraldi. `PreviewSim.load_preview` toetab faili valikut ning vanade testisalvestuste lugemist.
+- Mängujuhtimises keelatakse kampaania ajal kunstlikud näidisstsenaariumid, AI väljalülitamine, kontrollimatu ajakerimine ja vastasriigi linnas ehitamine. Uue mängu alustamisel eelmiste demode teed ja makstud rajatised ei kandu kaasa. Linna omanikuvärv loetakse aktiivsest mänguseisust pärast vallutusi.
+- `game/tests/port_checks.gd` kontrollib päris engine tick'i ja 13 käiku (780 mängusekundit), AI uurimis- ning ehituskäske, ressursside tootmist/majandust, käiguajalugu, eraldi salvestusfaili taastamist, riigipiirangut, võitu, kaotust ja 90 käigu limiiti.
+- 13-käigulise eraldi 4-linna katseseisu mõõdetud tulemus: **52 linna-majandusminutit, 6 AI uuringukäsku ja 6 AI ehituskäsku**, kõik 4 linna 4 elanikuga; kogu regressioonikomplekt **767/767**.
+- Godoti skriptide import, Android APK eksport ja PCK bootstrap-käivitustest edukad. CI https://github.com/orogdor/Kuningriigid/actions/runs/40112544971 ; Android/PCK https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-81 .
+- Üldpordi **hinnanguline valmidus ~51%** (töömahu hinnang, mitte automaatmõõdetud funktsioonipariteet).
+
+**Olulised piirangud:** praegune kampaania on peamiselt majanduse ja teaduse vertikaallõik. 14 linna on ette antud, mitte mängija rajatud. Vastaste täiemahuline sõjaväeline AI, linna asutamine, diplomaatia, tehnoloogiapuu terviklik kasutajaliides ja pika kampaania mängutasakaal vajavad veel portimist ja päris telefonitesti. CI headless tõendab regressioonireegleid, mitte kasutaja käitumise täielikku testimist Androidis.
+
 ## V4.0 / Androidi rõhtasend ja vananenud PCK tagasilaadimise tõke (2026-10-24)
 
 - Telefoni kuvatõrke põhjus oli `window/handheld/orientation=1` nii käivitaja kui mängu `project.godot` failis. See oli Godoti **portrait** režiim ja andis telefoni ekraanil suure musta ala ning 1280×720 horisontaalse mänguriba. Mõlemas projektis nüüd `orientation=4` ehk `SENSOR_LANDSCAPE`, lisaks kutsub Androidis ka käivitaja ja mäng `DisplayServer.screen_set_orientation` sama väärtusega.
