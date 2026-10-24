@@ -6,6 +6,12 @@ on:
         type: boolean
         default: false
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/avaldamine.yml'
+      - 'scenarios/ai-medieval-v*.json'
+      - 'ai-medieval-demo-v*.js'
 
 permissions:
   contents: read
@@ -25,8 +31,32 @@ jobs:
     steps:
       - name: Fetch game
         uses: actions/checkout@v4
+      - name: Checkout the actual latest main commit
+        run: |
+          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+          git checkout --detach refs/remotes/origin/main
+          echo "PUBLISHING_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "Publishing actual repository HEAD: $(git rev-parse HEAD)"
+      - name: Verify playable AI saves are present in the deployed files
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          for(const file of fs.readdirSync('.').filter(name=>/^ai-medieval-demo-v\d+\.js$/.test(name))){
+            const source=fs.readFileSync(file,'utf8');
+            const paths=[...source.matchAll(/fetcher\(['"]\.\/(scenarios\/[^'"]+\.json)/g)].map(match=>match[1]);
+            if(!paths.length)throw Error(file+': no AI save reference');
+            for(const path of paths){
+              if(!fs.existsSync(path)||fs.statSync(path).size===0)
+                throw Error(file+' points to missing Pages asset: '+path);
+              const state=JSON.parse(fs.readFileSync(path,'utf8'));
+              if(!state.demo||!state.medievalTestV147&&path.endsWith('-v147.json'))
+                throw Error(path+': not a playable validated test state');
+              console.log('VERIFIED FOR PAGES',file,path,fs.statSync(path).size+' bytes');
+            }
+          }
+          NODE
       - name: Validate manual publication
-        if: inputs.validated != true
+        if: github.event_name == 'workflow_dispatch' && inputs.validated != true
         run: node scripts/test.mjs full --jobs 2
       - name: Verify website entry points
         run: |
