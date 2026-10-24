@@ -3,6 +3,7 @@ extends RefCounted
 ## Tests native 3D refresh when automated cities construct buildings.
 const Economy = preload("res://scripts/core/economy_port.gd")
 const CityLayout = preload("res://scripts/core/city_layout_port.gd")
+const CityPlanning = preload("res://scripts/core/city_planning_port.gd")
 const BuildingRules = preload("res://scripts/core/building_rules_port.gd")
 const Research = preload("res://scripts/core/research_port.gd")
 const Planner = preload("res://scripts/core/research_planner_port.gd")
@@ -25,7 +26,7 @@ static func choose_building(city: Dictionary, known: Dictionary, unfinished: int
         priorities.append("well")
     if float(stock.get("wood",0)) < 25.0:
         priorities.append("lumber")
-    if pop >= 4 + 3 * _ready_count(buildings,"house"):
+    if pop >= BuildingRules.housing_capacity(buildings)-1:
         priorities.append("house")
     for kind in BUILD_ORDER:
         if not priorities.has(kind):
@@ -43,7 +44,7 @@ static func choose_building(city: Dictionary, known: Dictionary, unfinished: int
         if kind == "well" and float(stock.get("water",0)) < float(pop) * 2.0:
             target = 2
         if kind == "house":
-            target = maxi(1,mini(5,int(city.get("pop",3)) / 3))
+            target = CityPlanning.housing_target(pop)
         if count >= target:
             continue
         if BuildingRules.build_error(kind,city,known,unfinished).is_empty():
