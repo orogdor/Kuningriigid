@@ -3,66 +3,66 @@
   "roster": [
     {
       "team": 1,
-      "cities": 8,
-      "buildings": 246,
+      "cities": 7,
+      "buildings": 257,
       "markets": 6,
       "harbors": 2,
-      "houses": 70,
-      "fields": 4,
+      "houses": 69,
+      "fields": 3,
       "ages": 5
     },
     {
       "team": 2,
       "cities": 5,
-      "buildings": 227,
+      "buildings": 234,
       "markets": 5,
       "harbors": 0,
-      "houses": 67,
-      "fields": 1,
-      "ages": 5
+      "houses": 63,
+      "fields": 2,
+      "ages": 4
     },
     {
       "team": 3,
       "cities": 11,
       "buildings": 285,
-      "markets": 6,
+      "markets": 5,
       "harbors": 1,
-      "houses": 91,
-      "fields": 4,
+      "houses": 89,
+      "fields": 2,
       "ages": 5
     }
   ],
   "landUse": [
     {
       "name": "Idaküla 1",
-      "owned": 182,
+      "owned": 47,
       "developed": 4,
       "ruralDeveloped": 0,
       "planned": 3,
       "homes": 13,
-      "foodGrowthBonus": 0.25
+      "foodGrowthBonus": 0.2
     },
     {
       "name": "Idaküla 2",
       "owned": 243,
-      "developed": 3,
+      "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 14,
-      "foodGrowthBonus": 0.25
+      "foodGrowthBonus": 0.2
     },
     {
       "name": "Idaküla 3",
-      "owned": 67,
-      "developed": 3,
+      "owned": 243,
+      "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 11,
-      "foodGrowthBonus": 0.25
+      "homes": 12,
+      "foodGrowthBonus": 0.2
     },
     {
       "name": "Idaküla 4",
-      "owned": 50,
+      "owned": 78,
       "developed": 4,
       "ruralDeveloped": 1,
       "planned": 0,
@@ -71,34 +71,25 @@
     },
     {
       "name": "Idaküla 5",
-      "owned": 243,
+      "owned": 5,
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 12,
-      "foodGrowthBonus": 0.25
+      "foodGrowthBonus": 0.2
     },
     {
       "name": "Idaküla 6",
-      "owned": 243,
-      "developed": 5,
+      "owned": 147,
+      "developed": 4,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 10,
-      "foodGrowthBonus": 0.05
+      "homes": 9,
+      "foodGrowthBonus": 0.15000000000000002
     },
     {
       "name": "Idaküla 7",
-      "owned": 51,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 1,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Idaküla 8",
-      "owned": 75,
+      "owned": 27,
       "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
@@ -109,8 +100,8 @@
   "seed": 136023,
   "turn": 246,
   "sourceTeam": 1,
-  "cities": 8,
-  "buildings": 246,
+  "cities": 7,
+  "buildings": 257,
   "spacingPairs": [
     9,
     9,
@@ -118,35 +109,28 @@
     15,
     18,
     23,
-    28,
     18,
     9,
     17,
     9,
     21,
-    19,
     17,
     9,
     27,
     29,
-    37,
     26,
     13,
     12,
-    23,
     26,
     38,
-    36,
-    25,
-    10,
-    35
+    25
   ],
   "ages": [
     5,
     0,
-    5,
+    4,
     5
   ],
-  "bytes": 3288192,
-  "seconds": 332
+  "bytes": 3079868,
+  "seconds": 249
 }
