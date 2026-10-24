@@ -1,5 +1,19 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.5 / Dev97 arendusetapp, avaldatud Godot Dev 100 (2026-10-24)
+
+- `campaign_siege_port.gd`: kampaanias kindlustatud linnale kohale jõudnud vähemalt kahe vaenlase üksuse vastu kutsutakse vajadusel päris erakorraline mobiliseeritud odamees. Garnison maksab **1 elaniku, 8 puitu ja 2 kivi**; tasuta kloonarmeesid ei teki.
+- `campaign_war_port.gd` seob garnisoni AI sõjakampaaniaga, `main.gd` proovib piiramist enne käigu simulatsiooni ja pärast armee saabumist. Olemasolev `IndividualBattle.start` loob ehitatud vallile päris piiramislahingu, koos väravate, müüride, nurgatornide ja linnakaitsjatega. Tegelikult vallutatud keep muudab linna omanikku senise `CityCapture` teekonna kaudu.
+- Kui kindlustatud linnal pole kaitseväge ning ei jätku rahvast või varustust uue garnisoni mobiliseerimiseks, peab vähemalt kahe üksusega piirav vaenlane viibima seal **6 eri kampaaniakäiku**, enne kui linn alistub blokaadi tõttu. See märgitakse eraldi `blockade_surrender` sündmusena, mitte ei nimetata taktikalise lahingu võiduks. Topeltkäikude arvestus, omanikuvahetus ja salvestatav blokaadi edenemine on kontrollitud.
+- Uued testid: ressursikulu, rahvaarvu muutus, päris sidus piiramislahing, topeltgarnisoni puudumine, oleku JSON-säilivus, keep'i vallutuse omanikuvahetus, 6 käigu blokaad ja topeltvallutuse vältimine.
+- GitHub Actions **841/841** regressioonikontrolli läbitud, Godoti import, PCK laadimistest ja Android debug APK eksport edukad.
+- GitHub CI: https://github.com/orogdor/Kuningriigid/actions/runs/40116326025
+- Avaldatud APK/PCK: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-100
+- **Hinnanguline pordi valmidus ~61%** (töömahu eksperthinnang, mitte automaatmõõtmine; eelmise etapi hinnang oli 59%).
+
+**Piirangud:** kaitseva garnisoni mobiliseerimine töötab praegu kindlustatud linna *keskruudul*, mitte veel igal 12×12 linnaalal; kindlustamata linnade automaatkaitse ja pikema mitme-armee sõjakäigu AI vajavad edasiarendust. Tornides on endiselt varasem V131 ajutine kaitsjate loogika; seos linna püsiva palga- ja vägede süsteemiga vajab täiendamist. Tegelik Androidi kasutajakogemus ning OTA paketi vahetus pärisseadmel ei ole selle CI-ga eraldi kinnitatud.
+
+
 ## V4.3 / liikuvad asutajad ja AI riikide laienemine (2026-10-24)
 
 - `settler_campaign_port.gd`: päris kampaania asutamisülesanded `settler_missions` (JSON-püsiv), iga käik 3 **kõrvuti olevat maismaaruutu**, teekond kuni 40 ruutu. Ressursid ning kolm elanikku võetakse lähteasulast asutaja teele saatmisel. Uus linn luuakse **alles pärast asutaja päriselt sihtkohta jõudmist**, ilma varusid topelt kulutamata.
