@@ -91,7 +91,10 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git config user.name 'github-actions[bot]'
           git add scenarios/ai-medieval-v153.json scenarios/ai-medieval-v153.manifest.json
-          git commit -m "V153: tested Claude V150 world at first Medieval Age checkpoint"
+          git commit -m "V153: validated V152 balanced AI Medieval plus 30 save"
+          # Browser smoke tests can dirty tracked screenshot manifests; discard only
+          # post-test working-tree edits, never the committed and validated game state.
+          git reset --hard HEAD
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
