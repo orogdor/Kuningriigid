@@ -7,6 +7,7 @@ const CountiesPort = preload("res://scripts/core/counties_port.gd")
 const Territory = preload("res://scripts/core/territory_port.gd")
 const CityFortifications = preload("res://scripts/core/city_fortification_port.gd")
 const BuildVersion = preload("res://scripts/core/build_version_port.gd")
+const CampaignPlay = preload("res://scripts/core/campaign_play_port.gd")
 const EconomyPort = preload("res://scripts/core/economy_port.gd")
 const ResearchPort = preload("res://scripts/core/research_port.gd")
 const PortChecks = preload("res://tests/port_checks.gd")
@@ -191,8 +192,17 @@ var bench_county_replans: int = 0
 var county_demo_backup: Dictionary = {}
 var bridge_test_tile: Vector2i = Vector2i(-1,-1)
 var county_demo_was_paused: bool = false
-const MENU_CATEGORIES: Array[String] = ["Testid", "Linn ja ehitus", "Majandus", "Armee", "Piiramine", "Juhtimine ja salvestus"]
+const MENU_CATEGORIES: Array[String] = ["Kampaania", "Testid", "Linn ja ehitus", "Majandus", "Armee", "Piiramine", "Juhtimine ja salvestus"]
 const MOBILE_MENU_ACTIONS = [
+    ["Kampaania", "ALUSTA UUT KAMPAANIAT", "campaign_start"],
+    ["Kampaania", "LÕPETA KÄIK (+1)", "campaign_turn"],
+    ["Kampaania", "Kampaania seis ja edetabel", "campaign_info"],
+    ["Kampaania", "Järgmine minu linn", "campaign_city"],
+    ["Kampaania", "Vali järgmine uurimus", "campaign_research"],
+    ["Kampaania", "Ehita elamu", "campaign_house"],
+    ["Kampaania", "Ehita metsamaja", "campaign_lumber"],
+    ["Kampaania", "Salvesta kampaania", "campaign_save"],
+    ["Kampaania", "Laadi kampaania", "campaign_load"],
     ["Testid", "24 mehe lahing", "infantry_battle"],
     ["Testid", "Katapuldi demo", "artillery"],
     ["Testid", "Pronkslinna piiramine", "siege"],
@@ -368,6 +378,80 @@ func _manual_check_version() -> void:
     build_version_manual_check = true
     status_label.text = "Kontrollin uusimat Godoti versiooni GitHubist…"
     _check_latest_version()
+
+func _start_campaign() -> void:
+    # Reset ALL preview fixtures; campaign actions spend genuine resources.
+    # The original sample map is an early 4-faction scenario, NOT the V153 map.
+    wall_demo_backup = {}
+    county_demo_backup = {}
+    territory_demo_index = -1
+    city_stress_index = -1
+    preview_state = PreviewSim.initialize(cities)
+    preview_state["world_roads"] = roads
+    var start: Dictionary = CampaignPlay.begin(preview_state,0)
+    if not bool(start.get("ok",false)):
+        status_label.text = str(start.get("reason","Kampaania avamine ebaõnnestus"))
+        return
+    paused = true
+    ai_enabled = true
+    city_index = CampaignPlay.own_city_index(preview_state,-1)
+    if city_index >= 0:
+        var city: Dictionary = preview_state["cities"][city_index]
+        selected = Vector2i(int(city["c"]),int(city["r"]))
+    _show_world_map()
+    Territory.rebuild(preview_state,land,true)
+    Territory.reconcile_worksites(preview_state,land,heights)
+    _configure_fine_navigation()
+    _build_counties()
+    _build_cities()
+    _refresh_building_proxies()
+    if is_instance_valid(local_streets):
+        local_streets.clear()
+    status_label.text = "KIVIAJA KAMPAANIA: juhid sinist riiki. Ehita majad/toidutootmine, vali Uuri ja lõpeta käigud."
+    _update_labels()
+
+func _campaign_end_turn() -> void:
+    if not CampaignPlay.is_running(preview_state):
+        status_label.text = "Alusta kõigepealt kampaania või vaata selle lõpptulemust."
+        return
+    if not wall_demo_backup.is_empty() or not county_demo_backup.is_empty() or city_stress_index >= 0 or territory_demo_index >= 0:
+        status_label.text = "Lõpeta katse enne kampaania käigu lõpetamist."
+        return
+    # One turn is EXACTLY 60 simulation seconds. Existing economy, science,
+    # AI, trade and military engines are used unchanged, not faked.
+    PreviewSim.tick(preview_state,CampaignPlay.GAME_SECONDS_PER_TURN,
+        local_streets if street_nav_on else null,world_trade_nav,shared_landscape)
+    var result: Dictionary = CampaignPlay.finish_turn(preview_state)
+    road_time = float(preview_state.get("seconds",road_time))
+    if Territory.rebuild(preview_state,land):
+        Territory.reconcile_worksites(preview_state,land,heights)
+        _build_counties()
+    _build_cities()
+    _build_roads()
+    _refresh_building_proxies()
+    if is_instance_valid(army_view):
+        army_view.refresh(preview_state,heights)
+    if is_instance_valid(trade_view):
+        trade_view.refresh(preview_state,heights)
+    if mobile_view == "detail" and is_instance_valid(native_detail_tile):
+        native_detail_tile.show_tile(detail_tile_coords,preview_state.get("cities",[]),
+            heights,local_streets if street_nav_on else null,
+            preview_state.get("detail_bridges",{}),shared_landscape)
+    var report: Dictionary = result.get("status",{})
+    status_label.text = str(report.get("message","Käik lõpetatud"))
+    _update_labels()
+
+func _campaign_info() -> void:
+    if not CampaignPlay.is_active(preview_state):
+        status_label.text = "Vali Kampaania → ALUSTA UUT KAMPAANIAT."
+        return
+    var scores: Array = CampaignPlay.standings(preview_state)
+    var summary: PackedStringArray = []
+    for entry in scores:
+        summary.append("R%d: %d linna, %d inimest, ajastu %d" % [
+            int(entry["team"]),int(entry["cities"]),int(entry["population"]),int(entry["age"])])
+    status_label.text = CampaignPlay.text_status(preview_state)+" | "+", ".join(summary)
+    _update_labels()
 
 func _setup_lighting() -> void:
     var env := WorldEnvironment.new()
@@ -722,7 +806,31 @@ func _show_siege_view() -> void:
 
 func _menu_action(action_id: String) -> void:
     _close_mobile_menu()
+    if CampaignPlay.is_active(preview_state):
+        var restricted: bool = false
+        for option in MOBILE_MENU_ACTIONS:
+            if String(option[2]) == action_id and String(option[0]) == "Testid":
+                restricted = true
+                break
+        if action_id in ["pause","advance","ai_toggle","market","trade","army_demo","infantry_battle","artillery","siege","gate","battlefield_500"]:
+            restricted = true
+        if restricted:
+            status_label.text = "Kampaanias ei saa demodega mänguseisu muuta. Kasuta kampaania menüüd."
+            return
+        if action_id.begins_with("build_") or action_id.begins_with("county_") or action_id in ["research","recruit","city_gate_toggle"]:
+            if not CampaignPlay.owns_city(preview_state,city_index):
+                status_label.text = "Selle linna omanik on teine riik. Vali oma linn."
+                return
     match action_id:
+        "campaign_start": _start_campaign()
+        "campaign_turn": _campaign_end_turn()
+        "campaign_info": _campaign_info()
+        "campaign_city": _select_next_city()
+        "campaign_research": _preview_research()
+        "campaign_house": _preview_build("house")
+        "campaign_lumber": _preview_build("lumber")
+        "campaign_save": _preview_save()
+        "campaign_load": _preview_load()
         "infantry_battle": _show_battle_view()
         "artillery":
             _artillery_battle_demo()
@@ -2341,7 +2449,7 @@ func _update_labels() -> void:
     for frame in frame_samples:
         avg_ms+=frame
     avg_ms=avg_ms/float(maxi(1,frame_samples.size()))
-    ui_label.text="%.0f FPS | %.1f ms" %[1000.0/maxf(.001,avg_ms),avg_ms]
+    ui_label.text=("KÄIK %d/%d • " % [int(preview_state["campaign"]["turn"]),int(preview_state["campaign"]["turn_limit"])] if CampaignPlay.is_active(preview_state) else "") + ("%.0f FPS | %.1f ms" %[1000.0/maxf(.001,avg_ms),avg_ms])
     info_label.text="V131 Godot 3.3 | %d ruutu | %d linna | %d maakonnaruutu | %d tegelast | %s: %d / cache %d | GLB %d/5 | test %s" %[COLS*ROWS,cities.size(),county_tile_count,actors.size(),"Godot A*" if use_native_astar else "V131 BFS",routes_calculated,routes_reused,native_renderer.loaded_count if is_instance_valid(native_renderer) else 0,rules_check_result]
     if city_label != null and not preview_state.is_empty() and city_index < preview_state["cities"].size():
         var people: int = 0
@@ -2370,7 +2478,10 @@ func _run_rule_checks() -> void:
 func _select_next_city() -> void:
     if cities.is_empty():
         return
-    city_index = (city_index + 1) % cities.size()
+    city_index = CampaignPlay.own_city_index(preview_state,city_index) if CampaignPlay.is_active(preview_state) else (city_index+1)%cities.size()
+    if city_index < 0:
+        status_label.text = "Sinu riigil pole enam linnu."
+        return
     _show_city_view()
     _update_labels()
 
@@ -2840,7 +2951,8 @@ func _preview_save() -> void:
     if city_stress_index >= 0:
         status_label.text = "Sünteetilist linnakatset ei salvestata. Vajuta Taasta linn."
         return
-    status_label.text = "KATSESEIS SALVESTATUD: user://v131_godot_preview_v25.json" if PreviewSim.save_preview(preview_state) else "Salvestamine ei õnnestunud"
+    var saved: bool = PreviewSim.save_preview(preview_state)
+    status_label.text = ("KAMPAANIA SALVESTATUD" if CampaignPlay.is_active(preview_state) else "KATSESEIS SALVESTATUD") if saved else "Salvestamine ei õnnestunud"
 
 func _preview_load() -> void:
     if not wall_demo_backup.is_empty():
@@ -2887,17 +2999,28 @@ func _preview_load() -> void:
         native_detail_tile.show_tile(detail_tile_coords,preview_state.get("cities",[]),heights,local_streets if street_nav_on else null,preview_state.get("detail_bridges",{}),shared_landscape)
         detail_last_revision = int(preview_state.get("revision",0))
     ai_enabled = bool(data.get("ai_enabled",false))
+    if CampaignPlay.is_active(preview_state):
+        paused = true
+        if not CampaignPlay.owns_city(preview_state,city_index):
+            city_index = CampaignPlay.own_city_index(preview_state,-1)
+        _build_cities()
     _refresh_building_proxies()
-    status_label.text = "KATSESEIS LAETUD (mitte V131 V4)"
+    status_label.text = CampaignPlay.text_status(preview_state) if CampaignPlay.is_active(preview_state) else "KATSESEIS LAETUD (mitte V131 V4)"
     _update_labels()
 
 func _toggle_preview_ai() -> void:
+    if CampaignPlay.is_active(preview_state):
+        status_label.text = "Kampaanias on vastaste AI alati sisse lülitatud."
+        return
     ai_enabled = not ai_enabled
     preview_state["ai_enabled"] = ai_enabled
     status_label.text = "Katse-AI: töötab riikidele 1–3 (ei ole veel V131 strateegiline AI)." if ai_enabled else "Katse-AI välja lülitatud."
     _update_labels()
 
 func _fast_forward_preview() -> void:
+    if CampaignPlay.is_active(preview_state):
+        status_label.text = "Kampaanias kasuta käigu lõpetamist, mitte +10 min testi."
+        return
     if not wall_demo_backup.is_empty():
         status_label.text = "Taasta vallide demo enne aja edasikerimist"
         return
@@ -2942,6 +3065,9 @@ func _cargo_count() -> int:
     return count
 
 func _toggle_pause() -> void:
+    if CampaignPlay.is_active(preview_state):
+        status_label.text = "Kampaania käib ühekaupa. Kasuta Kampaania → LÕPETA KÄIK."
+        return
     paused=not paused
     status_label.text="Simulatsioon peatatud." if paused else "Simulatsioon käib."
 
