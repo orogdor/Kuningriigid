@@ -508,12 +508,12 @@ func refresh_movers(town: Dictionary,shipments: Array = [],roads: Dictionary = {
             continue
         if String(agent.get("status","")) in ["Kodus","Tee puudub"]:
             continue
-        var local: Vector2 = city_to_detail(town,Vector2(float(agent.get("x",0.0)),float(agent.get("z",0.0))))
+        var local: Vector2 = Layout.site_in_tile(town,Vector2(float(agent.get("x",0.0)),float(agent.get("z",0.0))),current_tile)*SITE_SCALE
         if absf(local.x)>TILE_WIDTH*.5 or absf(local.y)>TILE_DEPTH*.5:
             continue
         positions[kind].append(Transform3D(Basis(),CENTER+Vector3(local.x,_point_height(local.x,local.y)+1.3,local.y)))
     for shipment in town.get("cargo",[]):
-        var local: Vector2 = city_to_detail(town,Vector2(float(shipment.get("x",0.0)),float(shipment.get("z",0.0))))
+        var local: Vector2 = Layout.site_in_tile(town,Vector2(float(shipment.get("x",0.0)),float(shipment.get("z",0.0))),current_tile)*SITE_SCALE
         if absf(local.x)>TILE_WIDTH*.5 or absf(local.y)>TILE_DEPTH*.5:
             continue
         positions["cargo"].append(Transform3D(Basis(),CENTER+Vector3(local.x,_point_height(local.x,local.y)+.6,local.y)))
