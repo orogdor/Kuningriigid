@@ -12,7 +12,8 @@ const RESEARCH_UNLOCKS: Dictionary = {
     "bakery":"milling", "barracks":"warfare", "archery":"archery",
     "stable":"horsemanship", "mine":"iron", "coal":"iron",
     "smelter":"smelting", "smith":"smithing", "warehouse":"storage",
-    "cellar":"cellaring", "market":"commerce", "harbor":"shipbuilding"
+    "cellar":"cellaring", "market":"commerce", "harbor":"shipbuilding",
+    "steelworks":"steelmaking", "machine_shop":"steam_engine"
 }
 
 static func housing_capacity(buildings: Array) -> int:
