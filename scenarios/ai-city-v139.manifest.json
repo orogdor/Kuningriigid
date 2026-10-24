@@ -3,79 +3,95 @@
   "roster": [
     {
       "team": 1,
-      "cities": 1,
-      "buildings": 56,
+      "cities": 2,
+      "buildings": 90,
       "markets": 0,
       "harbors": 0,
-      "houses": 24,
+      "houses": 33,
       "fields": 1,
       "ages": 1
     },
     {
       "team": 2,
-      "cities": 1,
-      "buildings": 71,
+      "cities": 2,
+      "buildings": 81,
       "markets": 0,
       "harbors": 0,
-      "houses": 22,
+      "houses": 27,
       "fields": 1,
       "ages": 2
     },
     {
       "team": 3,
-      "cities": 2,
-      "buildings": 105,
-      "markets": 1,
+      "cities": 3,
+      "buildings": 137,
+      "markets": 2,
       "harbors": 0,
-      "houses": 41,
-      "fields": 2,
-      "ages": 2
+      "houses": 37,
+      "fields": 1,
+      "ages": 3
     }
   ],
   "landUse": [
     {
       "name": "Lõunaküla 1",
-      "owned": 339,
+      "owned": 195,
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 24,
-      "foodGrowthBonus": 0.15000000000000002
+      "homes": 15,
+      "foodGrowthBonus": 0.2
     },
     {
       "name": "Lõunaküla 2",
-      "owned": 157,
-      "developed": 2,
+      "owned": 179,
+      "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 17,
+      "homes": 16,
+      "foodGrowthBonus": 0.2
+    },
+    {
+      "name": "Lõunaküla 3",
+      "owned": 147,
+      "developed": 4,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 6,
       "foodGrowthBonus": 0
     }
   ],
   "density": [
     {
       "city": "Lõunaküla 1",
-      "nearEdge": 3,
+      "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 80,
-      "urbanTiles": 91
+      "urbanBuildings": 76,
+      "urbanTiles": 59
     },
     {
       "city": "Lõunaküla 2",
-      "nearEdge": 1,
+      "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 23,
-      "urbanTiles": 90
+      "urbanBuildings": 49,
+      "urbanTiles": 48
+    },
+    {
+      "city": "Lõunaküla 3",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 11,
+      "urbanTiles": 37
     }
   ],
   "historicMetrics": [
     {
       "name": "Lõunaküla 1",
       "centreHouses": 13,
-      "mainTileHouses": 16,
-      "totalHouses": 24,
-      "walls": 37,
-      "gates": 2,
+      "mainTileHouses": 15,
+      "totalHouses": 15,
+      "walls": 38,
+      "gates": 1,
       "wallPlan": 88,
       "services": {
         "well": 1,
@@ -86,32 +102,45 @@
     },
     {
       "name": "Lõunaküla 2",
-      "centreHouses": 14,
+      "centreHouses": 13,
       "mainTileHouses": 16,
-      "totalHouses": 17,
-      "walls": 0,
-      "gates": 0,
-      "wallPlan": 64,
+      "totalHouses": 16,
+      "walls": 7,
+      "gates": 1,
+      "wallPlan": 92,
       "services": {
         "well": 1,
-        "study": 1
+        "scriptorium": 1,
+        "market": 1
       }
+    },
+    {
+      "name": "Lõunaküla 3",
+      "centreHouses": 6,
+      "mainTileHouses": 6,
+      "totalHouses": 6,
+      "walls": 0,
+      "gates": 0,
+      "wallPlan": 0,
+      "services": {}
     }
   ],
   "seed": 139023,
   "turn": 201,
   "sourceTeam": 3,
-  "cities": 2,
-  "buildings": 105,
+  "cities": 3,
+  "buildings": 137,
   "spacingPairs": [
-    9
+    11,
+    13,
+    13
   ],
   "ages": [
-    2,
+    3,
     1,
     2,
     0
   ],
-  "bytes": 810801,
-  "seconds": 79
+  "bytes": 1026571,
+  "seconds": 85
 }
