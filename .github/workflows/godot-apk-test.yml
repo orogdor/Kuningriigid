@@ -129,7 +129,7 @@ jobs:
           name: Kuningriigid-Godot-Dev-test-logs
           path: dist/logs/
           if-no-files-found: warn
-publish_preview:
+  publish_preview:
     name: Publish tagged Godot OTA prerelease
     needs: android
     if: ${{ needs.android.result == 'success' && needs.android.outputs.tests_ok == 'success' }}
