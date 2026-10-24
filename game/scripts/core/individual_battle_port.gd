@@ -763,6 +763,13 @@ static func _finish(state: Dictionary, battle: Dictionary, world_nav = null) -> 
         "initial_men":int(battle["initial_men"]),"reserve_men":int(battle["reserve_men"]),
         "casualties":battle["casualties"].duplicate(true), "shots":int(battle["shots"]), "impacts":int(battle.get("impacts",0)), "steps":int(battle["steps"]), "model_tactic_version":19, "terrain_routes":int(battle.get("terrain_routes",0)),"terrain_blocked":int(battle.get("terrain_blocked",0)), "formation_changes":int(battle.get("formation_changes",0)), "archer_repositions":int(battle.get("archer_repositions",0)), "cavalry_flanks":int(battle.get("cavalry_flanks",0)), "friendly_lanes_blocked":int(battle.get("friendly_lanes_blocked",0)), "morale_routs":int(battle.get("morale_routs",0)), "ordered_retreats":int(battle.get("ordered_retreats",0)), "escape_routes":int(battle.get("escape_routes",0)), "escape_failed_routes":int(battle.get("escape_failed_routes",0)), "flank_shocks":int(battle.get("flank_shocks",0)), "stone_shots":int(battle.get("stone_shots",0)), "friendly_rock_hits":int(battle.get("friendly_rock_hits",0)), "missed_arrows":int(battle.get("missed_arrows",0)), "siege": battle.get("siege",{}).duplicate(true),"city_capture":capture_result.duplicate(true),"test_only":not bool(linked.get("linked_city",false))})
     state["battle_cooldown_until"] = float(state.get("seconds", 0.0)) + 30.0
+    if bool(state.get("campaign",{}).get("active",false)):
+        # Cool down only the two former combatants: other waiting fronts can
+        # engage immediately without re-fighting these same survivors.
+        for id in ["army_a","army_b"]:
+            var veteran: Dictionary = _army(state,int(battle.get(id,-1)))
+            if not veteran.is_empty():
+                veteran["engagement_cooldown_until"] = float(state.get("seconds",0.0))+30.0
     state["individual_battles_finished"] = int(state.get("individual_battles_finished", 0)) + 1
     state["battles_finished"] = int(state.get("battles_finished", 0)) + 1
     state["individual_battle"] = {}
