@@ -372,32 +372,48 @@ func _wall_piece(width: float,height: float,depth: float,x: float,z: float,mater
     _add_mesh(mesh,material,CENTER+Vector3(x,_point_height(x,z)+height*.5,z))
 
 func _create_city_fortifications(town: Dictionary) -> void:
-    # Preview visualization of already paid, saved palisade segments.
-    # Adjacent fortified districts share open internal roads; outside edges
-    # have 12m gaps at the central street portals. Not yet battle colliders.
+    # Visual segments map to precisely the same indexed sections as the real
+    # siege system. Damaged parts remain broken on the next detail-map visit.
     if not CityFortifications.fortified(town,current_tile):
         return
     var timber: Material = _material(Color("75543a"))
     var towers: Material = _material(Color("967451"))
     var side_x: float = TILE_WIDTH*.5-2.0
     var side_z: float = TILE_DEPTH*.5-2.0
-    var gate_half: float = 6.0
-    for delta in [Vector2i(-1,0),Vector2i(1,0),Vector2i(0,-1),Vector2i(0,1)]:
-        if CityFortifications.fortified(town,current_tile+delta):
-            continue
-        if delta.x != 0:
-            var middle_x: float = float(delta.x)*side_x
-            var half_length_z: float = (side_z-gate_half)*.5
-            _wall_piece(3.2,5.4,side_z-gate_half,middle_x,-(gate_half+half_length_z),timber)
-            _wall_piece(3.2,5.4,side_z-gate_half,middle_x,gate_half+half_length_z,timber)
-        else:
-            var middle_z: float = float(delta.y)*side_z
-            var half_length_x: float = (side_x-gate_half)*.5
-            _wall_piece(side_x-gate_half,5.4,3.2,-(gate_half+half_length_x),middle_z,timber)
-            _wall_piece(side_x-gate_half,5.4,3.2,gate_half+half_length_x,middle_z,timber)
-    for x_sign in [-1.0,1.0]:
-        for z_sign in [-1.0,1.0]:
-            _wall_piece(7.0,8.4,7.0,x_sign*side_x,z_sign*side_z,towers)
+    var half_gate: float = 6.0
+    if not CityFortifications.fortified(town,current_tile+Vector2i.LEFT):
+        var span: float = (side_z-half_gate)*.5
+        for i in range(4):
+            var section_z: float = (-half_gate-span*(1.5-float(i))) if i < 2 else (half_gate+span*(float(i)-1.5))
+            var hp: float = CityFortifications.segment_hp(town,current_tile,i,420.0)
+            if hp > 0.0:
+                _wall_piece(3.2,5.4*clampf(hp/420.0,.3,1.0),span,-side_x,section_z,timber)
+        var gate_hp: float = CityFortifications.segment_hp(town,current_tile,4,500.0)
+        if gate_hp > 0.0 and not CityFortifications.gate_is_open(town,current_tile):
+            _wall_piece(3.8,4.8*clampf(gate_hp/500.0,.3,1.0),half_gate*2.0,-side_x,0.0,towers)
+    if not CityFortifications.fortified(town,current_tile+Vector2i.RIGHT):
+        var east_span: float = side_z*2.0/5.0
+        for i in range(5):
+            var hp: float = CityFortifications.segment_hp(town,current_tile,5+i,420.0)
+            if hp > 0.0:
+                _wall_piece(3.2,5.4*clampf(hp/420.0,.3,1.0),east_span,side_x,-side_z+east_span*(float(i)+.5),timber)
+    var horizontal_span: float = side_x*2.0/3.0
+    for j in range(3):
+        var section_x: float = -side_x+horizontal_span*(float(j)+.5)
+        if not CityFortifications.fortified(town,current_tile+Vector2i.UP):
+            var north_hp: float = CityFortifications.segment_hp(town,current_tile,10+2*j,420.0)
+            if north_hp > 0.0:
+                _wall_piece(horizontal_span,5.4*clampf(north_hp/420.0,.3,1.0),3.2,section_x,-side_z,timber)
+        if not CityFortifications.fortified(town,current_tile+Vector2i.DOWN):
+            var south_hp: float = CityFortifications.segment_hp(town,current_tile,11+2*j,420.0)
+            if south_hp > 0.0:
+                _wall_piece(horizontal_span,5.4*clampf(south_hp/420.0,.3,1.0),3.2,section_x,side_z,timber)
+    for x_index in range(2):
+        for z_index in range(2):
+            var tower_index: int = 16+x_index*2+z_index
+            var tower_hp: float = CityFortifications.segment_hp(town,current_tile,tower_index,520.0)
+            if tower_hp > 0.0:
+                _wall_piece(7.0,8.4*clampf(tower_hp/520.0,.3,1.0),7.0,(-side_x if x_index == 0 else side_x),(-side_z if z_index == 0 else side_z),towers)
 
 func _create_county_worksites(town: Dictionary) -> void:
     var hits: Array = []
