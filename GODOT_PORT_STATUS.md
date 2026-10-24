@@ -1,5 +1,21 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V5.3 / Godot Dev 142 – fookus linnadele, tööstusele ja pikale tsiviilkampaaniale (2026-10-24)
+
+**Strateegiline muudatus:** pärast mitut järjestikust sõjalise pordi väljalaset on järgmiste etappide põhifookus uuesti linnamajandusel, teadusel, asustamisel, kaubandusel, tootmisel, 3D linnadel ja kampaania kestusel. Sõjategevus ei ole kuningriikide põhisisu, vaid tsiviilarengu peale ehitatud süsteem.
+
+- `campaign_play_port.gd`: algset 90-käigulist pronksiaja õpetuskampaaniat **ei muudeta**. Lisatud vabatahtlik uus režiim `stone_to_modern` (600 käiku; võidusiht moodne ajastu 6 ja vähemalt 100 elanikku). Pronksiaeg ega 90. käik uut režiimi ei lõpeta. Väljundtekst, võidutingimused ja salvestuse kampaaniarežiim kajastavad tegelikku sihti.
+- `main.gd`: mobiilile kampaania nupp **PIKK MÄNG: KIVIAJAST MOODSANI (600 KÄIKU)**. Ehituste nimekirjas nüüd ka veski, pagariäri, rauakaevandus, söepõletaja, rauasulatus, relvasepp, terasesulatus, masinatehas ja materjaliladu. Mängija saab ehitusobjekte käsitsi tellida samas päris ressursside, sõltuvuste, ehitusplatsi ning ehitusaja süsteemis.
+- `economy_port.gd`: tööstusajastul lisatud **steelworks** (vajab rauasulatust, steelmaking uuringut, ehitusmaterjale, rauda ja sütt → teras) ning **machine_shop** (vajab terasesulatust, seppa, steam_engine uuringut, terast ja plankusid → masinad). Need on tõelised hooned koos töötajavajaduse, materjalikulude, tootmisretsepti, tootmistsükli ja laopiiriga. Moodsa ajastu 35 terase ja 17.5 masina teaduskulud saab nüüd tasuda ilma etteantud tasuta materjalideta.
+- `preview_ai_port.gd`, `city_layout_port.gd`, `city_planning_port.gd`, `building_rules_port.gd` ja `labor_port.gd`: AI võib nüüd tööstushooneid ehitada. Need on paigutatud tööstusvööndisse ja nõuavad päris tööjõudu. Linna tootmisvõrk laieneb elanikega: farmide, jahimajade, kaevude, saekaatrite ja metsamajade soovituslik arv ei peatu enam kahe juures; elamute siht jääb vastavusse tegeliku majutusvajadusega.
+- `preview_sim_port.gd`: pika kampaania mängija järjestikune **Uuri** käsk lähtub eeltingimusi arvestavast tehnoloogiaarenduse planeerijast, mitte üksnes varase kiviaja/pronksiaja fikseeritud 12 tehnoloogia nimekirjast.
+- Lisatud **23 uut kontrolli**, sh tööstuse avamise eeltingimused, tasutud ehituskulud, kohapealne tootmisretsept ja ressursi jäävus, masinate tootmine, tegeliku moodsasse aega ülemineku materjalid, AI valikud, 80-elanikuga linna toidu/vee vajadus ning pika kampaania algus/võit, vana õpetusmängu ühilduvus ja JSON salvestus.
+- GitHub Actions **936/936 regressioonitesti**, Godoti import, Android APK eksport ja PCK bootstrap test kõik edukad: https://github.com/orogdor/Kuningriigid/actions/runs/40123253920
+- Avaldatud Dev 142: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-142
+
+**Olulised veel tegemata süsteemid:** täielik 600-käiguline päris AI testmäng ja tasakaalustamine, toiduliikide ja luksuskaupade täistsükkel, maakonnasisene 3D linnaehitus ja muu detailkaart kogu riigis, arenenud ajaloolise linna teevõrk, riikidevaheline diplomaatia ja päriskaubandus, sadamad ja merevedu, hilisemate ajastute tehnoloogia täisressursiahelad, suurte linnade renderdus/jõudlus ning päris Android-seadme UI test. **Hinnangulist valmiduse protsenti ei tõstetud:** varasem 75% oli tervikliku mängu kohta liiga optimistlik ja puudus tõenduseks pikk integreeritud mängutest.
+
+
 ## V5.2 / Godot Dev 130 – mobiilne lahingujärjekorra ülevaade ja tegelik lahinguraport (2026-10-24)
 
 - `campaign_battle_brief_port.gd`: uus lugemiseks mõeldud raportimoodul loetleb aktiivse lahingu ja kuni 32 ootel mitme rinde kokkupõrget koos koordinaatide, armee ID-de, päris riiginumbrite ja tegelike elusate üksuste arvuga. Annab kokkuvõtte kampaania registreeritud, aegunud ja lõpetatud lahingutest.
