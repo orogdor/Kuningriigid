@@ -19,6 +19,9 @@ for(const type of ['house','market','mason','stonewall','stonetower','gatehouse'
 }
 assert.equal(BUILDINGS.house.cost.wood,12,'V137 half-price timber homes preserved');
 assert.equal(BUILDINGS.house.cost.plank,undefined,'No imaginary plank price on wooden homes');
+assert.ok(BUILDINGS.market.cost.wood<=25,'Bronze markets must not consume the capital timber reserve');
+assert.equal(BUILDINGS.gatehouse.cost.plank,0,'Bronze stone gates must not require processed planks');
+assert.ok(BUILDINGS.lumber.rate>12,'Timber supply supports repeated Bronze houses');
 assert.ok(BUILDINGS.stonewall.time<=20,'Bronze stonewall construction completes within a small fraction of a turn');
 assert.ok(BUILDINGS.gatehouse.cost.cutstone<13,'Bronze gates do not consume all dressed stone');
 assert.equal(BUILD_TECH.gatehouse,'stone_fortifications','gates require masonry technology');
