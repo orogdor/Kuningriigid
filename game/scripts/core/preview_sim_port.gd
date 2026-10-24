@@ -25,6 +25,7 @@ const Trade = preload("res://scripts/core/trade_network_port.gd")
 const Military = preload("res://scripts/core/military_port.gd")
 const BattlePreview = preload("res://scripts/core/battle_preview_port.gd")
 const IndividualBattle = preload("res://scripts/core/individual_battle_port.gd")
+const BattleQueue = preload("res://scripts/core/campaign_battle_queue_port.gd")
 const FOOD_PER_RESIDENT: float = 0.60  # labor.js
 const WATER_PER_RESIDENT: float = 0.45  # labor.js
 const RESEARCH_ORDER = ["hunting","fishing","stone_tools","learning","settlement","water","agriculture","warfare","pottery","grain_storage","village_council","bronze"]
@@ -49,6 +50,10 @@ static func initialize(manifest_cities: Array) -> Dictionary:
     var state: Dictionary = {"cities":towns,"teams":teams,"seconds":0.0,"revision":1,"ai_enabled":false,"ai_build_orders":0,"ai_research_orders":0,"economic_ticks":0,"produced_cycles":0,"shortage_minutes":0,"cargo_dispatched":0,"cargo_deliveries":0,"cargo_units_delivered":0.0,"citizens_moving":0,"citizens_working":0,"citizens_hauled":0.0,"market_purchases":0,"market_deliveries":0,"market_food_bought":0.0,"market_water_bought":0.0,"market_food_delivered":0.0,"market_water_delivered":0.0,"shipments":[],"world_roads":{},"next_shipment":1,"trade_dispatched":0,"trade_arrived":0,"trade_units_delivered":0.0,"trade_auto":true,"county_shipments":[],"next_county_cargo":1,"county_worker_steps":0,"county_cargo_steps":0,"county_cargo_dispatched":0,"county_cargo_delivered":0,"county_units_delivered":0.0,"county_blocked_routes":0,"county_supply_sent":0,"county_supply_delivered":0,"county_supply_units":0.0,"county_route_replans":0}
     Military.setup(state)
     state["individual_battle"] = {}
+    state["pending_battles"] = []
+    state["battles_queued_total"] = 0
+    state["battles_dequeued_total"] = 0
+    state["battles_queue_expired"] = 0
     state["individual_battles_started"] = 0
     state["individual_battles_finished"] = 0
     state["campaign_retreats"] = 0
@@ -130,9 +135,13 @@ static func tick(state: Dictionary, dt: float, navigator = null, world_nav = nul
         state["seconds"] = before + step
         _tick_fragment(state,step,navigator,world_nav)
         Military.advance(state,step,world_nav)
-        if state.get("individual_battle",{}).is_empty():
+        if bool(state.get("campaign",{}).get("active",false)):
+            # Register collisions on all fronts, even during a tactical siege.
+            BattleQueue.advance(state)
+        elif state.get("individual_battle",{}).is_empty():
             if float(state.get("seconds",0.0)) >= float(state.get("battle_cooldown_until",0.0)):
                 BattlePreview.detect_encounter(state)
+        if state.get("individual_battle",{}).is_empty():
             BattlePreview.tick(state,step)
         else:
             IndividualBattle.tick(state,step,world_nav)
@@ -321,6 +330,11 @@ static func load_preview(manifest_cities: Array,path: String = "user://v131_godo
     data["teams"] = teams
     if not data.has("individual_battle"):
         data["individual_battle"] = {}
+    if not data.has("pending_battles"):
+        data["pending_battles"] = []
+    for metric in ["battles_queued_total","battles_dequeued_total","battles_queue_expired"]:
+        if not data.has(metric):
+            data[metric] = 0
     for key in ["individual_battles_started", "individual_battles_finished"]:
         if not data.has(key):
             data[key] = 0
