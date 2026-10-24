@@ -5,6 +5,7 @@ extends RefCounted
 const Military = preload("res://scripts/core/military_port.gd")
 const Preview = preload("res://scripts/core/preview_sim_port.gd")
 const Fort = preload("res://scripts/core/city_fortification_port.gd")
+const CampaignSiege = preload("res://scripts/core/campaign_siege_port.gd")
 const CAMPAIGN_AI_FIRST_TURN: int = 10
 const CAMPAIGN_ATTACK_FIRST_TURN: int = 18
 const MIN_ATTACK_UNITS: int = 2
@@ -170,6 +171,12 @@ static func occupy_unfortified(state: Dictionary) -> Dictionary:
         captured += 1
     state["city_occupation_progress"] = progress
     return {"captured":captured}
+
+static func prepare_city_sieges(state: Dictionary) -> Dictionary:
+    return CampaignSiege.prepare(state)
+
+static func advance_blockades(state: Dictionary) -> Dictionary:
+    return CampaignSiege.advance_blockades(state)
 
 static func report(state: Dictionary,team: int) -> String:
     var army_count: int = 0
