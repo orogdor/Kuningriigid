@@ -1,5 +1,18 @@
 # Kuningriigid → Godot 4: pordi seis (2026-10-24)
 
+## V4.9 / Godot Dev 116 – automaatne päris piiramistehnika AI-le (2026-10-24)
+
+- `campaign_siege_ai_port.gd` seob AI piiramistaktika olemasoleva `Siege.start_ladder` ja `Siege.start_assault_work` mootoriga. AI ehitab kindlustatud linna päris lahingus eelistatult rammi (55 puitu, 90 s), lisaks sobiva salgu abil redeli (18 puitu, 30 s). Juba avatud värava korral oskab kasutada piiramistorni (75 puitu, 120 s), kui ründesalk ja puit on olemas.
+- Maksimaalselt kaks piiramisvahendi ehituskäsku ühe lahingu alguses; igal töödel päris `owner`, progress, kohale liikumine, valmimisaeg ja olemasolev kokkupõrke-/müürikahjustuse loogika. Kulud arvestatakse maha AI riigi linna puiduvarust, mitte ei teki tasuta masinaid.
+- `individual_battle_port.gd`: AI ehitustööde automaatne algus toimub üksnes salvestatud linnamüüriga seotud lahingu käivitamisel, kui ründajaks on AI riik (mitte mängija). Korduva väljakutse korral materjalikulu ei dubleerita; kulud ja tööd on JSON-salvestatavad.
+- **11 uut testi** kontrollivad päris seotud piiramislahingut, kahte tööjärjekorda, 73 puidu tasumist, tegelikke töötaimereid, idempotentsust, kampaania statistikat, salvestatavust, vahendite puudumist materjalipuudusel, avatud värava torni ja seda, et mängija armeele AI ehitust ei tellitaks.
+- GitHub Actions **881/881 regressioonitestid**, Godoti import, Android debug APK eksport ning bootstrap PCK laadimine läbitud: https://github.com/orogdor/Kuningriigid/actions/runs/40119385444
+- Väljalase: https://github.com/orogdor/Kuningriigid/releases/tag/godot-dev-116
+- **Pordi hinnanguline valmidus ~69%**, eelmine ~67%.
+
+**Teadaolevad piirangud:** piiramistarvikute materjal võetakse praegu ründaja riigi mis tahes piisava puiduvaruga linnast; tegelik pikamaaline varustuskonvoi ja selle haavatavus pole veel porditud. Piiramisvahendite valik on algeline ega kohane pidevalt lahinguolukorraga. Eri rinnete lahingud lahendatakse endiselt järjest, mitte paralleelselt. Androidi pärisseadmel pole seda funktsiooni eraldi kontrollitud.
+
+
 ## V4.8 / Dev 113 – mitmest linnast koonduvad päris piiramisarmeed (2026-10-24)
 
 - `campaign_rally_port.gd`: kui AI-l on kindlustatud vastaselinn käeulatuses, kuid koduarmee on alla 4 üksuse (või vajab pärast kodugarnisoni jätmist täiendust), valib ta liitlaste teise linna olemasoleva doonorarmee. Donorist suunatakse osa päriselt juba värvatud üksusi eraldi marssivasse koondusüksusse, jättes linnale vähemalt 1 kaitseüksuse.
