@@ -41,7 +41,7 @@ planAIDefenses(mock,1,city);
 assert.ok(city.defensePlanV139?.slots?.length>30,'wealthy established town gets wall plan');
 assert.equal(city.defensePlanV139.constructed,1);
 assert.equal(city.economy.buildings.at(-1).historicPerimeterV139,true);
-mock.s.time+=60;realm.resources.wood=70;
+mock.s.time+=60;realm.resources.wood=35; // below the V146 defense-surplus threshold
 planAIDefenses(mock,1,city);
 assert.equal(city.defensePlanV139.constructed,1,'walls stop when spare construction resources fall');
 const s=JSON.parse(fs.readFileSync('scenarios/ai-city-v138.manifest.json'));
