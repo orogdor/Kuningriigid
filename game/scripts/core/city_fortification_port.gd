@@ -1,6 +1,6 @@
 extends RefCounted
 ## V3.6 preview city palisades. These are real, resource-paid persistent
-## construction, but NOT yet siege colliders, damage, gates or battle defense.
+## construction, linked to native V131 siege combat with persisted damage.
 const Economy = preload("res://scripts/core/economy_port.gd")
 const Layout = preload("res://scripts/core/city_layout_port.gd")
 const FIRST_COST: Dictionary = {"wood":65.0,"stone":20.0}
@@ -66,3 +66,46 @@ static func build_next(city: Dictionary) -> Dictionary:
     city["fortification"]["tiles"].append([tile.x,tile.y])
     return {"ok":true,"reason":"Linnavall rajatud ruudule %d,%d" % [tile.x,tile.y],
         "tile":[tile.x,tile.y],"cost":available["cost"]}
+
+static func gate_is_open(city: Dictionary,tile: Vector2i) -> bool:
+    if not fortified(city,tile):
+        return false
+    var fort: Dictionary = city.get("fortification",{})
+    return bool(fort.get("gates_open",{}).get(tile_key(tile.x,tile.y),false))
+
+static func set_gate(city: Dictionary,tile: Vector2i,opened: bool) -> bool:
+    if not fortified(city,tile):
+        return false
+    var fort: Dictionary = city["fortification"]
+    if not fort.has("gates_open"):
+        fort["gates_open"] = {}
+    fort["gates_open"][tile_key(tile.x,tile.y)] = opened
+    return true
+
+static func apply_siege_damage(city: Dictionary,siege: Dictionary) -> bool:
+    # Battle has its own mutable section data. Copy back after termination so
+    # the next attack cannot magically restore every segment to full strength.
+    if not bool(siege.get("linked_city",false)):
+        return false
+    var tile := Vector2i(int(siege.get("city_c",-1)),int(siege.get("city_r",-1)))
+    if int(siege.get("city_team",-1)) != int(city.get("team",-2)) or not fortified(city,tile):
+        return false
+    var fort: Dictionary = city["fortification"]
+    if not fort.has("integrity"):
+        fort["integrity"] = {}
+    var changed: bool = false
+    for section in siege.get("sections",[]):
+        var key: String = String(section.get("source_key",""))
+        var prefix: String = "%d:%d:" % [tile.x,tile.y]
+        if not key.begins_with(prefix):
+            continue
+        var maximum: float = maxf(1.0,float(section.get("max_hp",420.0)))
+        var hp: float = clampf(float(section.get("hp",maximum)),0.0,maximum)
+        fort["integrity"][key] = hp
+        changed = true
+    if bool(siege.get("gate_open",false)):
+        set_gate(city,tile,true)
+        changed = true
+    fort["last_battle_breaches"] = int(siege.get("breaches",0))
+    fort["last_battle_captured"] = bool(siege.get("captured",false))
+    return changed
