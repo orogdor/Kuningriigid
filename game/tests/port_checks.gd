@@ -31,6 +31,7 @@ const WorldTradeNav = preload("res://scripts/adapters/world_trade_nav.gd")
 const Military = preload("res://scripts/core/military_port.gd")
 const BattlePreview = preload("res://scripts/core/battle_preview_port.gd")
 const BattleQueue = preload("res://scripts/core/campaign_battle_queue_port.gd")
+const BattleBrief = preload("res://scripts/core/campaign_battle_brief_port.gd")
 const IndividualBattle = preload("res://scripts/core/individual_battle_port.gd")
 const BattleDoctrine = preload("res://scripts/core/battle_doctrine_v131.gd")
 const BattleFormations = preload("res://scripts/core/battle_formations_v131.gd")
@@ -608,6 +609,16 @@ static func run() -> Dictionary:
         start_front and int(fronts_state["individual_battle"]["world_c"])==25 and int(fronts_state["individual_battles_started"])==1)
     _check(results,"v51-two-remaining-fronts-queued-not-lost",
         fronts_state["pending_battles"].size()==2 and int(fronts_state["pending_battles"][0]["c"])==45 and int(fronts_state["pending_battles"][1]["c"])==70)
+    var brief_three: Array = BattleBrief.fronts(fronts_state)
+    _check(results,"v52-panel-lists-active-plus-two-waiting-fronts",
+        brief_three.size()==3 and str(brief_three[0]["kind"])=="active" and str(brief_three[1]["kind"])=="pending" and str(brief_three[2]["kind"])=="pending")
+    _check(results,"v52-front-selector-shows-real-teams-and-army-strength",
+        int(brief_three[0]["c"])==25 and int(brief_three[0]["units_a"])==1 and int(brief_three[0]["team_b"])==1 and BattleBrief.front_label(brief_three[1]).contains("(45,20)"))
+    var brief_live: String = BattleBrief.report(fronts_state)
+    _check(results,"v52-long-mobile-report-includes-front-positions",
+        brief_live.contains("KÄIB") and brief_live.contains("OOTEL 1") and brief_live.contains("(70,20)") and brief_live.contains("Järjekorda võetud kokku: 3"))
+    _check(results,"v52-no-finished-battle-is-not-fictionally-reported",
+        brief_live.contains("Lahinguid ei ole veel lõpetatud."))
     _check(results,"v51-queued-armies-stay-at-contact-position",
         distant_a["path"].is_empty() and distant_b["path"].is_empty() and middle_a["path"].is_empty())
     _check(results,"v51-do-not-start-simultaneous-second-battle",
@@ -650,6 +661,29 @@ static func run() -> Dictionary:
         legacy_saved and legacy_loaded.get("pending_battles",[]).is_empty() and int(legacy_loaded.get("battles_queued_total",0))==0)
     if FileAccess.file_exists("user://v51_legacy.json"):
         DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v51_legacy.json"))
+    var brief_done: Dictionary = {"world_c":44,"world_r":19,"winner":1,"initial_men":60,
+        "reserve_men":12,"casualties":{"1":7,"0":11},"shots":25,"impacts":9,"steps":150,
+        "retreats":[{"army":3}],"city_capture":{"ok":true},
+        "siege":{"breaches":2,"ram_hits":6}}
+    var report_fixture: Dictionary = {"pending_battles":[],"individual_battle":{},
+        "battle_log":[brief_done],"individual_battles_finished":1,
+        "battles_queued_total":3,"battles_queue_expired":1}
+    var final_brief: String = BattleBrief.report(report_fixture)
+    _check(results,"v52-report-shows-real-winner-location-and-men",
+        final_brief.contains("(44,19)") and final_brief.contains("Riik 1") and final_brief.contains("60 meest") and final_brief.contains("12"))
+    _check(results,"v52-report-shows-casualties-shots-and-retreat",
+        final_brief.contains("R0: 11") and final_brief.contains("R1: 7") and final_brief.contains("Laske: 25") and final_brief.contains("Taganemised: 1"))
+    _check(results,"v52-report-displays-wall-breaches-and-real-capture",
+        final_brief.contains("Müüri läbimurdeid: 2") and final_brief.contains("vallutatud: jah"))
+    _check(results,"v52-report-empty-fronts-safe-and-finished-only",
+        BattleBrief.fronts(report_fixture).is_empty() and final_brief.contains("Praegu pole aktiivseid ega ootel lahinguid."))
+    _check(results,"v52-battle-report-does-not-mutate-simulation-state",
+        report_fixture["battle_log"].size()==1 and int(report_fixture["battles_queued_total"])==3 and int(report_fixture["battle_log"][0]["winner"])==1)
+    var report_json = JSON.parse_string(JSON.stringify(report_fixture))
+    _check(results,"v52-last-report-survives-save-format-roundtrip",
+        report_json is Dictionary and BattleBrief.report(report_json).contains("Langenuid: R0: 11, R1: 7"))
+    _check(results,"v52-old-log-without-modern-fields-prints-safely",
+        BattleBrief.report({"battle_log":[{"winner":-1}]}).contains("Sõdurikaotuste täpne arv puudub."))
     # V4.3 physical founders: no instant teleportation / no double charging.
     var journey_state: Dictionary = Preview.initialize([
         {"id":0,"c":20,"r":20,"team":0,"name":"Teekonna kodu"},
