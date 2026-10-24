@@ -6,6 +6,7 @@ const Military = preload("res://scripts/core/military_port.gd")
 const Preview = preload("res://scripts/core/preview_sim_port.gd")
 const Fort = preload("res://scripts/core/city_fortification_port.gd")
 const CampaignSiege = preload("res://scripts/core/campaign_siege_port.gd")
+const CampaignDefense = preload("res://scripts/core/campaign_defense_port.gd")
 const CAMPAIGN_AI_FIRST_TURN: int = 10
 const CAMPAIGN_ATTACK_FIRST_TURN: int = 18
 const MIN_ATTACK_UNITS: int = 2
@@ -70,7 +71,7 @@ static func ai_recruit(state: Dictionary,landscape = null) -> Dictionary:
             for army in state.get("armies",[]):
                 if int(army.get("team",-1)) == team and int(army.get("c",-2)) == home.x and int(army.get("r",-2)) == home.y:
                     stationed += Military.units_for(state,army).size()
-            if stationed >= 4:
+            if stationed >= 6:
                 continue
             if bool(Military.train(state,i,"spearman","standard").get("ok",false)):
                 trained += 1
@@ -148,7 +149,7 @@ static func ai_march(state: Dictionary,world_nav) -> Dictionary:
     var front_counts: Dictionary = {}
     for army in state.get("armies",[]):
         var team: int = int(army.get("team",-1))
-        if team < 1 or team > 3 or army.get("path",[]).is_empty() or Military.units_for(state,army).is_empty():
+        if team < 1 or team > 3 or army.get("path",[]).is_empty() or Military.units_for(state,army).is_empty() or String(army.get("strategic_role","")) == "relief":
             continue
         front_counts[team] = int(front_counts.get(team,0))+1
         var id: int = int(army.get("campaign_target_city",-1))
@@ -166,12 +167,14 @@ static func ai_march(state: Dictionary,world_nav) -> Dictionary:
             continue
         if not ongoing.is_empty() and int(army.get("id",-1)) in [int(ongoing.get("army_a",-1)),int(ongoing.get("army_b",-1))]:
             continue
-        if String(army.get("strategic_role","")) == "garrison":
+        if String(army.get("strategic_role","")) in ["garrison","relief"]:
             continue
         var point := Vector2i(int(army["c"]),int(army["r"]))
         if _on_hostile_city(state,team,point):
             continue # Stay for the occupation or linked city siege.
         var home: Dictionary = _friendly_city(state,team,point)
+        if not home.is_empty() and CampaignDefense.threatened(state,team,point):
+            continue # Preserve the endangered city's garrison.
         var other_guards: bool = _has_other_garrison(state,team,point,int(army["id"])) if not home.is_empty() else false
         var troops: Array = Military.units_for(state,army)
         var should_split: bool = not home.is_empty() and not other_guards and troops.size() >= 3
@@ -186,6 +189,10 @@ static func ai_march(state: Dictionary,world_nav) -> Dictionary:
         for option in _candidates(state,team,point,reserved):
             var city: Dictionary = option["city"]
             var dest := Vector2i(int(city["c"]),int(city["r"]))
+            var siege_minimum: int = 4 if Fort.fortified(city,dest) else MIN_ATTACK_UNITS
+            var ready_to_depart: int = troops.size()-(1 if should_split else 0)
+            if ready_to_depart < siege_minimum:
+                continue # Rally paid reinforcements before a wall assault.
             var order: Dictionary = Military.command_move(state,int(army["id"]),dest.x,dest.y,world_nav)
             if not bool(order.get("ok",false)):
                 continue # A land route may be blocked by water.
@@ -267,6 +274,9 @@ static func occupy_unfortified(state: Dictionary) -> Dictionary:
         captured += 1
     state["city_occupation_progress"] = progress
     return {"captured":captured}
+
+static func recall_threatened(state: Dictionary,world_nav) -> Dictionary:
+    return CampaignDefense.recall(state,world_nav)
 
 static func prepare_city_sieges(state: Dictionary) -> Dictionary:
     return CampaignSiege.prepare(state)
