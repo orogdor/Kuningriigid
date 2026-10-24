@@ -141,11 +141,11 @@ static func run() -> Dictionary:
     _check(results,"v44-ai-marches-to-rival-city",int(ai_march_order["ordered"])==1 and war_state["armies"][0]["path"].size()>0)
     _check(results,"v44-ai-target-memo",int(war_state["armies"][0].get("campaign_target_city",-1))==0)
     _check(results,"v44-ai-keeps-existing-legal-route",int(CampaignWar.ai_march(war_state,strategic_nav)["ordered"])==0)
-    var army_save: bool = Preview.save_preview(war_state,"user://v44_campaign_army.json")
+    var war_army_save: bool = Preview.save_preview(war_state,"user://v44_campaign_army.json")
     var army_load: Dictionary = Preview.load_preview([
         {"id":0,"team":0,"c":60,"r":20,"name":"Kaitselinn"},
         {"id":1,"team":1,"c":38,"r":20,"name":"Väepealik"}],"user://v44_campaign_army.json")
-    _check(results,"v44-army-route-and-recruits-persist",army_save and army_load.get("armies",[]).size()==1 and army_load["armies"][0].get("path",[]).size()>0 and int(army_load.get("ai_military_recruit_orders",0))==2)
+    _check(results,"v44-army-route-and-recruits-persist",war_army_save and army_load.get("armies",[]).size()==1 and army_load["armies"][0].get("path",[]).size()>0 and int(army_load.get("ai_military_recruit_orders",0))==2)
     if FileAccess.file_exists("user://v44_campaign_army.json"):
         DirAccess.remove_absolute(ProjectSettings.globalize_path("user://v44_campaign_army.json"))
     var battlefield_state: Dictionary = Preview.initialize([
@@ -163,9 +163,9 @@ static func run() -> Dictionary:
         {"id":0,"team":0,"c":20,"r":20,"name":"Avatud linn"},
         {"id":1,"team":1,"c":35,"r":20,"name":"Vallutaja"}])
     occupation_state["campaign"] = {"active":true,"player_team":0,"turn":30,"result":"playing"}
-    var attacker: Dictionary = Military.create_army(occupation_state,1,20,20)
-    Military.add_unit(occupation_state,attacker,"spearman")
-    Military.add_unit(occupation_state,attacker,"spearman")
+    var occupying_army: Dictionary = Military.create_army(occupation_state,1,20,20)
+    Military.add_unit(occupation_state,occupying_army,"spearman")
+    Military.add_unit(occupation_state,occupying_army,"spearman")
     var first_occupation: Dictionary = CampaignWar.occupy_unfortified(occupation_state)
     _check(results,"v44-city-requires-two-occupation-turns",int(first_occupation["captured"])==0 and int(occupation_state["cities"][0]["team"])==0)
     _check(results,"v44-first-occupation-tracked",int(occupation_state["city_occupation_progress"]["0"]["turns"])==1)
