@@ -31,6 +31,12 @@ jobs:
             if [ "$i" -eq 40 ]; then echo "PUBLIC V159 SAVE NOT AVAILABLE" >&2; exit 1; fi
             sleep 5
           done
+      - name: Check live JavaScript assets
+        run: |
+          curl --fail --location --silent --show-error "https://orogdor.github.io/Kuningriigid/civilization.js?v=159-diagnostic-${GITHUB_RUN_ID}" -o /tmp/live-civilization.js
+          curl --fail --location --silent --show-error "https://orogdor.github.io/Kuningriigid/ai-medieval-demo-v159.js?v=159-diagnostic-${GITHUB_RUN_ID}" -o /tmp/live-loader.js
+          wc -c /tmp/live-civilization.js /tmp/live-loader.js
+          grep -n -m 2 'aiMedievalV159Demo' /tmp/live-civilization.js || echo 'PUBLIC CIVILIZATION.JS MISSING V159 ROUTE'
       - name: Install browser tester
         run: npm install --no-save playwright
       - name: Verify V159 public game link on mobile and desktop
@@ -44,9 +50,12 @@ jobs:
               const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});
               await context.addInitScript(()=>localStorage.setItem('kingdoms-quality','low'));
               const page=await context.newPage(),errors=[];page.setDefaultTimeout(180000);
-              page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>console.log('REQUEST FAILED',r.url(),r.failure()?.errorText));
+              page.on('pageerror',e=>{errors.push(e.message);console.log('PAGE ERROR',e.message)});page.on('console',m=>{if(m.type()==='error')console.log('CONSOLE ERROR',m.text())});page.on('requestfailed',r=>console.log('REQUEST FAILED',r.url(),r.failure()?.errorText));
               await page.goto('https://orogdor.github.io/Kuningriigid/?v=159-20261024&demo=ai-medieval-v159',{waitUntil:'domcontentloaded',timeout:150000});
-              await page.waitForFunction(()=>window.gameDebug&&!document.getElementById('menu-status').hidden,null,{timeout:180000});
+              await page.waitForTimeout(25000);
+              const diag=await page.evaluate(()=>({readyState:document.readyState,location:location.href,title:document.title,hasGameDebug:!!window.gameDebug,menuHidden:document.getElementById('menu-status')?.hidden,menuStatus:document.getElementById('menu-status')?.textContent?.slice(0,400),scripts:[...document.scripts].map(s=>s.src).slice(-10)}));
+              console.log('PUBLIC LIVE DIAGNOSTIC',JSON.stringify(diag),'ERRORS',JSON.stringify(errors));
+              await page.waitForFunction(()=>window.gameDebug&&!document.getElementById('menu-status').hidden,null,{timeout:12000});
               const result=await page.evaluate(()=>({demo:gameDebug.state.demo,test:gameDebug.state.medievalTestV159,city:gameDebug.activeCity()?.id,view:gameDebug.view()}));
               assert.equal(result.demo,'ai-medieval-v159');assert.equal(result.test.turn,189);assert.equal(result.city,result.test.targetCityId);assert.equal(result.view,'local');assert.deepEqual(errors,[]);
               console.log('PUBLIC BROWSER PASS',mobile?'mobile':'desktop',JSON.stringify({turn:result.test.turn,city:result.test.targetCityName}));
