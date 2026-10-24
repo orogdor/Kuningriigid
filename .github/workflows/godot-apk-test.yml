@@ -133,6 +133,19 @@ jobs:
             cp "$source_dir/android_release.apk" "$dest/android_release.apk"
           fi
           ls -lh "$dest/android_debug.apk" "$dest/android_release.apk"
+          mkdir -p "${HOME}/.config/godot"
+          if [[ -s /root/.config/godot/editor_settings-4.7.tres ]]; then
+            cp /root/.config/godot/editor_settings-4.7.tres "${HOME}/.config/godot/editor_settings-4.7.tres"
+          else
+            printf '[gd_resource type="EditorSettings" format=3]\n[resource]\n' > "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/android_sdk_path = "/usr/lib/android-sdk"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/debug_keystore = "/root/debug.keystore"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/debug_keystore_user = "androiddebugkey"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+            printf 'export/android/debug_keystore_pass = "android"\n' >> "${HOME}/.config/godot/editor_settings-4.7.tres"
+          fi
+          grep -E 'export/android/(java_sdk_path|android_sdk_path|debug_keystore) ' "${HOME}/.config/godot/editor_settings-4.7.tres" | sed 's/debug_keystore.*/debug_keystore: configured/'
+
       - name: Ehita Android APK
         if: steps.source.outputs.ready == 'true'
         shell: bash
