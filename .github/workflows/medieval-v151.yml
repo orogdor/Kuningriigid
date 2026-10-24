@@ -52,7 +52,7 @@ jobs:
             throw Error('World stagnated before first Medieval transition '+JSON.stringify({turn:m.turn,cities:m.totalCities,population:m.totals.pop}));
           console.log('MEDIEVAL I VERIFIED',JSON.stringify({turn:m.turn,cities:m.totalCities,population:m.totals.pop,ages:m.byTeam.map(x=>x.age)}));
           NODE
-      - name: Browser test: Android, desktop, Claude soldiers, terrain and earlier AI save
+      - name: Browser regressions on phone and desktop with Claude soldiers and terrain
         run: |
           npm install --no-save playwright
           export CHROME_PATH="$(command -v google-chrome)"
