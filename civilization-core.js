@@ -187,7 +187,7 @@ BUILDINGS.barracks.requires=['hall'];BUILDINGS.mason.requires=['hall'];BUILDINGS
 const copy=x=>JSON.parse(JSON.stringify(x)),distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export const tileKey=p=>p.c+':'+p.r;
 export const STARTS=[{c:Math.round(COLS*.16),r:Math.round(ROWS*.21)},{c:Math.round(COLS*.78),r:Math.round(ROWS*.20)},{c:Math.round(COLS*.20),r:Math.round(ROWS*.78)},{c:Math.round(COLS*.76),r:Math.round(ROWS*.80)}];
-export const FACTION_NAMES=['Kadaka','Ida','Põhja','Lõuna'];
+export const FACTION_NAMES=['Eesti','Soome','Rootsi','Norra']; // Team cultures and their own story-based village names
 
 function generateRivers(cells,noise,starts=[]){
  const idx=(c,r)=>cells[r*COLS+c],startSet=new Set(starts.map(p=>p.c+':'+p.r));
