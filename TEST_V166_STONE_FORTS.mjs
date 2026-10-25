@@ -48,7 +48,7 @@ planStoneVillageDefenses(model,1,city);
 assert.equal(city.economy.buildings.at(-1).type,'woodgate','second opposing entrance follows');
 assert.equal(resources.wood,138);
 const completed=city.stoneDefensePlanV166.constructed;
-resources.wood=12;model.s.time+=25;
+resources.wood=10;model.s.time+=25;
 planStoneVillageDefenses(model,1,city);
 assert.equal(city.stoneDefensePlanV166.constructed,completed,'defense does not consume scarce construction timber');
 // Real AI playthrough. Observe where each AI finishes Stone Age; do not inject resources.
