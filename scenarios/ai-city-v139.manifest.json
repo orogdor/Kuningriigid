@@ -4,30 +4,30 @@
     {
       "team": 1,
       "cities": 1,
-      "buildings": 48,
+      "buildings": 63,
       "markets": 0,
       "harbors": 0,
-      "houses": 13,
+      "houses": 15,
       "fields": 1,
       "ages": 1
     },
     {
       "team": 2,
-      "cities": 6,
-      "buildings": 186,
-      "markets": 6,
-      "harbors": 1,
-      "houses": 62,
-      "fields": 1,
-      "ages": 3
+      "cities": 2,
+      "buildings": 145,
+      "markets": 2,
+      "harbors": 0,
+      "houses": 28,
+      "fields": 2,
+      "ages": 1
     },
     {
       "team": 3,
       "cities": 2,
-      "buildings": 164,
+      "buildings": 142,
       "markets": 2,
-      "harbors": 2,
-      "houses": 45,
+      "harbors": 0,
+      "houses": 43,
       "fields": 1,
       "ages": 2
     }
@@ -35,129 +35,61 @@
   "landUse": [
     {
       "name": "Järnsida",
-      "owned": 298,
+      "owned": 363,
       "developed": 7,
       "ruralDeveloped": 0,
-      "planned": 1,
-      "homes": 25,
+      "planned": 5,
+      "homes": 14,
       "foodGrowthBonus": 0.2
     },
     {
       "name": "Runsten",
-      "owned": 363,
-      "developed": 4,
+      "owned": 289,
+      "developed": 7,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 17,
+      "homes": 14,
       "foodGrowthBonus": 0.2
-    },
-    {
-      "name": "Uppsala",
-      "owned": 239,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 8,
-      "foodGrowthBonus": 0.2
-    },
-    {
-      "name": "Ynglinga",
-      "owned": 21,
-      "developed": 3,
-      "ruralDeveloped": 1,
-      "planned": 0,
-      "homes": 3,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Svitjod",
-      "owned": 75,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 3,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Bråvalla",
-      "owned": 147,
-      "developed": 2,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 6,
-      "foodGrowthBonus": 0.15000000000000002
     }
   ],
   "density": [
     {
       "city": "Järnsida",
-      "nearEdge": 2,
+      "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 96,
+      "urbanBuildings": 67,
       "urbanTiles": 89
     },
     {
       "city": "Runsten",
-      "nearEdge": 1,
-      "expanded": 0,
-      "urbanBuildings": 36,
-      "urbanTiles": 86
-    },
-    {
-      "city": "Uppsala",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 20,
-      "urbanTiles": 58
-    },
-    {
-      "city": "Ynglinga",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 8,
-      "urbanTiles": 18
-    },
-    {
-      "city": "Svitjod",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 9,
-      "urbanTiles": 17
-    },
-    {
-      "city": "Bråvalla",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 15,
-      "urbanTiles": 35
+      "urbanBuildings": 76,
+      "urbanTiles": 74
     }
   ],
   "historicMetrics": [
     {
       "name": "Järnsida",
-      "centreHouses": 15,
-      "mainTileHouses": 16,
-      "totalHouses": 25,
+      "centreHouses": 11,
+      "mainTileHouses": 14,
+      "totalHouses": 14,
       "walls": 29,
       "gates": 0,
       "wallPlan": 60,
       "services": {
-        "well": 1,
+        "well": 2,
         "study": 1,
-        "warehouse": 1,
-        "scriptorium": 1,
-        "market": 1,
-        "cellar": 1,
-        "harbor": 1
+        "market": 1
       }
     },
     {
       "name": "Runsten",
-      "centreHouses": 13,
-      "mainTileHouses": 16,
-      "totalHouses": 17,
-      "walls": 0,
-      "gates": 0,
+      "centreHouses": 9,
+      "mainTileHouses": 14,
+      "totalHouses": 14,
+      "walls": 42,
+      "gates": 1,
       "wallPlan": 60,
       "services": {
         "well": 1,
@@ -165,88 +97,22 @@
         "market": 1,
         "scriptorium": 1
       }
-    },
-    {
-      "name": "Uppsala",
-      "centreHouses": 8,
-      "mainTileHouses": 8,
-      "totalHouses": 8,
-      "walls": 1,
-      "gates": 0,
-      "wallPlan": 60,
-      "services": {
-        "scriptorium": 1,
-        "market": 1
-      }
-    },
-    {
-      "name": "Ynglinga",
-      "centreHouses": 3,
-      "mainTileHouses": 3,
-      "totalHouses": 3,
-      "walls": 0,
-      "gates": 0,
-      "wallPlan": 0,
-      "services": {
-        "well": 1,
-        "market": 1
-      }
-    },
-    {
-      "name": "Svitjod",
-      "centreHouses": 3,
-      "mainTileHouses": 3,
-      "totalHouses": 3,
-      "walls": 0,
-      "gates": 0,
-      "wallPlan": 0,
-      "services": {
-        "well": 1,
-        "market": 1
-      }
-    },
-    {
-      "name": "Bråvalla",
-      "centreHouses": 6,
-      "mainTileHouses": 6,
-      "totalHouses": 6,
-      "walls": 0,
-      "gates": 0,
-      "wallPlan": 0,
-      "services": {
-        "well": 1,
-        "market": 1
-      }
     }
   ],
   "seed": 139023,
   "turn": 201,
   "sourceTeam": 2,
-  "cities": 6,
-  "buildings": 186,
+  "cities": 2,
+  "buildings": 145,
   "spacingPairs": [
-    9,
-    12,
-    13,
-    22,
-    17,
-    21,
-    22,
-    31,
-    13,
-    9,
-    10,
-    15,
-    9,
-    21,
-    25
+    9
   ],
   "ages": [
-    3,
+    1,
     1,
     0,
     2
   ],
-  "bytes": 1803524,
-  "seconds": 102
+  "bytes": 1266030,
+  "seconds": 68
 }
