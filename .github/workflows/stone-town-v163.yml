@@ -1,0 +1,42 @@
+name: V163 Stone Age Town Zoning and Fields
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stone-town-v163.yml'
+      - 'stone-town-plan-v163.js'
+      - 'historic-urban-v138.js'
+      - 'ai-rural-v143.js'
+      - 'civilization-core.js'
+      - 'TEST_V163_STONE_CITY.mjs'
+      - 'scripts/stone-town-v163-report.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stone-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Syntax and stone town placement rules
+        run: |
+          node --check stone-town-plan-v163.js
+          node --check historic-urban-v138.js
+          node --check ai-rural-v143.js
+          node --check civilization-core.js
+          node --check scripts/stone-town-v163-report.mjs
+          node TEST_V163_STONE_CITY.mjs
+      - name: Legacy compact town tests
+        run: |
+          node TEST_V139.mjs
+          node TEST_V138.mjs
+      - name: Real 48 turn Stone Age simulation
+        run: node scripts/stone-town-v163-report.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v163-stone-town-report
+          path: artifacts-v163/
