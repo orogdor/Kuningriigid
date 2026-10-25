@@ -65,6 +65,8 @@ for(let turn=1;turn<=70;turn++){
   readyWalls:game.allBuildings(c).filter(b=>['palisade','woodgate','watchtower'].includes(b.type)&&b.hp>0&&b.ready).length,
   total: c.stoneDefensePlanV166?.slots.length||0,
   status:c.aiStoneDefenseStatusV166?.reason||null,
+  details:c.aiStoneDefenseStatusV166?.details||{},
+  initialBlocked:c.stoneDefensePlanV166?.initialBlocked||0,
   stocks:{wood:Math.round(c.economy.realms[c.team].resources.wood||0),stone:Math.round(c.economy.realms[c.team].resources.stone||0)}
  }));
  for(const team of [1,2,3])if(eras[team]==null&&game.s.ages[team]>0)eras[team]=turn;
