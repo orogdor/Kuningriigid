@@ -2,7 +2,7 @@
 // Separate saved plan from the Bronze stone ring, so the latter stays compatible.
 // All placements go through normal building, pathfinding and resource checks.
 import {canAfford} from './economy.js';
-export const STONE_VILLAGE_DEFENSE_VERSION=166;
+export const STONE_VILLAGE_DEFENSE_VERSION=167;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const HOUSING=new Set(['hall','house','well','study','market','warehouse','cellar']);
 const FORTS=new Set(['palisade','woodgate','watchtower','stonewall','gatehouse','stonetower','reinforced_wall']);
@@ -20,28 +20,35 @@ export function stoneVillageWallPlan(buildings=[],seed=0){
  const rz=snap(clamp(radius(sorted('z'))+14,42,56));
  const slots=[];
  const push=(type,x,z,wallAxis=0)=>slots.push({type,x:Math.round((x+hall.x)*2)/2,z:Math.round((z+hall.z)*2)/2,wallAxis});
- // Each paid timber section spans 14m; end caps are 7m. This halves
- // construction orders versus the old 7m ring while preserving collisions.
+ // Segment endpoints, not building counts, define the enclosure. Two 14m
+ // gates cross the main N/S road. Palisade ends meet each gate and tower.
+ // Long variable spans are real paid buildings, with matching nav footprints.
  for(const z of [-rz,rz])push('woodgate',0,z,0);
  for(const x of [-rx,rx])for(const z of [-rz,rz])push('watchtower',x,z,0);
- for(const z of [-rz,rz]){
-  for(let x=14;x<=rx-14;x+=14)for(const sign of [-1,1])
-   slots.push({type:'palisade',x:hall.x+sign*x,z:hall.z+z,wallAxis:0,extendedPalisadeV166:true});
-  for(const sign of [-1,1])push('palisade',sign*(rx-7),z,0);
+ for(const z of [-rz,rz])for(const side of [-1,1]){
+  const distance=rx-7,parts=Math.max(1,Math.ceil(distance/25));
+  for(let i=0;i<parts;i++){
+   const a=7+distance*i/parts,b=7+distance*(i+1)/parts;
+   const centre=(a+b)/2;
+   push('palisade',side*centre,z,0);
+   slots.at(-1).palisadeSpanV167=b-a;
+  }
  }
  for(const x of [-rx,rx]){
-  for(let z=0;z<=rz-14;z+=14)for(const sign of (z===0?[1]:[-1,1]))
-   slots.push({type:'palisade',x:hall.x+x,z:hall.z+sign*z,wallAxis:1,extendedPalisadeV166:true});
-  for(const sign of [-1,1])push('palisade',x,sign*(rz-7),1);
+  const parts=Math.max(2,Math.ceil(2*rz/28));
+  for(let i=0;i<parts;i++){
+   const a=-rz+2*rz*i/parts,b=-rz+2*rz*(i+1)/parts;
+   push('palisade',x,(a+b)/2,1);
+   slots.at(-1).palisadeSpanV167=b-a;
+  }
  }
- // Double-width wooden gate leaves a pedestrian-clear central opening.
  for(const slot of slots)if(slot.type==='woodgate')slot.extendedPalisadeV166=true;
  return {version:STONE_VILLAGE_DEFENSE_VERSION,slots,gateOpenings:2,rx,rz,
    shape:'rectangular-wooden-palisade',nextIndex:0,constructed:0,blocked:0,seed};
 }
 export function stoneVillageDefenseEligibility({age=0,pop=0,readyHouses=0,services=0,waiting=0,stock={}}){
  const reason=age!==0?'later-era':pop<7?'population':
-  readyHouses<4?'housing':services<1?'services':waiting>2?'construction-backlog':
+  readyHouses<4?'housing':services<1?'services':waiting>3?'construction-backlog':
   (stock.wood||0)<12?'timber-reserve':(stock.water||0)<pop?'water':
   foodTotal(stock)<pop*1.4?'food':null;
  return {ok:reason===null,reason};
@@ -50,7 +57,7 @@ export function planStoneVillageDefenses(game,team,city){
  const age=game.s.ages[team],local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
  if(age!==0)return false; // let the existing Bronze fortification strategy proceed
  if(game.s.time<(city.nextStoneDefenseCheckV166||0))return true;
- city.nextStoneDefenseCheckV166=game.s.time+24;
+ city.nextStoneDefenseCheckV166=game.s.time+9;
  const realm=city.economy.realms[team],stock=realm.resources,
   all=game.allBuildings(city),pending=all.filter(b=>!b.ready&&b.hp>0);
  const eligibility=stoneVillageDefenseEligibility({
@@ -59,10 +66,11 @@ export function planStoneVillageDefenses(game,team,city){
   waiting:pending.length,stock
  });
  if(!eligibility.ok){city.aiStoneDefenseStatusV166={reason:eligibility.reason,at:game.s.time};return true;}
- if(all.some(b=>FORTS.has(b.type)&&!b.ready&&b.hp>0)){
+ if(all.filter(b=>FORTS.has(b.type)&&!b.ready&&b.hp>0).length>=2){
   city.aiStoneDefenseStatusV166={reason:'construction-in-progress',at:game.s.time};return true;
  }
- if(!city.stoneDefensePlanV166)
+ if(!city.stoneDefensePlanV166||
+    (city.stoneDefensePlanV166.version<167&&!local.some(b=>b.historicPalisadeV166&&b.hp>0)))
   city.stoneDefensePlanV166=stoneVillageWallPlan(local,game.s.seed+city.id*19);
  const plan=city.stoneDefensePlanV166,counts={};
  let ready=0,placed=0;
@@ -82,8 +90,10 @@ export function planStoneVillageDefenses(game,team,city){
   if(game.buildRule(city,slot.type)){counts.locked=(counts.locked||0)+1;continue;}
   if(!canAfford(stock,limit)||stock.wood-(limit.wood||0)<7||
     stock.stone-(limit.stone||0)<3){counts.materials=(counts.materials||0)+1;continue;}
-  const placement={...slot,navWidth:slot.extendedPalisadeV166?(slot.wallAxis?1.1:7.2):undefined,
-   navDepth:slot.extendedPalisadeV166?(slot.wallAxis?7.2:1.1):undefined};
+  const extent=(slot.palisadeSpanV167|| (slot.extendedPalisadeV166?14:7))/2+.2;
+  const placement={...slot,
+   navWidth:slot.type==='palisade'?(slot.wallAxis?1.1:extent):(slot.extendedPalisadeV166?7.2:undefined),
+   navDepth:slot.type==='palisade'?(slot.wallAxis?extent:1.1):(slot.extendedPalisadeV166?1.1:undefined)};
   if(game.previewBuild(city,slot.type,placement).error){counts.site=(counts.site||0)+1;continue;}
   const result=game.build(city,slot.type,{...placement,plannedDefense:true});
   if(!result.building){counts.build=(counts.build||0)+1;continue;}
@@ -92,7 +102,8 @@ export function planStoneVillageDefenses(game,team,city){
   result.building.wallAxis=slot.wallAxis;
   result.building.plannedDefense=true;
   result.building.extendedPalisadeV166=!!slot.extendedPalisadeV166;
-  if(slot.extendedPalisadeV166){
+  if(slot.palisadeSpanV167)result.building.palisadeSpanV167=slot.palisadeSpanV167;
+  if(slot.extendedPalisadeV166||slot.palisadeSpanV167){
    result.building.navWidth=placement.navWidth;result.building.navDepth=placement.navDepth;
    game.nav?.(city)?.rebuild();
   }
