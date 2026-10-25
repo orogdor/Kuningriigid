@@ -16,7 +16,7 @@ const FOOTPRINTS=Object.freeze({
  pottery_kiln:[4.7,4.6],pasture:[4.8,4.8],mason:[4.8,5],
  cartwright:[5,6],coppermine:[5,6],tinmine:[5,6],
  bronze_foundry:[5.3,6],road_depot:[5.2,5],scriptorium:[5,5],
- keep:[5.7,5.3],gatehouse:[5.4,5.1],guildhall:[5.3,5.0],
+ keep:[5.7,5.3],gatehouse:[5.4,5.1],woodgate:[3.5,2.1],guildhall:[5.3,5.0],
  chapel:[5.3,5.1],monastery:[5.4,5.1],watchtower:[4.7,4.6],
  stonetower:[5.2,5.0],stonewall:[4.8,4.5],palisade:[4.8,4.5]
 });
@@ -55,7 +55,7 @@ world.navBounds={minX:this.minX,minZ:this.minZ,w:this.w,h:this.h};this.base=new 
 index(x,z){const xx=Math.round(x)-this.minX,zz=Math.round(z)-this.minZ;return xx>=0&&xx<this.w&&zz>=0&&zz<this.h?zz*this.w+xx:-1}
 point(i){return {x:i%this.w+this.minX,z:Math.floor(i/this.w)+this.minZ}}
 rebuildTerrain(){for(let z=0;z<this.h;z++)for(let x=0;x<this.w;x++)this.base[z*this.w+x]=this.passable(x+this.minX,z+this.minZ)?1:0;this.rebuild()}
-rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings()){if(b.hp<=0)continue;if(b.type==='gatehouse'){if(b.wallAxis){for(const side of [-1,1])paint(b.x,b.z+side*2.55,2.2,.95,false);}else{for(const side of [-1,1])paint(b.x+side*2.55,b.z,.95,2.2,false);}continue;}const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);// When a settlement grows or moves buildings over earlier footpaths,
+rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings()){if(b.hp<=0)continue;if(b.type==='gatehouse'||b.type==='woodgate'){if(b.wallAxis){for(const side of [-1,1])paint(b.x,b.z+side*2.55,2.2,.95,false);}else{for(const side of [-1,1])paint(b.x+side*2.55,b.z,.95,2.2,false);}continue;}const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);// When a settlement grows or moves buildings over earlier footpaths,
  // remove buried wear rather than reviving the road through a new house.
  // Old V4 saves with roads inside construction footprints repair on load.
  let buried=0;
