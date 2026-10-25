@@ -53,7 +53,7 @@ export const siegeSection=(building,index)=>{prepareWall(building);const profile
 };};
 export function attachSiegeSections(city,battle){
  if(!battle.fortress)return;
- battle.siegeSections=(city.economy.buildings||[]).flatMap((b,i)=>b.ready&&b.hp>0&&!b.disabled&&['palisade','stonewall','reinforced_wall','gatehouse'].includes(b.type)?[siegeSection(b,i)]:[]);
+ battle.siegeSections=(city.economy.buildings||[]).flatMap((b,i)=>b.ready&&b.hp>0&&!b.disabled&&['palisade','woodgate','stonewall','reinforced_wall','gatehouse'].includes(b.type)?[siegeSection(b,i)]:[]);
  battle.siegeProtected=battle.siegeSections.length>0;
  battle.keepProtected=hasReady(city,'keep');
  battle.fortress.keepBonus=battle.keepProtected?180:0;
