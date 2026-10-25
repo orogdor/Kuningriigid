@@ -442,3 +442,82 @@ Kasutaja palus parandada „mis veel hoiab välimust tagasi“ nimekirja. Muudet
 ### Testid
 - PASS: `TEST_V48`, `TEST_V152`, `TEST_V154`, `TEST_V156`, `TEST_V67`, `TEST_V149_BROWSER`, `TEST_V143_BROWSER`, `TEST_V88_EXPLORATION_UI`, `TEST_V151_BROWSER`, `TEST_V157`, `TEST_V123_UI`, `TEST_V148_BROWSER`.
 - `TEST_V88_SITES` kukub läbi ka ilma selle muudatuseta, sh V152 kõrgustega (rannakrundi kõrguse kontroll) – see ei ole V158 regressioon.
+
+---
+
+## V161 – sujuv ruutude vahetus, ühtne maapind maakera- ja detailkaardil, FPV-jalutaja (Claude, 2026-10-25)
+
+Kasutaja palus:
+1. eemaldada põldude tekstuur, mis talle ei meeldinud;
+2. teha nii, et maakera kaart vastaks detailkaardile;
+3. teha detailvaates ruutude vahel liikumine sujuvamaks;
+4. lisada nupp, millega tegelase saab kaardile panna ja FPV-vaates juhtida.
+
+Mänguloogika ja salvestused ei muutunud. V159 ja V160 on ChatGPT omad, seetõttu on see versioon V161.
+
+### 1. Põllutekstuur
+- Faili `landscape-v149.js` maailmavarjutajast on eemaldatud V157 põllumustrid. `CULTIVATION` / `setCultivation` jäid alles ühilduvuse jaoks, aga varjutaja neid enam ei loe.
+- Failis `atlas-style.js` funktsioon `atlasColor` enam `farmlandTint`-i ei kutsu.
+
+### 2. Maakera kaart = detailkaart
+- `groundBaseColor(cell)` failis `landscape-v149.js` on üks ühine maapinna palett:
+  - parasvöötme toonid on samad mis detailkaardil;
+  - kliimabioomidel (steppe, desert, taiga, tundra, jungle, mesa, snow) on oma toon mõlemal kaardil;
+  - seda kasutavad nii `atlasColor` kui ka `detailGroundColor`, sama vahemälu võtmega `'ground'`.
+- Mõlema kaardi varjutaja arvutab niidulaigud (kuiv, lopsakas, kanarbik) maailmameetrites, seega on laigud mõlemal kaardil samas kohas.
+- Faili `atmosphere-v158.js` valgus on nüüd mõlemas stseenis sama: poolkeravalgus `0xdfe9f2` / `0x5b6a45` tugevusega 1,05 ja päike 2,7.
+- Linnaala ja maakonna täitekiht `atlas-style.js`-is: läbipaistmatus muutus 0,29/0,15 → 0,11/0,07. Just see helesinine kiht muutis maakera kaardi kahvatuks. Piirjooned jäid samaks.
+
+### 3. Ruutude vahetus
+Mõõtsin, et iga ruudu vahetus (`followDetail` → `openTile`) võttis peaaegu 3 s. Sellest umbes 70% oli varjutajate kompileerimine ja ülejäänu maastiku ning rohu ehitamine.
+- **Varjutajad:**
+  - maastiku, jõe ja tee materjalides on detailruudu nihe nüüd uniform `uL149Tile`, mitte GLSL-i sisse kirjutatud arv;
+  - vahemälu võtmed ei sõltu enam ruudust: `terrain-v149-v161-*`, `water-v149-v161-*`, `road-v149-v161-*`;
+  - lisaks vabastas three.js programmi kohe, kui viimane materjal kustutati. Selle vastu on uus fail `program-keep-v161.js` funktsiooniga `releaseMaterial`, mis vabastab tekstuurid, aga materjali alles jätab. Seda kasutavad `clearLocal` ja `disposeNetwork`;
+  - linnasildi sprite'i materjali ei kustutata enam, kustutatakse ainult tekstuur;
+  - nüüd kompileeritakse ainult esimesel jõe- või rajaruudul, edaspidi enam mitte (`TEST_V161`).
+- **Maastik:**
+  - `terrainVertex()` failis `civilization.js` hoiab tipu kõrgust, värvi ja mäe-lippu ühises globaalses võrgus ruuduplokkide kaupa (LRU 48 plokki);
+  - naaberruudu 3×3 jagab 2/3 tippudest, seega arvutatakse ainult uus kolmandik;
+  - keskmise kvaliteedi Z-segmendid muutusid 260 → 261, et tipud langeksid täpselt kokku. Kõik segmentide arvud on nüüd 3 kordsed;
+  - detailvärvi laigud kasutavad maailmakoordinaate, nii et pärast ruudu vahetust muster ei hüppa.
+- **Maapinna kate:**
+  - `createGroundCoverV156(..., {fraction, salt, deferred})` võimaldab kihte ja tagastab sammud;
+  - `syncGroundCover()` failis `civilization.js` hoiab vahemälu ruudu ja kihi kaupa: keskmisel ruudul kiht a (35%) + b (65%), naabritel ainult a;
+  - naabrite sammud tehakse `runCoverJobs()` abil, kuni 5 ms kaadri kohta;
+  - kaks või enam ruutu eemal olevad ruudud vabastatakse (`disposeGroundCover`);
+  - varem jäid InstancedMesh-puhvrid vabastamata, mis oli mälu leke.
+
+### 4. FPV-jalutaja – `fpv-walker-v161.js` (uus)
+- Nupp `#hud-walk` („🧍 Walk“) tööriistaribal. Maailmavaates on see peidetud ja lahingus keelatud.
+- Esimesel vajutusel tuleb klõpsata kaardil kohta, kuhu tegelane panna (`pollPlacing(pick)`), seejärel läheb kaamera tegelase silmadesse.
+- Juhtimine:
+  - WASD / nooled, hiir pointer lock'iga, ilma lukuta lohistamine;
+  - Shift jookseb, Space hüppab, Esc väljub;
+  - puutega: vasak pool on kang, parem pool vaade.
+- Sisendid püütakse capture-faasis kinni, nii et mängu kiirklahvid ja kaardiklõpsud FPV ajal ei käivitu.
+- Kokkupõrked (`walkBlocked` failis `civilization.js`):
+  - 3×3 ala hoonete ristkülikud on 82% `buildingClearance` suurusest;
+  - läbitavad on väravad, põllud, karjamaad ja sillad;
+  - vesi on blokeeritud, kui kõrgus < −0,25.
+- Ruudupiiri ületamine:
+  - fookus järgib tegelast ja `followDetail` avab naaberruudu;
+  - `openTile` nihutab tegelast ruudu võrra (`walker.shift`, `walkerTile`);
+  - kui tegelane jääb uuest 3×3 alast välja, eemaldatakse ta.
+- Kaamera FPV ajal: fov 68, near 0,05, far 2400. Väljudes taastatakse need ja strateegiakaamera fookus läheb tegelasele.
+- Tegelane on ainult visuaal, see ei ole mänguüksus ega salvestu.
+- `gameDebug` sai juurde `worldScene` ja `walker`.
+
+### Versioonid
+- `civilization.js?v=161a` (`boot-v83.js`, `index.html` boot `?v=161a`);
+- `landscape-v149.js`, `atlas-style.js`, `atmosphere-v158.js`, `ground-detail-v156.js`, `continuous-landscape-visual.js` (varem kaks erinevat spetsifikaatorit, nüüd üks), `detail-roads.js` ja kõik endised `?v=158a` importijad on `?v=161a`;
+- `ui-v155.css?v=161a`.
+
+### Testid
+- Uus `TEST_V161.mjs`: korduval ruudu vahetusel 0 programmi linkimist, kate on 9 ruudul, maailmavarjutajas pole põllumustrit, FPV paigutus, ruudupiiri ületus ja väljumine.
+- PASS: `TEST_V161`, `TEST_V152`, `TEST_V154`, `TEST_V156`, `TEST_V157`, `TEST_V160`, `TEST_V120_LOCALE`, `TEST_V123_UI`, `TEST_V148_BROWSER`, `TEST_V149_BROWSER`, `TEST_V151_BROWSER`, `TEST_V153_BROWSER`, `TEST_V159_BROWSER`.
+- `TEST_V149_BROWSER` otsib vahemälu võtmetest sõna `v149`, seepärast on võtmed kujul `terrain-v149-v161-*` jne.
+
+### Pooleli / ideed
+- Esimesel jõe- või rajaruudul kompileeritakse üks kord veel 3–5 programmi. Selle saaks käivitusel ette soojendada.
+- `syncLocal` ja `createUnifiedRoadNetwork` võtavad ruudu vahetusel endiselt aega (umbes 100–170 ms aeglases testbrauseris).

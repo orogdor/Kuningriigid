@@ -5,7 +5,7 @@
 // one draw call per kind. Presentation only.
 import * as T from './vendor/three.module.js';
 import {DETAIL_TILE_X,DETAIL_TILE_Z} from './detail-scale-v123.js';
-import {addWind} from './atmosphere-v158.js?v=158a';
+import {addWind} from './atmosphere-v158.js?v=161a';
 
 const MAT=new T.MeshStandardMaterial({vertexColors:true,roughness:.95,metalness:0,side:T.DoubleSide});
 addWind(MAT,{strength:.35,from:.05,key:'wind-ground'});
@@ -53,9 +53,13 @@ const FLOWERS=['#f4f1e6','#f2d24a','#b58ad6','#e6795c','#8fb1e6','#f3a6c4'];
 const BUDGET={low:{grass:900,tall:120,flower:60,stone:40,shrub:16,fern:20,wood:6},medium:{grass:3400,tall:520,flower:200,stone:90,shrub:36,fern:50,wood:14},high:{grass:6500,tall:1100,flower:420,stone:150,shrub:60,fern:90,wood:24}};
 
 // avoid: optional {segments:[[x0,z0,x1,z1,halfWidth]...], rects:[[x,z,rx,rz]...]} in local units
-export function createGroundCoverV156(tile,height,quality='medium',avoid={}){
- const group=new T.Group();group.userData.groundCoverV156=true;if(!tile.land)return group;
- const budget=BUDGET[quality]||BUDGET.medium,seed=(tile.c*193+tile.r*337)%20000,woods=tile.biome==='forest'||tile.biome==='taiga'||tile.biome==='jungle',
+// V161 opts: fraction (share of the full density, for layered/neighbour cover), salt (a different
+// but equally natural scatter), deferred (return {group,steps} so the caller can spread the work
+// over several frames instead of one long freeze).
+export function createGroundCoverV156(tile,height,quality='medium',avoid={},opts={}){
+ const fraction=opts.fraction??1,steps=[];
+ const group=new T.Group();group.userData.groundCoverV156=true;if(!tile.land)return opts.deferred?{group,steps}:group;
+ const budget=BUDGET[quality]||BUDGET.medium,seed=((tile.c*193+tile.r*337)%20000)+(opts.salt||0)*7919,woods=tile.biome==='forest'||tile.biome==='taiga'||tile.biome==='jungle',
   dry=['steppe','desert','tundra','mesa','coastal_steppe'].includes(tile.biome),hills=tile.mountain||tile.biome==='hills';
  const W=DETAIL_TILE_X-4,D=DETAIL_TILE_Z-4,segs=avoid.segments||[],rects=avoid.rects||[];
  const blocked=(x,z)=>{for(const [x0,z0,x1,z1,hw] of segs){const dx=x1-x0,dz=z1-z0,l=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-x0)*dx+(z-z0)*dz)/l));if(Math.hypot(x0+dx*t-x,z0+dz*t-z)<hw)return true;}
@@ -63,6 +67,7 @@ export function createGroundCoverV156(tile,height,quality='medium',avoid={}){
  const dummy=new T.Object3D(),col=new T.Color();
  // rejection sampling against a clustering field so meadows, clearings and drifts form
  function place(name,count,{field,scale,tint,yOff=0,tilt=0}){
+  count=Math.round(count*fraction);if(count<1)return null;
   const mesh=new T.InstancedMesh(geo(name),MAT,Math.max(1,count));let n=0,tries=0;
   while(n<count&&tries<count*6){tries++;const i=tries+name.length*977;
    const x=(hash(i,seed,1)-.5)*W,z=(hash(i,seed,2)-.5)*D;if(hash(i,seed,3)>field(x,z))continue;if(blocked(x,z))continue;
@@ -70,21 +75,25 @@ export function createGroundCoverV156(tile,height,quality='medium',avoid={}){
    dummy.position.set(x,y+yOff*s,z);dummy.rotation.set((hash(i,seed,5)-.5)*tilt,hash(i,seed,4)*6.283,(hash(i,seed,6)-.5)*tilt);dummy.scale.setScalar(s);dummy.updateMatrix();
    mesh.setMatrixAt(n,dummy.matrix);mesh.setColorAt(n,tint(i,x,z,col));n++;}
   mesh.count=n;mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();mesh.userData.groundCoverV156=name;if(n)group.add(mesh);return mesh;}
+ const P=(...args)=>steps.push(()=>place(...args));
  const meadow=(x,z)=>fbm(x/38,z/38,seed+11),flowerDrift=(x,z)=>fbm(x/22,z/22,seed+29),stony=(x,z)=>fbm(x/30,z/30,seed+47);
  const grassTint=(i,x,z,c)=>{const m=meadow(x,z);c.setRGB(1,1,1);if(dry)c.setRGB(1.08,1.0,.72);c.multiplyScalar(.82+m*.32);if(m<.35)c.lerp(new T.Color(1.1,1.02,.72),.4);return c;};
- place('grass',budget.grass,{field:(x,z)=>.25+meadow(x,z)*.9,scale:i=>1.0+hash(i,seed,7)*1.3,tint:grassTint});
- place('tall',budget.tall,{field:(x,z)=>Math.max(0,meadow(x,z)-.45)*2.4,scale:i=>1.1+hash(i,seed,8)*1.0,tint:grassTint});
+ P('grass',budget.grass,{field:(x,z)=>.25+meadow(x,z)*.9,scale:i=>1.0+hash(i,seed,7)*1.3,tint:grassTint});
+ P('tall',budget.tall,{field:(x,z)=>Math.max(0,meadow(x,z)-.45)*2.4,scale:i=>1.1+hash(i,seed,8)*1.0,tint:grassTint});
  // each flower colour is its own small batch so stems stay green; drifts of one colour form naturally
- if(!dry||tile.biome==='steppe')FLOWERS.forEach((c,k)=>place('flower:'+c,Math.round(budget.flower/FLOWERS.length*(k<2?1.6:.8)),{field:(x,z)=>Math.max(0,flowerDrift(x,z)-.5)*3.2*(Math.floor(fbm(x/45,z/45,seed+61+k)*3)===1?1:.25),
+ if(!dry||tile.biome==='steppe')FLOWERS.forEach((c,k)=>P('flower:'+c,Math.round(budget.flower/FLOWERS.length*(k<2?1.6:.8)),{field:(x,z)=>Math.max(0,flowerDrift(x,z)-.5)*3.2*(Math.floor(fbm(x/45,z/45,seed+61+k)*3)===1?1:.25),
   scale:i=>1.3+hash(i,seed,9)*.8,tint:(i,x,z,c2)=>c2.setScalar(.9+hash(i,seed,10)*.2)}));
- place('stone',Math.round(budget.stone*(hills?2:dry?1.4:1)),{field:(x,z)=>.15+Math.max(0,stony(x,z)-.4)*1.8,scale:i=>(.18+Math.pow(hash(i,seed,11),3)*(hills?1.6:.9)),yOff:-.05,tilt:.4,
+ P('stone',Math.round(budget.stone*(hills?2:dry?1.4:1)),{field:(x,z)=>.15+Math.max(0,stony(x,z)-.4)*1.8,scale:i=>(.18+Math.pow(hash(i,seed,11),3)*(hills?1.6:.9)),yOff:-.05,tilt:.4,
   tint:(i,x,z,c)=>c.setScalar(.85+hash(i,seed,12)*.3)});
- place('shrub',Math.round(budget.shrub*(woods?1.6:dry?.6:1)),{field:(x,z)=>.2+Math.max(0,.55-meadow(x,z))*1.5,scale:i=>.6+hash(i,seed,13)*.8,tint:(i,x,z,c)=>c.setScalar(.85+hash(i,seed,14)*.3)});
- if(!dry)place('fern',Math.round(budget.fern*(woods?2.2:.6)),{field:(x,z)=>woods?.8:Math.max(0,.5-meadow(x,z)),scale:i=>.8+hash(i,seed,15)*.9,tint:(i,x,z,c)=>c.setScalar(.85+hash(i,seed,16)*.3)});
+ P('shrub',Math.round(budget.shrub*(woods?1.6:dry?.6:1)),{field:(x,z)=>.2+Math.max(0,.55-meadow(x,z))*1.5,scale:i=>.6+hash(i,seed,13)*.8,tint:(i,x,z,c)=>c.setScalar(.85+hash(i,seed,14)*.3)});
+ if(!dry)P('fern',Math.round(budget.fern*(woods?2.2:.6)),{field:(x,z)=>woods?.8:Math.max(0,.5-meadow(x,z)),scale:i=>.8+hash(i,seed,15)*.9,tint:(i,x,z,c)=>c.setScalar(.85+hash(i,seed,16)*.3)});
  if(woods||tile.biome==='grassland'||tile.biome==='lush_river'){const k=woods?1:.35;
-  place('stump',Math.round(budget.wood*k),{field:()=>.7,scale:i=>.8+hash(i,seed,17)*.6,tint:(i,x,z,c)=>c.setScalar(1)});
-  place('log',Math.round(budget.wood*k*.6),{field:()=>.7,scale:i=>.7+hash(i,seed,18)*.5,yOff:-.04,tint:(i,x,z,c)=>c.setScalar(1)});
-  if(woods)place('mushroom',budget.wood*2,{field:()=>.7,scale:i=>1+hash(i,seed,19),tint:(i,x,z,c)=>c.setScalar(1)});}
+  P('stump',Math.round(budget.wood*k),{field:()=>.7,scale:i=>.8+hash(i,seed,17)*.6,tint:(i,x,z,c)=>c.setScalar(1)});
+  P('log',Math.round(budget.wood*k*.6),{field:()=>.7,scale:i=>.7+hash(i,seed,18)*.5,yOff:-.04,tint:(i,x,z,c)=>c.setScalar(1)});
+  if(woods)P('mushroom',budget.wood*2,{field:()=>.7,scale:i=>1+hash(i,seed,19),tint:(i,x,z,c)=>c.setScalar(1)});}
+ if(opts.deferred)return {group,steps};
+ for(const f of steps)f();
  return group;
 }
+export function disposeGroundCover(group){group?.traverse(o=>{if(o.isInstancedMesh)o.dispose();});}
 export const groundCoverBudgetV156=q=>BUDGET[q]||BUDGET.medium;

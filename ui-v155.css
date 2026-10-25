@@ -144,3 +144,27 @@ header .time{gap:10px}
  #atlaspanel > #selectsettler,#atlaspanel > #autoexplore,#atlaspanel > #inspecttile{margin-right:6px!important}
  #atlaspanel #atlasdetail{font-size:12px;line-height:1.5;color:var(--v155-muted)}
 }
+
+/* ---------- V161 first-person walker */
+#tools #hud-walk{order:6} #tools #hud-walk::before{content:"🧍"} #tools #hud-walk::after{content:"Walk"}
+body.atlas #tools #hud-walk{display:none!important}
+body.fpv-mode #tools #hud-walk{background:linear-gradient(#4b6d52,#335241)!important;border-color:#dbc491a8!important}
+body.fpv-mode #citypanel,body.fpv-mode #v51insights,body.fpv-mode #v51cities,body.fpv-mode #atlasoverview,body.fpv-mode #hud-minimap-toggle,
+body.fpv-mode #building-inspector,body.fpv-mode #hud-tile-resources,body.fpv-mode #hud-resource-toggle,body.fpv-mode #settlerpanel,
+body.fpv-mode #battlepanel,body.fpv-mode #hud-explore-panel,body.fpv-mode #hud-zoom-controls{display:none!important}
+body.fpv-mode #world{cursor:crosshair}
+body.fpv-placing #world{cursor:copy}
+#fpv-hud{position:fixed;inset:0;pointer-events:none;z-index:30}
+#fpv-hud[hidden],#fpv-place-hint[hidden]{display:none!important}
+#fpv-hud .fpv-cross{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#fff8e6;box-shadow:0 0 0 1.5px #0007}
+#fpv-hud .fpv-bar,#fpv-place-hint{position:fixed;bottom:calc(var(--hud-bottom,84px) + 12px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;
+ padding:7px 8px 7px 14px;border-radius:12px;background:var(--v155-bg,#13262acc);border:1px solid var(--v155-line-strong,#d9bd7c55);box-shadow:var(--v155-shadow,0 6px 20px #0006);
+ color:var(--v155-text,#f1e6c8);font:500 12.5px/1.3 var(--v155-font,system-ui);pointer-events:auto;max-width:calc(100vw - 24px);z-index:31}
+#fpv-place-hint{padding:9px 14px}
+#fpv-hud .fpv-bar b{color:#f3d58f;font-weight:700;white-space:nowrap}
+#fpv-hud .fpv-help{opacity:.85}
+#fpv-hud .fpv-bar button{padding:6px 11px;border-radius:9px;border:1px solid var(--v155-line-strong,#d9bd7c55);background:linear-gradient(#2a4c4a,#1d3a3a);color:inherit;font:inherit;cursor:pointer;white-space:nowrap}
+#fpv-hud .fpv-bar button:hover{border-color:#e8cf95}
+#fpv-hud .fpv-stick{position:fixed;width:110px;height:110px;border-radius:50%;border:2px solid #ffffff55;background:#00000026;pointer-events:none}
+#fpv-hud .fpv-stick i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:#fff8e699;box-shadow:0 2px 8px #0006}
+@media (max-width:900px){#fpv-hud .fpv-help{display:none}}

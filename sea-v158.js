@@ -1,7 +1,7 @@
 // V158: one sea look for both maps. Colour follows the water depth (attribute aDepth in world
 // metres), the surface ripples and catches the sun, and surf foam rolls in along the shoreline.
 import * as T from './vendor/three.module.js';
-import {CLOUD_TIME} from './atmosphere-v158.js?v=158a';
+import {CLOUD_TIME} from './atmosphere-v158.js?v=161a';
 
 export function seaMaterial({scale=1}={}){
  // scale: model units per world metre on the horizontal plane (1 on the world map, ~4.5 on detail maps)

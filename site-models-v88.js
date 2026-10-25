@@ -1,6 +1,6 @@
 import * as T from './vendor/three.module.js';
 import {MINERAL_BUILDINGS,COASTAL_BUILDINGS} from './resource-sites-v88.js';
-import {depositGeometry,miningSiteGeometry,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=158a';
+import {depositGeometry,miningSiteGeometry,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=161a';
 const materials=new Map();
 function material(color){if(!materials.has(color))materials.set(color,new T.MeshStandardMaterial({color,roughness:.86}));return materials.get(color);}
 function mesh(g,geometry,color,x,y,z){const m=new T.Mesh(geometry,material(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m;}

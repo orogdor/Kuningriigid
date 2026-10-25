@@ -1,13 +1,13 @@
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 import * as T from './vendor/three.module.js';
-import {smoothBiomeColor,farmlandTint,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=158a';
+import {smoothBiomeColor,groundBaseColor,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=161a';
 import {createMountainOutcrops} from './landscape-polish-v84.js?v=85a';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
-import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=158a';
-import {settlementGeometry,getWorldModel,WORLD_MODEL_MATERIAL,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=158a';
-import {seaMaterial} from './sea-v158.js?v=158a';
-import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=85a';
+import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=161a';
+import {settlementGeometry,getWorldModel,WORLD_MODEL_MATERIAL,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=161a';
+import {seaMaterial} from './sea-v158.js?v=161a';
+import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=161a';
 import {surface,riverNear} from './continuous-landscape.js?v=85a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
 const palette={
@@ -48,13 +48,12 @@ function biomeBaseColor(game,cell,h,x,z){
 // V150: biome colours blend smoothly between neighbouring cells along warped natural edges
 // (no square tiles); beaches and shallows still follow the real height; grain cells show
 // a patchwork of strip fields painted into the ground.
-const atlasBase=(game,cell,out)=>out.copy(biomeBaseColor(game,cell,10,cell.x,cell.z));
+const atlasBase=(game,cell,out)=>groundBaseColor(cell,out); // V161: same palette as the detail map
 export function atlasColor(game,x,z,h){
  const c=Math.min(COLS-1,Math.max(0,Math.floor((x-ORIGIN_X)/50))),r=Math.min(ROWS-1,Math.max(0,Math.floor((z-ORIGIN_Z)/50))),cell=game.cells[r*COLS+c];
- let color=smoothBiomeColor(game,x,z,'atlas',(cl,out)=>atlasBase(game,cl,out));
+ let color=smoothBiomeColor(game,x,z,'ground',(cl,out)=>atlasBase(game,cl,out));
  if(h<.7)color.set(palette.shallow);
  else if(h<3.4)color.lerp(new T.Color(palette.beach),Math.min(1,(3.4-h)/1.6)*.85);
- farmlandTint(game,cell,x,z,color);
  // Water is drawn by the real 3D channel. Do not paint the entire 50 m
  // river tile blue; it made square-ended ribbons and polygon patches.
  if(cell?.river){const near=riverNear(game,x,z);if(near.distance<near.width*1.6)color.lerp(new T.Color('#728e74'),.10)}
@@ -131,7 +130,7 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
    const edges=[];
    for(const keys of cities.values()){const seg=regionContour(cellRegion(keys));for(let i=0;i<seg.length;i+=4)edges.push(seg[i],height(seg[i],seg[i+1])+.9,seg[i+1],seg[i+2],height(seg[i+2],seg[i+3])+.9,seg[i+3]);}
    const geo=new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(fill,3)).setAttribute('color',new T.Float32BufferAttribute(rgba,4));
-   const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({color,vertexColors:true,transparent:true,opacity:rural?.15:.29,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-8}));
+   const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({color,vertexColors:true,transparent:true,opacity:rural?.07:.11,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-8}));
    mesh.name=rural?'county area':'urban area';
    const line=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(edges,3)),new T.LineBasicMaterial({color,transparent:true,opacity:rural?.95:.9}));line.name=rural?'county border':'urban border';territories.add(mesh,line);
   }

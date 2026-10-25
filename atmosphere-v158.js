@@ -20,8 +20,9 @@ export function setupAtmosphere({renderer,worldScene,localScene,quality}){
  for(const [scene,local] of [[worldScene,false],[localScene,true]]){
   // remove the earlier flat light set (hemisphere + 2 directional lights)
   for(const o of [...scene.children])if(o.isHemisphereLight||o.isDirectionalLight)scene.remove(o);
-  const hemi=new T.HemisphereLight(local?0xdfe9f2:0xe3ecf0,local?0x5b6a45:0x4d5a48,local?1.05:1.15);scene.add(hemi);
-  const sun=new T.DirectionalLight(0xffe2b8,local?2.7:2.35);sun.castShadow=true;sun.shadow.mapSize.set(quality==='high'?2048:1024,quality==='high'?2048:1024);
+  // V161: the same light on both maps, so the same ground reads the same colour
+  const hemi=new T.HemisphereLight(0xdfe9f2,0x5b6a45,1.05);scene.add(hemi);
+  const sun=new T.DirectionalLight(0xffe2b8,2.7);sun.castShadow=true;sun.shadow.mapSize.set(quality==='high'?2048:1024,quality==='high'?2048:1024);
   sun.shadow.bias=-.0005;sun.shadow.normalBias=local?.02:.6;sun.shadow.radius=3;scene.add(sun);scene.add(sun.target);
   const fill=new T.DirectionalLight(0xa9c6db,.32);fill.position.set(130,90,-120);scene.add(fill);
   const sky=local?skyDome('#7fa9c8','#d9e3dc','#a8b79a'):skyDome('#5b86a3','#c9d6d2','#2b4a55');scene.add(sky);

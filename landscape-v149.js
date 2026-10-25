@@ -5,7 +5,7 @@
 // Everything is procedural in the shaders (no texture downloads); geometry counts stay the same.
 import * as T from './vendor/three.module.js';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
-import {CLOUD_TIME} from './atmosphere-v158.js?v=158a';
+import {CLOUD_TIME} from './atmosphere-v158.js?v=161a';
 
 export const LANDSCAPE_TIME={value:0};
 const tick=()=>{LANDSCAPE_TIME.value=performance.now()/1000;};
@@ -18,14 +18,17 @@ float l149n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
 float l149f(vec2 p){return l149n(p)*.55+l149n(p*2.07+17.3)*.30+l149n(p*4.31+41.9)*.15;}
 `;
 // Object position -> world metres (detail maps are scaled 4.5 x 0.30 x 3.9 around the tile).
+// V161: the tile offset is a uniform (uL149Tile), not baked into the GLSL, so every detail tile
+// shares one compiled program and moving between tiles never recompiles shaders.
 function worldMapping(scope,tile){
- if(scope==='world')return {pos:'position',nrm:'objectNormal'};
- const tx=Number(tile?.x||0).toFixed(4),tz=Number(tile?.z||0).toFixed(4);
- return {pos:`vec3(position.x/${DETAIL_X.toFixed(3)}+${tx},position.y/0.30+0.7,position.z/${DETAIL_Z.toFixed(3)}+${tz})`,
-  nrm:`vec3(objectNormal.x*${DETAIL_X.toFixed(3)},objectNormal.y*0.30,objectNormal.z*${DETAIL_Z.toFixed(3)})`};
+ if(scope==='world')return {pos:'position',nrm:'objectNormal',head:'',uniforms:{}};
+ return {pos:`vec3(position.x/${DETAIL_X.toFixed(3)}+uL149Tile.x,position.y/0.30+0.7,position.z/${DETAIL_Z.toFixed(3)}+uL149Tile.y)`,
+  nrm:`vec3(objectNormal.x*${DETAIL_X.toFixed(3)},objectNormal.y*0.30,objectNormal.z*${DETAIL_Z.toFixed(3)})`,
+  head:'uniform vec2 uL149Tile;',uniforms:{uL149Tile:{value:new T.Vector2(Number(tile?.x||0),Number(tile?.z||0))}}};
 }
-function inject(shader,{vertexHead='',vertexBody='',fragHead='',color=''}){
- shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\n'+vertexHead)
+function inject(shader,{map=null,vertexHead='',vertexBody='',fragHead='',color=''}){
+ if(map)Object.assign(shader.uniforms,map.uniforms);
+ shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\n'+(map?.head||'')+vertexHead)
   .replace('#include <begin_vertex>','#include <begin_vertex>\n'+vertexBody);
  shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\n'+NOISE+fragHead)
   .replace('#include <color_fragment>','#include <color_fragment>\n'+color);
@@ -45,12 +48,11 @@ export function terrainMaterial(scope='world',tile=null){
  const material=new T.MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0});
  const map=worldMapping(scope,tile),detail=scope!=='world';
  material.onBeforeCompile=shader=>{
-  if(!detail)shader.uniforms.uT157Cult={value:CULTIVATION.texture};
   shader.uniforms.uT158Cloud=CLOUD_TIME;
-  inject(shader,{
+  inject(shader,{map,
    vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':''),
    vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':''),
-   fragHead:'uniform float uT158Cloud;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;':'uniform sampler2D uT157Cult;'),
+   fragHead:'uniform float uT158Cloud;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;':''),
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);
@@ -59,38 +61,18 @@ export function terrainMaterial(scope='world',tile=null){
  // above ~70 m the grass thins into yellow-grey alpine turf
  float alpine=smoothstep(70.0,105.0,elev+nBroad*18.0);
  land=mix(land,land*vec3(.86,.90,.72)+vec3(.02,.025,.0),alpine*.6);
- ${detail?'':`// V157 world map: livelier meadows (dry, lush and heath tones at several scales) and a
- // patchwork of fields, pastures and hedgerows around settlements (cultivation mask per map cell).
- float wgrass=smoothstep(.0,.05,land.g-land.r)*(1.0-alpine);
- float hueA=l149n(lp*.011+2.0),hueB=l149n(lp*.034+8.0);
- land=mix(land,mix(land*vec3(.86,1.0,.86),land*vec3(1.12,1.04,.74)+vec3(.03,.02,.0),smoothstep(.3,.75,hueA)),wgrass*.55);
- land=mix(land,land*vec3(.92,.86,.96),smoothstep(.62,.80,hueB)*wgrass*.35);
- land*=1.0+(l149n(lp*.23)-.5)*.10*wgrass;
- vec2 cuv=vec2((vL149P.x-(${CULT_OX.toFixed(1)}))/${CULT_W.toFixed(1)},(vL149P.z-(${CULT_OZ.toFixed(1)}))/${CULT_D.toFixed(1)});
- float cult=texture2D(uT157Cult,cuv).r;
- float farm=smoothstep(.22,.55,cult+(l149n(lp*.05)-.5)*.35)*wgrass*(1.0-smoothstep(.08,.22,1.0-clamp(abs(normalize(vL149N).y),0.0,1.0)));
- if(farm>.001){
-  float ang=floor(l149h(floor(lp/90.0)+vec2(3.0,1.0))*4.0)*.42;float ca=cos(ang),sa=sin(ang);
-  vec2 fp=vec2(ca*lp.x+sa*lp.y,-sa*lp.x+ca*lp.y),fsz=vec2(17.0,10.5),fq=fp/fsz,fcell=floor(fq),ff=fract(fq);
-  float fh=l149h(fcell+vec2(17.0,3.0));
-  vec3 crop=fh<.26?vec3(.74,.62,.27):fh<.48?vec3(.36,.50,.20):fh<.64?vec3(.42,.31,.20):fh<.84?vec3(.46,.58,.27):vec3(.68,.63,.40);
-  float furrow=.93+.07*sin(fp.x*3.1);crop*=(fh<.26||(fh>=.48&&fh<.64))?furrow:1.0;
-  crop*=.92+l149n(fcell*1.7)*.12;
-  float aaF=1.0-smoothstep(.25,.8,fwidth(fq.x)+fwidth(fq.y));
-  float edge=min(min(ff.x,1.0-ff.x)*fsz.x,min(ff.y,1.0-ff.y)*fsz.y);
-  float hedge=(1.0-smoothstep(.35,1.1,edge))*step(.35,l149h(fcell+vec2(5.0,9.0)))*aaF;
-  land=mix(land,crop,farm*.85);
-  land=mix(land,vec3(.22,.32,.17),hedge*farm*.7);
- }`}
+ // V161: the same broad meadow patches on both maps, computed in world metres, so the world
+ // map shows exactly the dry/lush/heath patches you see on the detail map (no field patchwork).
+ float grassy=smoothstep(.0,.05,land.g-land.r)*(1.0-alpine*.5);
+ float mm=l149n(lp*.094+3.0)*.6+l149n(lp*.23+7.0)*.4;
+ vec3 lush=land*vec3(.84,1.0,.82),dryC=land*vec3(1.13,1.05,.76)+vec3(.035,.02,0.0);
+ land=mix(land,mix(lush,dryC,smoothstep(.38,.74,mm)),grassy*.7);
+ float heath=smoothstep(.62,.80,l149n(lp*.034+8.0));land=mix(land,land*vec3(.94,.90,.97),heath*grassy*.25);
  ${detail?`// V156 close-up ground, in local detail-map units: meadow hue patches, grass clumps,
  // blade streaks, bare soil, wild-flower specks and pebbles, plus a small bump for relief light.
  // Fine detail fades out where it would alias (fwidth).
  vec2 q=vL156L;
  float aa=1.0-smoothstep(.35,1.1,(fwidth(q.x)+fwidth(q.y))*1.4);
- float grassy=smoothstep(.0,.05,land.g-land.r)*(1.0-alpine*.5);
- float mm=l149n(q*.021+3.0)*.6+l149n(q*.052+7.0)*.4;
- vec3 lush=land*vec3(.84,1.0,.82),dryC=land*vec3(1.13,1.05,.76)+vec3(.035,.02,0.0);
- land=mix(land,mix(lush,dryC,smoothstep(.38,.74,mm)),grassy*.7);
  float cl=l149n(q*.55),cl2=l149n(q*1.7+4.0);
  land*=1.0+((cl-.5)*.30+(cl2-.5)*.22*aa)*grassy;
  float bl=l149n(q*3.1+1.7)*.55+l149n(q*7.3+5.2)*.45;
@@ -137,7 +119,7 @@ export function terrainMaterial(scope='world',tile=null){
   vec3 grad=sign(det)*(dhx*r1+dhy*r2);normal=normalize(abs(det)*normal-.32*grad);
  }`);
  };
- material.customProgramCacheKey=()=>`terrain-v149-v156-${scope}-${tile?.x||0}-${tile?.z||0}`;
+ material.customProgramCacheKey=()=>'terrain-v149-v161-'+scope;
  return material;
 }
 // Vertex tint for mountain cells (called by the terrain builder): forested lower slopes give way
@@ -168,7 +150,7 @@ export function waterMaterial(scope='world',tile=null){
  const map=worldMapping(scope,tile);
  material.onBeforeCompile=shader=>{
   shader.uniforms.uL149Time=LANDSCAPE_TIME;
-  inject(shader,{
+  inject(shader,{map,
    vertexHead:'attribute vec2 aFlow;attribute float aShore;varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;',
    vertexBody:`vL149P=${map.pos};vL149F=aFlow;vL149S=aShore;`,
    fragHead:'uniform float uL149Time;varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;',
@@ -191,7 +173,7 @@ export function waterMaterial(scope='world',tile=null){
    .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
  normal=normalize(normal+vec3(vL149Ripple-.5,0.0,.5-vL149Ripple)*.12);`);
  };
- material.customProgramCacheKey=()=>`water-v149-${scope}-${tile?.x||0}-${tile?.z||0}`;
+ material.customProgramCacheKey=()=>'water-v149-v161-'+scope;
  material.userData.animated=true;
  return material;
 }
@@ -206,7 +188,7 @@ export function roadMaterial(scope='world',tile=null){
   polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  const map=worldMapping(scope,tile),detail=scope!=='world';
  material.onBeforeCompile=shader=>{
-  inject(shader,{
+  inject(shader,{map,
    vertexHead:'attribute float aLevel;varying vec3 vL149P;varying vec2 vL149U;varying float vL149L;',
    vertexBody:`vL149P=${map.pos};vL149U=uv;vL149L=aLevel;`,
    fragHead:'varying vec3 vL149P;varying vec2 vL149U;varying float vL149L;',
@@ -240,7 +222,7 @@ export function roadMaterial(scope='world',tile=null){
  a*=lvl<1.5?.86:.95;
  diffuseColor=vec4(col,a);`});
  };
- material.customProgramCacheKey=()=>`road-v149-${scope}-${tile?.x||0}-${tile?.z||0}`;
+ material.customProgramCacheKey=()=>'road-v149-v161-'+scope;
  return material;
 }
 
@@ -340,11 +322,25 @@ export function farmlandTint(game,cell,x,z,color,strength=.34){
 
 // Detail-map ground colour with the same soft biome edges (the 3x3 neighbourhood of tiles no
 // longer shows square colour seams). h is the detail-projected height used by the old palette.
-const DETAIL_BASE={forest:'#56774c',hills:'#67745d',beach:'#c4ad7d'};
-const detailBase=(cell,out)=>out.set(!cell?.land?'#92a365':cell.mountain?'#7d8274':DETAIL_BASE[cell.biome]||'#92a365');
+// V161: ONE ground palette for both maps (world map and detail map read the same colour for the
+// same place). Temperate land keeps the detail-map tones; climate biomes (steppe, desert, taiga,
+// tundra, jungle, mesa, snow) get their own tone on both maps.
+const GROUND={grassland:'#92a365',lush_river:'#86a35e',steppe:'#98a463',forest:'#56774c',jungle:'#4b7245',
+ taiga:'#5f7457',tundra:'#9aa18a',desert:'#c6b17c',mesa:'#a4876a',snow:'#dfe2d9',mountain:'#7d8274',snow_mountain:'#8b928a'};
+const WOODED={grassland:'#56774c',lush_river:'#56774c',steppe:'#62794e',desert:'#b3a873',tundra:'#7f8a72',taiga:'#4f6a4f',jungle:'#3f6a40'};
+export function groundBaseColor(cell,out=new T.Color()){
+ if(!cell?.land)return out.set('#92a365');
+ const vb=cell.visualBiome||(cell.mountain?(cell.h>38?'snow_mountain':'mountain'):cell.biome==='forest'?'forest':'grassland');
+ if(cell.mountain||vb==='mountain'||vb==='snow_mountain')return out.set(GROUND[vb]||GROUND.mountain);
+ if(cell.biome==='hills')return out.set('#67745d');
+ if(cell.biome==='beach')return out.set('#c4ad7d');
+ if(cell.biome==='forest'&&WOODED[vb])return out.set(WOODED[vb]);
+ return out.set(GROUND[vb]||GROUND.grassland);
+}
+const detailBase=(cell,out)=>groundBaseColor(cell,out);
 const D_WATER=new T.Color('#8b9c91'),D_SAND=new T.Color('#dbcba0'),D_HIGH=new T.Color('#77856d'),D_ROCK=new T.Color('#8a9188');
 export function detailGroundColor(game,wx,wz,h,mountainHere){
- const color=smoothBiomeColor(game,wx,wz,'detail',detailBase);
+ const color=smoothBiomeColor(game,wx,wz,'ground',detailBase);
  if(h<-.15)return color.copy(D_WATER);
  if(h<.65)return color.copy(D_SAND);
  if(mountainHere&&h>12)color.lerp(D_ROCK,Math.min(1,(h-12)/10)*.6);

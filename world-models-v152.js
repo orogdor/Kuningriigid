@@ -2,7 +2,7 @@
 // Built once in code as small vertex-coloured meshes and shared by all instances,
 // so they cost no downloads and few triangles. Presentation only: no gameplay data changes.
 import * as T from './vendor/three.module.js';
-import {addWind} from './atmosphere-v158.js?v=158a';
+import {addWind} from './atmosphere-v158.js?v=161a';
 
 export const WORLD_MODEL_MATERIAL=new T.MeshStandardMaterial({vertexColors:true,roughness:.9,metalness:0,side:T.DoubleSide});
 // V158: settlements keep a still copy; trees, shrubs and rocks sway in the wind

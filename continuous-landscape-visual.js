@@ -4,7 +4,8 @@ import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
 import * as T from './vendor/three.module.js';
-import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=158a';
+import {releaseMaterial} from './program-keep-v161.js';
+import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=161a';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
 import {riverNear,localToWorld} from './continuous-landscape.js?v=123a';
 import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
@@ -229,5 +230,5 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=
 }
 export function disposeNetwork(group){
  if(!group)return;
- group.traverse(o=>{if(!o.geometry?.userData.sharedLandscape)o.geometry?.dispose();if(o.material&&!Array.isArray(o.material)&&!o.material.userData.sharedLandscape)o.material.dispose()});
+ group.traverse(o=>{if(!o.geometry?.userData.sharedLandscape)o.geometry?.dispose();releaseMaterial(o.material)}); // V161: keep compiled programs
 }

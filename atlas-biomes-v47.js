@@ -24,7 +24,7 @@ const palette={
  boulders:['#92968d','#858b83','#a9a99a'],sand:['#c5b487','#bfa975']
 };
 function color(arr,idx){return arr[idx%arr.length]}
-import {getWorldModel,WORLD_MODEL_MATERIAL} from './world-models-v152.js?v=158a';
+import {getWorldModel,WORLD_MODEL_MATERIAL} from './world-models-v152.js?v=161a';
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 
 // V48: single batched draw per authored asset. Farther and mobile quality modes
