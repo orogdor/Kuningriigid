@@ -110,8 +110,7 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
   // Never prefer a bigger wall merely for aesthetic reasons.
   const reserve=city.stoneDefenseReserveV168;
   const preferred=reserve&&plan.rx===reserve.rx&&plan.rz===reserve.rz&&
-    Math.abs((centre.x+dx)-(reserve.slots[0]?.x||0))<100&&
-    Math.abs((centre.z+dz)-(reserve.slots[0]?.z||0))<100 ? 7:0;
+    plan.slots[0]?.x===reserve.slots[0]?.x&&plan.slots[0]?.z===reserve.slots[0]?.z ? 14:0;
   const score=viable*4-failed*25-plan.slots.length*1.3-(plan.rx+plan.rz)*.10-
     (Math.abs(dx)+Math.abs(dz))*.03+preferred;
   if(score>bestScore){bestScore=score;best={...plan,initialViable:viable,initialBlocked:failed};}
