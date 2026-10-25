@@ -13,43 +13,52 @@
     },
     {
       "team": 2,
-      "cities": 2,
-      "buildings": 145,
+      "cities": 3,
+      "buildings": 161,
       "markets": 2,
-      "harbors": 0,
-      "houses": 28,
-      "fields": 2,
+      "harbors": 1,
+      "houses": 39,
+      "fields": 1,
       "ages": 1
     },
     {
       "team": 3,
       "cities": 2,
-      "buildings": 142,
+      "buildings": 152,
       "markets": 2,
       "harbors": 0,
-      "houses": 43,
+      "houses": 32,
       "fields": 1,
-      "ages": 2
+      "ages": 1
     }
   ],
   "landUse": [
     {
       "name": "Järnsida",
-      "owned": 363,
+      "owned": 61,
       "developed": 7,
       "ruralDeveloped": 0,
       "planned": 5,
-      "homes": 14,
+      "homes": 16,
       "foodGrowthBonus": 0.2
     },
     {
       "name": "Runsten",
-      "owned": 289,
-      "developed": 7,
+      "owned": 363,
+      "developed": 5,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 14,
+      "homes": 20,
       "foodGrowthBonus": 0.2
+    },
+    {
+      "name": "Uppsala",
+      "owned": 75,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 3,
+      "foodGrowthBonus": 0
     }
   ],
   "density": [
@@ -57,44 +66,67 @@
       "city": "Järnsida",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 67,
-      "urbanTiles": 89
+      "urbanBuildings": 73,
+      "urbanTiles": 58
     },
     {
       "city": "Runsten",
+      "nearEdge": 3,
+      "expanded": 0,
+      "urbanBuildings": 80,
+      "urbanTiles": 86
+    },
+    {
+      "city": "Uppsala",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 76,
-      "urbanTiles": 74
+      "urbanBuildings": 7,
+      "urbanTiles": 17
     }
   ],
   "historicMetrics": [
     {
       "name": "Järnsida",
-      "centreHouses": 11,
-      "mainTileHouses": 14,
-      "totalHouses": 14,
-      "walls": 29,
+      "centreHouses": 12,
+      "mainTileHouses": 16,
+      "totalHouses": 16,
+      "walls": 32,
       "gates": 0,
       "wallPlan": 60,
       "services": {
         "well": 2,
         "study": 1,
-        "market": 1
+        "market": 1,
+        "scriptorium": 1
       }
     },
     {
       "name": "Runsten",
-      "centreHouses": 9,
-      "mainTileHouses": 14,
-      "totalHouses": 14,
-      "walls": 42,
-      "gates": 1,
+      "centreHouses": 11,
+      "mainTileHouses": 16,
+      "totalHouses": 20,
+      "walls": 37,
+      "gates": 0,
       "wallPlan": 60,
       "services": {
         "well": 1,
         "study": 1,
         "market": 1,
+        "scriptorium": 1,
+        "warehouse": 1,
+        "cellar": 1,
+        "harbor": 1
+      }
+    },
+    {
+      "name": "Uppsala",
+      "centreHouses": 3,
+      "mainTileHouses": 3,
+      "totalHouses": 3,
+      "walls": 0,
+      "gates": 0,
+      "wallPlan": 0,
+      "services": {
         "scriptorium": 1
       }
     }
@@ -102,17 +134,19 @@
   "seed": 139023,
   "turn": 201,
   "sourceTeam": 2,
-  "cities": 2,
-  "buildings": 145,
+  "cities": 3,
+  "buildings": 161,
   "spacingPairs": [
-    9
+    9,
+    9,
+    18
   ],
   "ages": [
     1,
     1,
     0,
-    2
+    1
   ],
-  "bytes": 1266030,
-  "seconds": 68
+  "bytes": 1333143,
+  "seconds": 46
 }
