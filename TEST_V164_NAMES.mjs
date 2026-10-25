@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict';
-import {NORDIC_NAME_SOURCES,NORDIC_VILLAGE_NAMES,nordicVillageName} from './folklore-village-names-v164.js';
+import {NORDIC_COUNTRIES,NORDIC_NAME_SOURCES,NORDIC_VILLAGE_NAMES,countryForTeam,nordicVillageName} from './folklore-village-names-v164.js';
 import {Civilization,createGame} from './civilization-core.js';
-assert.equal(NORDIC_VILLAGE_NAMES.length,4);
-assert.deepEqual(NORDIC_NAME_SOURCES,['Eesti pärimus','Kalevala','Rootsi saagad','Edda ja Põhjala saagad']);
-for(const team of [0,1,2,3]){
+assert.equal(NORDIC_VILLAGE_NAMES.length,6);
+assert.deepEqual(NORDIC_COUNTRIES,['Eesti','Soome','Rootsi','Norra','Taani','Island']);
+assert.equal(NORDIC_NAME_SOURCES.length,6);
+assert.equal(countryForTeam(0),'Eesti');
+assert.equal(countryForTeam(1),'Soome');
+assert.equal(countryForTeam(2),'Rootsi');
+assert.equal(countryForTeam(3),'Norra');
+const namesAcrossCountries=NORDIC_VILLAGE_NAMES.flat();
+assert.equal(new Set(namesAcrossCountries).size,namesAcrossCountries.length,'Country-specific names must never be shared');
+for(const team of [0,1,2,3,4,5]){
  const original=NORDIC_VILLAGE_NAMES[team];
  assert.ok(original.length>=12,'Each region needs names for at least 12 cities');
  assert.equal(new Set(original).size,original.length,'No duplicate within a region');
@@ -30,4 +37,4 @@ for(const town of towns)assert.ok(NORDIC_VILLAGE_NAMES[town.team].includes(town.
 const old=game.s.cities[0],previous=old.name;
 const loaded=new Civilization(JSON.parse(JSON.stringify(game.s)));
 assert.equal(loaded.s.cities[0].name,previous,'Save/reload never renames an existing village');
-console.log('V164 NORDIC NAMES PASS',JSON.stringify(towns.map(c=>({team:c.team,name:c.name}))));
+console.log('V165 COUNTRY NAMES PASS',JSON.stringify(towns.map(c=>({team:c.team,name:c.name}))));
