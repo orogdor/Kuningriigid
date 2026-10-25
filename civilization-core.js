@@ -683,7 +683,7 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
  // Planning a distant city's next construction only every 36 game seconds
  // avoids 12-town empires recomputing thousands of building-site paths per frame.
  // Two paid builders for the mature Bronze core; never conjure completed walls.
-  if((age===0&&city.economy.realms[team].pop>=8&&this.s.research[team].known.includes('fortifications'))||(age>=1&&city.economy.realms[team].pop>=18))city.builderCount=Math.max(2,city.builderCount||1);
+  if((age===0&&city.economy.realms[team].pop>=7&&this.s.research[team].known.includes('fortifications'))||(age>=1&&city.economy.realms[team].pop>=18))city.builderCount=Math.max(2,city.builderCount||1);
  planAIDefenses(this,team,city);
  if(this.s.time>=(city.aiNextBuildCheck||0)){
   city.aiNextBuildCheck=this.s.time+36;
