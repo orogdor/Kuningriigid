@@ -1,0 +1,43 @@
+name: V166 Stone Age Fortified Villages
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stone-forts-v166.yml'
+      - 'stone-village-defenses-v166.js'
+      - 'ai-defenses-v128.js'
+      - 'civilization-core.js'
+      - 'buildings.js'
+      - 'navigation.js'
+      - 'army-gates-v133.js'
+      - 'siege-rules-v114.js'
+      - 'medieval-v62.js'
+      - 'civilization.js'
+      - 'TEST_V166_STONE_FORTS.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stone-forts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax and early village defense rules
+        run: |
+          node --check stone-village-defenses-v166.js
+          node --check ai-defenses-v128.js
+          node --check civilization-core.js
+          node --check buildings.js
+          node --check navigation.js
+          node --check civilization.js
+          node --check TEST_V166_STONE_FORTS.mjs
+          node TEST_V166_STONE_FORTS.mjs
+      - name: Preserve historic Bronze walls
+        run: |
+          node TEST_V139.mjs
+          node TEST_V160.mjs
+          node TEST_V163_STONE_CITY.mjs
