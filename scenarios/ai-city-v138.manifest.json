@@ -34,7 +34,7 @@
   ],
   "landUse": [
     {
-      "name": "Idaküla 1",
+      "name": "Sampola",
       "owned": 320,
       "developed": 6,
       "ruralDeveloped": 0,
@@ -43,7 +43,7 @@
       "foodGrowthBonus": 0.2
     },
     {
-      "name": "Idaküla 2",
+      "name": "Ainola",
       "owned": 363,
       "developed": 3,
       "ruralDeveloped": 0,
@@ -52,7 +52,7 @@
       "foodGrowthBonus": 0.2
     },
     {
-      "name": "Idaküla 3",
+      "name": "Väinölä",
       "owned": 243,
       "developed": 2,
       "ruralDeveloped": 0,
@@ -61,7 +61,7 @@
       "foodGrowthBonus": 0.15000000000000002
     },
     {
-      "name": "Idaküla 4",
+      "name": "Pohjola",
       "owned": 49,
       "developed": 3,
       "ruralDeveloped": 0,
@@ -70,7 +70,7 @@
       "foodGrowthBonus": 0.15000000000000002
     },
     {
-      "name": "Idaküla 5",
+      "name": "Tapiola",
       "owned": 45,
       "developed": 2,
       "ruralDeveloped": 1,
@@ -81,35 +81,35 @@
   ],
   "density": [
     {
-      "city": "Idaküla 1",
+      "city": "Sampola",
       "nearEdge": 4,
       "expanded": 0,
       "urbanBuildings": 87,
       "urbanTiles": 83
     },
     {
-      "city": "Idaküla 2",
+      "city": "Ainola",
       "nearEdge": 5,
       "expanded": 0,
       "urbanBuildings": 89,
       "urbanTiles": 88
     },
     {
-      "city": "Idaküla 3",
+      "city": "Väinölä",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 27,
       "urbanTiles": 60
     },
     {
-      "city": "Idaküla 4",
+      "city": "Pohjola",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 19,
       "urbanTiles": 37
     },
     {
-      "city": "Idaküla 5",
+      "city": "Tapiola",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 13,
@@ -139,6 +139,6 @@
     4,
     4
   ],
-  "bytes": 3274333,
-  "seconds": 251
+  "bytes": 3273937,
+  "seconds": 245
 }
