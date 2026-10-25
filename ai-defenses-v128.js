@@ -1,5 +1,5 @@
 import {canAfford} from './economy.js';
-import {planStoneVillageDefenses} from './stone-village-defenses-v166.js?v=167a';
+import {planStoneVillageDefenses} from './stone-village-defenses-v166.js?v=168a';
 import {combatUnit} from './ai-development-v128.js';
 import {ancientWallPlan,surplusForWalls,reserveAfterWalls} from './ancient-walls-v139.js';
 import {BRONZE_FORTIFY_POP_V160,BRONZE_FULL_WALL_POP_V160} from './bronze-city-balance-v160.js';
