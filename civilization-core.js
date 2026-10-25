@@ -735,6 +735,10 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
    const batch=[...centerFirst,...nextPlotBatch(spots,plotCursor,96).filter(p=>!centerFirst.some(q=>p.x===q.x&&p.z===q.z))];
    (ctx.aiPlotCursorV138??={})[next]=plotCursor+batch.length;
    for(const p of batch){
+    // V167: do not fill a previously surveyed palisade/gateway corridor with
+    // new huts. This preserves the funded fortress plan while housing expands.
+    if(age===0&&ctx.c===city.c&&ctx.r===city.r&&city.stoneDefensePlanV166?.slots?.some(slot=>
+      Math.abs(slot.x-p.x)<8&&Math.abs(slot.z-p.z)<8))continue;
     const check=this.previewBuild(ctx,next,p);if(check.error)continue;
     const nav=this.nav(ctx),home=nav.nearest(check.landEntry||door({...p,type:next}),9),depot=nav.nearest(door(h),9);
     if(!home||!depot||!nav.reachable(depot,home))continue;
