@@ -1,9 +1,10 @@
 import {canAfford} from './economy.js';
+import {planStoneVillageDefenses} from './stone-village-defenses-v166.js';
 import {combatUnit} from './ai-development-v128.js';
 import {ancientWallPlan,surplusForWalls,reserveAfterWalls} from './ancient-walls-v139.js';
 import {BRONZE_FORTIFY_POP_V160,BRONZE_FULL_WALL_POP_V160} from './bronze-city-balance-v160.js';
 
-export const DEFENSE_TYPES=new Set(['palisade','stonewall','reinforced_wall','gatehouse','watchtower','stonetower']);
+export const DEFENSE_TYPES=new Set(['palisade','woodgate','stonewall','reinforced_wall','gatehouse','watchtower','stonetower']);
 // Keep the old export for battle scenes and saved projects.
 export function defenseLayout(wall='palisade',tower='watchtower'){
  const plan=[];
@@ -39,6 +40,7 @@ export function defenseEligibility({population,readyHouses,services,waiting,stoc
  return {ok:reason===null,reason};
 }
 export function planAIDefenses(game,team,city){
+ if(planStoneVillageDefenses(game,team,city))return;
  if(game.s.time<(city.nextDefenseCheckV128||0))return;
  const realm=city.economy.realms[team],stock=realm.resources,all=game.allBuildings(city);
  city.nextDefenseCheckV128=game.s.time+(realm.pop>=BRONZE_FORTIFY_POP_V160?24:42);
