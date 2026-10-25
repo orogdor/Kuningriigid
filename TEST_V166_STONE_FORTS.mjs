@@ -77,3 +77,16 @@ for(let turn=1;turn<=70;turn++){
  if(turn===70)forts.push(...list);
 }
 console.log('V166 STONE DEFENSES PASS',JSON.stringify({planSlots:ring.slots.length,firstBronze:eras,towns:forts,checkpoints:history.length}));
+
+// V167 diagnostic: examine the last stubborn gaps, using real build checks.
+for(let turn=71;turn<=115;turn++)for(let step=0;step<5;step++)game.tick(12);
+for(const c of game.s.cities.filter(c=>c.team>0).slice(0,3)){
+ const plan=c.stoneDefensePlanV166;if(!plan)continue;
+ const local=c.economy.buildings.filter(b=>b.hp>0&&!b.virtual);
+ const missing=plan.slots.filter(slot=>!local.some(b=>b.hp>0&&b.ready&&b.type===slot.type&&
+ Math.hypot(b.x-slot.x,b.z-slot.z)<4.5)).map(slot=>({type:slot.type,x:slot.x,z:slot.z,
+ error:game.previewBuild(c,slot.type,{...slot,plannedDefense:true}).error||'buildable-now'}));
+ console.log('V167 GAP DIAG',JSON.stringify({name:c.name,team:c.team,age:game.s.ages[c.team],pop:c.economy.realms[c.team].pop,
+ ready:plan.slots.length-missing.length,total:plan.slots.length,missing:missing.slice(0,12)}));
+}
+
