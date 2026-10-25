@@ -27,7 +27,7 @@ function summary(g,c,turn){
 for(const seed of seeds){
  const g=new Civilization(createGame(seed)),lastStone={},atBronze={},checkpoints=[];
  const started=Date.now();
- for(let turn=1;turn<=83;turn++){
+ for(let turn=1;turn<=125;turn++){
   for(let i=0;i<5;i++)g.tick(12);
   for(const team of [1,2,3]){
    const leader=g.s.cities.find(c=>c.team===team);
@@ -35,7 +35,7 @@ for(const seed of seeds){
    if(g.s.ages[team]===0)lastStone[team]=summary(g,leader,turn);
    else if(!atBronze[team])atBronze[team]=summary(g,leader,turn);
   }
-  if([25,40,55,65,83].includes(turn)){
+  if([25,40,55,80,110,125].includes(turn)){
    checkpoints.push({turn,ages:g.s.ages.slice(1),
     capitals:[1,2,3].map(team=>g.s.cities.find(c=>c.team===team)).filter(Boolean).map(c=>summary(g,c,turn))});
   }
@@ -53,7 +53,7 @@ const rows=out.flatMap(x=>[1,2,3].map(t=>{
 fs.writeFileSync('artifacts-v167/stone-fort-balance.md',[
  '# V167: Kiviaja päris AI kindlustamistest',
  '',
- '3 eri maailma seemet, 3 AI riiki igas maailmas, 83 käiku; algne mängumajandus ja ehitushinnad, ilma tasuta üksuste või materjalideta.',
+ '3 eri maailma seemet, 3 AI riiki igas maailmas, 125 käiku; algne mängumajandus ja ehitushinnad, ilma tasuta üksuste või materjalideta.',
  'Allolev rida mõõdab pealinna viimast kiviaja käiku, mitte hilisemat pronksiaega.',
  '',
  '| Seeme | Riik | Linn | Kiviaja viimane käik | Elanikud | Elumaju | Valmis väravaid | Valmis torne | Valmis palisaade | Valmis / plaanis | Valmis % | Puiduvaru | Täisring |',
