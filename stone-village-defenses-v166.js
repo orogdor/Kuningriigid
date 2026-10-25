@@ -54,6 +54,31 @@ export function stoneVillageDefenseEligibility({age=0,pop=0,readyHouses=0,servic
   foodTotal(stock)<pop*1.4?'food':null;
  return {ok:reason===null,reason};
 }
+// Fit the wooden enclosure to real buildable terrain BEFORE purchasing a gate.
+// This prevents a paid ring from being frozen across buildings or steep banks.
+export function bestStoneVillageWallPlan(game,city,buildings,seed){
+ const centre=buildings.find(b=>b.type==='hall')||{x:0,z:0};
+ const homes=buildings.filter(b=>b.type==='house'&&b.hp>0);
+ let best=null,bestScore=-Infinity,examined=0;
+ for(const extraX of [0,14,28])for(const extraZ of [0,14,28])
+ for(const dx of [0,-7,7])for(const dz of [0,-7,7]){
+  const plan=stoneVillageWallPlan(buildings,seed,{extraX,extraZ,dx,dz});
+  // Keep the entire early residential quarter inside the perimeter.
+  const cx=centre.x+dx,cz=centre.z+dz;
+  if(homes.some(h=>Math.abs(h.x-cx)>plan.rx-9||Math.abs(h.z-cz)>plan.rz-9))continue;
+  let viable=0,failed=0;
+  for(const slot of plan.slots){
+   const check=game.previewBuild(city,slot.type,{...slot,plannedDefense:true});
+   if(check.error)failed++;else viable++;
+  }
+  examined++;
+  // Never prefer a bigger wall merely for aesthetic reasons.
+  const score=viable*4-failed*25-plan.slots.length*1.3-(plan.rx+plan.rz)*.10-
+    (Math.abs(dx)+Math.abs(dz))*.03;
+  if(score>bestScore){bestScore=score;best={...plan,initialViable:viable,initialBlocked:failed};}
+ }
+ return best||stoneVillageWallPlan(buildings,seed);
+}
 export function planStoneVillageDefenses(game,team,city){
  const age=game.s.ages[team],local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
  if(age!==0)return false; // let the existing Bronze fortification strategy proceed
@@ -72,7 +97,7 @@ export function planStoneVillageDefenses(game,team,city){
  }
  if(!city.stoneDefensePlanV166||
     (city.stoneDefensePlanV166.version<167&&!local.some(b=>b.historicPalisadeV166&&b.hp>0)))
-  city.stoneDefensePlanV166=stoneVillageWallPlan(local,game.s.seed+city.id*19);
+  city.stoneDefensePlanV166=bestStoneVillageWallPlan(game,city,local,game.s.seed+city.id*19);
  const plan=city.stoneDefensePlanV166,counts={};
  let ready=0,placed=0;
  for(const slot of plan.slots){
