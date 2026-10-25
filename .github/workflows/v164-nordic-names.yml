@@ -1,4 +1,4 @@
-name: V164 Nordic Saga Village Names
+name: V165 Country-Specific Nordic Saga Village Names
 on:
   push:
     branches: [main]
@@ -7,6 +7,7 @@ on:
       - 'folklore-village-names-v164.js'
       - 'civilization-core.js'
       - 'TEST_V164_NAMES.mjs'
+      - 'index.html'
   workflow_dispatch:
 permissions:
   contents: read
