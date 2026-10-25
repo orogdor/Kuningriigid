@@ -2,6 +2,7 @@
 // Separate saved plan from the Bronze stone ring, so the latter stays compatible.
 // All placements go through normal building, pathfinding and resource checks.
 import {canAfford} from './economy.js';
+import {footprintsCrossV168} from './stone-fort-footprints-v168.js';
 export const STONE_VILLAGE_DEFENSE_VERSION=167;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const HOUSING=new Set(['hall','house','well','study','market','warehouse','cellar']);
@@ -68,7 +69,12 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
   if(homes.some(h=>Math.abs(h.x-cx)>plan.rx-9||Math.abs(h.z-cz)>plan.rz-9))continue;
   let viable=0,failed=0;
   for(const slot of plan.slots){
-   const check=game.previewBuild(city,slot.type,{...slot,plannedDefense:true});
+   // V168: a 28-42m timber segment cannot be screened as a point.
+   // Existing fields/homes may collide at its ENDS even when the centre is free.
+   const intersects=buildings.some(b=>b.hp>0&&!b.virtual&&!FORTS.has(b.type)&&
+    footprintsCrossV168(slot,b,1.2));
+   const check=intersects?{error:'occupied-corridor'}:
+    game.previewBuild(city,slot.type,{...slot,plannedDefense:true});
    if(check.error)failed++;else viable++;
   }
   examined++;
@@ -138,7 +144,9 @@ export function planStoneVillageDefenses(game,team,city){
   const placement={...slot,
    navWidth:slot.type==='palisade'?(slot.wallAxis?1.1:extent):(slot.extendedPalisadeV166?7.2:undefined),
    navDepth:slot.type==='palisade'?(slot.wallAxis?extent:1.1):(slot.extendedPalisadeV166?1.1:undefined)};
-  const siteResult=game.previewBuild(city,slot.type,{...placement,plannedDefense:true});
+  const occupied=local.some(b=>!FORTS.has(b.type)&&footprintsCrossV168(slot,b,1.2));
+  const siteResult=occupied?{error:'Põld või hoone asub müürikoridoris'}:
+   game.previewBuild(city,slot.type,{...placement,plannedDefense:true});
   if(siteResult.error){counts.site=(counts.site||0)+1;const why=String(siteResult.error).slice(0,85);counts['site:'+why]=(counts['site:'+why]||0)+1;continue;}
   const result=game.build(city,slot.type,{...placement,plannedDefense:true});
   if(!result.building){counts.build=(counts.build||0)+1;continue;}
