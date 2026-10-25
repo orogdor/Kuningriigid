@@ -7,6 +7,7 @@ on:
       - 'stone-village-defenses-v166.js'
       - 'ai-defenses-v128.js'
       - 'civilization-core.js'
+      - 'builders.js'
       - 'buildings.js'
       - 'navigation.js'
       - 'army-gates-v133.js'
@@ -31,6 +32,7 @@ jobs:
           node --check stone-village-defenses-v166.js
           node --check ai-defenses-v128.js
           node --check civilization-core.js
+          node --check builders.js
           node --check buildings.js
           node --check navigation.js
           node --check civilization.js
