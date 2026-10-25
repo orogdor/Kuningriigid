@@ -77,7 +77,7 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
     (Math.abs(dx)+Math.abs(dz))*.03;
   if(score>bestScore){bestScore=score;best={...plan,initialViable:viable,initialBlocked:failed};}
  }
- return best||stoneVillageWallPlan(buildings,seed);
+ return best?{...best,verifiedAtTechV167:true}:stoneVillageWallPlan(buildings,seed);
 }
 export function planStoneVillageDefenses(game,team,city){
  const age=game.s.ages[team],local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
@@ -92,11 +92,17 @@ export function planStoneVillageDefenses(game,team,city){
   waiting:pending.length,stock
  });
  if(!eligibility.ok){city.aiStoneDefenseStatusV166={reason:eligibility.reason,at:game.s.time};return true;}
+ // A terrain survey is only reliable AFTER the real building technology and
+ // lumber-yard dependency are unlocked; otherwise every candidate looks locked.
+ if(game.buildRule(city,'woodgate')){
+  city.aiStoneDefenseStatusV166={reason:'wooden-gate-research-or-lumber',at:game.s.time};return true;
+ }
  if(all.filter(b=>FORTS.has(b.type)&&!b.ready&&b.hp>0).length>=2){
   city.aiStoneDefenseStatusV166={reason:'construction-in-progress',at:game.s.time};return true;
  }
  if(!city.stoneDefensePlanV166||
-    (city.stoneDefensePlanV166.version<167&&!local.some(b=>b.historicPalisadeV166&&b.hp>0)))
+    ((!city.stoneDefensePlanV166.verifiedAtTechV167||city.stoneDefensePlanV166.version<167)&&
+       !local.some(b=>b.historicPalisadeV166&&b.hp>0)))
   city.stoneDefensePlanV166=bestStoneVillageWallPlan(game,city,local,game.s.seed+city.id*19);
  const plan=city.stoneDefensePlanV166,counts={};
  let ready=0,placed=0;
