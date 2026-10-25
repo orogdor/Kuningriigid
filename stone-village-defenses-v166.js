@@ -27,7 +27,7 @@ export function stoneVillageWallPlan(buildings=[],seed=0){
  // Start with walls adjoining the gates; grow evenly outwards.
  for(let step=7;step<rx;step+=7)for(const sign of [-1,1])for(const z of [-rz,rz])push('palisade',sign*step,z,0);
  // End-to-end, 7-unit palisades; no invisible "free" wall.
- for(let step=0;step<rz;step+=7)for(const sign of [-1,1])for(const x of [-rx,rx])push('palisade',x,sign*step,1);
+ for(let step=0;step<rz;step+=7)for(const sign of (step===0?[1]:[-1,1]))for(const x of [-rx,rx])push('palisade',x,sign*step,1);
  // Fill N/S sides beyond any earlier step ordering.
  return {version:STONE_VILLAGE_DEFENSE_VERSION,slots,gateOpenings:2,rx,rz,
    shape:'rectangular-wooden-palisade',nextIndex:0,constructed:0,blocked:0,seed};
