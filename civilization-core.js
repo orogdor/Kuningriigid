@@ -162,9 +162,9 @@ balanceUnitDefinitions(TROOPS);
 applyDevelopmentBalance(BUILDINGS,TROOPS);
 // V166: affordable real wooden fortifications can be built before the Bronze era.
 // Every paid palisade, gate and watchtower still needs builder time.
-Object.assign(BUILDINGS.palisade,{cost:{wood:4},time:10});
-Object.assign(BUILDINGS.woodgate,{cost:{wood:6},time:12});
-Object.assign(BUILDINGS.watchtower,{cost:{wood:9,stone:3},time:14});
+Object.assign(BUILDINGS.palisade,{cost:{wood:3},time:9});
+Object.assign(BUILDINGS.woodgate,{cost:{wood:5},time:11});
+Object.assign(BUILDINGS.watchtower,{cost:{wood:7,stone:2},time:12});
 // V160: houses are small, repeated investments; keep the half-capacity per home.
 // Stone walls spend real dressed stone but no longer consume an entire timber supply.
 BUILDINGS.house.time=Math.ceil(BUILDINGS.house.time*.85);
@@ -683,7 +683,7 @@ const science=this.s.research[team];if(science.active&&!allowAIResearch(this.s,t
  // Planning a distant city's next construction only every 36 game seconds
  // avoids 12-town empires recomputing thousands of building-site paths per frame.
  // Two paid builders for the mature Bronze core; never conjure completed walls.
-  if(age>=1&&city.economy.realms[team].pop>=18)city.builderCount=Math.max(2,city.builderCount||1);
+  if((age===0&&city.economy.realms[team].pop>=8&&this.s.research[team].known.includes('fortifications'))||(age>=1&&city.economy.realms[team].pop>=18))city.builderCount=Math.max(2,city.builderCount||1);
  planAIDefenses(this,team,city);
  if(this.s.time>=(city.aiNextBuildCheck||0)){
   city.aiNextBuildCheck=this.s.time+36;
