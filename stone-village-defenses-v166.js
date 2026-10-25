@@ -89,32 +89,33 @@ export function stoneVillageDefenseEligibility({age=0,pop=0,readyHouses=0,servic
 export function bestStoneVillageWallPlan(game,city,buildings,seed){
  const centre=buildings.find(b=>b.type==='hall')||{x:0,z:0};
  const homes=buildings.filter(b=>b.type==='house'&&b.hp>0);
- let best=null,bestScore=-Infinity,examined=0;
- for(const extraX of [0,14,28])for(const extraZ of [0,14,28])
- for(const dx of [0,-7,7])for(const dz of [0,-7,7]){
-  const plan=stoneVillageWallPlan(buildings,seed,{extraX,extraZ,dx,dz});
-  // Keep the entire early residential quarter inside the perimeter.
-  const cx=centre.x+dx,cz=centre.z+dz;
-  if(homes.some(h=>Math.abs(h.x-cx)>plan.rx-9||Math.abs(h.z-cz)>plan.rz-9))continue;
+ let best=null,bestScore=-Infinity;
+ const survey=(plan,prefer=false)=>{
+  if(!plan)return;
+  // The inner stockade protects a central quarter. Outside huts are
+  // historically ordinary, so do not enlarge the ring for every suburb.
+  const cx=(plan.slots[0]?.x||centre.x),cz=((plan.slots[0]?.z||centre.z)+(plan.slots[1]?.z||centre.z))/2;
+  const inside=homes.filter(h=>Math.abs(h.x-cx)<=plan.rx-8&&Math.abs(h.z-cz)<=plan.rz-8).length;
+  if(homes.length>=4&&inside<Math.ceil(homes.length*.72))return;
   let viable=0,failed=0;
   for(const slot of plan.slots){
-   // V168: a 28-42m timber segment cannot be screened as a point.
-   // Existing fields/homes may collide at its ENDS even when the centre is free.
    const intersects=buildings.some(b=>b.hp>0&&!b.virtual&&!FORTS.has(b.type)&&
     footprintsCrossV168(slot,b,1.2));
    const check=intersects?{error:'occupied-corridor'}:
     game.previewBuild(city,slot.type,{...slot,plannedDefense:true});
    if(check.error)failed++;else viable++;
   }
-  examined++;
-  // Never prefer a bigger wall merely for aesthetic reasons.
-  const reserve=city.stoneDefenseReserveV168;
-  const preferred=reserve&&plan.rx===reserve.rx&&plan.rz===reserve.rz&&
-    plan.slots[0]?.x===reserve.slots[0]?.x&&plan.slots[0]?.z===reserve.slots[0]?.z ? 14:0;
+  const offset=(Math.abs(cx-centre.x)+Math.abs(cz-centre.z));
   const score=viable*4-failed*25-plan.slots.length*1.3-(plan.rx+plan.rz)*.10-
-    (Math.abs(dx)+Math.abs(dz))*.03+preferred;
+   offset*.03+(prefer?35:0);
   if(score>bestScore){bestScore=score;best={...plan,initialViable:viable,initialBlocked:failed};}
- }
+ };
+ // Land reserved at founding gets first refusal, provided it is actually
+ // buildable and still protects most of the compact historic centre.
+ survey(city.stoneDefenseReserveV168,true);
+ for(const extraX of [0,14,28])for(const extraZ of [0,14,28])
+ for(const dx of [0,-7,7])for(const dz of [0,-7,7])
+  survey(stoneVillageWallPlan(buildings,seed,{extraX,extraZ,dx,dz}));
  return best?{...best,verifiedAtTechV167:true}:stoneVillageWallPlan(buildings,seed);
 }
 // A mature Stone Age capital spends a bounded extra period finishing its
