@@ -14,20 +14,20 @@
     {
       "team": 2,
       "cities": 5,
-      "buildings": 161,
+      "buildings": 160,
       "markets": 2,
       "harbors": 0,
-      "houses": 53,
-      "fields": 3,
+      "houses": 58,
+      "fields": 1,
       "ages": 3
     },
     {
       "team": 3,
       "cities": 2,
-      "buildings": 148,
+      "buildings": 163,
       "markets": 2,
-      "harbors": 1,
-      "houses": 44,
+      "harbors": 2,
+      "houses": 45,
       "fields": 2,
       "ages": 2
     }
@@ -36,7 +36,7 @@
     {
       "name": "Hrafnista",
       "owned": 180,
-      "developed": 4,
+      "developed": 5,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 20,
@@ -48,23 +48,23 @@
       "developed": 5,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 24,
+      "homes": 25,
       "foodGrowthBonus": 0.2
     }
   ],
   "density": [
     {
       "city": "Hrafnista",
-      "nearEdge": 4,
+      "nearEdge": 3,
       "expanded": 0,
-      "urbanBuildings": 80,
+      "urbanBuildings": 82,
       "urbanTiles": 91
     },
     {
       "city": "Dovre",
-      "nearEdge": 6,
+      "nearEdge": 7,
       "expanded": 0,
-      "urbanBuildings": 66,
+      "urbanBuildings": 79,
       "urbanTiles": 90
     }
   ],
@@ -91,9 +91,9 @@
       "name": "Dovre",
       "centreHouses": 13,
       "mainTileHouses": 16,
-      "totalHouses": 24,
-      "walls": 18,
-      "gates": 1,
+      "totalHouses": 25,
+      "walls": 27,
+      "gates": 3,
       "wallPlan": 60,
       "services": {
         "well": 1,
@@ -101,7 +101,8 @@
         "market": 1,
         "scriptorium": 1,
         "warehouse": 1,
-        "cellar": 1
+        "cellar": 1,
+        "harbor": 1
       }
     }
   ],
@@ -109,7 +110,7 @@
   "turn": 201,
   "sourceTeam": 3,
   "cities": 2,
-  "buildings": 148,
+  "buildings": 163,
   "spacingPairs": [
     9
   ],
@@ -119,6 +120,6 @@
     3,
     0
   ],
-  "bytes": 1682711,
-  "seconds": 83
+  "bytes": 1637207,
+  "seconds": 113
 }
