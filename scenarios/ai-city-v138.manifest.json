@@ -3,66 +3,93 @@
   "roster": [
     {
       "team": 1,
-      "cities": 10,
-      "buildings": 279,
+      "cities": 9,
+      "buildings": 254,
       "markets": 5,
       "harbors": 1,
-      "houses": 85,
+      "houses": 67,
       "fields": 1,
       "ages": 5
     },
     {
       "team": 2,
-      "cities": 8,
-      "buildings": 229,
+      "cities": 9,
+      "buildings": 246,
       "markets": 5,
       "harbors": 2,
-      "houses": 67,
+      "houses": 69,
       "fields": 2,
       "ages": 4
     },
     {
       "team": 3,
       "cities": 6,
-      "buildings": 227,
+      "buildings": 230,
       "markets": 3,
-      "harbors": 2,
-      "houses": 58,
-      "fields": 2,
+      "harbors": 1,
+      "houses": 65,
+      "fields": 4,
       "ages": 4
     }
   ],
   "landUse": [
     {
-      "name": "Sampola",
-      "owned": 163,
+      "name": "Vendel",
+      "owned": 82,
+      "developed": 6,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 20,
+      "foodGrowthBonus": 0.30000000000000004
+    },
+    {
+      "name": "Fyrisvellir",
+      "owned": 363,
+      "developed": 6,
+      "ruralDeveloped": 1,
+      "planned": 0,
+      "homes": 19,
+      "foodGrowthBonus": 0.30000000000000004
+    },
+    {
+      "name": "Alvhem",
+      "owned": 243,
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 21,
-      "foodGrowthBonus": 0.2
+      "homes": 9,
+      "foodGrowthBonus": 0.30000000000000004
     },
     {
-      "name": "Ainola",
-      "owned": 363,
+      "name": "Starkad",
+      "owned": 147,
+      "developed": 3,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 6,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Hervor",
+      "owned": 129,
       "developed": 5,
       "ruralDeveloped": 0,
-      "planned": 2,
-      "homes": 21,
-      "foodGrowthBonus": 0.2
+      "planned": 0,
+      "homes": 5,
+      "foodGrowthBonus": 0
     },
     {
-      "name": "Väinölä",
-      "owned": 243,
+      "name": "Yngve",
+      "owned": 75,
       "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 11,
-      "foodGrowthBonus": 0.2
+      "homes": 2,
+      "foodGrowthBonus": 0
     },
     {
-      "name": "Pohjola",
-      "owned": 42,
+      "name": "Svea",
+      "owned": 75,
       "developed": 3,
       "ruralDeveloped": 1,
       "planned": 0,
@@ -70,190 +97,138 @@
       "foodGrowthBonus": 0
     },
     {
-      "name": "Tapiola",
-      "owned": 45,
-      "developed": 3,
+      "name": "Götaland",
+      "owned": 26,
+      "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 7,
-      "foodGrowthBonus": 0.2
-    },
-    {
-      "name": "Metsola",
-      "owned": 104,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 7,
+      "homes": 3,
       "foodGrowthBonus": 0
     },
     {
-      "name": "Ahtola",
-      "owned": 68,
-      "developed": 4,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 5,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Sariola",
-      "owned": 75,
-      "developed": 3,
+      "name": "Järnsida",
+      "owned": 27,
+      "developed": 2,
       "ruralDeveloped": 1,
       "planned": 0,
-      "homes": 3,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Hiitola",
-      "owned": 75,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 3,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Kalevala",
-      "owned": 53,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 3,
+      "homes": 1,
       "foodGrowthBonus": 0
     }
   ],
   "density": [
     {
-      "city": "Sampola",
-      "nearEdge": 2,
-      "expanded": 0,
-      "urbanBuildings": 88,
-      "urbanTiles": 82
-    },
-    {
-      "city": "Ainola",
+      "city": "Vendel",
       "nearEdge": 5,
       "expanded": 0,
-      "urbanBuildings": 89,
-      "urbanTiles": 88
+      "urbanBuildings": 82,
+      "urbanTiles": 68
     },
     {
-      "city": "Väinölä",
-      "nearEdge": 0,
+      "city": "Fyrisvellir",
+      "nearEdge": 1,
       "expanded": 0,
-      "urbanBuildings": 28,
-      "urbanTiles": 58
+      "urbanBuildings": 80,
+      "urbanTiles": 92
     },
     {
-      "city": "Pohjola",
+      "city": "Alvhem",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 8,
-      "urbanTiles": 18
+      "urbanBuildings": 31,
+      "urbanTiles": 59
     },
     {
-      "city": "Tapiola",
+      "city": "Starkad",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 20,
+      "urbanBuildings": 13,
       "urbanTiles": 37
     },
     {
-      "city": "Metsola",
+      "city": "Hervor",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 12,
+      "urbanBuildings": 14,
       "urbanTiles": 35
     },
     {
-      "city": "Ahtola",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 12,
-      "urbanTiles": 35
-    },
-    {
-      "city": "Sariola",
+      "city": "Yngve",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 6,
-      "urbanTiles": 17
+      "urbanTiles": 19
     },
     {
-      "city": "Hiitola",
+      "city": "Svea",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 7,
       "urbanTiles": 17
     },
     {
-      "city": "Kalevala",
+      "city": "Götaland",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 6,
-      "urbanTiles": 18
+      "urbanTiles": 12
+    },
+    {
+      "city": "Järnsida",
+      "nearEdge": 0,
+      "expanded": 0,
+      "urbanBuildings": 2,
+      "urbanTiles": 5
     }
   ],
   "seed": 138023,
   "turn": 246,
-  "sourceTeam": 1,
-  "cities": 10,
-  "buildings": 279,
+  "sourceTeam": 2,
+  "cities": 9,
+  "buildings": 246,
   "spacingPairs": [
     9,
-    11,
-    20,
-    10,
-    19,
-    14,
-    19,
-    28,
     17,
-    20,
-    29,
     10,
+    22,
     19,
+    19,
+    18,
+    29,
     11,
+    19,
+    13,
+    19,
     28,
-    28,
-    26,
+    27,
+    29,
+    27,
     9,
     20,
-    29,
-    25,
-    9,
+    36,
+    35,
     18,
-    23,
-    22,
-    25,
-    34,
-    13,
-    22,
-    19,
-    9,
-    12,
-    29,
-    38,
-    19,
-    9,
-    38,
-    47,
-    22,
-    33,
-    39,
-    31,
-    9,
     32,
-    41
+    9,
+    9,
+    28,
+    19,
+    25,
+    41,
+    40,
+    27,
+    16,
+    37,
+    12,
+    26,
+    28,
+    47
   ],
   "ages": [
+    4,
     5,
     0,
-    4,
     4
   ],
-  "bytes": 4554433,
-  "seconds": 289
+  "bytes": 3491033,
+  "seconds": 262
 }
