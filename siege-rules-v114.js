@@ -3,7 +3,8 @@ export const WALL_PROFILES=Object.freeze({
  palisade:{name:'Puitvall',height:2.4,hp:420,cover:.55,material:'wood'},
  stonewall:{name:'Madal kivivall',height:3.8,hp:900,cover:.45,material:'stone'},
  reinforced_wall:{name:'Kõrge kivivall',height:6.4,hp:1800,cover:.35,material:'stone'},
- gatehouse:{name:'Kindlustatud värav',height:3.8,hp:700,cover:.45,material:'gate'}
+ gatehouse:{name:'Kindlustatud värav',height:3.8,hp:700,cover:.45,material:'gate'},
+ woodgate:{name:'Puidust külavärav',height:3.1,hp:320,cover:.2,material:'gate'}
 });
 export const wallProfile=type=>WALL_PROFILES[type];
 // Once-only save migration preserves the fraction of damage, including ruins.
