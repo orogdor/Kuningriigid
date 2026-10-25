@@ -115,6 +115,7 @@ Object.assign(BUILDINGS,{
 // V61: Fortifications are expensive fixed defences, not free military spawns.
 Object.assign(BUILDINGS,{
  palisade:{name:'Puitvall',icon:'▥',cost:{wood:30,stone:4},requires:['lumber'],workers:0,time:35},
+ woodgate:{name:'Puidust külavärav',icon:'⌑',cost:{wood:8},requires:['lumber'],workers:0,time:14},
  watchtower:{name:'Vahitorn',icon:'♜',cost:{wood:45,stone:18},requires:['lumber','quarry'],workers:1,time:50},
  stonewall:{name:'Madal kivivall',icon:'▤',cost:{stone:58,cutstone:18,wood:8},requires:['quarry','mason'],workers:0,time:58},
  stonetower:{name:'Kivist kaitsetorn',icon:'♜',cost:{stone:80,cutstone:26,plank:15},requires:['quarry','mason'],workers:1,time:85}
@@ -149,8 +150,8 @@ export const AGES=[{name:'Kiviaeg',cost:null},{name:'Pronksiaeg',cost:ERA_MATERI
 Object.assign(BUILDINGS.farm,{name:'Põllutalu · farmerihoone',requires:['hall']});
 BUILDINGS.field={name:'Põld · lohista ala',icon:'▥',cost:{wood:6},requires:['farm'],workers:0,time:12};
 Object.assign(BUILDINGS.pasture,{name:'Loomafarm',requires:['hall'],out:'meat',input:{water:2},rate:5});
-BUILD_TECH.field='agriculture';
-export const BUILD_AGE={library:1,school:3,public_school:5,high_school:5,field:0,...Object.fromEntries(Object.entries(GOOD_BUILDINGS).map(([k,d])=>[k,d.age])),...Object.fromEntries(Object.keys(MEDIEVAL_BUILDINGS).map(k=>[k,3])),siegeworkshop:2,watermill:2,gatehouse:1,reinforced_wall:1,palisade:0,watchtower:0,stonewall:1,stonetower:1,claypit:0,pottery_kiln:0,pasture:0,mason:0,cartwright:1,coppermine:1,tinmine:1,bronze_foundry:1,road_depot:1,printer:4,observatory:4,nitrate:3,powdermill:3,steelworks:5,engineworks:5,polytechnic:5,railstation:5,oilwell:5,refinery:5,powerplant:5,autofactory:5,laboratory:6,airfield:6,study:0,scriptorium:1,academy:2,university:3,warehouse:1,cellar:1,market:1,harbor:1,bridge:1,hall:0,lumber:0,forester:1,quarry:0,house:0,well:0,farm:0,hunter:0,fisher:0,barracks:0,saw:1,mill:1,bakery:1,archery:0,mine:2,coal:2,smelter:2,smith:2,stable:2};
+BUILD_TECH.field='agriculture';BUILD_TECH.woodgate='fortifications';
+export const BUILD_AGE={library:1,school:3,public_school:5,high_school:5,field:0,...Object.fromEntries(Object.entries(GOOD_BUILDINGS).map(([k,d])=>[k,d.age])),...Object.fromEntries(Object.keys(MEDIEVAL_BUILDINGS).map(k=>[k,3])),siegeworkshop:2,watermill:2,gatehouse:1,reinforced_wall:1,palisade:0,woodgate:0,watchtower:0,stonewall:1,stonetower:1,claypit:0,pottery_kiln:0,pasture:0,mason:0,cartwright:1,coppermine:1,tinmine:1,bronze_foundry:1,road_depot:1,printer:4,observatory:4,nitrate:3,powdermill:3,steelworks:5,engineworks:5,polytechnic:5,railstation:5,oilwell:5,refinery:5,powerplant:5,autofactory:5,laboratory:6,airfield:6,study:0,scriptorium:1,academy:2,university:3,warehouse:1,cellar:1,market:1,harbor:1,bridge:1,hall:0,lumber:0,forester:1,quarry:0,house:0,well:0,farm:0,hunter:0,fisher:0,barracks:0,saw:1,mill:1,bakery:1,archery:0,mine:2,coal:2,smelter:2,smith:2,stable:2};
 export const TROOPS={scout:{name:"Avastaja",age:0,cost:{wood:10},requires:[],hp:55,dmg:3,range:2.5,speed:4.3},militia:{name:"Linna kaitsjad",age:0,cost:{},requires:[],hp:36,dmg:4,range:3,speed:2.6},slinger:{name:'Kiviviskajad',age:0,cost:{wood:8,stone:18},requires:['barracks'],hp:85,dmg:7,range:10,speed:2.7},spearman:{name:'Puuodamehed',age:0,cost:{wood:22,stone:4},requires:['barracks'],hp:125,dmg:10,range:3,speed:2.8},axeman:{name:'Kivikirvemehed',age:0,cost:{wood:14,stone:14},requires:['barracks'],hp:140,dmg:12,range:2.5,speed:2.7},archer:{name:'Vibukütid',age:0,cost:{wood:25,stone:8,bread:8},requires:['archery'],hp:100,dmg:12,range:13,speed:2.8},infantry:{name:'Raudmõõgamehed',age:2,cost:{weapons:3,bread:10},requires:['smith','barracks'],hp:175,dmg:18,range:3,speed:2.8},cavalry:{name:'Ratsavägi',age:2,cost:{weapons:4,bread:18},requires:['stable'],hp:210,dmg:23,range:3.5,speed:4.6}};
 Object.assign(TROOPS,{musketeer:{name:'Musketärid',age:4,cost:{gunpowder:8,iron:10,bread:10},requires:['barracks','powdermill'],hp:170,dmg:26,range:15,speed:2.7},rifleman:{name:'Püssimehed',age:5,cost:{gunpowder:10,steel:6,bread:12},requires:['barracks','steelworks'],hp:220,dmg:38,range:20,speed:3.1},motorized:{name:'Motoriseeritud jalavägi',age:6,cost:{fuel:15,vehicles:2,weapons:5,bread:16},requires:['autofactory','barracks'],hp:300,dmg:48,range:18,speed:5.1}});
 for(const [kind,d]of Object.entries(TROOPS))d.time={scout:18,slinger:25,spearman:30,axeman:35,archer:40,infantry:50,cavalry:60,musketeer:70,rifleman:90,motorized:125,militia:0}[kind];
@@ -159,6 +160,11 @@ Object.assign(TROOPS,MEDIEVAL_UNITS);
 installEraUnits(TROOPS,UNIT_TECH);
 balanceUnitDefinitions(TROOPS);
 applyDevelopmentBalance(BUILDINGS,TROOPS);
+// V166: affordable real wooden fortifications can be built before the Bronze era.
+// Every paid palisade, gate and watchtower still needs builder time.
+Object.assign(BUILDINGS.palisade,{cost:{wood:6},time:12});
+Object.assign(BUILDINGS.woodgate,{cost:{wood:8},time:14});
+Object.assign(BUILDINGS.watchtower,{cost:{wood:14,stone:4},time:18});
 // V160: houses are small, repeated investments; keep the half-capacity per home.
 // Stone walls spend real dressed stone but no longer consume an entire timber supply.
 BUILDINGS.house.time=Math.ceil(BUILDINGS.house.time*.85);
