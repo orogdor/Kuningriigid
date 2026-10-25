@@ -11,8 +11,13 @@ export function tickBuilders(game,city,dt){city.builderCount??=1;city.builderAge
  jobs.sort((a,b)=>Number(FOUNDATION_TYPES.has(b.b.type))-Number(FOUNDATION_TYPES.has(a.b.type)));
  // V160: a second real builder serves the historic wall while the first
  // maintains food, houses and material chains. Neither project is free.
- if((city.builderCount||1)>=2&&city.economy.realms[city.team]?.pop>=18){
-  const wall=jobs.findIndex(({b})=>['stonewall','gatehouse','stonetower'].includes(b.type));
+ if((city.builderCount||1)>=2&&city.economy.realms[city.team]?.pop>=7){
+  // Reserve builder #2 for paid kiviaja timber defenses while builder #1
+  // continues housing, food and production infrastructure.
+  const stoneAge=game.s.ages[city.team]===0;
+  const wall=jobs.findIndex(({b})=>stoneAge?
+   ['woodgate','watchtower','palisade'].includes(b.type):
+   (city.economy.realms[city.team].pop>=18&&['stonewall','gatehouse','stonetower'].includes(b.type)));
   if(wall>=0){const [fortification]=jobs.splice(wall,1);jobs.splice(1,0,fortification);}
  }
 }const assigned=city.buildersAssigned||0,count=Math.ceil(assigned);for(let i=0;i<count;i++)if(!city.builderAgents[i]){const hall=city.economy.buildings.find(b=>b.type==='hall'),p=game.nav(city).nearest(door(hall));if(!p)continue;city.builderAgents[i]={...p,c:city.c,r:city.r,team:city.team,kind:'builder',workerKey:'builder:'+city.id+':'+i,working:false,moving:false,visible:true}}
