@@ -1,6 +1,6 @@
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
 import {nordicVillageName} from './folklore-village-names-v164.js?v=165a';
-import {stoneFortificationAgeGate} from './stone-village-defenses-v166.js';
+import {stoneFortificationAgeGate} from './stone-village-defenses-v166.js?v=167a';
 import {allocateTerritory} from './territory-v143.js';
 import {urbanExpansionFits,grownCityRadius} from './city-area-v142.js';
 import {installGameRevisions,citySummary,cityContexts,cityLookup,navigationRevision,resourcesNear,buildingsNear} from './perf-state-v131.js';
