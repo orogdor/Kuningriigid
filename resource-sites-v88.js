@@ -1,5 +1,5 @@
 import {detailHeight} from './world-details.js?v=123a';
-import {localSurface} from './continuous-landscape.js?v=123a';
+import {localSurface} from './continuous-landscape.js?v=162a';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 
 export const MINERAL_BUILDINGS=Object.freeze({quarry:'stone',mine:'ore',coppermine:'copper',tinmine:'tin',claypit:'clay',gem_mine:'gems',oilwell:'oil'});

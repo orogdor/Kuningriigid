@@ -20,11 +20,14 @@ float l149f(vec2 p){return l149n(p)*.55+l149n(p*2.07+17.3)*.30+l149n(p*4.31+41.9
 // Object position -> world metres (detail maps are scaled 4.5 x 0.30 x 3.9 around the tile).
 // V161: the tile offset is a uniform (uL149Tile), not baked into the GLSL, so every detail tile
 // shares one compiled program and moving between tiles never recompiles shaders.
-function worldMapping(scope,tile){
+function worldMapping(scope,tile,terrain=false){
  if(scope==='world')return {pos:'position',nrm:'objectNormal',head:'',uniforms:{}};
- return {pos:`vec3(position.x/${DETAIL_X.toFixed(3)}+uL149Tile.x,position.y/0.30+0.7,position.z/${DETAIL_Z.toFixed(3)}+uL149Tile.y)`,
-  nrm:`vec3(objectNormal.x*${DETAIL_X.toFixed(3)},objectNormal.y*0.30,objectNormal.z*${DETAIL_Z.toFixed(3)})`,
-  head:'uniform vec2 uL149Tile;',uniforms:{uL149Tile:{value:new T.Vector2(Number(tile?.x||0),Number(tile?.z||0))}}};
+ // V161: detail terrain carries its world height and mountain mask per vertex (aL161), because the
+ // drawing height of mountains is exaggerated only on mountain cells; water and roads use 0.3.
+ const y=terrain?'aL161.x':'position.y/0.30+0.7',sy=terrain?'(0.30+(aL161.x>10.0?0.9*aL161.y:0.0))':'0.30';
+ return {pos:`vec3(position.x/${DETAIL_X.toFixed(3)}+uL149Tile.x,${y},position.z/${DETAIL_Z.toFixed(3)}+uL149Tile.y)`,
+  nrm:`vec3(objectNormal.x*${DETAIL_X.toFixed(3)},objectNormal.y*${sy},objectNormal.z*${DETAIL_Z.toFixed(3)})`,
+  head:'uniform vec2 uL149Tile;'+(terrain?'attribute vec2 aL161;':''),uniforms:{uL149Tile:{value:new T.Vector2(Number(tile?.x||0),Number(tile?.z||0))}}};
 }
 function inject(shader,{map=null,vertexHead='',vertexBody='',fragHead='',color=''}){
  if(map)Object.assign(shader.uniforms,map.uniforms);
@@ -46,13 +49,13 @@ export function setCultivation(values){CULTIVATION.data.set(values);CULTIVATION.
 // Lowlands keep their biome colours with a natural, non-repeating grain.
 export function terrainMaterial(scope='world',tile=null){
  const material=new T.MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0});
- const map=worldMapping(scope,tile),detail=scope!=='world';
+ const map=worldMapping(scope,tile,true),detail=scope!=='world';
  material.onBeforeCompile=shader=>{
   shader.uniforms.uT158Cloud=CLOUD_TIME;
   inject(shader,{map,
    vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':''),
    vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':''),
-   fragHead:'uniform float uT158Cloud;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;':''),
+   fragHead:'uniform float uT158Cloud;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;float t156G=0.0;':''),
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);
@@ -87,7 +90,7 @@ export function terrainMaterial(scope='world',tile=null){
  land=mix(land,fc,flower*grassy*aa*(1.0-soil)*smoothstep(.42,.62,l149n(q*.04+5.0)));
  float pebbles=smoothstep(.82,.90,l149n(q*2.6+3.1))*aa*(soil*.8+smoothstep(35.0,65.0,elev)+(1.0-grassy)*.4);
  land=mix(land,vec3(.52,.50,.46)*(.85+cl2*.3),min(1.0,pebbles)*.6);
- t156Bump=(cl*.7+bl*.35*aa+cl2*.25*aa-soil*.5+pebbles*.6)*grassy+pebbles*.4;`:''}
+ t156Bump=(cl*.7+bl*.35*aa+cl2*.25*aa-soil*.5+pebbles*.6)*grassy+pebbles*.4;t156G=grassy*(1.0-soil*.5);`:''}
  // rock appears on steep ground, earlier the higher it is
  float rockAt=mix(.42,.20,smoothstep(30.0,95.0,elev));
  float rock=smoothstep(rockAt-.07,rockAt+.09,slope+(nMid-.5)*.16)*smoothstep(16.0,34.0,elev);
@@ -113,10 +116,15 @@ export function terrainMaterial(scope='world',tile=null){
  diffuseColor.rgb=col;`});
   shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n roughnessFactor=1.0;');
   if(detail)shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
- { // V156 bump from the ground pattern (screen-space derivative method)
-  vec3 sp=-vViewPosition,dpx=dFdx(sp),dpy=dFdy(sp);float dhx=dFdx(t156Bump),dhy=dFdy(t156Bump);
-  vec3 r1=cross(dpy,normal),r2=cross(normal,dpx);float det=dot(dpx,r1);
-  vec3 grad=sign(det)*(dhx*r1+dhy*r2);normal=normalize(abs(det)*normal-.32*grad);
+ { // V161: relief from the analytic slope of the grass-clump pattern. The V156 screen-space
+   // derivative bump drew dotted lines along the terrain triangles on phones.
+  vec2 q2=vL156L;const float e=.35;
+  float h0=l149n(q2*.55)*.7+l149n(q2*1.7+4.0)*.25;
+  float hx=l149n((q2+vec2(e,0.0))*.55)*.7+l149n((q2+vec2(e,0.0))*1.7+4.0)*.25;
+  float hz=l149n((q2+vec2(0.0,e))*.55)*.7+l149n((q2+vec2(0.0,e))*1.7+4.0)*.25;
+  vec2 g=vec2(hx-h0,hz-h0)/e;
+  vec3 tX=normalize((viewMatrix*vec4(1.0,0.0,0.0,0.0)).xyz),tZ=normalize((viewMatrix*vec4(0.0,0.0,1.0,0.0)).xyz);
+  normal=normalize(normal-(g.x*tX+g.y*tZ)*.45*t156G);
  }`);
  };
  material.customProgramCacheKey=()=>'terrain-v149-v161-'+scope;

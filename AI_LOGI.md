@@ -521,3 +521,55 @@ Mõõtsin, et iga ruudu vahetus (`followDetail` → `openTile`) võttis peaaegu 
 ### Pooleli / ideed
 - Esimesel jõe- või rajaruudul kompileeritakse üks kord veel 3–5 programmi. Selle saaks käivitusel ette soojendada.
 - `syncLocal` ja `createUnifiedRoadNetwork` võtavad ruudu vahetusel endiselt aega (umbes 100–170 ms aeglases testbrauseris).
+
+---
+
+## V162 – kõrged mäed detailkaardil, jõekaldad, kiviaja seinad, punktiirjooned (Claude, 2026-10-25)
+
+Kasutaja saatis telefonist ekraanipildid ja kirjutas: mäed peaksid detailvaates kõrgemad olema, jõed hõljuvad õhus ja kiviaja majade seinad on liiga madalad.
+
+Põhimõte: kõik muudatused on ainult joonistamiseks. Mängu loogika kasutab endiselt `surface()`, `localSurface()` ja `projectHeight()` muutmata kujul.
+
+### Joonistuskõrgused – `continuous-landscape.js`
+- `worldElevation(game,x,z,visual=false)`: kui `visual` on tõene ja maapind jõe ümber (`outer + 18`) on madalam kui `waterHeight + 0.6`, tõstetakse see sujuvalt kaldaks.
+  - Mõõtsin, et hõljuvaid kaldapunkte oli 864 / 22 930, nüüd on 168.
+  - Navigatsioon ja ehitusreeglid kutsuvad funktsiooni ilma lipuni, nende jaoks ei muutunud midagi.
+- `visualElevation()` (oma vahemäluga), `visualSurface()`, `localVisualSurface()`.
+- `mountainMask(game,x,z)`:
+  - on 1 mäeruutude sees ja **alati 0 mitte-mäeruudul**;
+  - otsing on domeeniväänatud (warp), seega jalamid ei järgi ruudu servi;
+  - lävi on `smooth((f-.58)/.42)`.
+- `visualProject(game,e,x,z) = (e-0.7)*0.3 + max(0,e-10)*0.9*mask`. Kõrgeim tipp (e ≈ 185) jõuab umbes 210 ühikuni.
+- Linnade hoonete all ei muutunud kõrguste vahe (kontrollitud skriptiga kolmes demos). Mäeruutudel hooneid pole, sest navigatsioon nõuab `!cell.mountain`.
+
+### Joonistuskõrguste kasutajad
+- `civilization.js`:
+  - `ground()` kasutab `localVisualSurface`;
+  - `terrainVertex` salvestab plokki 7 väärtust: h, rgb, mountain, e, mask. Värvi lävendid kasutavad vana 0,3 skaalat;
+  - mäevarjutus (`mountainShade`) kasutab maailmakõrgust `aL161[i*2]`.
+- Uus `distantTerrain(cell)`:
+  - jäme maastik 9×9 ruudu ulatuses (samm 15 × 13), vahemälus globaalse võrgu järgi;
+  - 3×3 ala sees on see 6 ühikut madalamal, nii et päris maastik katab selle;
+  - kasutab `terrainMaterial('detail')`.
+- Kaamera: `camLiftV161` järgib maapinda fookuse all (sujuvalt) ja kaamera ei lähe maapinnast madalamale kui +4.
+- `continuous-landscape-visual.js`: jõe veepind, kaldad, koolmed (`vp()`), `landscape-polish-v84.js` (sillad ja koolmed) ja `detail-borders-v85.js` kasutavad `visualProject` / `visualElevation`.
+
+### Varjutaja – `landscape-v149.js`
+- Detailmaastiku geomeetrias on atribuut `aL161 = (maailmakõrgus, mägimask)`. Varjutaja loeb maailmakõrguse sealt (kivi, lumi, alpiniit) ja normaali Y-skaala on `0.3 + 0.9*mask`.
+- Vesi ja teed kasutavad endist `y/0.30+0.7`.
+- **Punktiirjooned telefonis**: V156 ekraaniruumi tuletiste reljeef (`dFdx`/`dFdy`) andis kolmnurkade servadel katkestusi. Asendasin selle muru-mustri analüütilise kallakuga (lõplikud vahed, `t156G`). Tuletisi enam ei kasutata.
+
+### Kiviaja seinad – `town-models-v154.js`
+- `body()`:
+  - kiviaja seinakõrgus 1,7 → 2,4, pronksiaja 2,0 → 2,5;
+  - varajaste ajastute uks 1,0 × 1,6 → 1,1 × 2,0.
+- `houseStone`:
+  - ümaronni sein 1,2–1,6 → 2,1–2,5, kind 3 0,8 → 1,9, lisaonn 0,8 → 1,6;
+  - uks 1,25 → 1,85.
+- `houseEarly`: ümarmaja sein 1,7 → 2,4, muud majad 1,9–2,3 → 2,4–2,8 (pikkmaja 1,5 → 2,3).
+
+### Versioonid
+- `civilization.js?v=162a` (`boot-v83.js`, `index.html` boot);
+- `continuous-landscape.js`, `continuous-landscape-visual.js`, `landscape-polish-v84.js`, `detail-borders-v85.js` ja `landscape-v149.js` on `?v=162a`;
+- `town-models-v154.js?v=161b`;
+- import-map'i vanad spetsifikaatorid suunavad samadele failidele.

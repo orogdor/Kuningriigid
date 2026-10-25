@@ -143,10 +143,14 @@ export function baseHeight(game,x,z){
  const oceanFloor=sub?(2.5*smooth(sub/7)+sub*.10):0;
  return h+roll+relief-oceanFloor;
 }
-export function worldElevation(game,x,z){
- const base=baseHeight(game,x,z),{distance:d,width:w,waterHeight,fordStrength=0}=riverNear(game,x,z);
+// visual=true (drawing only): where the rolling ground dips below a river's water level, the banks
+// rise gently to just above the water (natural levees), so the river sits in its bed instead of
+// floating above the land. Navigation keeps calling it without the flag (V161).
+export function worldElevation(game,x,z,visual=false){
+ let base=baseHeight(game,x,z);const {distance:d,width:w,waterHeight,fordStrength=0}=riverNear(game,x,z);
  if(!Number.isFinite(d))return base;
  const inner=w*1.04,outer=Math.max(inner+3.5,w*1.8+3);
+ if(visual){const rim=waterHeight+.6,reach=outer+18;if(base<rim&&d<reach)base+=(rim-base)*(1-smooth((d-outer)/(reach-outer)));}
  // Incise the SAME water elevation into the terrain, even where a mountain
  // ridge crosses the river. Subtracting depth from the ridge left dry spikes.
  const deep=2.2+Math.max(0,1-d/inner)*1.4;
@@ -158,7 +162,34 @@ export function worldElevation(game,x,z){
 
 }
 export function projectHeight(y,view){return view==='detail'?(y-.7)*DETAIL_Y:y}
+// V161: drawing-only height for detail maps. On mountain cells, ground above 10 rises 0.9 extra per
+// unit, so mountains tower over the tile instead of being flattened to 0.3x. The mask is 0 on every
+// non-mountain cell (towns, fields, roads are never on mountain cells), so nothing that stands on
+// the ground changes. Gameplay keeps projectHeight()/localSurface().
+export const DETAIL_MOUNTAIN_FROM=10,DETAIL_MOUNTAIN_EXTRA=.9;
+const maskCaches=new WeakMap();
+export function mountainMask(game,x,z){
+ let m=maskCaches.get(game);if(!m){m=new Uint8Array(game.cells.length);game.cells.forEach((c,i)=>{m[i]=c.land&&c.mountain?1:0;});maskCaches.set(game,m);}
+ const at=(c,r)=>c<0||r<0||c>=COLS||r>=ROWS?0:m[r*COLS+c];
+ // warped lookup: foothills follow irregular natural lines, not the square cell edges
+ const wx=x+(game.smooth(x/37+3.7,z/37+8.1)-.5)*30+(game.smooth(x/11+51,z/11+17)-.5)*8,wz=z+(game.smooth(x/37+61.3,z/37+2.9)-.5)*30+(game.smooth(x/11+9,z/11+77)-.5)*8;
+ const u=(wx+650)/50-.5,v=(wz+550)/50-.5,c0=Math.floor(u),r0=Math.floor(v),fu=smooth(u-c0),fv=smooth(v-r0);
+ {const oc=Math.floor((x+650)/50),or=Math.floor((z+550)/50);if(!at(oc,or))return 0;} // never on a non-mountain cell
+ const f=at(c0,r0)*(1-fu)*(1-fv)+at(c0+1,r0)*fu*(1-fv)+at(c0,r0+1)*(1-fu)*fv+at(c0+1,r0+1)*fu*fv;
+ return smooth((f-.58)/.42);
+}
+export function visualProject(game,e,x,z){return (e-.7)*DETAIL_Y+(e>DETAIL_MOUNTAIN_FROM?(e-DETAIL_MOUNTAIN_FROM)*DETAIL_MOUNTAIN_EXTRA*mountainMask(game,x,z):0)}
 export function surface(game,x,z,view='world'){return projectHeight(memoHeight(game,x,z,()=>worldElevation(game,x,z)),view)}
+// Drawing heights (with river levees). Gameplay keeps surface()/localSurface().
+const visualCaches=new WeakMap();
+export function visualElevation(game,x,z){
+ const rev=(game.s?.terrainRevision||0)+':'+(game.s?.crossingRevision||0);let c=visualCaches.get(game);
+ if(!c||c.rev!==rev){c={rev,map:new Map()};visualCaches.set(game,c);}
+ const key=x+','+z;let v=c.map.get(key);if(v!==undefined)return v;
+ v=worldElevation(game,x,z,true);if(c.map.size>120000)c.map.clear();c.map.set(key,v);return v;
+}
+export function visualSurface(game,x,z,view='world'){const e=visualElevation(game,x,z);return view==='detail'?visualProject(game,e,x,z):e}
+export function localVisualSurface(game,tile,x,z){const p=localToWorld(tile,x,z);return visualProject(game,visualElevation(game,p.x,p.z),p.x,p.z)}
 export function worldToLocal(tile,x,z){return {x:(x-tile.x)*DETAIL_X,z:(z-tile.z)*DETAIL_Z}}
 export function localToWorld(tile,x,z){return {x:tile.x+x/DETAIL_X,z:tile.z+z/DETAIL_Z}}
 export function localSurface(game,tile,x,z,cache=true){const p=localToWorld(tile,x,z);return cache?surface(game,p.x,p.z,'detail'):projectHeight(worldElevation(game,p.x,p.z),'detail')}

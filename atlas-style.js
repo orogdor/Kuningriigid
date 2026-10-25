@@ -1,14 +1,14 @@
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 import * as T from './vendor/three.module.js';
-import {smoothBiomeColor,groundBaseColor,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=161a';
-import {createMountainOutcrops} from './landscape-polish-v84.js?v=85a';
+import {smoothBiomeColor,groundBaseColor,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=162a';
+import {createMountainOutcrops} from './landscape-polish-v84.js?v=162a';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
-import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=161a';
+import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=162a';
 import {settlementGeometry,getWorldModel,WORLD_MODEL_MATERIAL,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=161a';
 import {seaMaterial} from './sea-v158.js?v=161a';
-import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=161a';
-import {surface,riverNear} from './continuous-landscape.js?v=85a';
+import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=162a';
+import {surface,riverNear} from './continuous-landscape.js?v=162a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center} from './campaign.js';
 const palette={
  sea:'#173f58',deepSea:'#102d4e',shallow:'#64aba7',beach:'#dfcea0',coastGrass:'#b7c28b',

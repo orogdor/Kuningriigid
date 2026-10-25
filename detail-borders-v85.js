@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.js';
-import {surface,worldToLocal,projectHeight} from './continuous-landscape.js?v=123a';
+import {visualElevation as surface,visualProject,worldToLocal,projectHeight} from './continuous-landscape.js?v=162a';
 const colors=['#65d6d0','#ed8f70','#bba1ef','#eed474'];
 // County perimeter plus the urban/rural boundary; ordinary district seams stay unmarked.
 export function createDetailBorders(game,tile){
@@ -17,7 +17,7 @@ export function createDetailBorders(game,tile){
    const x=cell.x+dx,z=cell.z+dz,vx=dc===0?50:0,vz=dr===0?50:0;
    for(let i=0;i<50;i++){
     const t0=i/50,t1=(i+1)/50,half=boundary>=8?1.15:boundary>=4?.18:.30;
-    const pt=(t,side)=>{const X=x+vx*t+(dc?half*side:0),Z=z+vz*t+(dr?half*side:0),p=worldToLocal(tile,X,Z);return [p.x,projectHeight(Math.max(.95,surface(game,X,Z))+.55,'detail'),p.z]};
+    const pt=(t,side)=>{const X=x+vx*t+(dc?half*side:0),Z=z+vz*t+(dr?half*side:0),p=worldToLocal(tile,X,Z);return [p.x,visualProject(game,Math.max(.95,surface(game,X,Z))+.55,X,Z),p.z]};
     const a=pt(t0,-1),b=pt(t0,1),c=pt(t1,-1),d=pt(t1,1);vertices.push(...a,...c,...b,...b,...c,...d);if(boundary>=8){const outline=byTeam.get(boundary+4)||[];byTeam.set(boundary+4,outline);const A=pt(t0,-1.7),B=pt(t0,1.7),C=pt(t1,-1.7),D=pt(t1,1.7);outline.push(...A,...C,...B,...B,...C,...D);}
    }
   }

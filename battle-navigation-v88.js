@@ -1,6 +1,6 @@
 import {createBattleSteering} from './battle-movement-v97.js';
 import {Navigation,buildingClearance} from './navigation.js';
-import {localSurface} from './continuous-landscape.js?v=123a';
+import {localSurface} from './continuous-landscape.js?v=162a';
 import {DETAIL_TILE_X,DETAIL_TILE_Z,tileDelta} from './detail-scale-v123.js';
 import {BATTLEFIELD,battlefieldTiles} from './battlefield-v88.js';
 import {assaultLaneAt} from './siege-assault-v108.js?v=117a';

@@ -189,18 +189,18 @@ function houseStone(b,r,v){
   const R=1.9+r()*.4,H=3.4+r()*.5,hide=pick(r,['#b49a72','#a68a63','#c2aa83']);
   cone(b,0,0,0,R,H,hide,M.cloth,9);for(let i=0;i<7;i++){const a=i/7*6.28;boxR(b,Math.cos(a)*.22,H+.2,Math.sin(a)*.22,.07,1.2,.07,'#6d5034',M.beam,Math.sin(a)*.25,0,-Math.cos(a)*.25);}
   box(b,0,0,R*.82,.8,1.1,.25,'#4a3a2a',M.cloth);fire();rack(b,-2,1.4,.5,'#9b7b55');return;}
- const R=kind===2?2.6:2.0+r()*.6,wall=kind===3?.8:1.2+r()*.4,roofH=kind===2?2.2:2.4+r()*.8,c=pick(r,PAL.daub),th=pick(r,PAL.thatch);
+ const R=kind===2?2.6:2.0+r()*.6,wall=kind===3?1.9:2.1+r()*.4,roofH=kind===2?2.2:2.4+r()*.8,c=pick(r,PAL.daub),th=pick(r,PAL.thatch);
  cyl(b,0,0,0,R,R*1.04,wall,c,M.plaster,12);cone(b,0,wall,0,R+.5,roofH,th,M.thatch,12);cone(b,0,wall+roofH-.3,0,.3,.6,shade(th,.75),M.thatch,8);
- box(b,0,0,R-.05,.9,1.25,.4,'#3b2c20',M.boards);
- if(kind===3){cyl(b,2.3,0,-1.3,1.1,1.15,.8,c,M.plaster,10);cone(b,2.3,.8,-1.3,1.45,1.6,th,M.thatch,10);}
+ box(b,0,0,R-.05,1.0,1.85,.4,'#3b2c20',M.boards);
+ if(kind===3){cyl(b,2.3,0,-1.3,1.1,1.15,1.6,c,M.plaster,10);cone(b,2.3,1.6,-1.3,1.45,1.6,th,M.thatch,10);}
  fire();if(r()>.4)logPile(b,-2.4,.9,5,1.2);if(r()>.5)pots(b,-1.8,-2.0);if(r()>.6)rack(b,-2.2,1.9,.3,'#a08060');
 }
 function houseEarly(b,r,v,age){ // bronze & iron age
  const kind=v%6,iron=age>=2,th=pick(r,PAL.thatch);
  const yard=()=>{if(r()>.35)fenceLine(b,-3.4,2.6,-1.2,2.6,'#8a6c48',.8);if(r()>.4)logPile(b,2.7,1.9,4+(r()*3|0),Math.PI/2);if(r()>.6)hay(b,-2.8,-2.2,.6);if(r()>.6)pots(b,2.4,-2.3);if(r()>.7)cart(b,-2.6,1.6,.4);};
  if(kind===2){ // round house
-  const R=2.6+r()*.4,c=pick(r,PAL.wattle);cyl(b,0,0,0,R,R,1.7,c,M.plaster,14);cone(b,0,1.6,0,R+.6,3.3,th,M.thatch,14);box(b,0,0,R-.1,1.0,1.5,.6,'#4b3826',M.boards);box(b,0,1.5,R+.25,1.3,.12,.8,th,M.thatch);yard();return;}
- const long=kind===1,logH=kind===3,w=long?6.8:4.6+r()*1.3,d=long?3.8:3.6+r()*.7,wh=long?1.5:1.9+r()*.4,rise=long?2.6:2.2+r()*.8;
+  const R=2.6+r()*.4,c=pick(r,PAL.wattle);cyl(b,0,0,0,R,R,2.4,c,M.plaster,14);cone(b,0,2.3,0,R+.6,3.3,th,M.thatch,14);box(b,0,0,R-.1,1.1,2.0,.6,'#4b3826',M.boards);box(b,0,2.0,R+.25,1.4,.12,.8,th,M.thatch);yard();return;}
+ const long=kind===1,logH=kind===3,w=long?6.8:4.6+r()*1.3,d=long?3.8:3.6+r()*.7,wh=long?2.3:2.4+r()*.4,rise=long?2.6:2.2+r()*.8;
  const wall=logH?pick(r,PAL.logs):pick(r,PAL.wattle),wm=logH?M.logs:M.plaster;
  if(iron)box(b,0,0,0,w+.25,.3,d+.25,'#8d877a',M.stone);
  box(b,0,iron?.3:0,0,w,wh,d,wall,wm);
@@ -320,8 +320,8 @@ function buildHouse(b,age,variant){
 // A standard building body in the era's style; returns the eave height.
 function body(b,era,r,{w=6,d=5,storeys=1,roof='gable',axis:axis0='x',x=0,z=0,wallC=null,roofC=null,windows=true,door=true,chim=false,style=null}={}){
  let wall,wm,rc,rm,sh=era>=5?2.7:2.4,axis=axis0;const st=style??Math.floor(r()*4);
- if(era===0){wall=pick(r,PAL.daub);wm=st===1?M.logs:M.plaster;rc=st===3?'#7a8a4f':pick(r,PAL.thatch);rm=st===3?M.leaf:M.thatch;sh=1.7;}
- else if(era===1){sh=2.0; // wattle & thatch, log & plank, gable-front thatch, dry stone & turf
+ if(era===0){wall=pick(r,PAL.daub);wm=st===1?M.logs:M.plaster;rc=st===3?'#7a8a4f':pick(r,PAL.thatch);rm=st===3?M.leaf:M.thatch;sh=2.4;} // V161: walls taller than a person
+ else if(era===1){sh=2.5; // wattle & thatch, log & plank, gable-front thatch, dry stone & turf
   if(st===1){wall=pick(r,PAL.logs);wm=M.logs;rc=pick(r,['#6f5b45','#5f4e3c','#7a6650']);rm=M.boards;}
   else if(st===3){wall=pick(r,['#9b968a','#8e897c']);wm=M.stone;rc=pick(r,['#6d8a4a','#7a9150','#5f7d45']);rm=M.leaf;}
   else{wall=pick(r,PAL.wattle);wm=M.plaster;rc=pick(r,PAL.thatch);rm=M.thatch;if(st===2)axis=axis==='x'?'z':'x';}}
@@ -341,7 +341,7 @@ function body(b,era,r,{w=6,d=5,storeys=1,roof='gable',axis:axis0='x',x=0,z=0,wal
   else if(roof==='flat'){box(b,0,H,0,w+.2,.3,d+.2,shade(wall,.85));}
   else if(roof==='saw'){const n=Math.max(2,Math.round(w/2.4));for(let i=0;i<n;i++){const xx=-w/2+(i+.5)*w/n;shed(b,xx,H,0,w/n,d,1.2,rc,M.metal);box(b,xx-w/n/2+.05,H,0,.06,1.2,d,'#9fb6c2',M.glass);}}
   if(windows)windowRows(b,w,d,era>=1?.15:0,sh,storeys,{spacing:era>=5?1.5:2.2,ww:era<=1?.45:.65,frame:era<=1?'#6d5034':'#ece6d6',glass:era<=1?'#2b2a26':'#384b55',cross:era>=3,sill:era>=3,doorGap:1.3});
-  if(door)doorway(b,'f',0,d/2,0,era<=1?1.0:1.3,era<=1?1.6:2.2,pick(r,PAL.door),era<=1?'#6d5034':'#d9d0bc',era===4);
+  if(door)doorway(b,'f',0,d/2,0,era<=1?1.1:1.3,era<=1?2.0:2.2,pick(r,PAL.door),era<=1?'#6d5034':'#d9d0bc',era===4);
   if(chim)chimney(b,w*.3,-d*.2,H,2,'#8e8578');
  });
  return H;

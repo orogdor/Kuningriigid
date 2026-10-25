@@ -1,6 +1,6 @@
 // V84 visual dressing shares the exact atlas/detail projection and saved rivers.
 import * as T from './vendor/three.module.js';
-import {getRivers,riverNear,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
+import {getRivers,riverNear,surface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=162a';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
 const templates=new Map(),crossingMaps=new WeakMap(),crossingCatalogs=new WeakMap();
@@ -53,12 +53,12 @@ export function crossingFrame(game,cell,scope='world',tile=null,height=null){
  const len=Math.hypot(b.x-a.x,b.z-a.z)||1,nx=-(b.z-a.z)/len,nz=(b.x-a.x)/len;
  const width=a.width||cell.riverWidth||3,halfSpan=width*1.65+4;
  const left={x:a.x+nx*halfSpan,z:a.z+nz*halfSpan},right={x:a.x-nx*halfSpan,z:a.z-nz*halfSpan};
- const ford=!cell.bridge,LH=surface(game,left.x,left.z),RH=surface(game,right.x,right.z);
+ const ford=!cell.bridge,LH=(scope==='world'?surface:visualElevation)(game,left.x,left.z),RH=(scope==='world'?surface:visualElevation)(game,right.x,right.z);
  // The ford stones lie on the shallow channel floor, not above a deep-water surface.
  const riverLevel=riverNear(game,a.x,a.z).waterHeight;
  const worldBase=ford?riverLevel-.13:(LH+RH)/2;let rise=ford?0:LH-RH;
- let p=scope==='world'?{x:a.x,z:a.z}:worldToLocal(tile,a.x,a.z),y=projectHeight(worldBase,scope);
- if(scope!=='world'&&height){const L=worldToLocal(tile,left.x,left.z),R=worldToLocal(tile,right.x,right.z);const lh=height(L.x,L.z),rh=height(R.x,R.z);y=ford?projectHeight(worldBase,'detail'):(lh+rh)/2;rise=ford?0:(lh-rh)/.30}
+ let p=scope==='world'?{x:a.x,z:a.z}:worldToLocal(tile,a.x,a.z),y=scope==='world'?worldBase:visualProject(game,worldBase,a.x,a.z);
+ if(scope!=='world'&&height){const L=worldToLocal(tile,left.x,left.z),R=worldToLocal(tile,right.x,right.z);const lh=height(L.x,L.z),rh=height(R.x,R.z);y=ford?visualProject(game,worldBase,a.x,a.z):(lh+rh)/2;rise=ford?0:(lh-rh)/.30}
  // A local X axis rotated by yaw points along the river normal.
  return {x:p.x,z:p.z,y,rise,yaw:Math.atan2(-nz,nx),halfSpan,width:6.2,ford,
   scale:scope==='world'?{x:halfSpan,y:1,z:6.2}:{x:halfSpan*3,y:.30,z:6.2*2.6},left,right,normal:{x:nx,z:nz}};

@@ -19,7 +19,7 @@ import {BATTLEFIELD} from './battlefield-v88.js';
 import {installEraUnits,troopCost,UNIT_GRADES} from './military-v88.js?v=117a';
 import {initArmyExperience,syncArmyStats,unitStats,armyTravelMultiplier,rallyArmies} from './army-experience-v88.js';
 import {productivityBonus,productivityResearchOrder} from './productivity-techs-v88.js';
-import {localSurface,localToWorld,riverNear} from './continuous-landscape.js?v=123a';
+import {localSurface,localToWorld,riverNear} from './continuous-landscape.js?v=162a';
 import {DETAIL_HALF_X,DETAIL_HALF_Z,DETAIL_TILE_X,DETAIL_TILE_Z,tileDelta,localTilePoint} from './detail-scale-v123.js';
 import {MINERAL_BUILDINGS,COASTAL_BUILDINGS,consolidateMinerals,mineralSite,mineralPlacement,harvestMineral,coastalPlacement,coastalSites} from './resource-sites-v88.js';
 import {nationalResourceNeeds,settlementResourceScore,specializeNewCity} from './settlement-ai-v88.js?v=125a';

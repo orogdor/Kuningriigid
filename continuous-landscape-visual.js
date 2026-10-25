@@ -5,15 +5,15 @@ import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 // NEVER independently drawn rectangular per-tile water/road chunks.
 import * as T from './vendor/three.module.js';
 import {releaseMaterial} from './program-keep-v161.js';
-import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=161a';
-import {createCrossingNetwork} from './landscape-polish-v84.js?v=85a';
-import {riverNear,localToWorld} from './continuous-landscape.js?v=123a';
-import {getRivers,roadNetwork,surface,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=123a';
+import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=162a';
+import {createCrossingNetwork} from './landscape-polish-v84.js?v=162a';
+import {riverNear,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=162a';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
-const elev=(game,x,z,view)=>surface(game,x,z,view);
-const pos=(game,x,z,y,view,tile)=>({...field(game,x,z,view,tile),y:projectHeight(y,view)});
+const elev=(game,x,z,view)=>view==='world'?surface(game,x,z,view):visualSurface(game,x,z,view);
+const vp=(game,y,view,x,z)=>view==='detail'?visualProject(game,y,x,z):projectHeight(y,view); // V161 drawing heights
+const pos=(game,x,z,y,view,tile)=>({...field(game,x,z,view,tile),y:vp(game,y,view,x,z)});
 function join(pts,game,scope,tile,kind,level=1){
  // V149: atlas roads are drawn wider so they read at map scale (centre lines are unchanged).
  const isRiver=kind==='river',wBase=isRiver?0:[0,.85,1.1,1.4,1.75][level],out=[];
@@ -25,7 +25,7 @@ function join(pts,game,scope,tile,kind,level=1){
   const outer=isRiver?width+Math.max(1.4,width*.32)*(1+.24*Math.sin(p.x*.17+p.z*.13)):width*1.6;
   const outerL={x:p.x+nx*outer,z:p.z+nz*outer},outerR={x:p.x-nx*outer,z:p.z-nz*outer};
   const waterHeight=Math.max(.85,baseHeight(game,p.x,p.z)-(2.4+Math.min(2.1,p.width*.20)));
-  const innerY=isRiver?projectHeight(waterHeight,scope):elev(game,p.x,p.z,scope)+(scope==='world'?1.32:.396);
+  const innerY=isRiver?vp(game,waterHeight,scope,p.x,p.z):elev(game,p.x,p.z,scope)+(scope==='world'?1.32:.396);
   const edgeY=isRiver?innerY:elev(game,p.x,p.z,scope)+(scope==='world'?1.3:.39);
   const bankY=(v)=>elev(game,v.x,v.z,scope)+(scope==='world'?.12:.036);
   out.push({
@@ -110,9 +110,9 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   const points=polygon.map(p=>{
    // V152: rivers run on through the beach into the sea; near the mouth the surface settles just above
    // sea level and its colour fades to the shallow-sea tone, so it flows into the sea instead of stopping at the shore.
-   let y=isWater?riverNear(game,p.x,p.z).waterHeight||.86:surface(game,p.x,p.z)+.10;
+   let y=isWater?riverNear(game,p.x,p.z).waterHeight||.86:(scope==='world'?surface:visualElevation)(game,p.x,p.z)+.10;
    if(isWater){const m=mouthBlend(game,p.x,p.z);if(m<1)y=.78+(y-.78)*m;}
-   return {...field(game,p.x,p.z,scope,tile),y:projectHeight(y,scope)};
+   return {...field(game,p.x,p.z,scope,tile),y:vp(game,y,scope,p.x,p.z)};
   });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
  };
  for(const key of cells){
@@ -136,7 +136,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
    const size=width*(Math.abs(at)>=9?.48:Math.abs(at)>=5?.85:1);
    const pts=[-size,size].map(offset=>{
     const x=edge.c.x+tx*at+nx*offset,z=edge.c.z+tz*at+nz*offset;
-    return {...field(game,x,z,scope,tile),y:projectHeight((riverNear(game,x,z).waterHeight||.86)+.065,scope)};
+    return {...field(game,x,z,scope,tile),y:vp(game,(riverNear(game,x,z).waterHeight||.86)+.065,scope,x,z)};
    });
    if(last)strip(fordShoals,last[0],last[1],pts[0],pts[1]);
    last=pts;

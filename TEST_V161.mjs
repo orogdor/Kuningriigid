@@ -22,7 +22,7 @@ try{
  const cover=await page.evaluate(()=>{const tiles=new Set();gameDebug.localScene.traverse(o=>{if(o.userData?.coverCached)tiles.add(o.position.x+','+o.position.z);});return tiles.size;});
  console.log('V161 ground cover tiles',cover);assert.ok(cover>=8,'ground cover on the centre and neighbouring tiles');
  // 3. the world terrain no longer paints a field patchwork
- const src=await page.evaluate(async()=>{const m=await import('./landscape-v149.js?v=161a');const mat=m.terrainMaterial('world');const sh={uniforms:{},vertexShader:'#include <common>\n#include <begin_vertex>',fragmentShader:'#include <common>\n#include <color_fragment>\n#include <roughnessmap_fragment>'};mat.onBeforeCompile(sh);return sh.fragmentShader;});
+ const src=await page.evaluate(async()=>{const m=await import('./landscape-v149.js?v=162a');const mat=m.terrainMaterial('world');const sh={uniforms:{},vertexShader:'#include <common>\n#include <begin_vertex>',fragmentShader:'#include <common>\n#include <color_fragment>\n#include <roughnessmap_fragment>'};mat.onBeforeCompile(sh);return sh.fragmentShader;});
  assert.ok(!src.includes('uT157Cult')&&!src.includes('hedge'),'no farmland patchwork on the world map');
  // 4. first-person walker: place, walk across a tile edge, exit
  await page.click('#hud-walk');await page.waitForTimeout(400);
