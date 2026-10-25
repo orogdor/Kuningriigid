@@ -1,6 +1,7 @@
 import {MINERAL_BUILDINGS} from './resource-sites-v88.js';
 import {DETAIL_HALF_X,DETAIL_HALF_Z,DETAIL_TILE_X,DETAIL_TILE_Z} from './detail-scale-v123.js';
 import {stoneFieldClusterScore} from './stone-town-plan-v163.js';
+import {fieldCrossesWoodenRingV168} from './stone-fort-footprints-v168.js';
 import {AI_FIELD_WIDTH,AI_FIELD_DEPTH,validateField} from './farming-v127.js';
 import {detailHeight} from './world-details.js';
 // Find a usable field before funding a remote farmhouse, and use the same
@@ -18,6 +19,10 @@ export function findAIFieldSite(game,ctx,farm=null){
  }):Math.hypot(p.x-home.x,p.z-home.z);
  points.sort((a,b)=>score(a)-score(b)||a.z-b.z||a.x-b.x);
  for(const p of points){
+  // A planted field is permanent until its owner removes or rebuilds it.
+  // Keep the full width of each surveyed palisade span and both gates clear.
+  if(stoneAge&&parent&&ctx.c===parent.c&&ctx.r===parent.r&&
+   fieldCrossesWoodenRingV168(p,parent.stoneDefensePlanV166))continue;
   if(validateField(sample,p,(x,z)=>nav.passable(x,z)))continue;
   let lo=Infinity,hi=-Infinity;for(let x=-p.width/2;x<=p.width/2;x+=4)for(let z=-p.depth/2;z<=p.depth/2;z+=4){const h=detailHeight(game.cell(ctx),p.x+x,p.z+z);lo=Math.min(lo,h);hi=Math.max(hi,h);}
   if(hi-lo<=1.8)return p;
