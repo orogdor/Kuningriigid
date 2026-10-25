@@ -1,0 +1,1097 @@
+[
+ {
+  "cat": "1 Hooned",
+  "id": "hall",
+  "label": "Algusmaja · 3 worker(s)",
+  "make": [
+   "b",
+   "hall"
+  ],
+  "file": "000_hall.png",
+  "size": [
+   9.47,
+   7.22,
+   8.28
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "lumber",
+  "label": "Lumber Camp",
+  "make": [
+   "b",
+   "lumber"
+  ],
+  "file": "001_lumber.png",
+  "size": [
+   6.98,
+   5.44,
+   6.67
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "quarry",
+  "label": "Quarry",
+  "make": [
+   "b",
+   "quarry"
+  ],
+  "file": "002_quarry.png",
+  "size": [
+   7.34,
+   5.89,
+   6.79
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "well",
+  "label": "Well",
+  "make": [
+   "b",
+   "well"
+  ],
+  "file": "003_well.png",
+  "size": [
+   3.4,
+   2.7,
+   3.5
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "farm",
+  "label": "Farmstead",
+  "make": [
+   "b",
+   "farm"
+  ],
+  "file": "004_farm.png",
+  "size": [
+   7.7,
+   3.97,
+   6.63
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "barracks",
+  "label": "Warrior Camp",
+  "make": [
+   "b",
+   "barracks"
+  ],
+  "file": "005_barracks.png",
+  "size": [
+   9.2,
+   5.84,
+   7.82
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "archery",
+  "label": "Archery Training Ground",
+  "make": [
+   "b",
+   "archery"
+  ],
+  "file": "006_archery.png",
+  "size": [
+   8.55,
+   5.33,
+   7.57
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "hunter",
+  "label": "Hunter's Hut",
+  "make": [
+   "b",
+   "hunter"
+  ],
+  "file": "007_hunter.png",
+  "size": [
+   6.45,
+   5.44,
+   7.12
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "fisher",
+  "label": "Fisherman's Hut",
+  "make": [
+   "b",
+   "fisher"
+  ],
+  "file": "008_fisher.png",
+  "size": [
+   5.35,
+   5.79,
+   12
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "study",
+  "label": "Schoolhouse",
+  "make": [
+   "b",
+   "study"
+  ],
+  "file": "009_study.png",
+  "size": [
+   7.61,
+   6.19,
+   5.75
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "claypit",
+  "label": "Clay Pit",
+  "make": [
+   "b",
+   "claypit"
+  ],
+  "file": "010_claypit.png",
+  "size": [
+   7.1,
+   1.26,
+   6.75
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "pottery_kiln",
+  "label": "Pottery Workshop",
+  "make": [
+   "b",
+   "pottery_kiln"
+  ],
+  "file": "011_pottery_kiln.png",
+  "size": [
+   8.5,
+   5.12,
+   7.38
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "pasture",
+  "label": "Loomafarm",
+  "make": [
+   "b",
+   "pasture"
+  ],
+  "file": "012_pasture.png",
+  "size": [
+   9.11,
+   3.01,
+   7.61
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "mason",
+  "label": "Stonemason's Workshop",
+  "make": [
+   "b",
+   "mason"
+  ],
+  "file": "013_mason.png",
+  "size": [
+   8.06,
+   5.51,
+   7.23
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "palisade",
+  "label": "Puitvall",
+  "make": [
+   "b",
+   "palisade"
+  ],
+  "file": "014_palisade.png",
+  "size": [
+   7,
+   3.6,
+   3.05
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "watchtower",
+  "label": "Watchtower",
+  "make": [
+   "b",
+   "watchtower"
+  ],
+  "file": "015_watchtower.png",
+  "size": [
+   5.1,
+   8.25,
+   5.1
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "field",
+  "label": "Field · drag an area",
+  "make": [
+   "b",
+   "field"
+  ],
+  "file": "016_field.png",
+  "size": [
+   16.1,
+   0.9,
+   16.1
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#0",
+  "label": "Elamu variant 1",
+  "make": [
+   "house",
+   0
+  ],
+  "file": "017_house_0.png",
+  "size": [
+   5.68,
+   5,
+   5.68
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#1",
+  "label": "Elamu variant 2",
+  "make": [
+   "house",
+   1
+  ],
+  "file": "018_house_1.png",
+  "size": [
+   5.32,
+   4.48,
+   4.48
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#2",
+  "label": "Elamu variant 3",
+  "make": [
+   "house",
+   2
+  ],
+  "file": "019_house_2.png",
+  "size": [
+   6.2,
+   4.75,
+   6.2
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#3",
+  "label": "Elamu variant 4",
+  "make": [
+   "house",
+   3
+  ],
+  "file": "020_house_3.png",
+  "size": [
+   6.75,
+   4.92,
+   5.94
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#4",
+  "label": "Elamu variant 5",
+  "make": [
+   "house",
+   4
+  ],
+  "file": "021_house_4.png",
+  "size": [
+   5.51,
+   5.29,
+   5.03
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#5",
+  "label": "Elamu variant 6",
+  "make": [
+   "house",
+   5
+  ],
+  "file": "022_house_5.png",
+  "size": [
+   5.32,
+   4.31,
+   4.38
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#6",
+  "label": "Elamu variant 7",
+  "make": [
+   "house",
+   6
+  ],
+  "file": "023_house_6.png",
+  "size": [
+   6.2,
+   4.61,
+   6.2
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#7",
+  "label": "Elamu variant 8",
+  "make": [
+   "house",
+   7
+  ],
+  "file": "024_house_7.png",
+  "size": [
+   6.75,
+   4.6,
+   5.27
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "stone_builder",
+  "label": "stone_builder",
+  "make": [
+   "p",
+   "stone_builder"
+  ],
+  "file": "025_stone_builder.png",
+  "size": [
+   0.86,
+   1.66,
+   0.74
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "stone_worker",
+  "label": "stone_worker",
+  "make": [
+   "p",
+   "stone_worker"
+  ],
+  "file": "026_stone_worker.png",
+  "size": [
+   0.77,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "stone_lumber",
+  "label": "stone_lumber",
+  "make": [
+   "p",
+   "stone_lumber"
+  ],
+  "file": "027_stone_lumber.png",
+  "size": [
+   1,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "stone_miner",
+  "label": "stone_miner",
+  "make": [
+   "p",
+   "stone_miner"
+  ],
+  "file": "028_stone_miner.png",
+  "size": [
+   1,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "stone_forester",
+  "label": "stone_forester",
+  "make": [
+   "p",
+   "stone_forester"
+  ],
+  "file": "029_stone_forester.png",
+  "size": [
+   0.77,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "stone_fisher",
+  "label": "stone_fisher",
+  "make": [
+   "p",
+   "stone_fisher"
+  ],
+  "file": "030_stone_fisher.png",
+  "size": [
+   0.77,
+   2.18,
+   0.87
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "gatherer",
+  "label": "gatherer",
+  "make": [
+   "p",
+   "gatherer"
+  ],
+  "file": "031_gatherer.png",
+  "size": [
+   0.77,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "watercarrier",
+  "label": "watercarrier",
+  "make": [
+   "p",
+   "watercarrier"
+  ],
+  "file": "032_watercarrier.png",
+  "size": [
+   0.82,
+   1.66,
+   0.53
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "farmer",
+  "label": "farmer",
+  "make": [
+   "p",
+   "farmer"
+  ],
+  "file": "033_farmer.png",
+  "size": [
+   0.98,
+   1.68,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "market_woman",
+  "label": "market_woman",
+  "make": [
+   "p",
+   "market_woman"
+  ],
+  "file": "034_market_woman.png",
+  "size": [
+   0.77,
+   1.66,
+   0.64
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "villager",
+  "label": "villager",
+  "make": [
+   "p",
+   "villager"
+  ],
+  "file": "035_villager.png",
+  "size": [
+   1.16,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "settler",
+  "label": "settler",
+  "make": [
+   "p",
+   "settler"
+  ],
+  "file": "036_settler.png",
+  "size": [
+   0.77,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "scholar",
+  "label": "scholar",
+  "make": [
+   "p",
+   "scholar"
+  ],
+  "file": "037_scholar.png",
+  "size": [
+   1.16,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "merchant",
+  "label": "merchant",
+  "make": [
+   "p",
+   "merchant"
+  ],
+  "file": "038_merchant.png",
+  "size": [
+   1.16,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "trainer",
+  "label": "trainer",
+  "make": [
+   "p",
+   "trainer"
+  ],
+  "file": "039_trainer.png",
+  "size": [
+   0.77,
+   1.66,
+   0.43
+  ]
+ },
+ {
+  "cat": "3 Inimesed",
+  "id": "shipwright",
+  "label": "shipwright",
+  "make": [
+   "p",
+   "shipwright"
+  ],
+  "file": "040_shipwright.png",
+  "size": [
+   0.85,
+   1.66,
+   0.74
+  ]
+ },
+ {
+  "cat": "4 Sõdurid",
+  "id": "scout",
+  "label": "Scout",
+  "make": [
+   "p",
+   "scout"
+  ],
+  "file": "041_scout.png",
+  "size": [
+   0.59,
+   2.36,
+   0.68
+  ]
+ },
+ {
+  "cat": "4 Sõdurid",
+  "id": "militia",
+  "label": "City Defenders",
+  "make": [
+   "p",
+   "militia"
+  ],
+  "file": "042_militia.png",
+  "size": [
+   1.01,
+   2.4,
+   0.87
+  ]
+ },
+ {
+  "cat": "4 Sõdurid",
+  "id": "slinger",
+  "label": "Slingers",
+  "make": [
+   "p",
+   "slinger"
+  ],
+  "file": "043_slinger.png",
+  "size": [
+   0.62,
+   1.78,
+   0.53
+  ]
+ },
+ {
+  "cat": "4 Sõdurid",
+  "id": "spearman",
+  "label": "Wooden Spearmen",
+  "make": [
+   "p",
+   "spearman"
+  ],
+  "file": "044_spearman.png",
+  "size": [
+   0.58,
+   2.4,
+   0.66
+  ]
+ },
+ {
+  "cat": "4 Sõdurid",
+  "id": "axeman",
+  "label": "Stone Axemen",
+  "make": [
+   "p",
+   "axeman"
+  ],
+  "file": "045_axeman.png",
+  "size": [
+   0.59,
+   1.78,
+   0.78
+  ]
+ },
+ {
+  "cat": "4 Sõdurid",
+  "id": "archer",
+  "label": "Archers",
+  "make": [
+   "p",
+   "archer"
+  ],
+  "file": "046_archer.png",
+  "size": [
+   0.59,
+   1.86,
+   1.17
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "tree",
+  "label": "tree",
+  "make": [
+   "r",
+   "tree"
+  ],
+  "file": "047_tree.png",
+  "size": [
+   5.85,
+   4.67,
+   5.32
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "game",
+  "label": "game",
+  "make": [
+   "r",
+   "game"
+  ],
+  "file": "048_game.png",
+  "size": [
+   1.46,
+   1.95,
+   0.45
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "fish",
+  "label": "fish",
+  "make": [
+   "r",
+   "fish"
+  ],
+  "file": "049_fish.png",
+  "size": [
+   1.57,
+   0.52,
+   0.54
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "berry",
+  "label": "berry",
+  "make": [
+   "r",
+   "berry"
+  ],
+  "file": "050_berry.png",
+  "size": [
+   2.53,
+   1.96,
+   2.6
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "deposit:stone",
+  "label": "maardla stone",
+  "make": [
+   "d",
+   "stone"
+  ],
+  "file": "051_deposit_stone.png",
+  "size": [
+   5.22,
+   2.4,
+   5.11
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "deposit:ore",
+  "label": "maardla ore",
+  "make": [
+   "d",
+   "ore"
+  ],
+  "file": "052_deposit_ore.png",
+  "size": [
+   4.89,
+   2.39,
+   4.42
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "deposit:copper",
+  "label": "maardla copper",
+  "make": [
+   "d",
+   "copper"
+  ],
+  "file": "053_deposit_copper.png",
+  "size": [
+   4.32,
+   2.17,
+   5.47
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "deposit:tin",
+  "label": "maardla tin",
+  "make": [
+   "d",
+   "tin"
+  ],
+  "file": "054_deposit_tin.png",
+  "size": [
+   4.89,
+   2.39,
+   4.42
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "deposit:clay",
+  "label": "maardla clay",
+  "make": [
+   "d",
+   "clay"
+  ],
+  "file": "055_deposit_clay.png",
+  "size": [
+   5.34,
+   0.84,
+   4.44
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "deposit:gems",
+  "label": "maardla gems",
+  "make": [
+   "d",
+   "gems"
+  ],
+  "file": "056_deposit_gems.png",
+  "size": [
+   5.36,
+   2.52,
+   4.08
+  ]
+ },
+ {
+  "cat": "5 Loodus ja ressursid",
+  "id": "deposit:oil",
+  "label": "maardla oil",
+  "make": [
+   "d",
+   "oil"
+  ],
+  "file": "057_deposit_oil.png",
+  "size": [
+   4.61,
+   0.99,
+   4.4
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:oak",
+  "label": "maakaart oak",
+  "make": [
+   "w",
+   "oak"
+  ],
+  "file": "058_world_oak.png",
+  "size": [
+   2.49,
+   2.67,
+   2.2
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:lime",
+  "label": "maakaart lime",
+  "make": [
+   "w",
+   "lime"
+  ],
+  "file": "059_world_lime.png",
+  "size": [
+   2.24,
+   2.64,
+   2.27
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:birch",
+  "label": "maakaart birch",
+  "make": [
+   "w",
+   "birch"
+  ],
+  "file": "060_world_birch.png",
+  "size": [
+   1.13,
+   2.87,
+   1.09
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:pine",
+  "label": "maakaart pine",
+  "make": [
+   "w",
+   "pine"
+  ],
+  "file": "061_world_pine.png",
+  "size": [
+   1.22,
+   3.05,
+   1.28
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:spruce",
+  "label": "maakaart spruce",
+  "make": [
+   "w",
+   "spruce"
+  ],
+  "file": "062_world_spruce.png",
+  "size": [
+   1.19,
+   3.05,
+   1.32
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:palm",
+  "label": "maakaart palm",
+  "make": [
+   "w",
+   "palm"
+  ],
+  "file": "063_world_palm.png",
+  "size": [
+   2.86,
+   2.63,
+   2.54
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:cactus",
+  "label": "maakaart cactus",
+  "make": [
+   "w",
+   "cactus"
+  ],
+  "file": "064_world_cactus.png",
+  "size": [
+   1,
+   1.81,
+   0.33
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:rock",
+  "label": "maakaart rock",
+  "make": [
+   "w",
+   "rock"
+  ],
+  "file": "065_world_rock.png",
+  "size": [
+   2.38,
+   1.26,
+   1.85
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "world:shrub",
+  "label": "maakaart shrub",
+  "make": [
+   "w",
+   "shrub"
+  ],
+  "file": "066_world_shrub.png",
+  "size": [
+   1.13,
+   0.58,
+   1.03
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "settlement:1",
+  "label": "kiviaja asula 1",
+  "make": [
+   "s",
+   1
+  ],
+  "file": "067_settlement_1.png",
+  "size": [
+   30.8,
+   6.04,
+   30.8
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "settlement:2",
+  "label": "kiviaja asula 2",
+  "make": [
+   "s",
+   2
+  ],
+  "file": "068_settlement_2.png",
+  "size": [
+   30.8,
+   6.04,
+   30.8
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "settlement:3",
+  "label": "kiviaja asula 3",
+  "make": [
+   "s",
+   3
+  ],
+  "file": "069_settlement_3.png",
+  "size": [
+   30.8,
+   6.04,
+   30.8
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "unit:army",
+  "label": "maakaardi army",
+  "make": [
+   "u",
+   "army"
+  ],
+  "file": "070_unit_army.png",
+  "size": [
+   34,
+   33.59,
+   34
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "unit:settler",
+  "label": "maakaardi settler",
+  "make": [
+   "u",
+   "settler"
+  ],
+  "file": "071_unit_settler.png",
+  "size": [
+   34,
+   39.86,
+   34
+  ]
+ },
+ {
+  "cat": "6 Maakaart",
+  "id": "unit:caravan",
+  "label": "maakaardi caravan",
+  "make": [
+   "u",
+   "caravan"
+  ],
+  "file": "072_unit_caravan.png",
+  "size": [
+   34,
+   40.02,
+   35.6
+  ]
+ }
+]

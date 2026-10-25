@@ -573,3 +573,14 @@ Põhimõte: kõik muudatused on ainult joonistamiseks. Mängu loogika kasutab en
 - `continuous-landscape.js`, `continuous-landscape-visual.js`, `landscape-polish-v84.js`, `detail-borders-v85.js` ja `landscape-v149.js` on `?v=162a`;
 - `town-models-v154.js?v=161b`;
 - import-map'i vanad spetsifikaatorid suunavad samadele failidele.
+
+---
+
+## V163 – kiviaja mudelite kataloog (Claude, 2026-10-25)
+
+Kasutaja soovis pilti kõigist kiviaja hoonetest, inimestest ja muust, et neid ükshaaval uute vastu vahetada.
+
+- Kaust `catalog-v163/` sisaldab 6 kokkuvõttelehte, 73 eraldi pilti ja `tiles/index.json`. Kirjeldus on `catalog-v163/LOEMIND.md`.
+- `tools/catalog-v163/render.mjs` renderdab kataloogi uuesti. Iga mudel on omaette väikeses stseenis mängu valgusega.
+- `civilization.js` sai `gameDebug.catalogV163` (mängu enda mudelifunktsioonid ja andmed), boot laeb `civilization.js?v=162b`. Mängu ennast see ei muuda.
+- Tähelepanek kataloogist: `villager`, `scholar` ja `merchant` renderduvad praegu kilbi ja mõõgaga sõdalasena. Külaelu (`village-life-v76`) kasutab külaelanikuks `villager`-it.
