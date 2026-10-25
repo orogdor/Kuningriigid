@@ -14,12 +14,12 @@
     {
       "team": 2,
       "cities": 3,
-      "buildings": 175,
+      "buildings": 189,
       "markets": 3,
       "harbors": 0,
-      "houses": 47,
-      "fields": 1,
-      "ages": 3
+      "houses": 46,
+      "fields": 2,
+      "ages": 4
     },
     {
       "team": 3,
@@ -34,7 +34,7 @@
   ],
   "landUse": [
     {
-      "name": "Idaküla 1",
+      "name": "Sampola",
       "owned": 363,
       "developed": 7,
       "ruralDeveloped": 0,
@@ -43,7 +43,7 @@
       "foodGrowthBonus": 0.2
     },
     {
-      "name": "Idaküla 2",
+      "name": "Ainola",
       "owned": 243,
       "developed": 4,
       "ruralDeveloped": 0,
@@ -52,7 +52,7 @@
       "foodGrowthBonus": 0.2
     },
     {
-      "name": "Idaküla 3",
+      "name": "Väinölä",
       "owned": 147,
       "developed": 3,
       "ruralDeveloped": 1,
@@ -61,7 +61,7 @@
       "foodGrowthBonus": 0
     },
     {
-      "name": "Idaküla 4",
+      "name": "Pohjola",
       "owned": 75,
       "developed": 3,
       "ruralDeveloped": 0,
@@ -70,7 +70,7 @@
       "foodGrowthBonus": 0
     },
     {
-      "name": "Idaküla 5",
+      "name": "Tapiola",
       "owned": 75,
       "developed": 3,
       "ruralDeveloped": 0,
@@ -99,9 +99,9 @@
   "ages": [
     4,
     0,
-    3,
+    4,
     1
   ],
-  "bytes": 2184802,
-  "seconds": 122
+  "bytes": 1856814,
+  "seconds": 141
 }
