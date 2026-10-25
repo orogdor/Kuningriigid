@@ -4,133 +4,79 @@
     {
       "team": 1,
       "cities": 3,
-      "buildings": 131,
+      "buildings": 138,
       "markets": 2,
-      "harbors": 0,
-      "houses": 54,
+      "harbors": 1,
+      "houses": 45,
       "fields": 2,
       "ages": 4
     },
     {
       "team": 2,
       "cities": 3,
-      "buildings": 184,
+      "buildings": 193,
       "markets": 2,
       "harbors": 0,
       "houses": 51,
-      "fields": 2,
-      "ages": 4
+      "fields": 1,
+      "ages": 5
     },
     {
       "team": 3,
-      "cities": 7,
-      "buildings": 165,
-      "markets": 3,
+      "cities": 2,
+      "buildings": 83,
+      "markets": 1,
       "harbors": 0,
-      "houses": 46,
-      "fields": 1,
-      "ages": 2
+      "houses": 28,
+      "fields": 2,
+      "ages": 1
     }
   ],
   "landUse": [
     {
-      "name": "Sogn",
-      "owned": 363,
-      "developed": 4,
+      "name": "Vendel",
+      "owned": 256,
+      "developed": 7,
       "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 17,
-      "foodGrowthBonus": 0.25
-    },
-    {
-      "name": "Rogaland",
-      "owned": 243,
-      "developed": 5,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 14,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Naumudalr",
-      "owned": 147,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 5,
+      "planned": 2,
+      "homes": 20,
       "foodGrowthBonus": 0.2
     },
     {
-      "name": "Niðaróss",
-      "owned": 88,
-      "developed": 3,
+      "name": "Fyrisvellir",
+      "owned": 329,
+      "developed": 4,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 5,
-      "foodGrowthBonus": 0
+      "homes": 23,
+      "foodGrowthBonus": 0.2
     },
     {
-      "name": "Hlaðir",
-      "owned": 75,
+      "name": "Alvhem",
+      "owned": 147,
       "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 2,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Skiringssal",
-      "owned": 75,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 2,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Kaupang",
-      "owned": 41,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 1,
+      "homes": 8,
       "foodGrowthBonus": 0
     }
   ],
   "seed": 136023,
   "turn": 246,
-  "sourceTeam": 3,
-  "cities": 7,
-  "buildings": 165,
+  "sourceTeam": 2,
+  "cities": 3,
+  "buildings": 193,
   "spacingPairs": [
     9,
     16,
-    18,
-    12,
-    25,
-    18,
-    10,
-    9,
-    18,
-    19,
-    27,
-    19,
-    9,
-    9,
-    18,
-    27,
-    28,
-    36,
-    13,
-    9,
-    20
+    18
   ],
   "ages": [
-    2,
+    5,
     4,
-    4,
-    0
+    0,
+    1
   ],
-  "bytes": 2115756,
-  "seconds": 152
+  "bytes": 1544342,
+  "seconds": 134
 }
