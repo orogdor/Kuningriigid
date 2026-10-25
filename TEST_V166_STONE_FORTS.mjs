@@ -15,8 +15,8 @@ assert.ok(ring.slots.every(p=>Math.abs(p.x)<110&&Math.abs(p.z)<89));
 assert.deepEqual(ring.slots,stoneVillageWallPlan([hall,...homes,study],142023).slots,'persistent deterministic layout');
 assert.ok(ring.slots.some(b=>b.type==='palisade'&&b.wallAxis===1),'side sections rotate');
 assert.equal(BUILDINGS.woodgate.requires[0],'lumber');
-assert.deepEqual(BUILDINGS.woodgate.cost,{wood:8});
-assert.deepEqual(BUILDINGS.palisade.cost,{wood:6});
+assert.deepEqual(BUILDINGS.woodgate.cost,{wood:6});
+assert.deepEqual(BUILDINGS.palisade.cost,{wood:4});
 assert.ok(stoneVillageDefenseEligibility({age:0,pop:9,readyHouses:6,services:1,waiting:0,
  stock:{wood:90,stone:25,water:40,bread:45}}).ok);
 assert.equal(stoneVillageDefenseEligibility({age:0,pop:4,readyHouses:6,services:1,waiting:0,
@@ -41,12 +41,12 @@ const model={s:{time:1000,seed:142023,ages:[0,0],research:[{}, {known:['fortific
  const building={...p,type,ready:true,hp:350};ctx.economy.buildings.push(building);return {building};}};
 planStoneVillageDefenses(model,1,city);
 assert.equal(city.economy.buildings.at(-1).type,'woodgate','first construction creates a usable entrance');
-assert.equal(resources.wood,142,'gate wood was actually deducted');
+assert.equal(resources.wood,144,'gate wood was actually deducted');
 assert.equal(city.economy.buildings.at(-1).historicPalisadeV166,true);
 model.s.time+=25;
 planStoneVillageDefenses(model,1,city);
 assert.equal(city.economy.buildings.at(-1).type,'woodgate','second opposing entrance follows');
-assert.equal(resources.wood,134);
+assert.equal(resources.wood,138);
 const completed=city.stoneDefensePlanV166.constructed;
 resources.wood=12;model.s.time+=25;
 planStoneVillageDefenses(model,1,city);
