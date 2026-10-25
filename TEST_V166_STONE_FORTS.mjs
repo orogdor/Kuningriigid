@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {Civilization,createGame,BUILDINGS} from './civilization-core.js';
-import {stoneVillageWallPlan,stoneVillageDefenseEligibility,planStoneVillageDefenses} from './stone-village-defenses-v166.js';
+import {stoneVillageWallPlan,stoneVillageDefenseEligibility,planStoneVillageDefenses,stoneFortificationAgeGate} from './stone-village-defenses-v166.js';
 import {Navigation} from './navigation.js';
 const hall={type:'hall',hp:1200,ready:true,x:0,z:0};
 const homes=[[-28,-17],[-12,-26],[15,-21],[29,13],[-24,20],[8,28]].map(([x,z])=>({type:'house',hp:350,ready:true,x,z}));
@@ -52,6 +52,9 @@ resources.wood=9;model.s.time+=25;
 planStoneVillageDefenses(model,1,city);
 assert.equal(city.stoneDefensePlanV166.constructed,completed,'defense does not consume scarce construction timber');
 // Real AI playthrough. Observe where each AI finishes Stone Age; do not inject resources.
+assert.equal(stoneFortificationAgeGate(city,0,1000),true,'incomplete Stone Age ring postpones Bronze');
+assert.equal(stoneFortificationAgeGate(city,1,1000),false,'Bronze settlements are not gated');
+assert.equal(stoneFortificationAgeGate(city,0,6600),false,'Stone Age milestone has bounded 110-turn timeout');
 const game=new Civilization(createGame(142023));
 const eras={},forts=[],history=[];
 for(let turn=1;turn<=70;turn++){
