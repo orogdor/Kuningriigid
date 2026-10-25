@@ -7,26 +7,27 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const HOUSING=new Set(['hall','house','well','study','market','warehouse','cellar']);
 const FORTS=new Set(['palisade','woodgate','watchtower','stonewall','gatehouse','stonetower','reinforced_wall']);
 const foodTotal=r=>['bread','meat','fish','grain','berries','vegetables'].reduce((n,k)=>n+(r[k]||0),0);
-export function stoneVillageWallPlan(buildings=[],seed=0){
+export function stoneVillageWallPlan(buildings=[],seed=0,options={}){
  const core=buildings.filter(b=>b.hp>0&&!b.virtual&&HOUSING.has(b.type));
  const houses=core.filter(b=>b.type==='house');
  const hall=core.find(b=>b.type==='hall')||{x:0,z:0};
+ const origin={x:hall.x+(options.dx||0),z:hall.z+(options.dz||0)};
  const snap=n=>Math.ceil(n/14)*14;
  // Fit the founded historic centre; reserve clearance for roads and huts.
  // Only the inner centre is fortified; distant farms stay outside.
  const sorted=(axis)=>houses.map(b=>Math.abs((b[axis]||0)-(hall[axis]||0))).sort((a,b)=>a-b);
  const radius=arr=>arr.length?arr[Math.floor((arr.length-1)*.90)]:25;
- const rx=snap(clamp(radius(sorted('x'))+14,42,70));
- const rz=snap(clamp(radius(sorted('z'))+14,42,56));
+ const rx=snap(clamp(radius(sorted('x'))+14+(options.extraX||0),42,70));
+ const rz=snap(clamp(radius(sorted('z'))+14+(options.extraZ||0),42,70));
  const slots=[];
- const push=(type,x,z,wallAxis=0)=>slots.push({type,x:Math.round((x+hall.x)*2)/2,z:Math.round((z+hall.z)*2)/2,wallAxis});
+ const push=(type,x,z,wallAxis=0)=>slots.push({type,x:Math.round((x+origin.x)*2)/2,z:Math.round((z+origin.z)*2)/2,wallAxis});
  // Segment endpoints, not building counts, define the enclosure. Two 14m
  // gates cross the main N/S road. Palisade ends meet each gate and tower.
  // Long variable spans are real paid buildings, with matching nav footprints.
  for(const z of [-rz,rz])push('woodgate',0,z,0);
  for(const x of [-rx,rx])for(const z of [-rz,rz])push('watchtower',x,z,0);
  for(const z of [-rz,rz])for(const side of [-1,1]){
-  const distance=rx-7,parts=Math.max(1,Math.ceil(distance/25));
+  const distance=rx-7,parts=Math.max(1,Math.ceil(distance/35));
   for(let i=0;i<parts;i++){
    const a=7+distance*i/parts,b=7+distance*(i+1)/parts;
    const centre=(a+b)/2;
@@ -35,7 +36,7 @@ export function stoneVillageWallPlan(buildings=[],seed=0){
   }
  }
  for(const x of [-rx,rx]){
-  const parts=Math.max(2,Math.ceil(2*rz/28));
+  const parts=Math.max(2,Math.ceil(2*rz/42));
   for(let i=0;i<parts;i++){
    const a=-rz+2*rz*i/parts,b=-rz+2*rz*(i+1)/parts;
    push('palisade',x,(a+b)/2,1);
@@ -47,8 +48,8 @@ export function stoneVillageWallPlan(buildings=[],seed=0){
    shape:'rectangular-wooden-palisade',nextIndex:0,constructed:0,blocked:0,seed};
 }
 export function stoneVillageDefenseEligibility({age=0,pop=0,readyHouses=0,services=0,waiting=0,stock={}}){
- const reason=age!==0?'later-era':pop<7?'population':
-  readyHouses<4?'housing':services<1?'services':waiting>3?'construction-backlog':
+ const reason=age!==0?'later-era':pop<5?'population':
+  readyHouses<3?'housing':services<1?'services':waiting>3?'construction-backlog':
   (stock.wood||0)<12?'timber-reserve':(stock.water||0)<pop?'water':
   foodTotal(stock)<pop*1.4?'food':null;
  return {ok:reason===null,reason};
@@ -61,7 +62,7 @@ export function planStoneVillageDefenses(game,team,city){
  const realm=city.economy.realms[team],stock=realm.resources,
   all=game.allBuildings(city),pending=all.filter(b=>!b.ready&&b.hp>0);
  const eligibility=stoneVillageDefenseEligibility({
-  age,pop:realm.pop,readyHouses:all.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length,
+  age,pop:Math.max(realm.pop,city.stoneDefensePlanV166?5:0),readyHouses:all.filter(b=>b.type==='house'&&b.ready&&b.hp>0).length,
   services:all.filter(b=>['study','well','market','warehouse','cellar'].includes(b.type)&&b.ready&&b.hp>0).length,
   waiting:pending.length,stock
  });
@@ -94,7 +95,8 @@ export function planStoneVillageDefenses(game,team,city){
   const placement={...slot,
    navWidth:slot.type==='palisade'?(slot.wallAxis?1.1:extent):(slot.extendedPalisadeV166?7.2:undefined),
    navDepth:slot.type==='palisade'?(slot.wallAxis?extent:1.1):(slot.extendedPalisadeV166?1.1:undefined)};
-  if(game.previewBuild(city,slot.type,placement).error){counts.site=(counts.site||0)+1;continue;}
+  const siteResult=game.previewBuild(city,slot.type,{...placement,plannedDefense:true});
+  if(siteResult.error){counts.site=(counts.site||0)+1;const why=String(siteResult.error).slice(0,85);counts['site:'+why]=(counts['site:'+why]||0)+1;continue;}
   const result=game.build(city,slot.type,{...placement,plannedDefense:true});
   if(!result.building){counts.build=(counts.build||0)+1;continue;}
   // The existing engine records each paid building and its construction.
