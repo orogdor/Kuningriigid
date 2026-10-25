@@ -1,6 +1,7 @@
 // V138: historically grown street blocks, continuous over neighboring 225x195 detail tiles.
 // Pure/deterministic: candidate planning cannot change saves or reserve fake buildings.
 import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
+import {stoneTownPlotScore} from './stone-town-plan-v163.js';
 const hash=(a,b,seed=0)=>{const t=Math.sin(a*127.1+b*311.7+seed*74.7)*43758.5453;return t-Math.floor(t);};
 const sqr=x=>x*x;
 const snap=x=>Math.round(x*2)/2;
@@ -27,7 +28,7 @@ export function ancientStreetSpace(x,z,seed=0){
  const ringDistance=Math.abs(radius-ring);
  return {road:nearestRay<(radius<70?4.2:5.5)||ringDistance<4.5,artery:nearestRay,ring:ringDistance,radius};
 }
-export function historicalBuildingPlots(tile,parent,type='house',seed=0){
+export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge=false){
  if(!tile||!parent)return [];
  const dx=tile.c-parent.c,dz=tile.r-parent.r;
  const hall=parent.economy?.buildings?.find(b=>b.type==='hall'&&!b.virtual)||{x:0,z:0};
@@ -50,7 +51,8 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0){
    const key=Math.round(street.radius/24);
    const quarterNoise=hash(Math.floor(gx/32),Math.floor(gz/32),seed+5);
    const civic=CIVIC.has(type),rural=RURAL.has(type),industrial=INDUSTRIAL.has(type);
-   const priority=(civic?Math.abs(street.radius-42)*.13:
+   const priority=(stoneAge?stoneTownPlotScore(type,gx,gz,seed):
+                    civic?Math.abs(street.radius-42)*.13:
                     rural?-street.radius*.075:
                     industrial?Math.abs(street.radius-170)*.045:
                     street.radius*.22)+
