@@ -48,6 +48,35 @@ export function stoneVillageWallPlan(buildings=[],seed=0,options={}){
  return {version:STONE_VILLAGE_DEFENSE_VERSION,slots,gateOpenings:2,rx,rz,
    shape:'rectangular-wooden-palisade',nextIndex:0,constructed:0,blocked:0,seed};
 }
+// V168: reserve a plausible timber perimeter on the first day of a village.
+// Do not require defense research to plan future land use. This is only a
+// reservation: not a building, not construction work and not a wall.
+export function reserveStoneVillageRingV168(game,city){
+ const hall=city.economy.buildings.find(b=>b.type==='hall'&&b.hp>0);
+ if(!hall||game.s.ages[city.team]!==0)return null;
+ const nav=game.nav(city),seed=game.s.seed+city.id*19;
+ let best=null,score=-Infinity;
+ for(const extraX of [14,0,28])for(const extraZ of [14,0,28])
+ for(const dx of [0,-7,7])for(const dz of [0,-7,7]){
+  const candidate=stoneVillageWallPlan([hall],seed,{extraX,extraZ,dx,dz});
+  let bad=0;
+  for(const slot of candidate.slots){
+   const half=slot.type==='palisade'?(slot.palisadeSpanV167||14)/2:
+     slot.type==='woodgate'?7:2;
+   const count=Math.ceil(half/3);
+   for(let k=-count;k<=count;k++){
+    const step=k*half/count;
+    const x=slot.x+(slot.wallAxis?0:step),z=slot.z+(slot.wallAxis?step:0);
+    if(!nav.passable(x,z)){bad++;break;}
+   }
+  }
+  // Prefer the 56x56m inner quarters but pick dry ground over a prettier ring.
+  const value=-bad*25-Math.abs(candidate.rx-56)*.20-
+   Math.abs(candidate.rz-56)*.20-(Math.abs(dx)+Math.abs(dz))*.06;
+  if(value>score){score=value;best={...candidate,reservedV168:true,terrainBlockedAtFounding:bad};}
+ }
+ return best;
+}
 export function stoneVillageDefenseEligibility({age=0,pop=0,readyHouses=0,services=0,waiting=0,stock={}}){
  const reason=age!==0?'later-era':pop<5?'population':
   readyHouses<3?'housing':services<1?'services':waiting>3?'construction-backlog':
@@ -79,8 +108,12 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
   }
   examined++;
   // Never prefer a bigger wall merely for aesthetic reasons.
+  const reserve=city.stoneDefenseReserveV168;
+  const preferred=reserve&&plan.rx===reserve.rx&&plan.rz===reserve.rz&&
+    Math.abs((centre.x+dx)-(reserve.slots[0]?.x||0))<100&&
+    Math.abs((centre.z+dz)-(reserve.slots[0]?.z||0))<100 ? 7:0;
   const score=viable*4-failed*25-plan.slots.length*1.3-(plan.rx+plan.rz)*.10-
-    (Math.abs(dx)+Math.abs(dz))*.03;
+    (Math.abs(dx)+Math.abs(dz))*.03+preferred;
   if(score>bestScore){bestScore=score;best={...plan,initialViable:viable,initialBlocked:failed};}
  }
  return best?{...best,verifiedAtTechV167:true}:stoneVillageWallPlan(buildings,seed);
