@@ -6,7 +6,7 @@ const segmentDistance=(p,a,b)=>{const dx=b.x-a.x,dz=b.z-a.z,n=dx*dx+dz*dz,t=n?Ma
 export function gateTraffic(orders,nav,occupants=[]){
  const waiting=new Set(),approaches=new Map();if(!nav?.buildings)return {waiting,approaches,hasGates:false};
  let state=queues.get(nav);if(!state){state={claims:new Map(),routes:new WeakMap(),bays:new WeakMap()};queues.set(nav,state);}const {claims,routes,bays}=state;
- const gates=nav.buildings().filter(b=>b.type==='gatehouse'&&b.hp>0),groups=new Map(),moving=new Set(orders.map(o=>o.agent));
+ const gates=nav.buildings().filter(b=>['gatehouse','woodgate'].includes(b.type)&&b.hp>0),groups=new Map(),moving=new Set(orders.map(o=>o.agent));
  for(const order of orders){
   const {agent,goal}=order,stamp=goal.x+':'+goal.z+':'+nav.version;let memo=routes.get(agent);
   if(!memo||memo.stamp!==stamp){memo={stamp,path:nav.route(agent,goal)||[]};routes.set(agent,memo);}
