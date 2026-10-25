@@ -3,31 +3,31 @@
   "roster": [
     {
       "team": 1,
-      "cities": 11,
-      "buildings": 287,
-      "markets": 5,
+      "cities": 9,
+      "buildings": 242,
+      "markets": 4,
       "harbors": 1,
-      "houses": 67,
-      "fields": 1,
+      "houses": 72,
+      "fields": 2,
       "ages": 4
     },
     {
       "team": 2,
       "cities": 5,
-      "buildings": 163,
+      "buildings": 123,
       "markets": 2,
       "harbors": 0,
-      "houses": 50,
+      "houses": 43,
       "fields": 2,
-      "ages": 4
+      "ages": 2
     },
     {
       "team": 3,
-      "cities": 6,
-      "buildings": 139,
-      "markets": 2,
+      "cities": 3,
+      "buildings": 106,
+      "markets": 1,
       "harbors": 0,
-      "houses": 52,
+      "houses": 43,
       "fields": 3,
       "ages": 2
     }
@@ -35,43 +35,52 @@
   "landUse": [
     {
       "name": "Idaküla 1",
-      "owned": 151,
-      "developed": 4,
+      "owned": 307,
+      "developed": 7,
       "ruralDeveloped": 0,
       "planned": 2,
-      "homes": 12,
+      "homes": 20,
       "foodGrowthBonus": 0.30000000000000004
     },
     {
       "name": "Idaküla 2",
       "owned": 363,
-      "developed": 4,
-      "ruralDeveloped": 0,
+      "developed": 5,
+      "ruralDeveloped": 1,
       "planned": 0,
       "homes": 19,
       "foodGrowthBonus": 0.30000000000000004
     },
     {
       "name": "Idaküla 3",
-      "owned": 137,
-      "developed": 4,
-      "ruralDeveloped": 1,
+      "owned": 147,
+      "developed": 3,
+      "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 8,
+      "homes": 5,
       "foodGrowthBonus": 0.30000000000000004
     },
     {
       "name": "Idaküla 4",
-      "owned": 18,
+      "owned": 44,
       "developed": 3,
-      "ruralDeveloped": 1,
+      "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 3,
+      "homes": 8,
       "foodGrowthBonus": 0
     },
     {
       "name": "Idaküla 5",
-      "owned": 124,
+      "owned": 125,
+      "developed": 4,
+      "ruralDeveloped": 1,
+      "planned": 0,
+      "homes": 9,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Idaküla 6",
+      "owned": 88,
       "developed": 5,
       "ruralDeveloped": 1,
       "planned": 0,
@@ -79,53 +88,26 @@
       "foodGrowthBonus": 0
     },
     {
-      "name": "Idaküla 6",
-      "owned": 243,
+      "name": "Idaküla 7",
+      "owned": 75,
       "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 9,
-      "foodGrowthBonus": 0.30000000000000004
-    },
-    {
-      "name": "Idaküla 7",
-      "owned": 40,
-      "developed": 4,
-      "ruralDeveloped": 2,
-      "planned": 0,
-      "homes": 2,
+      "homes": 3,
       "foodGrowthBonus": 0
     },
     {
       "name": "Idaküla 8",
-      "owned": 75,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 3,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Idaküla 9",
-      "owned": 44,
-      "developed": 3,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 3,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Idaküla 10",
-      "owned": 75,
-      "developed": 3,
+      "owned": 32,
+      "developed": 4,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 2,
       "foodGrowthBonus": 0
     },
     {
-      "name": "Idaküla 11",
-      "owned": 27,
+      "name": "Idaküla 9",
+      "owned": 53,
       "developed": 3,
       "ruralDeveloped": 1,
       "planned": 0,
@@ -136,150 +118,117 @@
   "density": [
     {
       "city": "Idaküla 1",
-      "nearEdge": 0,
+      "nearEdge": 5,
       "expanded": 0,
-      "urbanBuildings": 100,
-      "urbanTiles": 59
+      "urbanBuildings": 98,
+      "urbanTiles": 91
     },
     {
       "city": "Idaküla 2",
-      "nearEdge": 2,
+      "nearEdge": 1,
       "expanded": 0,
-      "urbanBuildings": 92,
+      "urbanBuildings": 67,
       "urbanTiles": 90
     },
     {
       "city": "Idaküla 3",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 18,
-      "urbanTiles": 58
+      "urbanBuildings": 14,
+      "urbanTiles": 37
     },
     {
       "city": "Idaküla 4",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 6,
-      "urbanTiles": 17
+      "urbanBuildings": 14,
+      "urbanTiles": 36
     },
     {
       "city": "Idaküla 5",
-      "nearEdge": 1,
+      "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 12,
+      "urbanBuildings": 18,
       "urbanTiles": 35
     },
     {
       "city": "Idaküla 6",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 23,
-      "urbanTiles": 60
+      "urbanBuildings": 10,
+      "urbanTiles": 33
     },
     {
       "city": "Idaküla 7",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 4,
+      "urbanBuildings": 6,
       "urbanTiles": 18
     },
     {
       "city": "Idaküla 8",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 7,
-      "urbanTiles": 19
+      "urbanBuildings": 6,
+      "urbanTiles": 18
     },
     {
       "city": "Idaküla 9",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 7,
-      "urbanTiles": 17
-    },
-    {
-      "city": "Idaküla 10",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 7,
-      "urbanTiles": 18
-    },
-    {
-      "city": "Idaküla 11",
-      "nearEdge": 0,
-      "expanded": 0,
       "urbanBuildings": 3,
-      "urbanTiles": 6
+      "urbanTiles": 19
     }
   ],
   "seed": 138023,
   "turn": 246,
   "sourceTeam": 1,
-  "cities": 11,
-  "buildings": 287,
+  "cities": 9,
+  "buildings": 242,
   "spacingPairs": [
     9,
-    10,
-    15,
-    13,
     18,
-    24,
-    28,
-    61,
-    37,
-    17,
     10,
-    15,
-    22,
-    18,
-    24,
-    28,
-    61,
-    37,
-    26,
-    9,
-    16,
-    28,
-    14,
-    38,
-    51,
-    47,
     19,
+    16,
+    16,
+    21,
+    21,
+    9,
+    10,
+    19,
+    25,
+    25,
+    21,
+    30,
+    16,
+    13,
+    34,
+    34,
+    12,
+    39,
+    9,
+    18,
+    24,
+    12,
+    23,
     24,
     33,
     9,
-    43,
-    46,
-    52,
-    28,
-    12,
-    30,
-    22,
-    67,
-    31,
-    19,
-    42,
-    10,
-    79,
-    19,
-    31,
-    52,
-    37,
-    61,
-    27,
-    89,
+    26,
     9,
-    41,
-    98,
-    48,
-    50
+    30,
+    18,
+    35,
+    27,
+    35
   ],
   "ages": [
     4,
     0,
-    4,
+    2,
     2
   ],
-  "bytes": 3203076,
-  "seconds": 237
+  "bytes": 2440573,
+  "seconds": 225
 }
