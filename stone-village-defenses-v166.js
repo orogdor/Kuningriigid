@@ -79,6 +79,18 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
  }
  return best?{...best,verifiedAtTechV167:true}:stoneVillageWallPlan(buildings,seed);
 }
+// A mature Stone Age capital spends a bounded extra period finishing its
+// defenses before the AI commits to Bronze. Never stall another age indefinitely.
+export function stoneFortificationAgeGate(city,age,time,limit=110*60){
+ if(age!==0||time>=limit||!city?.stoneDefensePlanV166?.slots?.length)return false;
+ const pop=city.economy?.realms?.[city.team]?.pop||0;
+ if(pop<6)return false;
+ const plan=city.stoneDefensePlanV166;
+ const local=city.economy.buildings.filter(b=>b.hp>0&&!b.virtual);
+ const ready=plan.slots.filter(slot=>local.some(b=>b.type===slot.type&&b.ready&&b.hp>0&&
+   !b.disabled&&Math.hypot(b.x-slot.x,b.z-slot.z)<4.5)).length;
+ return ready<plan.slots.length;
+}
 export function planStoneVillageDefenses(game,team,city){
  const age=game.s.ages[team],local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
  if(age!==0)return false; // let the existing Bronze fortification strategy proceed
