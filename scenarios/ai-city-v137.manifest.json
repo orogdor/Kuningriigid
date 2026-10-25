@@ -3,80 +3,105 @@
   "roster": [
     {
       "team": 1,
-      "cities": 3,
-      "buildings": 132,
-      "markets": 1,
+      "cities": 5,
+      "buildings": 218,
+      "markets": 4,
       "harbors": 0,
-      "houses": 48,
+      "houses": 55,
       "fields": 3,
-      "ages": 3
+      "ages": 2
     },
     {
       "team": 2,
       "cities": 3,
-      "buildings": 176,
-      "markets": 3,
+      "buildings": 183,
+      "markets": 2,
       "harbors": 0,
-      "houses": 48,
+      "houses": 42,
       "fields": 2,
-      "ages": 3
+      "ages": 2
     },
     {
       "team": 3,
-      "cities": 3,
-      "buildings": 92,
-      "markets": 1,
+      "cities": 4,
+      "buildings": 154,
+      "markets": 2,
       "harbors": 0,
-      "houses": 24,
-      "fields": 2,
-      "ages": 1
+      "houses": 40,
+      "fields": 1,
+      "ages": 2
     }
   ],
   "landUse": [
     {
-      "name": "Vendel",
-      "owned": 432,
-      "developed": 7,
+      "name": "Sampola",
+      "owned": 288,
+      "developed": 5,
       "ruralDeveloped": 0,
       "planned": 4,
-      "homes": 25,
+      "homes": 21,
+      "foodGrowthBonus": 0.25
+    },
+    {
+      "name": "Ainola",
+      "owned": 363,
+      "developed": 4,
+      "ruralDeveloped": 0,
+      "planned": 2,
+      "homes": 22,
       "foodGrowthBonus": 0.2
     },
     {
-      "name": "Fyrisvellir",
-      "owned": 100,
-      "developed": 6,
-      "ruralDeveloped": 0,
-      "planned": 2,
-      "homes": 18,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Alvhem",
+      "name": "Väinölä",
       "owned": 147,
-      "developed": 3,
+      "developed": 2,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 5,
+      "foodGrowthBonus": 0
+    },
+    {
+      "name": "Pohjola",
+      "owned": 58,
+      "developed": 4,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 5,
+      "foodGrowthBonus": 0.25
+    },
+    {
+      "name": "Tapiola",
+      "owned": 66,
+      "developed": 2,
+      "ruralDeveloped": 0,
+      "planned": 0,
+      "homes": 2,
       "foodGrowthBonus": 0
     }
   ],
   "seed": 136023,
   "turn": 246,
-  "sourceTeam": 2,
-  "cities": 3,
-  "buildings": 176,
+  "sourceTeam": 1,
+  "cities": 5,
+  "buildings": 218,
   "spacingPairs": [
     9,
+    20,
     14,
-    16
+    16,
+    11,
+    12,
+    25,
+    9,
+    36,
+    27
   ],
   "ages": [
-    3,
-    3,
+    2,
     0,
-    1
+    2,
+    2
   ],
-  "bytes": 1701422,
-  "seconds": 77
+  "bytes": 2301268,
+  "seconds": 167
 }
