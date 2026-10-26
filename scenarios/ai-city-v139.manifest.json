@@ -3,11 +3,11 @@
   "roster": [
     {
       "team": 1,
-      "cities": 3,
-      "buildings": 98,
-      "markets": 2,
+      "cities": 1,
+      "buildings": 63,
+      "markets": 0,
       "harbors": 0,
-      "houses": 28,
+      "houses": 15,
       "fields": 1,
       "ages": 1
     },
@@ -106,14 +106,14 @@
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 16,
-      "urbanTiles": 36
+      "urbanTiles": 37
     },
     {
       "city": "Svitjod",
       "nearEdge": 0,
       "expanded": 0,
       "urbanBuildings": 11,
-      "urbanTiles": 18
+      "urbanTiles": 17
     }
   ],
   "historicMetrics": [
@@ -167,7 +167,7 @@
     },
     {
       "name": "Ynglinga",
-      "centreHouses": 6,
+      "centreHouses": 7,
       "mainTileHouses": 7,
       "totalHouses": 7,
       "walls": 0,
@@ -213,6 +213,6 @@
     0,
     2
   ],
-  "bytes": 1912611,
-  "seconds": 81
+  "bytes": 1692675,
+  "seconds": 74
 }
