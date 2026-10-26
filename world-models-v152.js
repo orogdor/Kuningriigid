@@ -273,6 +273,16 @@ export function miningSiteGeometry(type,kind,age){const key='site:'+type+':'+kin
   for(let i=0;i<3;i++)siteBox(b,-1+i*1.1,0,-.2+i*.1,1.0,1.6-i*.45,1.2,'#b9b5a8');
   for(let i=0;i<5;i++)siteBox(b,-2.4+(i%3)*1.0,Math.floor(i/3)*.55,1.8,.9,.55,.65,'#bdb8aa',(i%2)*.2);
   siteCyl(b,2.4,1.9,.2,.1,3.8,timber);b.part(cyl(.07,.07,3.2,6),{at:[1.5,3.4,.2],rot:[0,0,1.1],color:()=>C(timber)});siteCyl(b,.65,2.6,.2,.02,1.6,'#c9b58a');siteBox(b,.65,1.6,.2,.6,.4,.5,'#bdb8aa');
+  // V170b: chisel-cut stone benches, timber props and quarry hand tools.
+  // Decorative additions to the same extraction-site mesh; gameplay is unchanged.
+  for(let level=0;level<3;level++)for(let col=0;col<3-level;col++)
+   siteBox(b,-2.10+col*1.06,level*.46,1.35-level*.52,.96,.42,.74,
+    level%2?'#aaa89b':'#c5c0af',.025*(col-level));
+  for(const x of [-2.5,-1.05])siteBox(b,x,0,-1.0,.14,2.65,.16,timber);
+  siteBox(b,-1.78,2.52,-1.0,1.72,.17,.16,timber);
+  for(const x of [-3.0,-2.15])siteBox(b,x,0,2.7,.72,.38,.68,'#b7b3a7');
+  siteBox(b,-1.52,0,2.72,.18,.95,.18,timber,.22);
+  siteBox(b,-1.27,.55,2.72,.56,.14,.11,modern?'#849091':'#898679',-.24);
   cart(b,2.6,2.6,.4,'stone');}
  else if(type==='claypit'){ // wet pit, clay heaps, bricks drying on pallets
   b.part(new T.RingGeometry(1.4,3.2,20,1),{at:[0,.08,0],rot:[-Math.PI/2,0,0],color:(u,w)=>mix(C('#7a5038'),C('#9c6b4a'),noise(w.x*2,0,w.z*2))});
