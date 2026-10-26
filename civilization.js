@@ -16,7 +16,7 @@ import {loadArmyTrafficTest} from './army-traffic-demo-v133.js';
 import {SnapshotEncoder,serializeSnapshot} from './snapshot-v131.js';
 import {freezeStaticTransforms,updateStaticRoot,patchMenu} from './perf-render-v131.js';
 import {loadIronAITest} from './ai-takeover-v128.js';
-import {createFieldModel,createFarmhouseModel,createLivestockModel,updateFarmEquipment} from './farm-visuals-v127.js?v=170c';
+import {createFieldModel,createFarmhouseModel,createLivestockModel,updateFarmEquipment} from './farm-visuals-v127.js?v=174a';
 import {fieldRect,fieldSize} from './farming-v127.js';
 import {addTowerGuards,tickTowerGuards,persistTowerGuards} from './tower-garrison-v117.js?v=128a';
 import {siegeSection} from './medieval-v62.js?v=117a';
