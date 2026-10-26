@@ -1,6 +1,8 @@
 // V175.2: touch/mouse wall-stroke geometry. No game globals, no save writes.
 // The builder owns resources, technology, terrain and pathfinding checks.
-export const WALL_DRAW_V175=Object.freeze({spacing:7,maxSegments:10,minLength:3,maxPointGap:1.8});
+// V175.3: short timber overlaps at adjacent joints hide small model-end gaps.
+// This changes geometry coverage only, never the number/cost of segments.
+export const WALL_DRAW_V175=Object.freeze({spacing:7,maxSegments:10,minLength:3,maxPointGap:1.8,jointOverlap:.52});
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t});
 export const isDrawableWallV175=type=>['palisade','stonewall','reinforced_wall'].includes(type);
@@ -51,7 +53,7 @@ export function wallStrokePlanV175(points,shape='straight',maxSegments=WALL_DRAW
   if(span<.1)continue;
   const angle=-Math.atan2(b.z-a.z,b.x-a.x);
   segments.push({x:(a.x+b.x)/2,z:(a.z+b.z)/2,
-   wallAngleV175:angle,palisadeSpanV167:span,
+   wallAngleV175:angle,palisadeSpanV167:span+WALL_DRAW_V175.jointOverlap,
    wallAxis:Math.abs(b.z-a.z)>Math.abs(b.x-a.x)?1:0,
    drawnWallV175:true,
    from:{x:a.x,z:a.z},to:{x:b.x,z:b.z}});
