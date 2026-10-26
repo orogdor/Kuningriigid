@@ -386,7 +386,17 @@ function plotRects(cell,neighbours=true){const rects=[];let stamp='';
    // V175.1: solid fortification footprints MUST be supplied to the
    // local world-road renderer. Previously the wall types were excluded,
    // so paved road ribbons went straight through solid timber/stone walls.
-   rects.push([b.x+dc*DETAIL_TILE_X,b.z+dr*DETAIL_TILE_Z,cl.rx,cl.rz]);
+   if(b.type==='woodgate'||b.type==='gatehouse'){
+    // A gate isn't a solid rectangle. Keep the actual 3.6m clear passage,
+    // steering paving around only its two real timber/stone gate posts.
+    const wide=b.type==='woodgate'&&b.extendedPalisadeV166;
+    const side=wide?5.2:2.55,post=wide?1.6:2.2;
+    for(const sign of [-1,1])rects.push([
+     b.x+dc*DETAIL_TILE_X+(b.wallAxis?0:sign*side),
+     b.z+dr*DETAIL_TILE_Z+(b.wallAxis?sign*side:0),
+     b.wallAxis?.95:post,b.wallAxis?post:.95
+    ]);
+   }else rects.push([b.x+dc*DETAIL_TILE_X,b.z+dr*DETAIL_TILE_Z,cl.rx,cl.rz]);
    stamp+=b.type[0]+Math.round(b.x)+','+Math.round(b.z)+','+
     (b.palisadeSpanV167||0)+','+(b.wallAxis||0)+','+Number(b.hp>0)+';';}}
  return {rects,stamp};}
