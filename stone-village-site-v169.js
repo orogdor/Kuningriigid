@@ -1,7 +1,7 @@
 // V169: first AI villages should not be founded on terrain where no real
 // wooden perimeter can fit. Move at most one tile inland, preserving the
 // initial coastal expedition and normal settler path / founding rules.
-import {reserveStoneVillageRingV168} from './stone-village-defenses-v166.js';
+import {reserveStoneVillageRingV168} from './stone-village-defenses-v166.js?v=169a';
 const LAND_OFFSETS=[[0,0],[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,-1],[1,1],[-1,1]];
 export function stoneVillageFoundingTileV169(game,settler,target){
  if(!target||settler.team===0||game.s.cities.some(c=>c.team===settler.team))return target;
