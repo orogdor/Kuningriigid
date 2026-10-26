@@ -57,7 +57,7 @@ import {BASIC_JOBS,allocateCity,housingCapacity,HALL_CAPACITY,HOUSE_CAPACITY,FOO
 import {TECHS,BUILD_TECH,UNIT_TECH,newResearch,initResearch,startResearch,tickResearch,techBlock,queueResearch,nextResearchForGoals} from './research.js?v=125a';
 import {BUILDINGS,RESOURCE_NAMES,START,RESOURCE_PRODUCTION_MULTIPLIER,FOOD_KEYS,storageLimit,takeFood,recordDelivery,realm as freshRealm,initialState,migrateEconomy,buildRule as placementRule,placeBuilding,tickEconomy,ready,canAfford,spendResources} from './economy.js';
 import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js?v=1752a';
-import {isDrawableWallV175,wallPointInsideV175} from './wall-draw-v175.js?v=1753a';
+import {isDrawableWallV175,wallPointInsideV175,wallCrossesGateOpeningV175} from './wall-draw-v175.js?v=1754a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js?v=123a';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
@@ -493,6 +493,11 @@ export class Civilization{
    const span=type==='palisade'?p.palisadeSpanV167:7;
    if(!Number.isFinite(p.wallAngleV175)||!Number.isFinite(span)||span<2.4||span>8)
     return {error:'Müürijupi pikkus või pöördenurk ei sobi.'};
+   // V175.4: joining a wooden gate's posts is fine, walling up its entrance
+   // is not. Otherwise AI civilians and defending soldiers lose their exit.
+   if(city.economy.buildings.some(g=>g.hp>0&&!g.virtual&&
+     ['woodgate','gatehouse'].includes(g.type)&&wallCrossesGateOpeningV175(p,g)))
+    return {error:'Müür läbiks värava ava. Ühenda müür väravapostidega, jäta keskkoht vabaks.'};
    // Check the physical stroke corridor; do not rely on a centre-point-only
    // dry-land check. Endpoints may touch a real neighbouring palisade.
    for(let i=1;i<=9;i++){
