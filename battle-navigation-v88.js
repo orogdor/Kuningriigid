@@ -22,7 +22,7 @@ export function createBattleNavigation(game,battle){
     for(const side of [-1,1]){
      add({type:'gatepost',x:b.x+offset.x+(b.wallAxis?0:side*offsetPost),
       z:b.z+offset.z+(b.wallAxis?side*offsetPost:0)},
-      b.wallAxis?post:.95,b.wallAxis?.95:post);
+      b.wallAxis?.95:post,b.wallAxis?post:.95);
     }
     continue;
    }
