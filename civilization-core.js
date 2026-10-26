@@ -13,7 +13,7 @@ import {marketFoodGrowth} from './city-growth-v137.js';
 import {historicalTilePlan,historicalTilePriority} from './historical-districts-v137.js';
 import {countyFootprint,countySearchRadius,urbanTile,countyBuildRule,countyBuildingCount,citySpacingAllowed,MIN_CITY_SPACING} from './counties-v126.js?v=136a';
 import {AI_CITY_SPACING,historicalCitySites,historicalDistrictOrder,historicalSiteScore} from './historical-city-v135.js';
-import {historicalBuildingPlots,nextPlotBatch,urbanExpansionEligible} from './historic-urban-v138.js';
+import {historicalBuildingPlots,nextPlotBatch,urbanExpansionEligible} from './historic-urban-v138.js?v=174a';
 import {V139_CORE_HOUSES,cityInfillRank} from './urban-infill-v139.js';
 import {unitSuccessor,buildingSuccessor,suppliesBuilding} from './era-availability-v116.js?v=118a';
 import {migrateBattleAmmunition} from './combat-equipment-v100.js';
