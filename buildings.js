@@ -2,6 +2,7 @@ import {createBronzeCityModel,createBronzeTownHouse} from './bronze-city-v111.js
 import {createMiningSite,createCoastalBuilding} from './site-models-v88.js';
 import {GOOD_BUILDINGS} from './city-needs-v87.js';
 import * as T from './vendor/three.module.js';
+import {WOOD_FORT_V1757} from './wood-fort-levels-v1757.js?v=1757a';
 import {createIndustrialBuilding} from './industrial-buildings-v82.js?v=82a';
 import {createMedievalBuilding} from './medieval-buildings-v80.js?v=80a';
 import {createRenaissanceBuilding} from './renaissance-buildings-v81.js?v=81a';
@@ -40,7 +41,7 @@ function crate(g,x,z,size=.55){box(g,x,size/2+.15,z,size,size,size,'#987047','wo
 function chimney(g,x,z,height=3.6){box(g,x,height/2,z,.5,height,.5,'#a39178','stone');box(g,x,height+.05,z,.65,.18,.65,'#685e4e','stone')}
 function fence(g,x,z,w){for(let i=0;i<=4;i++)box(g,x-w/2+i*w/4,.55,z,.07,1,.07,'#776042','wood');for(const y of [.4,.8])box(g,x,y,z,w,.07,.07,'#987b51','wood')}
 function compile(root){root.updateMatrixWorld(true);const buckets=new Map();root.traverse(o=>{if(!o.isMesh)return;const geo=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();geo.applyMatrix4(o.matrixWorld);const key=o.material.uuid;if(!buckets.has(key))buckets.set(key,{mat:o.material,geo:[]});buckets.get(key).geo.push(geo)});const result=[];for(const{mat,geo}of buckets.values()){const count=geo.reduce((n,g)=>n+g.attributes.position.count,0),p=new Float32Array(count*3),n=new Float32Array(count*3),uv=new Float32Array(count*2);let off=0;for(const a of geo){const c=a.attributes.position.count;p.set(a.attributes.position.array,off*3);n.set(a.attributes.normal.array,off*3);if(a.attributes.uv)uv.set(a.attributes.uv.array,off*2);off+=c;a.dispose()}const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p,3));g.setAttribute('normal',new T.BufferAttribute(n,3));g.setAttribute('uv',new T.BufferAttribute(uv,2));g.computeBoundingSphere();g.userData.shared=true;result.push({geo:g,material:mat})}root.traverse(o=>{if(o.geometry)o.geometry.dispose()});return result}
-function staticModel(type,team){const key=type+team;if(models.has(key))return models.get(key);const g=new T.Group(),flag=team?'#ac5945':'#4a7288';
+function staticModel(type,team,woodFortTier=1){const key=type+team+(woodFortTier===2?':wood-fort-ii':'');if(models.has(key))return models.get(key);const g=new T.Group(),flag=team?'#ac5945':'#4a7288';
 // V60: recognisable historic building silhouettes, sharing the existing batched model pipeline.
 if(['library','school','public_school','high_school'].includes(type)){
  const library=type==='library',secondary=type==='high_school',industrial=type==='public_school'||secondary;
@@ -60,6 +61,54 @@ else if(type==='cartwright'){cottage(g,-1,-.6,2.5,2.1,1.85,'#8b6847',true);box(g
 else if(type==='coppermine'||type==='tinmine'){cottage(g,-1.4,-.7,2.3,1.95,1.65,'#827461',true);box(g,.85,1,.15,2,1.9,2,'#777b70','stone');box(g,.85,1.2,1.23,1.1,1.35,.12,'#262721');for(const x of [-.15,1.85])box(g,x,1.55,1.3,.18,3.1,.2,'#795938','wood');box(g,.85,3.1,1.3,2.5,.18,.2,'#876b44','wood');for(let i=0;i<4;i++)box(g,-1.1+i*.65,.32,1.55,.55,.58,.55,type==='coppermine'?'#a86d50':'#9eaaac','stone');}
 else if(type==='bronze_foundry'){cottage(g,-1.2,-.5,2.3,2.1,1.7,'#8c684c',true);cylinder(g,1.1,1.5,-.5,.85,1.1,2.6,'#a69575','stone');chimney(g,1.6,-1.2,4.2);box(g,1.1,.45,.48,.7,.6,.12,'#6b3829');box(g,1.1,.4,.56,.5,.36,.04,'#e58036','plain',true);for(let i=0;i<3;i++)cylinder(g,-.5+i*.8,.26,1.7,.32,.38,.32,'#b88a4c','metal');}
 else if(type==='road_depot'){cottage(g,-.9,-.5,2.8,2.6,2,'#967e5d',true);for(let i=0;i<5;i++)box(g,.9+(i%3)*.63,.15+Math.floor(i/3)*.35,.25,.55,.3,1.1,'#b3aa94','stone');for(const x of [.3,2])cylinder(g,x,.45,1.6,.5,.5,.15,'#62523c','wood',12).rotation.z=Math.PI/2;box(g,1.2,.9,1.6,2.15,.17,.8,'#94754c','wood');}
+else if(type==='woodgate'&&woodFortTier===2){
+ // V175.7a: high gate prototype. The centre remains physically open below
+ // the overhead bridge, while the walk deck matches the enclosed watchtower.
+ const c=WOOD_FORT_V1757,wood='#795a3d',dark='#67482f',light='#9c784c';
+ // Two solid tall timber gate cheeks; leave an unobstructed 3.6m passage.
+ for(const side of [-1,1]){
+  box(g,side*2.72,3.30,0,1.30,6.60,2.05,wood,'wood');
+  for(const x of [side*2.2,side*3.22])
+   box(g,x,3.30,1.10,.20,6.60,.24,dark,'wood');
+  for(const y of [1.6,3.5,5.9])
+   box(g,side*2.72,y,1.18,1.38,.22,.22,dark,'wood');
+  box(g,side*2.65,7.25,.55,1.0,1.45,.45,light,'wood');
+ }
+ // Upper crossbeam cannot obstruct the opening at ground level.
+ box(g,0,5.95,0,3.90,.43,1.05,dark,'wood');
+ // Shared timber wall-walk level: real top surface y=6.875m.
+ box(g,0,c.deckCenter,-1.20,7.15,c.deckThickness,2.45,light,'wood');
+ for(const x of [-3.25,3.25])box(g,x,c.deckCenter-.42,-1.20,.3,.90,2.55,dark,'wood');
+ // Full protective rails around the walkway, except at both wall joins.
+ box(g,0,7.27,.58,7.20,.9,.28,wood,'wood');
+ box(g,0,7.27,-2.38,7.20,.9,.28,wood,'wood');
+ for(const x of [-2.70,0,2.70])for(const z of [.58,-2.38])
+  box(g,x,7.85,z,.72,.45,.40,light,'wood');
+}
+else if(type==='palisade'&&woodFortTier===2){
+ // V175.7a: high walkable palisade prototype; the normal single row of
+ // low, pointed stakes remains the default until the tier UI is introduced.
+ const c=WOOD_FORT_V1757,dark='#674b32',wood='#806040',light='#a07c51';
+ // Solid timber curtain. Its outer stakes share the same end positions as
+ // the existing seven-metre low palisade, so curving and rotations still fit.
+ box(g,0,3.20,.48,7.10,6.4,.40,wood,'wood');
+ for(let i=0;i<=14;i++){
+  const x=-3.5+i*.5;
+  cylinder(g,x,3.30,.65,.24,.27,6.6,i%4===0?dark:wood,'wood',7);
+  cone(g,x,6.94,.65,.26,.62,light,7);
+ }
+ for(const y of [1.35,3.55,5.7])
+  box(g,0,y,-.05,7.20,.20,.24,dark,'wood');
+ // An interior fighting gallery backed by real braces and two guardrails.
+ box(g,0,c.deckCenter,-1.20,7.15,c.deckThickness,2.45,light,'wood');
+ for(const x of [-2.9,0,2.9]){
+  beam(g,[x,1.1,-.10],[x,6.52,-2.1],.20,dark);
+  box(g,x,5.90,-1.30,.30,1.8,.30,dark,'wood');
+ }
+ box(g,0,7.27,-2.38,7.20,.90,.30,wood,'wood');
+ for(const x of [-2.65,0,2.65])
+  box(g,x,7.83,-2.38,.72,.44,.34,light,'wood');
+}
 else if(type==='woodgate'){
  // Walkable 3.6-metre-wide timber opening between defensive palisade wings.
  for(const x of [-2.65,2.65]){
@@ -255,11 +304,11 @@ else if(['steelworks','engineworks','polytechnic','railstation','oilwell','refin
 }
 else cottage(g);
 if(type!=='hall')box(g,-1.8,.48,1.8,.18,.6,.08,flag);const result=compile(g);models.set(key,result);return result}
-export function createBuildingModel(type,team=0){const root=new T.Group();for(const part of staticModel(type,team)){const m=new T.Mesh(part.geo,part.material);m.castShadow=true;m.receiveShadow=true;root.add(m)}root.userData.animations=[];// Bronze-era grain grinding uses a hand quern; wood production uses a hand saw.
+export function createBuildingModel(type,team=0,woodFortTier=1){const root=new T.Group();for(const part of staticModel(type,team,woodFortTier)){const m=new T.Mesh(part.geo,part.material);m.castShadow=true;m.receiveShadow=true;root.add(m)}root.userData.animations=[];// Bronze-era grain grinding uses a hand quern; wood production uses a hand saw.
 // Neither should show medieval windmill sails or a motorized circular saw.
 if(['bakery','smith','smelter','coal','steelworks','refinery','powerplant'].includes(type)){const smoke=new T.Group();const origin=type==='bakery'?[1.45,3.4,-.1]:type==='smith'?[-1.2,4,-.6]:type==='smelter'?[.7,4.3,-.45]:[0,2.7,-.3];smoke.position.set(...origin);for(let i=0;i<4;i++){const m=new T.Mesh(new T.SphereGeometry(1,6,4),new T.MeshBasicMaterial({color:0xaaa99e,transparent:true,opacity:.16,depthWrite:false}));m.scale.setScalar(.14+i*.05);smoke.add(m)}root.add(smoke);root.userData.smoke=smoke}return root}
 export function animateBuilding(root,time,active,ready){for(const a of root.userData.animations||[]){if(ready&&(!a.node.userData.workOnly||active))a.node.rotation[a.axis]=time*a.speed}const smoke=root.userData.smoke;if(smoke){smoke.visible=ready&&active;smoke.children.forEach((p,i)=>{const f=(time*.23+i*.25)%1;p.position.set(f*.35,f*1.5,Math.sin(i+time*.15)*.06);p.scale.setScalar(.12+f*.35);p.material.opacity=(1-f)*.18})}}
-export function createAgeBuilding(type,team,age=0){if(type==='woodgate')return createBuildingModel(type,team);if(['palisade','stonewall','reinforced_wall','gatehouse'].includes(type))return createBronzeCityModel(type,team);const site=createCoastalBuilding(type,team,age)||createMiningSite(type,team,age);if(site)return site;if(GOOD_BUILDINGS[type]){const d=GOOD_BUILDINGS[type],g=new T.Group();g.userData.buildingType=type;box(g,0,.2,0,6,.4,5,'#948777','stone');box(g,0,1.5,-.8,3,2.6,3,'#d5bf97','plaster');gable(g,0,3,-.8,4,4,1.2,d.age>=4?'#657f81':'#996a48');if(d.deposit){for(const x of [-2,-1,0,1,2]){box(g,x,.45,2,.3,.2,2,'#6c7140','wood');for(const z of [1.5,2.3])cylinder(g,x,.9,z,.24,.12,.7,d.out==='gems'?'#aa8ac9':'#79984f','wood');}}else{box(g,2,1.1,1,1.4,1.5,1.5,'#a77a4a','wood');for(const x of [-2,-1])cylinder(g,x,.8,1.8,.4,.4,1.2,d.age>=5?'#586e79':'#a3886a','metal');box(g,-1,3,-1,.6,3,.6,'#867b72','stone');}return g;}if(age===5){const industrial=createIndustrialBuilding(type,team);if(industrial)return industrial;}if(age===4){const renaissance=createRenaissanceBuilding(type,team);if(renaissance)return renaissance;}if(age===3){const medieval=createMedievalBuilding(type,team);if(medieval)return medieval;}if(age===0){const stone=createStoneBuilding(type,team);if(stone)return stone;}if(age===1){const fort=createBronzeCityModel(type,team);if(fort)return fort;const bronze=createBronzeBuilding(type,team);if(bronze)return bronze;}if(['palisade','stonewall','watchtower','stonetower','reinforced_wall',...['armor_workshop','crossbow_range','guildhall','master_workshop','watermill','windmill','infirmary','trade_yard','inn','monastery','chapel','keep','gatehouse','siegeworkshop']].includes(type))return createBuildingModel(type,team);if(type==='harbor'){const g=new T.Group();box(g,0,.3,2,6,.6,9,'#94724b','wood');for(const x of [-2.5,2.5])for(const z of [-1,3,6])cylinder(g,x,.1,z,.16,.2,2,'#68543a','wood');box(g,0,1.7,-2,4,2.8,3,'#b7a27c','wood');gable(g,0,3.5,-2,5,4,1.2,age>=2?'#797e83':'#98744c');box(g,0,3.7,3,.12,5,.12,'#735a3a','wood');box(g,.7,5.3,3,1.4,.8,.05,['#8fb6a2','#b77c61','#aa8bc5','#ceb66b'][team]);return g}if(type==='bridge'){const g=new T.Group();for(const x of [-2.2,2.2])for(const z of [-1.2,1.2])cylinder(g,x,.9,z,.16,.16,1.8,'#7a5a3d','wood');for(const z of [-1.2,1.2])box(g,0,1.35,z,5.5,.22,.18,'#8b6845','wood');for(const x of [-2.6,-.9,.9,2.6])box(g,x,1.05,0,.18,.75,2.9,'#9d7b55','wood');box(g,0,.72,0,6.2,.2,3.4,'#a88c65','wood');if(age>=2){box(g,0,.92,0,6.4,.28,3.8,'#9a9b95','stone')}return g}if(age>0){const g=createBuildingModel(type,team);g.userData.upgradeAge=age;g.add(createArchitecturalDetails(type,team,age));if(age>=2){box(g,0,.25,0,6,.5,6,'#92958d','stone');for(const x of [-2.5,2.5])box(g,x,1.8,2.6,.15,3.3,.12,'#747f84','metal')}if(age>=5){box(g,0,.2,0,6.7,.42,6.7,'#858e90','metal');box(g,1.85,5.5,-1.7,.7,3.5,.7,'#69757a','metal')}if(age>=6){for(const x of [-1.6,0,1.6])box(g,x,4.25,2.57,.8,.85,.06,'#a7cad2','plain');}if(age>=3){for(const z of [-2.7,2.7])box(g,0,2.8,z,5.7,.18,.18,'#c5b779','metal');box(g,2.1,4.2,-1.6,.7,2.5,.7,'#969c92','stone')}return g;}const key='prehistoric:'+type+team;if(!models.has(key)){const g=new T.Group(),flag=team?'#ae6650':'#748e8d';const hut=(x,z,size=1)=>{cylinder(g,x,1*size,z,1.35*size,1.65*size,2*size,'#a48c62','plain',12);cone(g,x,2.5*size,z,2*size,2.4*size,'#80684d',10);box(g,x,.65*size,z+1.5*size,.6*size,1.3*size,.08,'#302c23');for(let i=0;i<8;i++){const a=i*Math.PI/4;beam(g,[x+Math.cos(a)*1.65*size,0,z+Math.sin(a)*1.65*size],[x,3.8*size,z],.085,'#65503b')}};
+export function createAgeBuilding(type,team,age=0,woodFortTier=1){if(woodFortTier===2&&['palisade','woodgate'].includes(type))return createBuildingModel(type,team,2);if(type==='woodgate')return createBuildingModel(type,team);if(['palisade','stonewall','reinforced_wall','gatehouse'].includes(type))return createBronzeCityModel(type,team);const site=createCoastalBuilding(type,team,age)||createMiningSite(type,team,age);if(site)return site;if(GOOD_BUILDINGS[type]){const d=GOOD_BUILDINGS[type],g=new T.Group();g.userData.buildingType=type;box(g,0,.2,0,6,.4,5,'#948777','stone');box(g,0,1.5,-.8,3,2.6,3,'#d5bf97','plaster');gable(g,0,3,-.8,4,4,1.2,d.age>=4?'#657f81':'#996a48');if(d.deposit){for(const x of [-2,-1,0,1,2]){box(g,x,.45,2,.3,.2,2,'#6c7140','wood');for(const z of [1.5,2.3])cylinder(g,x,.9,z,.24,.12,.7,d.out==='gems'?'#aa8ac9':'#79984f','wood');}}else{box(g,2,1.1,1,1.4,1.5,1.5,'#a77a4a','wood');for(const x of [-2,-1])cylinder(g,x,.8,1.8,.4,.4,1.2,d.age>=5?'#586e79':'#a3886a','metal');box(g,-1,3,-1,.6,3,.6,'#867b72','stone');}return g;}if(age===5){const industrial=createIndustrialBuilding(type,team);if(industrial)return industrial;}if(age===4){const renaissance=createRenaissanceBuilding(type,team);if(renaissance)return renaissance;}if(age===3){const medieval=createMedievalBuilding(type,team);if(medieval)return medieval;}if(age===0){const stone=createStoneBuilding(type,team);if(stone)return stone;}if(age===1){const fort=createBronzeCityModel(type,team);if(fort)return fort;const bronze=createBronzeBuilding(type,team);if(bronze)return bronze;}if(['palisade','stonewall','watchtower','stonetower','reinforced_wall',...['armor_workshop','crossbow_range','guildhall','master_workshop','watermill','windmill','infirmary','trade_yard','inn','monastery','chapel','keep','gatehouse','siegeworkshop']].includes(type))return createBuildingModel(type,team);if(type==='harbor'){const g=new T.Group();box(g,0,.3,2,6,.6,9,'#94724b','wood');for(const x of [-2.5,2.5])for(const z of [-1,3,6])cylinder(g,x,.1,z,.16,.2,2,'#68543a','wood');box(g,0,1.7,-2,4,2.8,3,'#b7a27c','wood');gable(g,0,3.5,-2,5,4,1.2,age>=2?'#797e83':'#98744c');box(g,0,3.7,3,.12,5,.12,'#735a3a','wood');box(g,.7,5.3,3,1.4,.8,.05,['#8fb6a2','#b77c61','#aa8bc5','#ceb66b'][team]);return g}if(type==='bridge'){const g=new T.Group();for(const x of [-2.2,2.2])for(const z of [-1.2,1.2])cylinder(g,x,.9,z,.16,.16,1.8,'#7a5a3d','wood');for(const z of [-1.2,1.2])box(g,0,1.35,z,5.5,.22,.18,'#8b6845','wood');for(const x of [-2.6,-.9,.9,2.6])box(g,x,1.05,0,.18,.75,2.9,'#9d7b55','wood');box(g,0,.72,0,6.2,.2,3.4,'#a88c65','wood');if(age>=2){box(g,0,.92,0,6.4,.28,3.8,'#9a9b95','stone')}return g}if(age>0){const g=createBuildingModel(type,team);g.userData.upgradeAge=age;g.add(createArchitecturalDetails(type,team,age));if(age>=2){box(g,0,.25,0,6,.5,6,'#92958d','stone');for(const x of [-2.5,2.5])box(g,x,1.8,2.6,.15,3.3,.12,'#747f84','metal')}if(age>=5){box(g,0,.2,0,6.7,.42,6.7,'#858e90','metal');box(g,1.85,5.5,-1.7,.7,3.5,.7,'#69757a','metal')}if(age>=6){for(const x of [-1.6,0,1.6])box(g,x,4.25,2.57,.8,.85,.06,'#a7cad2','plain');}if(age>=3){for(const z of [-2.7,2.7])box(g,0,2.8,z,5.7,.18,.18,'#c5b779','metal');box(g,2.1,4.2,-1.6,.7,2.5,.7,'#969c92','stone')}return g;}const key='prehistoric:'+type+team;if(!models.has(key)){const g=new T.Group(),flag=team?'#ae6650':'#748e8d';const hut=(x,z,size=1)=>{cylinder(g,x,1*size,z,1.35*size,1.65*size,2*size,'#a48c62','plain',12);cone(g,x,2.5*size,z,2*size,2.4*size,'#80684d',10);box(g,x,.65*size,z+1.5*size,.6*size,1.3*size,.08,'#302c23');for(let i=0;i<8;i++){const a=i*Math.PI/4;beam(g,[x+Math.cos(a)*1.65*size,0,z+Math.sin(a)*1.65*size],[x,3.8*size,z],.085,'#65503b')}};
 if(type==='hall'){hut(0,-.4,1.35);for(let i=0;i<9;i++){const a=i*Math.PI*2/9;mesh(g,new T.DodecahedronGeometry(.3,0),'#8e9081','plain',Math.cos(a),.2,2+Math.sin(a))}cone(g,0,.6,2,.3,1,'#d58c4f',6);beam(g,[2.5,0,-1],[2.5,4,-1],.14);box(g,2.85,3.3,-1,.7,.7,.04,flag)}
 else if(type==='house'){hut(0,0,1);logs(g,1.8,1.3,3)}
 else if(type==='quarry'){for(let i=0;i<7;i++)mesh(g,new T.DodecahedronGeometry(.7+i%2*.25,0),'#a8aa96','plain',(i%3-1)*1.2,.4+Math.floor(i/3)*.25,Math.floor(i/3)-1);beam(g,[1,0,1.5],[1,1.5,1.5],.12);box(g,1.2,1.4,1.5,.5,.3,.14,'#929381')}

@@ -2,7 +2,7 @@ import {addTowerGuards} from './tower-garrison-v117.js?v=117a';
 import {ballistaUnlocked} from './era-availability-v116.js?v=117a';
 import {towerBallista} from './siege-support-v115.js?v=117a';
 // V62: medieval walls, castles and independent siege sections.
-import {wallProfile,prepareWall} from './siege-rules-v114.js?v=117a';
+import {wallProfile,buildingWallProfileV1757,prepareWall} from './siege-rules-v114.js?v=117a';
 import {attachSiegeSections} from './medieval-v62.js?v=117a';
 import {wallFootprintV175} from './wall-draw-v175.js?v=1754a';
 // V61: One civilian worker mans each tower; wall soldiers come only from real units.
@@ -22,15 +22,16 @@ export function configureWallFootprint(b){
  // V175.1: preserve actual PAID wooden span (up to 42m), even when the
  // old construction handler calls this AFTER the site got its dimensions.
  // A 42m wall must never revert to a 7m collision rectangle.
+ const thin=b.type==='palisade'&&b.woodFortTierV1757===2?2.35:1.1;
  const half=b.type==='palisade'?Math.max(3.6,(b.palisadeSpanV167||
    (b.extendedPalisadeV166?14:7))/2+.3):3.6;
- b.navWidth=b.wallAxis?1.1:Math.max(half,b.navWidth||0);
- b.navDepth=b.wallAxis?Math.max(half,b.navDepth||0):1.1;
+ b.navWidth=b.wallAxis?thin:Math.max(half,b.navWidth||0);
+ b.navDepth=b.wallAxis?Math.max(half,b.navDepth||0):thin;
  return b;
 }
 export const towerManned=b=>TOWER_TYPES.has(b?.type)&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>=.99;
 export const wallCapacity=type=>type==='keep'?6:type==='reinforced_wall'?4:type==='stonewall'?3:type==='palisade'?2:0;
-export const wallHeight=type=>wallProfile(type)?.height||(type==='keep'?6:0);
+export const wallHeight=value=>{const type=typeof value==='string'?value:value?.type;return (typeof value==='object'?buildingWallProfileV1757(value):wallProfile(type))?.height||(type==='keep'?6:0);};
 export function wallGuards(state,ctx,building){
  return state.units.map((unit,source)=>({unit,source})).filter(({unit})=>
   unit.hp>0&&unit.team===ctx.team&&unit.garrison&&
@@ -88,7 +89,7 @@ export function fortifyBattle(game,city,battle){
    if(battle.squads.some(q=>q.source===source))continue;
    const slot=wallGuards(game.s,city,wall).findIndex(q=>q.source===source);
    battle.squads.push({source,team:unit.team,kind:unit.kind,grade:unit.grade,experienceMultiplier:unit.experienceMultiplier,menCount:unit.menCount,wallWalk:!!battle.wallWalkEnabled,hp:unit.hp,maxHp:unit.maxHp||unit.hp,morale:unit.morale??100,
-    x:wall.x+(wall.wallAxis?0:(slot-0.5)*1.6),z:wall.z+(wall.wallAxis?(slot-0.5)*1.6:0),heading:wall.wallAxis?Math.PI/2:0,target:null,cool:0,guardPost:true,wallElevation:wallHeight(wall.type),wallType:wall.type,advance:false});
+    x:wall.x+(wall.wallAxis?0:(slot-0.5)*1.6),z:wall.z+(wall.wallAxis?(slot-0.5)*1.6:0),heading:wall.wallAxis?Math.PI/2:0,target:null,cool:0,guardPost:true,wallElevation:wallHeight(wall),wallType:wall.type,advance:false});
   }
  }
  addTowerGuards(city,game.s,battle);

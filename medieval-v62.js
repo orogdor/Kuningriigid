@@ -1,4 +1,4 @@
-import {wallProfile,prepareWall,structuralMultiplier} from './siege-rules-v114.js?v=117a';
+import {wallProfile,buildingWallProfileV1757,prepareWall,structuralMultiplier} from './siege-rules-v114.js?v=117a';
 // V62: optional medieval expansion. Definitions are data; older V4 saves retain their schema.
 export const MEDIEVAL_TECHS={
  armor_craft:{name:'Soomusevalmistamine',age:3,turns:4,requires:['civics','smithing'],unlocks:'Soomustöökoda ja raskerelvastus'},
@@ -48,7 +48,7 @@ export const MEDIEVAL_UNIT_TECH={crossbowman:'crossbows',halberdier:'knighthood'
 export const SIEGE_KINDS=new Set(['bronze_catapult','catapult','battering_ram','siege_tower','field_cannon','industrial_artillery']);
 export const isSiegeUnit=kind=>SIEGE_KINDS.has(kind);
 export function hasReady(city,type){return city?.economy?.buildings?.some(b=>b.type===type&&b.ready&&b.hp>0&&!b.disabled)}
-export const siegeSection=(building,index)=>{prepareWall(building);const profile=wallProfile(building.type);return {
+export const siegeSection=(building,index)=>{prepareWall(building);const profile=buildingWallProfileV1757(building);return {
  walkable:true,height:profile?.height||3.8,index,type:building.type,x:building.x,z:building.z,team:building.team,wallAxis:building.wallAxis||0,hp:building.hp,maxHp:building.damageMaxHp||building.hp,breached:building.hp<=0
 };};
 export function attachSiegeSections(city,battle){

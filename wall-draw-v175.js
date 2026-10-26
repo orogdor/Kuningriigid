@@ -64,9 +64,10 @@ export function wallStrokePlanV175(points,shape='straight',maxSegments=WALL_DRAW
 export function wallPointInsideV175(point,wall,pad=0){
  const angle=wall.wallAngleV175??(wall.wallAxis?Math.PI/2:0);
  const span=wall.palisadeSpanV167||7;
+ const wallDepth=wall.type==='palisade'&&wall.woodFortTierV1757===2?2.35:1.1;
  const dx=point.x-wall.x,dz=point.z-wall.z,c=Math.cos(angle),s=Math.sin(angle);
  const along=dx*c-dz*s,across=dx*s+dz*c;
- return Math.abs(along)<=span/2+pad&&Math.abs(across)<=1.1+pad;
+ return Math.abs(along)<=span/2+pad&&Math.abs(across)<=wallDepth+pad;
 }
 // V175.4: a new drawn timber section may connect to the posts flanking
 // a real gate, but must never seal the accessible open doorway itself.
@@ -87,7 +88,7 @@ export function wallCrossesGateOpeningV175(wall,gate,clearance=2.25){
 }
 export function wallFootprintV175(wall,pad=0){
  const angle=wall.wallAngleV175??(wall.wallAxis?Math.PI/2:0);
- const half=(wall.palisadeSpanV167||7)/2+pad,thin=1.1+pad;
+ const half=(wall.palisadeSpanV167||7)/2+pad,thin=(wall.type==='palisade'&&wall.woodFortTierV1757===2?2.35:1.1)+pad;
  return {rx:Math.abs(Math.cos(angle))*half+Math.abs(Math.sin(angle))*thin,
          rz:Math.abs(Math.sin(angle))*half+Math.abs(Math.cos(angle))*thin};
 }

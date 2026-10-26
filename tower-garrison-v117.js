@@ -1,9 +1,10 @@
 import {towerGuardKind} from './ai-development-v128.js';
+import {WOOD_FORT_V1757} from './wood-fort-levels-v1757.js?v=1757a';
 // Five persistent individuals per completed tower. Simulation also runs in peace.
 import {wallNodes,wallPath,wallRankPoint} from './wall-walk-v111.js?v=117a';
 const d=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const tower=b=>['watchtower','stonetower'].includes(b.type);
-export const towerRoof=b=>b.bronzeWall?6.4:b.type==='stonetower'?7.55:7.25;
+export const towerRoof=b=>b.bronzeWall?6.4:b.type==='stonetower'?7.55:WOOD_FORT_V1757.walkHeight;
 export function towerSections(city){return city.economy.buildings.flatMap((t,index)=>tower(t)&&t.ready&&t.hp>0&&!t.disabled?[{index,type:t.type,tower:true,walkable:true,x:t.x,z:t.z,height:towerRoof(t),hp:t.hp,team:city.team}]:[]);}
 export function addTowerGuards(city,state,b){
  b.siegeSections??=[];for(const w of towerSections(city))if(!b.siegeSections.some(n=>n.index===w.index))b.siegeSections.push(w);

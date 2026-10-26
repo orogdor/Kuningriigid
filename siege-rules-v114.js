@@ -1,3 +1,4 @@
+import {WOOD_FORT_V1757,isHighWoodFortV1757} from './wood-fort-levels-v1757.js?v=1757a';
 // Game-scale profiles: height is the walk deck, not the top of the parapet.
 export const WALL_PROFILES=Object.freeze({
  palisade:{name:'Puitvall',height:2.4,hp:420,cover:.55,material:'wood'},
@@ -7,6 +8,12 @@ export const WALL_PROFILES=Object.freeze({
  woodgate:{name:'Puidust külavärav',height:3.1,hp:320,cover:.2,material:'gate'}
 });
 export const wallProfile=type=>WALL_PROFILES[type];
+// Persisted opt-in high timber sections use the exact tower guard elevation.
+// Preserve base HP, damage migration and low-wall siege rules in V175.7a.
+export const buildingWallProfileV1757=building=>{
+ const p=wallProfile(building?.type);
+ return p&&isHighWoodFortV1757(building)?{...p,height:WOOD_FORT_V1757.walkHeight}:p;
+};
 // Once-only save migration preserves the fraction of damage, including ruins.
 export function prepareWall(b){const p=wallProfile(b?.type);if(!p)return b;
  if(b.wallRulesVersion!==114){const old=b.damageMaxHp||b.hp||350,ratio=Math.max(0,Math.min(1,(b.hp??old)/old));b.hp=p.hp*ratio;b.damageMaxHp=p.hp;b.wallRulesVersion=114;}

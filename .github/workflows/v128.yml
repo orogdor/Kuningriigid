@@ -40,5 +40,7 @@ jobs:
           node --check tower-patrol-v1757.js
           node --check civilization.js
           node TEST_V1757_TOWER_PATROL.mjs
+      - name: Stone Age low/high timber defense height parity (V175.7a)
+        run: node TEST_V1757A_FORT_HEIGHTS.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic
