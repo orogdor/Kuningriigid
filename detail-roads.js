@@ -38,6 +38,21 @@ function roadMesh(vertices,colors,uvs=null){
  group.add(mesh);
  return group;
 }
+// V175.4: never render a world's trade/army road straight through a solid
+// palisade. Follow the local walkable navigation (prefer worn footpaths) to
+// the gate if the direct ribbon would cross a wall; otherwise stop drawing.
+export function navigableWorldRoadV1754(nav,a,b){
+ if(nav.open(a.x,a.z)&&nav.open(b.x,b.z)&&nav.clear(a,b))return [a,b];
+ const from=nav.nearest(a,8),to=nav.nearest(b,8);
+ if(!from||!to)return [];
+ const path=nav.route(from,to,{preferRoads:true});
+ if(!path||!path.length)return [];
+ const result=[from,...path],direct=Math.hypot(a.x-b.x,a.z-b.z);
+ const length=result.slice(1).reduce((n,p,i)=>
+  n+Math.hypot(p.x-result[i].x,p.z-result[i].z),0);
+ if(length>Math.max(22,direct*4+8))return [];
+ return result.every((p,i)=>i===0||nav.clear(result[i-1],p))?result:[];
+}
 export function createDetailWorldRoads(game,tile,nav,height){
  const vertices=[],colors=[];
  // Never disclose roads on the opposite side of the fog of war.
@@ -55,7 +70,9 @@ export function createDetailWorldRoads(game,tile,nav,height){
    if(!segmentTouchesTile(tile,points[i-1],points[i],0))continue;
    const p=worldToDetail(tile,points[i-1].x,points[i-1].z);
    const q=worldToDetail(tile,points[i].x,points[i].z);
-   appendRibbon(vertices,colors,p,q,width,color,height);
+   const safe=navigableWorldRoadV1754(nav,p,q);
+   for(let j=1;j<safe.length;j++)
+    appendRibbon(vertices,colors,safe[j-1],safe[j],width,color,height);
   }
  }
  return roadMesh(vertices,colors);
@@ -86,7 +103,19 @@ function clearRibbonWidth(a,b,width,blockers){
 }
 export function createDetailTrailLinks(spots,nav,height){
  const vertices=[],colors=[],uvs=[];
- const blockers=(nav.buildings?.()||[]).filter(b=>b.hp>0&&!b.virtual).map(b=>({b,f:buildingClearance(b)})).filter(o=>o.f);
+ // Treat a real gate as two physical posts, not one solid building.
+ // Traffic already knows where the clear central doorway is; its visible
+ // ribbon must be permitted between those posts but never through them.
+ const blockers=(nav.buildings?.()||[]).filter(b=>b.hp>0&&!b.virtual).flatMap(b=>{
+  if(b.type==='woodgate'||b.type==='gatehouse'){
+   const wide=b.type==='woodgate'&&b.extendedPalisadeV166,
+    offset=wide?5.2:2.55,post=wide?1.6:2.2;
+   return [-1,1].map(sign=>b.wallAxis?
+    {b:{x:b.x,z:b.z+sign*offset},f:{rx:.95,rz:post}}:
+    {b:{x:b.x+sign*offset,z:b.z},f:{rx:post,rz:.95}});
+  }
+  return [{b,f:buildingClearance(b)}];
+ }).filter(o=>o.f);
  // Do not paint legacy traffic that lies beneath newly sized building footprints.
  const levels=new Map(spots.map(({key})=>[key,nav.roadLevel(key)])
   .filter(([key,level])=>level>0&&nav.open(nav.point(key).x,nav.point(key).z)));
