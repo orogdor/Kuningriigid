@@ -4,6 +4,7 @@ import {towerBallista} from './siege-support-v115.js?v=117a';
 // V62: medieval walls, castles and independent siege sections.
 import {wallProfile,prepareWall} from './siege-rules-v114.js?v=117a';
 import {attachSiegeSections} from './medieval-v62.js?v=117a';
+import {wallFootprintV175} from './wall-draw-v175.js';
 // V61: One civilian worker mans each tower; wall soldiers come only from real units.
 export const WALL_TYPES=new Set(['palisade','stonewall','reinforced_wall','keep']);
 export const TOWER_TYPES=new Set(['watchtower','stonetower']);
@@ -13,6 +14,11 @@ export function configureWallFootprint(b){
  prepareWall(b);if(!WALL_TYPES.has(b?.type))return b;
  if(b.type==='keep'){b.navWidth=3.3;b.navDepth=3.3;return b;}
  b.wallAxis=b.wallAxis?1:0;
+ if(Number.isFinite(b.wallAngleV175)){
+  const footprint=wallFootprintV175(b,.6);
+  b.navWidth=footprint.rx;b.navDepth=footprint.rz;
+  return b;
+ }
  // V175.1: preserve actual PAID wooden span (up to 42m), even when the
  // old construction handler calls this AFTER the site got its dimensions.
  // A 42m wall must never revert to a 7m collision rectangle.
