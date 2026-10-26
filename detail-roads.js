@@ -1,5 +1,5 @@
 import {detailTrailWidth} from './road-width-v89.js';
-import {buildingClearance} from './navigation.js';
+import {buildingClearance} from './navigation.js?v=1751a';
 // V59: Shared terrain-following road ribbons on detail maps.
 // World edges are projected through the local walkable navigation mesh;
 // local footpaths connect adjacent cells that have accumulated enough traffic.
