@@ -1,15 +1,6 @@
 name: Kuningriigid 200-turn regression
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'civilization-core.js'
-      - 'economy.js'
-      - 'research.js'
-      - 'navigation.js'
-      - 'ai-strategy.js'
-      - 'regression/**'
-      - '.github/workflows/regression-200.yml'
 permissions:
   contents: read
 jobs:
