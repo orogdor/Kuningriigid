@@ -57,6 +57,7 @@ import {BASIC_JOBS,allocateCity,housingCapacity,HALL_CAPACITY,HOUSE_CAPACITY,FOO
 import {TECHS,BUILD_TECH,UNIT_TECH,newResearch,initResearch,startResearch,tickResearch,techBlock,queueResearch,nextResearchForGoals} from './research.js?v=125a';
 import {BUILDINGS,RESOURCE_NAMES,START,RESOURCE_PRODUCTION_MULTIPLIER,FOOD_KEYS,storageLimit,takeFood,recordDelivery,realm as freshRealm,initialState,migrateEconomy,buildRule as placementRule,placeBuilding,tickEconomy,ready,canAfford,spendResources} from './economy.js';
 import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js?v=1751a';
+import {isDrawableWallV175,wallPointInsideV175} from './wall-draw-v175.js';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js?v=123a';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
@@ -477,6 +478,7 @@ export class Civilization{
   if(COASTAL_BUILDINGS.has(type))site=coastalPlacement(this,this.cell(city),type,p);
   if(site.error)return site;p=site.p;
   const env=this.placementEnv(city,type);
+  if(p?.drawnWallV175&&isDrawableWallV175(type))env.unlimitedBuildingRange=true;
   if(!COASTAL_BUILDINGS.has(type)){
    for(const dx of (type==='market'?[-10,0,10]:[-3,0,3]))for(const dz of (type==='market'?[-9,0,9]:[-2.8,0,2.8]))if(!env.passable(p.x+dx,p.z+dz))return {error:'Kogu hoone peab mahtuma kuivale maale.'};
    const levels=(type==='market'?[[-10,-9],[-10,9],[10,-9],[10,9]]:[[-3,-2.8],[-3,2.8],[3,-2.8],[3,2.8]]).map(([dx,dz])=>detailHeight(this.cell(city),p.x+dx,p.z+dz));
@@ -486,11 +488,43 @@ export class Civilization{
    if(!from||!to||!nav.reachable(from,to))return {error:'Rannahoone maapoolne sissepääs peab olema linnaga ühendatud.'};
   }
   const rule=placementRule(city.economy,city.team,type,p,env);if(rule.error)return rule;
-  const candidate={...p,type,...site},nav=this.nav(city);if(p.plannedDefense){for(const b of city.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&!DEFENSE_TYPES.has(b.type)&&b.type!=='field'))if(Math.abs(b.x-p.x)<7&&Math.abs(b.z-p.z)<7)return {error:'Kaitserajatis kattuks linnahoonega.'};return {...rule,...site};}
+  const candidate={...p,type,...site},nav=this.nav(city);
+  if(p.drawnWallV175&&isDrawableWallV175(type)){
+   const span=type==='palisade'?p.palisadeSpanV167:7;
+   if(!Number.isFinite(p.wallAngleV175)||!Number.isFinite(span)||span<2.4||span>8)
+    return {error:'Müürijupi pikkus või pöördenurk ei sobi.'};
+   // Check the physical stroke corridor; do not rely on a centre-point-only
+   // dry-land check. Endpoints may touch a real neighbouring palisade.
+   for(let i=1;i<=9;i++){
+    const d=(i/10-.5)*span,x=p.x+Math.cos(p.wallAngleV175)*d,
+      z=p.z-Math.sin(p.wallAngleV175)*d;
+    if(!env.passable(x,z))return {error:'Müür läbiks takistust või juba ehitatud müürilõiku.'};
+   }
+   for(const b of city.economy.buildings.filter(b=>b.hp>0&&!b.virtual&&!['palisade','stonewall','reinforced_wall','woodgate','gatehouse','watchtower','stonetower'].includes(b.type))){
+    // Reject wall geometry crossing actual existing houses including the
+    // eaves/porch; tangent joins with other palisades remain legal.
+    for(let i=0;i<=8;i++){
+     const t=i/8-.5,point={x:p.x+Math.cos(p.wallAngleV175)*span*t,
+       z:p.z-Math.sin(p.wallAngleV175)*span*t};
+     if(Math.abs(point.x-b.x)<4.7&&Math.abs(point.z-b.z)<4.7)
+      return {error:'Müür läbiks olemasolevat hoonet.'};
+    }
+   }
+   return {...rule,...site};
+  }
+  if(p.plannedDefense){for(const b of city.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&!DEFENSE_TYPES.has(b.type)&&b.type!=='field'))if(Math.abs(b.x-p.x)<7&&Math.abs(b.z-p.z)<7)return {error:'Kaitserajatis kattuks linnahoonega.'};return {...rule,...site};}
   if(!nav.preservesAccess(candidate,city.economy.cargo))return {error:'Hoone sulgeks sissepääsu või töötaja tagasitee. Jäta majade vahele läbipääs.'};
   return {...rule,...site};
  }
- build(city,type,p){const check=this.previewBuild(city,type,p);if(check.error)return check;p=check.p||p;if(type==='bridge'){const r=city.economy.realms[city.team],cost=BUILDINGS.bridge.cost;if(!canAfford(r.resources,cost))return {error:'Silla jaoks napib materjale.'};spendResources(r.resources,cost);const building={type:'bridge',x:0,z:0,team:city.team,hp:350,progress:0,ready:false};city.economy.buildings.push(building);this.uiRevision++;return {building}}const result=placeBuilding(city.economy,city.team,type,p,this.placementEnv(city,type));if(result.building){if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plannedDefense=true;configureWallFootprint(result.building);this.nav(city).rebuild();}if(type==='farm')result.building.fieldSystemV127=true;if(type==='field'){Object.assign(result.building,fieldSize(p));for(const r of city.world.resources)if(['tree','berry','game'].includes(r.kind)&&fieldContains(result.building,r)){r.removed=true;r.amount=0;}city.world.revision++;}for(const k of ['depositId','shoreAngle','landEntry','baseY'])if(check[k]!=null)result.building[k]=check[k];}return result}
+ build(city,type,p){const check=this.previewBuild(city,type,p);if(check.error)return check;p=check.p||p;if(type==='bridge'){const r=city.economy.realms[city.team],cost=BUILDINGS.bridge.cost;if(!canAfford(r.resources,cost))return {error:'Silla jaoks napib materjale.'};spendResources(r.resources,cost);const building={type:'bridge',x:0,z:0,team:city.team,hp:350,progress:0,ready:false};city.economy.buildings.push(building);this.uiRevision++;return {building}}const env=this.placementEnv(city,type);if(p.drawnWallV175&&isDrawableWallV175(type))env.unlimitedBuildingRange=true;const result=placeBuilding(city.economy,city.team,type,p,env);if(result.building){
+ if(p.drawnWallV175&&isDrawableWallV175(type)){
+  result.building.wallAngleV175=p.wallAngleV175;
+  result.building.wallAxis=p.wallAxis||0;
+  result.building.palisadeSpanV167=p.palisadeSpanV167||7;
+  result.building.drawnWallV175=true;
+  configureWallFootprint(result.building);this.nav(city).rebuild();
+ }
+if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plannedDefense=true;configureWallFootprint(result.building);this.nav(city).rebuild();}if(type==='farm')result.building.fieldSystemV127=true;if(type==='field'){Object.assign(result.building,fieldSize(p));for(const r of city.world.resources)if(['tree','berry','game'].includes(r.kind)&&fieldContains(result.building,r)){r.removed=true;r.amount=0;}city.world.revision++;}for(const k of ['depositId','shoreAngle','landEntry','baseY'])if(check[k]!=null)result.building[k]=check[k];}return result}
 
  // An order can be given on any tile owned by the parent city. Coordinates
  // supplied by a detail-map click may extend into one of its eight neighbours.
