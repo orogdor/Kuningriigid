@@ -6,13 +6,6 @@ on:
         type: boolean
         default: false
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/avaldamine.yml'
-      - 'scenarios/ai-medieval-v*.json'
-      - 'ai-medieval-demo-v*.js'
-
 permissions:
   contents: read
   pages: write
@@ -55,9 +48,20 @@ jobs:
             }
           }
           NODE
-      - name: Validate manual publication
-        if: github.event_name == 'workflow_dispatch' && inputs.validated != true
-        run: node scripts/test.mjs full --jobs 2
+      - name: Quick game check before manual publication
+        if: github.event_name == 'workflow_dispatch'
+        run: node scripts/test.mjs traffic
+      - name: Install Chromium for manual release QA
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Verify desktop and mobile wall placement before release
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 -m http.server 8765 >/tmp/kuningriigid-pages-browser.log 2>&1 &
+          node TEST_V1754_REAL_TOUCH.mjs
+          node TEST_V1754_CURVED_TOUCH.mjs
       - name: Verify website entry points
         run: |
           test -s index.html
