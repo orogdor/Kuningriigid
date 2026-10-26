@@ -1,0 +1,295 @@
+{
+  "version": 173,
+  "pass": true,
+  "seed": 142023,
+  "turn": 107,
+  "sourceTeam": 3,
+  "selectedCity": "Sogn",
+  "selectedCityId": 0,
+  "age": 0,
+  "targetTown": {
+    "turn": 107,
+    "team": 3,
+    "name": "Sogn",
+    "id": 0,
+    "age": 0,
+    "pop": 11,
+    "totalBuildings": 42,
+    "readyBuildings": 42,
+    "houses": 11,
+    "halls": 1,
+    "markets": 0,
+    "farms": 1,
+    "fields": 1,
+    "lumber": 2,
+    "gates": 2,
+    "towers": 4,
+    "walls": 14,
+    "defensesReady": 20,
+    "defensesTotal": 20,
+    "food": 52.814285714285994,
+    "wood": 34,
+    "stone": 120
+  },
+  "meanHouseDistance": 34.883778942027,
+  "otherTowns": [
+    {
+      "turn": 107,
+      "team": 3,
+      "name": "Sogn",
+      "id": 0,
+      "age": 0,
+      "pop": 11,
+      "totalBuildings": 42,
+      "readyBuildings": 42,
+      "houses": 11,
+      "halls": 1,
+      "markets": 0,
+      "farms": 1,
+      "fields": 1,
+      "lumber": 2,
+      "gates": 2,
+      "towers": 4,
+      "walls": 14,
+      "defensesReady": 20,
+      "defensesTotal": 20,
+      "food": 52.814285714285994,
+      "wood": 34,
+      "stone": 120
+    },
+    {
+      "turn": 109,
+      "team": 1,
+      "name": "Sampola",
+      "id": 2,
+      "age": 0,
+      "pop": 17,
+      "totalBuildings": 41,
+      "readyBuildings": 41,
+      "houses": 12,
+      "halls": 1,
+      "markets": 0,
+      "farms": 1,
+      "fields": 1,
+      "lumber": 1,
+      "gates": 2,
+      "towers": 4,
+      "walls": 14,
+      "defensesReady": 20,
+      "defensesTotal": 20,
+      "food": 56.48571428571445,
+      "wood": 11,
+      "stone": 120
+    },
+    {
+      "turn": 70,
+      "team": 2,
+      "name": "Vendel",
+      "id": 1,
+      "age": 0,
+      "pop": 9,
+      "totalBuildings": 43,
+      "readyBuildings": 41,
+      "houses": 7,
+      "halls": 1,
+      "markets": 0,
+      "farms": 2,
+      "fields": 1,
+      "lumber": 2,
+      "gates": 2,
+      "towers": 4,
+      "walls": 16,
+      "defensesReady": 22,
+      "defensesTotal": 22,
+      "food": 46.657142857142844,
+      "wood": 115.44999999999999,
+      "stone": 120
+    }
+  ],
+  "firstBronzeAt": 108,
+  "milestones": [
+    {
+      "turn": 20,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "towns": [
+        {
+          "team": 3,
+          "name": "Sogn",
+          "pop": 6
+        },
+        {
+          "team": 2,
+          "name": "Vendel",
+          "pop": 6
+        },
+        {
+          "team": 1,
+          "name": "Sampola",
+          "pop": 7
+        }
+      ]
+    },
+    {
+      "turn": 40,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "towns": [
+        {
+          "team": 3,
+          "name": "Sogn",
+          "pop": 8
+        },
+        {
+          "team": 2,
+          "name": "Vendel",
+          "pop": 5
+        },
+        {
+          "team": 1,
+          "name": "Sampola",
+          "pop": 8
+        }
+      ]
+    },
+    {
+      "turn": 60,
+      "ages": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "towns": [
+        {
+          "team": 3,
+          "name": "Sogn",
+          "pop": 11
+        },
+        {
+          "team": 2,
+          "name": "Vendel",
+          "pop": 7
+        },
+        {
+          "team": 1,
+          "name": "Sampola",
+          "pop": 11
+        },
+        {
+          "team": 2,
+          "name": "Fyrisvellir",
+          "pop": 6
+        }
+      ]
+    },
+    {
+      "turn": 80,
+      "ages": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "towns": [
+        {
+          "team": 3,
+          "name": "Sogn",
+          "pop": 14
+        },
+        {
+          "team": 2,
+          "name": "Vendel",
+          "pop": 13
+        },
+        {
+          "team": 1,
+          "name": "Sampola",
+          "pop": 13
+        },
+        {
+          "team": 2,
+          "name": "Fyrisvellir",
+          "pop": 10
+        }
+      ]
+    },
+    {
+      "turn": 100,
+      "ages": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "towns": [
+        {
+          "team": 3,
+          "name": "Sogn",
+          "pop": 10
+        },
+        {
+          "team": 2,
+          "name": "Vendel",
+          "pop": 19
+        },
+        {
+          "team": 1,
+          "name": "Sampola",
+          "pop": 16
+        },
+        {
+          "team": 2,
+          "name": "Fyrisvellir",
+          "pop": 15
+        }
+      ]
+    },
+    {
+      "turn": 116,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "towns": [
+        {
+          "team": 3,
+          "name": "Sogn",
+          "pop": 12
+        },
+        {
+          "team": 2,
+          "name": "Vendel",
+          "pop": 22
+        },
+        {
+          "team": 1,
+          "name": "Sampola",
+          "pop": 19
+        },
+        {
+          "team": 2,
+          "name": "Fyrisvellir",
+          "pop": 18
+        },
+        {
+          "team": 3,
+          "name": "Rogaland",
+          "pop": 4
+        }
+      ]
+    }
+  ],
+  "gameTimeSeconds": 6420,
+  "savedBytes": 640727
+}
