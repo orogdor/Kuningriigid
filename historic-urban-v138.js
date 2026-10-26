@@ -4,6 +4,7 @@ import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-
 import {stoneTownPlotScore} from './stone-town-plan-v163.js';
 import {compactStonePlotScoreV172,compactStoneTypesV172} from './compact-stone-v172.js';
 import {wornStreetCellsV173,overlapsWornStreetV173} from './living-streets-v173.js';
+import {indexActiveStreetV174,streetfrontScoreV174,courtyardScoreV174} from './streetfront-v174.js';
 const hash=(a,b,seed=0)=>{const t=Math.sin(a*127.1+b*311.7+seed*74.7)*43758.5453;return t-Math.floor(t);};
 const sqr=x=>x*x;
 const snap=x=>Math.round(x*2)/2;
@@ -45,6 +46,9 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
  const protectPaths=type==='house'||CIVIC.has(type)||INDUSTRIAL.has(type);
  const activeTrails=protectPaths?wornStreetCellsV173(tile.world,
   tile.world?.trailTime||parent.world?.trailTime||0):[];
+ // Use the read-only V173 traffic sample as the street-front reference;
+ // one 12m spatial index per plot batch keeps mobile AI evaluation bounded.
+ const streetIndex=stoneAge&&type==='house'?indexActiveStreetV174(activeTrails):null;
  const plots=[];
  const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?(stoneAge?10.2:10.6):13.2;
  // Staggered rows and slight bends, not a chessboard; deterministic per tile.
@@ -79,7 +83,12 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
                     industrial?Math.abs(street.radius-170)*.045:
                     street.radius*.22)+
                     Math.abs(street.artery-12)*.08+(quarterNoise-.5)*3+
-                    (type==='house'?hash(key,row,seed)*.9:0);
+                    (type==='house'?hash(key,row,seed)*.9:0)+
+                    // V174: frontage/courtyard bias never creates fake roads,
+                    // and cannot override V173's real path collision checks.
+                    (stoneAge&&type==='house'?
+                     streetfrontScoreV174({x:px,z:pz},streetIndex)+
+                     (dx===0&&dz===0?courtyardScoreV174({x:gx,z:gz},coreNeighbours):0):0);
    plots.push({x:px,z:pz,priority,globalX:gx,globalZ:gz});
   }
  }
