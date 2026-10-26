@@ -1,0 +1,45 @@
+name: V175.2 Two Wall Drawing Modes WebGL QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'TEST_V1752_WALL_BROWSER.mjs'
+      - 'wall-draw-v175.js'
+      - 'civilization.js'
+      - 'civilization-core.js'
+      - 'navigation.js'
+      - 'fortifications.js'
+      - 'index.html'
+      - 'boot-v83.js'
+      - '.github/workflows/v1752-wall-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v1752-browser-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  desktop-and-mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Validate game and browser test syntax
+        run: |
+          node --check civilization.js
+          node --check TEST_V1752_WALL_BROWSER.mjs
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Drag real curved wall on desktop and mobile
+        run: |
+          python3 -m http.server 8765 >/tmp/v1752-http.log 2>&1 &
+          node TEST_V1752_WALL_BROWSER.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v1752-wall-picker-desktop-and-mobile
+          path: artifacts-v1752/
