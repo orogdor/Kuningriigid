@@ -57,11 +57,11 @@ import {BASIC_JOBS,allocateCity,housingCapacity,HALL_CAPACITY,HOUSE_CAPACITY,FOO
 import {TECHS,BUILD_TECH,UNIT_TECH,newResearch,initResearch,startResearch,tickResearch,techBlock,queueResearch,nextResearchForGoals} from './research.js?v=125a';
 import {BUILDINGS,RESOURCE_NAMES,START,RESOURCE_PRODUCTION_MULTIPLIER,FOOD_KEYS,storageLimit,takeFood,recordDelivery,realm as freshRealm,initialState,migrateEconomy,buildRule as placementRule,placeBuilding,tickEconomy,ready,canAfford,spendResources} from './economy.js';
 import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js?v=1752a';
-import {isDrawableWallV175,wallPointInsideV175} from './wall-draw-v175.js';
+import {isDrawableWallV175,wallPointInsideV175} from './wall-draw-v175.js?v=1753a';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js?v=123a';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
-import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=1752a';
+import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=1753a';
 import {MEDIEVAL_BUILDINGS,MEDIEVAL_UNITS,medievalBonus,healMedievalArmies} from './medieval-v62.js?v=117a';
 export {BUILDINGS,RESOURCE_NAMES};
 RESOURCE_NAMES.bread='Teraviljatoit';BUILDINGS.harbor={name:'Sadam ja laevatehas',icon:'⚓',cost:{wood:60,plank:25,stone:25},requires:['lumber','quarry'],workers:0,time:40};BUILDINGS.hall.name='Algusmaja · 3 töölist';
