@@ -1,0 +1,49 @@
+name: V175.1 Wooden Palisade Physics and Traffic QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v175-fort-nav.yml'
+      - 'TEST_V1751_WALL_ROADS.mjs'
+      - 'navigation.js'
+      - 'fortifications.js'
+      - 'buildings.js'
+      - 'bronze-city-v111.js'
+      - 'battle-navigation-v88.js'
+      - 'continuous-landscape-visual.js'
+      - 'civilization.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v175-fort-qa-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  real-wall-physics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Syntax and physics
+        run: |
+          node --check navigation.js
+          node --check fortifications.js
+          node --check buildings.js
+          node --check bronze-city-v111.js
+          node --check battle-navigation-v88.js
+          node --check continuous-landscape-visual.js
+          node --check civilization.js
+          node --check TEST_V1751_WALL_ROADS.mjs
+          node TEST_V1751_WALL_ROADS.mjs
+      - name: Existing fort, traffic, save and economy regression
+        run: |
+          node TEST_V59.mjs
+          node TEST_V80.mjs
+          node TEST_V168_RING_CORRIDOR.mjs
+          node TEST_V173_STREETS.mjs
+          node TEST_V174_STREETFRONT.mjs
+          node TEST_V73.mjs
+          node TEST_V154.mjs --node-only
+          node TEST_V163_STONE_CITY.mjs
