@@ -99,11 +99,60 @@ else if(type==='stonewall'){
  for(const x of [-2.4,0,2.4])box(g,x,1.55,.69,.15,2.9,.08,'#777870','stone');
 }
 else if(type==='watchtower'){
- for(const x of [-2,2])for(const z of [-2,2]){box(g,x,3.8,z,.44,7.6,.44,'#73583b','wood');cone(g,x,7.85,z,.44,.65,'#aa8b5b',6)}
- for(const y of [2,4.5,6.7]){box(g,0,y,0,5.1,.35,5.1,'#8f6e4b','wood');for(const x of [-2,2])box(g,x,y-.8,0,.23,1.5,4.3,'#73553c','wood')}
- for(const z of [-2,2])box(g,0,6.9,z,5.1,1,.18,'#785d40','wood');
- for(const x of [-2,2])box(g,x,6.9,0,.18,1,5.1,'#785d40','wood');
- for(const x of [-1.8,1.8])for(const z of [-1.8,1.8])box(g,x,7.85,z,.48,.8,.48,'#957550','wood');
+ // V175.6: enclosed Stone/Bronze wooden watchtower. Keep the original 5.1m
+ // floors, 7.6m corner posts, roofless fighting platform and footprint;
+ // model-only changes preserve V4 saves, collision and garrison mechanics.
+ const post='#73583b',timber='#785d40',planks='#8f6e4b',dark='#59422e',trim='#aa8b5b';
+ // Four full-height carrying posts, pegged into the ground.
+ for(const x of [-2,2])for(const z of [-2,2]){
+  box(g,x,3.8,z,.44,7.6,.44,post,'wood');
+  cone(g,x,7.85,z,.44,.65,trim,6);
+ }
+ // Solid plank infill, overlapping the posts: three fully enclosed sides.
+ // Back is -Z; the +Z front has the only entrance at ground level.
+ box(g,0,3.2,-2.06,4.24,6.28,.30,planks,'wood');
+ for(const x of [-2.06,2.06])box(g,x,3.2,0,.30,6.28,4.24,planks,'wood');
+ for(const side of [-1,1])
+  box(g,side*1.47,1.27,2.06,1.53,2.43,.30,planks,'wood');
+ box(g,0,4.43,2.06,4.24,3.83,.30,planks,'wood');
+ // Exterior vertical planks and horizontal structural beams read at phone zoom.
+ for(const x of [-1.65,-.9,.9,1.65]){
+  box(g,x,3.15,-2.24,.12,6.13,.09,post,'wood');
+  box(g,x,4.32,2.24,.12,3.94,.09,post,'wood');
+ }
+ for(const side of [-1,1])for(const z of [-1.65,-.85,.85,1.65])
+  box(g,side*2.24,3.15,z,.09,6.13,.12,post,'wood');
+ for(const y of [1.95,4.38,6.19]){
+  box(g,0,y,-2.31,4.43,.2,.17,dark,'wood');
+  for(const side of [-1,1])box(g,side*2.31,y,0,.17,.2,4.43,dark,'wood');
+ }
+ // Single front door, with side jambs, thick lintel, plank and hinge straps.
+ box(g,0,1.18,2.30,1.38,2.28,.17,dark,'wood');
+ for(const x of [-.54,-.18,.18,.54])
+  box(g,x,1.18,2.41,.30,2.20,.08,planks,'wood');
+ for(const x of [-.77,.77])box(g,x,1.23,2.37,.16,2.46,.2,post,'wood');
+ box(g,0,2.54,2.35,1.73,.26,.34,post,'wood');
+ for(const y of [.65,1.75])
+  box(g,0,y,2.47,1.23,.10,.09,dark,'wood');
+ box(g,.44,1.17,2.53,.11,.14,.10,trim,'metal');
+ // Real continuous intermediate floors; no open-looking horizontal gaps.
+ for(const y of [2,4.5,6.7]){
+  box(g,0,y,0,5.1,.35,5.1,planks,'wood');
+  for(const side of [-1,1])
+   box(g,side*2.0,y-.8,0,.23,1.5,4.3,post,'wood');
+ }
+ // Roofless guard platform; parapet fits the unchanged 7.25m guard origin.
+ for(const z of [-2.37,2.37])
+  box(g,0,7.20,z,5.02,.80,.31,timber,'wood');
+ for(const x of [-2.37,2.37])
+  box(g,x,7.20,0,.31,.80,5.02,timber,'wood');
+ // Short raised merlons leave sight gaps rather than four open sides.
+ for(const x of [-1.8,0,1.8])for(const z of [-2.40,2.40])
+  box(g,x,7.75,z,.66,.42,.35,planks,'wood');
+ for(const z of [-1.8,0,1.8])for(const x of [-2.40,2.40])
+  box(g,x,7.75,z,.35,.42,.66,planks,'wood');
+ for(const x of [-2.15,2.15])for(const z of [-2.15,2.15])
+  box(g,x,7.90,z,.48,.75,.48,trim,'wood');
 }
 else if(type==='stonetower'){
  cylinder(g,0,3.5,0,2.6,3.1,7,'#92958f','stone',12);
