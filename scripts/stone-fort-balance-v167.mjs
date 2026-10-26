@@ -35,6 +35,23 @@ for(const seed of seeds){
    if(g.s.ages[team]===0)lastStone[team]=summary(g,leader,turn);
    else if(!atBronze[team])atBronze[team]=summary(g,leader,turn);
   }
+  if(turn===110){
+   for(const c of g.s.cities.filter(c=>c.team>0&&g.s.ages[c.team]===0)){
+    const local=c.economy.buildings.filter(b=>b.hp>0&&!b.virtual),plan=c.stoneDefensePlanV166;
+    if(!plan?.slots?.length)continue;
+    const gaps=plan.slots.filter(slot=>!local.some(b=>b.type===slot.type&&b.hp>0&&b.ready&&
+      Math.hypot(b.x-slot.x,b.z-slot.z)<4.5)).map(slot=>{
+       const overlap=local.filter(b=>!['palisade','woodgate','watchtower','stonewall','gatehouse','stonetower','reinforced_wall'].includes(b.type)).filter(b=>
+        (Math.abs(slot.x-b.x)<15&&Math.abs(slot.z-b.z)<15)).map(b=>({type:b.type,x:b.x,z:b.z}));
+       const p={...slot,plannedDefense:true};
+       return {type:slot.type,x:slot.x,z:slot.z,axis:slot.wallAxis,span:slot.palisadeSpanV167||0,
+        preview:g.previewBuild(c,slot.type,p).error||'ok',buildRule:g.buildRule(c,slot.type)||'ok',near:overlap};
+      });
+    console.log('V169 BLOCKERS',JSON.stringify({seed,turn,name:c.name,team:c.team,
+      pop:c.economy.realms[c.team].pop,wood:c.economy.realms[c.team].resources.wood,
+      planned:plan.slots.length,notReady:gaps.length,gaps:gaps.slice(0,15)}));
+   }
+  }
   if([25,40,55,80,110,125].includes(turn)){
    checkpoints.push({turn,ages:g.s.ages.slice(1),
     capitals:[1,2,3].map(team=>g.s.cities.find(c=>c.team===team)).filter(Boolean).map(c=>summary(g,c,turn))});
