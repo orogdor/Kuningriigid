@@ -1,11 +1,5 @@
 name: V175.5 Wall Rotation Gate and Roads QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'navigation.js'
-      - 'TEST_V1755_ROTATION.mjs'
-      - '.github/workflows/v1755-wall-rotation.yml'
   workflow_dispatch:
 permissions:
   contents: read
