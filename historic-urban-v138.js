@@ -3,6 +3,7 @@
 import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 import {stoneTownPlotScore} from './stone-town-plan-v163.js';
 import {compactStonePlotScoreV172,compactStoneTypesV172} from './compact-stone-v172.js';
+import {wornStreetCellsV173,overlapsWornStreetV173} from './living-streets-v173.js';
 const hash=(a,b,seed=0)=>{const t=Math.sin(a*127.1+b*311.7+seed*74.7)*43758.5453;return t-Math.floor(t);};
 const sqr=x=>x*x;
 const snap=x=>Math.round(x*2)/2;
@@ -38,6 +39,12 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
  const coreNeighbours=stoneAge&&dx===0&&dz===0?
   (parent.economy?.buildings||[]).filter(b=>b.hp>0&&!b.virtual&&b.type==='house')
    .map(b=>({type:b.type,x:b.x-hall.x,z:b.z-hall.z,hp:b.hp})):[];
+ // V173: inspect REAL citizen-worn footpaths once per batch. This is a
+ // read-only input: the pedestrian Navigation system continues to create and
+ // age the roads, and placing a building never adds fictitious trail heat.
+ const protectPaths=type==='house'||CIVIC.has(type)||INDUSTRIAL.has(type);
+ const activeTrails=protectPaths?wornStreetCellsV173(tile.world,
+  tile.world?.trailTime||parent.world?.trailTime||0):[];
  const plots=[];
  const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?(stoneAge?10.2:10.6):13.2;
  // Staggered rows and slight bends, not a chessboard; deterministic per tile.
@@ -53,6 +60,13 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
    // The heart of a capital reserves space for a main bazaar/sanctuary.
    if(type==='house'&&street.radius<20)continue;
    if(street.road)continue;
+   if(protectPaths&&activeTrails.length&&
+    overlapsWornStreetV173({x:px,z:pz},type,activeTrails))continue;
+   // V173: account for whole roofs as well as center points. This protects
+   // the *unbuilt* arterial space; actual visible roads still need traffic.
+   if(type==='house'&&stoneAge&&[
+      [-4.5,-4.1],[4.5,-4.1],[-4.5,4.1],[4.5,4.1]
+     ].some(([ox,oz])=>ancientStreetSpace(gx+ox,gz+oz,seed).road))continue;
    // No building sits on a main route or over the wide marketplace.
    const key=Math.round(street.radius/24);
    const quarterNoise=hash(Math.floor(gx/32),Math.floor(gz/32),seed+5);
