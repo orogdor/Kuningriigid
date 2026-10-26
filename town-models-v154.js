@@ -475,10 +475,23 @@ SIG.stable=(b,era,r,t)=>{const H=body(b,era,r,{w:7.6,d:3.4,z:-2,roof:'gable',win
  for(const [x,z,c] of [[0,2.0,'#6b4a2e'],[-2.4,2.4,'#3c2d22']]){box(b,x,.75,z,1.6,.55,.55,c);box(b,x+.9,1.1,z,.5,.5,.35,c);for(const sx of [-.6,.6])for(const sz of [-.18,.18])box(b,x+sx,0,z+sz,.12,.8,.12,shade(c,.8));}};
 SIG.hunter=(b,era,r)=>{body(b,era,r,{w:4.6,d:3.6,x:-1.4,z:-1.4});rack(b,2.4,.6,Math.PI/2,'#a3825c');rack(b,2.4,2.4,Math.PI/2,'#8f6b48');
  for(const s of [-1,1])boxR(b,-1.4+s*.35,3.2,.45,.06,.8,.06,'#e8dfca',M.plain,0,0,s*.6);logPile(b,-2.8,2.4,4,0);};
-SIG.well=(b,era,r)=>{const c=era>=4?'#b7b0a2':'#9a968a';cyl(b,0,0,0,1.25,1.35,.9,c,M.stone,14);cyl(b,0,.9,0,1.3,1.3,.12,shade(c,.85),M.stone,14);cyl(b,0,.85,0,1.0,1.0,.04,'#2e4a50',M.glass,14);
- for(const s of [-1,1])box(b,s*1.15,.9,0,.16,1.8,.16,'#6d5034',M.beam);cylR(b,0,2.4,0,.12,2.5,'#7a5a3a',M.logs,0,0,Math.PI/2);
- if(era>=1)gable(b,0,2.7,0,2.8,1.8,.8,era>=3?'#8a4a32':'#9a8452',era>=3?M.tile:M.thatch,{axis:'x',over:.15,thick:.12});cyl(b,.2,1.4,0,.18,.15,.3,'#6e5034',M.boards,8);
- for(let i=0;i<5;i++)box(b,(i-2)*.7,0,1.9,.6,.08,.5,'#a7a092',M.stone);};
+SIG.well=(b,era,r)=>{ // V170 3.1b: well is unmistakable at all ages
+ const c=era>=4?'#b7b0a2':era>=1?'#9a968a':'#927b5c',stone=era>=1?M.stone:M.logs;
+ cyl(b,0,0,0,1.25,1.35,.9,c,stone,14);
+ cyl(b,0,.9,0,1.3,1.3,.12,shade(c,.85),stone,14);
+ cyl(b,0,.85,0,1.0,1.0,.04,'#2e4a50',M.glass,14);
+ for(const x of [-1.15,1.15])box(b,x,.88,0,.17,1.86,.17,'#6d5034',M.beam);
+ cylR(b,0,2.45,0,.13,2.5,'#7a5a3a',M.logs,0,0,Math.PI/2);
+ // Roof from Stone Age onward: rain cover, wooden crank and visible bucket.
+ gable(b,0,2.72,0,2.85,2.05,era===0?1.02:.8,
+  era>=3?'#8a4a32':'#9a8452',era>=3?M.tile:M.thatch,{axis:'x',over:.2,thick:.13});
+ cyl(b,.25,1.25,0,.23,.2,.34,'#6e5034',M.boards,8);
+ box(b,.25,1.19,.05,.65,.065,.065,'#513d2d',M.beam);
+ box(b,0,1.65,.33,.035,.70,.035,'#b69d78',M.cloth);
+ box(b,0,.92,.37,.45,.45,.45,'#654830',M.boards);
+ for(let i=0;i<4;i++)box(b,(i-1.5)*.7,0,1.8,.6,.09,.45,'#a7a092',M.stone);
+};
+
 SIG.study=(b,era,r,t)=>{const H=body(b,era,r,{w:6.4,d:4.6,storeys:era>=4?2:1,roof:'gable',axis:'z'});
  if(era<=1){for(let i=0;i<4;i++)box(b,-2.4+i*.6,0,3.0,.42,.9+i*.1,.3,'#c9bfa4',M.stone);}
  else{box(b,0,H+1.4,-1.0,1.2,1.8,1.2,'#d8d0bc',M.plaster);gable(b,0,H+3.2,-1.0,1.2,1.2,1.0,'#6f5b45',M.tile,{axis:'z',over:.1});box(b,0,H+2.0,-1.0+.62,.5,.6,.04,'#c9a24a',M.metal);}
@@ -493,16 +506,68 @@ SIG.public_school=SIG.school;SIG.high_school=(b,era,r,t)=>{const H=body(b,era,r,
 SIG.academy=(b,era,r,t)=>{const H=body(b,era,r,{w:8.6,d:6,storeys:2,roof:'flat',wallC:'#ece4d2'});for(let i=0;i<6;i++)cyl(b,-3.4+i*1.36,.3,3.3,.25,.3,H-.3,'#f2ede0',M.plaster,10);
  box(b,0,H-.3,3.3,8.4,.6,.8,'#e5ddc8');b.poly([[-4.2,H+.3,3.6],[4.2,H+.3,3.6],[0,H+2,3.6]],'#e5ddc8',M.plaster);cyl(b,0,H+.3,-.6,1.8,1.8,.6,'#e5ddc8',M.plaster,14);dome(b,0,H+.9,-.6,1.8,'#6f8f86',M.metal,14);};
 SIG.university=SIG.academy;
-SIG.market=(b,era,r,t)=>{ // drawn at half size; the game scales markets ×2
- box(b,0,0,0,9,.08,8,'#b1a585',M.stone);const cols=[['#b54a32','#efe2c6'],['#2f6e5e','#efe2c6'],['#c9a23a','#7a3f2a'],['#3d5f8a','#ece4d2'],['#8a3f6a','#efe2c6'],['#5f7d3a','#e8dcc0']];
- let k=0;for(const x of [-2.6,0,2.6])for(const z of [-2.2,1.6]){stall(b,x,z,cols[k%6][0],cols[k%6][1],z<0?Math.PI:0);k++;}
- if(era>=3){cyl(b,0,0,0,.35,.4,2.6,'#b7b0a2',M.stone,10);ball(b,0,2.8,0,.4,'#b7b0a2',M.stone,1,8);}else{box(b,0,0,0,.9,.9,.9,'#9b7447',M.boards);}
- for(const [x,z] of [[-4,-3.4],[4,3.4],[-4,3.4],[4,-3.4]])barrel(b,x,z);sack(b,1.2,0);sack(b,-1.3,-.2);crate(b,3.9,0,.6);};
-SIG.warehouse=(b,era,r,t)=>{const H=body(b,era,r,{w:8.4,d:6,roof:era>=5?'saw':'gable',axis:'x',windows:false,door:false});
- box(b,0,0,3.01,3,Math.min(H-.3,3),.08,'#6b4f33',M.boards);for(const s of [-1,1])boxR(b,s*.75,1.5,3.06,.1,Math.hypot(1.5,2.9),.04,'#4a3726',M.beam,0,0,s*.47);
- for(let i=0;i<4;i++)crate(b,-3.6+(i%2)*.7,3.6+Math.floor(i/2)*.7,.6);barrel(b,3.4,3.8);barrel(b,3.9,3.4);if(era>=3){box(b,2.8,H-1,3.0,.2,.2,1.4,'#5b4430',M.beam);cylR(b,2.8,H-1.2,3.7,.03,1.6,'#c9b58a',M.plain,0,0,0,4);}};
-SIG.cellar=(b,era,r,t)=>{b.with(0,0,0,()=>{const c=era>=3?'#a49c8c':'#7f8a5a';box(b,0,0,-.5,7,1.2,6,c,era>=3?M.stone:M.leaf);hip(b,0,1.2,-.5,7,6,1.2,'#6c8a4c',M.leaf,.2);
- box(b,0,0,2.6,2.2,2.0,1.0,'#a49c8c',M.stone);cylR(b,0,1.8,3.0,1.1,.3,'#a49c8c',M.stone,Math.PI/2,0,0,12);box(b,0,0,3.12,1.3,1.9,.08,'#5d4127',M.boards);barrel(b,1.8,3.4);barrel(b,-1.8,3.4);});};
+SIG.market=(b,era,r,t)=>{ // V170 3.1b: period-correct trading yard; game already scales ×2
+ box(b,0,0,0,9,.08,8,era<=1?'#a18b65':'#b1a585',era<=1?M.dirt:M.stone);
+ if(era<=1){
+  // Larger timber-framed central canopy and bartering tables, not Renaissance awnings.
+  for(const [x,z] of [[-2.7,-1.8],[2.7,-1.8],[-2.7,1.5],[2.7,1.5]]){
+   box(b,x,0,z,.17,2.2,.17,'#62472f',M.beam);
+  }
+  gable(b,0,2.25,-.2,6.7,4.1,1.55,pick(r,PAL.thatch),M.thatch,
+   {axis:'x',over:.23,thick:.22});
+  for(const [x,z] of [[-2.3,-1],[-.6,-1],[1.25,-1],[-2.3,2],[.2,2],[2.35,2]]){
+   box(b,x,0,z,1.2,.75,.60,'#805e3c',M.boards);
+   box(b,x,.80,z,1.4,.09,.8,'#b08a58',M.boards);
+  }
+  pots(b,-3.3,2.6);crate(b,3.1,.6,.6);sack(b,1.2,2.6);sack(b,-1.3,2.6);
+  logPile(b,3.2,-2.7,4,.5);
+ }else{
+  const cols=[['#b54a32','#efe2c6'],['#2f6e5e','#efe2c6'],['#c9a23a','#7a3f2a'],['#3d5f8a','#ece4d2'],['#8a3f6a','#efe2c6'],['#5f7d3a','#e8dcc0']];
+  let k=0;for(const x of [-2.6,0,2.6])for(const z of [-2.2,1.6]){
+   stall(b,x,z,cols[k%6][0],cols[k%6][1],z<0?Math.PI:0);k++;
+  }
+  cyl(b,0,0,0,.35,.4,2.6,'#b7b0a2',M.stone,10);
+  ball(b,0,2.8,0,.4,'#b7b0a2',M.stone,1,8);
+  for(const [x,z] of [[-4,-3.4],[4,3.4],[-4,3.4],[4,-3.4]])barrel(b,x,z);
+  sack(b,1.2,0);sack(b,-1.3,-.2);crate(b,3.9,0,.6);
+ }
+};
+
+SIG.warehouse=(b,era,r,t)=>{ // V170 3.1b: timber grain store remains the same plot
+ const H=body(b,era,r,{w:8.4,d:6,roof:era>=5?'saw':'gable',axis:'x',
+  windows:false,door:false,style:era<=1?1:null});
+ const doorC=era<=1?'#61472f':'#6b4f33';
+ box(b,0,0,3.01,3,Math.min(H-.3,3),.08,doorC,M.boards);
+ for(const x of [-1.5,1.5])box(b,x,0,3.15,.15,3,.15,'#533c28',M.beam);
+ for(const slope of [-1,1])boxR(b,slope*.75,1.5,3.10,.10,
+  Math.hypot(1.5,2.9),.04,'#4a3726',M.beam,0,0,slope*.47);
+ if(era<=1){ // raised threshold, drying rack and storage bins
+  for(const x of [-1.0,0,1.0])box(b,x,0,3.50,.95,.16,.62,'#947857',M.boards);
+  for(const x of [-3.35,3.35])box(b,x,0,0,.17,1.85,.17,'#6b5035',M.beam);
+  rack(b,-3.5,2.0,Math.PI/2,'#c1a36b');
+  logPile(b,3.0,2.35,4,.8);
+ }else if(era>=3){
+  box(b,2.8,H-1,3.0,.2,.2,1.4,'#5b4430',M.beam);
+  cylR(b,2.8,H-1.2,3.7,.03,1.6,'#c9b58a',M.plain,0,0,0,4);
+ }
+ for(let i=0;i<4;i++)crate(b,-3.5+(i%2)*.7,3.6+Math.floor(i/2)*.7,.55);
+ barrel(b,3.0,3.4);barrel(b,3.55,3.0);
+};
+
+SIG.cellar=(b,era,r,t)=>{ // V170 3.1b: low covered earth cellar / stone store
+ const early=era<=1,c=early?'#786a4e':'#a49c8c';
+ box(b,0,0,-.6,6.8,1.05,5.6,c,early?M.dirt:M.stone);
+ hip(b,0,1.05,-.6,7.0,5.8,1.05,early?'#637c4d':'#6c8a4c',M.leaf,.12);
+ for(const x of [-3.2,3.2])box(b,x,0,0,.55,.65,4.5,
+   early?'#816f51':'#aea493',early?M.dirt:M.stone);
+ box(b,0,0,2.32,2.2,2.05,.72,early?'#756047':'#a49c8c',early?M.logs:M.stone);
+ box(b,0,0,2.72,1.40,1.82,.12,'#523b27',M.boards);
+ for(const x of [-.55,.55])box(b,x,.2,2.83,.12,1.45,.08,'#84603a',M.beam);
+ box(b,0,1.82,2.72,2.55,.18,.68,'#796044',M.logs);
+ barrel(b,1.80,2.85);barrel(b,-1.80,2.85);
+ if(early)logPile(b,-2.70,2.05,4,.6);
+};
+
 SIG.mason=(b,era,r)=>{body(b,era,r,{w:4.6,d:3.6,x:-1.8,z:-1.8});stoneBlocks(b,1.8,.4,0);stoneBlocks(b,1.6,2.4,.3);box(b,-1.2,0,2.2,1.4,.8,.8,'#b3ad9e',M.stone);
  for(const s of [-1,1])boxR(b,3.6,1.6,-1.8+s*.6,.12,3.4,.12,'#6d5034',M.beam,s*.2,0,0);box(b,3.6,3.1,-1.8,.12,.12,2.4,'#6d5034',M.beam);cylR(b,3.6,1.8,-1.8,.02,2.6,'#c9b58a',M.plain,0,0,0,4);};
 SIG.pottery_kiln=(b,era,r,t,root)=>{body(b,era,r,{w:4.2,d:3.4,x:-2,z:-1.8});dome(b,1.8,0,.4,1.5,'#a55a38',M.brick,12);cyl(b,1.8,1.3,.4,.35,.4,1.1,'#8e4b38',M.brick,8);box(b,1.8,0,1.85,.8,.7,.2,'#2a1d16');
