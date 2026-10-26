@@ -383,8 +383,12 @@ function openWorld(){villageLife.clear();if(walker.active)walker.exit();walker.c
 function plotRects(cell,neighbours=true){const rects=[];let stamp='';
  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!neighbours&&(dc||dr))continue;const c={c:cell.c+dc,r:cell.r+dr};let ctx=null;try{ctx=game.contextAt(c,false)}catch{}
   for(const b of ctx?.economy?.buildings||[]){if(b.virtual||b.type==='bridge')continue;const cl=buildingClearance(b);if(!cl)continue;
-   if(['palisade','stonewall','reinforced_wall'].includes(b.type))continue;
-   rects.push([b.x+dc*DETAIL_TILE_X,b.z+dr*DETAIL_TILE_Z,cl.rx,cl.rz]);stamp+=b.type[0]+Math.round(b.x)+','+Math.round(b.z)+';';}}
+   // V175.1: solid fortification footprints MUST be supplied to the
+   // local world-road renderer. Previously the wall types were excluded,
+   // so paved road ribbons went straight through solid timber/stone walls.
+   rects.push([b.x+dc*DETAIL_TILE_X,b.z+dr*DETAIL_TILE_Z,cl.rx,cl.rz]);
+   stamp+=b.type[0]+Math.round(b.x)+','+Math.round(b.z)+','+
+    (b.palisadeSpanV167||0)+','+(b.wallAxis||0)+','+Number(b.hp>0)+';';}}
  return {rects,stamp};}
 function groundAvoidance(cell){const segments=[],rects=[];
  try{for(const e of roadNetwork(game)){const hw=(1.8+e.level*1.1)/2+1.4;for(let i=1;i<(e.points?.length||0);i++){const a=worldToLocal(cell,e.points[i-1].x,e.points[i-1].z),b=worldToLocal(cell,e.points[i].x,e.points[i].z);
