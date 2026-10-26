@@ -382,7 +382,7 @@ function openWorld(){villageLife.clear();if(walker.active)walker.exit();walker.c
 // V157: building plots (local units) of this tile and its neighbours, for roads and ground cover.
 function plotRects(cell,neighbours=true){const rects=[];let stamp='';
  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!neighbours&&(dc||dr))continue;const c={c:cell.c+dc,r:cell.r+dr};let ctx=null;try{ctx=game.contextAt(c,false)}catch{}
-  for(const b of ctx?.economy?.buildings||[]){if(b.virtual||b.type==='bridge')continue;const cl=buildingClearance(b);if(!cl)continue;
+  for(const b of ctx?.economy?.buildings||[]){if(b.virtual||b.type==='bridge'||b.hp<=0)continue;const cl=buildingClearance(b);if(!cl)continue;
    // V175.1: solid fortification footprints MUST be supplied to the
    // local world-road renderer. Previously the wall types were excluded,
    // so paved road ribbons went straight through solid timber/stone walls.
