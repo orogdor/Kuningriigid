@@ -48,7 +48,15 @@ try{
     {waitUntil:'domcontentloaded',timeout:120000});
    await page.waitForFunction(()=>window.gameDebug&&document.getElementById('startmenu')?.hidden,
     {timeout:120000});
-   await page.waitForTimeout(2200);
+   // AI takeover examples intentionally start paused. Resume with the real
+   // game button so peace guards receive nonzero frameDelta and can patrol.
+   await page.evaluate(()=>{
+    const pause=document.getElementById('pause');
+    if(pause?.textContent.includes('▶'))pause.click();
+   });
+   await page.waitForFunction(()=>window.gameDebug.towerPatrolStatus?.().some(p=>
+     p.phase==='descending'||p.phase==='outbound'||p.phase==='return'),null,{timeout:30000});
+   await page.waitForTimeout(600);
    const info=await page.evaluate(()=>{
     const dbg=window.gameDebug,city=dbg.activeCity();
     return {title:document.title,city:city?.name||null,
@@ -58,7 +66,8 @@ try{
    });
    assert.ok(info.towers>=1,'stone-age test city should contain a ready wooden watchtower: '+JSON.stringify(info));
    assert.ok(info.patrols.length>=5,'real peaceful guard squads should be present');
-   assert.ok(info.patrols.some(p=>p.phase!=='roof'),'actual guards should have started patrol schedule');
+   assert.ok(info.patrols.some(p=>p.phase!=='roof'),
+    'actual guards should have started patrol schedule after pressing Play: '+JSON.stringify(info));
    assert.deepEqual(errors,[],'game Javascript errors');
    const file=output+'/actual-city-'+label+'.png';
    await page.screenshot({path:file});
