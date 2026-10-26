@@ -487,17 +487,17 @@ export class Civilization{
    const nav=this.nav(city),hall=city.economy.buildings.find(b=>b.type==='hall'),from=nav.nearest(door(hall),15),to=nav.nearest(site.landEntry,3);
    if(!from||!to||!nav.reachable(from,to))return {error:'Rannahoone maapoolne sissepääs peab olema linnaga ühendatud.'};
   }
+   // V175.4: joining a wooden gate's posts is fine, walling up its entrance
+   // is not. Otherwise AI civilians and defending soldiers lose their exit.
+   if(city.economy.buildings.some(g=>g.hp>0&&!g.virtual&&
+     ['woodgate','gatehouse'].includes(g.type)&&wallCrossesGateOpeningV175(p,g)))
+    return {error:'Müür läbiks värava ava. Ühenda müür väravapostidega, jäta keskkoht vabaks.'};
   const rule=placementRule(city.economy,city.team,type,p,env);if(rule.error)return rule;
   const candidate={...p,type,...site},nav=this.nav(city);
   if(p.drawnWallV175&&isDrawableWallV175(type)){
    const span=type==='palisade'?p.palisadeSpanV167:7;
    if(!Number.isFinite(p.wallAngleV175)||!Number.isFinite(span)||span<2.4||span>8)
     return {error:'Müürijupi pikkus või pöördenurk ei sobi.'};
-   // V175.4: joining a wooden gate's posts is fine, walling up its entrance
-   // is not. Otherwise AI civilians and defending soldiers lose their exit.
-   if(city.economy.buildings.some(g=>g.hp>0&&!g.virtual&&
-     ['woodgate','gatehouse'].includes(g.type)&&wallCrossesGateOpeningV175(p,g)))
-    return {error:'Müür läbiks värava ava. Ühenda müür väravapostidega, jäta keskkoht vabaks.'};
    // Check the physical stroke corridor; do not rely on a centre-point-only
    // dry-land check. Endpoints may touch a real neighbouring palisade.
    for(let i=1;i<=9;i++){
