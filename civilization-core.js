@@ -1,6 +1,7 @@
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
 import {nordicVillageName} from './folklore-village-names-v164.js?v=165a';
 import {stoneFortificationAgeGate,reserveStoneVillageRingV168} from './stone-village-defenses-v166.js?v=168a';
+import {stoneVillageFoundingTileV169} from './stone-village-site-v169.js';
 import {objectCrossesWoodenRingV168} from './stone-fort-footprints-v168.js';
 import {allocateTerritory} from './territory-v143.js';
 import {urbanExpansionFits,grownCityRadius} from './city-area-v142.js';
@@ -680,7 +681,8 @@ const science=this.s.research[team];
    !citySpacingAllowed(c,this.s.cities,AI_CITY_SPACING)||Math.abs(c.c-a.c)+Math.abs(c.r-a.r)>span)continue;
   options.push(c);
  }
- options.sort((p,q)=>score(q)-score(p));const target=options.find(c=>{const path=this.landPath(a,c,team);return path!==null&&(!hasCity||path.length<=64)&&[-18,-6,6,18].some(x=>[-18,-6,6,18].some(z=>!this.siteRule({...a,c:c.c,r:c.r,landed:true,path:[]},{x,z})));});if(!target){a.aiSeaNeeded=hasCity;continue;}a.aiSeaNeeded=false;if(a.c!==target.c||a.r!==target.r){this.moveSettler(a.id,target);continue}this.land(a.id)}if(a.localTarget)continue;let founded=false;for(let x=-18;x<=18&&!founded;x+=6)for(let z=-18;z<=18&&!founded;z+=6){if(!this.siteRule(a,{x,z})&&this.nav(a).route(a,{x,z})){if(distance(a,{x,z})<1){this.found(a.id);founded=true}else{a.localTarget={x,z};founded=true}}}}
+ options.sort((p,q)=>score(q)-score(p));let target=options.find(c=>{const path=this.landPath(a,c,team);return path!==null&&(!hasCity||path.length<=64)&&[-18,-6,6,18].some(x=>[-18,-6,6,18].some(z=>!this.siteRule({...a,c:c.c,r:c.r,landed:true,path:[]},{x,z})));});
+ if(target&&!hasCity)target=stoneVillageFoundingTileV169(this,a,target);if(!target){a.aiSeaNeeded=hasCity;continue;}a.aiSeaNeeded=false;if(a.c!==target.c||a.r!==target.r){this.moveSettler(a.id,target);continue}this.land(a.id)}if(a.localTarget)continue;let founded=false;for(let x=-18;x<=18&&!founded;x+=6)for(let z=-18;z<=18&&!founded;z+=6){if(!this.siteRule(a,{x,z})&&this.nav(a).route(a,{x,z})){if(distance(a,{x,z})<1){this.found(a.id);founded=true}else{a.localTarget={x,z};founded=true}}}}
  for(const city of this.s.cities.filter(c=>c.team===team)){const army=this.s.armies[team];if(city===this.s.cities.find(c=>c.team===team)&&!army.path.length&&this.s.units.filter(u=>u.team===team&&u.hp>0).every(u=>u.kind==='scout')&&(army.c!==city.c||army.r!==city.r))army.path=this.landPath(army,city,team)||[];const age=this.s.ages[team];
  for(const b of this.allBuildings(city))if(b.ready&&b.hp>0&&b.disabled&&['well','hunter','fisher','lumber','quarry','saw','mine','coal','smelter'].includes(b.type)){b.disabled=false;b.workerLimit=Math.max(1,b.workerLimit||1);}
  // A usable production chain is more important than a fixed construction list.
