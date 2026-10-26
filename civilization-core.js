@@ -1,6 +1,6 @@
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
 import {nordicVillageName} from './folklore-village-names-v164.js?v=165a';
-import {stoneFortificationAgeGate,reserveStoneVillageRingV168} from './stone-village-defenses-v166.js?v=168a';
+import {stoneFortificationAgeGate,reserveStoneVillageRingV168} from './stone-village-defenses-v166.js?v=169a';
 import {stoneVillageFoundingTileV169} from './stone-village-site-v169.js';
 import {objectCrossesWoodenRingV168} from './stone-fort-footprints-v168.js';
 import {allocateTerritory} from './territory-v143.js';
