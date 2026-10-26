@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'TEST_V1754_GATES.mjs'
+      - 'TEST_V1754_ROAD_GATE.mjs'
+      - 'detail-roads.js'
       - 'wall-draw-v175.js'
       - 'navigation.js'
       - 'civilization-core.js'
@@ -26,6 +28,7 @@ jobs:
         run: |
           node --check TEST_V1754_GATES.mjs
           node TEST_V1754_GATES.mjs
+          node TEST_V1754_ROAD_GATE.mjs
           node TEST_V1753_JOINTS.mjs
           node TEST_V59.mjs
           node TEST_V80.mjs
