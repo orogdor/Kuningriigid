@@ -6,6 +6,8 @@ on:
       - '.github/workflows/stone-forts-v167.yml'
       - 'stone-village-defenses-v166.js'
       - 'stone-fort-footprints-v168.js'
+      - 'stone-village-site-v169.js'
+      - 'TEST_V169_FOUNDING.mjs'
       - 'ai-rural-v143.js'
       - 'TEST_V168_RING_CORRIDOR.mjs'
       - 'civilization-core.js'
@@ -32,6 +34,7 @@ jobs:
           node --check civilization.js
           node TEST_V166_STONE_FORTS.mjs
           node TEST_V168_RING_CORRIDOR.mjs
+          node TEST_V169_FOUNDING.mjs
       - name: Prior city economy and fort regressions
         run: |
           node TEST_V139.mjs
