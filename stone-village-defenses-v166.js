@@ -94,7 +94,7 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
  // geographically impossible wall through a river or resource deposit.
  const orderedHomes=[...homes].sort((a,b)=>Math.hypot(a.x-centre.x,a.z-centre.z)-Math.hypot(b.x-centre.x,b.z-centre.z));
  const coreHomes=orderedHomes.slice(0,Math.max(1,Math.ceil(orderedHomes.length*.9)));
- const nav=game.nav(city),visited=new Set();
+ const nav=typeof game.nav==='function'?game.nav(city):null,visited=new Set();
  let best=null,bestScore=-Infinity,examined=0;
  for(const extraX of [0,14,28])for(const extraZ of [0,14,28])
  for(const dx of [0,-7,7,-14,14])for(const dz of [0,-7,7,-14,14]){
@@ -117,7 +117,7 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
    let terrainBlocked=false;
    for(let d=-span/2;d<=span/2;d+=3.5){
     const x=slot.x+(slot.wallAxis?0:d),z=slot.z+(slot.wallAxis?d:0);
-    if(!nav.passable(x,z)){terrainBlocked=true;break;}
+    if(nav&&!nav.passable(x,z)){terrainBlocked=true;break;}
    }
    const check=intersects?{error:'occupied-corridor'}:
     terrainBlocked?{error:'terrain-corridor'}:
