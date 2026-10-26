@@ -101,6 +101,10 @@ try{
     backup:localStorage.getItem('kingdoms-civ4-backup')
    }));
    assert.ok(after.count>before.count,label+': a real paid palisade is built');
+   assert.equal(after.drawing.lastBuild?.built,after.count-before.count,
+    label+': construction feedback reflects actual created segments');
+   assert.equal(after.drawing.lastBuild?.error,'',
+    label+': builder reports no ignored placement failures');
    assert.ok(after.wood<before.wood,label+': paid resources deducted');
    assert.ok(after.walls.every(w=>Number.isFinite(w.angle)&&w.span>=3));
    assert.ok(after.road>0,'natural traffic paths remain');
