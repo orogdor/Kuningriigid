@@ -2,6 +2,7 @@
 // Pure/deterministic: candidate planning cannot change saves or reserve fake buildings.
 import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 import {stoneTownPlotScore} from './stone-town-plan-v163.js';
+import {compactStonePlotScoreV172,compactStoneTypesV172} from './compact-stone-v172.js';
 const hash=(a,b,seed=0)=>{const t=Math.sin(a*127.1+b*311.7+seed*74.7)*43758.5453;return t-Math.floor(t);};
 const sqr=x=>x*x;
 const snap=x=>Math.round(x*2)/2;
@@ -32,8 +33,13 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
  if(!tile||!parent)return [];
  const dx=tile.c-parent.c,dz=tile.r-parent.r;
  const hall=parent.economy?.buildings?.find(b=>b.type==='hall'&&!b.virtual)||{x:0,z:0};
+ // V172: only already-built capital houses influence new capital plots.
+ // Ignore separate districts so all coordinates share the same hall origin.
+ const coreNeighbours=stoneAge&&dx===0&&dz===0?
+  (parent.economy?.buildings||[]).filter(b=>b.hp>0&&!b.virtual&&b.type==='house')
+   .map(b=>({type:b.type,x:b.x-hall.x,z:b.z-hall.z,hp:b.hp})):[];
  const plots=[];
- const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?10.6:13.2;
+ const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?(stoneAge?10.2:10.6):13.2;
  // Staggered rows and slight bends, not a chessboard; deterministic per tile.
  const line=0;
  for(let row=0,z=-DETAIL_HALF_Z+margin;z<=DETAIL_HALF_Z-margin;row++,z+=grid){
@@ -51,7 +57,9 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
    const key=Math.round(street.radius/24);
    const quarterNoise=hash(Math.floor(gx/32),Math.floor(gz/32),seed+5);
    const civic=CIVIC.has(type),rural=RURAL.has(type),industrial=INDUSTRIAL.has(type);
-   const priority=(stoneAge?stoneTownPlotScore(type,gx,gz,seed):
+   const compact=stoneAge&&compactStoneTypesV172(type)?
+    compactStonePlotScoreV172(type,gx,gz,coreNeighbours):null;
+   const priority=(compact!=null?compact:stoneAge?stoneTownPlotScore(type,gx,gz,seed):
                     civic?Math.abs(street.radius-42)*.13:
                     rural?-street.radius*.075:
                     industrial?Math.abs(street.radius-170)*.045:
