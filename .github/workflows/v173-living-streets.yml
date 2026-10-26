@@ -1,0 +1,45 @@
+name: V173 Organic Roads and Compact Towns QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v173-living-streets.yml'
+      - 'living-streets-v173.js'
+      - 'historic-urban-v138.js'
+      - 'TEST_V173_STREETS.mjs'
+      - 'TEST_V172_LAYOUT.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v173-streets-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  paths-and-town:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Syntax, emergent roads, eroding streets and safe infill
+        run: |
+          node --check living-streets-v173.js
+          node --check historic-urban-v138.js
+          node --check TEST_V173_STREETS.mjs
+          node TEST_V173_STREETS.mjs
+          node TEST_V59.mjs
+          node TEST_V80.mjs
+          node TEST_V172_LAYOUT.mjs
+          node TEST_V138.mjs
+          node TEST_V139.mjs
+          node TEST_V163_STONE_CITY.mjs
+          node TEST_V168_RING_CORRIDOR.mjs
+          node TEST_V73.mjs
+      - name: Real 48 turn AI town progression
+        run: node scripts/stone-town-v163-report.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v173-street-and-ai-town-evidence
+          path: artifacts-v163/
