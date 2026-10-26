@@ -48,7 +48,7 @@ import {atWar,setRelation,relation,blockMerchants} from './diplomacy-v87.js';
 import {cityNeeds,nationalStock,foodTotal,GOODS} from './city-needs-v87.js';
 import {spatialInstances,updateSpatialBatches} from './spatial-batches-v86.js?v=86a';
 import {getWorldModel,WORLD_MODEL_MATERIAL} from './world-models-v152.js?v=161a';
-import {createTownModelV154,buildingSeed} from './town-models-v154.js?v=170c';
+import {createTownModelV154,buildingSeed} from './town-models-v154.js?v=174a';
 import {automaticUIRefreshDue} from './gameplay-flow-v86.js?v=86a';
 import {releaseMaterial} from './program-keep-v161.js';
 import {createWalker} from './fpv-walker-v161.js';
