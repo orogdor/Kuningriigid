@@ -58,7 +58,7 @@ try{
     const d=window.gameDebug,city=d.activeCity(),tower=city?.economy?.buildings
      .find(b=>b.type==='watchtower'&&b.ready&&b.hp>0);
     if(tower){
-     d.focus.set(tower.x,0,tower.z);
+     d.detailFocus.set(tower.x,0,tower.z);
      for(let i=0;i<4;i++)document.getElementById('hud-zoom-in')?.click();
     }
     return tower?{x:tower.x,z:tower.z}:null;
