@@ -445,8 +445,19 @@ SIG.hall=(b,era,r,t,root,variant=0)=>{
  banner(b,tx+1.4,H+4.5,-.2,t,2.5);
  for(let i=0;i<4;i++)box(b,0,0,3.4+i*.35,3.2-i*.4,.12,.35,'#a7a092',M.stone);
 };
-SIG.lumber=(b,era,r)=>{body(b,era,r,{w:4.6,d:3.6,x:-1.6,z:-1.4,chim:false});logPile(b,2.6,-1,9,Math.PI/2);logPile(b,2.6,1.6,6,Math.PI/2);
- box(b,-.4,0,2.4,.7,.6,.7,'#7a5a3a',M.logs);boxR(b,-.4,.85,2.4,.08,.6,.08,'#6d5034',M.beam,0,0,.5);box(b,-.25,1.05,2.4,.3,.14,.06,'#8a8d90',M.metal);planks(b,-2.5,2.4,0,'#b48a5a');};
+SIG.lumber=(b,era,r)=>{ // V170b: distinct timber yard
+ const early=era<=1,wood='#745738';
+ body(b,era,r,{w:4.4,d:3.4,x:-1.8,z:-1.6,windows:!early,style:early?1:null});
+ logPile(b,2.3,-1.4,8,Math.PI/2);logPile(b,2.3,1.25,6,Math.PI/2);
+ // Sawhorse, splitwood stack and upright chopping block.
+ for(const x of [-.65,.65])for(const z of [-.3,1.3])
+  boxR(b,x,.69,z,.13,1.35,.13,wood,M.beam,0,0,x<0?-.25:.25);
+ box(b,0,1.25,.5,2.1,.15,.27,'#99774d',M.logs);
+ box(b,.05,0,2.7,1.2,.65,.95,wood,M.logs);
+ boxR(b,.2,1.18,2.72,.095,1.0,.095,'#6b4f33',M.beam,0,0,-.25);
+ box(b,-.04,1.5,2.72,.42,.24,.1,early?'#8b8779':'#939796',early?M.stone:M.metal);
+ planks(b,-2.4,2.5,0,'#b48a5a');
+};
 SIG.forester=(b,era,r)=>{body(b,era,r,{w:4.2,d:3.4,x:-1.8,z:-1.6});for(let i=0;i<3;i++)for(let j=0;j<3;j++){const x=1.2+i*1.2,z=.4+j*1.2;box(b,x,0,z,.9,.15,.9,'#5e4630',M.dirt);cone(b,x,.15,z,.25+((i+j)%3)*.08,.6+((i*2+j)%3)*.3,'#3f6b3a',M.leaf,7);}fenceLine(b,.5,3.4,4,3.4,'#8a6c48',.7);};
 SIG.saw=(b,era,r,t,root)=>{const H=body(b,era,r,{w:6,d:4,x:-.8,z:-1.6,roof:'gable'});box(b,-.8,0,1.4,6.4,.25,2.2,'#7d6a52',M.boards);
  for(const s of [-1,1])box(b,s*2.6-.8,0,1.4,.2,2.2,.2,'#6d5034',M.beam);gable(b,-.8,2.2,1.4,6.4,2.2,.6,'#6f5b45',M.boards,{axis:'x',over:.2,thick:.1});
@@ -466,15 +477,46 @@ SIG.smelter=(b,era,r,t,root)=>{body(b,era,r,{w:4.4,d:3.6,x:-2,z:-1.6,windows:fal
  box(b,1.8,.4,2.3,.9,.9,.4,'#d0662a');stoneBlocks(b,-1.6,2.4,.2);box(b,3.6,0,2.4,1.0,.4,.8,'#5d5f62',M.metal);smokeFrom(root,1.8,5.8,.6);};
 SIG.coal=(b,era,r,t,root)=>{for(const [x,z,s] of [[-1.6,-1.2,1.6],[1.6,-1.4,1.3],[0,1.6,1.4]]){dome(b,x,0,z,s,'#3f3a34',M.dirt,12);ball(b,x,s*.75,z,s*.35,'#2c2925',M.dirt,.6,8);}
  box(b,3.2,0,2.4,1.2,.5,1.2,'#24221f',M.dirt);cart(b,-3.0,2.6,.3);logPile(b,3.0,-.2,5,Math.PI/2);smokeFrom(root,-1.6,1.9,-1.2);};
-SIG.barracks=(b,era,r,t)=>{const H=body(b,era,r,{w:8.6,d:4,x:0,z:-2,storeys:era>=4?2:1,roof:'gable'});box(b,0,0,1.6,8,.08,3.2,'#a69a7e',M.dirt);
- for(const x of [-3,-1]){box(b,x,0,1.2,.12,1.8,.12,'#6d5034',M.beam);boxR(b,x,1.3,1.2,.9,.12,.12,'#6d5034',M.beam,0,0,0);ball(b,x,1.85,1.2,.22,'#c9b58a',M.cloth,1.1,6);}
- rack(b,2.4,1.5,0,'#7b7f84');for(let i=0;i<4;i++)boxR(b,3.6+i*.12,.8,2.6,.04,1.8,.04,'#7a7d80',M.metal,.08*(i-2),0,0);banner(b,-4.2,0,2.8,t,4.4);};
+SIG.barracks=(b,era,r,t)=>{ // V170b: training yard with primitive spears
+ const early=era<=1,wood='#6b5038';
+ body(b,era,r,{w:8.2,d:3.8,z:-2,storeys:era>=4?2:1,windows:!early,style:early?1:null});
+ box(b,0,0,1.45,8,.07,3,'#a69a7e',M.dirt);
+ for(const x of [-2.9,-1.35]){
+  box(b,x,0,1.4,.19,2,.19,wood,M.beam);
+  box(b,x,1.35,1.5,.85,.14,.16,wood,M.beam);
+  ball(b,x,1.95,1.4,.24,'#c5af8a',M.thatch,1,6);
+ }
+ for(const x of [1.25,2.95])box(b,x,0,.8,.14,1.75,.14,wood,M.beam);
+ box(b,2.1,1.55,.8,2,.14,.12,wood,M.beam);
+ for(let i=0;i<4;i++){
+  const x=1.4+i*.42;
+  boxR(b,x,.94,.9,.065,1.9,.065,wood,M.beam,0,0,-.04*i);
+  cone(b,x,1.95,.9,.1,.36,early?'#8d897f':'#939b9b',early?M.stone:M.metal,6);
+ }
+ cylR(b,3.35,1.15,2.3,.58,.17,'#c3af8e',M.thatch,Math.PI/2,0,0,10);
+ cylR(b,3.35,1.15,2.4,.33,.08,'#80634b',M.boards,Math.PI/2,0,0,10);
+ fenceLine(b,-4,3.2,4,3.2,wood,.7);banner(b,-4.1,0,2.8,t,4);
+};
 SIG.archery=(b,era,r,t)=>{body(b,era,r,{w:4.4,d:3.4,x:-2.2,z:-2});for(const x of [-1.6,.4,2.4])target(b,x,1.9,0);box(b,1.6,0,-1.4,3.4,.06,.3,'#c8b48a',M.dirt);rack(b,2.6,-1.6,0,'#6d5034');fenceLine(b,-3.8,3.2,3.8,3.2,'#8a6c48',.6);banner(b,-4,0,1.2,t,3.6);};
 SIG.stable=(b,era,r,t)=>{const H=body(b,era,r,{w:7.6,d:3.4,z:-2,roof:'gable',windows:false,door:false});for(let i=0;i<4;i++){const x=-2.85+i*1.9;box(b,x,0,-.29,1.3,1.6,.06,'#5a3f28',M.boards);box(b,x,1.0,-.27,1.3,.08,.06,'#3a2a1c');}
  fenceLine(b,-3.8,3.4,3.8,3.4);fenceLine(b,-3.8,.6,-3.8,3.4);fenceLine(b,3.8,.6,3.8,3.4);hay(b,2.6,1.6,.55);box(b,-1.6,0,1.6,1.4,.45,.5,'#6d5034',M.boards);
  for(const [x,z,c] of [[0,2.0,'#6b4a2e'],[-2.4,2.4,'#3c2d22']]){box(b,x,.75,z,1.6,.55,.55,c);box(b,x+.9,1.1,z,.5,.5,.35,c);for(const sx of [-.6,.6])for(const sz of [-.18,.18])box(b,x+sx,0,z+sz,.12,.8,.12,shade(c,.8));}};
-SIG.hunter=(b,era,r)=>{body(b,era,r,{w:4.6,d:3.6,x:-1.4,z:-1.4});rack(b,2.4,.6,Math.PI/2,'#a3825c');rack(b,2.4,2.4,Math.PI/2,'#8f6b48');
- for(const s of [-1,1])boxR(b,-1.4+s*.35,3.2,.45,.06,.8,.06,'#e8dfca',M.plain,0,0,s*.6);logPile(b,-2.8,2.4,4,0);};
+SIG.hunter=(b,era,r)=>{ // V170b: hides, drying racks, hunting equipment
+ const early=era<=1;
+ body(b,era,r,{w:4.4,d:3.4,x:-1.6,z:-1.5,windows:!early,style:early?0:null});
+ for(const z of [-.15,2.1]){
+  for(const x of [1.3,3.35])box(b,x,0,z,.12,2.05,.12,'#735338',M.beam);
+  box(b,2.3,1.95,z,2.15,.12,.12,'#735338',M.beam);
+  box(b,2.3,.35,z,1,1.45,.07,z<0?'#b89d76':'#a18864',M.cloth);
+  for(const x of [1.8,2.8])box(b,x,.72,z+.06,.05,.95,.04,'#87674a',M.beam);
+ }
+ for(let i=0;i<3;i++){
+  const x=-3.15+i*.3;
+  boxR(b,x,1.2,2.28,.07,2.3,.07,'#765639',M.beam,0,0,.24);
+  cone(b,x-.31,2.42,2.28,.11,.34,early?'#888779':'#969d9c',early?M.stone:M.metal,6);
+ }
+ logPile(b,-2.7,2.5,4,0);
+};
 SIG.well=(b,era,r)=>{ // V170 3.1b: well is unmistakable at all ages
  const c=era>=4?'#b7b0a2':era>=1?'#9a968a':'#927b5c',stone=era>=1?M.stone:M.logs;
  cyl(b,0,0,0,1.25,1.35,.9,c,stone,14);
@@ -492,10 +534,24 @@ SIG.well=(b,era,r)=>{ // V170 3.1b: well is unmistakable at all ages
  for(let i=0;i<4;i++)box(b,(i-1.5)*.7,0,1.8,.6,.09,.45,'#a7a092',M.stone);
 };
 
-SIG.study=(b,era,r,t)=>{const H=body(b,era,r,{w:6.4,d:4.6,storeys:era>=4?2:1,roof:'gable',axis:'z'});
- if(era<=1){for(let i=0;i<4;i++)box(b,-2.4+i*.6,0,3.0,.42,.9+i*.1,.3,'#c9bfa4',M.stone);}
- else{box(b,0,H+1.4,-1.0,1.2,1.8,1.2,'#d8d0bc',M.plaster);gable(b,0,H+3.2,-1.0,1.2,1.2,1.0,'#6f5b45',M.tile,{axis:'z',over:.1});box(b,0,H+2.0,-1.0+.62,.5,.6,.04,'#c9a24a',M.metal);}
- box(b,2.4,0,2.8,1.4,.8,.6,'#7a5a3a',M.boards);box(b,2.4,.8,2.8,1.2,.06,.5,'#e8e2cf');};
+SIG.study=(b,era,r,t)=>{ // V170b: early stone marker and gathering benches
+ const early=era<=1;
+ const H=body(b,era,r,{w:6.2,d:4.4,storeys:era>=4?2:1,roof:'gable',axis:'z',
+   windows:!early,style:early?0:null});
+ if(early){
+  for(const x of [-2.3,-1.1,.1,1.3])box(b,x,0,2.93,.65,.57,.47,'#999182',M.stone);
+  box(b,2.6,0,2.7,.9,2.35,.5,'#928a79',M.stone);
+  for(const y of [.65,.96,1.27])box(b,2.6,y,2.96,.46,.075,.055,'#655f54',M.stone);
+  box(b,-.25,0,3.42,2.4,.55,.5,'#826347',M.logs);
+  box(b,-.25,.55,3.42,2.4,.1,.5,'#b29b72',M.boards);
+ }else{
+  box(b,0,H+1.4,-1,1.2,1.8,1.2,'#d8d0bc',M.plaster);
+  gable(b,0,H+3.2,-1,1.2,1.2,1,'#6f5b45',M.tile,{axis:'z',over:.1});
+  box(b,0,H+2,-.38,.5,.6,.04,'#c9a24a',M.metal);
+  box(b,2.4,0,2.8,1.4,.8,.6,'#7a5a3a',M.boards);
+  box(b,2.4,.8,2.8,1.2,.06,.5,'#e8e2cf',M.plain);
+ }
+};
 SIG.scriptorium=(b,era,r,t)=>{const H=body(b,era,r,{w:6.8,d:4.4,storeys:1,roof:'gable',axis:'x'});for(let i=0;i<3;i++)box(b,-2+i*2,H*.45,2.25,.9,1.3,.1,'#c9a24a');
  box(b,3.6,0,-1,1.4,H+2.2,1.4,'#c9bfa8',M.stone);cone(b,3.6,H+2.2,-1,1.1,1.8,'#7e3f2c',M.tile,4);bush(b,-3.6,2.6,.5,'#5b8a46');bush(b,-2.8,2.9,.4,'#6b9a4e');};
 SIG.library=(b,era,r,t)=>{const H=body(b,era,r,{w:7.4,d:5,storeys:2,roof:era>=4?'hip':'gable',axis:'x',wallC:era>=4?'#e9e1cc':null});
@@ -658,7 +714,17 @@ export function farmhouseGeometry(age=0){
  // barn
  const barnC=era>=5?'#8e3f32':era>=3?'#7a5a3a':'#8a6c48';
  box(b,2.4,0,-1.6,2.6,2.2,3.0,barnC,M.boards);gable(b,2.4,2.2,-1.6,2.6,3.0,1.6,era>=3?'#5b4a3a':'#a08452',era>=3?M.boards:M.thatch,{axis:'z',over:.3,gableC:barnC,gableM:M.boards});
- box(b,2.4,0,-.08,1.3,1.6,.08,'#4e3a28',M.boards);
+ box(b,2.4,0,-.08,1.3,1.6,.08,'#4e3a28',M.boards); 
+  // V170b: primitive grain drying and stone quern in the farmhouse yard.
+  if(era<=1){
+   box(b,-3,0,1.35,1.25,.14,.92,'#765b3d',M.boards);
+   for(const x of [-3.45,-2.55])for(const z of [1,1.75])box(b,x,0,z,.11,.77,.11,'#674e32',M.beam);
+   for(let i=0;i<3;i++)sack(b,-3.32+i*.32,1.32,'#c0ad81');
+   cyl(b,.3,0,2.8,.45,.48,.19,'#9c9587',M.stone,10);
+   cyl(b,.3,.2,2.8,.44,.44,.16,'#817b70',M.stone,10);
+   boxR(b,.53,.46,2.8,.065,.48,.065,'#71543a',M.beam,0,0,.17);
+  }
+
  // yard: hay, fence, cart, water trough
  hay(b,3.2,1.6,.7);hay(b,2.2,2.3,.55);
  fenceLine(b,-3.6,3.3,3.6,3.3,'#8a6c48',.8);fenceLine(b,-3.6,1.4,-3.6,3.3,'#8a6c48',.8);
