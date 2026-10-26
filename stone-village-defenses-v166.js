@@ -89,20 +89,38 @@ export function stoneVillageDefenseEligibility({age=0,pop=0,readyHouses=0,servic
 export function bestStoneVillageWallPlan(game,city,buildings,seed){
  const centre=buildings.find(b=>b.type==='hall')||{x:0,z:0};
  const homes=buildings.filter(b=>b.type==='house'&&b.hp>0);
+ // Protect the historic, densely built inner 90% of houses. An exceptional
+ // isolated outer home may remain in a suburb rather than forcing a
+ // geographically impossible wall through a river or resource deposit.
+ const orderedHomes=[...homes].sort((a,b)=>Math.hypot(a.x-centre.x,a.z-centre.z)-Math.hypot(b.x-centre.x,b.z-centre.z));
+ const coreHomes=orderedHomes.slice(0,Math.max(1,Math.ceil(orderedHomes.length*.9)));
+ const nav=game.nav(city),visited=new Set();
  let best=null,bestScore=-Infinity,examined=0;
  for(const extraX of [0,14,28])for(const extraZ of [0,14,28])
- for(const dx of [0,-7,7])for(const dz of [0,-7,7]){
+ for(const dx of [0,-7,7,-14,14])for(const dz of [0,-7,7,-14,14]){
   const plan=stoneVillageWallPlan(buildings,seed,{extraX,extraZ,dx,dz});
-  // Keep the entire early residential quarter inside the perimeter.
+  const key=plan.rx+':'+plan.rz+':'+plan.slots[0].x+':'+plan.slots[0].z;
+  if(visited.has(key))continue;visited.add(key);
+  // Avoid the historical mistake of enclosing distant production outposts.
   const cx=centre.x+dx,cz=centre.z+dz;
-  if(homes.some(h=>Math.abs(h.x-cx)>plan.rx-9||Math.abs(h.z-cz)>plan.rz-9))continue;
+  if(coreHomes.some(h=>Math.abs(h.x-cx)>plan.rx-9||Math.abs(h.z-cz)>plan.rz-9))continue;
   let viable=0,failed=0;
   for(const slot of plan.slots){
    // V168: a 28-42m timber segment cannot be screened as a point.
    // Existing fields/homes may collide at its ENDS even when the centre is free.
    const intersects=buildings.some(b=>b.hp>0&&!b.virtual&&!FORTS.has(b.type)&&
     footprintsCrossV168(slot,b,1.2));
+   // PreviewBuild checks a 6x5.6 m footprint around a building centre.
+   // A 25-42 m palisade can also cross a river/impassable slope at its ends.
+   const span=slot.type==='palisade'?(slot.palisadeSpanV167||14):
+    slot.type==='woodgate'?14:6;
+   let terrainBlocked=false;
+   for(let d=-span/2;d<=span/2;d+=3.5){
+    const x=slot.x+(slot.wallAxis?0:d),z=slot.z+(slot.wallAxis?d:0);
+    if(!nav.passable(x,z)){terrainBlocked=true;break;}
+   }
    const check=intersects?{error:'occupied-corridor'}:
+    terrainBlocked?{error:'terrain-corridor'}:
     game.previewBuild(city,slot.type,{...slot,plannedDefense:true});
    if(check.error)failed++;else viable++;
   }
@@ -111,7 +129,7 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
   const reserve=city.stoneDefenseReserveV168;
   const preferred=reserve&&plan.rx===reserve.rx&&plan.rz===reserve.rz&&
     plan.slots[0]?.x===reserve.slots[0]?.x&&plan.slots[0]?.z===reserve.slots[0]?.z ? 14:0;
-  const score=viable*4-failed*25-plan.slots.length*1.3-(plan.rx+plan.rz)*.10-
+  const score=viable*4-failed*100-plan.slots.length*1.3-(plan.rx+plan.rz)*.10-
     (Math.abs(dx)+Math.abs(dz))*.03+preferred;
   if(score>bestScore){bestScore=score;best={...plan,initialViable:viable,initialBlocked:failed};}
  }
