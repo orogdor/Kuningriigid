@@ -711,6 +711,7 @@ function renderUIImpl(){updateBuildingInfo();syncResourceLayer();const resourceC
   if(!visibleCount){const empty=document.createElement('p');empty.className='v121-build-empty';empty.textContent='No matching buildings. Select All or clear the search.';tray.append(empty)}
   tray.scrollTop=Math.min(oldTrayScroll,Math.max(0,tray.scrollHeight-tray.clientHeight));
  }
+ updateWallDrawToolbar();
  const unavailableBuildings=tab==='build'&&localCity?.team===0&&!Object.keys(BUILDINGS).some(k=>k!=='hall'&&game.canBuildNow(localCity,k));$('hud-build-guidance').textContent=unavailableBuildings?'Some structures need more resources or research.':tab==='army'?'Recruit troops for your city.':isDrawableWallV175(mode)?'V175: vali Sirge või Kumer ja lohista maapinnale.':mode?'Place '+(BUILDINGS[mode]?.name||mode)+' on the map.':'Choose a building, then click a site on the map.';if(view==='local'&&localCity?.team===0&&isDrawableWallV175(mode)){
  button($('actions'),(wallDrawShape==='straight'?'✓ ':'')+'▰ Sirge müür',()=>{wallDrawShape='straight';renderUI();say('Sirge müür: lohista algusest lõpuni.');});
  button($('actions'),(wallDrawShape==='curved'?'✓ ':'')+'⌒ Kumer müür',()=>{wallDrawShape='curved';renderUI();say('Kumer müür: joonista sõrmega kaar.');});
@@ -789,6 +790,29 @@ function pick(e){
 // Track simultaneous fingers separately. A completed pinch must never become a map tap.
 const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
  let wallDrawShape='straight',wallStroke=null,wallStrokePreview=null;
+ const wallToolbar=document.createElement('div');
+ wallToolbar.id='v175-wall-toolbar';wallToolbar.hidden=true;
+ const wallChoices=document.createElement('div');
+ wallChoices.className='v175-wall-choices';
+ const straightChoice=document.createElement('button'),curvedChoice=document.createElement('button');
+ straightChoice.type=curvedChoice.type='button';
+ straightChoice.textContent='▰ Sirge';curvedChoice.textContent='⌒ Kumer';
+ straightChoice.setAttribute('aria-label','Ehita sirge müür');
+ curvedChoice.setAttribute('aria-label','Ehita kumer müür');
+ const wallHelp=document.createElement('div');
+ wallHelp.className='v175-wall-help';
+ wallHelp.textContent='Lohista sõrmega kaardil müüri asukoht';
+ wallChoices.append(straightChoice,curvedChoice);wallToolbar.append(wallChoices,wallHelp);
+ document.body.append(wallToolbar);
+ function updateWallDrawToolbar(){
+  const visible=view==='local'&&isDrawableWallV175(mode)&&activeCity()?.team===0&&!s.battle;
+  wallToolbar.hidden=!visible;
+  straightChoice.setAttribute('aria-pressed',String(wallDrawShape==='straight'));
+  curvedChoice.setAttribute('aria-pressed',String(wallDrawShape==='curved'));
+ }
+ straightChoice.onclick=()=>{wallDrawShape='straight';updateWallDrawToolbar();updateGhost();renderUI();};
+ curvedChoice.onclick=()=>{wallDrawShape='curved';updateWallDrawToolbar();updateGhost();renderUI();};
+
  function removeWallStrokePreview(){
   if(!wallStrokePreview)return;environment.remove(wallStrokePreview);
   wallStrokePreview.geometry?.dispose();wallStrokePreview.material?.dispose();wallStrokePreview=null;
