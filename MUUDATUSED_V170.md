@@ -100,3 +100,13 @@ Pildikontroll näitas V139 näidislinnas varajase rauaaja kõrval ajastuga sobim
 - Eraldi on vaja võrdlevat päris seadme kaadrisageduse mõõtmist enne absoluutset jõudlusgarantiid.
 
 Töövoog: [V170 graafika QA](https://github.com/orogdor/Kuningriigid/actions/workflows/v170-graphics-qa.yml).
+
+
+### V170c korduskontroll (mudelite parandus pärast pildiauditit)
+
+- [GitHub Actions #40296930738](https://github.com/orogdor/Kuningriigid/actions/runs/40296930738): **model-and-save PASS** ning **desktop-and-mobile PASS**.
+- Neli V170c WebGL-brauseritesti said taas PASS: `stone-desktop`, `stone-mobile`, `ai-town-desktop`, `ai-town-mobile`.
+- Kontrollpildil on rauaaegse linna kaks ebasobiva klassikalise stiiliga õppehoonet asendunud puithoonetega. Kiviaja stseeni üldilme jäi samaks.
+- Uus screenshotide artefakt: `v170-city-screenshots-and-browser-results` töövoos #40296930738.
+- 200 käigu AI ja V169 baasversiooni võrdluse otsus ei olnud selle kirje koostamise hetkeks lõplik. `regression-200` on eraldi töövoojob ja vajab selle enda tulemust, mitte üksnes brauseri PASS-i.
+
