@@ -58,6 +58,7 @@ import {TECHS,BUILD_TECH,UNIT_TECH,newResearch,initResearch,startResearch,tickRe
 import {BUILDINGS,RESOURCE_NAMES,START,RESOURCE_PRODUCTION_MULTIPLIER,FOOD_KEYS,storageLimit,takeFood,recordDelivery,realm as freshRealm,initialState,migrateEconomy,buildRule as placementRule,placeBuilding,tickEconomy,ready,canAfford,spendResources} from './economy.js';
 import {Navigation,clearFootprint,door,gather,plantTrees} from './navigation.js?v=1752a';
 import {isDrawableWallV175,wallPointInsideV175,wallCrossesGateOpeningV175} from './wall-draw-v175.js?v=1754a';
+import {woodFortCostV1757,woodFortBuildTimeV1757,woodFortSurchargeV1757} from './wood-fort-levels-v1757.js?v=1757b';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js?v=123a';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
@@ -374,7 +375,7 @@ export class Civilization{
  upgrade(team){return upgradeLevel(this.s,team)}
  buildingAge(team,type){return Math.max(BUILD_AGE[type]||0,this.upgrade(team))}
  buildingName(team,type){return upgradedName(this.s,team,type,BUILDINGS[type].name)}
- constructionTime(type){return BUILDINGS[type].time*tempoMultiplier(this.s)}
+ constructionTime(type,tier=1){return woodFortBuildTimeV1757(type,tier,BUILDINGS[type].time)*tempoMultiplier(this.s)}
  scienceRate(team){return scienceRate(this.s,team)}
  bonus(team){return productionBonus(this.s,team)}
  builderTier(team){return Math.max(0,Math.min(6,this.s.ages?.[team]||0))}
@@ -469,6 +470,14 @@ export class Civilization{
  buildingSites(city,type){if(MINERAL_BUILDINGS[type]){const r=mineralSite(city.world,type);return r?[{x:r.x,z:r.z}]:[]}if(COASTAL_BUILDINGS.has(type))return coastalSites(this,this.cell(city),type);const parent=this.parentCity(city);return historicalBuildingPlots(city,parent,type,this.s.seed+parent.id*31,this.s.ages[parent.team]===0)}
  previewBuild(city,type,p){
   const error=this.buildRule(city,type);if(error)return {error};
+  // A tall palisade spends ALL its materials on the actual build. Reject a
+  // preview that can only afford the old low wall; do not create debt.
+  const tier=['palisade','woodgate'].includes(type)&&p?.woodFortTierV1757===2?2:1;
+  if(tier===2){
+   const cost=woodFortCostV1757(type,2,BUILDINGS[type].cost);
+   if(!canAfford(city.economy.realms[city.team].resources,cost))
+    return {error:'Suure puumüüri jaoks ei jätku materjale.'};
+  }
   if(type==='field'){const error=validateField(city,p,(x,z)=>this.nav(city).passable(x,z));if(error)return {error};const d=fieldSize(p),heights=[];for(let x=-d.width/2;x<=d.width/2;x+=4)for(let z=-d.depth/2;z<=d.depth/2;z+=4)heights.push(detailHeight(this.cell(city),p.x+x,p.z+z));if(Math.max(...heights)-Math.min(...heights)>1.8)return {error:'Põllu maapind on liiga järsk. Vali väiksem või tasasem ala.'};}
   else if(city.economy.buildings.some(b=>b.type==='field'&&b.hp>0&&fieldContains(b,p,type==='market'?17:6)))return {error:'Hoone ei mahu põllule. Vali koht põllu kõrval.'};
   if(this.constructionArea(city).pending.length>=12)return {error:'Linna ühises ehitusjärjekorras on juba 12 hoonet.'};
@@ -522,6 +531,19 @@ export class Civilization{
   return {...rule,...site};
  }
  build(city,type,p){const check=this.previewBuild(city,type,p);if(check.error)return check;p=check.p||p;if(type==='bridge'){const r=city.economy.realms[city.team],cost=BUILDINGS.bridge.cost;if(!canAfford(r.resources,cost))return {error:'Silla jaoks napib materjale.'};spendResources(r.resources,cost);const building={type:'bridge',x:0,z:0,team:city.team,hp:350,progress:0,ready:false};city.economy.buildings.push(building);this.uiRevision++;return {building}}const env=this.placementEnv(city,type);if(p.drawnWallV175&&isDrawableWallV175(type))env.unlimitedBuildingRange=true;const result=placeBuilding(city.economy,city.team,type,p,env);if(result.building){
+ // The ordinary economy charges the tier-I price. Once the placement has
+ // succeeded, charge ONLY the difference and store the variant on the new
+ // building. This avoids altering AI prices or legacy V4 save data.
+ const tier=['palisade','woodgate'].includes(type)&&p.woodFortTierV1757===2?2:1;
+ if(tier===2){
+  const surcharge=woodFortSurchargeV1757(type,tier,BUILDINGS[type].cost);
+  spendResources(city.economy.realms[city.team].resources,surcharge);
+  const fullCost=woodFortCostV1757(type,tier,BUILDINGS[type].cost);
+  result.building.woodFortTierV1757=2;
+  result.building.buildTimeV1757=woodFortBuildTimeV1757(type,tier,BUILDINGS[type].time);
+  result.building.materialsTotal=Object.values(fullCost).reduce((a,n)=>a+n,0);
+  result.building.materialsRemaining=result.building.materialsTotal;
+ }
  if(p.drawnWallV175&&isDrawableWallV175(type)){
   result.building.wallAngleV175=p.wallAngleV175;
   result.building.wallAxis=p.wallAxis||0;
@@ -529,6 +551,7 @@ export class Civilization{
   result.building.drawnWallV175=true;
   configureWallFootprint(result.building);this.nav(city).rebuild();
  }
+if(tier===2&&!p.drawnWallV175){configureWallFootprint(result.building);this.nav(city).rebuild();}
 if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plannedDefense=true;configureWallFootprint(result.building);this.nav(city).rebuild();}if(type==='farm')result.building.fieldSystemV127=true;if(type==='field'){Object.assign(result.building,fieldSize(p));for(const r of city.world.resources)if(['tree','berry','game'].includes(r.kind)&&fieldContains(result.building,r)){r.removed=true;r.amount=0;}city.world.revision++;}for(const k of ['depositId','shoreAngle','landEntry','baseY'])if(check[k]!=null)result.building[k]=check[k];}return result}
 
  // An order can be given on any tile owned by the parent city. Coordinates
@@ -542,7 +565,7 @@ if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plan
   const destination=this.cell({c:city.c+dc,r:city.r+dr});
   if(!destination?.land||this.territoryOwner(destination)?.id!==parent.id)
    return {error:'Valitud ruut ei kuulu selle linna ühisesse ehitusalasse.'};
-  const raw=localTilePoint(at.x,at.z,dc,dr),point={x:Math.round(raw.x/2)*2,z:Math.round(raw.z/2)*2};
+  const raw=localTilePoint(at.x,at.z,dc,dr),point={x:Math.round(raw.x/2)*2,z:Math.round(raw.z/2)*2};if(at.woodFortTierV1757===2)point.woodFortTierV1757=2;
   // The destination remains a separate *physical* tile but not a city.
   const ctx=this.contextAt(destination,true);
   return {ctx,point};

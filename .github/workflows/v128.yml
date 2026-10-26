@@ -42,5 +42,7 @@ jobs:
           node TEST_V1757_TOWER_PATROL.mjs
       - name: Stone Age low/high timber defense height parity (V175.7a)
         run: node TEST_V1757A_FORT_HEIGHTS.mjs
+      - name: Tier I and Tier II wall costs, saved levels and real placement (V175.7b)
+        run: node TEST_V1757B_WALL_LEVELS.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic

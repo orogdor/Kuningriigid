@@ -51,6 +51,7 @@ import {spatialInstances,updateSpatialBatches} from './spatial-batches-v86.js?v=
 import {getWorldModel,WORLD_MODEL_MATERIAL} from './world-models-v152.js?v=161a';
 import {createTownModelV154,buildingSeed} from './town-models-v154.js?v=174a';
 import {isDrawableWallV175,wallStrokePlanV175} from './wall-draw-v175.js?v=1754a';
+import {woodFortCostV1757} from './wood-fort-levels-v1757.js?v=1757b';
 import {automaticUIRefreshDue} from './gameplay-flow-v86.js?v=86a';
 import {releaseMaterial} from './program-keep-v161.js';
 import {createWalker} from './fpv-walker-v161.js';
@@ -694,8 +695,8 @@ function renderUIImpl(){updateBuildingInfo();syncResourceLayer();const resourceC
  }
  if(tab==='build'&&view==='local'&&localCity?.team===0){
   const tray=$('tray'),buttons=[...tray.querySelectorAll('button[data-building]')];
-  const counts={all:buttons.length};
-  for(const [id] of BUILD_CATEGORIES)if(id!=='all')counts[id]=buttons.filter(b=>buildingCategory(b.dataset.building)===id).length;
+  const tallChoice=buttons.some(b=>b.dataset.building==='palisade'),counts={all:buttons.length+(tallChoice?1:0)};
+  for(const [id] of BUILD_CATEGORIES)if(id!=='all')counts[id]=buttons.filter(b=>buildingCategory(b.dataset.building)===id).length+(tallChoice&&id==='military'?1:0);
   renderBuildingCategories($('buildcategories'),buildCategory,id=>{buildCategory=id;tray.scrollTop=0;renderUI()},counts);
   let visibleCount=0;
   for(const original of buttons){
@@ -703,6 +704,32 @@ function renderUIImpl(){updateBuildingInfo();syncResourceLayer();const resourceC
    if(!matchesBuilding(type,name,buildCategory,buildSearch)){original.remove();continue}
    const error=game.buildRule(localCity,type),missing=missingMaterials(localCity.economy.realms[0].resources,d.cost);
    const wrapper=document.createDocumentFragment(),action=original.onclick;
+   if(type==='palisade'){
+    const error=game.buildRule(localCity,type);
+    for(const tier of [1,2]){
+     const cost=woodFortCostV1757(type,tier,BUILDINGS[type].cost);
+     const missing=missingMaterials(localCity.economy.realms[0].resources,cost);
+     const tall=tier===2,name=tall?'Müür II · kõrge käiguteega':'Müür I · madal palisaad';
+     const select=()=>{
+      woodWallTierV1757=tier;mode=type;commandMode='select';
+      if(matchMedia('(max-width:900px), (max-height:580px)').matches)
+       document.body.classList.remove('hud-city-open','hud-queue-open');
+      renderUI();say(name+': lohista müüri asukoht kaardile.');
+     };
+     const order=()=>{
+      const parent=game.parentCity(localCity);
+      parent.importRequests={...(parent.importRequests||{}),...cost};
+      say('Materjalide tellimus lisatud: '+name);save();
+     };
+     appendBuildingCard(wrapper,{type,name,icon:d.icon,cost:price(cost),
+      time:timeLabel(game.constructionTime(type,tier)),
+      builder:translateEstonian(game.builderLabel(localCity.team)),
+      missing,error,active:mode===type&&woodWallTierV1757===tier,
+      extra:tall?'Kõrge puumüür · käigutee torniga samal kõrgusel':'Odav madal kaitsepiire · ilma käiguteeta',
+      onChoose:select,onRequest:order});
+    }
+    original.replaceWith(wrapper);visibleCount+=2;continue;
+   }
    const card=appendBuildingCard(wrapper,{type,name,icon:d.icon,cost:price(d.cost),time:timeLabel(game.constructionTime(type)),
     builder:translateEstonian(game.builderLabel(localCity.team)),missing,error,active:mode===type,
     extra:type==='fisher'?'Fishing range: '+fishingRange(s.ages[localCity.team])+' sea tiles':'',
@@ -716,6 +743,11 @@ function renderUIImpl(){updateBuildingInfo();syncResourceLayer();const resourceC
  const unavailableBuildings=tab==='build'&&localCity?.team===0&&!Object.keys(BUILDINGS).some(k=>k!=='hall'&&game.canBuildNow(localCity,k));$('hud-build-guidance').textContent=unavailableBuildings?'Some structures need more resources or research.':tab==='army'?'Recruit troops for your city.':isDrawableWallV175(mode)?'V175: vali Sirge või Kumer ja lohista maapinnale.':mode?'Place '+(BUILDINGS[mode]?.name||mode)+' on the map.':'Choose a building, then click a site on the map.';if(view==='local'&&localCity?.team===0&&isDrawableWallV175(mode)){
  button($('actions'),(wallDrawShape==='straight'?'✓ ':'')+'▰ Sirge müür',()=>{wallDrawShape='straight';renderUI();say('Sirge müür: lohista algusest lõpuni.');});
  button($('actions'),(wallDrawShape==='curved'?'✓ ':'')+'⌒ Kumer müür',()=>{wallDrawShape='curved';renderUI();say('Kumer müür: joonista sõrmega kaar.');});
+ if(mode==='palisade')for(const tier of [1,2])
+  button($('actions'),(woodWallTierV1757===tier?'✓ ':'')+'Müür '+(tier===2?'II · kõrge':'I · madal'),()=>{
+   woodWallTierV1757=tier;renderUI();
+   say('Valitud Müür '+(tier===2?'II: kõrge ja pealkäidav.':'I: madal ja odav.'));
+  });
 }else if(view==='local'&&localCity?.team===0&&WALL_TYPES.has(mode)&&mode!=='keep')button($('actions'),'↻ Pööra müüri 90° (R)',()=>{wallAxis=wallAxis?0:1;updateGhost();renderUI()});
 if(view==='local'&&localCity?.team===0&&!s.battle&&selectedBuilding&&WALL_TYPES.has(selectedBuilding.type)&&localCity.economy.buildings.includes(selectedBuilding)){
  const b=selectedBuilding,guards=game.wallGuards(localCity,b);
@@ -790,7 +822,7 @@ function pick(e){
 }
 // Track simultaneous fingers separately. A completed pinch must never become a map tap.
 const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
- let wallDrawShape='straight',wallStroke=null,wallStrokePreview=null,lastWallBuildV175=null;
+ let wallDrawShape='straight',wallStroke=null,wallStrokePreview=null,lastWallBuildV175=null,woodWallTierV1757=1;
  const wallToolbar=document.createElement('div');
  wallToolbar.id='v175-wall-toolbar';wallToolbar.hidden=true;
  const wallChoices=document.createElement('div');
@@ -802,7 +834,7 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
  curvedChoice.setAttribute('aria-label','Ehita kumer müür');
  const wallHelp=document.createElement('div');
  wallHelp.className='v175-wall-help';
- wallHelp.textContent='Lohista sõrmega kaardil müüri asukoht';
+ wallHelp.textContent='Vali Müür I või II ja lohista sõrmega kaardil müüri asukoht';
  wallChoices.append(straightChoice,curvedChoice);wallToolbar.append(wallChoices,wallHelp);
  document.body.append(wallToolbar);
  function updateWallDrawToolbar(){
@@ -825,7 +857,7 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
   if(plan.error)return plan.error;
   const city=activeCity();
   if(!city||city.team!==0||!BUILDINGS[mode])return 'Vali oma linna müür.';
-  const area=game.constructionArea(city),cost=BUILDINGS[mode].cost;
+  const area=game.constructionArea(city),cost=woodFortCostV1757(mode,mode==='palisade'?woodWallTierV1757:1,BUILDINGS[mode].cost);
   if(area.pending.length+plan.segments.length>12)
    return 'Ehitusjärjekorras pole piisavalt kohti: '+(12-area.pending.length)+' vaba.';
   for(const [resource,amount] of Object.entries(cost))
@@ -839,7 +871,7 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
    const result=game.previewBuild(city,mode,{
     x:part.x,z:part.z,wallAngleV175:part.wallAngleV175,
     wallAxis:part.wallAxis,palisadeSpanV167:part.palisadeSpanV167,
-    drawnWallV175:true
+    drawnWallV175:true,woodFortTierV1757:mode==='palisade'?woodWallTierV1757:1
    });
    if(result.error)return 'Lõik '+(i+1)+': '+result.error;
   }
@@ -855,7 +887,7 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
    new T.LineBasicMaterial({color:reason?'#e85c52':'#7bd2a2',depthTest:false}));
   wallStrokePreview.name='V175 curved or straight wall preview';wallStrokePreview.renderOrder=25;environment.add(wallStrokePreview);
   $('buildhint').hidden=false;$('buildhint').textContent=reason||
-   ('V175 '+(wallDrawShape==='curved'?'KUMER':'SIRGE')+
+   ('V175.7b Müür '+(mode==='palisade'?woodWallTierV1757:'')+' '+(wallDrawShape==='curved'?'KUMER':'SIRGE')+
     ' · '+plan.segments.length+' lõiku · vabasta ehitamiseks');
   wallHelp.textContent=reason||
    ('✓ '+plan.segments.length+' lõiku saab ehitada · vabasta sõrm');
@@ -879,7 +911,8 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
    }
    const result=game.build(city,type,{x:part.x,z:part.z,
     wallAngleV175:part.wallAngleV175,wallAxis:part.wallAxis,
-    palisadeSpanV167:part.palisadeSpanV167,drawnWallV175:true});
+    palisadeSpanV167:part.palisadeSpanV167,drawnWallV175:true,
+    woodFortTierV1757:type==='palisade'?woodWallTierV1757:1});
    if(result.error){error=result.error;break;}built++;
   }
   lastWallBuildV175={built,attempted:plan.segments.length,shape:wallDrawShape,error};
@@ -940,7 +973,7 @@ function localClick(p,forceMove=false){const city=activeCity(),a=settlerHere();i
  attacker.attackTargetSource=pick.unit.source;attacker.target=null;attacker.manualOrder=false;attacker.advance=true;
  if(attacker.formation==='hold')setFormation(attacker,'line',TROOPS,s.battle.elapsed,false);
  commandMode='select';say('Ründekäsk antud: '+(TROOPS[pick.unit.kind]?.name||'vastase salk')+'.');renderUI();save();return;
- }if(mode&&city?.team===0&&!s.battle&&!forceMove){ghostPoint={x:Math.round(p.x/2)*2,z:Math.round(p.z/2)*2};updateGhost();const r=game.buildInArea(city,mode,ghostPoint);say(r.error||'Ehitus algas · '+game.parentCity(city).name);if(r.building){if(WALL_TYPES.has(r.building.type)){r.building.wallAxis=wallAxis;configureWallFootprint(r.building);game.nav(r.ctx).rebuild()}mode=null;if(r.ctx.c!==activeTile.c||r.ctx.r!==activeTile.r)openTile(game.cell(r.ctx))}renderUI();save();return}const moving=forceMove||commandMode==='move';if(moving){if(selectedUnit?.team===0&&selectedUnit.hp>0&&!selectedUnit.retreated&&(!selectedUnit.guardPost||s.battle?.wallWalkEnabled)){const nav=detailNav();const wallOrder=orderWallMove(s.battle,selectedUnit,p,nav);if(wallOrder){say(wallOrder.error||'Sõdurid liiguvad müürikäigule.');renderUI();save();return;}if(selectedUnit.guardPost)return say('Vali ühendatud müürikäik.');const target=nav.nearest(p,6);if(!target||!nav.route(selectedUnit,target))return say('Üksus ei pääse sinna.');const actual=s.battle?selectedUnit:deploymentFor(s,activeTile,selectedUnit.source,s.units[selectedUnit.source]);actual.target=target;actual.attackTargetSource=null;actual.advance=false;actual.manualOrder=true;}else if(a&&selectedMover===a.id&&!s.battle){const target={x:Math.round(p.x),z:Math.round(p.z)},error=game.siteRule(a,target);if(error)return say(error);if(!game.nav(a).route(a,target))return say('Asunik ei pääse sinna.');a.localTarget=target}else return say('Vali esmalt sellel detailkaardil oma üksus.');commandMode='select';say('Liikumiskäsk antud.');renderUI();save();return}
+ }if(mode&&city?.team===0&&!s.battle&&!forceMove){ghostPoint={x:Math.round(p.x/2)*2,z:Math.round(p.z/2)*2};updateGhost();const r=game.buildInArea(city,mode,mode==='palisade'?{...ghostPoint,woodFortTierV1757:woodWallTierV1757}:ghostPoint);say(r.error||'Ehitus algas · '+game.parentCity(city).name);if(r.building){if(WALL_TYPES.has(r.building.type)){r.building.wallAxis=wallAxis;configureWallFootprint(r.building);game.nav(r.ctx).rebuild()}mode=null;if(r.ctx.c!==activeTile.c||r.ctx.r!==activeTile.r)openTile(game.cell(r.ctx))}renderUI();save();return}const moving=forceMove||commandMode==='move';if(moving){if(selectedUnit?.team===0&&selectedUnit.hp>0&&!selectedUnit.retreated&&(!selectedUnit.guardPost||s.battle?.wallWalkEnabled)){const nav=detailNav();const wallOrder=orderWallMove(s.battle,selectedUnit,p,nav);if(wallOrder){say(wallOrder.error||'Sõdurid liiguvad müürikäigule.');renderUI();save();return;}if(selectedUnit.guardPost)return say('Vali ühendatud müürikäik.');const target=nav.nearest(p,6);if(!target||!nav.route(selectedUnit,target))return say('Üksus ei pääse sinna.');const actual=s.battle?selectedUnit:deploymentFor(s,activeTile,selectedUnit.source,s.units[selectedUnit.source]);actual.target=target;actual.attackTargetSource=null;actual.advance=false;actual.manualOrder=true;}else if(a&&selectedMover===a.id&&!s.battle){const target={x:Math.round(p.x),z:Math.round(p.z)},error=game.siteRule(a,target);if(error)return say(error);if(!game.nav(a).route(a,target))return say('Asunik ei pääse sinna.');a.localTarget=target}else return say('Vali esmalt sellel detailkaardil oma üksus.');commandMode='select';say('Liikumiskäsk antud.');renderUI();save();return}
 const {dc,dr}=tileDelta(p.x,p.z);if((dc||dr)&&!s.battle){const c=activeTile.c+dc,r=activeTile.r+dr;if(c>=0&&r>=0&&c<COLS&&r<ROWS)openTile(game.cell({c,r}));return}const hitWall=city?.team===0&&!s.battle&&city.economy.buildings.find(b=>WALL_TYPES.has(b.type)&&dist(b,p)<3.5);if(hitWall){inspectBuilding(hitWall);return}const hitMan=s.battle?.squads.filter(u=>!u.reserve&&!u.retreated).flatMap(u=>(u.men||[]).filter(m=>m.hp>0&&!m.escaped).map(m=>({u,m,d:dist(m,p)}))).filter(q=>q.d<(q.m.radius||.34)+1).sort((a,b)=>a.d-b.d)[0];const unit=hitMan?.u||(s.battle?.squads||inspection()).find(u=>u.hp>0&&!u.reserve&&!u.retreated&&dist(u,p)<4);selectedSoldierId=hitMan?.m.id??null;if(unit){document.body.classList.remove('hud-city-open','hud-queue-open');selectedBuilding=null;selectedUnit=unit;selectedMover=null;selectedShip=null;armySelected=false;renderUI();return}if(a&&dist(a,p)<4){selectedUnit=null;selectedBuilding=null;selectedMover=a.id;renderUI();return}if(city){const b=city.economy.buildings.filter(b=>!b.virtual)
  .map(b=>({b,d:dist(b,p)})).sort((a,b)=>a.d-b.d)
  .find(({b})=>Math.abs(p.x-b.x)<4.4&&Math.abs(p.z-b.z)<4.2)?.b;
@@ -1011,7 +1044,7 @@ function queueTechnology(id){const r=game.queueResearch(0,id);say(r.error||'Jär
 function removeTechnology(id){const r=s.research[0];r.queue=r.queue.filter(t=>t!==id);const planned={known:[...r.known,...(r.active?[r.active]:[])]};r.queue=r.queue.filter(t=>{if(techBlock(planned,t))return false;planned.known.push(t);return true});renderUI();save()}
 function applyQuality(){villageLife.clear();if(typeof atmosphere!=='undefined')atmosphere.setQuality(quality);renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?.85:quality==='medium'?1.15:1.6));renderer.shadowMap.enabled=quality!=='low';$('quality').textContent='Graafika: '+({low:'säästlik',medium:'keskmine',high:'kõrge'}[quality]);for(const[key,model]of unitModels)if(key.startsWith('unit:')){people.remove(model);unitModels.delete(key)}try{localStorage.setItem('kingdoms-quality',quality)}catch{}}
 $('quality').onclick=()=>{quality=quality==='high'?'medium':quality==='medium'?'low':'high';applyQuality();say($('quality').textContent)};
-function updateGhost(){if(isDrawableWallV175(mode)){if(ghost)ghost.visible=false;$('buildhint').hidden=false;$('buildhint').textContent='V175 · '+(wallDrawShape==='curved'?'Kumer':'Sirge')+' müür: hoia sõrme kaardil ja lohista.';return;}const city=activeCity();if(view!=='local'||!mode||!city||city.team!==0||s.battle){if(ghost)ghost.visible=false;$('buildhint').hidden=true;return}const key=mode+':'+game.buildingAge(0,mode);if(!ghost||ghostKey!==key){if(ghost){localObjects.remove(ghost);ghost.traverse(o=>o.material?.dispose())}ghost=townBuildingModel(mode,0,game.buildingAge(0,mode));ghost.traverse(o=>{if(o.material){o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.48;o.material.depthWrite=false}});ghostKey=key;localObjects.add(ghost)}if(!ghostPoint){ghost.visible=false;$('buildhint').hidden=false;$('buildhint').textContent='Valitud: '+BUILDINGS[mode].name+' · puuduta ehituskohta';return}const check=game.previewInArea(city,mode,ghostPoint);ghost.visible=true;const snapped=check.p||check.point||ghostPoint,offset=check.ctx?{x:(check.ctx.c-activeTile.c)*150,z:(check.ctx.r-activeTile.r)*130}:{x:0,z:0};if(mode==='field'){const size=fieldSize(ghostPoint);ghost.scale.set(size.width/16,1,size.depth/16);}else if(mode==='market')ghost.scale.set(2,1,2);
+function updateGhost(){if(isDrawableWallV175(mode)){if(ghost)ghost.visible=false;$('buildhint').hidden=false;$('buildhint').textContent='V175.7b Müür '+(woodWallTierV1757===2?'II':'I')+' · '+(wallDrawShape==='curved'?'Kumer':'Sirge')+' müür: hoia sõrme kaardil ja lohista.';return;}const city=activeCity();if(view!=='local'||!mode||!city||city.team!==0||s.battle){if(ghost)ghost.visible=false;$('buildhint').hidden=true;return}const key=mode+':'+game.buildingAge(0,mode)+':'+(mode==='palisade'?woodWallTierV1757:1);if(!ghost||ghostKey!==key){if(ghost){localObjects.remove(ghost);ghost.traverse(o=>o.material?.dispose())}ghost=townBuildingModel(mode,0,game.buildingAge(0,mode),0,0,mode==='palisade'?woodWallTierV1757:1);ghost.traverse(o=>{if(o.material){o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.48;o.material.depthWrite=false}});ghostKey=key;localObjects.add(ghost)}if(!ghostPoint){ghost.visible=false;$('buildhint').hidden=false;$('buildhint').textContent='Valitud: '+BUILDINGS[mode].name+' · puuduta ehituskohta';return}const check=game.previewInArea(city,mode,mode==='palisade'?{...ghostPoint,woodFortTierV1757:woodWallTierV1757}:ghostPoint);ghost.visible=true;const snapped=check.p||check.point||ghostPoint,offset=check.ctx?{x:(check.ctx.c-activeTile.c)*150,z:(check.ctx.r-activeTile.r)*130}:{x:0,z:0};if(mode==='field'){const size=fieldSize(ghostPoint);ghost.scale.set(size.width/16,1,size.depth/16);}else if(mode==='market')ghost.scale.set(2,1,2);
 ghost.position.set(snapped.x+offset.x,check.baseY??(check.ctx?ground(game.cell(check.ctx),snapped.x,snapped.z):ground(activeTile,snapped.x,snapped.z)),snapped.z+offset.z);ghost.rotation.y=check.shoreAngle??(WALL_TYPES.has(mode)&&wallAxis?Math.PI/2:0);ghost.traverse(o=>{if(o.material)o.material.color.set(check.error?'#c26757':'#9fc877')});$('buildhint').hidden=false;$('buildhint').textContent=check.error||BUILDINGS[mode].name+' · sobiv koht';$('buildhint').classList.toggle('invalid',!!check.error)}
 function renderCityHealth(){const city=activeCity();$('cityhealth').hidden=!city;if(!city)return;const parent=game.parentCity(city),area=game.constructionArea(city),radius=game.radius(parent);const r=city.economy.realms[city.team],foodNeed=Math.round(r.pop*FOOD_PER_RESIDENT*100)/100,waterNeed=Math.round(r.pop*WATER_PER_RESIDENT*100)/100,capacity=game.housing(city),waiting=area.buildings.filter(b=>b.status?.startsWith('Ootab')||b.status?.includes('napib')||b.status?.includes('pole ligipääsetavat')).length;const happiness=cityNeeds(parent,s.ages[parent.team]),food=Math.floor(foodTotal(r.resources)),water=Math.floor(r.resources.water),waterCap=game.storageCap(city,'water'),foodCap=game.storageCap(city,'bread'),employed=Math.round((r.employed||0)*100)/100,growth=Math.round(100*(r.growthProgress||0)/Math.max(1,r.growthNeed||4)),extent=cityExtent(radius),nextPop=nextCityPopulation(radius),shipments=s.shipments.filter(c=>c.to===parent.id||c.from===parent.id).length,incoming=s.shipments.filter(c=>c.to===city.id).length,outgoing=s.shipments.filter(c=>c.from===city.id).length;
  // V155: the overview is a small dashboard (key numbers, warnings, collapsible details) instead of one long line.
@@ -1249,11 +1282,11 @@ $('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('ki
  selectBuildingType:(type,index=0)=>{const c=activeCity();return inspectBuilding(c?.economy.buildings.filter(b=>b.type===type)[index])},
  industrialModelStatus:()=>{const result=[];localScene.traverse(o=>{if(o.userData?.industrialAgeModel)result.push({
   type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,
-  age:o.userData.age,center:{x:o.position.x,z:o.position.z}})});return result},renaissanceModelStatus:()=>{const out=[];localScene.traverse(o=>{if(o.userData?.renaissanceAgeModel)out.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return out},bronzeModelStatus:()=>{const list=[];localScene.traverse(o=>{if(o.userData?.bronzeAgeModel)list.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return list},marketWalkStatus:()=>{const city=activeCity();return Object.entries(city?.world?.workers||{}).filter(([id,w])=>w.kind==='market_woman').map(([id,w])=>({id,x:w.x,z:w.z,moving:w.moving,phase:w.shoppingPhase,status:w.status}))},localRoadStatus:()=>({spots:localTrails?.count||0,ribbonTriangles:localTrailLinks?.children?.[0]?.geometry?.attributes?.position?.count/3||0,trailCells:Object.keys(activeCity()?.world?.heat||{}).length}),refreshLocalRoads:()=>{lastTrailTime=-1;syncLocal()},stoneModelStatus:()=>{const list=[];localScene.traverse(o=>{if(o.userData?.stoneAgeModel)list.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return list},villageLifeStatus:()=>villageLife.stats(),refreshVillageLife:(time)=>villageLife.update(time,.1),perfStats:()=>({drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,pixelRatio:renderer.getPixelRatio(),drawingBuffer:{w:renderer.domElement.width,h:renderer.domElement.height}}),detailObjectStatus:()=>[...detailObjectHolders.values()].map(({tile,holder})=>({c:tile.c,r:tile.r,ids:holder.children.flatMap(g=>g.userData.siteIds||[]),objects:holder.children.flatMap(g=>g.children.map(m=>({id:m.userData.worldSiteId,kind:m.userData.worldProp,claimedBy:m.userData.claimedBy,visible:m.visible})))})),resourceLayerStatus:()=>({enabled:showResourceOverlay,icons:resourceSprites.length}),pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,overviewMetrics,wallDrawStatus:()=>({mode,shape:wallDrawShape,points:wallStroke?.points.length||0,preview:!!wallStrokePreview,lastBuild:lastWallBuildV175,feedback:wallHelp.textContent}),towerPatrolStatus:()=>{const city=activeCity(),b=city&&peacefulGarrisons.get(city);
+  age:o.userData.age,center:{x:o.position.x,z:o.position.z}})});return result},renaissanceModelStatus:()=>{const out=[];localScene.traverse(o=>{if(o.userData?.renaissanceAgeModel)out.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return out},bronzeModelStatus:()=>{const list=[];localScene.traverse(o=>{if(o.userData?.bronzeAgeModel)list.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return list},marketWalkStatus:()=>{const city=activeCity();return Object.entries(city?.world?.workers||{}).filter(([id,w])=>w.kind==='market_woman').map(([id,w])=>({id,x:w.x,z:w.z,moving:w.moving,phase:w.shoppingPhase,status:w.status}))},localRoadStatus:()=>({spots:localTrails?.count||0,ribbonTriangles:localTrailLinks?.children?.[0]?.geometry?.attributes?.position?.count/3||0,trailCells:Object.keys(activeCity()?.world?.heat||{}).length}),refreshLocalRoads:()=>{lastTrailTime=-1;syncLocal()},stoneModelStatus:()=>{const list=[];localScene.traverse(o=>{if(o.userData?.stoneAgeModel)list.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return list},villageLifeStatus:()=>villageLife.stats(),refreshVillageLife:(time)=>villageLife.update(time,.1),perfStats:()=>({drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,pixelRatio:renderer.getPixelRatio(),drawingBuffer:{w:renderer.domElement.width,h:renderer.domElement.height}}),detailObjectStatus:()=>[...detailObjectHolders.values()].map(({tile,holder})=>({c:tile.c,r:tile.r,ids:holder.children.flatMap(g=>g.userData.siteIds||[]),objects:holder.children.flatMap(g=>g.children.map(m=>({id:m.userData.worldSiteId,kind:m.userData.worldProp,claimedBy:m.userData.claimedBy,visible:m.visible})))})),resourceLayerStatus:()=>({enabled:showResourceOverlay,icons:resourceSprites.length}),pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,overviewMetrics,wallDrawStatus:()=>({mode,shape:wallDrawShape,points:wallStroke?.points.length||0,preview:!!wallStrokePreview,lastBuild:lastWallBuildV175,tier:woodWallTierV1757,feedback:wallHelp.textContent}),towerPatrolStatus:()=>{const city=activeCity(),b=city&&peacefulGarrisons.get(city);
  return (b?.squads||[]).filter(u=>u.towerGuard).map(u=>({
  slot:u.guardSlot,homeTower:u.homeTower,phase:u.peacePatrolV1757?.phase||'roof',
  x:u.x,z:u.z,elevation:u.wallElevation,walking:!!u.moving,guardPost:!!u.guardPost
- }));},setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
+ }));},setBuildPreview:(type,p,tier=1)=>{mode=type;woodWallTierV1757=tier;ghostPoint=p;updateGhost();return ghost}};
 // Delegation survives the regularly refreshed HUD.
 function openFoodStocks(){const city=activeCity()?.team===0?game.parentCity(activeCity()):ownCity();if(!city)return;let dialog=document.getElementById('food-stocks-v87');if(!dialog){dialog=document.createElement('dialog');dialog.id='food-stocks-v87';document.body.append(dialog);}const r=city.economy.realms[0].resources,n=nationalStock(s,0),needs=cityNeeds(city,s.ages[0]);dialog.replaceChildren();const title=document.createElement('h2');title.textContent=city.name+' · toiduvarud';dialog.append(title);const intro=document.createElement('p');intro.textContent='Kohalik (riigi kogus). Vajadus '+needs.need.food+' toitu ja '+needs.need.luxury+' luksust. Tootlikkus '+Math.round(needs.productivity*100)+'%. Iga puuduv liik −5%, üleliigne +2%.';dialog.append(intro);for(const k of ['bread','grain','flour',...Object.keys(GOODS).filter(k=>GOODS[k].food||GOODS[k].luxury),'pottery']){const line=document.createElement('p');line.textContent=(RESOURCE_NAMES[k]||k)+': '+(r[k]||0).toFixed(1)+' ('+(n[k]||0).toFixed(1)+')';dialog.append(line);}const close=document.createElement('button');close.textContent='Sulge';close.onclick=()=>dialog.close();dialog.append(close);dialog.showModal();}
 $('resources').addEventListener('click',e=>{if(e.target.closest('[data-resource="bread"]'))openFoodStocks();});
