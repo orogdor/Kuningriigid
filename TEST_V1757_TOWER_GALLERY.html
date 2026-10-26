@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="et"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kuningriigid V175.7 | Puidust torn – 3D ülevaatus</title>
+<title>Kuningriigid V175.7b | Puitkindlustused – 3D ülevaatus</title>
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#a2aca8;font:14px system-ui}
 #info{position:absolute;top:12px;left:12px;z-index:2;background:#1b2724da;color:white;
@@ -32,27 +32,43 @@ sun.shadow.camera.bottom=-20;scene.add(sun);
 const floor=new T.Mesh(new T.PlaneGeometry(90,90),
  new T.MeshStandardMaterial({color:'#6e815d',roughness:1}));
 floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
-const tower=createAgeBuilding('watchtower',0,0);
-scene.add(tower);
 const params=new URLSearchParams(location.search);
+const subject=params.get('subject')||'tower';
 const angle=params.get('angle')||'front',mobile=innerWidth<600;
-const positions={front:[10.8,10.2,16.8],side:[18.5,10.2,4.5],
- rear:[-10.5,11.5,-17.5],top:[11,22,13]};
+const structures=[];
+function add(type,tier,x){
+ const model=createAgeBuilding(type,0,0,tier);
+ model.position.x=x;scene.add(model);structures.push({type,tier,x});
+}
+if(subject==='wall-low')add('palisade',1,0);
+else if(subject==='wall-high')add('palisade',2,0);
+else if(subject==='comparison'){
+ add('watchtower',1,-7.1);add('palisade',2,0);add('palisade',1,8);
+}else add('watchtower',1,0);
+const large=subject==='comparison';
+const pivot=new T.Vector3(large?0:0,large?4.2:4.3,0);
+const positions=large?{front:[22,14,28],side:[33,15,8],rear:[-18,17,-29],top:[17,33,18]}:
+ {front:[10.8,10.2,16.8],side:[18.5,10.2,4.5],
+  rear:[-10.5,11.5,-17.5],top:[11,22,13]};
 const eye=positions[angle]||positions.front;
 camera.position.set(...eye);
-if(mobile){const pivot=new T.Vector3(0,4.3,0);
- camera.position.sub(pivot).multiplyScalar(2.30).add(pivot);}
-camera.lookAt(0,4.3,0);
+if(mobile)camera.position.sub(pivot).multiplyScalar(large?2.55:2.30).add(pivot);
+camera.lookAt(pivot);
 document.querySelector('#side').textContent={
  front:'Eestvaade – uks ja sissepääs',side:'Külgvaade – kinnine sein',
  rear:'Tagantvaade – kinnine sein',top:'Ülevaade – ülemine kaitseplatvorm'
 }[angle]||'Eestvaade';
+document.querySelector('#info strong').textContent={
+ tower:'Puidust kaitsetorn', 'wall-low':'Müür I · madal palisaad',
+ 'wall-high':'Müür II · kõrge käigutee',
+ comparison:'Torn + Müür II + Müür I'
+}[subject]||'Puitkindlustused';
 function render(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
  renderer.setSize(innerWidth,innerHeight);renderer.render(scene,camera);}
 addEventListener('resize',render);render();
-window.towerVisualInfo={angle,mobile,
+window.towerVisualInfo={angle,mobile,subject,structures,
  drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,
- buildingType:'watchtower'};
+ buildingType:structures[0].type};
 window.towerVisualReady=true;
 </script>
 </html>

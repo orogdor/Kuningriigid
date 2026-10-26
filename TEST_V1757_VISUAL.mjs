@@ -34,6 +34,33 @@ try{
   console.log('V175.7 TOWER VISUAL PASS '+label+' '+angle+' '+info.triangles+' triangles');
   await ctx.close();
  }
+ // V175.7b: capture each real wooden wall model and compare both heights
+ // with the actual finished tower. These are genuine headless WebGL frames.
+ for(const subject of ['wall-low','wall-high','comparison'])
+  for(const [label,viewport] of [
+   ['desktop',{width:1000,height:760}],
+   ['mobile',{width:390,height:844}]
+  ]){
+   const ctx=await browser.newContext({viewport,deviceScaleFactor:label==='mobile'?2:1});
+   const page=await ctx.newPage(),errors=[];
+   page.on('pageerror',e=>errors.push(e.message));
+   try{
+    await page.goto(base+'TEST_V1757_TOWER_GALLERY.html?angle=front&subject='+subject,
+     {waitUntil:'domcontentloaded',timeout:90000});
+    await page.waitForFunction(()=>window.towerVisualReady,{timeout:90000});
+    await page.waitForTimeout(160);
+    const info=await page.evaluate(()=>window.towerVisualInfo);
+    const expected=subject==='comparison'?3:1;
+    assert.equal(info.structures.length,expected,'real fortification geometry in 3D scene');
+    assert.ok(info.triangles>=350,'wall mesh must render on '+label);
+    assert.deepEqual(errors,[],'new wall scene must not trigger browser errors');
+    const file=output+'/walls-'+subject+'-'+label+'.png';
+    await page.screenshot({path:file});
+    assert.ok(fs.statSync(file).size>10000,'wall picture should contain actual WebGL frame');
+    report.gallery.push({file,...info,size:fs.statSync(file).size});
+    console.log('V175.7b VISUAL '+label+' '+subject+' PASS '+info.triangles+' triangles');
+   }finally{await ctx.close();}
+  }
  for(const [label,viewport,mobile] of [
   ['desktop',{width:1280,height:800},false],
   ['mobile',{width:390,height:844},true]
