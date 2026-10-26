@@ -1,0 +1,30 @@
+/* V175.2: phone-friendly straight/curved wall drawing selector.
+   Only visible while constructing a manual palisade/stone wall. */
+#v175-wall-toolbar[hidden]{display:none!important}
+#v175-wall-toolbar{
+ position:fixed;top:calc(env(safe-area-inset-top, 0px) + 66px);
+ left:50%;transform:translateX(-50%);z-index:90;
+ display:flex;flex-direction:column;align-items:center;gap:3px;
+ padding:7px 9px 6px;background:rgba(17,42,37,.96);
+ border:1px solid rgba(223,195,132,.68);border-radius:12px;
+ box-shadow:0 4px 16px rgba(0,0,0,.37);
+ max-width:calc(100vw - 20px);color:#f5ebd1;
+ font:600 13px system-ui,-apple-system,sans-serif;
+ pointer-events:auto;touch-action:manipulation;
+}
+#v175-wall-toolbar .v175-wall-choices{display:flex;gap:7px;justify-content:center}
+#v175-wall-toolbar button{
+ appearance:none;min-width:102px;min-height:38px;padding:7px 11px;
+ background:#234139;color:#f4e9cd;border:1px solid #698b74;
+ border-radius:8px;cursor:pointer;font:inherit;
+ touch-action:manipulation;white-space:nowrap;
+}
+#v175-wall-toolbar button[aria-pressed="true"]{
+ background:#cbb06e;color:#1e2d25;border-color:#f7d68a;
+}
+#v175-wall-toolbar .v175-wall-help{
+ font-size:11px;line-height:1.25;color:#c5d6c7;font-weight:500;text-align:center
+}
+@media(min-width:901px){
+ #v175-wall-toolbar{top:76px;left:auto;right:20px;transform:none}
+}
