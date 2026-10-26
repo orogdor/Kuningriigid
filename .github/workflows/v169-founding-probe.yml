@@ -1,0 +1,19 @@
+name: V169 Founding Site Dry-Land Probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v169-founding-probe.yml'
+      - 'scripts/v169-founding-probe.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  founding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node scripts/v169-founding-probe.mjs
