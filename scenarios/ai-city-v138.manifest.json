@@ -4,7 +4,7 @@
     {
       "team": 1,
       "cities": 11,
-      "buildings": 293,
+      "buildings": 294,
       "markets": 5,
       "harbors": 1,
       "houses": 90,
@@ -17,19 +17,19 @@
       "buildings": 238,
       "markets": 2,
       "harbors": 1,
-      "houses": 61,
+      "houses": 57,
       "fields": 2,
       "ages": 4
     },
     {
       "team": 3,
-      "cities": 7,
-      "buildings": 245,
-      "markets": 5,
+      "cities": 6,
+      "buildings": 222,
+      "markets": 4,
       "harbors": 1,
-      "houses": 71,
+      "houses": 68,
       "fields": 2,
-      "ages": 4
+      "ages": 3
     }
   ],
   "landUse": [
@@ -126,7 +126,7 @@
     {
       "name": "Tuonela",
       "owned": 75,
-      "developed": 2,
+      "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 1,
@@ -208,15 +208,15 @@
       "city": "Tuonela",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 4,
-      "urbanTiles": 17
+      "urbanBuildings": 5,
+      "urbanTiles": 18
     }
   ],
   "seed": 138023,
   "turn": 246,
   "sourceTeam": 1,
   "cities": 11,
-  "buildings": 293,
+  "buildings": 294,
   "spacingPairs": [
     9,
     11,
@@ -278,8 +278,8 @@
     5,
     0,
     4,
-    4
+    3
   ],
-  "bytes": 4770784,
-  "seconds": 232
+  "bytes": 4029702,
+  "seconds": 224
 }
