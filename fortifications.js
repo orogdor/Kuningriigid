@@ -4,7 +4,7 @@ import {towerBallista} from './siege-support-v115.js?v=117a';
 // V62: medieval walls, castles and independent siege sections.
 import {wallProfile,prepareWall} from './siege-rules-v114.js?v=117a';
 import {attachSiegeSections} from './medieval-v62.js?v=117a';
-import {wallFootprintV175} from './wall-draw-v175.js?v=1753a';
+import {wallFootprintV175} from './wall-draw-v175.js?v=1754a';
 // V61: One civilian worker mans each tower; wall soldiers come only from real units.
 export const WALL_TYPES=new Set(['palisade','stonewall','reinforced_wall','keep']);
 export const TOWER_TYPES=new Set(['watchtower','stonetower']);
