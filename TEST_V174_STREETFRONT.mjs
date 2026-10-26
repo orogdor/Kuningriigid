@@ -54,6 +54,20 @@ assert.ok(oldConfig.includes('recordWorldStep'),'world roads must retain real tr
 const nav=fs.readFileSync('navigation.js','utf8');
 assert.ok(nav.includes('recordTraffic(from,to,weight=1)'),'local street wear remains based on movement');
 assert.ok(nav.includes('pruneTrails()'),'disused lanes still fade');
+const live=JSON.parse(fs.readFileSync('scenarios/ai-stone-v174.json','utf8'));
+const liveGame=new Civilization(live),liveCity=liveGame.s.cities.find(c=>c.id===live.stoneTestV174.targetCityId);
+assert.equal(liveCity?.team,0,'latest AI town belongs to the player');
+const liveNav=liveGame.nav(liveCity);
+const liveRoads=Object.keys(liveCity.world.heat||{}).map(Number).filter(i=>
+ liveNav.roadLevel(i)>0&&liveNav.open(liveNav.point(i).x,liveNav.point(i).z));
+assert.ok(liveRoads.length>=25,'V174 real village must have naturally worn roads');
+assert.ok(Object.keys(liveGame.s.worldRoads||{}).length>=5,'world traffic remains active');
+const roadsBefore=JSON.stringify(liveCity.world.heat);
+const candidateHouses=liveGame.buildingSites(liveCity,'house');
+assert.ok(candidateHouses.length>30,'paths do not prevent continued settlement growth');
+assert.equal(JSON.stringify(liveCity.world.heat),roadsBefore,'new AI planning cannot fabricate or erase traffic wear');
+const newManifest=JSON.parse(fs.readFileSync('scenarios/ai-stone-v174.manifest.json','utf8'));
+assert.equal(newManifest.version,174);
 console.log('V174 STREETFRONT AND COURTYARD PASS '+JSON.stringify({trackedTrailCells:trail.length,
  availablePlots:plots.length,variants:shapes.length,firstHouseVertices:shapes[0].vertices,
- meanCandidateStreetDistance:Math.round(plots.slice(0,16).reduce((n,p)=>n+Math.min(100,closestActiveStreetV174(idx,p)),0)/16)}));
+ meanCandidateStreetDistance:Math.round(plots.slice(0,16).reduce((n,p)=>n+Math.min(100,closestActiveStreetV174(idx,p)),0)/16),liveRoadCells:liveRoads.length,worldRoadEdges:Object.keys(liveGame.s.worldRoads||{}).length}));
