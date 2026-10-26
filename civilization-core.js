@@ -61,7 +61,7 @@ import {isDrawableWallV175,wallPointInsideV175,wallCrossesGateOpeningV175} from 
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js?v=123a';
 import {roadBoost,recordWorldStep,decayWorldRoads} from './roads.js?v=59';
-import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=1753a';
+import {wallGuards,stationWall,releaseWall,configureWallFootprint} from './fortifications.js?v=1754a';
 import {MEDIEVAL_BUILDINGS,MEDIEVAL_UNITS,medievalBonus,healMedievalArmies} from './medieval-v62.js?v=117a';
 export {BUILDINGS,RESOURCE_NAMES};
 RESOURCE_NAMES.bread='Teraviljatoit';BUILDINGS.harbor={name:'Sadam ja laevatehas',icon:'⚓',cost:{wood:60,plank:25,stone:25},requires:['lumber','quarry'],workers:0,time:40};BUILDINGS.hall.name='Algusmaja · 3 töölist';
