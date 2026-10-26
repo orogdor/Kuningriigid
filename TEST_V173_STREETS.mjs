@@ -70,8 +70,20 @@ const snapshot=JSON.stringify(sample.s);
 const samplePlots=sample.buildingSites(selected,'house');
 assert.ok(samplePlots.length>20,'existing V172 saved city can still identify building sites');
 assert.equal(JSON.stringify(sample.s),snapshot,'reading candidate plots never changes saved town or roads');
+const liveState=JSON.parse(fs.readFileSync('scenarios/ai-stone-v173.json','utf8'));
+const liveGame=new Civilization(liveState);
+const livedCity=liveGame.s.cities.find(c=>c.id===liveGame.s.stoneTestV173.targetCityId);
+assert.equal(livedCity?.team,0,'V173 real AI city is player-owned');
+const livedNav=liveGame.nav(livedCity);
+const pavedCells=Object.keys(livedCity.world.heat||{}).map(Number)
+ .filter(i=>livedNav.roadLevel(i)>=1&&livedNav.open(livedNav.point(i).x,livedNav.point(i).z));
+assert.ok(pavedCells.length>25,'late Stone Age village has naturally worn paths already stored in its V4 save');
+assert.ok(Object.keys(liveGame.s.worldRoads||{}).length>5,'AI empires continue to wear inter-city road edges');
+const roadStamp=JSON.stringify(livedCity.world.heat);
+liveGame.buildingSites(livedCity,'house');
+assert.equal(JSON.stringify(livedCity.world.heat),roadStamp,'V173 street-aware site selection never replaces accumulated live roads');
 console.log('V173 STREET PRESERVATION PASS',JSON.stringify({
  links:links.length,visibleBefore:0,visibleAfter:paths.length,
  buildableAfter:after.length,previousCandidates:before.length,
- worldRoadFirstLevel:firstLevel,saveProtocol:sample.s.version
+ worldRoadFirstLevel:firstLevel,saveProtocol:sample.s.version,liveVillageRoadCells:pavedCells.length,worldRoadEdges:Object.keys(liveGame.s.worldRoads||{}).length
 }));
