@@ -71,12 +71,26 @@ else if(type==='woodgate'){
  for(const x of [-1.8,0,1.8])box(g,x,4.9,.02,.2,.55,.2,'#b18d5d','wood');
  // Raised timber door leaves: route through the centre is unblocked.
  for(const x of [-2.05,2.05])box(g,x,1.8,.38,.48,3.35,.18,'#99734a','wood');
- for(const x of [-3.25,3.25])for(const z of [-.22,.22])box(g,x,1.5,z,.25,3,.2,'#785939','wood');
+ // Two full-length timber wings connect the 14m gate to the neighbouring
+ // palisade ends; keep the central 3.6m opening entirely walkable.
+ for(const side of [-1,1]){
+  for(const x of [2.7,3.1,3.5]){const xx=side*x;
+   cylinder(g,xx,0,0,.29,.34,3.35,'#836241','wood',7);
+   cone(g,xx,3.35,0,.34,.5,'#a98a5e',7);
+  }
+  for(const z of [-.32,.32])for(const y of [.85,2.05])
+   box(g,side*3.08,y,z,.85,.2,.18,'#705338','wood');
+ }
 }
 else if(type==='palisade'){
- for(let x=-3;x<=3;x+=.62){cylinder(g,x,1.65,0,.29,.34,3.3,'#836241','wood',7);cone(g,x,3.48,0,.34,.5,'#a98a5e',7)}
- for(const z of [-.34,.34])for(const y of [.85,2.1])box(g,0,y,z,7,.2,.18,'#6f5338','wood');
- for(const x of [-3,0,3])box(g,x,.7,.65,.32,1.4,.42,'#69513a','wood');
+ // Include BOTH end posts. The previous .62 step stopped at x=2.58,
+ // leaving multi-metre visual gaps after 28–42m segment scaling.
+ for(let i=0;i<=10;i++){const x=-3.5+i*.7;
+  cylinder(g,x,1.65,0,.30,.35,3.3,i%5===0?'#735636':'#836241','wood',7);
+  cone(g,x,3.48,0,.35,.5,'#a98a5e',7);
+ }
+ for(const z of [-.34,.34])for(const y of [.85,2.1])box(g,0,y,z,7.18,.2,.18,'#6f5338','wood');
+ for(const x of [-3.5,0,3.5])box(g,x,.7,.65,.32,1.4,.42,'#69513a','wood');
 }
 else if(type==='stonewall'){
  box(g,0,1.65,0,7,3.3,1.25,'#9e9c8d','stone');
