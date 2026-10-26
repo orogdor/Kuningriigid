@@ -30,8 +30,13 @@ export function buildingClearance(b){
  // lateral ground open for soldiers and pedestrians.
  if(['palisade','stonewall','reinforced_wall'].includes(b.type)){
   const vertical=!!b.wallAxis;
-  return {rx:b.navWidth??(vertical?1.1:3.6),
-          rz:b.navDepth??(vertical?3.6:1.1)};
+  // V175.1: V4 legacy saves may contain 42m palisades with old 7m nav
+  // footprints. Derive geometry from the paid, persisted segment length.
+  const long=b.type==='palisade'?(b.palisadeSpanV167||
+    (b.extendedPalisadeV166?14:7)):7;
+  const half=Math.max(3.6,long/2+.35);
+  return {rx:vertical?Math.max(1.1,b.navWidth||0):Math.max(half,b.navWidth||0),
+          rz:vertical?Math.max(half,b.navDepth||0):Math.max(1.1,b.navDepth||0)};
  }
  // Include a full walking-grid cell's road-ribbon margin for tall Renaissance façades.
  const v=FOOTPRINTS[b.type]||[5.0,5.0];
@@ -72,7 +77,7 @@ currentSignature(){
  // Buildings of equal count can be moved/destroyed; stale nav masks previously
  // caused footsteps to be drawn through a different building at the same index.
  return (this.world.revision||0)+':'+this.buildings().map(b=>
-  b.type+':'+(b.hp<=0?'dead':'live')+':'+Number(!!b.ready)+':'+(b.wallAxis||0)+':'+(b.width||0)+':'+(b.depth||0)+':'+Math.round(b.x*10)+':'+Math.round(b.z*10)+':'+(b.navWidth||0)+':'+(b.navDepth||0)+':'+(b.shoreAngle||0)+':'+(b.landEntry?.x??'')+':'+(b.landEntry?.z??'')
+  b.type+':'+(b.hp<=0?'dead':'live')+':'+Number(!!b.ready)+':'+(b.wallAxis||0)+':'+(b.width||0)+':'+(b.depth||0)+':'+Math.round(b.x*10)+':'+Math.round(b.z*10)+':'+(b.navWidth||0)+':'+(b.navDepth||0)+':'+(b.palisadeSpanV167||0)+':'+Number(!!b.extendedPalisadeV166)+':'+(b.shoreAngle||0)+':'+(b.landEntry?.x??'')+':'+(b.landEntry?.z??'')
  ).join('|');
 }
 refresh(){if(this.signature!==this.currentSignature())this.rebuild()}
