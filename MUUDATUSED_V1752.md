@@ -27,7 +27,7 @@ Sama valik toimib ka kivimüüri ehitusrežiimis, kui ajastu ja tehnoloogia luba
 
 - [V175.2 müüride füüsika ja ehitusreeglite CI](https://github.com/orogdor/Kuningriigid/actions/runs/40328249245): **PASS**. Kontrollitud sirge ja kumer kuju, naaberlõikude ühispunktid, pööratud seinast läbipääsu puudumine, Sogni päris salvestusest müüri ost ja ehitamine, materjalide mahaarvamine, V4 salvestus/laadimine. V175.1 väravate test, V168 kaitsekoridorid, V173/V59 päris liiklusest tekkivad teed ja V73 vanad salvestused: **PASS**.
 - [V175.2 WebGL telefon ja arvuti](https://github.com/orogdor/Kuningriigid/actions/runs/40329085668): **PASS**. Kummaski vaates leiti Sirge ja Kumer valik, kaarjoont sai lohistada ning värviline eelvaade tekkis; arvutis alustati ühe päris müürilõigu ehitamist. Telefoni esialgne lohistus valis takistatud koha, seega üksikust katsest ei saanud kinnitada telefoni müüri valmimist, küll aga režiimi ja joonistamise tööd.
-- [V175.2 uue mobiiliriba korduskontroll](https://github.com/orogdor/Kuningriigid/actions/workflows/v1752-wall-browser.yml) – testib just füüsiliselt klõpsatavaid kahte valikunuppu, sh telefoni vaates.
+- [V175.2 mobiiliriba füüsilise puudutamise korduskontroll](https://github.com/orogdor/Kuningriigid/actions/runs/40330589535): **2/2 PASS**, nii arvutis kui emuleeritud Androidi mõõdus sai uue ülariba kaudu valida Kumer → Sirge, lohistada päris kaare eelvaadet, olemasolevad teerakud säilisid ning kasutaja autosalvestusi ei muudetud. Arvuti žest ehitas ühe müürilõigu; mobiili katse lohistus lõppes olemasolevale hoonele liiga lähedal ja tagastas õigesti ehituse keelamise, mitte ekraanivea.
 
 ## Piirangud, mida mitte segi ajada
 
