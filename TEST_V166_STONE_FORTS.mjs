@@ -53,6 +53,9 @@ planStoneVillageDefenses(model,1,city);
 assert.equal(city.stoneDefensePlanV166.constructed,completed,'defense does not consume scarce construction timber');
 // Real AI playthrough. Observe where each AI finishes Stone Age; do not inject resources.
 assert.equal(stoneFortificationAgeGate(city,0,1000),true,'incomplete Stone Age ring postpones Bronze');
+city.economy.realms[1].pop=4;
+assert.equal(stoneFortificationAgeGate(city,0,1000),true,'temporary population dips cannot abandon already started real walls');
+city.economy.realms[1].pop=10;
 assert.equal(stoneFortificationAgeGate(city,1,1000),false,'Bronze settlements are not gated');
 assert.equal(stoneFortificationAgeGate(city,0,6600),false,'Stone Age milestone has bounded 110-turn timeout');
 const game=new Civilization(createGame(142023));
