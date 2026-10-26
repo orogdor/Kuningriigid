@@ -33,5 +33,7 @@ jobs:
           node --check wall-draw-v175.js
           node --check economy.js
           node --check campaign.js
+      - name: Wood tower geometry and footprint regression (V175.6)
+        run: node TEST_V1756_WOOD_TOWER.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic
