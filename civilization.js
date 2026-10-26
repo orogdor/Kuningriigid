@@ -789,7 +789,7 @@ function pick(e){
 }
 // Track simultaneous fingers separately. A completed pinch must never become a map tap.
 const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
- let wallDrawShape='straight',wallStroke=null,wallStrokePreview=null;
+ let wallDrawShape='straight',wallStroke=null,wallStrokePreview=null,lastWallBuildV175=null;
  const wallToolbar=document.createElement('div');
  wallToolbar.id='v175-wall-toolbar';wallToolbar.hidden=true;
  const wallChoices=document.createElement('div');
@@ -817,27 +817,59 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
   if(!wallStrokePreview)return;environment.remove(wallStrokePreview);
   wallStrokePreview.geometry?.dispose();wallStrokePreview.material?.dispose();wallStrokePreview=null;
  }
+ // Fast & honest user feedback. Construction costs and terrain restrictions
+ // are identical to those on release; previewing NEVER spends resources or
+ // stamps a road. It also rejects an entire stroke before a partial build.
+ function wallStrokePrecheckV175(plan){
+  if(plan.error)return plan.error;
+  const city=activeCity();
+  if(!city||city.team!==0||!BUILDINGS[mode])return 'Vali oma linna müür.';
+  const area=game.constructionArea(city),cost=BUILDINGS[mode].cost;
+  if(area.pending.length+plan.segments.length>12)
+   return 'Ehitusjärjekorras pole piisavalt kohti: '+(12-area.pending.length)+' vaba.';
+  for(const [resource,amount] of Object.entries(cost))
+   if((area.stock[resource]||0)<amount*plan.segments.length)
+    return 'Müüri jaoks napib '+(RESOURCE_NAMES[resource]||resource)+
+     ': vaja '+amount*plan.segments.length;
+  for(let i=0;i<plan.segments.length;i++){
+   const part=plan.segments[i];
+   if(Math.abs(part.x)>DETAIL_HALF_X-5||Math.abs(part.z)>DETAIL_HALF_Z-5)
+    return 'Müür väljub detailkaardi piiridest.';
+   const result=game.previewBuild(city,mode,{
+    x:part.x,z:part.z,wallAngleV175:part.wallAngleV175,
+    wallAxis:part.wallAxis,palisadeSpanV167:part.palisadeSpanV167,
+    drawnWallV175:true
+   });
+   if(result.error)return 'Lõik '+(i+1)+': '+result.error;
+  }
+  return '';
+ }
  function updateWallStrokePreview(){
   removeWallStrokePreview();if(!wallStroke||!activeTile)return;
   const plan=wallStrokePlanV175(wallStroke.points,wallDrawShape),outline=plan.curve||[];
   if(outline.length<2)return;
+  const reason=wallStrokePrecheckV175(plan);
   const pos=outline.map(p=>new T.Vector3(p.x,ground(activeTile,p.x,p.z)+.7,p.z));
   wallStrokePreview=new T.Line(new T.BufferGeometry().setFromPoints(pos),
-   new T.LineBasicMaterial({color:plan.error?'#e85c52':'#7bd2a2',depthTest:false}));
+   new T.LineBasicMaterial({color:reason?'#e85c52':'#7bd2a2',depthTest:false}));
   wallStrokePreview.name='V175 curved or straight wall preview';wallStrokePreview.renderOrder=25;environment.add(wallStrokePreview);
-  $('buildhint').hidden=false;$('buildhint').textContent=plan.error||('V175 '+(wallDrawShape==='curved'?'KUMER':'SIRGE')+' · '+plan.segments.length+' lõiku · vabasta ehitamiseks');
+  $('buildhint').hidden=false;$('buildhint').textContent=reason||
+   ('V175 '+(wallDrawShape==='curved'?'KUMER':'SIRGE')+
+    ' · '+plan.segments.length+' lõiku · vabasta ehitamiseks');
+  wallHelp.textContent=reason||
+   ('✓ '+plan.segments.length+' lõiku saab ehitada · vabasta sõrm');
+  wallHelp.style.color=reason?'#ffd0be':'#b8f2cf';
  }
  function finishWallStroke(){
   const stroke=wallStroke;wallStroke=null;removeWallStrokePreview();
   if(!stroke||!isDrawableWallV175(mode)||s.battle||view!=='local')return;
   const plan=wallStrokePlanV175(stroke.points,wallDrawShape);
-  if(plan.error){say(plan.error);renderUI();return;}
-  const city=activeCity(),type=mode;if(!city||city.team!==0)return;
-  const area=game.constructionArea(city),pending=area.pending.length;
-  if(pending+plan.segments.length>12){say('Ehitusjärjekorras pole piisavalt kohti: '+(12-pending)+' vaba.');return;}
-  const stock=area.stock,cost=BUILDINGS[type].cost;
-  for(const [resource,amount] of Object.entries(cost))if((stock[resource]||0)<amount*plan.segments.length){
-   say('Müüri jaoks napib '+(RESOURCE_NAMES[resource]||resource)+': vaja '+amount*plan.segments.length);return;
+  const city=activeCity(),type=mode;
+  const warning=wallStrokePrecheckV175(plan);
+  if(warning){
+   lastWallBuildV175={built:0,attempted:plan.segments.length,shape:wallDrawShape,error:warning};
+   wallHelp.textContent='⚠ '+warning;wallHelp.style.color='#ffd0be';
+   say(warning);renderUI();return;
   }
   let built=0,error='';
   for(const part of plan.segments){
@@ -849,6 +881,9 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
     palisadeSpanV167:part.palisadeSpanV167,drawnWallV175:true});
    if(result.error){error=result.error;break;}built++;
   }
+  lastWallBuildV175={built,attempted:plan.segments.length,shape:wallDrawShape,error};
+  wallHelp.textContent=error?'⚠ '+error:(built+' müürilõiku ehitamisel');
+  wallHelp.style.color=error?'#ffd0be':'#b8f2cf';
   say((built?'Ehitus algas: '+built+' '+(wallDrawShape==='curved'?'kumerat':'sirget')+' müürilõiku.':'Müüri ei saanud ehitada.')+(error?' '+error:''));
   ghostPoint=null;syncLocal();renderUI();save();
  }
@@ -1213,7 +1248,7 @@ $('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('ki
  selectBuildingType:(type,index=0)=>{const c=activeCity();return inspectBuilding(c?.economy.buildings.filter(b=>b.type===type)[index])},
  industrialModelStatus:()=>{const result=[];localScene.traverse(o=>{if(o.userData?.industrialAgeModel)result.push({
   type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,
-  age:o.userData.age,center:{x:o.position.x,z:o.position.z}})});return result},renaissanceModelStatus:()=>{const out=[];localScene.traverse(o=>{if(o.userData?.renaissanceAgeModel)out.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return out},bronzeModelStatus:()=>{const list=[];localScene.traverse(o=>{if(o.userData?.bronzeAgeModel)list.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return list},marketWalkStatus:()=>{const city=activeCity();return Object.entries(city?.world?.workers||{}).filter(([id,w])=>w.kind==='market_woman').map(([id,w])=>({id,x:w.x,z:w.z,moving:w.moving,phase:w.shoppingPhase,status:w.status}))},localRoadStatus:()=>({spots:localTrails?.count||0,ribbonTriangles:localTrailLinks?.children?.[0]?.geometry?.attributes?.position?.count/3||0,trailCells:Object.keys(activeCity()?.world?.heat||{}).length}),refreshLocalRoads:()=>{lastTrailTime=-1;syncLocal()},stoneModelStatus:()=>{const list=[];localScene.traverse(o=>{if(o.userData?.stoneAgeModel)list.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return list},villageLifeStatus:()=>villageLife.stats(),refreshVillageLife:(time)=>villageLife.update(time,.1),perfStats:()=>({drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,pixelRatio:renderer.getPixelRatio(),drawingBuffer:{w:renderer.domElement.width,h:renderer.domElement.height}}),detailObjectStatus:()=>[...detailObjectHolders.values()].map(({tile,holder})=>({c:tile.c,r:tile.r,ids:holder.children.flatMap(g=>g.userData.siteIds||[]),objects:holder.children.flatMap(g=>g.children.map(m=>({id:m.userData.worldSiteId,kind:m.userData.worldProp,claimedBy:m.userData.claimedBy,visible:m.visible})))})),resourceLayerStatus:()=>({enabled:showResourceOverlay,icons:resourceSprites.length}),pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,overviewMetrics,wallDrawStatus:()=>({mode,shape:wallDrawShape,points:wallStroke?.points.length||0,preview:!!wallStrokePreview}),setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
+  age:o.userData.age,center:{x:o.position.x,z:o.position.z}})});return result},renaissanceModelStatus:()=>{const out=[];localScene.traverse(o=>{if(o.userData?.renaissanceAgeModel)out.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return out},bronzeModelStatus:()=>{const list=[];localScene.traverse(o=>{if(o.userData?.bronzeAgeModel)list.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return list},marketWalkStatus:()=>{const city=activeCity();return Object.entries(city?.world?.workers||{}).filter(([id,w])=>w.kind==='market_woman').map(([id,w])=>({id,x:w.x,z:w.z,moving:w.moving,phase:w.shoppingPhase,status:w.status}))},localRoadStatus:()=>({spots:localTrails?.count||0,ribbonTriangles:localTrailLinks?.children?.[0]?.geometry?.attributes?.position?.count/3||0,trailCells:Object.keys(activeCity()?.world?.heat||{}).length}),refreshLocalRoads:()=>{lastTrailTime=-1;syncLocal()},stoneModelStatus:()=>{const list=[];localScene.traverse(o=>{if(o.userData?.stoneAgeModel)list.push({type:o.userData.buildingType,triangles:o.userData.triangles,drawCalls:o.children.length,age:o.userData.age})});return list},villageLifeStatus:()=>villageLife.stats(),refreshVillageLife:(time)=>villageLife.update(time,.1),perfStats:()=>({drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,pixelRatio:renderer.getPixelRatio(),drawingBuffer:{w:renderer.domElement.width,h:renderer.domElement.height}}),detailObjectStatus:()=>[...detailObjectHolders.values()].map(({tile,holder})=>({c:tile.c,r:tile.r,ids:holder.children.flatMap(g=>g.userData.siteIds||[]),objects:holder.children.flatMap(g=>g.children.map(m=>({id:m.userData.worldSiteId,kind:m.userData.worldProp,claimedBy:m.userData.claimedBy,visible:m.visible})))})),resourceLayerStatus:()=>({enabled:showResourceOverlay,icons:resourceSprites.length}),pick,worldClick,localClick,currentSelection,setCommandMode,commandMode:()=>commandMode,cameraKeys,updateCameraKeys,commandOverlay,worldSync,getZoom:()=>zoom,setCityTab,cityTab:()=>cityTab,detailFocus:focus,followDetail,neighbours:()=>neighbourTerrains,game,state:s,openWorld,openTile,renderUI,frame,checkEncounter,activeCity,save,view:()=>view,atlasDecor,worldScene,worldMarkers,destination,openResearch,chooseResearch,queueTechnology,removeTechnology,updateGhost,quality:()=>quality,applyQuality,currentLanguage,changeLanguage,overviewMetrics,wallDrawStatus:()=>({mode,shape:wallDrawShape,points:wallStroke?.points.length||0,preview:!!wallStrokePreview,lastBuild:lastWallBuildV175,feedback:wallHelp.textContent}),setBuildPreview:(type,p)=>{mode=type;ghostPoint=p;updateGhost();return ghost}};
 // Delegation survives the regularly refreshed HUD.
 function openFoodStocks(){const city=activeCity()?.team===0?game.parentCity(activeCity()):ownCity();if(!city)return;let dialog=document.getElementById('food-stocks-v87');if(!dialog){dialog=document.createElement('dialog');dialog.id='food-stocks-v87';document.body.append(dialog);}const r=city.economy.realms[0].resources,n=nationalStock(s,0),needs=cityNeeds(city,s.ages[0]);dialog.replaceChildren();const title=document.createElement('h2');title.textContent=city.name+' · toiduvarud';dialog.append(title);const intro=document.createElement('p');intro.textContent='Kohalik (riigi kogus). Vajadus '+needs.need.food+' toitu ja '+needs.need.luxury+' luksust. Tootlikkus '+Math.round(needs.productivity*100)+'%. Iga puuduv liik −5%, üleliigne +2%.';dialog.append(intro);for(const k of ['bread','grain','flour',...Object.keys(GOODS).filter(k=>GOODS[k].food||GOODS[k].luxury),'pottery']){const line=document.createElement('p');line.textContent=(RESOURCE_NAMES[k]||k)+': '+(r[k]||0).toFixed(1)+' ('+(n[k]||0).toFixed(1)+')';dialog.append(line);}const close=document.createElement('button');close.textContent='Sulge';close.onclick=()=>dialog.close();dialog.append(close);dialog.showModal();}
 $('resources').addEventListener('click',e=>{if(e.target.closest('[data-resource="bread"]'))openFoodStocks();});
