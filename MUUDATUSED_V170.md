@@ -1,4 +1,4 @@
-# Kuningriigid V170a – etapp 3.1, hoonemudelite esimene väljalase
+# Kuningriigid V170 – etapi 3.1 graafikauuendused
 
 Kuupäev: 2026-10-26.
 
@@ -32,8 +32,30 @@ Kuupäev: 2026-10-26.
 
 **Piirang:** asendusklassidel tehtud mudelitest ei võrdu päris WebGL renderdamise ega telefoni jõudluskontrolliga. GitHub Pagesi avaliku lehe laadimist ja V169 täielikku AI-simulatsiooni pole V170a jaoks veel kinnitatud.
 
+## Tehtud: 3.1c, tootmishooned ja õppelaager
+
+V170b muudab mängu tegelikult kasutatavaid 3D-mudelite genereerijaid:
+
+- `town-models-v154.js`: **metsatöölise hoone** (`lumber`) sai palgivirnad, saepuki, lõhkumispaku ja ajastule vastava kirve; **jahimeheonn** (`hunter`) nahkuivatuse ja odad; **sõdalaste laager** (`barracks`) harjutuspostid, odarestid ja märklaua; **õpikoda** (`study`) kiviajal tahutud tähiste ning istumiskoha; **talumudel** (`farmhouseGeometry`) viljakuivatusaluse ja käsikivi.
+- `site-models-v88.js`: **kalurihoone** (`fisher`) sai muulile nähtava kala- ja võrgukuivatuse, ujukid ning maismaapoolse varustuse. Sadama (`harbor`) mudelit see ei muuda.
+- `world-models-v152.js`: **kivimurru** (`quarry`) ühisesse geomeetriasse lisati raiumisastmed, tugipostid, kiviplokid ja käsi­tööriistad.
+- `farm-visuals-v127.js`, `civilization.js`, `boot-v83.js`, `index.html`: ühised mudelid ja käivitaja seoti värskete `v=170b` URL-idega.
+
+Muudatused ei tekita uusi päris hooneid ega lisa AI-le otsuseid. Hoonete maksumus, toodang, salvestused ja rajaleidmise reeglid on lähtekoodis muutmata.
+
+### V170b kontroll
+
+- JavaScripti süntaks: uuendatud kolme graafikamooduli ja versiooniviidete kontroll läbitud.
+- Mudeligeneraatori käivituskatse Three.js API asendusklassidega: **202** edukat linnahoone, kaevanduse ja farmi varianti; pärast testasenduse `Vector3` meetodite täiendamist lisaks **14** edukat kaluri-/sadamamudelit.
+- Kontrolliti, et `index.html` versioon on `Kingdoms V170b`, `civilization.js` kasutab uut farmi- ja linnamudeli URL-i ning rannikumudel laeb uuendatud kivimurru geomeetria.
+
+**Piirang:** mudeligeneraatori asendusklassidega tehtud test ei kinnita päris Three.js WebGL-renderdust, FPS-i, GitHub Pagesi levimist ega 200 käigu AI-regressiooni. Avalikku URL-i ei õnnestunud kontrollivahendiga avada. Need jäävad etappi 3.1d.
+
+### V170b mängulink
+
+https://orogdor.github.io/Kuningriigid/?v=170b-20261026
+
 ## Järgmine töö
 
-- 3.1c: tootmishoonete ja sõdalaste laagri eristuvam visuaal, vajaduse korral eraldi farmi/kaevanduse renderdajad.
 - 3.1d: kõigi mudelite pildikontroll, brauseri- ja mobiilikatse, FPS ning V169 regressioonid.
 - Etapid 3.2–3.5 ei kuulu V170a väljalaskesse.
