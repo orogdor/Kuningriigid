@@ -1,6 +1,6 @@
 import * as T from './vendor/three.module.js';
 import {MINERAL_BUILDINGS,COASTAL_BUILDINGS} from './resource-sites-v88.js';
-import {depositGeometry,miningSiteGeometry,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=161a';
+import {depositGeometry,miningSiteGeometry,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=170b';
 const materials=new Map();
 function material(color){if(!materials.has(color))materials.set(color,new T.MeshStandardMaterial({color,roughness:.86}));return materials.get(color);}
 function mesh(g,geometry,color,x,y,z){const m=new T.Mesh(geometry,material(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m;}
@@ -56,6 +56,30 @@ export function createCoastalBuilding(type,team,age){
  for(let z=-.2;z>=-length;z-=.4)box(water,0,.58,z,harbor?3.65:2.55,.05,.07,'#725c41');
  if(harbor){box(water,0,.42,-length,7,.25,2.6,'#a18458');beam(water,[2,.5,-5],[2,4.8,-5],.13,'#67553f');beam(water,[2,4.6,-5],[-.4,4.6,-6],.12,'#67553f');beam(water,[-.4,4.6,-6],[-.4,1,-6],.025,'#c2b58b');}
  else{for(const x of [-1,1])beam(water,[x,.6,-4],[x,2.5,-4],.06,'#806c4b');beam(water,[-1,2.5,-4],[1,2.5,-4],.05,'#806c4b');for(let i=0;i<7;i++)beam(water,[-1+i/3,1,-4],[-1+i/3,2.5,-4],.012,'#b8ae8e');}
+ if(!harbor){ // V170b 3.1c: fishing hut has distinctive nets, drying fish and floats.
+  // All are purely visual and remain attached to the existing coast model.
+  for(const x of [-.75,0,.75]){
+   const f=box(water,x,1.34,-4.0,.36,.56,.08,'#c3ae85');
+   f.rotation.z=x===0?0:x*.18;
+   box(water,x,1.75,-4.0,.12,.11,.13,'#85735b');
+  }
+  for(const z of [-1.5,-2.8,-4.1,-5.2]){
+   for(const x of [-1.22,1.22])cylinder(water,x,.51,z,.13,.19,'#b9a36e');
+  }
+  // Drying frame on the land side with fish suspended in the open air.
+  for(const x of [1.72,2.43])box(land,x,1.2,1.18,.12,2.4,.12,'#72563c');
+  box(land,2.06,2.35,1.18,.92,.12,.14,'#72563c');
+  for(const x of [1.78,2.05,2.32]){
+   box(land,x,1.67,1.20,.18,.55,.09,'#a6a68a');
+   box(land,x,1.97,1.20,.065,.42,.065,'#bdaf89');
+  }
+  // Fishing oars distinguish the hut from the otherwise similar harbor office.
+  for(const x of [-2.25,-1.97]){
+   const oar=box(land,x,1.55,3.95,.09,2.6,.09,'#a0835b');
+   oar.rotation.z=x< -2.1?-.28:.25;
+   box(land,x,2.82,3.95,.3,.6,.09,'#a0835b');
+  }
+ }
  box(land,2.3,.8,2.5,.8,.9,.8,'#9a784d');cylinder(land,-2.2,.9,3.3,.45,1.2,'#826446');
  return g;
 }
