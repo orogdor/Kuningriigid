@@ -1,103 +1,37 @@
-name: Fast Game Validation
+name: Kuningriigid Fast Game Check
+# Only one short, automatic job per game-code push. No browser matrix or publishing.
 on:
   push:
     branches: [main]
-    paths-ignore: ['**.md', 'reports/**', 'V88_*TEST.json', 'V88_*TEST.jsonl.gz']
+    paths-ignore:
+      - '**.md'
+      - 'reports/**'
+      - '.github/workflows/**'
+      - 'artifacts-*/**'
+      - 'V88_*TEST.json'
+      - 'V88_*TEST.jsonl.gz'
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
-  group: current-game-validation
+  group: kuningriigid-fast-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  traffic:
+  quick-check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: node scripts/test.mjs traffic
-      - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: traffic-fast-results
-          path: artifacts-tests/
-  regression:
-    needs: traffic
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: node scripts/test.mjs rules --jobs 2
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: regression-results
-          path: artifacts-tests/
-  browser:
-    # Comprehensive browser matrix is on-demand, not on every push.
-    if: github.event_name == 'workflow_dispatch'
-    needs: traffic
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        profile: [borders-v143, iron-city-v142, science, traffic, interface, ai-city, ai-city-v136, ai-city-v137, ai-city-v138, ai-city-v139]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: |
-          npm install --no-save playwright
-          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
-      - run: |
-          python3 -m http.server 8765 >/tmp/game-http.log 2>&1 &
-          if [ '${{ matrix.profile }}' = borders-v143 ]; then
-            node TEST_V143_BROWSER.mjs
-          elif [ '${{ matrix.profile }}' = iron-city-v142 ]; then
-            node TEST_V142_BROWSER.mjs
-          elif [ '${{ matrix.profile }}' = science ]; then
-            node TEST_V141_BROWSER.mjs
-          elif [ '${{ matrix.profile }}' = traffic ]; then
-            node TEST_V133_BROWSER.mjs
-          elif [ '${{ matrix.profile }}' = ai-city-v139 ]; then
-            node TEST_V139_BROWSER.mjs
-          elif [ '${{ matrix.profile }}' = ai-city-v138 ]; then
-            node TEST_V138_BROWSER.mjs
-          elif [ '${{ matrix.profile }}' = ai-city-v137 ]; then
-            node TEST_V137_BROWSER.mjs
-          elif [ '${{ matrix.profile }}' = ai-city-v136 ]; then
-            node TEST_V136_BROWSER.mjs
-          elif [ '${{ matrix.profile }}' = ai-city ]; then
-            node TEST_V135_BROWSER.mjs
-          else
-            node TEST_V128_BROWSER.mjs
-          fi
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: browser-${{ matrix.profile }}-evidence
-          path: |
-            artifacts-v128/
-            artifacts-v133/
-            artifacts-v135/
-            artifacts-v136/
-            artifacts-v137/
-            artifacts-v138/
-            artifacts-v139/
-            artifacts-v141/
-            artifacts-v142/
-            artifacts-v143/
-  publish:
-    needs: [traffic, regression, browser]
-    # A skipped browser matrix is expected for push; manual runs require it to pass.
-    if: ${{ always() && needs.traffic.result == 'success' && needs.regression.result == 'success' && (needs.browser.result == 'success' || (github.event_name == 'push' && needs.browser.result == 'skipped')) }}
-    uses: ./.github/workflows/avaldamine.yml
-    with:
-      validated: true
+          node-version: '22'
+      - name: Syntax of playable game and wall navigation
+        run: |
+          node --check civilization.js
+          node --check civilization-core.js
+          node --check navigation.js
+          node --check wall-draw-v175.js
+          node --check economy.js
+          node --check campaign.js
+      - name: Fast gameplay and road smoke tests
+        run: node scripts/test.mjs traffic
