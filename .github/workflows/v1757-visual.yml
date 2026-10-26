@@ -1,0 +1,38 @@
+name: V175.7 3D Tower Visual Review (manual)
+# One automatic kick-off when this workflow is first introduced.
+# All future visual captures are manual via Run workflow.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v1757-visual.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v1757-visual-review-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  real-chromium-screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install real Chromium controller
+        run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Render tower model and real city in desktop and mobile Chrome
+        run: |
+          python3 -m http.server 8765 >/tmp/v1757-visual-http.log 2>&1 &
+          node TEST_V1757_VISUAL.mjs
+      - name: Export screenshots for visual inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v1757-real-3d-and-town-screenshots
+          path: artifacts-v1757-visual/
+          retention-days: 14
