@@ -27,9 +27,10 @@ for(let dc=-2;dc<=2;dc++)for(let dr=-2;dr<=2;dr++){
  if(!tile?.land||tile.mountain)continue;
  const fake={...capital,c:tile.c,r:tile.r,economy:{buildings:[{...hall,x:0,z:0}]}};
  const survey=reserveStoneVillageRingV168(g,fake);
+ const shifted=reserveStoneVillageRingV168(g,{...fake,economy:{buildings:[{...hall,x:-18,z:-12}]}});
  const origin=nav.passable(0,0);
  neighbors.push({dc,dr,c:tile.c,r:tile.r,coast:!!tile.coast,river:!!tile.river,
-  deposits:tile.deposits,blocked:survey?.terrainBlockedAtFounding,rx:survey?.rx,rz:survey?.rz,
+  deposits:tile.deposits,blocked:survey?.terrainBlockedAtFounding,shiftedBlocked:shifted?.terrainBlockedAtFounding,rx:survey?.rx,rz:survey?.rz,
   currentlyOwned:g.territoryOwner(tile)?.id!=null,origin});
 }
 neighbors.sort((a,b)=>a.blocked-b.blocked||Math.abs(a.dc)+Math.abs(a.dr)-Math.abs(b.dc)-Math.abs(b.dr));
