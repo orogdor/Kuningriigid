@@ -80,7 +80,7 @@ const actualWalls=town.economy.buildings.filter(w=>w.type==='palisade'&&w.hp>0);
 assert.ok(actualWalls.length>=10);
 const actualNav=game.nav(town);
 let inspected=0;
-for(const wall of actualWalls){const size=buildingClearance(w);
+for(const wall of actualWalls){const size=buildingClearance(wall);
  if(w.palisadeSpanV167>=12){
   const half=wall.palisadeSpanV167/2;
   assert.ok(wall.wallAxis?size.rz>half:size.rx>half,'real saved wall has long collision');
