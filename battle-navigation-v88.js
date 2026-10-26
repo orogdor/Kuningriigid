@@ -11,7 +11,24 @@ export function createBattleNavigation(game,battle){
  const add=(o,rx,rz)=>{rx+=scale/2;rz+=scale/2;for(let z=Math.floor((o.z-rz)/16);z<=Math.floor((o.z+rz)/16);z++)for(let x=Math.floor((o.x-rx)/16);x<=Math.floor((o.x+rx)/16);x++){const k=x+':'+z,list=bins.get(k)||[];list.push({...o,rx,rz});bins.set(k,list);}};
  for(const tile of battlefieldTiles(battle.cell)){if(tile.c<0||tile.r<0||tile.c>=220||tile.r>=165)continue;const offset={x:tile.dc*DETAIL_TILE_X,z:tile.dr*DETAIL_TILE_Z};
   for(const r of game.localWorld(tile).resources)if(!r.removed&&r.amount>0&&!['game','fish'].includes(r.kind))add({x:r.x+offset.x,z:r.z+offset.z},r.kind==='tree'?1.4:r.kind==='berry'?.8:3,r.kind==='tree'?1.4:r.kind==='berry'?.8:3);
-  for(const b of game.contextAt(tile,false)?.economy.buildings||[]){if(b.virtual||b.hp<=0)continue;const size=buildingClearance(b);if(size)add({type:b.type,x:b.x+offset.x,z:b.z+offset.z},size.rx,size.rz);}
+  for(const b of game.contextAt(tile,false)?.economy.buildings||[]){
+   if(b.virtual||b.hp<=0)continue;
+   // V175.1: render/nav must agree that an OPEN wooden gateway has solid
+   // side posts but a 3.6m corridor. A single rectangular blocker wrongly
+   // made the gate untraversable in tactical combat.
+   if(b.type==='woodgate'||b.type==='gatehouse'){
+    const wide=b.type==='woodgate'&&b.extendedPalisadeV166,
+     offsetPost=wide?5.2:2.55,post=wide?1.6:2.2;
+    for(const side of [-1,1]){
+     add({type:'gatepost',x:b.x+offset.x+(b.wallAxis?0:side*offsetPost),
+      z:b.z+offset.z+(b.wallAxis?side*offsetPost:0)},
+      b.wallAxis?post:.95,b.wallAxis?.95:post);
+    }
+    continue;
+   }
+   const size=buildingClearance(b);
+   if(size)add({type:b.type,x:b.x+offset.x,z:b.z+offset.z},size.rx,size.rz);
+  }
  }
  const passable=(x,z)=>{const {dc,dr}=tileDelta(x,z),c=battle.cell.c+dc,r=battle.cell.r+dr;if(c<0||r<0||c>=220||r>=165)return false;const tile=game.cell({c,r});if(tile.mountain||height(x,z)<=.2)return false;return !(bins.get(Math.floor(x/16)+':'+Math.floor(z/16))||[]).some(o=>{
   if(Math.abs(x-o.x)>o.rx||Math.abs(z-o.z)>o.rz)return false;
