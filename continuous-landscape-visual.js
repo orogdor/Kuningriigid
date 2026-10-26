@@ -199,6 +199,20 @@ function steerAroundPlots(points,tile,obstacles,margin){
  const out=[];let last=null;for(const p of local){if(last&&Math.hypot(p.x-last.x,p.z-last.z)<1.3&&p!==local[local.length-1])continue;const w=localToWorld(tile,p.x,p.z);out.push({x:w.x,z:w.z,width:p.width});last=p;}
  return out;
 }
+// V175.1: paving in the local scene must never contain a triangle crossing
+// a SOLID fortification or building. Paths still emerge from real world-road
+// traffic. The world atlas remains unchanged; the detail ribbon is clipped
+// against exactly the same footprint used by local navigation.
+export function roadRibbonClearV175(a,b,obstacles=[],extra=0){
+ if(!obstacles?.length)return true;
+ const limit=Math.max(.02,extra);
+ const len=Math.hypot(b.x-a.x,b.z-a.z),steps=Math.max(1,Math.ceil(len/.75));
+ for(let i=0;i<=steps;i++){
+  const t=i/steps,x=a.x+(b.x-a.x)*t,z=a.z+(b.z-a.z)*t;
+  if(obstacles.some(([cx,cz,rx,rz])=>Math.abs(x-cx)<rx+limit&&Math.abs(z-cz)<rz+limit))return false;
+ }
+ return true;
+}
 export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=null){
  const group=new T.Group();group.name='V67 continuous road graph';group.userData.roadNetwork=true;
  // V149: one lit ribbon per road (soft verge | bed | soft verge) with across/along UVs; the
@@ -215,7 +229,18 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=
    if(i){const p=pts[i],q=pts[i-1];along+=Math.hypot(p.x-q.x,p.z-q.z);}
    const x=xs[i];
    for(const [v,u] of [[x.ol,-1.5],[x.l,-1],[x.r,1],[x.or,1.5]]){pos.push(v.x,v.y,v.z);uv.push(u,along);lvl.push(edge.level)}
-   if(i){const r0=base+(i-1)*4,r1=base+i*4;for(let k=0;k<3;k++)index.push(r0+k,r0+k+1,r1+k,r1+k,r0+k+1,r1+k+1);beds+=2}
+   if(i){
+    const r0=base+(i-1)*4,r1=base+i*4;
+    // A smooth curve can cut a blocked corner even if all the generated
+    // centre points are legal. Sample the actual outer road ribbon too.
+    const clear=scope==='world'||!obstacles?.length||
+      (roadRibbonClearV175(xs[i-1].m,xs[i].m,obstacles)&&
+       roadRibbonClearV175(xs[i-1].ol,xs[i].ol,obstacles)&&
+       roadRibbonClearV175(xs[i-1].or,xs[i].or,obstacles)&&
+       roadRibbonClearV175(xs[i-1].l,xs[i].l,obstacles)&&
+       roadRibbonClearV175(xs[i-1].r,xs[i].r,obstacles));
+    if(clear){for(let k=0;k<3;k++)index.push(r0+k,r0+k+1,r1+k,r1+k,r0+k+1,r1+k+1);beds+=2;}
+   }
   }
   roads++;
  }
