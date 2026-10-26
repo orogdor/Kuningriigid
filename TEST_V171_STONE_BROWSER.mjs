@@ -40,8 +40,8 @@ try{
      meshes:sceneMeshes,modelVariants:modelKeys.size,
      perf:d.perfStats(),pause:document.getElementById('pause')?.textContent.trim(),
      activeSave:localStorage.getItem('kingdoms-civ4'),
-     backup:localStorage.getItem('kingdoms-civ4-backup'),errorText:document.getElementById('menu-status')?.textContent}};
-   );
+     backup:localStorage.getItem('kingdoms-civ4-backup'),errorText:document.getElementById('menu-status')?.textContent};
+   });
    assert.equal(initial.demo,'ai-stone-v171',label+' genuine demo');
    assert.equal(initial.age,0,label+' is late Stone Age, not Bronze');
    assert.equal(initial.owner,0,label+' is player-owned');
