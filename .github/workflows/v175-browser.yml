@@ -1,0 +1,47 @@
+name: V175.1 Palisade Live Browser QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v175-browser.yml'
+      - 'TEST_V1751_BROWSER.mjs'
+      - 'civilization.js'
+      - 'civilization-core.js'
+      - 'index.html'
+      - 'boot-v83.js'
+      - 'bronze-city-v111.js'
+      - 'navigation.js'
+      - 'battle-navigation-v88.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v1751-browser-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mobile-and-desktop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check game and browser script
+        run: |
+          node --check civilization.js
+          node --check civilization-core.js
+          node --check TEST_V1751_BROWSER.mjs
+          test -s scenarios/ai-stone-v174.json
+      - name: Set up Chromium WebGL
+        run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Visual and movement tests with real AI old save
+        run: |
+          python3 -m http.server 8765 > /tmp/v175-http.log 2>&1 &
+          node TEST_V1751_BROWSER.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V1751-palisade-mobile-desktop-screen-tests
+          path: artifacts-v1751/
