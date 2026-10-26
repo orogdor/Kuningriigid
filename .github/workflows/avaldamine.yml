@@ -30,6 +30,9 @@ jobs:
           git checkout --detach refs/remotes/origin/main
           echo "PUBLISHING_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
           echo "Publishing actual repository HEAD: $(git rev-parse HEAD)"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Verify playable AI saves are present in the deployed files
         run: |
           node --input-type=module <<'NODE'
