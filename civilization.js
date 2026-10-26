@@ -62,7 +62,7 @@ import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
-import {createDetailTrailLinks} from './detail-roads.js?v=161a';
+import {createDetailTrailLinks} from './detail-roads.js?v=174a';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=162a';
 import {surface,localSurface,localVisualSurface,worldElevation,visualElevation,visualProject,mountainMask,projectHeight as projectHeightV161,riverNear,overviewSurface,roadNetwork,worldToLocal} from './continuous-landscape.js?v=162a';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=125b';
