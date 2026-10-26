@@ -1,4 +1,6 @@
 // Fast feedback first, then bounded parallel read-only regression processes.
+// CI policy: push runs the traffic smoke profile only; full/rules remain on-demand.
+// See CI_TESTIMISE_KORD.md for manual browser QA, 200-turn tests, and release procedure.
 import {spawn} from 'node:child_process';
 import {availableParallelism} from 'node:os';
 import fs from 'node:fs';
