@@ -93,6 +93,24 @@ try{
    report.game.push({file,...info,size:fs.statSync(file).size});
    console.log('V175.7 CITY VISUAL PASS '+label+' '+JSON.stringify({city:info.city,towers:info.towers,
     guards:info.patrols.length,phases:info.patrols.map(p=>p.phase)}));
+   // Visual confirmation of a guard WALKING on the real terrain, not merely
+   // descending inside the closed tower. Focus on its actual live position.
+   await page.waitForFunction(()=>window.gameDebug.towerPatrolStatus?.().some(p=>
+     p.phase==='outbound'&&p.walking&&!p.guardPost),null,{timeout:60000});
+   const walking=await page.evaluate(()=>{
+    const guard=gameDebug.towerPatrolStatus().find(p=>p.phase==='outbound'&&p.walking);
+    if(guard){
+     gameDebug.detailFocus.set(guard.x,0,guard.z);
+     for(let i=0;i<10;i++)document.getElementById('zin')?.click();
+    }
+    return guard;
+   });
+   await page.waitForTimeout(280);
+   const patrolFile=output+'/actual-patrol-'+label+'.png';
+   await page.screenshot({path:patrolFile});
+   assert.ok(walking&&!walking.guardPost,'visible patrol must be outside tower');
+   report.game.push({file:patrolFile,walking,size:fs.statSync(patrolFile).size});
+   console.log('V175.7 LIVE WALKING PATROL PASS '+label+' '+JSON.stringify(walking));
   }finally{await ctx.close();}
  }
 }finally{
