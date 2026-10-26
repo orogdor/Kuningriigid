@@ -554,13 +554,61 @@ SIG.study=(b,era,r,t)=>{ // V170b: early stone marker and gathering benches
 };
 SIG.scriptorium=(b,era,r,t)=>{const H=body(b,era,r,{w:6.8,d:4.4,storeys:1,roof:'gable',axis:'x'});for(let i=0;i<3;i++)box(b,-2+i*2,H*.45,2.25,.9,1.3,.1,'#c9a24a');
  box(b,3.6,0,-1,1.4,H+2.2,1.4,'#c9bfa8',M.stone);cone(b,3.6,H+2.2,-1,1.1,1.8,'#7e3f2c',M.tile,4);bush(b,-3.6,2.6,.5,'#5b8a46');bush(b,-2.8,2.9,.4,'#6b9a4e');};
-SIG.library=(b,era,r,t)=>{const H=body(b,era,r,{w:7.4,d:5,storeys:2,roof:era>=4?'hip':'gable',axis:'x',wallC:era>=4?'#e9e1cc':null});
- for(let i=0;i<4;i++)cyl(b,-2.4+i*1.6,.3,2.9,.22,.26,H-.3,'#efe9da',M.plaster,10);box(b,0,H-.4,2.9,7,.5,.7,'#e5ddc8');b.poly([[-3.6,H+.1,3.2],[3.6,H+.1,3.2],[0,H+1.4,3.2]],'#e5ddc8',M.plaster);};
+SIG.library=(b,era,r,t)=>{ // V170c QA: classical portico must not appear in Stone/Iron cities.
+ if(era<=1){ // bark, wood, stone markers: an early record and teaching house.
+  const H=body(b,era,r,{w:6.7,d:4.9,storeys:1,roof:'gable',axis:'x',
+   wallC:era===0?'#997e59':'#8e7656',windows:false,style:1});
+  for(const x of [-2.65,-1.55,1.55,2.65])
+   box(b,x,0,2.63,.17,2.55,.17,'#634831',M.logs);
+  box(b,0,2.48,2.67,6.0,.16,.18,'#694b32',M.beam);
+  for(let i=0;i<4;i++)box(b,-2.8+i*.61,0,3.26,.47,.62,.43,
+   '#999285',M.stone);
+  rack(b,2.45,2.62,Math.PI/2,'#9c8058');
+  return;
+ }
+ if(era===3){ // Medieval library: stone-and-timber hall, not a neoclassical temple.
+  const H=body(b,era,r,{w:7.3,d:5.0,storeys:2,roof:'gable',axis:'x',
+   wallC:'#c8b99b',style:1});
+  for(const x of [-2.4,2.4])box(b,x,0,2.77,.23,H,.25,'#6e5039',M.beam);
+  box(b,0,H-.34,2.84,7.1,.18,.28,'#6e5039',M.beam);
+  sign(b,3.55,0,2.2,'#866a41',0);return;
+ }
+ const H=body(b,era,r,{w:7.4,d:5,storeys:2,roof:'hip',axis:'x',wallC:'#e9e1cc'});
+ for(let i=0;i<4;i++)cyl(b,-2.4+i*1.6,.3,2.9,.22,.26,H-.3,'#efe9da',M.plaster,10);
+ box(b,0,H-.4,2.9,7,.5,.7,'#e5ddc8');
+ b.poly([[-3.6,H+.1,3.2],[3.6,H+.1,3.2],[0,H+1.4,3.2]],'#e5ddc8',M.plaster);
+};
 SIG.school=(b,era,r,t)=>{const H=body(b,era,r,{w:8,d:4.6,storeys:era>=5?2:1,roof:'gable',axis:'x'});box(b,0,H,0,1.1,1.6,1.1,'#e6dfcf');cone(b,0,H+1.6,0,.9,1.2,'#5b616a',M.slate,4);box(b,0,H+.7,.56,.4,.4,.05,'#c9a24a',M.metal);
  box(b,0,0,3.3,7,.06,2.0,'#9f8f6e',M.dirt);for(const x of [-2.6,2.6]){box(b,x,0,3.3,.1,2.4,.1,'#5b616a',M.metal);box(b,x,2.3,3.3,1.2,.08,.08,'#5b616a',M.metal);}};
 SIG.public_school=SIG.school;SIG.high_school=(b,era,r,t)=>{const H=body(b,era,r,{w:8.6,d:5,storeys:3,roof:'flat'});box(b,0,0,2.6,2.6,H+.6,.6,'#d9d4c8');box(b,0,H-.6,2.9,2.2,.6,.05,'#2f5e8e',M.metal);box(b,0,0,4.2,7,.06,2.0,'#9f8f6e',M.dirt);};
-SIG.academy=(b,era,r,t)=>{const H=body(b,era,r,{w:8.6,d:6,storeys:2,roof:'flat',wallC:'#ece4d2'});for(let i=0;i<6;i++)cyl(b,-3.4+i*1.36,.3,3.3,.25,.3,H-.3,'#f2ede0',M.plaster,10);
- box(b,0,H-.3,3.3,8.4,.6,.8,'#e5ddc8');b.poly([[-4.2,H+.3,3.6],[4.2,H+.3,3.6],[0,H+2,3.6]],'#e5ddc8',M.plaster);cyl(b,0,H+.3,-.6,1.8,1.8,.6,'#e5ddc8',M.plaster,14);dome(b,0,H+.9,-.6,1.8,'#6f8f86',M.metal,14);};
+SIG.academy=(b,era,r,t)=>{ // V170c QA: dome only in later architectural ages.
+ if(era<=1){
+  const H=body(b,era,r,{w:8.4,d:5.8,storeys:1,roof:'gable',axis:'x',
+   windows:false,style:1,wallC:'#8c7757'});
+  for(const x of [-3.2,-1.55,1.55,3.2]){
+   box(b,x,0,3.06,.20,2.45,.20,'#614933',M.beam);
+   box(b,x,2.36,3.08,.40,.13,.25,'#74563a',M.boards);
+  }
+  box(b,0,2.42,3.06,7.1,.21,.19,'#6b5137',M.beam);
+  for(let i=0;i<6;i++)box(b,-2.95+i*1.18,0,3.77,.74,.48,.45,
+   '#918a79',M.stone);
+  banner(b,3.6,0,2.8,t,4.25);return;
+ }
+ if(era===3){
+  const H=body(b,era,r,{w:8.4,d:5.8,storeys:2,roof:'gable',axis:'x',
+   wallC:'#d0c2a5',style:1});
+  // A teaching bell / watch tower; keep the roof and walls era-appropriate.
+  box(b,-2.7,H-.1,-1.3,1.65,2.75,1.65,'#a99f8a',M.stone);
+  gable(b,-2.7,H+2.65,-1.3,2,2,1.2,'#66584a',M.slate,{axis:'x',over:.18});
+  banner(b,3.65,0,2.65,t,3.2);return;
+ }
+ const H=body(b,era,r,{w:8.6,d:6,storeys:2,roof:'flat',wallC:'#ece4d2'});
+ for(let i=0;i<6;i++)cyl(b,-3.4+i*1.36,.3,3.3,.25,.3,H-.3,'#f2ede0',M.plaster,10);
+ box(b,0,H-.3,3.3,8.4,.6,.8,'#e5ddc8');
+ b.poly([[-4.2,H+.3,3.6],[4.2,H+.3,3.6],[0,H+2,3.6]],'#e5ddc8',M.plaster);
+ cyl(b,0,H+.3,-.6,1.8,1.8,.6,'#e5ddc8',M.plaster,14);
+ dome(b,0,H+.9,-.6,1.8,'#6f8f86',M.metal,14);
+};
 SIG.university=SIG.academy;
 SIG.market=(b,era,r,t)=>{ // V170 3.1b: period-correct trading yard; game already scales ×2
  box(b,0,0,0,9,.08,8,era<=1?'#a18b65':'#b1a585',era<=1?M.dirt:M.stone);
