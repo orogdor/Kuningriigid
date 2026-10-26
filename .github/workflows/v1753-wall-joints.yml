@@ -1,0 +1,32 @@
+name: V175.3 Seamless Straight and Curved Palisade QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'wall-draw-v175.js'
+      - 'TEST_V1753_JOINTS.mjs'
+      - '.github/workflows/v1753-wall-joints.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v1753-joints-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  joints-navigation-road-wear:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify straight and curved wall joints, soldiers and natural roads
+        run: |
+          node --check wall-draw-v175.js
+          node --check TEST_V1753_JOINTS.mjs
+          node TEST_V1753_JOINTS.mjs
+          node TEST_V59.mjs
+          node TEST_V80.mjs
+          node TEST_V168_RING_CORRIDOR.mjs
+          node TEST_V73.mjs
