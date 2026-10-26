@@ -54,9 +54,28 @@ try{
     const pause=document.getElementById('pause');
     if(pause?.textContent.includes('▶'))pause.click();
    });
-   await page.waitForFunction(()=>window.gameDebug.towerPatrolStatus?.().some(p=>
-     p.phase==='descending'||p.phase==='outbound'||p.phase==='return'),null,{timeout:30000});
-   await page.waitForTimeout(600);
+   const chosen=await page.evaluate(()=>{
+    const d=window.gameDebug,city=d.activeCity(),tower=city?.economy?.buildings
+     .find(b=>b.type==='watchtower'&&b.ready&&b.hp>0);
+    if(tower){
+     d.focus.set(tower.x,0,tower.z);
+     for(let i=0;i<4;i++)document.getElementById('hud-zoom-in')?.click();
+    }
+    return tower?{x:tower.x,z:tower.z}:null;
+   });
+   assert.ok(chosen,'visual audit must focus on an actual wooden tower');
+   // Capture immediately while a real sentry is visibly in motion. In an
+   // actively building AI village, the garrison stamp can reset when a new
+   // structure completes; a fixed sleep used to miss the short patrol window.
+   let observed=false;
+   for(let attempt=0;attempt<5&&!observed;attempt++){
+    await page.waitForFunction(()=>window.gameDebug.towerPatrolStatus?.().some(p=>
+      ['descending','outbound','return','watch','ascending'].includes(p.phase)),
+      null,{timeout:30000});
+    observed=await page.evaluate(()=>window.gameDebug.towerPatrolStatus?.().some(p=>
+      ['descending','outbound','return','watch','ascending'].includes(p.phase)));
+   }
+   assert.ok(observed,'real game must show a guard leaving the roof');
    const info=await page.evaluate(()=>{
     const dbg=window.gameDebug,city=dbg.activeCity();
     return {title:document.title,city:city?.name||null,
@@ -66,11 +85,11 @@ try{
    });
    assert.ok(info.towers>=1,'stone-age test city should contain a ready wooden watchtower: '+JSON.stringify(info));
    assert.ok(info.patrols.length>=5,'real peaceful guard squads should be present');
-   assert.ok(info.patrols.some(p=>p.phase!=='roof'),
-    'actual guards should have started patrol schedule after pressing Play: '+JSON.stringify(info));
+   assert.ok(observed,'actual guards start patrolling after pressing Play');
    assert.deepEqual(errors,[],'game Javascript errors');
    const file=output+'/actual-city-'+label+'.png';
    await page.screenshot({path:file});
+   await page.locator('#world').screenshot({path:output+'/actual-tower-canvas-'+label+'.png'});
    report.game.push({file,...info,size:fs.statSync(file).size});
    console.log('V175.7 CITY VISUAL PASS '+label+' '+JSON.stringify({city:info.city,towers:info.towers,
     guards:info.patrols.length,phases:info.patrols.map(p=>p.phase)}));

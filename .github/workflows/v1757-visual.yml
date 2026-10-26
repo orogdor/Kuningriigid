@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/v1757-visual.yml'
       - 'TEST_V1757_VISUAL.mjs'
+      - 'TEST_V1757_VISUAL.mjs'
       - 'TEST_V1757_TOWER_GALLERY.html'
   workflow_dispatch:
 permissions:
