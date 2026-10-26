@@ -13,8 +13,13 @@ export function configureWallFootprint(b){
  prepareWall(b);if(!WALL_TYPES.has(b?.type))return b;
  if(b.type==='keep'){b.navWidth=3.3;b.navDepth=3.3;return b;}
  b.wallAxis=b.wallAxis?1:0;
- b.navWidth=b.wallAxis?1.1:3.6;
- b.navDepth=b.wallAxis?3.6:1.1;
+ // V175.1: preserve actual PAID wooden span (up to 42m), even when the
+ // old construction handler calls this AFTER the site got its dimensions.
+ // A 42m wall must never revert to a 7m collision rectangle.
+ const half=b.type==='palisade'?Math.max(3.6,(b.palisadeSpanV167||
+   (b.extendedPalisadeV166?14:7))/2+.3):3.6;
+ b.navWidth=b.wallAxis?1.1:Math.max(half,b.navWidth||0);
+ b.navDepth=b.wallAxis?Math.max(half,b.navDepth||0):1.1;
  return b;
 }
 export const towerManned=b=>TOWER_TYPES.has(b?.type)&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>=.99;
