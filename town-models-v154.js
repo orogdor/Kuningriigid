@@ -182,10 +182,24 @@ const PAL={
 const TEAM=['#3f7a8c','#b0533e','#7d5fb0','#c09a2e'];
 
 // ------------------------------------------------------------------ houses
+// V174: household courtyard details stay inside the existing footprint.
+// The +z entrance is never fenced: organically formed roads stay walkable.
+function stoneYardV174(b,variant){
+ const style=variant%4,wood='#876b49';
+ if(style===0||style===3){
+  fenceLine(b,3.55,-2.95,3.55,-1.0,wood,.66);
+  box(b,3.50,0,-2.72,.14,.82,.12,'#695138',M.beam);
+ }else fenceLine(b,-2.55,-3.18,-.85,-3.18,wood,.64);
+ if(style===0)bed(b,2.10,-2.68,1.35,.82,'#658649',2);
+ else if(style===1){crate(b,2.55,-2.65,.48);sack(b,1.87,-2.69);}
+ else if(style===2){logPile(b,2.50,-2.75,3,.22);box(b,1.55,0,-2.6,.9,.2,.42,'#836441',M.boards);}
+ else {bed(b,-2.28,-2.55,.85,1.00,'#647e46',2);crate(b,2.5,-2.67,.38);}
+}
 function houseStone(b,r,v){
  // V170 (stage 3.1a): twelve stable, historically plausible Stone Age silhouettes.
  // All details stay inside the existing small house plot and are decorative only.
  const kind=v%12,wood=pick(r,PAL.logs),daub=pick(r,PAL.daub);
+ stoneYardV174(b,kind);
  const thatch=pick(r,PAL.thatch),beams='#61492f';
  const hearth=(x=1.5,z=2)=>{for(let i=0;i<6;i++){
   const a=i*Math.PI/3;ball(b,x+Math.cos(a)*.42,.10,z+Math.sin(a)*.42,.16,'#88857b',M.stone,.7,6);
