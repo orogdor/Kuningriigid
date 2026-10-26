@@ -1,0 +1,48 @@
+name: V173 Playable Stone Age Takeover Browser Test
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v173-stone-browser.yml'
+      - 'TEST_V173_STONE_BROWSER.mjs'
+      - 'scenarios/ai-stone-v173.json'
+      - 'scenarios/ai-stone-v173.manifest.json'
+      - 'ai-stone-demo-v173.js'
+      - 'civilization.js'
+      - 'boot-v83.js'
+      - 'index.html'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v173-browser-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  playable:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify ready and validated AI save
+        id: ready
+        run: |
+          node --check civilization.js
+          node --check ai-stone-demo-v173.js
+          node --check TEST_V173_STONE_BROWSER.mjs
+          test -s scenarios/ai-stone-v173.json
+          test -s scenarios/ai-stone-v173.manifest.json
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Test real WebGL, takeover controls and old save preservation
+        run: |
+          python3 -m http.server 8765 >/tmp/v173-http.log 2>&1 &
+          node TEST_V173_STONE_BROWSER.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V173-stone-takeover-photos-and-results
+          path: artifacts-v173/
