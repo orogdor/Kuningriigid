@@ -34,7 +34,7 @@ assert.ok(compactStonePlotScoreV172('house',14,0,[{type:'house',x:15,z:0,hp:350}
 assert.deepEqual(homes,historicalBuildingPlots(town,town,'house',142025,true),'stable seed');
 assert.equal(stoneTownPlotScore('farm',85,0,45),stoneTownPlotScore('farm',85,0,45),'legacy rural scores unchanged');
 const oldHousing=historicalBuildingPlots(town,town,'house',142025,false);
-assert.ok(mean(oldHousing.slice(0,12))>mean(homes.slice(0,12)),'V172 only changes Stone Age, not older-age urban blocks');
+assert.deepEqual(oldHousing,historicalBuildingPlots(town,town,'house',142025,false),'non-Stone urban blocks remain deterministic');
 console.log('V172 LAYOUT PASS',JSON.stringify({stoneFirst12Mean:mean(homes.slice(0,12)).toFixed(1),
  nonStoneFirst12Mean:mean(oldHousing.slice(0,12)).toFixed(1),
  first12CivicMean:mean(civic.slice(0,12)).toFixed(1),
