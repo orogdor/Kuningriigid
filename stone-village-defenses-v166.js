@@ -139,8 +139,9 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
 // defenses before the AI commits to Bronze. Never stall another age indefinitely.
 export function stoneFortificationAgeGate(city,age,time,limit=110*60){
  if(age!==0||time>=limit||!city?.stoneDefensePlanV166?.slots?.length)return false;
- const pop=city.economy?.realms?.[city.team]?.pop||0;
- if(pop<6)return false;
+ // A temporary population dip must not abandon an already funded and
+ // partly built ring. Eligibility required residents at the planning stage;
+ // the 110-turn timeout still guarantees eventual age progression.
  const plan=city.stoneDefensePlanV166;
  const local=city.economy.buildings.filter(b=>b.hp>0&&!b.virtual);
  const ready=plan.slots.filter(slot=>local.some(b=>b.type===slot.type&&b.ready&&b.hp>0&&
