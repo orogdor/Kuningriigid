@@ -55,7 +55,7 @@ try{
    assert.equal(starting.toolbarVisible,true,'mobile-friendly selector displayed during wall placement');
    assert.ok(starting.toolbarButtons.some(t=>t.includes('Sirge')));
    assert.ok(starting.toolbarButtons.some(t=>t.includes('Kumer')));
-   await page.locator('#v175-wall-toolbar button[aria-label="Ehita kumer müür"]').click();
+   await page.locator('#v175-wall-toolbar .v175-wall-choices button').nth(1).click();
    assert.equal(await page.evaluate(()=>gameDebug.wallDrawStatus().shape),'curved');
    const pt=await page.evaluate(()=>{
     const result=[];
@@ -103,7 +103,7 @@ try{
    assert.equal(after.backup,'v1752-keep-backup');
    assert.ok(after.visibleRoads>0,'naturally worn roads remain visible');
    assert.deepEqual(errors,[],'no browser JavaScript exceptions');
-   await page.locator('#v175-wall-toolbar button[aria-label="Ehita sirge müür"]').click();
+   await page.locator('#v175-wall-toolbar .v175-wall-choices button').first().click();
    assert.equal(await page.evaluate(()=>gameDebug.wallDrawStatus().shape),'straight','user can also select straight walls');
    await page.screenshot({path:output+'/wall-builder-'+label+'.png'});
    results.push({label,pass:true,initial,starting,during,after,pt});
