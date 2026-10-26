@@ -1,5 +1,6 @@
 import {resourcesNear} from './perf-state-v131.js';
 import {CitizenRoutes} from './citizen-routes-v130.js';
+import {wallFootprintV175,wallPointInsideV175} from './wall-draw-v175.js';
 // Shared small-agent navigation for citizens, carriers and soldiers.
 const length=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 // Horizontal exclusion zones contain the actual roof, steps, carts and
@@ -29,6 +30,7 @@ export function buildingClearance(b){
  // wallAxis. Preserve them exactly so a 90-degree rotated wall keeps free
  // lateral ground open for soldiers and pedestrians.
  if(['palisade','stonewall','reinforced_wall'].includes(b.type)){
+  if(Number.isFinite(b.wallAngleV175))return wallFootprintV175(b,.6);
   const vertical=!!b.wallAxis;
   // V175.1: V4 legacy saves may contain 42m palisades with old 7m nav
   // footprints. Derive geometry from the paid, persisted segment length.
@@ -60,7 +62,18 @@ world.navBounds={minX:this.minX,minZ:this.minZ,w:this.w,h:this.h};this.base=new 
 index(x,z){const xx=Math.round(x)-this.minX,zz=Math.round(z)-this.minZ;return xx>=0&&xx<this.w&&zz>=0&&zz<this.h?zz*this.w+xx:-1}
 point(i){return {x:i%this.w+this.minX,z:Math.floor(i/this.w)+this.minZ}}
 rebuildTerrain(){for(let z=0;z<this.h;z++)for(let x=0;x<this.w;x++)this.base[z*this.w+x]=this.passable(x+this.minX,z+this.minZ)?1:0;this.rebuild()}
-rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings()){if(b.hp<=0)continue;if(b.type==='gatehouse'||b.type==='woodgate'){const wide=b.type==='woodgate'&&b.extendedPalisadeV166,offset=wide?5.2:2.55,post=wide?1.6:2.2;if(b.wallAxis){for(const side of [-1,1])paint(b.x,b.z+side*offset,.95,post,false);}else{for(const side of [-1,1])paint(b.x+side*offset,b.z,post,.95,false);}continue;}const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);// When a settlement grows or moves buildings over earlier footpaths,
+rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let zz=Math.floor(z-rz);zz<=Math.ceil(z+rz);zz++)for(let xx=Math.floor(x-rx);xx<=Math.ceil(x+rx);xx++){if(circle?Math.hypot(xx-x,zz-z)>rx:(Math.abs(xx-x)>rx||Math.abs(zz-z)>rz))continue;const i=this.index(xx,zz);if(i>=0)this.mask[i]=0}};for(const b of this.buildings()){if(b.hp<=0)continue;
+ // V175.2: keep a diagonally drawn palisade as a genuinely oriented
+ // solid strip, not an axis-aligned box which can block its own gate.
+ if(Number.isFinite(b.wallAngleV175)&&['palisade','stonewall','reinforced_wall'].includes(b.type)){
+  const ext=wallFootprintV175(b,1.25);
+  for(let z=Math.floor(b.z-ext.rz);z<=Math.ceil(b.z+ext.rz);z++)
+   for(let x=Math.floor(b.x-ext.rx);x<=Math.ceil(b.x+ext.rx);x++){
+    if(wallPointInsideV175({x,z},b,.55)){const i=this.index(x,z);if(i>=0)this.mask[i]=0;}
+   }
+  continue;
+ }
+ if(b.type==='gatehouse'||b.type==='woodgate'){const wide=b.type==='woodgate'&&b.extendedPalisadeV166,offset=wide?5.2:2.55,post=wide?1.6:2.2;if(b.wallAxis){for(const side of [-1,1])paint(b.x,b.z+side*offset,.95,post,false);}else{for(const side of [-1,1])paint(b.x+side*offset,b.z,post,.95,false);}continue;}const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);// When a settlement grows or moves buildings over earlier footpaths,
  // remove buried wear rather than reviving the road through a new house.
  // Old V4 saves with roads inside construction footprints repair on load.
  let buried=0;
