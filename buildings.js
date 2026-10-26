@@ -1,4 +1,4 @@
-import {createBronzeCityModel,createBronzeTownHouse} from './bronze-city-v111.js?v=117a';
+import {createBronzeCityModel,createBronzeTownHouse} from './bronze-city-v111.js?v=1751a';
 import {createMiningSite,createCoastalBuilding} from './site-models-v88.js';
 import {GOOD_BUILDINGS} from './city-needs-v87.js';
 import * as T from './vendor/three.module.js';
