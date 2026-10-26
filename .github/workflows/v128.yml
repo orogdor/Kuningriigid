@@ -35,5 +35,10 @@ jobs:
           node --check campaign.js
       - name: Wood tower geometry and footprint regression (V175.6)
         run: node TEST_V1756_WOOD_TOWER.mjs
+      - name: Tower patrol and siege recall regression (V175.7)
+        run: |
+          node --check tower-patrol-v1757.js
+          node --check civilization.js
+          node TEST_V1757_TOWER_PATROL.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic
