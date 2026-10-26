@@ -183,17 +183,76 @@ const TEAM=['#3f7a8c','#b0533e','#7d5fb0','#c09a2e'];
 
 // ------------------------------------------------------------------ houses
 function houseStone(b,r,v){
- const kind=v%4;
- const fire=()=>{for(let i=0;i<7;i++){const a=i/7*6.28;ball(b,1.9+Math.cos(a)*.45,.12,1.9+Math.sin(a)*.45,.16,'#8f8c80',M.stone,.7,6);}cone(b,1.9,0,1.9,.3,.5,'#c36a2e',M.plain,6);};
- if(kind===1){ // hide tent
-  const R=1.9+r()*.4,H=3.4+r()*.5,hide=pick(r,['#b49a72','#a68a63','#c2aa83']);
-  cone(b,0,0,0,R,H,hide,M.cloth,9);for(let i=0;i<7;i++){const a=i/7*6.28;boxR(b,Math.cos(a)*.22,H+.2,Math.sin(a)*.22,.07,1.2,.07,'#6d5034',M.beam,Math.sin(a)*.25,0,-Math.cos(a)*.25);}
-  box(b,0,0,R*.82,.8,1.1,.25,'#4a3a2a',M.cloth);fire();rack(b,-2,1.4,.5,'#9b7b55');return;}
- const R=kind===2?2.6:2.0+r()*.6,wall=kind===3?1.9:2.1+r()*.4,roofH=kind===2?2.2:2.4+r()*.8,c=pick(r,PAL.daub),th=pick(r,PAL.thatch);
- cyl(b,0,0,0,R,R*1.04,wall,c,M.plaster,12);cone(b,0,wall,0,R+.5,roofH,th,M.thatch,12);cone(b,0,wall+roofH-.3,0,.3,.6,shade(th,.75),M.thatch,8);
- box(b,0,0,R-.05,1.0,1.85,.4,'#3b2c20',M.boards);
- if(kind===3){cyl(b,2.3,0,-1.3,1.1,1.15,1.6,c,M.plaster,10);cone(b,2.3,1.6,-1.3,1.45,1.6,th,M.thatch,10);}
- fire();if(r()>.4)logPile(b,-2.4,.9,5,1.2);if(r()>.5)pots(b,-1.8,-2.0);if(r()>.6)rack(b,-2.2,1.9,.3,'#a08060');
+ // V170 (stage 3.1a): twelve stable, historically plausible Stone Age silhouettes.
+ // All details stay inside the existing small house plot and are decorative only.
+ const kind=v%12,wood=pick(r,PAL.logs),daub=pick(r,PAL.daub);
+ const thatch=pick(r,PAL.thatch),beams='#61492f';
+ const hearth=(x=1.5,z=2)=>{for(let i=0;i<6;i++){
+  const a=i*Math.PI/3;ball(b,x+Math.cos(a)*.42,.10,z+Math.sin(a)*.42,.16,'#88857b',M.stone,.7,6);
+ }box(b,x,.10,z,.50,.14,.45,'#5b4533',M.logs);};
+ const details=()=>{
+  const detail=kind%4;
+  if(detail===0){logPile(b,-2.6,2.1,5,.2);pots(b,2.5,1.6);}
+  else if(detail===1){rack(b,-2.8,1.6,0,'#947657');sack(b,2.5,1.9);}
+  else if(detail===2){hay(b,-2.5,2.0,.48);logPile(b,2.7,-1.7,4,.4);}
+  else {crate(b,-2.5,1.9,.42);pots(b,2.4,-2.1);}
+ };
+ if(kind===1){ // travelling hide tent
+  const R=1.95+r()*.25,H=3.3+r()*.45,hide=pick(r,['#b49a72','#a68a63','#c2aa83']);
+  cone(b,0,0,0,R,H,hide,M.cloth,9);
+  for(let i=0;i<7;i++){const a=i*Math.PI*2/7;
+   boxR(b,Math.cos(a)*.20,H+.06,Math.sin(a)*.20,.07,1.1,.07,beams,M.beam,Math.sin(a)*.25,0,-Math.cos(a)*.25);
+  }
+  box(b,0,0,R*.84,.85,1.22,.20,'#49392a',M.cloth);
+  hearth(1.9,2.0);rack(b,-2.1,1.5,.5,'#9b7b55');return;
+ }
+ if([0,2,3,8].includes(kind)){ // family roundhouses: differing proportions and attachments
+  const R=kind===2?2.6:kind===8?2.25:2.0+r()*.5;
+  const wall=kind===3?1.95:2.1+r()*.3;
+  const roofH=kind===8?3.15:2.2+r()*.7;
+  cyl(b,0,0,0,R,R*1.04,wall,daub,M.plaster,kind===8?10:12);
+  cone(b,0,wall,0,R+.48,roofH,thatch,M.thatch,kind===8?10:12);
+  cone(b,0,wall+roofH-.23,0,.26,.48,shade(thatch,.75),M.thatch,8);
+  box(b,0,0,R-.04,1.05,1.82,.38,'#443223',M.boards);
+  for(const x of [-.65,.65])box(b,x,0,R+.13,.12,1.9,.12,beams,M.beam);
+  if(kind===3){cyl(b,2.0,0,-1.2,1.0,1.06,1.55,daub,M.plaster,10);
+   cone(b,2.0,1.55,-1.2,1.30,1.50,thatch,M.thatch,10);}
+  if(kind===8){for(let i=0;i<5;i++){const a=i*2*Math.PI/5;
+   box(b,Math.cos(a)*(R+.08),0,Math.sin(a)*(R+.08),.13,wall+.2,.13,wood,M.beam);}}
+  hearth(1.9,2.0);details();return;
+ }
+ // Different rectangular/oval family buildings: early post framing, wattle, logs and turf.
+ const long=[4,6,9,11].includes(kind),plank=[5,10].includes(kind);
+ const w=long?6.3+r()*.45:4.6+r()*.7,d=long?3.5+r()*.35:3.9+r()*.4;
+ const H=kind===7?1.95:2.25+r()*.35,wall=plank?wood:daub,wallMat=plank?M.logs:M.plaster;
+ const turf=kind===9,roof=turf?'#6b8152':kind===5?'#806c50':thatch,roofMat=turf?M.leaf:kind===5?M.boards:M.thatch;
+ const axis=[6,10].includes(kind)?'z':'x',rise=kind===7?1.35:2.1+r()*.65;
+ box(b,0,0,0,w,H,d,wall,wallMat);
+ gable(b,0,H,0,w,d,rise,roof,roofMat,{axis,over:.35,thick:roofMat===M.thatch?.25:.15,gableC:wall,gableM:wallMat});
+ for(const x of [-w/2+.1,w/2-.1])for(const z of [-d/2+.08,d/2-.08])
+  box(b,x,0,z,.13,H+.10,.13,beams,M.beam);
+ doorway(b,'f',0,d/2,kind===11?-.85:0,.93,1.72,'#493729',beams);
+ if([4,6,11].includes(kind)){ // exposed binding rafters on longhouse frontage
+  for(const x of [-w*.35,0,w*.35])boxR(b,x,H+.30,d/2+.19,.10,.7,.10,beams,M.beam,.4,0,0);
+ }
+ if(kind===7){ // small rain shelter beside the door
+  for(const x of [-1.2,1.2])box(b,x,0,d/2+.85,.11,1.58,.11,beams,M.beam);
+  shed(b,0,1.61,d/2+.43,2.7,1.20,.50,thatch,M.thatch);
+ }
+ if(kind===9){ // turf-capped family longhouse
+  for(let i=0;i<4;i++)box(b,-w/2+.8+i*1.3,H+1.48,-.05,.65,.08,.45,'#7b8a53',M.leaf);
+ }
+ if(kind===10){ // one-sided timber lean-to
+  box(b,w/2+.35,0,-.6,.63,1.25,2.3,wood,M.logs);
+  shed(b,w/2+.25,1.35,-.6,1.15,2.4,.35,thatch,M.thatch);
+ }
+ if(kind===11){ // second low roof: a family annex
+  box(b,-w/2+.45,0,-d/2-.33,1.95,1.35,.85,daub,M.plaster);
+  shed(b,-w/2+.45,1.35,-d/2-.33,1.95,1.05,.52,thatch,M.thatch);
+ }
+ if(kind===5)logPile(b,-2.5,1.85,4,.6);
+ else details();
+ if(kind%3===0)hearth(1.5,2.15);
 }
 function houseEarly(b,r,v,age){ // bronze & iron age
  const kind=v%6,iron=age>=2,th=pick(r,PAL.thatch);
@@ -309,7 +368,8 @@ function houseModern(b,r,v){
  box(b,0,0,d/2+.05,2.0,2.4,.08,'#3e5664',M.glass);box(b,0,2.5,d/2+.6,2.6,.15,1.3,'#bdbab2');
  if(r()>.4){bush(b,-w/2+.4,d/2+.6,.45);bush(b,w/2-.4,d/2+.6,.45);}
 }
-const HOUSE_VARIANTS={0:8,1:12,3:16,4:16,5:12,6:16};
+const HOUSE_VARIANTS={0:12,1:12,3:16,4:16,5:12,6:16};
+export const HALL_VARIANTS_V170=4;
 function buildHouse(b,age,variant){
  const era=ERA(age),r=rng(variant*7919+era*104729+13);
  if(era===0)houseStone(b,r,variant);else if(era===1)houseEarly(b,r,variant,age);else if(era===3)houseMedieval(b,r,variant);
@@ -349,13 +409,42 @@ function body(b,era,r,{w=6,d=5,storeys=1,roof='gable',axis:axis0='x',x=0,z=0,wal
 
 // ------------------------------------------------------------------ signature buildings
 const SIG={};
-SIG.hall=(b,era,r,t,root)=>{const H=body(b,era,r,{w:8.6,d:6.2,storeys:era>=3?2:1,roof:era>=4?'hip':'gable',axis:'x'});
- if(era<=1){for(const s of [-1,1])boxR(b,s*4.3,H+3.4,0,.12,1.6,.12,'#6d5034',M.beam,0,0,s*.5);banner(b,3.6,0,3.6,t,5);}
- else{const tx=era>=4?0:-3.2;box(b,tx,0,-1.2,2.4,H+4.5,2.4,era>=5?'#a35a43':'#b0a898',era>=5?M.brick:M.stone);
-  if(era>=4)dome(b,tx,H+4.5,-1.2,1.3,'#6f8f86',M.metal);else{gable(b,tx,H+4.5,-1.2,2.4,2.4,1.8,'#7e3f2c',M.tile,{axis:'x',over:.2});}
-  box(b,tx,H+2.6,-1.2+1.21,1.2,1.2,.06,'#efe8d6');box(b,tx,H+3.15,-1.2+1.25,.06,.45,.04,'#2b2b2b');box(b,tx+.2,H+3.2,-1.2+1.25,.4,.06,.04,'#2b2b2b');
-  banner(b,tx+1.4,H+4.5,-.2,t,2.5);}
- for(let i=0;i<4;i++)box(b,0,0,3.4+i*.35,3.2-i*.4,.12,.35,'#a7a092',M.stone);};
+SIG.hall=(b,era,r,t,root,variant=0)=>{
+ if(era<=1){ // V170: four timber assembly-hall silhouettes, not a generic house
+  const shape=variant%4,w=8.6,d=6.2,H=shape===2?2.85:2.45;
+  const timber=pick(r,PAL.logs),wattle=pick(r,PAL.wattle),reed=pick(r,PAL.thatch);
+  const wall=shape===1?timber:wattle,wm=shape===1?M.logs:M.plaster;
+  box(b,0,0,0,w+.1,.18,d+.1,'#84745b',M.dirt);
+  box(b,0,.18,0,w,H-.18,d,wall,wm);
+  const roof=shape===3?'#768352':reed,rm=shape===3?M.leaf:M.thatch;
+  gable(b,0,H,0,w,d,shape===2?3.3:2.6+(shape===1?.35:0),roof,rm,
+   {axis:shape===2?'z':'x',over:.38,thick:rm===M.thatch?.28:.16,gableC:wall,gableM:wm});
+  for(const x of [-w/2+.14,0,w/2-.14])for(const z of [-d/2+.14,d/2-.14])
+   box(b,x,0,z,.17,H+.12,.17,'#5d432e',M.beam);
+  doorway(b,'f',0,d/2,0,1.42,2.03,'#493426','#76583b');
+  // Entry porch fits the established hall plot and indicates civic importance.
+  for(const x of [-1.35,1.35])box(b,x,0,d/2+.48,.16,2.2,.16,'#59442f',M.beam);
+  box(b,0,2.15,d/2+.45,3.1,.18,.18,'#61472f',M.beam);
+  for(const x of [-1.05,1.05])box(b,x,0,d/2+.9,1.0,.11,.35,'#968776',M.stone);
+  if(shape===1){ // long log-house carved roof ridge
+   for(const x of [-3.25,3.25])box(b,x,H+2.5,0,.15,.75,.16,timber,M.beam);
+  }else if(shape===3){ // low turf earth ridge
+   for(let i=0;i<5;i++)box(b,-3.4+i*1.7,H+2.15,-.10,.55,.08,.45,'#7d8b52',M.leaf);
+  }else{for(const x of [-3.1,3.1])boxR(b,x,H+2.6,0,.12,.65,.12,'#694e35',M.beam,0,0,.3);}
+  for(const x of [-3.2,3.2]){logPile(b,x,2.55,4,Math.PI/2);}
+  banner(b,3.6,0,3.6,t,4.8);return;
+ }
+ const H=body(b,era,r,{w:8.6,d:6.2,storeys:era>=3?2:1,roof:era>=4?'hip':'gable',axis:'x'});
+ const tx=era>=4?0:-3.2;
+ box(b,tx,0,-1.2,2.4,H+4.5,2.4,era>=5?'#a35a43':'#b0a898',era>=5?M.brick:M.stone);
+ if(era>=4)dome(b,tx,H+4.5,-1.2,1.3,'#6f8f86',M.metal);
+ else gable(b,tx,H+4.5,-1.2,2.4,2.4,1.8,'#7e3f2c',M.tile,{axis:'x',over:.2});
+ box(b,tx,H+2.6,-1.2+1.21,1.2,1.2,.06,'#efe8d6');
+ box(b,tx,H+3.15,-1.2+1.25,.06,.45,.04,'#2b2b2b');
+ box(b,tx+.2,H+3.2,-1.2+1.25,.4,.06,.04,'#2b2b2b');
+ banner(b,tx+1.4,H+4.5,-.2,t,2.5);
+ for(let i=0;i<4;i++)box(b,0,0,3.4+i*.35,3.2-i*.4,.12,.35,'#a7a092',M.stone);
+};
 SIG.lumber=(b,era,r)=>{body(b,era,r,{w:4.6,d:3.6,x:-1.6,z:-1.4,chim:false});logPile(b,2.6,-1,9,Math.PI/2);logPile(b,2.6,1.6,6,Math.PI/2);
  box(b,-.4,0,2.4,.7,.6,.7,'#7a5a3a',M.logs);boxR(b,-.4,.85,2.4,.08,.6,.08,'#6d5034',M.beam,0,0,.5);box(b,-.25,1.05,2.4,.3,.14,.06,'#8a8d90',M.metal);planks(b,-2.5,2.4,0,'#b48a5a');};
 SIG.forester=(b,era,r)=>{body(b,era,r,{w:4.2,d:3.4,x:-1.8,z:-1.6});for(let i=0;i<3;i++)for(let j=0;j<3;j++){const x=1.2+i*1.2,z=.4+j*1.2;box(b,x,0,z,.9,.15,.9,'#5e4630',M.dirt);cone(b,x,.15,z,.25+((i+j)%3)*.08,.6+((i*2+j)%3)*.3,'#3f6b3a',M.leaf,7);}fenceLine(b,.5,3.4,4,3.4,'#8a6c48',.7);};
@@ -470,13 +559,13 @@ export function houseVariantCount(age){return HOUSE_VARIANTS[ERA(age)]||8;}
 export function createTownModelV154(type,team=0,age=0,seed=0){
  if(!townModelSupported(type))return null;
  age=Math.max(0,Math.min(6,age|0));const era=ERA(age);
- const variant=HOUSE_TYPES.has(type)?((seed>>>0)%houseVariantCount(age)):0;
+ const variant=HOUSE_TYPES.has(type)?((seed>>>0)%houseVariantCount(age)):type==='hall'?((seed>>>0)%HALL_VARIANTS_V170):0;
  const key=type+'|'+age+'|'+variant+'|'+(HOUSE_TYPES.has(type)?0:team);
  let entry=CACHE.get(key);
  if(!entry){
   const b=new B(),tmp=new T.Group();let extra=null;
   if(HOUSE_TYPES.has(type))buildHouse(b,age,variant);
-  else extra=SIG[type](b,era,rng(type.length*977+age*31+team*7+1),TEAM[team]||TEAM[0],tmp)||null;
+  else extra=SIG[type](b,era,rng(type.length*977+age*31+team*7+1+variant*104729),TEAM[team]||TEAM[0],tmp,variant)||null;
   entry={geo:b.geometry(),anim:(extra?.anim||[]).map(a=>({...a,geo:a.geo.geometry()})),smoke:tmp.userData.smoke?.position.clone()||null,lantern:type==='inn'||type==='tavern'};
   CACHE.set(key,entry);
  }
