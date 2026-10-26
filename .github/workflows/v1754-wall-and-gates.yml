@@ -1,15 +1,5 @@
 name: V175.4 Solid Gates, Roads and Curved Wall QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'TEST_V1754_GATES.mjs'
-      - 'TEST_V1754_ROAD_GATE.mjs'
-      - 'detail-roads.js'
-      - 'wall-draw-v175.js'
-      - 'navigation.js'
-      - 'civilization-core.js'
-      - '.github/workflows/v1754-wall-and-gates.yml'
   workflow_dispatch:
 permissions:
   contents: read
