@@ -1,6 +1,6 @@
 import {resourcesNear} from './perf-state-v131.js';
 import {CitizenRoutes} from './citizen-routes-v130.js';
-import {wallFootprintV175,wallPointInsideV175} from './wall-draw-v175.js';
+import {wallFootprintV175,wallPointInsideV175} from './wall-draw-v175.js?v=1753a';
 // Shared small-agent navigation for citizens, carriers and soldiers.
 const length=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 // Horizontal exclusion zones contain the actual roof, steps, carts and
