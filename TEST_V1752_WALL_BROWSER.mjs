@@ -44,14 +44,18 @@ try{
    const starting=await page.evaluate(()=>({
     status:gameDebug.wallDrawStatus(),
     buttons:[...document.querySelectorAll('#actions button')].map(b=>b.textContent),
+    toolbarVisible:!!document.querySelector('#v175-wall-toolbar')&&!document.querySelector('#v175-wall-toolbar').hidden,
+    toolbarButtons:[...document.querySelectorAll('#v175-wall-toolbar button')].map(b=>b.textContent),
     oldSave:localStorage.getItem('kingdoms-civ4'),
     oldBackup:localStorage.getItem('kingdoms-civ4-backup')
    }));
    assert.equal(starting.status.mode,'palisade','palisade mode actually selected from menu');
    assert.ok(starting.buttons.some(t=>t.includes('Sirge müür')),'straight option present');
    assert.ok(starting.buttons.some(t=>t.includes('Kumer müür')),'curved option present');
-   await page.evaluate(()=>[...document.querySelectorAll('#actions button')]
-     .find(b=>b.textContent.includes('Kumer müür')).click());
+   assert.equal(starting.toolbarVisible,true,'mobile-friendly selector displayed during wall placement');
+   assert.ok(starting.toolbarButtons.some(t=>t.includes('Sirge')));
+   assert.ok(starting.toolbarButtons.some(t=>t.includes('Kumer')));
+   await page.locator('#v175-wall-toolbar button[aria-label="Ehita kumer müür"]').click();
    assert.equal(await page.evaluate(()=>gameDebug.wallDrawStatus().shape),'curved');
    const pt=await page.evaluate(()=>{
     const result=[];
@@ -99,6 +103,8 @@ try{
    assert.equal(after.backup,'v1752-keep-backup');
    assert.ok(after.visibleRoads>0,'naturally worn roads remain visible');
    assert.deepEqual(errors,[],'no browser JavaScript exceptions');
+   await page.locator('#v175-wall-toolbar button[aria-label="Ehita sirge müür"]').click();
+   assert.equal(await page.evaluate(()=>gameDebug.wallDrawStatus().shape),'straight','user can also select straight walls');
    await page.screenshot({path:output+'/wall-builder-'+label+'.png'});
    results.push({label,pass:true,initial,starting,during,after,pt});
    console.log('V175.2 BROWSER PASS '+label+' '+JSON.stringify({
