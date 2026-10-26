@@ -59,3 +59,44 @@ https://orogdor.github.io/Kuningriigid/?v=170b-20261026
 
 - 3.1d: kõigi mudelite pildikontroll, brauseri- ja mobiilikatse, FPS ning V169 regressioonid.
 - Etapid 3.2–3.5 ei kuulu V170a väljalaskesse.
+
+
+## Etapp 3.1d – V170 graafika ja regressioonide kontroll
+
+Kontroll tehti päris GitHub Actionsi Linuxi/Chromiumi WebGL testides ning eraldi Node testides, 26. oktoobril 2026. Esialgne V170b kontroll: [Actions #40295999971](https://github.com/orogdor/Kuningriigid/actions/runs/40295999971).
+
+### Läbitud Node-kontrollid
+
+- `node TEST_V154.mjs --node-only`: **PASS**, 551 mudelit ja 66 tüüpi, geomeetria ja elamukrundi mõõtmete/kolmnurkade piirid.
+- `TEST_V73.mjs`: **PASS**, V4 salvestused, varusalvestused ja vanad veosed.
+- `TEST_V163_STONE_CITY.mjs`: **PASS**, linnasüdame ja majapidamiste planeering.
+- `TEST_V169_FOUNDING.mjs`: **PASS**, AI leiab loogilise ranniku linnakoha.
+- `TEST_V160.mjs`: **PASS**, pronksiaja tasakaalureeglite kontroll.
+
+### Läbitud WebGL-brauserikontroll V170b-l
+
+`TEST_V170_BROWSER.mjs`: **4/4 PASS** – kiviaja näidislinn ning V139 AI ajalooline linn, mõlemad arvutis 1280×800 ja telefonivaates 390×844 CSS px.
+
+| Stseen | Aktiivsed WebGL joonistuskutsed | Kolmnurgad | Nähtavaid V154 mudelivariante |
+|---|---:|---:|---:|
+| Kiviaeg, arvuti | 587 | 374 121 | 12 |
+| Kiviaeg, mobiili emulatsioon | 383 | 253 039 | 12 |
+| AI ajalooline linn, arvuti | 1001 | 476 849 | 35 |
+| AI ajalooline linn, mobiili emulatsioon | 473 | 350 475 | 35 |
+
+Slaidid/kontrollpildid ja `results.json` on töövoo artefaktis `v170-city-screenshots-and-browser-results`.
+
+### Tegelikult leitud ja parandatud probleem
+
+Pildikontroll näitas V139 näidislinnas varajase rauaaja kõrval ajastuga sobimatuid valgeid klassikalisi sambaid ja kuppelmaju.
+
+**V170c**: `town-models-v154.js` parandab `library` ja `academy` 3D-mudelite ajastutingimused. Kiviajal ja rauaajal kasutatakse puit- ja saviehitisi, keskajal ajastutruumaid maju ning sammaste/kuplite arhitektuur avaneb alles hilisemate ajastute visuaalis. Mänguloogika ja salvestused jäävad muutmata.
+
+### Piirangud, mis jäävad lahtiseks kuni värske testitulemuseni
+
+- V170c lõplikke korduskuvatõmmiseid tuleb kontrollida eraldi, V170b kuvatõmmised näitavad vana kupli-sambaga viga.
+- GitHubi 200 käigu võrdlus V169 baasiga (seeme 8417) on käivitatud. PASS/FAIL otsust ei tohi enne töövoo lõpetamist väita.
+- Headless Chromiumi WebGL joonistuskutsed **ei ole FPS-test päris Samsungi GPU-ga**. Telefoni ressursiriba on kitsal ekraanil horisontaalselt keritav ning ajastu nimi võib lüheneda.
+- Eraldi on vaja võrdlevat päris seadme kaadrisageduse mõõtmist enne absoluutset jõudlusgarantiid.
+
+Töövoog: [V170 graafika QA](https://github.com/orogdor/Kuningriigid/actions/workflows/v170-graphics-qa.yml).
