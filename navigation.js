@@ -90,7 +90,7 @@ currentSignature(){
  // Buildings of equal count can be moved/destroyed; stale nav masks previously
  // caused footsteps to be drawn through a different building at the same index.
  return (this.world.revision||0)+':'+this.buildings().map(b=>
-  b.type+':'+(b.hp<=0?'dead':'live')+':'+Number(!!b.ready)+':'+(b.wallAxis||0)+':'+(b.width||0)+':'+(b.depth||0)+':'+Math.round(b.x*10)+':'+Math.round(b.z*10)+':'+(b.navWidth||0)+':'+(b.navDepth||0)+':'+(b.palisadeSpanV167||0)+':'+Number(!!b.extendedPalisadeV166)+':'+(b.shoreAngle||0)+':'+(b.landEntry?.x??'')+':'+(b.landEntry?.z??'')
+  b.type+':'+(b.hp<=0?'dead':'live')+':'+Number(!!b.ready)+':'+(b.wallAxis||0)+':'+(b.width||0)+':'+(b.depth||0)+':'+Math.round(b.x*10)+':'+Math.round(b.z*10)+':'+(b.navWidth||0)+':'+(b.navDepth||0)+':'+(b.palisadeSpanV167||0)+':'+(Number.isFinite(b.wallAngleV175)?b.wallAngleV175.toFixed(5):'axis')+':'+Number(!!b.extendedPalisadeV166)+':'+(b.shoreAngle||0)+':'+(b.landEntry?.x??'')+':'+(b.landEntry?.z??'')
  ).join('|');
 }
 refresh(){if(this.signature!==this.currentSignature())this.rebuild()}
