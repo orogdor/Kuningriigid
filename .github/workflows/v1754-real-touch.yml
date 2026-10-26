@@ -1,19 +1,5 @@
-name: V175.4 Actual Mobile Touch Wall Construction QA
+name: Kuningriigid Browser QA (manual)
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'TEST_V1754_REAL_TOUCH.mjs'
-      - 'TEST_V1754_CURVED_TOUCH.mjs'
-      - 'wall-draw-v175.js'
-      - 'civilization.js'
-      - 'civilization-core.js'
-      - 'navigation.js'
-      - 'fortifications.js'
-      - 'index.html'
-      - 'boot-v83.js'
-      - 'detail-roads.js'
-      - '.github/workflows/v1754-real-touch.yml'
   workflow_dispatch:
 permissions:
   contents: read
