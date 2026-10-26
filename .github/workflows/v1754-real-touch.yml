@@ -10,6 +10,9 @@ on:
       - 'civilization-core.js'
       - 'navigation.js'
       - 'fortifications.js'
+      - 'index.html'
+      - 'boot-v83.js'
+      - 'detail-roads.js'
       - '.github/workflows/v1754-real-touch.yml'
   workflow_dispatch:
 permissions:
@@ -30,6 +33,7 @@ jobs:
           node --check TEST_V1754_REAL_TOUCH.mjs
           node --check wall-draw-v175.js
           node --check civilization.js
+          node --check detail-roads.js
       - name: Install real Chromium
         run: |
           npm install --no-save playwright
