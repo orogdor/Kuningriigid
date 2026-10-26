@@ -3,257 +3,185 @@
   "roster": [
     {
       "team": 1,
-      "cities": 10,
-      "buildings": 282,
-      "markets": 6,
+      "cities": 11,
+      "buildings": 305,
+      "markets": 4,
       "harbors": 1,
-      "houses": 86,
-      "fields": 1,
-      "ages": 4
+      "houses": 92,
+      "fields": 2,
+      "ages": 5
     },
     {
       "team": 2,
-      "cities": 6,
-      "buildings": 170,
-      "markets": 2,
-      "harbors": 0,
-      "houses": 40,
-      "fields": 1,
-      "ages": 3
+      "cities": 7,
+      "buildings": 251,
+      "markets": 4,
+      "harbors": 1,
+      "houses": 63,
+      "fields": 2,
+      "ages": 4
     },
     {
       "team": 3,
-      "cities": 6,
-      "buildings": 231,
-      "markets": 4,
-      "harbors": 0,
-      "houses": 67,
+      "cities": 7,
+      "buildings": 279,
+      "markets": 5,
+      "harbors": 1,
+      "houses": 83,
       "fields": 2,
-      "ages": 4
+      "ages": 3
     }
   ],
   "landUse": [
     {
-      "name": "Sampola",
-      "owned": 278,
-      "developed": 5,
+      "name": "Sogn",
+      "owned": 8,
+      "developed": 6,
+      "ruralDeveloped": 0,
+      "planned": 6,
+      "homes": 21,
+      "foodGrowthBonus": 0.25
+    },
+    {
+      "name": "Rogaland",
+      "owned": 312,
+      "developed": 6,
       "ruralDeveloped": 0,
       "planned": 2,
-      "homes": 21,
+      "homes": 26,
       "foodGrowthBonus": 0.2
     },
     {
-      "name": "Ainola",
-      "owned": 432,
-      "developed": 4,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 25,
-      "foodGrowthBonus": 0.2
-    },
-    {
-      "name": "Väinölä",
+      "name": "Naumudalr",
       "owned": 243,
-      "developed": 4,
+      "developed": 3,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 10,
-      "foodGrowthBonus": 0.2
+      "foodGrowthBonus": 0.25
     },
     {
-      "name": "Pohjola",
-      "owned": 46,
-      "developed": 4,
-      "ruralDeveloped": 1,
-      "planned": 0,
-      "homes": 6,
-      "foodGrowthBonus": 0.2
-    },
-    {
-      "name": "Tapiola",
-      "owned": 81,
+      "name": "Niðaróss",
+      "owned": 102,
       "developed": 3,
-      "ruralDeveloped": 0,
+      "ruralDeveloped": 1,
       "planned": 0,
       "homes": 9,
       "foodGrowthBonus": 0
     },
     {
-      "name": "Metsola",
-      "owned": 147,
-      "developed": 4,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 6,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Ahtola",
-      "owned": 75,
+      "name": "Hlaðir",
+      "owned": 77,
       "developed": 3,
-      "ruralDeveloped": 1,
+      "ruralDeveloped": 0,
       "planned": 0,
-      "homes": 3,
+      "homes": 7,
       "foodGrowthBonus": 0
     },
     {
-      "name": "Sariola",
+      "name": "Skiringssal",
       "owned": 75,
-      "developed": 2,
+      "developed": 5,
       "ruralDeveloped": 0,
       "planned": 0,
       "homes": 3,
       "foodGrowthBonus": 0
     },
     {
-      "name": "Hiitola",
-      "owned": 53,
+      "name": "Kaupang",
+      "owned": 147,
       "developed": 2,
       "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 2,
-      "foodGrowthBonus": 0
-    },
-    {
-      "name": "Kalevala",
-      "owned": 26,
-      "developed": 2,
-      "ruralDeveloped": 0,
-      "planned": 0,
-      "homes": 1,
+      "planned": 1,
+      "homes": 7,
       "foodGrowthBonus": 0
     }
   ],
   "density": [
     {
-      "city": "Sampola",
-      "nearEdge": 2,
+      "city": "Sogn",
+      "nearEdge": 4,
       "expanded": 0,
-      "urbanBuildings": 98,
-      "urbanTiles": 91
+      "urbanBuildings": 103,
+      "urbanTiles": 8
     },
     {
-      "city": "Ainola",
+      "city": "Rogaland",
       "nearEdge": 3,
       "expanded": 0,
-      "urbanBuildings": 75,
-      "urbanTiles": 94
+      "urbanBuildings": 81,
+      "urbanTiles": 120
     },
     {
-      "city": "Väinölä",
+      "city": "Naumudalr",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 35,
-      "urbanTiles": 58
+      "urbanBuildings": 37,
+      "urbanTiles": 59
     },
     {
-      "city": "Pohjola",
+      "city": "Niðaróss",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 15,
-      "urbanTiles": 36
+      "urbanBuildings": 18,
+      "urbanTiles": 33
     },
     {
-      "city": "Tapiola",
-      "nearEdge": 1,
+      "city": "Hlaðir",
+      "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 19,
+      "urbanBuildings": 14,
       "urbanTiles": 35
     },
     {
-      "city": "Metsola",
+      "city": "Skiringssal",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 16,
-      "urbanTiles": 35
-    },
-    {
-      "city": "Ahtola",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 6,
-      "urbanTiles": 17
-    },
-    {
-      "city": "Sariola",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 6,
-      "urbanTiles": 19
-    },
-    {
-      "city": "Hiitola",
-      "nearEdge": 0,
-      "expanded": 0,
-      "urbanBuildings": 5,
+      "urbanBuildings": 9,
       "urbanTiles": 18
     },
     {
-      "city": "Kalevala",
+      "city": "Kaupang",
       "nearEdge": 0,
       "expanded": 0,
-      "urbanBuildings": 4,
-      "urbanTiles": 12
+      "urbanBuildings": 14,
+      "urbanTiles": 36
     }
   ],
   "seed": 138023,
   "turn": 246,
-  "sourceTeam": 1,
-  "cities": 10,
-  "buildings": 282,
+  "sourceTeam": 3,
+  "cities": 7,
+  "buildings": 279,
   "spacingPairs": [
     9,
+    9,
+    10,
     17,
-    15,
-    16,
-    16,
-    28,
-    77,
+    20,
     19,
-    49,
-    9,
-    15,
-    25,
-    25,
-    28,
-    68,
-    28,
-    49,
-    9,
-    33,
-    33,
-    37,
-    60,
-    36,
-    40,
-    24,
+    18,
+    16,
+    16,
     29,
-    43,
-    69,
-    27,
-    34,
+    18,
     9,
-    23,
-    93,
-    17,
-    54,
-    14,
-    93,
-    26,
-    63,
-    90,
-    40,
-    77,
-    96,
-    73,
-    37
+    16,
+    11,
+    18,
+    9,
+    13,
+    9,
+    22,
+    9,
+    16
   ],
   "ages": [
-    4,
-    0,
     3,
-    4
+    5,
+    4,
+    0
   ],
-  "bytes": 3309647,
-  "seconds": 255
+  "bytes": 4357697,
+  "seconds": 284
 }
