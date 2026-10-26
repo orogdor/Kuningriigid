@@ -35,6 +35,7 @@ jobs:
           node TEST_V154.mjs --node-only
           node TEST_V172_LAYOUT.mjs
           node TEST_V168_RING_CORRIDOR.mjs
+          node TEST_V169_FOUNDING.mjs
           node TEST_V73.mjs
       - name: Real AI growth 48 turns
         run: node scripts/stone-town-v163-report.mjs
