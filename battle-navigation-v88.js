@@ -16,7 +16,7 @@ export function createBattleNavigation(game,battle){
    // V175.1: render/nav must agree that an OPEN wooden gateway has solid
    // side posts but a 3.6m corridor. A single rectangular blocker wrongly
    // made the gate untraversable in tactical combat.
-   if(b.type==='woodgate'||b.type==='gatehouse'){
+   if(b.type==='woodgate'){
     const wide=b.type==='woodgate'&&b.extendedPalisadeV166,
      offsetPost=wide?5.2:2.55,post=wide?1.6:2.2;
     for(const side of [-1,1]){
