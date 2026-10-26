@@ -39,7 +39,10 @@ const angle=params.get('angle')||'front',mobile=innerWidth<600;
 const positions={front:[10.8,10.2,16.8],side:[18.5,10.2,4.5],
  rear:[-10.5,11.5,-17.5],top:[11,22,13]};
 const eye=positions[angle]||positions.front;
-camera.position.set(...eye);camera.lookAt(0,4.3,0);
+camera.position.set(...eye);
+if(mobile){const pivot=new T.Vector3(0,4.3,0);
+ camera.position.sub(pivot).multiplyScalar(2.30).add(pivot);}
+camera.lookAt(0,4.3,0);
 document.querySelector('#side').textContent={
  front:'Eestvaade – uks ja sissepääs',side:'Külgvaade – kinnine sein',
  rear:'Tagantvaade – kinnine sein',top:'Ülevaade – ülemine kaitseplatvorm'
