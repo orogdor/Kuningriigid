@@ -80,7 +80,7 @@ assert.equal(proof.s.cities.find(c=>c.id===selected.id)?.team,0,'Ownership survi
 fs.mkdirSync('scenarios',{recursive:true});
 fs.writeFileSync('scenarios/ai-stone-v172.json',JSON.stringify(state));
 fs.writeFileSync('scenarios/ai-stone-v172.manifest.json',JSON.stringify({
- version:171,pass:true,seed:SEED,turn:selected.turn,sourceTeam:selected.team,
+ version:172,pass:true,seed:SEED,turn:selected.turn,sourceTeam:selected.team,
  selectedCity:selected.name,selectedCityId:selected.id,age:state.ages[0],
  targetTown:selected,meanHouseDistance,otherTowns:choices.map(x=>x.info),
  firstBronzeAt:firstBronze.get(selected.team)?.turn||null, milestones,
