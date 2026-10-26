@@ -1,4 +1,5 @@
 import {detailTrailWidth} from './road-width-v89.js';
+import {buildingClearance} from './navigation.js';
 // V59: Shared terrain-following road ribbons on detail maps.
 // World edges are projected through the local walkable navigation mesh;
 // local footpaths connect adjacent cells that have accumulated enough traffic.
@@ -59,8 +60,33 @@ export function createDetailWorldRoads(game,tile,nav,height){
  }
  return roadMesh(vertices,colors);
 }
+// V173 3.2b: the road mesh is wider than its navigable centreline.
+// Keep its *actual corner vertices* outside the collision envelopes of huts,
+// workshops and fishing platforms. Never erase traffic heat as a visual fix.
+function clearRibbonWidth(a,b,width,blockers){
+ const dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz);
+ if(len<.01)return 0;
+ const near=blockers.filter(o=>
+  Math.min(a.x,b.x)<=o.b.x+o.f.rx+3&&Math.max(a.x,b.x)>=o.b.x-o.f.rx-3&&
+  Math.min(a.z,b.z)<=o.b.z+o.f.rz+3&&Math.max(a.z,b.z)>=o.b.z-o.f.rz-3);
+ if(!near.length)return width;
+ const nx=-dz/len,nz=dx/len;
+ for(const factor of [1,.8,.6,.4,.25]){
+  const w=width*factor*1.3,ex=dx/len*w*.25,ez=dz/len*w*.25;
+  const corners=[
+   {x:a.x-ex+nx*w*.5,z:a.z-ez+nz*w*.5},
+   {x:a.x-ex-nx*w*.5,z:a.z-ez-nz*w*.5},
+   {x:b.x+ex+nx*w*.5,z:b.z+ez+nz*w*.5},
+   {x:b.x+ex-nx*w*.5,z:b.z+ez-nz*w*.5}
+  ];
+  if(corners.every(p=>near.every(o=>
+    Math.abs(p.x-o.b.x)>=o.f.rx-.6||Math.abs(p.z-o.b.z)>=o.f.rz-.6)))return width*factor;
+ }
+ return 0;
+}
 export function createDetailTrailLinks(spots,nav,height){
  const vertices=[],colors=[],uvs=[];
+ const blockers=(nav.buildings?.()||[]).filter(b=>b.hp>0&&!b.virtual).map(b=>({b,f:buildingClearance(b)})).filter(o=>o.f);
  // Do not paint legacy traffic that lies beneath newly sized building footprints.
  const levels=new Map(spots.map(({key})=>[key,nav.roadLevel(key)])
   .filter(([key,level])=>level>0&&nav.open(nav.point(key).x,nav.point(key).z)));
@@ -73,7 +99,8 @@ export function createDetailTrailLinks(spots,nav,height){
    if(!otherLevel||!nav.clear(a,{x,z}))continue;
    const useLevel=Math.min(level,otherLevel);
    // Leave room beside the building walls and exterior props.
-   const width=detailTrailWidth(useLevel);
+   const width=clearRibbonWidth(a,{x,z},detailTrailWidth(useLevel),blockers);
+   if(width<=0)continue;
    appendRibbon(vertices,colors,a,{x,z},width,new T.Color(COLORS[useLevel]),height,uvs);
   }
  }
