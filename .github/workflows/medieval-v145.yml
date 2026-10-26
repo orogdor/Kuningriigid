@@ -1,16 +1,5 @@
 name: V145 Balanced Medieval City Simulation
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/make-ai-medieval-v145.mjs'
-      - '.github/workflows/medieval-v145.yml'
-      - 'TEST_V145.mjs'
-      - 'ai-strategy.js'
-      - 'ai-foundation-v88.js'
-      - 'ai-defenses-v128.js'
-      - 'civilization-core.js'
-      - 'labor.js'
   workflow_dispatch:
 permissions:
   contents: write

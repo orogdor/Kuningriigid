@@ -1,15 +1,5 @@
 name: V175.2 Straight or Curved Wall Builder
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'wall-draw-v175.js'
-      - 'navigation.js'
-      - 'fortifications.js'
-      - 'civilization-core.js'
-      - 'civilization.js'
-      - 'TEST_V1752_WALL_DRAW.mjs'
-      - '.github/workflows/v1752-wall-draw.yml'
   workflow_dispatch:
 permissions:
   contents: read

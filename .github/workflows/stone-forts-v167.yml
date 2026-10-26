@@ -1,20 +1,5 @@
 name: V167 Stone Age Palisade Balance
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/stone-forts-v167.yml'
-      - 'stone-village-defenses-v166.js'
-      - 'stone-fort-footprints-v168.js'
-      - 'stone-village-site-v169.js'
-      - 'TEST_V169_FOUNDING.mjs'
-      - 'ai-rural-v143.js'
-      - 'TEST_V168_RING_CORRIDOR.mjs'
-      - 'civilization-core.js'
-      - 'builders.js'
-      - 'civilization.js'
-      - 'TEST_V166_STONE_FORTS.mjs'
-      - 'scripts/stone-fort-balance-v167.mjs'
   workflow_dispatch:
 permissions:
   contents: read

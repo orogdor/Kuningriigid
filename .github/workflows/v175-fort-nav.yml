@@ -1,17 +1,5 @@
 name: V175.1 Wooden Palisade Physics and Traffic QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v175-fort-nav.yml'
-      - 'TEST_V1751_WALL_ROADS.mjs'
-      - 'navigation.js'
-      - 'fortifications.js'
-      - 'buildings.js'
-      - 'bronze-city-v111.js'
-      - 'battle-navigation-v88.js'
-      - 'continuous-landscape-visual.js'
-      - 'civilization.js'
   workflow_dispatch:
 permissions:
   contents: read

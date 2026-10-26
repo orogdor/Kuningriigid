@@ -1,15 +1,5 @@
 name: V137 Economy and City Expansion
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v137-city.yml'
-      - 'TEST_V137.mjs'
-      - 'civilization-core.js'
-      - 'economy.js'
-      - 'farming-v127.js'
-      - 'city-growth-v137.js'
-      - 'historical-districts-v137.js'
   workflow_dispatch:
 permissions:
   contents: read

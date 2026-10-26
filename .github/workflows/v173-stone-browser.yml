@@ -1,16 +1,5 @@
 name: V173 Playable Stone Age Takeover Browser Test
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v173-stone-browser.yml'
-      - 'TEST_V173_STONE_BROWSER.mjs'
-      - 'scenarios/ai-stone-v173.json'
-      - 'scenarios/ai-stone-v173.manifest.json'
-      - 'ai-stone-demo-v173.js'
-      - 'civilization.js'
-      - 'boot-v83.js'
-      - 'index.html'
   workflow_dispatch:
 permissions:
   contents: read

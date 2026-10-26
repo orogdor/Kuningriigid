@@ -1,19 +1,5 @@
 name: V146 Fortified Medieval City Simulation
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/make-ai-medieval-v146.mjs'
-      - '.github/workflows/medieval-v146.yml'
-      - 'TEST_V146.mjs'
-      - 'ai-strategy.js'
-      - 'ai-foundation-v88.js'
-      - 'ai-defenses-v128.js'
-      - 'civilization-core.js'
-      - 'labor.js'
-      - 'ai-development-v128.js'
-      - 'ancient-walls-v139.js'
-      - 'TEST_V146_BROWSER.mjs'
   workflow_dispatch:
 permissions:
   contents: write

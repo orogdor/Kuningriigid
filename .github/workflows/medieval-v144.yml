@@ -1,10 +1,5 @@
 name: V144 Medieval City Simulation
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/make-ai-medieval-v144.mjs'
-      - '.github/workflows/medieval-v144.yml'
   workflow_dispatch:
 permissions:
   contents: write

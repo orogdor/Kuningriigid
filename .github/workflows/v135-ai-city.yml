@@ -1,12 +1,5 @@
 name: V135 Real AI City Test
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v135-ai-city.yml'
-      - 'historical-city-v135.js'
-      - 'scripts/make-ai-city-v135.mjs'
-      - 'TEST_V135.mjs'
   workflow_dispatch:
 permissions:
   contents: write

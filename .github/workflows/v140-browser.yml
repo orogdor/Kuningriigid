@@ -1,13 +1,5 @@
 name: V140 Modern Takeover Browser
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v140-browser.yml'
-      - 'scenarios/ai-modern-v140.json'
-      - 'scenarios/ai-modern-v140.manifest.json'
-      - 'TEST_V140_BROWSER.mjs'
-      - 'ai-modern-demo-v140.js'
   workflow_dispatch:
 permissions:
   contents: read

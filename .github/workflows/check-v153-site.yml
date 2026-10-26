@@ -1,9 +1,5 @@
 name: V153 Public Web Save Check
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/check-v153-site.yml'
   workflow_dispatch:
 permissions:
   contents: read

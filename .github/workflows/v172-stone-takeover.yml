@@ -1,10 +1,5 @@
 name: V172 Generate Real AI Stone Age Takeover
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v172-stone-takeover.yml'
-      - 'scripts/make-ai-stone-v172.mjs'
   workflow_dispatch:
 permissions:
   contents: write

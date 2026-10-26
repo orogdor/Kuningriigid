@@ -1,17 +1,5 @@
 name: V139 Real AI Ancient City Test
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v139-simulation.yml'
-      - 'scripts/make-ai-city-v139.mjs'
-      - 'TEST_V139.mjs'
-      - 'ai-strategy.js'
-      - 'ancient-walls-v139.js'
-      - 'ai-defenses-v128.js'
-      - 'civilization-core.js'
-      - 'urban-infill-v139.js'
-      - 'historic-urban-v138.js'
   workflow_dispatch:
 permissions: {contents: write}
 concurrency:

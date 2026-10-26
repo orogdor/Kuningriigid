@@ -1,19 +1,5 @@
 name: V153 Balanced Medieval +30 — V152 Full Regression
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/make-ai-medieval-v153.mjs'
-      - '.github/workflows/medieval-v153.yml'
-      - 'TEST_V153_BROWSER.mjs'
-      - 'TEST_V139.mjs'
-      - 'TEST_V138.mjs'
-      - 'ai-strategy.js'
-      - 'ai-foundation-v88.js'
-      - 'ai-defenses-v128.js'
-      - 'civilization.js'
-      - 'index.html'
-      - 'TEST_V67.mjs'
   workflow_dispatch:
 permissions:
   contents: write

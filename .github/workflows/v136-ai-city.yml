@@ -1,14 +1,5 @@
 name: V136 Historical AI Town Simulation
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v136-ai-city.yml'
-      - 'scripts/make-ai-city-v136.mjs'
-      - 'TEST_V136.mjs'
-      - 'counties-v126.js'
-      - 'ai-strategy.js'
-      - 'resource-sites-v88.js'
   workflow_dispatch:
 permissions:
   contents: write

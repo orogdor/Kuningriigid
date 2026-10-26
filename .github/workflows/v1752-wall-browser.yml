@@ -1,17 +1,5 @@
 name: V175.2 Two Wall Drawing Modes WebGL QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'TEST_V1752_WALL_BROWSER.mjs'
-      - 'wall-draw-v175.js'
-      - 'civilization.js'
-      - 'civilization-core.js'
-      - 'navigation.js'
-      - 'fortifications.js'
-      - 'index.html'
-      - 'boot-v83.js'
-      - '.github/workflows/v1752-wall-browser.yml'
   workflow_dispatch:
 permissions:
   contents: read

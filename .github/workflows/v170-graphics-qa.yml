@@ -1,18 +1,5 @@
 name: V170 visual models, browser and 200-turn regression
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v170-graphics-qa.yml'
-      - 'TEST_V170_BROWSER.mjs'
-      - 'TEST_V154.mjs'
-      - 'town-models-v154.js'
-      - 'site-models-v88.js'
-      - 'world-models-v152.js'
-      - 'farm-visuals-v127.js'
-      - 'civilization.js'
-      - 'boot-v83.js'
-      - 'index.html'
   workflow_dispatch:
 concurrency:
   group: v170-graphics-qa-${{ github.ref }}

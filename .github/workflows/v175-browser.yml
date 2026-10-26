@@ -1,17 +1,5 @@
 name: V175.1 Palisade Live Browser QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v175-browser.yml'
-      - 'TEST_V1751_BROWSER.mjs'
-      - 'civilization.js'
-      - 'civilization-core.js'
-      - 'index.html'
-      - 'boot-v83.js'
-      - 'bronze-city-v111.js'
-      - 'navigation.js'
-      - 'battle-navigation-v88.js'
   workflow_dispatch:
 permissions:
   contents: read

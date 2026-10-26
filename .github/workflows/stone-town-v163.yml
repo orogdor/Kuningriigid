@@ -1,15 +1,5 @@
 name: V163 Stone Age Town Zoning and Fields
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/stone-town-v163.yml'
-      - 'stone-town-plan-v163.js'
-      - 'historic-urban-v138.js'
-      - 'ai-rural-v143.js'
-      - 'civilization-core.js'
-      - 'TEST_V163_STONE_CITY.mjs'
-      - 'scripts/stone-town-v163-report.mjs'
   workflow_dispatch:
 permissions:
   contents: read

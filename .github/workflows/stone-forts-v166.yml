@@ -1,20 +1,5 @@
 name: V166 Stone Age Fortified Villages
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/stone-forts-v166.yml'
-      - 'stone-village-defenses-v166.js'
-      - 'ai-defenses-v128.js'
-      - 'civilization-core.js'
-      - 'builders.js'
-      - 'buildings.js'
-      - 'navigation.js'
-      - 'army-gates-v133.js'
-      - 'siege-rules-v114.js'
-      - 'medieval-v62.js'
-      - 'civilization.js'
-      - 'TEST_V166_STONE_FORTS.mjs'
   workflow_dispatch:
 permissions:
   contents: read

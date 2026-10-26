@@ -1,10 +1,5 @@
 name: V169 Founding Site Dry-Land Probe
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v169-founding-probe.yml'
-      - 'scripts/v169-founding-probe.mjs'
   workflow_dispatch:
 permissions:
   contents: read

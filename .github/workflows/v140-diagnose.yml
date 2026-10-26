@@ -1,10 +1,5 @@
 name: V140 Modernity Block Diagnostic
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v140-diagnose.yml'
-      - 'scripts/diagnose-modern-block-v140.mjs'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:

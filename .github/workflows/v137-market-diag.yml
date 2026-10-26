@@ -1,10 +1,5 @@
 name: V137 Market Placement Diagnostic
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v137-market-diag.yml'
-      - 'scripts/diagnose-market-v137.mjs'
   workflow_dispatch:
 permissions:
   contents: read

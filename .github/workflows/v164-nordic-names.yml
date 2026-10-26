@@ -1,13 +1,5 @@
 name: V165 Country-Specific Nordic Saga Village Names
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v164-nordic-names.yml'
-      - 'folklore-village-names-v164.js'
-      - 'civilization-core.js'
-      - 'TEST_V164_NAMES.mjs'
-      - 'index.html'
   workflow_dispatch:
 permissions:
   contents: read

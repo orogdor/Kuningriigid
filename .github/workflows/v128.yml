@@ -40,6 +40,8 @@ jobs:
           name: regression-results
           path: artifacts-tests/
   browser:
+    # Comprehensive browser matrix is on-demand, not on every push.
+    if: github.event_name == 'workflow_dispatch'
     needs: traffic
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -94,6 +96,8 @@ jobs:
             artifacts-v143/
   publish:
     needs: [traffic, regression, browser]
+    # A skipped browser matrix is expected for push; manual runs require it to pass.
+    if: ${{ always() && needs.traffic.result == 'success' && needs.regression.result == 'success' && (needs.browser.result == 'success' || (github.event_name == 'push' && needs.browser.result == 'skipped')) }}
     uses: ./.github/workflows/avaldamine.yml
     with:
       validated: true

@@ -1,14 +1,5 @@
 name: V173 Organic Roads and Compact Towns QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v173-living-streets.yml'
-      - 'living-streets-v173.js'
-      - 'historic-urban-v138.js'
-      - 'detail-roads.js'
-      - 'TEST_V173_STREETS.mjs'
-      - 'TEST_V172_LAYOUT.mjs'
   workflow_dispatch:
 permissions:
   contents: read

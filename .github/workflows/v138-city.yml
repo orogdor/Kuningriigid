@@ -1,13 +1,5 @@
 name: V138 Ancient City Streets
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v138-city.yml'
-      - 'TEST_V138.mjs'
-      - 'historic-urban-v138.js'
-      - 'historical-districts-v137.js'
-      - 'civilization-core.js'
   workflow_dispatch:
 permissions:
   contents: read

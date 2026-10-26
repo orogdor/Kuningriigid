@@ -1,20 +1,5 @@
 name: V147 Stone Walls and Gatehouses AI Simulation
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/make-ai-medieval-v147.mjs'
-      - '.github/workflows/medieval-v147.yml'
-      - 'TEST_V147.mjs'
-      - 'ai-strategy.js'
-      - 'ai-foundation-v88.js'
-      - 'ai-defenses-v128.js'
-      - 'civilization-core.js'
-      - 'labor.js'
-      - 'ai-development-v128.js'
-      - 'ancient-walls-v139.js'
-      - 'TEST_V147_BROWSER.mjs'
-      - 'research.js'
   workflow_dispatch:
 permissions:
   contents: write

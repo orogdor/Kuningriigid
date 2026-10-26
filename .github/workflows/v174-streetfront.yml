@@ -1,13 +1,5 @@
 name: V174 Courtyards and Organic Streetfront QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'streetfront-v174.js'
-      - 'historic-urban-v138.js'
-      - 'town-models-v154.js'
-      - 'TEST_V174_STREETFRONT.mjs'
-      - '.github/workflows/v174-streetfront.yml'
   workflow_dispatch:
 permissions:
   contents: read

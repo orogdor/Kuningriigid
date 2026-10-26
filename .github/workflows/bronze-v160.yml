@@ -1,20 +1,5 @@
 name: V160 Bronze City and Fortification Balance
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'bronze-city-balance-v160.js'
-      - 'growth-balance-v125.js'
-      - 'economy.js'
-      - 'research.js'
-      - 'civilization-core.js'
-      - 'ai-strategy.js'
-      - 'ancient-walls-v139.js'
-      - 'ai-defenses-v128.js'
-      - 'TEST_V160.mjs'
-      - 'TEST_V125.mjs'
-      - 'scripts/make-ai-bronze-v160.mjs'
-      - '.github/workflows/bronze-v160.yml'
   workflow_dispatch:
 permissions:
   contents: read

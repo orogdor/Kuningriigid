@@ -1,13 +1,5 @@
 name: V172 Compact Historical Stone Village QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'compact-stone-v172.js'
-      - 'historic-urban-v138.js'
-      - 'stone-town-plan-v163.js'
-      - 'TEST_V172_LAYOUT.mjs'
-      - '.github/workflows/v172-core-layout.yml'
   workflow_dispatch:
 permissions:
   contents: read

@@ -1,11 +1,5 @@
 name: V175.3 Seamless Straight and Curved Palisade QA
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'wall-draw-v175.js'
-      - 'TEST_V1753_JOINTS.mjs'
-      - '.github/workflows/v1753-wall-joints.yml'
   workflow_dispatch:
 permissions:
   contents: read

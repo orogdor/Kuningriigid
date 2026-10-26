@@ -1,10 +1,5 @@
 name: V140 First Modern AI Campaign
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v140-modern-test.yml'
-      - 'scripts/run-to-first-modern-v140.mjs'
   workflow_dispatch:
 permissions: {contents: write}
 concurrency:

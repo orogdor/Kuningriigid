@@ -1,17 +1,5 @@
 name: V159 First Medieval Age – V152-V158 Compatibility Regression
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/make-ai-medieval-v159.mjs'
-      - '.github/workflows/medieval-v159.yml'
-      - 'TEST_V159_BROWSER.mjs'
-      - 'TEST_V139.mjs'
-      - 'TEST_V138.mjs'
-      - 'TEST_V67.mjs'
-      - 'TEST_V68.mjs'
-      - 'TEST_V142_BROWSER.mjs'
-      - 'TEST_V152.mjs'
   workflow_dispatch:
 permissions:
   contents: write
