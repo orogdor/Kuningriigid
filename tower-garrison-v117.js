@@ -12,13 +12,15 @@ export function addTowerGuards(city,state,b){
   const building=city.economy.buildings[t.index];
   if(building.guardOwner!==city.team){building.guardOwner=city.team;building.towerGuards=Array.from({length:5},(_,slot)=>({slot,hp:20,maxHp:20}));}
   for(const saved of building.towerGuards||[]){const source=-100000-t.index*5-saved.slot;if(b.squads.some(u=>u.source===source))continue;
-   const x=saved.x??t.x+(saved.slot-2)*.8,z=saved.z??t.z;
-   b.squads.push({source,team:city.team,kind,grade:'standard',menCount:1,hp:saved.hp,maxHp:saved.maxHp||20,morale:100,x,z,heading:0,cool:0,guardPost:true,wallWalk:true,wallType:'stonewall',wallElevation:saved.elevation??t.height,towerGuard:true,homeTower:t.index,guardSlot:saved.slot,patrolWait:saved.slot*2,combatMode:'auto',men:saved.hp>0?[{id:source+':0',index:0,x,z,hp:saved.hp,maxHp:saved.maxHp||20,radius:.34,elevation:saved.elevation??t.height,ammo:saved.ammo??40,arrowLoadVersion:100,cool:0,heading:0,kills:0,damageDealt:0}]:[]});
+   // A peacetime ground patrol returns to its defensive roof when siege starts.
+   const groundPatrol=!!saved.groundPatrolV1757;
+   const x=groundPatrol?t.x+(saved.slot-2)*.8:(saved.x??t.x+(saved.slot-2)*.8),z=groundPatrol?t.z:(saved.z??t.z);
+   b.squads.push({source,team:city.team,kind,grade:'standard',menCount:1,hp:saved.hp,maxHp:saved.maxHp||20,morale:100,x,z,heading:0,cool:0,guardPost:true,wallWalk:true,wallType:'stonewall',wallElevation:(groundPatrol?t.height:(saved.elevation??t.height)),towerGuard:true,homeTower:t.index,guardSlot:saved.slot,patrolWait:saved.slot*2,combatMode:'auto',men:saved.hp>0?[{id:source+':0',index:0,x,z,hp:saved.hp,maxHp:saved.maxHp||20,radius:.34,elevation:(groundPatrol?t.height:(saved.elevation??t.height)),ammo:saved.ammo??40,arrowLoadVersion:100,cool:0,heading:0,kills:0,damageDealt:0}]:[]});
   }
  }
  b.towerGarrisonVersion=117;
 }
-export function persistTowerGuards(city,b){if(!city)return;for(const u of b.squads.filter(u=>u.towerGuard)){const building=city.economy.buildings[u.homeTower],saved=building?.towerGuards?.find(g=>g.slot===u.guardSlot);if(!saved)continue;const m=u.men?.[0];Object.assign(saved,{hp:m?.hp??u.hp,x:m?.x??u.x,z:m?.z??u.z,elevation:m?.elevation??u.wallElevation,ammo:m?.ammo??40});}}
+export function persistTowerGuards(city,b){if(!city)return;for(const u of b.squads.filter(u=>u.towerGuard)){const building=city.economy.buildings[u.homeTower],saved=building?.towerGuards?.find(g=>g.slot===u.guardSlot);if(!saved)continue;const m=u.men?.[0];Object.assign(saved,{hp:m?.hp??u.hp,x:m?.x??u.x,z:m?.z??u.z,elevation:m?.elevation??u.wallElevation,ammo:m?.ammo??40,groundPatrolV1757:!!u.peacePatrolV1757});}}
 export function approachSide(p,center){const x=p.x-center.x,z=p.z-center.z;return Math.abs(x)>Math.abs(z)?x>0?'east':'west':z>0?'south':'north';}
 // Largest remainder: 4 northern squads + 1 eastern squad -> 4 + 1 of every five.
 export function splitGuards(weights,count=5){const entries=Object.entries(weights).filter(([,n])=>n>0),total=entries.reduce((n,[,v])=>n+v,0);if(!total)return {};const out={},fractions=[];let used=0;for(const [side,n]of entries){const exact=count*n/total;out[side]=Math.floor(exact);used+=out[side];fractions.push([side,exact-out[side]]);}fractions.sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));for(let i=0;i<count-used;i++)out[fractions[i%fractions.length][0]]++;return out;}
