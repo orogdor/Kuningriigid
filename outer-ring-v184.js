@@ -318,7 +318,7 @@ export function findOuterRingV184(game,city){
   if(++checked>3500)break;
   const {arc,points,shared,area,plots,oldGates,natural}=candidate;
   const physicalArc=natural?arc.map(p=>({...p})):arc;
-  if(natural){
+  if(natural?.kind==='mountain'&&natural.partialV195){
    physicalArc[0]=historicWallContactV199(arc[0],walls,gates);
    physicalArc[physicalArc.length-1]=historicWallContactV199(arc.at(-1),walls,gates);
   }
@@ -414,7 +414,7 @@ export function findOuterRingV184(game,city){
    naturalFailures:diagnostic.firstFailures,
    chosen:natural?.kind||'none'};
   return {
-   version:199,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   version:200,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
    historicSuburbV191:true,expandedSuburbV193:true,
    naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
      length:natural.naturalLengthV194,partial:!!natural.partialV195,
