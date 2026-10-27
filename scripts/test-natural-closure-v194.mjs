@@ -14,4 +14,10 @@ for(const kind of ['water','mountain']){
  assert.equal(naturalSuburbBoundaryV194(split,{},a,b,0,1,kind),null,
   'a navigable break in the '+kind+' cannot replace a physical wall');
 }
-console.log('V194 continuous wet/cliff barrier closure and dry-gap rejection PASS');
+const {partialNaturalBoundariesV195}=await import('../outer-ring-v184.js');
+const split={defenseTerrainKindV176:(_c,x,z)=>x<0&&z>80?'mountain':null,
+ defenseTerrainPassableV177:(_c,x,z)=>!(x<0&&z>80)};
+const runs=partialNaturalBoundariesV195(split,{},a,b,0,1,'mountain');
+assert.ok(runs.length,'half-width mountain should still close part of the rear');
+assert.ok(runs[0].naturalLengthV194>30);
+console.log('V195 continuous natural and partial cliff barrier closure PASS');

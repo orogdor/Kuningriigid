@@ -9,6 +9,7 @@ for(const kind of ['coast','mountain']){
  const s=await loadOrganicWallV190('wall-v190-'+kind,fakeFetch);
 
  const c=s.cities.find(x=>x.id===s.wallTestV190.targetCityId);
+ console.log('natural-plan-survey',kind,JSON.stringify(c.naturalSurveyDiagnosticV195||{}));
  if(kind==='mountain'){
   const {Civilization}=await import('../civilization-core.js');
   const g=new Civilization(s),city=g.s.cities.find(x=>x.id===s.wallTestV190.targetCityId);

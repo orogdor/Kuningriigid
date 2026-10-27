@@ -129,6 +129,62 @@ export function naturalSuburbBoundaryV194(game,city,a,b,nx,nz,target,maxDepth=16
   rearLength:boundaryLength,naturalLengthV194:boundaryLength};
 }
 
+
+// Cliff segments seldom stretch across the entire back of a quarter.
+// Trace any sizeable continuous PART of a rocky rim, then build the two
+// missing returns. A dry gap ALWAYS ends a natural stretch.
+export function partialNaturalBoundariesV195(game,city,a,b,nx,nz,target='mountain'){
+ const chord=meters(a,b),n=Math.max(12,Math.ceil(chord/2.5));
+ const move=(origin,d)=>({x:origin.x+nx*d,z:origin.z+nz*d});
+ const terrain=p=>game.defenseTerrainKindV176?.(city,p.x,p.z);
+ const safe=p=>terrainSafe(game,city,p);
+ const hits=[];
+ for(let i=0;i<=n;i++){
+  const origin=mix(a,b,i/n);
+  let land=0,water=null;
+  for(let d=0;d<=175;d+=2.5){
+   const pt=move(origin,d),kind=terrain(pt);
+   if(kind===target&&!safe(pt)){water=d;land=Math.max(0,d-2.5);break;}
+   if(!safe(pt))break;
+  }
+  if(water==null){hits.push(null);continue;}
+  if(water>0)for(let k=0;k<8;k++){
+   const d=(land+water)/2,p=move(origin,d);
+   if(terrain(p)===target&&!safe(p))water=d;else land=d;
+  }
+  const p=move(origin,land);
+  if([water+.4,water+1.2,water+2.4].some(d=>{
+   const test=move(origin,d);
+   return terrain(test)!==target||safe(test);
+  })){hits.push(null);continue;}
+  hits.push({p,d:land,origin,wet:water});
+ }
+ const runs=[];
+ let current=[];
+ function finish(){
+  if(current.length>=9){
+   const coast=current.map(x=>x.p),
+    length=coast.slice(1).reduce((s,p,i)=>s+meters(p,coast[i]),0);
+   if(length>=23&&length<=chord*1.75)
+    runs.push({kind:target,coast,naturalLengthV194:length,partialV195:true,
+      startFraction:current[0].i/n,endFraction:current.at(-1).i/n});
+  }
+  current=[];
+ }
+ for(let i=0;i<hits.length;i++){
+  const h=hits[i],prev=current.at(-1);
+  if(!h){finish();continue;}
+  if(prev&&(Math.abs(prev.d-h.d)>11||
+    ![.4,1.5].every(off=>{
+     const q=move(mix(prev.origin,h.origin,.5),(prev.wet+h.wet)/2+off);
+     return terrain(q)===target&&!safe(q);
+    })))finish();
+  current.push({...h,i});
+ }
+ finish();
+ return runs.sort((a,b)=>b.naturalLengthV194-a.naturalLengthV194).slice(0,5);
+}
+
 function roadFocusOnArc(arc,gates){
  return gates.filter(g=>arc.some(p=>meters(p,g)<11));
 }
@@ -168,18 +224,23 @@ export function findOuterRingV184(game,city){
    (h.x-middle.x)*nx+(h.z-middle.z)*nz>6&&
    Math.abs((h.x-middle.x)*tx+(h.z-middle.z)*tz)<chord*.72);
   const homeDepth=outwardHomes.reduce((max,h)=>Math.max(max,(h.x-middle.x)*nx+(h.z-middle.z)*nz),0);
-  // Survey natural defenses BEFORE spending time on arbitrary wall rings.
-  for(const kind of ['water','mountain']){
-   const natural=naturalSuburbBoundaryV194(game,city,a,b,nx,nz,kind);
-   if(!natural)continue;
+  // First prefer full sea/cliff closures; then use a VERIFIED partial
+  // mountain rim where there are still gaps that must be enclosed by walls.
+  const naturalChoices=[
+   ...['water','mountain'].map(kind=>naturalSuburbBoundaryV194(game,city,a,b,nx,nz,kind)).filter(Boolean),
+   ...partialNaturalBoundariesV195(game,city,a,b,nx,nz,'mountain')
+  ];
+  diagnostic.partialSurveys=(diagnostic.partialSurveys||0)+1;
+  diagnostic.partialFound=(diagnostic.partialFound||0)+naturalChoices.filter(n=>n.partialV195).length;
+  for(const natural of naturalChoices){
    const {coast}=natural,poly=[...arc,...coast.slice().reverse()];
    const area=polyArea(poly);
-   if(area<1550||area>12500)continue;
+   if(area<1550||area>12500){diagnostic.naturalAreaReject=(diagnostic.naturalAreaReject||0)+1;continue;}
    const plots=sitesInside(poly,inner,buildings,game,city);
    const occupiedHomes=outwardHomes.filter(h=>inside(h,poly)).length;
-   if(plots<3&&occupiedHomes<2)continue;
+   if(plots<3&&occupiedHomes<2){diagnostic.naturalPlotReject=(diagnostic.naturalPlotReject||0)+1;continue;}
    const center=mix(a,b,.5),distanceToCoast=meters(center,coast[Math.floor(coast.length/2)]);
-   const score=135+Math.min(8500,area)/170+
+   const score=150+Math.min(8500,area)/170+
       Math.min(22,plots)*3+Math.min(2,oldGates.length)*20+
       occupiedHomes*12-distanceToCoast*.18;
    candidates.push({arc,points:[a,...coast,b],area,shared,oldGates,
@@ -233,6 +294,7 @@ export function findOuterRingV184(game,city){
    // sequence of real impassable water/cliff cells, never as a free wall.
    for(const [start,end] of [[arc[0],natural.coast[0]],
       [arc.at(-1),natural.coast.at(-1)]]){
+    if(meters(start,end)<2.8)continue; // cliff already joins the old wall
     const boundary={x:end.x+(end.x-start.x)/Math.max(1,meters(start,end))*1.4,
      z:end.z+(end.z-start.z)/Math.max(1,meters(start,end))*1.4};
     const line=wallStrokePlanV175([start,boundary],'straight',100,
@@ -254,7 +316,9 @@ export function findOuterRingV184(game,city){
    for(const slot of stroke.segments)segments.push({...slot,type:'palisade',
     plannedDefense:true,outerRingV184:true});
   }
-  if(invalid||segments.length<3||segments.length>70){diagnostic.segments++;continue;}
+  if(invalid||segments.length<3||segments.length>70){
+   if(natural)diagnostic.naturalSegmentsReject=(diagnostic.naturalSegmentsReject||0)+1;
+   diagnostic.segments++;continue;}
   const length=segments.reduce((sum,p)=>sum+meters(p.from,p.to),0);
   const share=shared/(shared+length);
   if(share<.10||share>.75)continue;
@@ -287,6 +351,7 @@ export function findOuterRingV184(game,city){
    if(err){previewError=err;failedAt=j;break;}
   }
   if(previewError){
+   if(natural)diagnostic.naturalPreviewReject=(diagnostic.naturalPreviewReject||0)+1;
    diagnostic.preview++;
    const why=String(previewError).slice(0,65);
    diagnostic.rejectedReasons[why]=(diagnostic.rejectedReasons[why]||0)+1;
@@ -298,11 +363,17 @@ export function findOuterRingV184(game,city){
   }
   const boundary=natural?[...arc,...natural.coast.slice().reverse()]:
     [...arc,...points.slice(1,-1).reverse()];
+  city.naturalSurveyDiagnosticV195={partialFound:diagnostic.partialFound||0,
+   naturalPreviewReject:diagnostic.naturalPreviewReject||0,
+   naturalAreaReject:diagnostic.naturalAreaReject||0,
+   naturalPlotReject:diagnostic.naturalPlotReject||0,
+   chosen:natural?.kind||'none'};
   return {
-   version:194,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   version:195,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
    historicSuburbV191:true,expandedSuburbV193:true,
    naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
-     length:natural.naturalLengthV194,verified:true}:null,
+     length:natural.naturalLengthV194,partial:!!natural.partialV195,
+     verified:true}:null,
    oldGateCountV191:oldGates.length,plannedHousePlotsV191:plots,
    sharedLength:shared,newLength:length,sharedFraction:share,
    sharedArc:arc.map(p=>({x:p.x,z:p.z})),boundaryV186:boundary,
