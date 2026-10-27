@@ -9,21 +9,23 @@ export function defenseRoadCellsV177(game,city){
 }
 export function roadCrossesWallV177(wall,roads){
  const a=wall.wallAngleV175??(wall.wallAxis?Math.PI/2:0),c=Math.cos(a),s=Math.sin(a);
- let left=false,right=false;
+ let left=false,right=false,nearLeft=false,nearRight=false,farLeft=false,farRight=false;
  for(const p of roads){
   if(p.strength<13)continue;
   const dx=p.x-wall.x,dz=p.z-wall.z,along=dx*c-dz*s,across=dx*s+dz*c;
   if(Math.abs(along)>3.5||Math.abs(across)<2.5||Math.abs(across)>11)continue;
-  if(across<0)left=true;else right=true;
+  if(across<0){left=true;if(Math.abs(across)<=5)nearLeft=true;if(Math.abs(across)>=7)farLeft=true;}else{right=true;if(across<=5)nearRight=true;if(across>=7)farRight=true;}
  }
- return left&&right;
+ return (left&&right)||(nearLeft&&farLeft)||(nearRight&&farRight);
 }
 export function planRoadGatesV177(game,city){
  if(!game.defenseBuildingsV177||game.s.time<(city.nextRoadGateV177||0))return false;
  city.nextRoadGateV177=game.s.time+24;
  const roads=defenseRoadCellsV177(game,city);if(!roads.length)return false;
+ const existing=game.defenseBuildingsV177(city).filter(b=>['woodgate','gatehouse'].includes(b.type)&&b.hp>0);
  for(const wall of game.defenseBuildingsV177(city)){
   if(!['palisade','stonewall','reinforced_wall'].includes(wall.type)||!wall.ready||wall.hp<=0||!roadCrossesWallV177(wall,roads))continue;
+  if(existing.some(g=>Math.hypot(g.x-wall.x,g.z-wall.z)<22))continue;
   const type=wall.type==='palisade'?'woodgate':'gatehouse';
   const stock=city.economy.realms[city.team].resources,cost=game.buildingDefinitions[type]?.cost;
   if(!cost||Object.entries(cost).some(([k,v])=>(stock[k]||0)<v+(k==='wood'?7:0)))continue;

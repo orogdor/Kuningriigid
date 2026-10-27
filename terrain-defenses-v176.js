@@ -92,12 +92,12 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
   if(r<24)return null;
   if(anchor&&angleDistance(angle,anchor.angle)<Math.PI*.39){
    const hit=firstBarrier(hall,angle,Math.min(base+64,limit+3),passable,feature);
-   if(hit)r=Math.min(Math.max(base,hit.r-6),limit-5);
+   if(hit&&hit.kind==='mountain')r=Math.min(Math.max(base,hit.r+3),limit+3);
   }
   // A built curtain closes even the rear sector; a cliff is extra protection,
   // never an unverified missing wall. Pull vertices back onto dry owned land.
   const stop=firstBarrier(hall,angle,Math.min(r+2,limit+1),passable,feature);
-  if(stop)r=Math.min(r,stop.r-6);
+  if(stop&&stop.kind!=='mountain')r=Math.min(r,stop.r-6);
   points.push({x:hall.x+Math.cos(angle)*r,z:hall.z+Math.sin(angle)*r});
  }
  // Axis-aligned real gates keep their actual passage and post geometry.
@@ -144,7 +144,7 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
  let last=null;
  for(const point of orderedEdges){
   const dry=passable(point.x,point.z);
-  if(point.kind==='wall'&&!dry)return null;
+  if(point.kind==='wall'&&!dry&&feature(point.x,point.z)!=='mountain')return null;
   if(point.kind==='wall'&&dry){
    if(!run.length&&last?.kind==='wall'&&!passable(last.x,last.z))run.push(last);
    finishTerrain();run.push(point);
