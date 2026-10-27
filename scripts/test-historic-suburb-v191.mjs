@@ -21,7 +21,11 @@ for(const terrainKind of ['plain','cliff']){
  assert.ok(p.slots.length>=10);
  assert.ok(p.slots.every(s=>s.type==='palisade'));
  const unique=new Set(p.slots.map(s=>s.wallAngleV175.toFixed(2)));
- assert.ok(unique.size>=4&&unique.size<=8,'real polygonal curtain, not artificial micro-wiggles');
+ if(p.naturalBoundaryV194){
+  assert.equal(p.naturalBoundaryV194.kind,'mountain');
+  assert.ok(p.naturalBoundaryV194.length>24,'natural cliff replaces rear wall');
+  assert.ok(unique.size>=1&&unique.size<=8,'two purposeful returns to cliff');
+ }else assert.ok(unique.size>=4&&unique.size<=8,'real polygonal curtain, not artificial micro-wiggles');
  assert.ok(p.areaEstimateV186>1200&&p.areaEstimateV186<10500);
  console.log(terrainKind,JSON.stringify({segments:p.slots.length,plots:p.plannedHousePlotsV191,area:Math.round(p.areaEstimateV186),angles:unique.size}));
 }
