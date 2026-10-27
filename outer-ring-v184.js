@@ -400,7 +400,8 @@ export function findOuterRingV184(game,city){
      angle:b.wallAngleV175??(b.wallAxis?Math.PI/2:0),
      sideAngle:s.wallAngleV175,
      joined:allowedSuburbJoinV191(s,b)})).sort((a,b)=>a.dist-b.dist)[0];
-    diagnostic.firstFailures.push({reason:why,segment:failedAt,x:Math.round(s.x),z:Math.round(s.z),nearest});
+    diagnostic.firstFailures.push({reason:why,segment:failedAt,x:Math.round(s.x),z:Math.round(s.z),nearest,
+     joinedWalls:walls.filter(b=>allowedSuburbJoinV191(s,b)).slice(0,3).map(b=>({type:b.type,dist:Math.round(meters(b,s)*10)/10,angle:b.wallAngleV175}))});
    }
    continue;
   }
