@@ -54,6 +54,7 @@ export async function loadOrganicWallV190(demo,fetcher=fetch){
   suburbArea:city.outerRingV184.areaEstimateV186,
   naturalBoundary:city.outerRingV184.naturalBoundaryV194?.kind||null,
   naturalLength:city.outerRingV184.naturalBoundaryV194?.length||0,
-  naturalPartial:!!city.outerRingV184.naturalBoundaryV194?.partial};
+  naturalPartial:!!city.outerRingV184.naturalBoundaryV194?.partial,
+  cliffUseVerified:city.outerRingV184.naturalBoundaryV194?.kind==='mountain'};
  return game.s;
 }
