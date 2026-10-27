@@ -39,6 +39,8 @@ export function describeBuilding(game,city,building,ages=[],names={},definitions
   input:readable(d.input,names),
   cost:readable(d.cost,names),
   technology:techUnlocks[building.type]||null,
+  wallUpgrade:building.wallUpgradeV184?{progress:Math.round(100*(building.wallUpgradeV184.progress||0)/building.wallUpgradeV184.total)}:null,
+  upgradeOptions:owner?['auto','stone'].map(target=>({target,...game.wallUpgradeOptionsV184?.(city,building,target)})).filter(p=>p.type&&!p.error):[],
   position:{x:building.x,z:building.z},
   researchActivity:EDUCATION_TYPES.includes(building.type)?undefined:building.researchActivity,
   science:EDUCATION_TYPES.includes(building.type)?cityScience(home,game.s?.research?.[city.team]?.known||[]):null,
@@ -52,7 +54,7 @@ function line(label,value){
  const amount=document.createElement('strong');amount.textContent=String(value);
  row.append(name,amount);return row;
 }
-export function createBuildingInspector(root,{close,onWorkers,onToggle}){
+export function createBuildingInspector(root,{close,onWorkers,onToggle,onUpgrade}){
  if(!root)throw new Error('Missing building inspector container');
  root.classList.add('binfo');
  const title=document.createElement('h3');title.id='building-inspector-title';
@@ -70,7 +72,7 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle}){
   root.hidden=false;
   root.setAttribute('aria-label',data.name+' · '+data.eraName);
   const nextKey=[data.type,data.position.x,data.position.z,data.status,data.hp,data.maxHp,data.assigned,
-   data.needed,data.efficiency,data.progress,data.disabled,data.input,data.production,data.age].join('|');
+   data.needed,data.efficiency,data.progress,data.disabled,data.input,data.production,data.age,JSON.stringify(data.wallUpgrade),JSON.stringify(data.upgradeOptions)].join('|');
   if(currentKey===nextKey)return;
   currentKey=nextKey;
   title.textContent=(data.icon||'⌂')+' '+data.name;
@@ -85,6 +87,7 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle}){
    line('Ehitamise maksumus',data.cost)
   );
   if(data.science){detail.append(line('Linna baasteadus',fmt(data.science.base)+' / min'),line('Haridusasutused',data.science.institutions+' · ×'+fmt(data.science.educationMultiplier)),line('Avastuste boonus','×'+fmt(data.science.discoveryMultiplier)),line('Linna teadus kokku',fmt(data.science.total)+' / min'));}
+  if(data.wallUpgrade)detail.append(line('Müüri uuendamine',data.wallUpgrade.progress+'%'));
   if(data.technology)detail.append(line('Avastamine',data.technology));
   if(!data.ready){
    detail.append(line('Ehitusjärgus',data.progress+'%'));
@@ -93,6 +96,7 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle}){
   if(data.researchActivity!=null)detail.append(line('Teadustöö aktiivsus',Math.round(data.researchActivity*100)+'%'));
   actions.replaceChildren();
   if(data.owner){
+   for(const option of data.upgradeOptions||[]){const up=document.createElement('button');up.type='button';up.textContent='⬆ '+(option.target==='stone'?'Kiviks':'Kõrgemaks')+' · '+readable(option.cost,{});up.addEventListener('click',()=>onUpgrade?.(option.target));actions.append(up);}
    const staff=document.createElement('button');staff.type='button';staff.textContent='♟ Töölised';
    staff.addEventListener('click',onWorkers);actions.append(staff);
    if(data.ready&&data.type!=='hall'){

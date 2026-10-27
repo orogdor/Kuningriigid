@@ -75,11 +75,11 @@ rebuild(){this.mask=this.base.slice();const paint=(x,z,rx,rz,circle)=>{for(let z
   continue;
  }
  if((b.type==='gatehouse'||b.type==='woodgate')&&Number.isFinite(b.wallAngleV175)){
- const c=Math.cos(b.wallAngleV175),s=Math.sin(b.wallAngleV175);
- for(let z=Math.floor(b.z-6);z<=Math.ceil(b.z+6);z++)for(let x=Math.floor(b.x-6);x<=Math.ceil(b.x+6);x++){const dx=x-b.x,dz=z-b.z,along=dx*c-dz*s,across=dx*s+dz*c;if(Math.abs(across)<=.95&&Math.abs(Math.abs(along)-2.55)<=1.35){const i=this.index(x,z);if(i>=0)this.mask[i]=0;}}
+ const c=Math.cos(b.wallAngleV175),s=Math.sin(b.wallAngleV175),offset=b.extendedPalisadeV166?5.2:2.55,post=b.extendedPalisadeV166?1.6:1.35;
+ for(let z=Math.floor(b.z-8);z<=Math.ceil(b.z+8);z++)for(let x=Math.floor(b.x-8);x<=Math.ceil(b.x+8);x++){const dx=x-b.x,dz=z-b.z,along=dx*c-dz*s,across=dx*s+dz*c;if(Math.abs(across)<=.95&&Math.abs(Math.abs(along)-offset)<=post){const i=this.index(x,z);if(i>=0)this.mask[i]=0;}}
  continue;
  }
- if(b.type==='gatehouse'||b.type==='woodgate'){const wide=b.type==='woodgate'&&b.extendedPalisadeV166,offset=wide?5.2:2.55,post=wide?1.6:1.35;if(b.wallAxis){for(const side of [-1,1])paint(b.x,b.z+side*offset,.95,post,false);}else{for(const side of [-1,1])paint(b.x+side*offset,b.z,post,.95,false);}continue;}const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);// When a settlement grows or moves buildings over earlier footpaths,
+ if(b.type==='gatehouse'||b.type==='woodgate'){const wide=b.extendedPalisadeV166,offset=wide?5.2:2.55,post=wide?1.6:1.35;if(b.wallAxis){for(const side of [-1,1])paint(b.x,b.z+side*offset,.95,post,false);}else{for(const side of [-1,1])paint(b.x+side*offset,b.z,post,.95,false);}continue;}const size=buildingClearance(b);if(size)paint(b.x,b.z,size.rx,size.rz,false)}for(const r of this.world.resources)if(!['game','fish','berry'].includes(r.kind)&&!r.removed&&r.amount>0)paint(r.x,r.z,r.kind==='tree'?1.4:3,r.kind==='tree'?1.4:3,true);// When a settlement grows or moves buildings over earlier footpaths,
  // remove buried wear rather than reviving the road through a new house.
  // Old V4 saves with roads inside construction footprints repair on load.
  let buried=0;
