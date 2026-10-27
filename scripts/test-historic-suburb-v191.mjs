@@ -17,11 +17,11 @@ for(const terrainKind of ['plain','cliff']){
  assert.ok(p,terrainKind+' should have a real buildable quarter');
  assert.equal(p.historicSuburbV191,true);
  assert.ok(p.plannedHousePlotsV191>=3);
- assert.ok(p.slots.length<=35);
+ assert.ok(p.slots.length<=70);
  assert.ok(p.slots.length>=10);
  assert.ok(p.slots.every(s=>s.type==='palisade'));
  const unique=new Set(p.slots.map(s=>s.wallAngleV175.toFixed(2)));
  assert.ok(unique.size>=4&&unique.size<=8,'real polygonal curtain, not artificial micro-wiggles');
- assert.ok(p.areaEstimateV186>750&&p.areaEstimateV186<6200);
+ assert.ok(p.areaEstimateV186>1200&&p.areaEstimateV186<10500);
  console.log(terrainKind,JSON.stringify({segments:p.slots.length,plots:p.plannedHousePlotsV191,area:Math.round(p.areaEstimateV186),angles:unique.size}));
 }

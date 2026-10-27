@@ -10,7 +10,7 @@ for(const kind of ['coast','mountain']){
  const c=s.cities.find(x=>x.id===s.wallTestV190.targetCityId);
  assert.equal(c.outerRingDiagnosticV184?.reason,'complete');
  assert.equal(c.outerRingV184.slots.length,s.wallTestV190.outerSegments);
- assert.ok(c.outerRingV184.areaEstimateV186>=320);
+ assert.ok(c.outerRingV184.areaEstimateV186>=2600,'V193 suburb must be materially larger than V192 on '+kind);
  assert.equal(s.demo,'wall-v190-'+kind);
  console.log(kind,JSON.stringify(s.wallTestV190));
 }

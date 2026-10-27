@@ -104,13 +104,13 @@ export function findOuterRingV184(game,city){
  const n=inner.length,center=inner.reduce((s,p)=>({x:s.x+p.x/n,z:s.z+p.z/n}),{x:0,z:0});
  const candidates=[],diagnostic={arcs:0,arcWallGaps:0,sites:0,houseCorridor:0,
   raw:0,terrain:0,segments:0,preview:0,rejectedReasons:{},firstFailures:[]};
- for(let count=Math.max(5,Math.floor(n*.39));count>=Math.max(4,Math.floor(n*.24));count--)for(let i=0;i<n;i++){
+ for(let count=Math.max(6,Math.floor(n*.48));count>=Math.max(4,Math.floor(n*.24));count--)for(let i=0;i<n;i++){
   const arc=Array.from({length:count+1},(_,j)=>inner[(i+j)%n]);
   let shared=0;
   for(let j=1;j<arc.length;j++)shared+=meters(arc[j-1],arc[j]);
   const a=arc[0],b=arc.at(-1),chord=meters(a,b);
   diagnostic.arcs++;
-  if(shared<30||shared>140||chord<shared*.70||!arc.every(p=>wallAlreadyThere(walls,p))){diagnostic.arcWallGaps++;continue;}
+  if(shared<30||shared>170||chord<shared*.64||!arc.every(p=>wallAlreadyThere(walls,p))){diagnostic.arcWallGaps++;continue;}
   // The entire borrowed edge needs real standing walls, not merely vertices.
   if(arc.slice(1).some((p,j)=>sampleLine(arc[j],p,2).some(q=>!wallAlreadyThere(walls,q)))){diagnostic.arcWallGaps++;continue;}
   const tx=(b.x-a.x)/chord,tz=(b.z-a.z)/chord;
@@ -122,15 +122,16 @@ export function findOuterRingV184(game,city){
    (h.x-middle.x)*nx+(h.z-middle.z)*nz>6&&
    Math.abs((h.x-middle.x)*tx+(h.z-middle.z)*tz)<chord*.72);
   const homeDepth=outwardHomes.reduce((max,h)=>Math.max(max,(h.x-middle.x)*nx+(h.z-middle.z)*nz),0);
-  // Historical growth is incremental. The first suburb protects an actual
-  // quarter, rather than creating a giant empty enclosure at once.
-  for(const depth of [...new Set([Math.min(72,Math.max(28,homeDepth+17)),30,36,43,50,57,66,72])]){
-   if(depth>75||depth<26)continue;
+  // V193: protect a genuine large residential quarter with room for years
+  // of growth. The first ring may now cover two or three V192-size suburbs,
+  // rather than fitting the smallest possible 3-house extension.
+  for(const depth of [...new Set([Math.min(125,Math.max(57,homeDepth+25)),52,64,76,88,100,112,124,43])]){
+   if(depth>128||depth<38)continue;
    for(let variant=0;variant<3;variant++){
     const points=historicCurtainV191(a,b,nx,nz,depth,variant);
     const poly=[...arc,...points.slice(1,-1).reverse()];
     const area=polyArea(poly);
-    if(area<750||area>6200)continue;
+    if(area<1200||area>10500)continue;
     const occupiedHomes=outwardHomes.filter(h=>inside(h,poly)).length;
     // Reject candidate that puts existing homes inside its curtain material.
     if(buildings.some(h=>points.slice(1).some(p=>meters(p,h)<6))){diagnostic.houseCorridor++;continue;}
@@ -146,11 +147,14 @@ export function findOuterRingV184(game,city){
     const length=points.slice(1).reduce((sum,p,j)=>sum+meters(points[j],p),0);
     const front=points[3],outer={x:front.x+nx*7,z:front.z+nz*7};
     const natural=BAD_TERRAIN.has(game.defenseTerrainKindV176?.(city,outer.x,outer.z))?1:0;
-    // A road approach/gate matters more than empty area. The expansion must
-    // be economical: reward 4-10 future house plots, penalise wasteful walls.
-    const value=occupiedHomes*15+Math.min(10,plots)*3+
-     Math.min(2,oldGates.length)*23+natural*9+
-     Math.min(2400,area)/900-length*.36-Math.max(0,plots-12)*2;
+    // Prioritise useful, genuinely buildable new city land. Penalise undersized
+    // suburbs decisively but preserve a smaller fallback on constrained sites.
+    // Cost still matters, yet must not dominate the future housing capacity.
+    const target=4200;
+    const value=occupiedHomes*13+Math.min(22,plots)*3+
+     Math.min(2,oldGates.length)*20+natural*7+
+     Math.min(7500,area)/180-length*.18-
+     Math.max(0,target-area)/115-Math.max(0,area-7500)/250;
     candidates.push({arc,points,area,shared,oldGates,plots,occupiedHomes,rank:value});diagnostic.raw++;
    }
   }
@@ -158,7 +162,7 @@ export function findOuterRingV184(game,city){
  candidates.sort((a,b)=>b.rank-a.rank);
  let checked=0;
  for(const candidate of candidates){
-  if(++checked>2400)break;
+  if(++checked>3500)break;
   const {arc,points,shared,area,plots,oldGates}=candidate;
   const segments=[];let invalid=false;
   // Individual straight spans retain the kinks of historical polygonal walls.
@@ -172,10 +176,10 @@ export function findOuterRingV184(game,city){
    for(const slot of stroke.segments)segments.push({...slot,type:'palisade',
     plannedDefense:true,outerRingV184:true});
   }
-  if(invalid||segments.length<10||segments.length>35){diagnostic.segments++;continue;}
+  if(invalid||segments.length<10||segments.length>70){diagnostic.segments++;continue;}
   const length=segments.reduce((sum,p)=>sum+meters(p.from,p.to),0);
   const share=shared/(shared+length);
-  if(share<.16||share>.75)continue;
+  if(share<.10||share>.75)continue;
   const gate=oldGates[0]||gates.sort((a,b)=>meters(a,points[3])-meters(b,points[3]))[0];
   // Follow the approach of an existing town gate across the new quarter.
   // The gateway replaces a single seven-metre section, never an extra wall.
@@ -216,7 +220,7 @@ export function findOuterRingV184(game,city){
   }
   const boundary=[...arc,...points.slice(1,-1).reverse()];
   return {
-   version:191,shape:'historic-gate-suburb',historicSuburbV191:true,
+   version:193,shape:'historic-gate-suburb',historicSuburbV191:true,expandedSuburbV193:true,
    oldGateCountV191:oldGates.length,plannedHousePlotsV191:plots,
    sharedLength:shared,newLength:length,sharedFraction:share,
    sharedArc:arc.map(p=>({x:p.x,z:p.z})),boundaryV186:boundary,
