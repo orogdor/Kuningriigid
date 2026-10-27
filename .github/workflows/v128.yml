@@ -30,7 +30,9 @@ jobs:
           node --check wall-demo-v184.js
       - name: Historic suburb geometry (V191)
         run: node scripts/test-historic-suburb-v191.mjs
-      - name: Sea and cliff suburb demos (V190–191)
+      - name: Continuous natural barriers and gaps (V194)
+        run: node scripts/test-natural-closure-v194.mjs
+      - name: Sea and cliff suburb demos (V194)
         run: node scripts/test-organic-demo-v190.mjs
       - name: Defense construction priority (V188)
         run: node scripts/test-wall-priority-v188.mjs

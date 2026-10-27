@@ -17,8 +17,8 @@ export async function loadOrganicWallV190(demo,fetcher=fetch){
  const response=await fetcher('./scenarios/bronze-v183-'+kind+'.json?v=183');
  if(!response.ok)throw Error('Eeslinna test ei laaditud ('+response.status+').');
  const s=await response.json();
- const {Civilization}=await import('./civilization-core.js?v=193');
- const {planOuterRingV184}=await import('./ai-defenses-v128.js?v=193');
+ const {Civilization}=await import('./civilization-core.js?v=194');
+ const {planOuterRingV184}=await import('./ai-defenses-v128.js?v=194');
  const game=new Civilization(s);
  const city=game.s.cities.find(c=>c.id===s.bronzeTestV183?.targetCityId);
  if(s.version!==4||!city||city.team!==0)throw Error('Vigane eeslinna testsalvestus');
@@ -39,6 +39,8 @@ export async function loadOrganicWallV190(demo,fetcher=fetch){
  game.s.wallTestV190={kind,targetCityId:city.id,controlled:true,
   organic:!!city.outerRingV184?.organicOutlineV189,
   outerSegments:city.outerRingV184.slots.length,
-  suburbArea:city.outerRingV184.areaEstimateV186};
+  suburbArea:city.outerRingV184.areaEstimateV186,
+  naturalBoundary:city.outerRingV184.naturalBoundaryV194?.kind||null,
+  naturalLength:city.outerRingV184.naturalBoundaryV194?.length||0};
  return game.s;
 }

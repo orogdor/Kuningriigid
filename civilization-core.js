@@ -1,5 +1,5 @@
 import {planRoadGatesV177} from './road-gates-v177.js';
-import {protectedHousingZoneV184,allowedSuburbJoinV191} from './outer-ring-v184.js?v=193';
+import {protectedHousingZoneV184,allowedSuburbJoinV191} from './outer-ring-v184.js?v=194';
 import {mountainBlockedV178} from './mountain-foot-v178.js';
 import {wallTerrainErrorV1758,wallEndJoinV1758} from './wall-terrain-v1758.js';
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
@@ -10,7 +10,7 @@ import {objectCrossesWoodenRingV168} from './stone-fort-footprints-v168.js';
 import {allocateTerritory} from './territory-v143.js';
 import {urbanExpansionFits,grownCityRadius} from './city-area-v142.js';
 import {installGameRevisions,citySummary,cityContexts,cityLookup,navigationRevision,resourcesNear,buildingsNear} from './perf-state-v131.js';
-import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js?v=193';
+import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js?v=194';
 import {applyDevelopmentBalance,combatUnit,militaryChoices,readyForNextEra,allowAIResearch} from './ai-development-v128.js';
 import {farmWork,fieldSize,fieldContains,validateField,migrateLegacyFarms,AI_FIELD_WIDTH,AI_FIELD_DEPTH} from './farming-v127.js';
 import {marketFoodGrowth} from './city-growth-v137.js';

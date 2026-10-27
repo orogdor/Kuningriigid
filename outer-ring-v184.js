@@ -83,6 +83,52 @@ function historicCurtainV191(a,b,nx,nz,depth,variant=0){
   z:a.z+tz*chord*u+nz*depth*heights[i]
  })),b];
 }
+
+// V194: shore and mountain are PHYSICAL continuous boundaries. Trace the first
+// impassable terrain strip along a borrowed inner-wall chord, so a real natural
+// barrier replaces the rear curtain. Sampling each 2–3 metres and three
+// adjacent strips avoids the old false shortcut across a lake or isolated rock.
+export function naturalSuburbBoundaryV194(game,city,a,b,nx,nz,target,maxDepth=165){
+ const chord=meters(a,b),samples=Math.max(12,Math.ceil(chord/2.5));
+ const passable=p=>terrainSafe(game,city,p);
+ const kind=p=>game.defenseTerrainKindV176?.(city,p.x,p.z);
+ const move=(p,r)=>({x:p.x+nx*r,z:p.z+nz*r});
+ const coast=[],depths=[];
+ for(let i=0;i<=samples;i++){
+  const origin=mix(a,b,i/samples);
+  let dry=null,wet=null;
+  for(let d=8;d<=maxDepth;d+=2.5){
+   const pos=move(origin,d),type=kind(pos);
+   if(type===target&&!passable(pos)){wet=d;dry=d-2.5;break;}
+   // Other impassable land or unknown world boundaries are not a coast.
+   if(!passable(pos)&&type!==target)return null;
+  }
+  if(wet==null||dry<6)return null;
+  for(let k=0;k<8;k++){
+   const mid=(dry+wet)*.5,p=move(origin,mid);
+   if(kind(p)===target&&!passable(p))wet=mid;else dry=mid;
+  }
+  // This dry point is where the physical wall terminates.
+  const point=move(origin,dry);
+  // There must be an actual continuous block beyond the shoreline;
+  // a single rock/wet pixel cannot substitute for kilometres of curtain.
+  for(const depth of [wet+.4,wet+1.2,wet+2.4]){
+   const q=move(origin,depth);
+   if(kind(q)!==target||passable(q))return null;
+  }
+  coast.push(point);depths.push(dry);
+ }
+ const minDepth=Math.min(...depths),maxFound=Math.max(...depths);
+ if(minDepth<19||maxFound>maxDepth-1)return null;
+ for(let i=1;i<depths.length;i++)if(Math.abs(depths[i]-depths[i-1])>7)return null;
+ // Both ends must meet terrain directly; the gap is backed by water/cliff
+ // everywhere instead of being merely a visually closed straight chord.
+ const boundaryLength=coast.slice(1).reduce((sum,p,i)=>sum+meters(p,coast[i]),0);
+ if(boundaryLength<24||boundaryLength>chord*2.4)return null;
+ return {kind:target,coast,blockedFrom:depths,depth:Math.min(...depths),
+  rearLength:boundaryLength,naturalLengthV194:boundaryLength};
+}
+
 function roadFocusOnArc(arc,gates){
  return gates.filter(g=>arc.some(p=>meters(p,g)<11));
 }
@@ -122,6 +168,23 @@ export function findOuterRingV184(game,city){
    (h.x-middle.x)*nx+(h.z-middle.z)*nz>6&&
    Math.abs((h.x-middle.x)*tx+(h.z-middle.z)*tz)<chord*.72);
   const homeDepth=outwardHomes.reduce((max,h)=>Math.max(max,(h.x-middle.x)*nx+(h.z-middle.z)*nz),0);
+  // Survey natural defenses BEFORE spending time on arbitrary wall rings.
+  for(const kind of ['water','mountain']){
+   const natural=naturalSuburbBoundaryV194(game,city,a,b,nx,nz,kind);
+   if(!natural)continue;
+   const {coast}=natural,poly=[...arc,...coast.slice().reverse()];
+   const area=polyArea(poly);
+   if(area<1550||area>12500)continue;
+   const plots=sitesInside(poly,inner,buildings,game,city);
+   const occupiedHomes=outwardHomes.filter(h=>inside(h,poly)).length;
+   if(plots<3&&occupiedHomes<2)continue;
+   const center=mix(a,b,.5),distanceToCoast=meters(center,coast[Math.floor(coast.length/2)]);
+   const score=135+Math.min(8500,area)/170+
+      Math.min(22,plots)*3+Math.min(2,oldGates.length)*20+
+      occupiedHomes*12-distanceToCoast*.18;
+   candidates.push({arc,points:[a,...coast,b],area,shared,oldGates,
+    plots,occupiedHomes,rank:score,natural});diagnostic.raw++;
+  }
   // V193: protect a genuine large residential quarter with room for years
   // of growth. The first ring may now cover two or three V192-size suburbs,
   // rather than fitting the smallest possible 3-house extension.
@@ -163,12 +226,27 @@ export function findOuterRingV184(game,city){
  let checked=0;
  for(const candidate of candidates){
   if(++checked>3500)break;
-  const {arc,points,shared,area,plots,oldGates}=candidate;
+  const {arc,points,shared,area,plots,oldGates,natural}=candidate;
   const segments=[];let invalid=false;
+  if(natural){
+   // Both returns are paid-for walls. The back side is kept as a surveyed
+   // sequence of real impassable water/cliff cells, never as a free wall.
+   for(const [start,end] of [[arc[0],natural.coast[0]],
+      [arc.at(-1),natural.coast.at(-1)]]){
+    const boundary={x:end.x+(end.x-start.x)/Math.max(1,meters(start,end))*1.4,
+     z:end.z+(end.z-start.z)/Math.max(1,meters(start,end))*1.4};
+    const line=wallStrokePlanV175([start,boundary],'straight',100,
+      (x,z)=>terrainSafe(game,city,{x,z}));
+    if(line.error||!line.segments.length){invalid=true;break;}
+    if(natural.kind==='mountain')line.segments.at(-1).cliffEmbedEndV179=5;
+    for(const slot of line.segments)segments.push({...slot,type:'palisade',
+      plannedDefense:true,outerRingV184:true});
+   }
+  }
   // Individual straight spans retain the kinks of historical polygonal walls.
   // Calling the generic "straight" mode on the whole polyline would collapse
   // every intermediate point and silently rebuild the old rectangular wall!
-  for(let edge=1;edge<points.length;edge++){
+  for(let edge=1;!natural&&edge<points.length;edge++){
    const start=points[edge-1],end=points[edge];
    if(sampleLine(start,end,1.5).some(p=>!terrainSafe(game,city,p))){invalid=true;diagnostic.terrain++;break;}
    const stroke=wallStrokePlanV175([start,end],'straight',100);
@@ -176,14 +254,14 @@ export function findOuterRingV184(game,city){
    for(const slot of stroke.segments)segments.push({...slot,type:'palisade',
     plannedDefense:true,outerRingV184:true});
   }
-  if(invalid||segments.length<10||segments.length>70){diagnostic.segments++;continue;}
+  if(invalid||segments.length<3||segments.length>70){diagnostic.segments++;continue;}
   const length=segments.reduce((sum,p)=>sum+meters(p.from,p.to),0);
   const share=shared/(shared+length);
   if(share<.10||share>.75)continue;
   const gate=oldGates[0]||gates.sort((a,b)=>meters(a,points[3])-meters(b,points[3]))[0];
   // Follow the approach of an existing town gate across the new quarter.
   // The gateway replaces a single seven-metre section, never an extra wall.
-  if(gate&&segments.length>=12){
+  if(!natural&&gate&&segments.length>=12){
    const forward={x:points[3].x-arc[Math.floor(arc.length/2)].x,
     z:points[3].z-arc[Math.floor(arc.length/2)].z};
    const fLen=Math.max(1,Math.hypot(forward.x,forward.z));
@@ -218,14 +296,19 @@ export function findOuterRingV184(game,city){
    }
    continue;
   }
-  const boundary=[...arc,...points.slice(1,-1).reverse()];
+  const boundary=natural?[...arc,...natural.coast.slice().reverse()]:
+    [...arc,...points.slice(1,-1).reverse()];
   return {
-   version:193,shape:'historic-gate-suburb',historicSuburbV191:true,expandedSuburbV193:true,
+   version:194,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   historicSuburbV191:true,expandedSuburbV193:true,
+   naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
+     length:natural.naturalLengthV194,verified:true}:null,
    oldGateCountV191:oldGates.length,plannedHousePlotsV191:plots,
    sharedLength:shared,newLength:length,sharedFraction:share,
    sharedArc:arc.map(p=>({x:p.x,z:p.z})),boundaryV186:boundary,
    areaEstimateV186:polyArea(boundary),organicOutlineV189:true,
-   cliffBoundaryV186:false,waterBoundaryV187:false,
+   cliffBoundaryV186:natural?.kind==='mountain',
+   waterBoundaryV187:natural?.kind==='water',
    slots:segments,nextIndex:0
   };
  }
