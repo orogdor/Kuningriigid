@@ -194,6 +194,10 @@ function stoneYardV174(b,variant){
  else if(style===1){crate(b,2.55,-2.65,.48);sack(b,1.87,-2.69);}
  else if(style===2){logPile(b,2.50,-2.75,3,.22);box(b,1.55,0,-2.6,.9,.2,.42,'#836441',M.boards);}
  else {bed(b,-2.28,-2.55,.85,1.00,'#647e46',2);crate(b,2.5,-2.67,.38);}
+ // Small household props are confined to the existing footprint and do not
+ // obstruct the entrance, roads or worker navigation.
+ if(style===1)pots(b,-2.65,-2.55,'#a47755');
+ if(style===2)sack(b,-2.6,-2.45);
 }
 function houseStone(b,r,v){
  // V170 (stage 3.1a): twelve stable, historically plausible Stone Age silhouettes.

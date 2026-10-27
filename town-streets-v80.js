@@ -18,6 +18,12 @@ export function streetConnections(buildings){
   if(seen.has(key))return;seen.add(key);
   links.push({from:a,to:b,kind:label});
  };
+ const hubs=sites.filter(b=>['hall','market','well','inn','trade_yard'].includes(b.type));
+ // Connect each real gate to nearby civic destinations, so repeated errands
+ // wear a traversable approach rather than a decorative painted road.
+ for(const gate of sites.filter(b=>['woodgate','gatehouse'].includes(b.type))){
+  for(const hub of hubs.filter(b=>b!==gate).sort((a,b)=>dist(gate,a)-dist(gate,b)).slice(0,2))add(gate,hub,'gate-approach');
+ }
  // Near neighbours in each direction create a proper interlinked grid: not
  // one overused corridor from all houses to a single centre.
  for(const a of sites){
@@ -35,7 +41,6 @@ export function streetConnections(buildings){
  }
  // Houses and workplaces use several public destinations, not just one
  // market route. These paths emerge as the population actually uses them.
- const hubs=sites.filter(b=>['hall','market','well','inn','trade_yard'].includes(b.type));
  for(const a of sites){
   if(a.type==='house'||a.type==='warehouse'||a.type==='barracks'){
    for(const hub of hubs.filter(b=>b!==a).sort((b,c)=>dist(a,b)-dist(a,c)).slice(0,2))

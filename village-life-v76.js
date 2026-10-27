@@ -3,6 +3,7 @@
 // economy, population, pathfinding or combat changes are necessary.
 import * as T from './vendor/three.module.js';
 import {createSoldier,animateSoldier} from './visuals.js';
+import {door} from './navigation.js';
 
 // One game minute represents one village clock hour. Start new games in morning.
 export const VILLAGE_DAY_SECONDS=24*60;
@@ -168,7 +169,21 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
    for(const actor of actors){
     const activity=villageActivity(site.id,actor.index,time,threat);
     actor.activity=activity;actor.person.userData.activity=activity;
-    const dest=villageDestination(site.id,actor.index,activity,time);
+    let dest=villageDestination(site.id,actor.index,activity,time);
+    // In actual towns, decorative visitors share the real navigation grid and
+    // select existing workplaces instead of walking straight through houses.
+    const city=site.kind==='city'?game.contextAt(site.tile,false):null;
+    if(city){
+     const works=city.economy.buildings.filter(b=>b.ready&&b.hp>0&&!b.virtual&&['lumber','farm','hunter','quarry','market','well'].includes(b.type));
+     if(activity==='work'&&works.length)dest=door(works[actor.index%works.length]);
+     const nav=game.nav(city),bucket=Math.floor(time/6),key=activity+':'+bucket+':'+nav.version;
+     if(actor.routeKey!==key){
+      const start=nav.nearest({x:actor.x,z:actor.z},12),end=nav.nearest(dest,12);
+      actor.route=(start&&end?nav.route(start,end):null)||[];actor.routeKey=key;
+     }
+     while(actor.route?.length&&Math.hypot(actor.route[0].x-actor.x,actor.route[0].z-actor.z)<.8)actor.route.shift();
+     dest=actor.route?.[0]||{x:actor.x,z:actor.z};
+    }
     const dx=dest.x-actor.x,dz=dest.z-actor.z,d=Math.hypot(dx,dz);
     // The visible NPCs are decorative. No collision/pushing into nav paths and
     // no real worker/population counts are affected by these visual journeys.

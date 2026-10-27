@@ -101,7 +101,7 @@ export function terrainMaterial(scope='world',tile=null){
  rockCol*=.80+.20*smoothstep(.15,.55,fissure);
  rockCol=mix(rockCol,rockCol*vec3(.98,.92,.84),smoothstep(.55,.85,nMid)*.6);   // iron-stained bands
  // scree: loose pale stone just below the cliff line
- float scree=smoothstep(rockAt-.20,rockAt-.06,slope)*(1.0-rock)*smoothstep(26.0,44.0,elev);
+ float scree=smoothstep(rockAt-.20,rockAt-.06,slope)*(1.0-rock)*smoothstep(18.0,36.0,elev);
  vec3 screeCol=vec3(.34,.32,.29)*(.88+nFine*.2);
  vec3 col=mix(land,screeCol,scree*.75);
  col=mix(col,rockCol,rock);
@@ -350,7 +350,8 @@ const D_WATER=new T.Color('#8b9c91'),D_SAND=new T.Color('#dbcba0'),D_HIGH=new T.
 export function detailGroundColor(game,wx,wz,h,mountainHere){
  const color=smoothBiomeColor(game,wx,wz,'ground',detailBase);
  if(h<-.15)return color.copy(D_WATER);
- if(h<.65)return color.copy(D_SAND);
+ if(h<.65){const blend=Math.max(0,Math.min(1,(h+.15)/.8));return color.lerp(D_SAND,1-blend*.65);}
+ if(h<1.8)color.lerp(D_SAND,Math.max(0,1-(h-.65)/1.15)*.35);
  if(mountainHere&&h>12)color.lerp(D_ROCK,Math.min(1,(h-12)/10)*.6);
  else if(h>8)color.lerp(D_HIGH,Math.min(1,(h-8)/4)*.7);
  return color;
