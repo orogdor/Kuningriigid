@@ -367,6 +367,8 @@ export function findOuterRingV184(game,city){
    naturalPreviewReject:diagnostic.naturalPreviewReject||0,
    naturalAreaReject:diagnostic.naturalAreaReject||0,
    naturalPlotReject:diagnostic.naturalPlotReject||0,
+   naturalSegmentsReject:diagnostic.naturalSegmentsReject||0,
+   naturalFailures:diagnostic.firstFailures,
    chosen:natural?.kind||'none'};
   return {
    version:195,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
