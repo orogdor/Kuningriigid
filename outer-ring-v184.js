@@ -1,4 +1,4 @@
-import {wallStrokePlanV175,wallPointInsideV175} from './wall-draw-v175.js';
+import {wallStrokePlanV175,wallPointInsideV175,wallCrossesGateOpeningV175} from './wall-draw-v175.js';
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const fort=new Set(['palisade','stonewall','reinforced_wall','woodgate','gatehouse','watchtower','stonetower']);
 function inside(p,poly){
@@ -347,8 +347,13 @@ export function findOuterRingV184(game,city){
     if(toward>15&&score<best){target=j;best=score;}
    }
    if(target!=null&&best<20){
-    const g={...segments[target],type:'woodgate'};
-    if(!game.previewDefenseV177(city,g).error)segments[target]=g;
+    const g={...segments[target],type:'woodgate',hp:350};
+    // The entire planned curtain must still leave the gateway passage clear.
+    // A turn immediately beside a gate can cut through the opening even
+    // when each wall slot passes its stand-alone placement preview.
+    const crosses=segments.some((s,i)=>i!==target&&wallCrossesGateOpeningV175(s,g));
+    if(!crosses&&!game.previewDefenseV177(city,g).error)
+     segments[target]={...g,plannedDefense:true,outerRingV184:true};
    }
   }
   // All wall sections and the actual gate must fit. Do not accept a scenic
@@ -379,7 +384,7 @@ export function findOuterRingV184(game,city){
    naturalFailures:diagnostic.firstFailures,
    chosen:natural?.kind||'none'};
   return {
-   version:195,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   version:197,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
    historicSuburbV191:true,expandedSuburbV193:true,
    naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
      length:natural.naturalLengthV194,partial:!!natural.partialV195,

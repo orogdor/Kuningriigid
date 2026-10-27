@@ -1,4 +1,4 @@
-import {loadWallV184,loadOrganicWallV190} from './wall-demo-v184.js?v=196';
+import {loadWallV184,loadOrganicWallV190} from './wall-demo-v184.js?v=197';
 import {loadBronzeV183} from './bronze-ai-v183.js?v=183';
 import {loadAIMountainV176} from './ai-mountain-demo-v176.js?v=180test';
 import {loadIronCityV143} from './ai-iron-demo-v143.js';
@@ -93,7 +93,7 @@ import {buildDetailWorldObjects} from './detail-world-objects.js?v=123a';
 import {createVillageLife} from './village-life-v76.js?v=76a';
 import * as T from './vendor/three.module.js';
 import {DETAIL_X,DETAIL_Z,DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z,tileDelta} from './detail-scale-v123.js';
-import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=196';
+import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=197';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js?v=117a';
 import {detailHeight,featureNames} from './world-details.js?v=123a';
 import {createAgeBuilding,animateBuilding} from './buildings.js?v=1757a';
