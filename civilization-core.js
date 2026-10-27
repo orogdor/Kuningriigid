@@ -1,4 +1,5 @@
 import {planRoadGatesV177} from './road-gates-v177.js';
+import {protectedHousingZoneV184} from './outer-ring-v184.js?v=185';
 import {mountainBlockedV178} from './mountain-foot-v178.js';
 import {wallTerrainErrorV1758,wallEndJoinV1758} from './wall-terrain-v1758.js';
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
@@ -721,6 +722,10 @@ if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plan
    const mayExpand=item.canExpand;
    const types=historicalTilePlan(city,cell,urban||mayExpand,age);
    for(const type of types){
+    // Housing in a fortified city is placed by the main planner, which checks
+    // both protected areas in priority order across the whole city.
+    if(type==='house'&&city.outerRingDiagnosticV184?.reason==='complete'&&
+       protectedHousingZoneV184(city,{x:0,z:0})!==null)continue;
     if((urban||mayExpand)&&type==='house'&&((!mayExpand&&r.pop<Math.floor(capacity)-5)||houses>=70))continue;
     if(['market','warehouse','cellar','study','scriptorium','barracks','archery'].includes(type)&&
        area.buildings.some(b=>b.type===type&&b.hp>0))continue;
@@ -849,7 +854,12 @@ const science=this.s.research[team];
    };
    return rank(a)-rank(b);
   });
-  for(let ctx of orderedContexts){
+  // Once the second ring is complete, exhaust viable protected inner plots
+  // before using the extension. No unprotected house sites are selected.
+  const protectedHousing=isHousing&&city.outerRingDiagnosticV184?.reason==='complete'&&
+   protectedHousingZoneV184(city,{x:0,z:0})!==null;
+  const housingZones=protectedHousing?[0,1]:[null];
+  housingSites: for(const zone of housingZones)for(let ctx of orderedContexts){
    const expansion=!!ctx.expandV138;
    if(ctx.lazy)ctx=this.contextAt(ctx,true);
    if(!ctx)continue;
@@ -864,7 +874,8 @@ const science=this.s.research[team];
    const plotCursor=(ctx.aiPlotCursorV138?.[next]||0);
    const centerFirst=isHousing&&ctx.c===city.c&&ctx.r===city.r&&existingHomes<V139_CORE_HOUSES?
     spots.filter(p=>Math.hypot(p.x-city.economy.buildings[0].x,p.z-city.economy.buildings[0].z)<=70).slice(0,140):[];
-   const batch=[...centerFirst,...nextPlotBatch(spots,plotCursor,96).filter(p=>!centerFirst.some(q=>p.x===q.x&&p.z===q.z))];
+   const batch=protectedHousing?spots.filter(p=>protectedHousingZoneV184(city,{x:p.x+(ctx.c-city.c)*DETAIL_TILE_X,z:p.z+(ctx.r-city.r)*DETAIL_TILE_Z})===zone):
+    [...centerFirst,...nextPlotBatch(spots,plotCursor,96).filter(p=>!centerFirst.some(q=>p.x===q.x&&p.z===q.z))];
    (ctx.aiPlotCursorV138??={})[next]=plotCursor+batch.length;
    for(const p of batch){
     // V167: do not fill a previously surveyed palisade/gateway corridor with
@@ -877,7 +888,7 @@ const science=this.s.research[team];
     if(kind&&next!=='fisher'&&!deposits.some(r=>{if(distance(r,p)>=55)return false;const goal=nav.nearest({x:r.x+1.8,z:r.z},4);return goal&&nav.reachable(home,goal)}))continue;
     if(this.build(ctx,next,p).building){built=true;break;}
    }
-   if(built)break;
+   if(built)break housingSites;
    if(expansion&&!wasUrban)delete ctx.urbanExpansionV138;
   }
   if(built){city.aiPlacementRetry={};break;}excluded.add(next);(city.aiPlacementRetry??={})[next]=this.s.time+15;

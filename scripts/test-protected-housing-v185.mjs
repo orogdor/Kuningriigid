@@ -1,0 +1,5 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';import {Civilization} from '../civilization-core.js';import {takeOverAI} from '../ai-takeover-v128.js';import {protectedHousingZoneV184 as zone} from '../outer-ring-v184.js';
+for(const kind of ['coast','mountain'])for(const blocked of [false,true]){
+ const s=takeOverAI(JSON.parse(fs.readFileSync('scenarios/wall-v184-'+kind+'.json')),1),g=new Civilization(s),c=g.s.cities.find(x=>x.id===s.wallTestV184.targetCityId);c.aiNextBuildCheck=0;let orig=g.previewBuild.bind(g);if(blocked)g.previewBuild=(ctx,type,p)=>type==='house'&&zone(c,{x:p.x+(ctx.c-c.c)*225,z:p.z+(ctx.r-c.r)*195})===0?{error:'test: inner plots occupied'}:orig(ctx,type,p);
+ const old=new Set(g.allBuildings(c));g.aiTeam(1);const house=g.allBuildings(c).find(b=>b.type==='house'&&!old.has(b));assert.ok(house,kind+' no new house');const ctx=g.contexts(c).find(x=>x.economy.buildings.includes(house));const where=zone(c,{x:house.x+(ctx.c-c.c)*225,z:house.z+(ctx.r-c.r)*195});assert.equal(where,blocked?1:0,kind);console.log(kind,blocked?'inner blocked: outer':'inner available: inner',house.x,house.z);
+}
