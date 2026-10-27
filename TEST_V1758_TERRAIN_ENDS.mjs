@@ -43,6 +43,7 @@ for(let z=-80;z<=80;z+=2){
 assert.ok(planSite,'legal real construction site directly against mountain boundary');
 const site={...planSite.segments[0],woodFortTierV1757:2};
 assert.equal(game.wallTerrainPassable(city,DETAIL_HALF_X+.1,site.z),false,'neighbouring mountain is impassable');
+assert.equal(game.nav(city).passable(DETAIL_HALF_X+.1,site.z),false,'worker navigation cannot step into neighbouring mountain');
 const before=city.economy.realms[city.team].resources.wood;
 const built=game.build(city,'palisade',site);
 assert.ok(built.building,built.error);
