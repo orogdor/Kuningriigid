@@ -60,5 +60,7 @@ jobs:
         run: node TEST_V181_WORLD_ROAD_GATES.mjs
       - name: Connected Stone Age strategic roads (V182)
         run: node TEST_V182_ROAD_CONTINUITY.mjs
+      - name: Outer-ring priority and bounded fallback (V188)
+        run: node scripts/test-wall-priority-v188.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic
