@@ -34,6 +34,24 @@ export function allowedSuburbJoinV191(a,b){
   const angle=w.wallAngleV175??(w.wallAxis?Math.PI/2:0),half=(w.palisadeSpanV167||7)/2;
   return [-1,1].map(sign=>({x:w.x+Math.cos(angle)*half*sign,z:w.z-Math.sin(angle)*half*sign}));
  };
+ // A real physical intersection is an additional valid joining method.
+ // Reject parallel overlaps and never allow gates/ordinary buildings here.
+ const crossing=(u,v)=>{
+  const toEnds=w=>{
+   const angle=w.wallAngleV175??(w.wallAxis?Math.PI/2:0),
+    half=(w.palisadeSpanV167||7)/2;
+   return [{x:w.x-Math.cos(angle)*half,z:w.z+Math.sin(angle)*half},
+           {x:w.x+Math.cos(angle)*half,z:w.z-Math.sin(angle)*half}];
+  };
+  const [a0,a1]=toEnds(u),[b0,b1]=toEnds(v),
+   rx=a1.x-a0.x,rz=a1.z-a0.z,sx=b1.x-b0.x,sz=b1.z-b0.z,
+   cross=rx*sz-rz*sx;
+  if(Math.abs(cross)<5)return false;
+  const qx=b0.x-a0.x,qz=b0.z-a0.z,
+   t=(qx*sz-qz*sx)/cross,w=(qx*rz-qz*rx)/cross;
+  return t>=-.03&&t<=1.03&&w>=-.03&&w<=1.03;
+ };
+ if(crossing(a,b))return true;
  // Both an L-join at a historic wall end and a T-join to the middle of
  // an uninterrupted curtain are real, closed defensive connections.
  // The generic 6 m house-spacing rule cannot distinguish these joints.
@@ -429,7 +447,7 @@ export function findOuterRingV184(game,city){
    naturalFailures:diagnostic.firstFailures,
    chosen:natural?.kind||'none'};
   return {
-   version:201,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   version:202,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
    historicSuburbV191:true,expandedSuburbV193:true,
    naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
      length:natural.naturalLengthV194,partial:!!natural.partialV195,

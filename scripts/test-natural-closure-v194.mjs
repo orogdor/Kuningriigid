@@ -31,4 +31,8 @@ assert.ok(!allowedSuburbJoinV191(side,{...old,type:'woodgate'}),'never close or 
 const nextOld={...old,x:7,z:0};
 assert.ok(allowedSuburbCornerV201(side,nextOld,[old,nextOld]),'neighbor in same historic curtain does not block linked wall');
 assert.ok(!allowedSuburbCornerV201(side,{...nextOld,x:17},[old,{...nextOld,x:17}]),'unconnected old wall still blocks');
-console.log('V201 physical coast/cliff and safe historic-corner junction PASS');
+const cross={...side,z:0,palisadeSpanV167:8};
+assert.ok(allowedSuburbJoinV191(cross,old),'physical wall-line crossing seals a junction');
+assert.ok(!allowedSuburbJoinV191({...cross,wallAngleV175:0,z:.6},old),
+ 'parallel overlapped curtains are not real T-junctions');
+console.log('V202 continuous coast, cliff and geometric wall-course joins PASS');
