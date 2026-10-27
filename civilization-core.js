@@ -511,7 +511,7 @@ export class Civilization{
   const position=localToWorld(cell,x,z),river=riverNear(this,position.x,position.z);
   return river.distance>=river.width*.97||river.fordStrength>=.75||!!tile.bridge&&river.distance<river.width*1.15;
  }
- placementEnv(city,type){const env=this.env(city);if(isDrawableWallV175(type)){const parent=this.parentCity(city);env.passable=(x,z)=>this.defenseTerrainPassableV177(city,x+(city.c-parent.c)*DETAIL_TILE_X,z+(city.r-parent.r)*DETAIL_TILE_Z);}if(isDrawableWallV175(type)||['woodgate','gatehouse'].includes(type)){const near=env.nearBuildings;env.nearBuildings=(p,t)=>near(p,t).filter(b=>!wallEndJoinV1758({...p,type},b));}if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
+ placementEnv(city,type){const env=this.env(city);if(isDrawableWallV175(type)){const parent=this.parentCity(city);env.passable=(x,z)=>this.defenseTerrainPassableV177(city,x+(city.c-parent.c)*DETAIL_TILE_X,z+(city.r-parent.r)*DETAIL_TILE_Z);}if(isDrawableWallV175(type)||['woodgate','gatehouse','watchtower','stonetower'].includes(type)){const near=env.nearBuildings;env.nearBuildings=(p,t)=>near(p,t).filter(b=>!wallEndJoinV1758({...p,type},b)&&!(p.plannedDefense&&b.plannedDefense&&((['watchtower','stonetower'].includes(type)&&isDrawableWallV175(b.type))||(isDrawableWallV175(type)&&['watchtower','stonetower'].includes(b.type)))));}if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
  buildingSites(city,type){if(MINERAL_BUILDINGS[type]){const r=mineralSite(city.world,type);return r?[{x:r.x,z:r.z}]:[]}if(COASTAL_BUILDINGS.has(type))return coastalSites(this,this.cell(city),type);const parent=this.parentCity(city);return historicalBuildingPlots(city,parent,type,this.s.seed+parent.id*31,this.s.ages[parent.team]===0)}
  previewBuild(city,type,p){
   const error=this.buildRule(city,type);if(error)return {error};
@@ -588,6 +588,7 @@ export class Civilization{
   result.building.wallAxis=p.wallAxis||0;
   result.building.palisadeSpanV167=p.palisadeSpanV167||7;
   result.building.drawnWallV175=true;
+  result.building.cliffEmbedStartV179=p.cliffEmbedStartV179||0;result.building.cliffEmbedEndV179=p.cliffEmbedEndV179||0;
   configureWallFootprint(result.building);this.nav(city).rebuild();
  }
 if(tier===2&&!p.drawnWallV175){configureWallFootprint(result.building);this.nav(city).rebuild();}

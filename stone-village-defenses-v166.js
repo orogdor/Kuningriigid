@@ -186,8 +186,8 @@ export function planStoneVillageDefenses(game,team,city){
  const plan=city.stoneDefensePlanV166,counts={};
  let ready=0,placed=0;
  for(const slot of plan.slots){
-  if(local.some(b=>FORTS.has(b.type)&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5))){
-   placed++;if(local.some(b=>FORTS.has(b.type)&&b.ready&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5)))ready++;
+  if(local.some(b=>b.type===slot.type&&b.hp>0&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5))){
+   placed++;if(local.some(b=>b.type===slot.type&&b.hp>0&&b.ready&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5)))ready++;
   }
  }
  if(placed===plan.slots.length){
@@ -195,7 +195,7 @@ export function planStoneVillageDefenses(game,team,city){
   return true;
  }
  for(const slot of plan.slots){
-  if(local.some(b=>FORTS.has(b.type)&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5)))continue;
+  if(local.some(b=>b.type===slot.type&&b.hp>0&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5)))continue;
   const limit=game.buildingDefinitions[slot.type]?.cost;
   if(!limit){counts.definition=(counts.definition||0)+1;continue;}
   if(game.buildRule(city,slot.type)){counts.locked=(counts.locked||0)+1;continue;}
@@ -208,7 +208,7 @@ export function planStoneVillageDefenses(game,team,city){
   const occupied=local.some(b=>!FORTS.has(b.type)&&footprintsCrossV168(slot,b,1.2));
   let siteResult=occupied?{error:'Põld või hoone asub müürikoridoris'}:
    (game.previewDefenseV177?game.previewDefenseV177(city,{...placement,type:slot.type,plannedDefense:true}):game.previewBuild(city,slot.type,{...placement,plannedDefense:true}));
-  if(siteResult.error&&['watchtower','stonetower'].includes(slot.type)){
+  if(siteResult.error&&!slot.wallTowerV179&&['watchtower','stonetower'].includes(slot.type)){
    searchTower:for(const dx of [0,-3,3,-6,6,-9,9,-12,12])for(const dz of [0,-3,3,-6,6,-9,9,-12,12]){
     const candidate={...placement,x:slot.x+dx,z:slot.z+dz};
     if(!insideDefenseV176(candidate,plan)||local.some(b=>FORTS.has(b.type)&&Math.hypot(b.x-candidate.x,b.z-candidate.z)<7))continue;

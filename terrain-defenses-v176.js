@@ -133,8 +133,10 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
   if(run.length<2){run=[];return true;}
   const plan=wallStrokePlanV175(run,'curved',128,passable);
   if(plan.error){run=[];return false;}
-  for(const segment of plan.segments){
-   const slot={...segment,type:wall,plannedDefense:true,terrainDefenseV176:true};
+  for(const [index,segment] of plan.segments.entries()){
+   const startRock=index===0&&!passable(run[0].x,run[0].z)&&feature(run[0].x,run[0].z)==='mountain';
+   const endRock=index===plan.segments.length-1&&!passable(run.at(-1).x,run.at(-1).z)&&feature(run.at(-1).x,run.at(-1).z)==='mountain';
+   const slot={...segment,type:wall,plannedDefense:true,terrainDefenseV176:true,cliffEmbedStartV179:startRock?5:0,cliffEmbedEndV179:endRock?5:0};
    if(occupied(slot,buildings)||wallTerrainErrorV1758(slot,passable,game.defenseTerrainHeightV176?(x,z)=>game.defenseTerrainHeightV176(city,x,z):null)){run=[];return false;}
    slots.push(slot);
   }
@@ -165,13 +167,14 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
  // Towers face the open approaches, not buried inside a mountain. Leave
  // plenty of room around gates and real wall sections for their footprints.
  const towers=[];
+ const curtainSlots=slots.filter(s=>s.type===wall&&s.drawnWallV175);
  for(const target of [4,12,20,28]){
-  let chosen=null;
-  for(const di of [0,-1,1,-2,2,-3,3,-4,4,-5,5,-6,6,-7,7,-8,8])for(const inset of [11,14,17,20]){
-   if(chosen)continue;
-   const p=points[(target+di+32)%32],len=distance(p,hall),v={x:p.x-(p.x-hall.x)/len*inset,z:p.z-(p.z-hall.z)/len*inset,type:tower,wallAxis:0,plannedDefense:true};
-   if(!(city.world?.resources||[]).some(r=>!r.removed&&!['tree','berry','game','fish'].includes(r.kind)&&Math.abs(r.x-v.x)<(r.depositSite?10:4.5)&&Math.abs(r.z-v.z)<(r.depositSite?10:4))&&[[-5,-5],[-5,5],[5,-5],[5,5]].every(([dx,dz])=>passable(v.x+dx,v.z+dz))&&!occupied(v,buildings)&&slots.every(w=>distance(v,w)>7)&&towers.every(t=>distance(v,t)>18))chosen=v;
-  }
+  const goal=points[target];
+  const candidates=[...curtainSlots].sort((a,b)=>distance(a,goal)-distance(b,goal));
+  const chosen=candidates.map(w=>({x:w.x,z:w.z,type:tower,wallAxis:0,plannedDefense:true,wallTowerV179:true})).find(v=>
+   !(city.world?.resources||[]).some(r=>!r.removed&&!['tree','berry','game','fish'].includes(r.kind)&&Math.abs(r.x-v.x)<(r.depositSite?10:4.5)&&Math.abs(r.z-v.z)<(r.depositSite?10:4))&&
+   [[-5,-5],[-5,5],[5,-5],[5,5]].every(([dx,dz])=>passable(v.x+dx,v.z+dz))&&!occupied(v,buildings)&&
+   gates.every(g=>distance(v,g.slot)>12)&&towers.every(t=>distance(v,t)>18));
   if(chosen)towers.push(chosen);
  }
  if(towers.length<2)return null;
