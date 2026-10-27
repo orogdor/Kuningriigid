@@ -26,5 +26,6 @@ const side={type:'palisade',drawnWallV175:true,outerRingV184:true,x:0,z:4,
  wallAngleV175:-Math.PI/2,palisadeSpanV167:8.52};
 assert.ok(allowedSuburbJoinV191(side,old),'wall may join the middle of a historic wall at a real T-intersection');
 assert.ok(!allowedSuburbJoinV191({...side,wallAngleV175:0},old),'parallel overlap must not bypass spacing');
+assert.ok(allowedSuburbJoinV191(side,{...old,drawnWallV175:false}),'old, long non-drawn timber section may receive a physical T-junction');
 assert.ok(!allowedSuburbJoinV191(side,{...old,type:'woodgate'}),'never close or bypass an old gate');
 console.log('V196 continuous coastal/cliff closure and safe T-junction PASS');

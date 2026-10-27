@@ -26,7 +26,7 @@ export function protectedHousingZoneV184(city,p){
 // street approaches and settlement plots rather than arbitrary sine-wave lobes.
 // The old city wall forms one side; the new curtain forms a separate district.
 export function allowedSuburbJoinV191(a,b){
- if(!a.outerRingV184||!a.drawnWallV175||!b.drawnWallV175)return false;
+ if(!a.outerRingV184||!a.drawnWallV175)return false;
  if(!['palisade','stonewall','reinforced_wall'].includes(b.type))return false;
  const aAngle=a.wallAngleV175??0,bAngle=b.wallAngleV175??0;
  if(Math.abs(Math.cos(aAngle-bAngle))>.94)return false;
@@ -369,7 +369,11 @@ export function findOuterRingV184(game,city){
    const why=String(previewError).slice(0,65);
    diagnostic.rejectedReasons[why]=(diagnostic.rejectedReasons[why]||0)+1;
    if(diagnostic.firstFailures.length<6){
-    const s=segments[failedAt],nearest=walls.map(b=>({type:b.type,dist:Math.round(meters(b,s)*10)/10})).sort((a,b)=>a.dist-b.dist)[0];
+    const s=segments[failedAt],nearest=walls.map(b=>({type:b.type,dist:Math.round(meters(b,s)*10)/10,
+     drawn:!!b.drawnWallV175,span:b.palisadeSpanV167||7,
+     angle:b.wallAngleV175??(b.wallAxis?Math.PI/2:0),
+     sideAngle:s.wallAngleV175,
+     joined:allowedSuburbJoinV191(s,b)})).sort((a,b)=>a.dist-b.dist)[0];
     diagnostic.firstFailures.push({reason:why,segment:failedAt,x:Math.round(s.x),z:Math.round(s.z),nearest});
    }
    continue;
@@ -384,7 +388,7 @@ export function findOuterRingV184(game,city){
    naturalFailures:diagnostic.firstFailures,
    chosen:natural?.kind||'none'};
   return {
-   version:197,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   version:198,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
    historicSuburbV191:true,expandedSuburbV193:true,
    naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
      length:natural.naturalLengthV194,partial:!!natural.partialV195,
