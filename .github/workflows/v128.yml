@@ -62,9 +62,9 @@ jobs:
         run: node TEST_V182_ROAD_CONTINUITY.mjs
       - name: Outer-ring priority and bounded fallback (V188)
         run: node scripts/test-wall-priority-v188.mjs
-      - name: Organic suburb wall geometry (V189)
-        run: node scripts/test-organic-suburb-v189.mjs
       - name: New reference-preview suburbs (V190)
         run: node scripts/test-organic-demo-v190.mjs
+      - name: Historic gate-led quarter geometry (V191)
+        run: node scripts/test-historic-suburb-v191.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic

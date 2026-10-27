@@ -1,4 +1,4 @@
-import {findOuterRingV184} from './outer-ring-v184.js?v=189';
+import {findOuterRingV184} from './outer-ring-v184.js?v=191';
 import {planRoadGatesV177} from './road-gates-v177.js';
 import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
 import {canAfford} from './economy.js';

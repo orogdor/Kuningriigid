@@ -22,158 +22,168 @@ export function protectedHousingZoneV184(city,p){
  if(footprint.every(q=>inside(q,outer)))return 1;
  return 2;
 }
-// V189: an extension is a broad, irregular curtain, not a rectangle with
-// rounded corners. The control points make asymmetrical bends around a sizeable
-// suburb. Return the exact endpoints of the existing wall for watertight joins.
-export function organicSuburbCurveV189(a,b,nx,nz,height,variant=0){
- const chord=dist(a,b),tx=(b.x-a.x)/chord,tz=(b.z-a.z)/chord;
- const phase=Math.sin(a.x*.071+b.z*.053+variant*2.31);
- const shoulder=variant===1?.12:variant===2?-.09:0;
- const profile=[
-  [0,0],[.018,.20],[.078,.50],[.19+shoulder*.16,.78],
-  [.36+shoulder,.99+phase*.055],
-  [.55+shoulder*.7,1.09-phase*.06],
-  [.73+shoulder*.3,.91],
-  [.87,.67],[.966,.32],[1,0]
- ];
- return profile.map(([u,v],i)=>{
-  const irregular=i>2&&i<8?Math.sin((i+variant*3)*1.89+a.z*.015)*.045:0;
-  return {x:a.x+tx*chord*u+nx*height*(v+irregular),
-          z:a.z+tz*chord*u+nz*height*(v+irregular)};
- });
+// V191: historic gate-led suburban enclosure. Polygonal curtains follow real
+// street approaches and settlement plots rather than arbitrary sine-wave lobes.
+// The old city wall forms one side; the new curtain forms a separate district.
+const HOME_TYPES=new Set(['house','hall','market','well','warehouse','cellar','study','chapel','library','scriptorium','inn']);
+const BAD_TERRAIN=new Set(['water','mountain','river']);
+const meters=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
+const mix=(a,b,t)=>({x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t});
+const polyArea=poly=>Math.abs(poly.reduce((a,p,i)=>{const q=poly[(i+1)%poly.length];return a+p.x*q.z-q.x*p.z;},0))*.5;
+const terrainSafe=(game,city,p)=>!BAD_TERRAIN.has(game.defenseTerrainKindV176?.(city,p.x,p.z))&&
+ (game.defenseTerrainPassableV177?.(city,p.x,p.z)??true);
+function sampleLine(a,b,step=2){
+ const n=Math.max(1,Math.ceil(meters(a,b)/step));
+ return Array.from({length:n+1},(_,i)=>mix(a,b,i/n));
 }
-const polygonArea=points=>Math.abs(points.reduce((sum,p,i)=>{
- const next=points[(i+1)%points.length];
- return sum+p.x*next.z-next.x*p.z;
-},0))*.5;
-// Small, deterministic terrain-aware adjustments to the curved outline.
-// Never put a wall on water or a cliff just to make a symmetrical perimeter.
-function nudgeToDryTerrain(game,city,points,nx,nz){
- const land=(p)=>{
-  const kind=game.defenseTerrainKindV176?.(city,p.x,p.z);
-  return !['mountain','water','river'].includes(kind)&&
-   (game.defenseTerrainPassableV177?.(city,p.x,p.z)??true);
- };
- return points.map((p,i)=>{
-  if(i===0||i===points.length-1||land(p))return p;
-  for(const offset of [-3,-6,-10,-14,3,6]){
-   const q={x:p.x+nx*offset,z:p.z+nz*offset};
-   if(land(q))return q;
-  }
-  return p;
- });
+function sitesInside(poly,inner,buildings,game,city){
+ // Cheap proxy for buildable lots. A suburb is valuable only if future homes
+ // fit between roads, water, the original walls and the new curtain.
+ const xs=poly.map(p=>p.x),zs=poly.map(p=>p.z);
+ const x0=Math.min(...xs)+9,x1=Math.max(...xs)-9,z0=Math.min(...zs)+9,z1=Math.max(...zs)-9;
+ let plots=0;
+ for(let x=x0;x<=x1&&plots<25;x+=15)for(let z=z0;z<=z1&&plots<25;z+=15){
+  const p={x,z};
+  if(!inside(p,poly)||inside(p,inner))continue;
+  if(![-5,5].every(dx=>[-5,5].every(dz=>terrainSafe(game,city,{x:x+dx,z:z+dz}))))continue;
+  if(buildings.some(b=>b.hp>0&&meters(b,p)<12))continue;
+  plots++;
+ }
+ return plots;
 }
-// Pick one uninterrupted, already built portion of the inner curtain as the
-// shared boundary. Candidate extensions are physically previewed and paid for
-// by the standard game builder. No free walls or terrain alterations.
+function historicCurtainV191(a,b,nx,nz,depth,variant=0){
+ // Five recognisable courses and three deliberate corners: angled shoulders,
+ // a long city-facing front, and two returns. No smooth oval or scallops.
+ const chord=meters(a,b),tx=(b.x-a.x)/chord,tz=(b.z-a.z)/chord;
+ const offsets=variant===0?[.03,.14,.50,.88,.99]:
+  variant===1?[.04,.18,.55,.91,.99]:
+  [.03,.10,.44,.84,.99];
+ const heights=variant===0?[.18,.78,1,.75,.16]:
+  variant===1?[.16,.85,.96,.71,.15]:
+  [.15,.69,.98,.86,.20];
+ return [a,...offsets.map((u,i)=>({
+  x:a.x+tx*chord*u+nx*depth*heights[i],
+  z:a.z+tz*chord*u+nz*depth*heights[i]
+ })),b];
+}
+function roadFocusOnArc(arc,gates){
+ return gates.filter(g=>arc.some(p=>meters(p,g)<11));
+}
+function wallAlreadyThere(walls,p){
+ return walls.some(b=>['palisade','stonewall','reinforced_wall'].includes(b.type)?
+  wallPointInsideV175(p,b,1.8):meters(p,b)<6);
+}
 export function findOuterRingV184(game,city){
- const outline=city.stoneDefensePlanV166?.outlineV176||city.defensePlanV139?.outlineV176;
- if(!outline||outline.length<8)return null;
+ const inner=city.stoneDefensePlanV166?.outlineV176||city.defensePlanV139?.outlineV176;
+ if(!inner||inner.length<8)return null;
  const walls=game.defenseBuildingsV177(city).filter(b=>b.hp>0&&b.ready&&fort.has(b.type));
- const n=outline.length,center=outline.reduce((acc,p)=>({x:acc.x+p.x/n,z:acc.z+p.z/n}),{x:0,z:0});
- const covered=p=>walls.some(b=>['palisade','stonewall','reinforced_wall'].includes(b.type)?wallPointInsideV175(p,b,1.8):dist(p,b)<6);
- const terrain=(x,z)=>game.defenseTerrainKindV176?.(city,x,z);
- const permitted=(x,z)=>game.defenseTerrainPassableV177?.(city,x,z)??true;
+ const gates=walls.filter(b=>['woodgate','gatehouse'].includes(b.type));
+ const contexts=typeof game.contexts==='function'?game.contexts(city):[];
+ const buildings=contexts.flatMap(ctx=>(ctx.economy?.buildings||[])
+  .filter(b=>b.hp>0&&!b.virtual&&HOME_TYPES.has(b.type)).map(b=>({
+   ...b,x:b.x+((ctx.c??city.c??0)-(city.c??0))*225,
+   z:b.z+((ctx.r??city.r??0)-(city.r??0))*195
+  })));
+ const n=inner.length,center=inner.reduce((s,p)=>({x:s.x+p.x/n,z:s.z+p.z/n}),{x:0,z:0});
  const candidates=[];
- for(let len=Math.floor(n/2);len>=4;len--)for(let start=0;start<n;start++){
-  const arc=Array.from({length:len+1},(_,i)=>outline[(start+i)%n]);
-  let shared=0;for(let i=1;i<arc.length;i++)shared+=dist(arc[i-1],arc[i]);
-  const a=arc[0],b=arc.at(-1),chord=dist(a,b);
-  if(shared<32||shared>140||chord<shared*.72||arc.some(p=>!covered(p)))continue;
-  let gap=false;
-  for(let i=1;i<arc.length&&!gap;i++){
-   const p=arc[i-1],q=arc[i],steps=Math.max(1,Math.ceil(dist(p,q)/2));
-   for(let k=0;k<=steps;k++){
-    const t=k/steps;
-    if(!covered({x:p.x+(q.x-p.x)*t,z:p.z+(q.z-p.z)*t})){gap=true;break;}
+ for(let count=Math.max(5,Math.floor(n*.39));count>=Math.max(4,Math.floor(n*.24));count--)for(let i=0;i<n;i++){
+  const arc=Array.from({length:count+1},(_,j)=>inner[(i+j)%n]);
+  let shared=0;
+  for(let j=1;j<arc.length;j++)shared+=meters(arc[j-1],arc[j]);
+  const a=arc[0],b=arc.at(-1),chord=meters(a,b);
+  if(shared<30||shared>140||chord<shared*.70||!arc.every(p=>wallAlreadyThere(walls,p)))continue;
+  // The entire borrowed edge needs real standing walls, not merely vertices.
+  if(arc.slice(1).some((p,j)=>sampleLine(arc[j],p,2).some(q=>!wallAlreadyThere(walls,q))))continue;
+  const tx=(b.x-a.x)/chord,tz=(b.z-a.z)/chord;
+  const middle=mix(a,b,.5);
+  let nx=-tz,nz=tx;
+  if((middle.x-center.x)*nx+(middle.z-center.z)*nz<0){nx=-nx;nz=-nz;}
+  const oldGates=roadFocusOnArc(arc,gates);
+  const outwardHomes=buildings.filter(h=>!inside(h,inner)&&
+   (h.x-middle.x)*nx+(h.z-middle.z)*nz>6&&
+   Math.abs((h.x-middle.x)*tx+(h.z-middle.z)*tz)<chord*.72);
+  const homeDepth=outwardHomes.reduce((max,h)=>Math.max(max,(h.x-middle.x)*nx+(h.z-middle.z)*nz),0);
+  // Historical growth is incremental. The first suburb protects an actual
+  // quarter, rather than creating a giant empty enclosure at once.
+  for(const depth of [...new Set([Math.min(58,Math.max(29,homeDepth+17)),35,44,53])]){
+   if(depth>65||depth<26)continue;
+   for(let variant=0;variant<3;variant++){
+    const points=historicCurtainV191(a,b,nx,nz,depth,variant);
+    const poly=[...arc,...points.slice(1,-1).reverse()];
+    const area=polyArea(poly);
+    if(area<750||area>6200)continue;
+    const occupiedHomes=outwardHomes.filter(h=>inside(h,poly)).length;
+    // Reject candidate that puts existing homes inside its curtain material.
+    if(buildings.some(h=>points.slice(1).some((p,j)=>meters(p,h)<6)))continue;
+    const plots=sitesInside(poly,inner,buildings,game,city);
+    if(plots<3&&occupiedHomes<2)continue;
+    const length=points.slice(1).reduce((sum,p,j)=>sum+meters(points[j],p),0);
+    const front=points[3],outer={x:front.x+nx*7,z:front.z+nz*7};
+    const natural=BAD_TERRAIN.has(game.defenseTerrainKindV176?.(city,outer.x,outer.z))?1:0;
+    // A road approach/gate matters more than empty area. The expansion must
+    // be economical: reward 4-10 future house plots, penalise wasteful walls.
+    const value=occupiedHomes*15+Math.min(10,plots)*3+
+     Math.min(2,oldGates.length)*23+natural*9+
+     Math.min(2400,area)/900-length*.36-Math.max(0,plots-12)*2;
+    candidates.push({arc,points,area,shared,oldGates,plots,occupiedHomes,rank:value});
    }
-  }
-  if(gap)continue;
-  const dx=(b.x-a.x)/chord,dz=(b.z-a.z)/chord,mid={x:(a.x+b.x)/2,z:(a.z+b.z)/2};
-  let nx=-dz,nz=dx;
-  if((mid.x-center.x)*nx+(mid.z-center.z)*nz<0){nx=-nx;nz=-nz;}
-  for(const factor of [1.28,1.05,.83,.65,.50])for(const variant of [0,1,2]){
-   const h=shared*factor;
-   const rearA={x:a.x+nx*h,z:a.z+nz*h},rearB={x:b.x+nx*h,z:b.z+nz*h};
-   const rearMid={x:mid.x+nx*h,z:mid.z+nz*h};
-   const naturalKind=terrain(rearMid.x,rearMid.z);
-   const naturalCandidate=['mountain','water'].includes(naturalKind)&&
-    [rearA,rearMid,rearB].every(p=>terrain(p.x,p.z)===naturalKind);
-   // Existing cliff/shore construction can use a continuous natural rear
-   // boundary and needs walls only on the two sides.
-   const points=naturalCandidate?
-    [a,rearA,rearB,b]:
-    nudgeToDryTerrain(game,city,organicSuburbCurveV189(a,b,nx,nz,h,variant),nx,nz);
-   const boundary=[...arc,...points.slice(1).reverse()];
-   const area=polygonArea(boundary);
-   if(area<320)continue;
-   // Prefer actual inhabitable land over a mathematically large flooded area.
-   let usable=0,total=0;
-   for(const u of [.25,.5,.75])for(const v of [.35,.67]){
-    const x=a.x+dx*chord*u+nx*h*v,z=a.z+dz*chord*u+nz*h*v;
-    total++;if(!['water','mountain','river'].includes(terrain(x,z))&&permitted(x,z))usable++;
-   }
-   if(usable<4)continue;
-   let estimated=0;
-   for(let k=1;k<points.length;k++)estimated+=dist(points[k-1],points[k]);
-   const effectiveLength=naturalCandidate?2*h:estimated;
-   const rank=area/(effectiveLength+20)+area/1450+
-    (naturalCandidate?19:0)+usable/total*5;
-   candidates.push({arc,shared,points,area,rank,naturalCandidate});
   }
  }
  candidates.sort((a,b)=>b.rank-a.rank);
  let checked=0;
- for(const c of candidates){
-  if(++checked>2200)break;
-  const {arc,shared,points,area}=c,parts=[];
-  const naturalKind=terrain((points[1].x+points[2].x)/2,(points[1].z+points[2].z)/2);
-  // The natural boundary is real only if the complete rear corridor has
-  // continuous impassable terrain, including one metre either side.
-  let natural=c.naturalCandidate&&['mountain','water'].includes(naturalKind);
-  const rear=dist(points[1],points[2]);
-  const steps=Math.max(1,Math.ceil(rear/.5));
-  const vx=(points[2].x-points[1].x)/rear,vz=(points[2].z-points[1].z)/rear;
-  for(let i=0;natural&&i<=steps;i++)for(const off of [-1,0,1]){
-   const t=i/steps,p={x:points[1].x+(points[2].x-points[1].x)*t-vz*off,
-    z:points[1].z+(points[2].z-points[1].z)*t+vx*off};
-   if(terrain(p.x,p.z)!==naturalKind){natural=false;break;}
+ for(const candidate of candidates){
+  if(++checked>900)break;
+  const {arc,points,shared,area,plots,oldGates}=candidate;
+  const segments=[];let invalid=false;
+  // Individual straight spans retain the kinks of historical polygonal walls.
+  // Calling the generic "straight" mode on the whole polyline would collapse
+  // every intermediate point and silently rebuild the old rectangular wall!
+  for(let edge=1;edge<points.length;edge++){
+   const start=points[edge-1],end=points[edge];
+   if(sampleLine(start,end,1.5).some(p=>!terrainSafe(game,city,p))){invalid=true;break;}
+   const stroke=wallStrokePlanV175([start,end],'straight',100);
+   if(stroke.error){invalid=true;break;}
+   for(const slot of stroke.segments)segments.push({...slot,type:'palisade',
+    plannedDefense:true,outerRingV184:true});
   }
-  let bad=false,curvedBoundary=null;
-  // Natural cliffs/sea close the rear; all other sites use the complete
-  // winding hand-drawn curtain, never the old 3-segment rectangle.
-  for(const j of natural?[0,2]:[0]){
-   const line=natural?
-    wallStrokePlanV175([points[j],points[j+1]],'straight',100,(x,z)=>terrain(x,z)!==naturalKind):
-    wallStrokePlanV175(points,'curved',100);
-   if(!natural)curvedBoundary=line.curve;
-   if(line.error){bad=true;break;}
-   if(natural&&naturalKind==='mountain'){
-    const end=j===0?line.segments.at(-1):line.segments[0];
-    end[j===0?'cliffEmbedEndV179':'cliffEmbedStartV179']=5;
-   }
-   for(const segment of line.segments){
-    const slot={...segment,type:'palisade',plannedDefense:true,outerRingV184:true};
-    if(!permitted(slot.x,slot.z)){bad=true;break;}
-    parts.push(slot);
-   }
-   if(bad)break;
-  }
-  if(!bad&&parts.some(slot=>game.previewDefenseV177(city,slot).error))bad=true;
-  if(bad||!parts.length)continue;
-  const added=parts.reduce((sum,p)=>sum+dist(p.from,p.to),0);
-  const share=shared/(shared+added);
+  if(invalid||segments.length<10||segments.length>35)continue;
+  const length=segments.reduce((sum,p)=>sum+meters(p.from,p.to),0);
+  const share=shared/(shared+length);
   if(share<.16||share>.75)continue;
-  const boundary=[...arc,...(curvedBoundary||points).slice(1).reverse()];
-  // Never claim more buildable suburb than the actual resulting outline.
-  const finalArea=polygonArea(boundary);
-  if(finalArea<320)continue;
-  return {version:189,sharedLength:shared,newLength:added,sharedFraction:share,
-   sharedArc:arc.map(({x,z})=>({x,z})),boundaryV186:boundary,
-   areaEstimateV186:finalArea,organicOutlineV189:!natural,
-   cliffBoundaryV186:natural&&naturalKind==='mountain',
-   waterBoundaryV187:natural&&naturalKind==='water',
-   slots:parts,nextIndex:0};
+  const gate=oldGates[0]||gates.sort((a,b)=>meters(a,points[3])-meters(b,points[3]))[0];
+  // Follow the approach of an existing town gate across the new quarter.
+  // The gateway replaces a single seven-metre section, never an extra wall.
+  if(gate&&segments.length>=12){
+   const forward={x:points[3].x-arc[Math.floor(arc.length/2)].x,
+    z:points[3].z-arc[Math.floor(arc.length/2)].z};
+   const fLen=Math.max(1,Math.hypot(forward.x,forward.z));
+   const nx=forward.x/fLen,nz=forward.z/fLen;
+   let target=null,best=Infinity;
+   for(let j=3;j<segments.length-3;j++){
+    const p=segments[j],d=meters(p,gate);
+    const toward=(p.x-gate.x)*nx+(p.z-gate.z)*nz;
+    const projection=Math.abs((p.x-gate.x)*nz-(p.z-gate.z)*nx);
+    const score=projection+d*.08;
+    if(toward>15&&score<best){target=j;best=score;}
+   }
+   if(target!=null&&best<20){
+    const g={...segments[target],type:'woodgate'};
+    if(!game.previewDefenseV177(city,g).error)segments[target]=g;
+   }
+  }
+  // All wall sections and the actual gate must fit. Do not accept a scenic
+  // diagram that cannot be built on the physical city map.
+  if(segments.some(s=>game.previewDefenseV177(city,s).error))continue;
+  const boundary=[...arc,...points.slice(1,-1).reverse()];
+  return {
+   version:191,shape:'historic-gate-suburb',historicSuburbV191:true,
+   oldGateCountV191:oldGates.length,plannedHousePlotsV191:plots,
+   sharedLength:shared,newLength:length,sharedFraction:share,
+   sharedArc:arc.map(p=>({x:p.x,z:p.z})),boundaryV186:boundary,
+   areaEstimateV186:polyArea(boundary),organicOutlineV189:true,
+   cliffBoundaryV186:false,waterBoundaryV187:false,
+   slots:segments,nextIndex:0
+  };
  }
  return null;
 }
