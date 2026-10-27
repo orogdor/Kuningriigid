@@ -193,6 +193,27 @@ export function partialNaturalBoundariesV195(game,city,a,b,nx,nz,target='mountai
  return runs.sort((a,b)=>b.naturalLengthV194-a.naturalLengthV194).slice(0,5);
 }
 
+
+// Historic survey vertices can be ~2m outside the ACTUAL built timber mesh.
+// A wall starting at that mathematical vertex looks connected but is rejected
+// by spacing/navigation. Anchor returns to the real wall course instead.
+export function historicWallContactV199(point,walls,gates=[]){
+ let best=null,bestD=Infinity;
+ for(const b of walls){
+  if(!['palisade','stonewall','reinforced_wall'].includes(b.type)||b.hp<=0||!b.ready)continue;
+  const angle=b.wallAngleV175??(b.wallAxis?Math.PI/2:0),
+   tx=Math.cos(angle),tz=-Math.sin(angle),half=(b.palisadeSpanV167||7)/2;
+  const dx=point.x-b.x,dz=point.z-b.z;
+  const along=Math.max(-half+.3,Math.min(half-.3,dx*tx+dz*tz));
+  const p={x:b.x+along*tx,z:b.z+along*tz};
+  const distance=meters(point,p);
+  if(distance>4.5||distance>=bestD)continue;
+  if(gates.some(g=>meters(g,p)<5.3))continue;
+  best=p;bestD=distance;
+ }
+ return best||point;
+}
+
 function roadFocusOnArc(arc,gates){
  return gates.filter(g=>arc.some(p=>meters(p,g)<11));
 }
@@ -296,12 +317,17 @@ export function findOuterRingV184(game,city){
  for(const candidate of candidates){
   if(++checked>3500)break;
   const {arc,points,shared,area,plots,oldGates,natural}=candidate;
+  const physicalArc=natural?arc.map(p=>({...p})):arc;
+  if(natural){
+   physicalArc[0]=historicWallContactV199(arc[0],walls,gates);
+   physicalArc[physicalArc.length-1]=historicWallContactV199(arc.at(-1),walls,gates);
+  }
   const segments=[];let invalid=false;
   if(natural){
    // Both returns are paid-for walls. The back side is kept as a surveyed
    // sequence of real impassable water/cliff cells, never as a free wall.
-   for(const [start,end] of [[arc[0],natural.coast[0]],
-      [arc.at(-1),natural.coast.at(-1)]]){
+   for(const [start,end] of [[physicalArc[0],natural.coast[0]],
+      [physicalArc.at(-1),natural.coast.at(-1)]]){
     if(meters(start,end)<2.8)continue; // cliff already joins the old wall
     const boundary={x:end.x+(end.x-start.x)/Math.max(1,meters(start,end))*1.4,
      z:end.z+(end.z-start.z)/Math.max(1,meters(start,end))*1.4};
@@ -378,7 +404,7 @@ export function findOuterRingV184(game,city){
    }
    continue;
   }
-  const boundary=natural?[...arc,...natural.coast.slice().reverse()]:
+  const boundary=natural?[...physicalArc,...natural.coast.slice().reverse()]:
     [...arc,...points.slice(1,-1).reverse()];
   city.naturalSurveyDiagnosticV195={partialFound:diagnostic.partialFound||0,
    naturalPreviewReject:diagnostic.naturalPreviewReject||0,
@@ -388,14 +414,14 @@ export function findOuterRingV184(game,city){
    naturalFailures:diagnostic.firstFailures,
    chosen:natural?.kind||'none'};
   return {
-   version:198,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   version:199,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
    historicSuburbV191:true,expandedSuburbV193:true,
    naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
      length:natural.naturalLengthV194,partial:!!natural.partialV195,
      verified:true}:null,
    oldGateCountV191:oldGates.length,plannedHousePlotsV191:plots,
    sharedLength:shared,newLength:length,sharedFraction:share,
-   sharedArc:arc.map(p=>({x:p.x,z:p.z})),boundaryV186:boundary,
+   sharedArc:physicalArc.map(p=>({x:p.x,z:p.z})),boundaryV186:boundary,
    areaEstimateV186:polyArea(boundary),organicOutlineV189:true,
    cliffBoundaryV186:natural?.kind==='mountain',
    waterBoundaryV187:natural?.kind==='water',
