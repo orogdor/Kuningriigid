@@ -34,8 +34,16 @@ export function allowedSuburbJoinV191(a,b){
   const angle=w.wallAngleV175??(w.wallAxis?Math.PI/2:0),half=(w.palisadeSpanV167||7)/2;
   return [-1,1].map(sign=>({x:w.x+Math.cos(angle)*half*sign,z:w.z-Math.sin(angle)*half*sign}));
  };
- const d=Math.min(...endpoints(a).flatMap(p=>endpoints(b).map(q=>Math.hypot(p.x-q.x,p.z-q.z))));
- return d<2.6&&Math.hypot(a.x-b.x,a.z-b.z)>3.0;
+ // Both an L-join at a historic wall end and a T-join to the middle of
+ // an uninterrupted curtain are real, closed defensive connections.
+ // The generic 6 m house-spacing rule cannot distinguish these joints.
+ const bx=Math.cos(bAngle),bz=-Math.sin(bAngle),half=(b.palisadeSpanV167||7)/2;
+ const attached=endpoints(a).some(p=>{
+  const dx=p.x-b.x,dz=p.z-b.z;
+  const along=dx*bx+dz*bz,across=Math.abs(-dx*bz+dz*bx);
+  return Math.abs(along)<=half+1.1&&across<=1.05;
+ });
+ return attached&&Math.hypot(a.x-b.x,a.z-b.z)>2.5;
 }
 const HOME_TYPES=new Set(['house','hall','market','well','warehouse','cellar','study','chapel','library','scriptorium','inn']);
 const BAD_TERRAIN=new Set(['water','mountain','river']);
