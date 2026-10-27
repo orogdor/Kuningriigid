@@ -47,7 +47,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  const r=city.economy.realms[team],stock=r.resources,age=game.s.ages[team],science=game.s.research[team];
  const buildings=game.allBuildings(city);
  // Do not bankrupt a city by stacking construction orders with zero usable builders.
- const waiting=buildings.filter(b=>!b.ready&&b.hp>0&&!b.disabled);
+ const waiting=buildings.filter(b=>!b.ready&&b.hp>0&&!b.disabled&&!DEFENSE_TYPES.has(b.type));
  if(waiting.length>=3)return null; // V139: complete work already in progress before funding another project
  const gaps=science.ageWait?ageDeficit(game.s,team,science.ageWait.id):{};
  const missing=Object.keys(gaps).length>0;
@@ -82,6 +82,8 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
   possibilities.push({type,priority,reason});
  };
  for(const [i,type] of foundationNeeds(game,city).entries())add(type,220-i,'Linna põhiehitis');
+ // A coast is a useful complementary food source even without a food emergency.
+ if(r.pop>=5 && (stock.wood||0)>=35)add('fisher',250,'Ranniku kalapüük mitmekesistab toitu');
  for(const resource of city.resourceSpecialization||[])add(RESOURCE_BUILDINGS[resource],139,'Puuduva riigiressursi tootmine');
  // War production is an economic workstream, not a last-priority luxury.
  // The first barracks must be built before training can ever occur.
@@ -205,6 +207,7 @@ export function usefulDistrictTypes(game,team,localCity=null){
  if(totals.stone<28)deficits.add('quarry');
  if(totals.bread<population*3){deficits.add('hunter');deficits.add('fisher');deficits.add('farm')}
  if(totals.water<population*2)deficits.add('well');
+ if(localCity&&population>=5&&(localCity.economy.realms[team].resources.wood||0)>=35&&!game.allBuildings(localCity).some(b=>b.type==='fisher'&&b.hp>0&&!b.disabled))deficits.add('fisher');
  if(game.s.ages[team]>=1&&totals.bronze<16){if(totals.copper<20)deficits.add('coppermine');if(totals.tin<16)deficits.add('tinmine');}
  if(game.s.ages[team]>=2&&totals.ore<15)deficits.add('mine');
  if(game.s.ages[team]>=6&&totals.oil<20)deficits.add('oilwell');
