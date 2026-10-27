@@ -93,7 +93,7 @@ import {buildDetailWorldObjects} from './detail-world-objects.js?v=123a';
 import {createVillageLife} from './village-life-v76.js?v=76a';
 import * as T from './vendor/three.module.js';
 import {DETAIL_X,DETAIL_Z,DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z,tileDelta} from './detail-scale-v123.js';
-import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=191';
+import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESOURCE_NAMES,tileKey,FACTION_NAMES} from './civilization-core.js?v=192';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js?v=117a';
 import {detailHeight,featureNames} from './world-details.js?v=123a';
 import {createAgeBuilding,animateBuilding} from './buildings.js?v=1757a';

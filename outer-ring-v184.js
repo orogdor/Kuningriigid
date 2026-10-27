@@ -25,6 +25,18 @@ export function protectedHousingZoneV184(city,p){
 // V191: historic gate-led suburban enclosure. Polygonal curtains follow real
 // street approaches and settlement plots rather than arbitrary sine-wave lobes.
 // The old city wall forms one side; the new curtain forms a separate district.
+export function allowedSuburbJoinV191(a,b){
+ if(!a.outerRingV184||!a.drawnWallV175||!b.drawnWallV175)return false;
+ if(!['palisade','stonewall','reinforced_wall'].includes(b.type))return false;
+ const aAngle=a.wallAngleV175??0,bAngle=b.wallAngleV175??0;
+ if(Math.abs(Math.cos(aAngle-bAngle))>.94)return false;
+ const endpoints=w=>{
+  const angle=w.wallAngleV175??(w.wallAxis?Math.PI/2:0),half=(w.palisadeSpanV167||7)/2;
+  return [-1,1].map(sign=>({x:w.x+Math.cos(angle)*half*sign,z:w.z-Math.sin(angle)*half*sign}));
+ };
+ const d=Math.min(...endpoints(a).flatMap(p=>endpoints(b).map(q=>Math.hypot(p.x-q.x,p.z-q.z))));
+ return d<2.6&&Math.hypot(a.x-b.x,a.z-b.z)>3.0;
+}
 const HOME_TYPES=new Set(['house','hall','market','well','warehouse','cellar','study','chapel','library','scriptorium','inn']);
 const BAD_TERRAIN=new Set(['water','mountain','river']);
 const meters=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
@@ -91,7 +103,7 @@ export function findOuterRingV184(game,city){
   })));
  const n=inner.length,center=inner.reduce((s,p)=>({x:s.x+p.x/n,z:s.z+p.z/n}),{x:0,z:0});
  const candidates=[],diagnostic={arcs:0,arcWallGaps:0,sites:0,houseCorridor:0,
-  raw:0,terrain:0,segments:0,preview:0,rejectedReasons:{}};
+  raw:0,terrain:0,segments:0,preview:0,rejectedReasons:{},firstFailures:[]};
  for(let count=Math.max(5,Math.floor(n*.39));count>=Math.max(4,Math.floor(n*.24));count--)for(let i=0;i<n;i++){
   const arc=Array.from({length:count+1},(_,j)=>inner[(i+j)%n]);
   let shared=0;
@@ -187,8 +199,21 @@ export function findOuterRingV184(game,city){
   }
   // All wall sections and the actual gate must fit. Do not accept a scenic
   // diagram that cannot be built on the physical city map.
-  const previewError=segments.map(s=>game.previewDefenseV177(city,s).error).find(Boolean);
-  if(previewError){diagnostic.preview++;const why=String(previewError).slice(0,65);diagnostic.rejectedReasons[why]=(diagnostic.rejectedReasons[why]||0)+1;continue;}
+  let previewError=null,failedAt=-1;
+  for(let j=0;j<segments.length;j++){
+   const err=game.previewDefenseV177(city,segments[j]).error;
+   if(err){previewError=err;failedAt=j;break;}
+  }
+  if(previewError){
+   diagnostic.preview++;
+   const why=String(previewError).slice(0,65);
+   diagnostic.rejectedReasons[why]=(diagnostic.rejectedReasons[why]||0)+1;
+   if(diagnostic.firstFailures.length<6){
+    const s=segments[failedAt],nearest=walls.map(b=>({type:b.type,dist:Math.round(meters(b,s)*10)/10})).sort((a,b)=>a.dist-b.dist)[0];
+    diagnostic.firstFailures.push({reason:why,segment:failedAt,x:Math.round(s.x),z:Math.round(s.z),nearest});
+   }
+   continue;
+  }
   const boundary=[...arc,...points.slice(1,-1).reverse()];
   return {
    version:191,shape:'historic-gate-suburb',historicSuburbV191:true,
