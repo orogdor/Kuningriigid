@@ -28,6 +28,11 @@ export function protectedHousingZoneV184(city,p){
 const HOME_TYPES=new Set(['house','hall','market','well','warehouse','cellar','study','chapel','library','scriptorium','inn']);
 const BAD_TERRAIN=new Set(['water','mountain','river']);
 const meters=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
+function distanceToCourse(p,a,b){
+ const dx=b.x-a.x,dz=b.z-a.z,span=dx*dx+dz*dz;
+ const u=span?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.z-a.z)*dz)/span)):0;
+ return meters(p,{x:a.x+u*dx,z:a.z+u*dz});
+}
 const mix=(a,b,t)=>({x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t});
 const polyArea=poly=>Math.abs(poly.reduce((a,p,i)=>{const q=poly[(i+1)%poly.length];return a+p.x*q.z-q.x*p.z;},0))*.5;
 const terrainSafe=(game,city,p)=>!BAD_TERRAIN.has(game.defenseTerrainKindV176?.(city,p.x,p.z))&&
@@ -100,15 +105,15 @@ export function findOuterRingV184(game,city){
   const middle=mix(a,b,.5);
   let nx=-tz,nz=tx;
   if((middle.x-center.x)*nx+(middle.z-center.z)*nz<0){nx=-nx;nz=-nz;}
-  const oldGates=roadFocusOnArc(arc,gates);
+  const oldGates=roadFocusOnArc(arc,gates).filter(g=>meters(g,a)>14&&meters(g,b)>14);
   const outwardHomes=buildings.filter(h=>!inside(h,inner)&&
    (h.x-middle.x)*nx+(h.z-middle.z)*nz>6&&
    Math.abs((h.x-middle.x)*tx+(h.z-middle.z)*tz)<chord*.72);
   const homeDepth=outwardHomes.reduce((max,h)=>Math.max(max,(h.x-middle.x)*nx+(h.z-middle.z)*nz),0);
   // Historical growth is incremental. The first suburb protects an actual
   // quarter, rather than creating a giant empty enclosure at once.
-  for(const depth of [...new Set([Math.min(58,Math.max(29,homeDepth+17)),35,44,53])]){
-   if(depth>65||depth<26)continue;
+  for(const depth of [...new Set([Math.min(72,Math.max(28,homeDepth+17)),30,36,43,50,57,66,72])]){
+   if(depth>75||depth<26)continue;
    for(let variant=0;variant<3;variant++){
     const points=historicCurtainV191(a,b,nx,nz,depth,variant);
     const poly=[...arc,...points.slice(1,-1).reverse()];
@@ -117,6 +122,13 @@ export function findOuterRingV184(game,city){
     const occupiedHomes=outwardHomes.filter(h=>inside(h,poly)).length;
     // Reject candidate that puts existing homes inside its curtain material.
     if(buildings.some(h=>points.slice(1).some(p=>meters(p,h)<6))){diagnostic.houseCorridor++;continue;}
+    // Screen full wall courses, not just vertices. House/building footprints
+    // blocked over 80% of the original V191 preview attempts.
+    const occupied=buildings.some(h=>points.slice(1).some((p,j)=>
+     distanceToCourse(h,points[j],p)<8.2));
+    const blockedGate=gates.some(g=>points.slice(1).some((p,j)=>
+     distanceToCourse(g,points[j],p)<6.3));
+    if(occupied||blockedGate){diagnostic.houseCorridor++;continue;}
     const plots=sitesInside(poly,inner,buildings,game,city);
     if(plots<3&&occupiedHomes<2){diagnostic.sites++;continue;}
     const length=points.slice(1).reduce((sum,p,j)=>sum+meters(points[j],p),0);
@@ -134,7 +146,7 @@ export function findOuterRingV184(game,city){
  candidates.sort((a,b)=>b.rank-a.rank);
  let checked=0;
  for(const candidate of candidates){
-  if(++checked>900)break;
+  if(++checked>2400)break;
   const {arc,points,shared,area,plots,oldGates}=candidate;
   const segments=[];let invalid=false;
   // Individual straight spans retain the kinks of historical polygonal walls.
