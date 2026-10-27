@@ -33,7 +33,19 @@ export async function loadOrganicWallV190(demo,fetcher=fetch){
   for(const ctx of game.contexts(city))for(const b of ctx.economy.buildings)if(b.outerRingV184&&b.hp>0)b.ready=true;
   if(city.outerRingDiagnosticV184?.reason==='complete')break;
  }
- if(city.outerRingDiagnosticV184?.reason!=='complete')throw Error('Eeslinna müür ei valminud: '+JSON.stringify({outer:city.outerRingDiagnosticV184,survey:city.historicSurveyDiagnosticV191}));
+ if(city.outerRingDiagnosticV184?.reason!=='complete'){
+  const plan=city.outerRingV184,idx=city.outerRingDiagnosticV184?.index;
+  const slot=plan?.slots?.[idx];
+  const gates=game.defenseBuildingsV177(city).filter(b=>['woodgate','gatehouse'].includes(b.type)&&b.hp>0)
+   .map(b=>({x:Math.round(b.x),z:Math.round(b.z),type:b.type,
+    distance:slot?Math.round(Math.hypot(b.x-slot.x,b.z-slot.z)*10)/10:null}))
+   .sort((a,b)=>a.distance-b.distance).slice(0,6);
+  throw Error('Eeslinna müür ei valminud: '+JSON.stringify({
+   outer:city.outerRingDiagnosticV184,slot,
+   planType:plan?.naturalBoundaryV194,types:plan?.slots?.reduce((s,x)=>(s[x.type]=(s[x.type]||0)+1,s),{}),
+   gates,survey:city.historicSurveyDiagnosticV191
+  }));
+ }
  realm.resources=originalResources;realm.pop=originalPop;
  game.s.demo=demo;
  game.s.wallTestV190={kind,targetCityId:city.id,controlled:true,
