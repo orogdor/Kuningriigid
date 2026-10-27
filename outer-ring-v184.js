@@ -85,15 +85,17 @@ export function findOuterRingV184(game,city){
    z:b.z+((ctx.r??city.r??0)-(city.r??0))*195
   })));
  const n=inner.length,center=inner.reduce((s,p)=>({x:s.x+p.x/n,z:s.z+p.z/n}),{x:0,z:0});
- const candidates=[];
+ const candidates=[],diagnostic={arcs:0,arcWallGaps:0,sites:0,houseCorridor:0,
+  raw:0,terrain:0,segments:0,preview:0,rejectedReasons:{}};
  for(let count=Math.max(5,Math.floor(n*.39));count>=Math.max(4,Math.floor(n*.24));count--)for(let i=0;i<n;i++){
   const arc=Array.from({length:count+1},(_,j)=>inner[(i+j)%n]);
   let shared=0;
   for(let j=1;j<arc.length;j++)shared+=meters(arc[j-1],arc[j]);
   const a=arc[0],b=arc.at(-1),chord=meters(a,b);
-  if(shared<30||shared>140||chord<shared*.70||!arc.every(p=>wallAlreadyThere(walls,p)))continue;
+  diagnostic.arcs++;
+  if(shared<30||shared>140||chord<shared*.70||!arc.every(p=>wallAlreadyThere(walls,p))){diagnostic.arcWallGaps++;continue;}
   // The entire borrowed edge needs real standing walls, not merely vertices.
-  if(arc.slice(1).some((p,j)=>sampleLine(arc[j],p,2).some(q=>!wallAlreadyThere(walls,q))))continue;
+  if(arc.slice(1).some((p,j)=>sampleLine(arc[j],p,2).some(q=>!wallAlreadyThere(walls,q)))){diagnostic.arcWallGaps++;continue;}
   const tx=(b.x-a.x)/chord,tz=(b.z-a.z)/chord;
   const middle=mix(a,b,.5);
   let nx=-tz,nz=tx;
@@ -114,9 +116,9 @@ export function findOuterRingV184(game,city){
     if(area<750||area>6200)continue;
     const occupiedHomes=outwardHomes.filter(h=>inside(h,poly)).length;
     // Reject candidate that puts existing homes inside its curtain material.
-    if(buildings.some(h=>points.slice(1).some((p,j)=>meters(p,h)<6)))continue;
+    if(buildings.some(h=>points.slice(1).some(p=>meters(p,h)<6))){diagnostic.houseCorridor++;continue;}
     const plots=sitesInside(poly,inner,buildings,game,city);
-    if(plots<3&&occupiedHomes<2)continue;
+    if(plots<3&&occupiedHomes<2){diagnostic.sites++;continue;}
     const length=points.slice(1).reduce((sum,p,j)=>sum+meters(points[j],p),0);
     const front=points[3],outer={x:front.x+nx*7,z:front.z+nz*7};
     const natural=BAD_TERRAIN.has(game.defenseTerrainKindV176?.(city,outer.x,outer.z))?1:0;
@@ -125,7 +127,7 @@ export function findOuterRingV184(game,city){
     const value=occupiedHomes*15+Math.min(10,plots)*3+
      Math.min(2,oldGates.length)*23+natural*9+
      Math.min(2400,area)/900-length*.36-Math.max(0,plots-12)*2;
-    candidates.push({arc,points,area,shared,oldGates,plots,occupiedHomes,rank:value});
+    candidates.push({arc,points,area,shared,oldGates,plots,occupiedHomes,rank:value});diagnostic.raw++;
    }
   }
  }
@@ -140,13 +142,13 @@ export function findOuterRingV184(game,city){
   // every intermediate point and silently rebuild the old rectangular wall!
   for(let edge=1;edge<points.length;edge++){
    const start=points[edge-1],end=points[edge];
-   if(sampleLine(start,end,1.5).some(p=>!terrainSafe(game,city,p))){invalid=true;break;}
+   if(sampleLine(start,end,1.5).some(p=>!terrainSafe(game,city,p))){invalid=true;diagnostic.terrain++;break;}
    const stroke=wallStrokePlanV175([start,end],'straight',100);
    if(stroke.error){invalid=true;break;}
    for(const slot of stroke.segments)segments.push({...slot,type:'palisade',
     plannedDefense:true,outerRingV184:true});
   }
-  if(invalid||segments.length<10||segments.length>35)continue;
+  if(invalid||segments.length<10||segments.length>35){diagnostic.segments++;continue;}
   const length=segments.reduce((sum,p)=>sum+meters(p.from,p.to),0);
   const share=shared/(shared+length);
   if(share<.16||share>.75)continue;
@@ -173,7 +175,8 @@ export function findOuterRingV184(game,city){
   }
   // All wall sections and the actual gate must fit. Do not accept a scenic
   // diagram that cannot be built on the physical city map.
-  if(segments.some(s=>game.previewDefenseV177(city,s).error))continue;
+  const previewError=segments.map(s=>game.previewDefenseV177(city,s).error).find(Boolean);
+  if(previewError){diagnostic.preview++;const why=String(previewError).slice(0,65);diagnostic.rejectedReasons[why]=(diagnostic.rejectedReasons[why]||0)+1;continue;}
   const boundary=[...arc,...points.slice(1,-1).reverse()];
   return {
    version:191,shape:'historic-gate-suburb',historicSuburbV191:true,
@@ -185,5 +188,6 @@ export function findOuterRingV184(game,city){
    slots:segments,nextIndex:0
   };
  }
+ city.historicSurveyDiagnosticV191=diagnostic;
  return null;
 }

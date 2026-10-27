@@ -33,7 +33,7 @@ export async function loadOrganicWallV190(demo,fetcher=fetch){
   for(const ctx of game.contexts(city))for(const b of ctx.economy.buildings)if(b.outerRingV184&&b.hp>0)b.ready=true;
   if(city.outerRingDiagnosticV184?.reason==='complete')break;
  }
- if(city.outerRingDiagnosticV184?.reason!=='complete')throw Error('Eeslinna müür ei valminud: '+JSON.stringify(city.outerRingDiagnosticV184||{}));
+ if(city.outerRingDiagnosticV184?.reason!=='complete')throw Error('Eeslinna müür ei valminud: '+JSON.stringify({outer:city.outerRingDiagnosticV184,survey:city.historicSurveyDiagnosticV191}));
  realm.resources=originalResources;realm.pop=originalPop;
  game.s.demo=demo;
  game.s.wallTestV190={kind,targetCityId:city.id,controlled:true,

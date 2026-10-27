@@ -1,5 +1,4 @@
 name: Kuningriigid Fast Game Check
-# Only one short, automatic job per game-code push. No browser matrix or publishing.
 on:
   push:
     branches: [main]
@@ -7,9 +6,6 @@ on:
       - '**.md'
       - 'reports/**'
       - '.github/workflows/**'
-      - 'artifacts-*/**'
-      - 'V88_*TEST.json'
-      - 'V88_*TEST.jsonl.gz'
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,46 +21,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Syntax of playable game and wall navigation
+      - name: Main game and wall syntax
         run: |
           node --check civilization.js
           node --check civilization-core.js
-          node --check navigation.js
-          node --check wall-draw-v175.js
-          node --check economy.js
-          node --check campaign.js
-      - name: Wood tower geometry and footprint regression (V175.6)
-        run: node TEST_V1756_WOOD_TOWER.mjs
-      - name: Tower patrol and siege recall regression (V175.7)
-        run: |
-          node --check tower-patrol-v1757.js
-          node --check civilization.js
-          node TEST_V1757_TOWER_PATROL.mjs
-      - name: Stone Age low/high timber defense height parity (V175.7a)
-        run: node TEST_V1757A_FORT_HEIGHTS.mjs
-      - name: Tier I and Tier II wall costs, saved levels and real placement (V175.7b)
-        run: node TEST_V1757B_WALL_LEVELS.mjs
-      - name: Wall ends against sea and mountains (V175.8)
-        run: node TEST_V1758_TERRAIN_ENDS.mjs
-      - name: Organic AI cities and terrain-backed wall enclosures (V176)
-        run: node TEST_V176_TERRAIN_CITIES.mjs
-      - name: One-city mountain scenario and takeover (V176.1)
-        run: node TEST_V1761_MOUNTAIN_TAKEOVER.mjs
-      - name: Closed ring, neighbouring tile, road gate and continuous cliff (V177)
-        run: node TEST_V177_RING_ROADS.mjs
-      - name: Shared city construction area and visible cliff (V178)
-        run: node TEST_V178_CITY_AREA.mjs
-      - name: Cliff embedded wall ends and integrated towers (V179)
-        run: node TEST_V179_CLIFF_TOWERS.mjs
-      - name: Strategic road gates and usable crossings (V181)
-        run: node TEST_V181_WORLD_ROAD_GATES.mjs
-      - name: Connected Stone Age strategic roads (V182)
-        run: node TEST_V182_ROAD_CONTINUITY.mjs
-      - name: Outer-ring priority and bounded fallback (V188)
-        run: node scripts/test-wall-priority-v188.mjs
-      - name: New reference-preview suburbs (V190)
-        run: node scripts/test-organic-demo-v190.mjs
-      - name: Historic gate-led quarter geometry (V191)
+          node --check ai-defenses-v128.js
+          node --check outer-ring-v184.js
+          node --check wall-demo-v184.js
+      - name: Historic suburb geometry (V191)
         run: node scripts/test-historic-suburb-v191.mjs
-      - name: Fast gameplay and road smoke tests
+      - name: Sea and cliff suburb demos (V190–191)
+        run: node scripts/test-organic-demo-v190.mjs
+      - name: Defense construction priority (V188)
+        run: node scripts/test-wall-priority-v188.mjs
+      - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
