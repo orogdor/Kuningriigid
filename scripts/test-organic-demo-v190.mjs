@@ -24,6 +24,14 @@ for(const kind of ['coast','mountain']){
   }).filter(Boolean);
   console.log('mountain survey radial hits',JSON.stringify(rays));
   const pts=city.stoneDefensePlanV166?.outlineV176||city.defensePlanV139?.outlineV176||[];
+  console.log('outer wall bounds',JSON.stringify({
+   minX:Math.min(...c.outerRingV184.slots.map(p=>p.x)),
+   maxX:Math.max(...c.outerRingV184.slots.map(p=>p.x)),
+   minZ:Math.min(...c.outerRingV184.slots.map(p=>p.z)),
+   maxZ:Math.max(...c.outerRingV184.slots.map(p=>p.z)),
+   sections:c.outerRingV184.slots.filter((_,i)=>i%5===0).map(p=>({x:Math.round(p.x),z:Math.round(p.z)})),
+   natural:c.outerRingV184.naturalBoundaryV194?.kind
+  }));
   console.log('inner outline extents',JSON.stringify({minX:Math.min(...pts.map(p=>p.x)),maxX:Math.max(...pts.map(p=>p.x)),minZ:Math.min(...pts.map(p=>p.z)),maxZ:Math.max(...pts.map(p=>p.z))}));
  }
 
