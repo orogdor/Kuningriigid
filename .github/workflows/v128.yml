@@ -46,5 +46,7 @@ jobs:
         run: node TEST_V1757B_WALL_LEVELS.mjs
       - name: Wall ends against sea and mountains (V175.8)
         run: node TEST_V1758_TERRAIN_ENDS.mjs
+      - name: Organic AI cities and terrain-backed wall enclosures (V176)
+        run: node TEST_V176_TERRAIN_CITIES.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic

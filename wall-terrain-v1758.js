@@ -47,7 +47,9 @@ export function wallTerrainErrorV1758(wall,passable,height){
 // Short final sections still need to join their neighbours. The generic
 // six-metre building spacing would reject a paid 4-5m shoreline section.
 export function wallEndJoinV1758(a,b){
- if(!a.drawnWallV175||!b.drawnWallV175||!['palisade','stonewall','reinforced_wall'].includes(b.type))return false;
+ const gates=['woodgate','gatehouse'];
+ if(gates.includes(a.type)&&b.drawnWallV175)return wallEndJoinV1758(b,a);
+ if(!a.drawnWallV175||(!b.drawnWallV175&&!gates.includes(b.type)))return false;
  const angle=b.wallAngleV175??(b.wallAxis?Math.PI/2:0),dx=a.x-b.x,dz=a.z-b.z;
  if(Math.abs(dx*Math.cos(angle)-dz*Math.sin(angle))<(b.palisadeSpanV167||7)/2-.8&&Math.abs(dx*Math.sin(angle)+dz*Math.cos(angle))<.4)return false;
  const ends=w=>{const angle=w.wallAngleV175??(w.wallAxis?Math.PI/2:0),half=(w.palisadeSpanV167||7)/2;

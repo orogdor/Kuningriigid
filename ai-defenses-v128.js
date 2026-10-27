@@ -1,3 +1,4 @@
+import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
 import {canAfford} from './economy.js';
 import {planStoneVillageDefenses} from './stone-village-defenses-v166.js?v=169a';
 import {combatUnit} from './ai-development-v128.js';
@@ -61,13 +62,13 @@ export function planAIDefenses(game,team,city){
   city.aiDefenseDiagnosticV146={reason:'wall-being-built',checkedAt:game.s.time};return;
  }
  const local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
- if(!city.defensePlanV139){
+ if(!city.defensePlanV139||(city.defensePlanV139.version<176&&!city.defensePlanV139.terrainSurveyV176&&!local.some(b=>b.historicPerimeterV139||b.historicPalisadeV166))){
   // The entire ring is fixed at the time of first fortification.
   const available=id=>!game.buildRule(city,id);
   const wall=available('stonewall')?'stonewall':'palisade';
   const tower=available('stonetower')?'stonetower':'watchtower';
-  const ring=ancientWallPlan(local,wall,tower,game.s.seed+city.id*19);
-  city.defensePlanV139={version:146,kind:'historic-core',...ring,nextIndex:0,constructed:0};
+  const ring=terrainDefensePlanV176(game,city,local,game.s.seed+city.id*19,{wall,tower})||ancientWallPlan(local,wall,tower,game.s.seed+city.id*19);
+  city.defensePlanV139={version:ring.version||146,kind:'historic-core',...ring,terrainSurveyV176:true,nextIndex:0,constructed:0};
  }
  const plan=city.defensePlanV139;
  city.defensePlanV128={kind:plan.kind,slots:plan.slots.length,gateOpenings:plan.gateOpenings};
@@ -81,15 +82,15 @@ export function planAIDefenses(game,team,city){
   return later&&!game.buildRule(city,later)?{...slot,type:later}:slot;
  };
  const slots=plan.slots.map(effective);
- const walls=slots.filter(s=>!['stonetower','watchtower'].includes(s.type));
+ const walls=slots.filter(s=>!['stonetower','watchtower','woodgate','gatehouse'].includes(s.type));
  const towers=slots.filter(s=>['stonetower','watchtower'].includes(s.type));
  const hasReadyStone=readyBuilding(local,'stonewall');
- const gates=game.s.ages[team]>=1&&hasReadyStone?[
+ const gates=game.s.ages[team]>=1&&hasReadyStone?(plan.gates||[
   {type:'gatehouse',x:0,z:-plan.rz,wallAxis:0},
   {type:'gatehouse',x:0,z:plan.rz,wallAxis:0},
   {type:'gatehouse',x:-plan.rx,z:0,wallAxis:1},
   {type:'gatehouse',x:plan.rx,z:0,wallAxis:1}
- ]:[];
+ ]):[];
  const candidates=hasReadyStone&&realm.pop>=BRONZE_FORTIFY_POP_V160?[...gates,...walls,...towers]:[...walls,...towers];
  const wallCost=game.buildingDefinitions.stonewall?.cost||{};
  if(!hasReadyStone&&game.s.research?.[team]?.known?.includes('stone_fortifications')&&
@@ -99,7 +100,7 @@ export function planAIDefenses(game,team,city){
  };
  const reasons={};
  const viable=candidates.filter(slot=>{
-  if(local.some(b=>defendedTypes.has(b.type)&&Math.hypot(b.x-slot.x,b.z-slot.z)<5)){reasons.alreadyBuilt=(reasons.alreadyBuilt||0)+1;return false;}
+  if(local.some(b=>defendedTypes.has(b.type)&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:5))){reasons.alreadyBuilt=(reasons.alreadyBuilt||0)+1;return false;}
   if(local.some(b=>['house','market','warehouse','study','scriptorium','well','cellar','hall'].includes(b.type)&&Math.abs(b.x-slot.x)<9&&Math.abs(b.z-slot.z)<9)){reasons.overlapsCore=(reasons.overlapsCore||0)+1;return false;}
   const locked=game.buildRule(city,slot.type);if(locked){reasons.locked=(reasons.locked||0)+1;city.aiDefenseLockedReasonV146=String(locked);return false;}
   const cost=game.buildingDefinitions[slot.type]?.cost||{};
