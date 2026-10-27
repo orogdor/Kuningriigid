@@ -870,7 +870,7 @@ const science=this.s.research[team];
    pop:city.economy.realms[team].pop,food:foodTotal(stock),
    lastAt:(this.s.aiSettlerLastAt??={})[team]||0,
    hasSettlement:science.known.includes('settlement')});
- if(policy.allow){const result=this.recruitSettler(city);
+ if(policy.allow&&!this.s.singleCityScenarioV176){const result=this.recruitSettler(city);
   if(result.settler){this.s.aiSettlerLastAt[team]=this.s.time;city.lastSettler=this.s.time;}}
 }
  // Territorial competition: AI may declare a limited war only after scouting

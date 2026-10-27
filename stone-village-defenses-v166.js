@@ -90,6 +90,11 @@ export function stoneVillageDefenseEligibility({age=0,pop=0,readyHouses=0,servic
 // Fit the wooden enclosure to real buildable terrain BEFORE purchasing a gate.
 // This prevents a paid ring from being frozen across buildings or steep banks.
 export function bestStoneVillageWallPlan(game,city,buildings,seed){
+ // Founding reserved this exact corridor for later real construction. Keep
+ // it stable as inner housing grows instead of shifting it onto new fields.
+ const reserved=city.stoneDefenseReserveV168;
+ if(reserved?.version===176&&reserved.slots?.length&&!reserved.slots.some(slot=>buildings.some(b=>b.hp>0&&!b.virtual&&!FORTS.has(b.type)&&footprintsCrossV168(slot,b,1.2))))
+  return {...structuredClone(reserved),verifiedAtTechV167:true,nextIndex:0,constructed:0};
  for(const extra of [0,8,16]){const plan=terrainDefensePlanV176(game,city,buildings,seed,{extra});if(plan)return plan;}
  const centre=buildings.find(b=>b.type==='hall')||{x:0,z:0};
  const homes=buildings.filter(b=>b.type==='house'&&b.hp>0);

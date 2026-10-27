@@ -37,7 +37,8 @@ export function footprintsCrossV168(a,b,pad=1.0){
  return true;
 }
 export function fieldCrossesWoodenRingV168(field,plan,pad=2){
- return !!plan?.slots?.some(slot=>footprintsCrossV168(slot,{...field,type:'field'},pad));
+ return !!plan?.slots?.some(slot=>footprintsCrossV168(slot,{...field,type:'field'},pad)||
+  (Math.abs(slot.x-field.x)<(field.width??48)/2+6&&Math.abs(slot.z-field.z)<(field.depth??32)/2+6));
 }
 export function objectCrossesWoodenRingV168(b,plan,pad=1){
  return !!plan?.slots?.some(slot=>footprintsCrossV168(slot,b,pad));
