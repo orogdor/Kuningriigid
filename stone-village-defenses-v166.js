@@ -56,8 +56,10 @@ export function reserveStoneVillageRingV168(game,city){
  const hall=city.economy.buildings.find(b=>b.type==='hall'&&b.hp>0);
  if(!hall||game.s.ages[city.team]!==0)return null;
  const nav=game.nav(city),seed=game.s.seed+city.id*19;
- const natural=terrainDefensePlanV176(game,city,[hall],seed);
- if(natural)return {...natural,reservedV168:true};
+ for(const variation of [0,37,91,167]){
+  const natural=terrainDefensePlanV176(game,city,[hall],seed+variation);
+  if(natural)return {...natural,reservedV168:true};
+ }
  let best=null,score=-Infinity;
  for(const extraX of [14,0,28])for(const extraZ of [14,0,28])
  for(const dx of [0,-7,7])for(const dz of [0,-7,7]){
@@ -95,7 +97,9 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
  const reserved=city.stoneDefenseReserveV168;
  if(reserved?.version>=177&&reserved.slots?.length&&!reserved.slots.some(slot=>buildings.some(b=>b.hp>0&&!b.virtual&&!FORTS.has(b.type)&&footprintsCrossV168(slot,b,1.2))))
   return {...structuredClone(reserved),verifiedAtTechV167:true,nextIndex:0,constructed:0};
- for(const extra of [0,8,16]){const plan=terrainDefensePlanV176(game,city,buildings,seed,{extra});if(plan)return plan;}
+ for(const extra of [0,8,16])for(const variation of [0,37,91,167]){
+  const plan=terrainDefensePlanV176(game,city,buildings,seed+variation,{extra});if(plan)return plan;
+ }
  const centre=buildings.find(b=>b.type==='hall')||{x:0,z:0};
  const homes=buildings.filter(b=>b.type==='house'&&b.hp>0);
  // Protect the historic, densely built inner 90% of houses. An exceptional

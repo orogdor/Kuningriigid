@@ -61,7 +61,9 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
  const baseRadius=angle=>{
   const c=Math.cos(angle),s=Math.sin(angle);
   let r=1/Math.sqrt((c/baseX)**2+(s/baseZ)**2);
-  r*=1+.075*Math.sin(3*angle+phase)+.045*Math.sin(5*angle-phase);
+  // Broad, seeded lobes give each settlement a distinct, gently irregular outline.
+  // Changes are deliberately smooth: sharp noise would create weak zigzag joints.
+  r*=1+.13*Math.sin(3*angle+phase)+.075*Math.sin(2*angle-phase*.7)+.035*Math.sin(5*angle+phase*.4);
   for(const b of core){
    const dx=b.x-hall.x,dz=b.z-hall.z,along=dx*c+dz*s,across=Math.abs(-dx*s+dz*c);
    if(along>0&&across<19)r=Math.max(r,along+17);
