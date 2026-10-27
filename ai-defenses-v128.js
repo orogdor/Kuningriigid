@@ -1,4 +1,4 @@
-import {findOuterRingV184} from './outer-ring-v184.js?v=186';
+import {findOuterRingV184} from './outer-ring-v184.js?v=187';
 import {planRoadGatesV177} from './road-gates-v177.js';
 import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
 import {canAfford} from './economy.js';
@@ -46,7 +46,7 @@ export function planWallUpgradesV184(game,team,city){
  const age=game.s.ages[team],realm=city.economy.realms[team],known=game.s.research[team]?.known||[];
  if(!game.wallUpgradeOptionsV184||realm.pop<11||age===0)return false;
  if(!known.includes('stone_fortifications'))return false;
- const contexts=game.contexts(city),forts=contexts.flatMap(ctx=>ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&b.ready&&!b.outerRingV184&&['palisade','woodgate','watchtower'].includes(b.type)).map(b=>({ctx,b})));
+ const contexts=game.contexts(city),forts=contexts.flatMap(ctx=>ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&b.ready&&['palisade','woodgate','watchtower'].includes(b.type)).map(b=>({ctx,b})));
  if(!forts.length)return false;
  if(contexts.some(ctx=>ctx.economy.buildings.some(b=>b.wallUpgradeV184)))return true;
  const waiting=game.allBuildings(city).filter(b=>b.hp>0&&!b.ready).length;
@@ -63,7 +63,10 @@ export function planOuterRingV184(game,team,city){
  const realm=city.economy.realms[team],stock=realm.resources;
  if((game.s.ages[team]||0)<1||realm.pop<20)return false;
  const all=game.allBuildings(city);
- if(all.some(b=>b.wallUpgradeV184||(!b.outerRingV184&&b.hp>0&&b.ready&&['palisade','woodgate','watchtower'].includes(b.type))))return false;
+ if(all.some(b=>b.wallUpgradeV184))return false;
+ const inner=city.stoneDefensePlanV166||city.defensePlanV139;
+ if(!inner?.slots?.length)return false;
+ if(all.some(b=>b.hp>0&&!b.ready&&!b.outerRingV184&&DEFENSE_TYPES.has(b.type)))return false;
  if(all.filter(b=>!b.ready&&b.hp>0&&DEFENSE_TYPES.has(b.type)).length>=2)return false;
  if(!surplusForWalls(stock,realm.pop,all.filter(b=>b.hp>0&&!b.ready).length))return false;
  if(!city.outerRingV184){
@@ -85,10 +88,10 @@ export function planOuterRingV184(game,team,city){
  city.outerRingDiagnosticV184={reason:'complete',total:plan.slots.length,at:game.s.time};return false;
 }
 export function planAIDefenses(game,team,city){
- if(planWallUpgradesV184(game,team,city))return;
  if(planRoadGatesV177(game,city))return;
  if(planStoneVillageDefenses(game,team,city))return;
  if(planOuterRingV184(game,team,city))return;
+ if(planWallUpgradesV184(game,team,city))return;
  if(game.s.time<(city.nextDefenseCheckV128||0))return;
  const realm=city.economy.realms[team],stock=realm.resources,all=game.allBuildings(city);
  city.nextDefenseCheckV128=game.s.time+(realm.pop>=BRONZE_FORTIFY_POP_V160?24:42);

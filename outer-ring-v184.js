@@ -42,7 +42,7 @@ export function findOuterRingV184(game,city){
    const h=shared*factor,points=[a,{x:a.x+nx*h,z:a.z+nz*h},{x:b.x+nx*h,z:b.z+nz*h},b];
    const area=chord*h,mid={x:(points[1].x+points[2].x)/2,z:(points[1].z+points[2].z)/2};
    const kind=game.defenseTerrainKindV176?.bind(game,city);
-   const possibleCliff=kind&&[points[1],mid,points[2]].every(p=>kind(p.x,p.z)==='mountain');
+   const naturalKind=kind?.(mid.x,mid.z);const possibleCliff=['mountain','water'].includes(naturalKind)&&[points[1],mid,points[2]].every(p=>kind(p.x,p.z)===naturalKind);
    const expected=(possibleCliff?0:chord)+2*h;
    candidates.push({arc,shared,points,area,expected,rank:area/expected+area/2400});
   }
@@ -58,17 +58,20 @@ export function findOuterRingV184(game,city){
   // A natural rear edge is accepted only if the entire edge is continuous
   // impassable mountain, sampled across the walking width, and each side
   // ends at that barrier. Water, ownership edges and isolated rocks do not count.
-  let cliff=!!terrain;
+  const naturalKind=terrain?.((points[1].x+points[2].x)/2,(points[1].z+points[2].z)/2);
+  let natural=['mountain','water'].includes(naturalKind);
   const rear=dist(points[1],points[2]),steps=Math.ceil(rear/.5),vx=(points[2].x-points[1].x)/rear,vz=(points[2].z-points[1].z)/rear;
-  for(let i=0;cliff&&i<=steps;i++)for(const off of [-1,0,1]){
+  for(let i=0;natural&&i<=steps;i++)for(const off of [-1,0,1]){
    const t=i/steps,p={x:points[1].x+(points[2].x-points[1].x)*t-vz*off,z:points[1].z+(points[2].z-points[1].z)*t+vx*off};
-   if(terrain(p.x,p.z)!=='mountain'){cliff=false;break;}
+   if(terrain(p.x,p.z)!==naturalKind){natural=false;break;}
   }
   let bad=false;
-  for(const j of cliff?[0,2]:[0,1,2]){
-   const line=wallStrokePlanV175([points[j],points[j+1]],'straight',100,cliff?(x,z)=>terrain(x,z)!=='mountain':null);
+  let curvedBoundary=null;
+  for(const j of natural?[0,2]:[0]){
+   const line=natural?wallStrokePlanV175([points[j],points[j+1]],'straight',100,(x,z)=>terrain(x,z)!==naturalKind):wallStrokePlanV175(points,'curved',100);
+   if(!natural)curvedBoundary=line.curve;
    if(line.error){bad=true;break;}
-   if(cliff){const end=j===0?line.segments.at(-1):line.segments[0];end[j===0?'cliffEmbedEndV179':'cliffEmbedStartV179']=5;}
+   if(natural&&naturalKind==='mountain'){const end=j===0?line.segments.at(-1):line.segments[0];end[j===0?'cliffEmbedEndV179':'cliffEmbedStartV179']=5;}
    for(const p of line.segments){const slot={...p,type:'palisade',plannedDefense:true,outerRingV184:true};
     if(!game.defenseTerrainPassableV177(city,slot.x,slot.z)){bad=true;break;}parts.push(slot);
    }if(bad)break;
@@ -79,8 +82,8 @@ export function findOuterRingV184(game,city){
   if(bad||!parts.length)continue;
   const added=parts.reduce((s,p)=>s+dist(p.from,p.to),0),share=shared/(shared+added);
   if(share<.16||share>.75)continue;
-  const boundary=[...arc,...points.slice(1).reverse()];
-  return {version:186,sharedLength:shared,newLength:added,sharedFraction:share,sharedArc:arc.map(({x,z})=>({x,z})),boundaryV186:boundary,areaEstimateV186:area,cliffBoundaryV186:cliff,slots:parts,nextIndex:0};
+  const boundary=[...arc,...(curvedBoundary||points).slice(1).reverse()];
+  return {version:186,sharedLength:shared,newLength:added,sharedFraction:share,sharedArc:arc.map(({x,z})=>({x,z})),boundaryV186:boundary,areaEstimateV186:area,cliffBoundaryV186:natural&&naturalKind==='mountain',waterBoundaryV187:natural&&naturalKind==='water',slots:parts,nextIndex:0};
  }
  return null;
 }
