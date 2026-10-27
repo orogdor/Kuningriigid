@@ -1,7 +1,7 @@
 {
   "pass": true,
   "seed": 142023,
-  "turn": 80,
+  "turn": 82,
   "sourceTeam": 1,
   "targetCityId": 0,
   "targetCityName": "Kaljuvärava",
@@ -18,15 +18,15 @@
   "initialCities": 1,
   "initialPopulation": 3,
   "townStats": {
-    "turn": 80,
+    "turn": 82,
     "age": 0,
     "pop": 9,
-    "houses": 7,
-    "ready": 53,
-    "total": 53,
+    "houses": 8,
+    "ready": 54,
+    "total": 54,
     "towers": 4,
-    "gates": 5
+    "gates": 3
   },
   "closedRingV177": true,
-  "bytes": 1056719
+  "bytes": 1057228
 }

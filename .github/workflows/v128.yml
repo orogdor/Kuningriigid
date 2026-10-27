@@ -52,5 +52,7 @@ jobs:
         run: node TEST_V1761_MOUNTAIN_TAKEOVER.mjs
       - name: Closed ring, neighbouring tile, road gate and continuous cliff (V177)
         run: node TEST_V177_RING_ROADS.mjs
+      - name: Shared city construction area and visible cliff (V178)
+        run: node TEST_V178_CITY_AREA.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic

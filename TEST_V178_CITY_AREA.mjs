@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {Civilization} from './civilization-core.js';
+import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_Z} from './detail-scale-v123.js';
+const state=JSON.parse(fs.readFileSync('scenarios/ai-mountain-v176.json'));
+const game=new Civilization(state), city=game.s.cities[0];
+const distant=game.constructionArea(city).tiles.find(t=>Math.abs(t.c-city.c)>1&&!game.cell(t).mountain);
+assert.ok(distant,'city owns a distant land tile');
+const at={x:(distant.c-city.c)*DETAIL_TILE_X,z:(distant.r-city.r)*DETAIL_TILE_Z};
+const site=game.resolveAreaSite(city,at);
+assert.ok(!site.error,site.error);assert.equal(site.ctx.c,distant.c);assert.equal(site.ctx.r,distant.r);
+assert.equal(game.parentCity(site.ctx).id,city.id);
+const mountain=game.cell(state.mountainTestV176.mountain);assert.ok(mountain.mountain,'building on a mountain foot must not erase the mountain on reload');
+const cliff=city.stoneDefensePlanV166.naturalBarriersV176.find(b=>b.kind==='mountain');
+assert.ok(Math.max(cliff.points[0].z,cliff.points.at(-1).z)>DETAIL_HALF_Z+8,'wall reaches the rock beyond the tile boundary');
+console.log('V178 SHARED CITY AREA AND VISIBLE CLIFF PASS');

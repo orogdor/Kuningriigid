@@ -1,4 +1,4 @@
-import {loadAIMountainV176} from './ai-mountain-demo-v176.js?v=1771a';
+import {loadAIMountainV176} from './ai-mountain-demo-v176.js?v=178a';
 import {loadIronCityV143} from './ai-iron-demo-v143.js';
 import {loadAIMedievalV144} from './ai-medieval-demo-v144.js';
 import {loadAIMedievalV145} from './ai-medieval-demo-v145.js';
@@ -860,6 +860,7 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
  // Fast & honest user feedback. Construction costs and terrain restrictions
  // are identical to those on release; previewing NEVER spends resources or
  // stamps a road. It also rejects an entire stroke before a partial build.
+ function wallParentPointV178(city,p){const parent=game.parentCity(city);return {...p,x:p.x+(city.c-parent.c)*DETAIL_TILE_X,z:p.z+(city.r-parent.r)*DETAIL_TILE_Z};}
  function wallStrokePrecheckV175(plan){
   if(plan.error)return plan.error;
   const city=activeCity();
@@ -873,20 +874,18 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
      ': vaja '+amount*plan.segments.length;
   for(let i=0;i<plan.segments.length;i++){
    const part=plan.segments[i];
-   if(Math.abs(part.x)>DETAIL_HALF_X||Math.abs(part.z)>DETAIL_HALF_Z)
-    return 'Müür väljub detailkaardi piiridest.';
-   const result=game.previewBuild(city,mode,{
+   const result=game.previewDefenseV177(city,wallParentPointV178(city,{
     x:part.x,z:part.z,wallAngleV175:part.wallAngleV175,
     wallAxis:part.wallAxis,palisadeSpanV167:part.palisadeSpanV167,
-    drawnWallV175:true,woodFortTierV1757:mode==='palisade'?woodWallTierV1757:1
-   });
+    type:mode,drawnWallV175:true,woodFortTierV1757:mode==='palisade'?woodWallTierV1757:1
+   }));
    if(result.error)return 'Lõik '+(i+1)+': '+result.error;
   }
   return '';
  }
  function updateWallStrokePreview(){
   removeWallStrokePreview();if(!wallStroke||!activeTile)return;
-  const plan=wallStrokePlanV175(wallStroke.points,wallDrawShape,10,(x,z)=>game.wallTerrainPassable(activeCity(),x,z)),outline=plan.curve||[];
+  const plan=wallStrokePlanV175(wallStroke.points,wallDrawShape,10,(x,z)=>{const c=activeCity(),p=wallParentPointV178(c,{x,z});return game.defenseTerrainPassableV177(c,p.x,p.z);}),outline=plan.curve||[];
   if(outline.length<2)return;
   const reason=wallStrokePrecheckV175(plan);
   const pos=outline.map(p=>new T.Vector3(p.x,ground(activeTile,p.x,p.z)+.7,p.z));
@@ -903,7 +902,7 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
  function finishWallStroke(){
   const stroke=wallStroke;wallStroke=null;removeWallStrokePreview();
   if(!stroke||!isDrawableWallV175(mode)||s.battle||view!=='local')return;
-  const plan=wallStrokePlanV175(stroke.points,wallDrawShape,10,(x,z)=>game.wallTerrainPassable(activeCity(),x,z));
+  const plan=wallStrokePlanV175(stroke.points,wallDrawShape,10,(x,z)=>{const c=activeCity(),p=wallParentPointV178(c,{x,z});return game.defenseTerrainPassableV177(c,p.x,p.z);});
   const city=activeCity(),type=mode;
   const warning=wallStrokePrecheckV175(plan);
   if(warning){
@@ -913,13 +912,10 @@ const touchPointers=new Map();let pinch=null,pinchConsumed=false,fieldDrag=null;
   }
   let built=0,error='';
   for(const part of plan.segments){
-   if(Math.abs(part.x)>DETAIL_HALF_X||Math.abs(part.z)>DETAIL_HALF_Z){
-    error='Müür väljub detailkaardi piiridest. Jätka naaberruudul.';break;
-   }
-   const result=game.build(city,type,{x:part.x,z:part.z,
+   const result=game.buildDefenseV177(city,wallParentPointV178(city,{type,x:part.x,z:part.z,
     wallAngleV175:part.wallAngleV175,wallAxis:part.wallAxis,
     palisadeSpanV167:part.palisadeSpanV167,drawnWallV175:true,
-    woodFortTierV1757:type==='palisade'?woodWallTierV1757:1});
+    woodFortTierV1757:type==='palisade'?woodWallTierV1757:1}));
    if(result.error){error=result.error;break;}built++;
   }
   lastWallBuildV175={built,attempted:plan.segments.length,shape:wallDrawShape,error};

@@ -1,3 +1,4 @@
+import {mountainBlockedV178} from './mountain-foot-v178.js';
 import {createBattleSteering} from './battle-movement-v97.js';
 import {Navigation,buildingClearance} from './navigation.js?v=1751a';
 import {localSurface} from './continuous-landscape.js?v=162a';
@@ -30,7 +31,7 @@ export function createBattleNavigation(game,battle){
    if(size)add({type:b.type,x:b.x+offset.x,z:b.z+offset.z},size.rx,size.rz);
   }
  }
- const passable=(x,z)=>{const {dc,dr}=tileDelta(x,z),c=battle.cell.c+dc,r=battle.cell.r+dr;if(c<0||r<0||c>=220||r>=165)return false;const tile=game.cell({c,r});if(tile.mountain||height(x,z)<=.2)return false;return !(bins.get(Math.floor(x/16)+':'+Math.floor(z/16))||[]).some(o=>{
+ const passable=(x,z)=>{const {dc,dr}=tileDelta(x,z),c=battle.cell.c+dc,r=battle.cell.r+dr;if(c<0||r<0||c>=220||r>=165)return false;const tile=game.cell({c,r});if(mountainBlockedV178(game,battle.cell,x,z)||height(x,z)<=.2)return false;return !(bins.get(Math.floor(x/16)+':'+Math.floor(z/16))||[]).some(o=>{
   if(Math.abs(x-o.x)>o.rx||Math.abs(z-o.z)>o.rz)return false;
   if(['palisade','stonewall','reinforced_wall','gatehouse'].includes(o.type)){
    const sec=(battle.siegeSections||[]).find(w=>w.x===o.x&&w.z===o.z&&w.type===o.type);

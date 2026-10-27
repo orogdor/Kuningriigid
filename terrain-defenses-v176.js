@@ -70,9 +70,9 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
  };
  const rayLimit=angle=>{
   const c=Math.cos(angle),s=Math.sin(angle);
-  const rangeX=game.defenseTerrainPassableV177?DETAIL_HALF_X*3:DETAIL_HALF_X;
+  const rangeX=game.defenseTerrainPassableV177?DETAIL_HALF_X*24:DETAIL_HALF_X;
   const tx=Math.abs(c)<1e-6?Infinity:((c>0?rangeX:-rangeX)-hall.x)/c;
-  const rangeZ=game.defenseTerrainPassableV177?DETAIL_HALF_Z*3:DETAIL_HALF_Z;
+  const rangeZ=game.defenseTerrainPassableV177?DETAIL_HALF_Z*24:DETAIL_HALF_Z;
   const tz=Math.abs(s)<1e-6?Infinity:((s>0?rangeZ:-rangeZ)-hall.z)/s;
   return Math.max(0,Math.min(tx,tz));
  };
