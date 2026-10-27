@@ -1,7 +1,7 @@
 {
   "pass": true,
   "seed": 142023,
-  "turn": 74,
+  "turn": 93,
   "sourceTeam": 1,
   "targetCityId": 0,
   "targetCityName": "Kaljuvärava",
@@ -18,22 +18,15 @@
   "initialCities": 1,
   "initialPopulation": 3,
   "townStats": {
-    "turn": 74,
+    "turn": 93,
     "age": 0,
-    "pop": 9,
-    "houses": 7,
-    "ready": 49,
-    "total": 49,
-    "natural": true,
-    "buildings": 64,
-    "status": {
-      "reason": "ring-complete",
-      "ready": 49,
-      "placed": 49,
-      "total": 49,
-      "at": 4440
-    }
+    "pop": 10,
+    "houses": 8,
+    "ready": 71,
+    "total": 71,
+    "towers": 4,
+    "gates": 3
   },
-  "description": "One AI founded a single town beside a naturally generated mountain, then built it through normal gameplay. Ownership is transferred on loading.",
-  "bytes": 1053624
+  "closedRingV177": true,
+  "bytes": 1017967
 }

@@ -1,4 +1,4 @@
-import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
+import {terrainDefensePlanV176,insideDefenseV176} from './terrain-defenses-v176.js';
 // V166 Etapp 2: paid Stone Age palisade around an actual compact village.
 // Separate saved plan from the Bronze stone ring, so the latter stays compatible.
 // All placements go through normal building, pathfinding and resource checks.
@@ -93,7 +93,7 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
  // Founding reserved this exact corridor for later real construction. Keep
  // it stable as inner housing grows instead of shifting it onto new fields.
  const reserved=city.stoneDefenseReserveV168;
- if(reserved?.version===176&&reserved.slots?.length&&!reserved.slots.some(slot=>buildings.some(b=>b.hp>0&&!b.virtual&&!FORTS.has(b.type)&&footprintsCrossV168(slot,b,1.2))))
+ if(reserved?.version>=177&&reserved.slots?.length&&!reserved.slots.some(slot=>buildings.some(b=>b.hp>0&&!b.virtual&&!FORTS.has(b.type)&&footprintsCrossV168(slot,b,1.2))))
   return {...structuredClone(reserved),verifiedAtTechV167:true,nextIndex:0,constructed:0};
  for(const extra of [0,8,16]){const plan=terrainDefensePlanV176(game,city,buildings,seed,{extra});if(plan)return plan;}
  const centre=buildings.find(b=>b.type==='hall')||{x:0,z:0};
@@ -147,18 +147,19 @@ export function bestStoneVillageWallPlan(game,city,buildings,seed){
 // A mature Stone Age capital spends a bounded extra period finishing its
 // defenses before the AI commits to Bronze. Never stall another age indefinitely.
 export function stoneFortificationAgeGate(city,age,time,limit=110*60){
+ if(city?.stoneDefensePlanV166?.closedRingV177)limit=Math.max(limit,150*60);
  if(age!==0||time>=limit||!city?.stoneDefensePlanV166?.slots?.length)return false;
  // A temporary population dip must not abandon an already funded and
  // partly built ring. Eligibility required residents at the planning stage;
  // the 110-turn timeout still guarantees eventual age progression.
  const plan=city.stoneDefensePlanV166;
- const local=city.economy.buildings.filter(b=>b.hp>0&&!b.virtual);
+ const local=[city,...Object.values(city.districts||{})].flatMap(ctx=>ctx.economy.buildings.filter(b=>b.hp>0&&!b.virtual).map(b=>({...b,x:b.x+((ctx.c??city.c??0)-(city.c??0))*225,z:b.z+((ctx.r??city.r??0)-(city.r??0))*195})));
  const ready=plan.slots.filter(slot=>local.some(b=>b.type===slot.type&&b.ready&&b.hp>0&&
    !b.disabled&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5))).length;
  return ready<plan.slots.length;
 }
 export function planStoneVillageDefenses(game,team,city){
- const age=game.s.ages[team],local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
+ const age=game.s.ages[team],local=(game.defenseBuildingsV177?.(city)||city.economy.buildings).filter(b=>!b.virtual&&b.hp>0);
  if(age!==0)return false; // let the existing Bronze fortification strategy proceed
  if(game.s.time<(city.nextStoneDefenseCheckV166||0))return true;
  city.nextStoneDefenseCheckV166=game.s.time+9;
@@ -205,14 +206,23 @@ export function planStoneVillageDefenses(game,team,city){
    navWidth:slot.type==='palisade'?(slot.wallAxis?1.1:extent):(slot.extendedPalisadeV166?7.2:undefined),
    navDepth:slot.type==='palisade'?(slot.wallAxis?extent:1.1):(slot.extendedPalisadeV166?1.1:undefined)};
   const occupied=local.some(b=>!FORTS.has(b.type)&&footprintsCrossV168(slot,b,1.2));
-  const siteResult=occupied?{error:'Põld või hoone asub müürikoridoris'}:
-   game.previewBuild(city,slot.type,{...placement,plannedDefense:true});
+  let siteResult=occupied?{error:'Põld või hoone asub müürikoridoris'}:
+   (game.previewDefenseV177?game.previewDefenseV177(city,{...placement,type:slot.type,plannedDefense:true}):game.previewBuild(city,slot.type,{...placement,plannedDefense:true}));
+  if(siteResult.error&&['watchtower','stonetower'].includes(slot.type)){
+   searchTower:for(const dx of [0,-3,3,-6,6,-9,9,-12,12])for(const dz of [0,-3,3,-6,6,-9,9,-12,12]){
+    const candidate={...placement,x:slot.x+dx,z:slot.z+dz};
+    if(!insideDefenseV176(candidate,plan)||local.some(b=>FORTS.has(b.type)&&Math.hypot(b.x-candidate.x,b.z-candidate.z)<7))continue;
+    const check=game.previewDefenseV177?game.previewDefenseV177(city,{...candidate,type:slot.type,plannedDefense:true}):game.previewBuild(city,slot.type,{...candidate,plannedDefense:true});
+    if(!check.error){Object.assign(slot,{x:candidate.x,z:candidate.z});Object.assign(placement,{x:candidate.x,z:candidate.z});siteResult=check;break searchTower;}
+   }
+  }
   if(siteResult.error){counts.site=(counts.site||0)+1;const why=String(siteResult.error).slice(0,85);counts['site:'+why]=(counts['site:'+why]||0)+1;continue;}
-  const result=game.build(city,slot.type,{...placement,plannedDefense:true});
+  const result=game.buildDefenseV177?game.buildDefenseV177(city,{...placement,type:slot.type,plannedDefense:true}):game.build(city,slot.type,{...placement,plannedDefense:true});
   if(!result.building){counts.build=(counts.build||0)+1;continue;}
   // The existing engine records each paid building and its construction.
   result.building.historicPalisadeV166=true;
   result.building.wallAxis=slot.wallAxis;
+  if(Number.isFinite(slot.wallAngleV175))result.building.wallAngleV175=slot.wallAngleV175;
   result.building.plannedDefense=true;
   result.building.extendedPalisadeV166=!!slot.extendedPalisadeV166;
   if(slot.palisadeSpanV167)result.building.palisadeSpanV167=slot.palisadeSpanV167;

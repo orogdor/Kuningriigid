@@ -176,7 +176,19 @@ export function mountainMask(game,x,z){
  const u=(wx+650)/50-.5,v=(wz+550)/50-.5,c0=Math.floor(u),r0=Math.floor(v),fu=smooth(u-c0),fv=smooth(v-r0);
  {const oc=Math.floor((x+650)/50),or=Math.floor((z+550)/50);if(!at(oc,or))return 0;} // never on a non-mountain cell
  const f=at(c0,r0)*(1-fu)*(1-fv)+at(c0+1,r0)*fu*(1-fv)+at(c0,r0+1)*(1-fu)*fv+at(c0+1,r0+1)*fu*fv;
- return smooth((f-.58)/.42);
+ // Fade the exaggeration to zero at a real mountain/lowland boundary.
+ // The former hard tile mask exposed a vertical cut through the mountain.
+ const oc=Math.floor((x+650)/50),orr=Math.floor((z+550)/50);
+ let distance=Infinity;
+ // Distance to the same lowland rectangles on BOTH sides of a shared edge.
+ // Per-tile edge fades disagree at mountain/mountain/lowland corners.
+ for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+  const cc=oc+dc,rr=orr+dr;if(at(cc,rr))continue;
+  const left=cc*50-650,top=rr*50-550;
+  distance=Math.min(distance,Math.hypot(Math.max(left-x,0,x-left-50),Math.max(top-z,0,z-top-50)));
+ }
+ const border=smooth(distance/7);
+ return smooth((f-.58)/.42)*border;
 }
 export function visualProject(game,e,x,z){return (e-.7)*DETAIL_Y+(e>DETAIL_MOUNTAIN_FROM?(e-DETAIL_MOUNTAIN_FROM)*DETAIL_MOUNTAIN_EXTRA*mountainMask(game,x,z):0)}
 export function surface(game,x,z,view='world'){return projectHeight(memoHeight(game,x,z,()=>worldElevation(game,x,z)),view)}

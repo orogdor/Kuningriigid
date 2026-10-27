@@ -21,8 +21,8 @@ export function findAIFieldSite(game,ctx,farm=null){
  for(const p of points){
   // A planted field is permanent until its owner removes or rebuilds it.
   // Keep the full width of each surveyed palisade span and both gates clear.
-  if(stoneAge&&parent&&ctx.c===parent.c&&ctx.r===parent.r&&
-   fieldCrossesWoodenRingV168(p,parent.stoneDefensePlanV166||parent.stoneDefenseReserveV168))continue;
+  if(stoneAge&&parent&&
+   fieldCrossesWoodenRingV168({...p,x:p.x+(ctx.c-parent.c)*DETAIL_TILE_X,z:p.z+(ctx.r-parent.r)*DETAIL_TILE_Z},parent.stoneDefensePlanV166||parent.stoneDefenseReserveV168))continue;
   if(validateField(sample,p,(x,z)=>nav.passable(x,z)))continue;
   let lo=Infinity,hi=-Infinity;for(let x=-p.width/2;x<=p.width/2;x+=4)for(let z=-p.depth/2;z<=p.depth/2;z+=4){const h=detailHeight(game.cell(ctx),p.x+x,p.z+z);lo=Math.min(lo,h);hi=Math.max(hi,h);}
   if(hi-lo<=1.8)return p;

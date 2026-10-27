@@ -50,5 +50,7 @@ jobs:
         run: node TEST_V176_TERRAIN_CITIES.mjs
       - name: One-city mountain scenario and takeover (V176.1)
         run: node TEST_V1761_MOUNTAIN_TAKEOVER.mjs
+      - name: Closed ring, neighbouring tile, road gate and continuous cliff (V177)
+        run: node TEST_V177_RING_ROADS.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic

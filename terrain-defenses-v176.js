@@ -1,3 +1,4 @@
+import {defenseRoadCellsV177} from './road-gates-v177.js';
 // Deterministic terrain-backed enclosures. Nothing here places free walls,
 // changes the terrain, creates roads or demolishes existing buildings.
 import {wallStrokePlanV175} from './wall-draw-v175.js?v=1754a';
@@ -46,7 +47,7 @@ function occupied(slot,buildings){
 }
 export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={}){
  if(typeof game.wallTerrainPassable!=='function'||typeof game.defenseTerrainKindV176!=='function')return null;
- const passable=(x,z)=>game.wallTerrainPassable(city,x,z),feature=(x,z)=>game.defenseTerrainKindV176(city,x,z);
+ const passable=(x,z)=>game.defenseTerrainPassableV177?game.defenseTerrainPassableV177(city,x,z):game.wallTerrainPassable(city,x,z),feature=(x,z)=>game.defenseTerrainKindV176(city,x,z);
  const hall=buildings.find(b=>b.type==='hall'&&b.hp>0)||{x:0,z:0};
  if(!passable(hall.x,hall.z))return null;
  const wall=options.wall||'palisade',gate=wall==='palisade'?'woodgate':'gatehouse';
@@ -69,8 +70,10 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
  };
  const rayLimit=angle=>{
   const c=Math.cos(angle),s=Math.sin(angle);
-  const tx=Math.abs(c)<1e-6?Infinity:((c>0?DETAIL_HALF_X:-DETAIL_HALF_X)-hall.x)/c;
-  const tz=Math.abs(s)<1e-6?Infinity:((s>0?DETAIL_HALF_Z:-DETAIL_HALF_Z)-hall.z)/s;
+  const rangeX=game.defenseTerrainPassableV177?DETAIL_HALF_X*3:DETAIL_HALF_X;
+  const tx=Math.abs(c)<1e-6?Infinity:((c>0?rangeX:-rangeX)-hall.x)/c;
+  const rangeZ=game.defenseTerrainPassableV177?DETAIL_HALF_Z*3:DETAIL_HALF_Z;
+  const tz=Math.abs(s)<1e-6?Infinity:((s>0?rangeZ:-rangeZ)-hall.z)/s;
   return Math.max(0,Math.min(tx,tz));
  };
  // Survey just one strategic rear sector. A distant rock must not stretch
@@ -89,23 +92,27 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
   if(r<24)return null;
   if(anchor&&angleDistance(angle,anchor.angle)<Math.PI*.39){
    const hit=firstBarrier(hall,angle,Math.min(base+64,limit+3),passable,feature);
-   if(hit)r=Math.min(Math.max(base,hit.r+3),limit+3);
+   if(hit)r=Math.min(Math.max(base,hit.r-6),limit-5);
   }
+  // A built curtain closes even the rear sector; a cliff is extra protection,
+  // never an unverified missing wall. Pull vertices back onto dry owned land.
+  const stop=firstBarrier(hall,angle,Math.min(r+2,limit+1),passable,feature);
+  if(stop)r=Math.min(r,stop.r-6);
   points.push({x:hall.x+Math.cos(angle)*r,z:hall.z+Math.sin(angle)*r});
  }
  // Axis-aligned real gates keep their actual passage and post geometry.
  // Prefer the front away from the terrain anchor. A cliff-backed town may
  // have a single gate, whereas an open settlement normally has two.
- const gateOptions=[0,8,16,24].map(i=>{
-  const p=points[i],axis=i%16===0?1:0,half=3.5;
-  const a={x:p.x+(axis?0:half),z:p.z+(axis?-half:0)},b={x:p.x+(axis?0:-half),z:p.z+(axis?half:0)};
-  // Follow the counter-clockwise outline direction at each cardinal point.
-  if(i===16||i===24)[a.x,b.x,a.z,b.z]=[b.x,a.x,b.z,a.z];
-  const slot={type:gate,x:p.x,z:p.z,wallAxis:axis,plannedDefense:true};
+ const roads=game.contexts&&city.world?defenseRoadCellsV177(game,city):[];
+ const roadIndices=points.map((p,i)=>({i,score:roads.reduce((n,r)=>n+(distance(p,r)<9?r.strength:0),0)})).filter(v=>v.score>0).sort((a,b)=>b.score-a.score).slice(0,4).map(v=>v.i);
+ const gateOptions=[...new Set([...roadIndices,0,8,16,24])].map(i=>{
+  const p=points[i],previous=points[(i+31)%32],next=points[(i+1)%32],len=distance(previous,next),tx=(next.x-previous.x)/len,tz=(next.z-previous.z)/len,axis=Math.abs(tz)>Math.abs(tx)?1:0;
+  const a={x:p.x-tx*3.5,z:p.z-tz*3.5},b={x:p.x+tx*3.5,z:p.z+tz*3.5};
+  const slot={type:gate,x:p.x,z:p.z,wallAxis:axis,wallAngleV175:-Math.atan2(tz,tx),plannedDefense:true};
   const outward={x:(p.x-hall.x)/distance(p,hall),z:(p.z-hall.z)/distance(p,hall)};
   const dry=[-9,-4,0,4,9].every(d=>passable(p.x+outward.x*d,p.z+outward.z*d));
   const footprint=[-3,0,3].every(dx=>[-3,0,3].every(dz=>passable(p.x+dx,p.z+dz)));
-  return {i,slot,a,b,ok:dry&&footprint&&!occupied(slot,buildings),score:anchor?-Math.cos(i*TAU/32-anchor.angle):hash(seed,4+i)};
+  return {i,slot,a,b,ok:dry&&footprint&&!occupied(slot,buildings),score:roads.reduce((n,r)=>n+(distance(p,r)<9?r.strength:0),0)+(anchor?-Math.cos(i*TAU/32-anchor.angle):hash(seed,4+i))};
  }).filter(o=>o.ok).sort((a,b)=>b.score-a.score);
  if(!gateOptions.length)return null;
  const gates=[gateOptions[0]],second=gateOptions.find(o=>angleDistance(o.i*TAU/32,gates[0].i*TAU/32)>Math.PI*.75);
@@ -137,6 +144,7 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
  let last=null;
  for(const point of orderedEdges){
   const dry=passable(point.x,point.z);
+  if(point.kind==='wall'&&!dry)return null;
   if(point.kind==='wall'&&dry){
    if(!run.length&&last?.kind==='wall'&&!passable(last.x,last.z))run.push(last);
    finishTerrain();run.push(point);
@@ -157,14 +165,23 @@ export function terrainDefensePlanV176(game,city,buildings=[],seed=0,options={})
  // Towers face the open approaches, not buried inside a mountain. Leave
  // plenty of room around gates and real wall sections for their footprints.
  const towers=[];
- for(const i of [4,12,20,28]){
-  const p=points[i],v={x:hall.x+(p.x-hall.x)*.87,z:hall.z+(p.z-hall.z)*.87,type:tower,wallAxis:0,plannedDefense:true};
-  if([[-3,-3],[-3,3],[3,-3],[3,3]].every(([dx,dz])=>passable(v.x+dx,v.z+dz))&&!occupied(v,buildings)&&slots.every(w=>distance(v,w)>6))towers.push(v);
+ for(const target of [4,12,20,28]){
+  let chosen=null;
+  for(const di of [0,-1,1,-2,2,-3,3,-4,4,-5,5,-6,6,-7,7,-8,8])for(const inset of [11,14,17,20]){
+   if(chosen)continue;
+   const p=points[(target+di+32)%32],len=distance(p,hall),v={x:p.x-(p.x-hall.x)/len*inset,z:p.z-(p.z-hall.z)/len*inset,type:tower,wallAxis:0,plannedDefense:true};
+   if(!(city.world?.resources||[]).some(r=>!r.removed&&!['tree','berry','game','fish'].includes(r.kind)&&Math.abs(r.x-v.x)<(r.depositSite?10:4.5)&&Math.abs(r.z-v.z)<(r.depositSite?10:4))&&[[-5,-5],[-5,5],[5,-5],[5,5]].every(([dx,dz])=>passable(v.x+dx,v.z+dz))&&!occupied(v,buildings)&&slots.every(w=>distance(v,w)>7)&&towers.every(t=>distance(v,t)>18))chosen=v;
+  }
+  if(chosen)towers.push(chosen);
  }
- slots.push(...towers);
- return {version:176,kind:'terrain-following',shape:'organic-terrain-enclosure',slots,
+ if(towers.length<2)return null;
+ // Fund towers during curtain construction, before the last wall section.
+ const orderedSlots=[...slots.slice(0,gates.length)],curtains=slots.slice(gates.length);
+ for(let i=0;i<curtains.length;i++){orderedSlots.push(curtains[i]);if(i===1||i===12||i===25||i===38){const t=towers.shift();if(t)orderedSlots.push(t);}}
+ orderedSlots.push(...towers);slots.splice(0,slots.length,...orderedSlots);
+ return {version:177,closedRingV177:true,kind:'terrain-following',shape:'organic-terrain-enclosure',slots,
   gates:gates.map(g=>g.slot),gateOpenings:gates.length,outlineV176:outline,
-  naturalBarriersV176:natural,terrainBackedV176:natural.length>0,
+  naturalBarriersV176:natural.length?natural:anchor?[{kind:anchor.kind,points:[],backsBuiltRing:true}]:[],terrainBackedV176:!!anchor,
   terrainBlockedAtFounding:0,initialBlocked:0,initialViable:slots.length,
   verifiedAtTechV167:true,nextIndex:0,constructed:0,blocked:0,seed,
   rx:Math.max(...points.map(p=>Math.abs(p.x-hall.x))),rz:Math.max(...points.map(p=>Math.abs(p.z-hall.z)))};

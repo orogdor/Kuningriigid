@@ -1,3 +1,4 @@
+import {planRoadGatesV177} from './road-gates-v177.js';
 import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
 import {canAfford} from './economy.js';
 import {planStoneVillageDefenses} from './stone-village-defenses-v166.js?v=169a';
@@ -41,6 +42,7 @@ export function defenseEligibility({population,readyHouses,services,waiting,stoc
  return {ok:reason===null,reason};
 }
 export function planAIDefenses(game,team,city){
+ if(planRoadGatesV177(game,city))return;
  if(planStoneVillageDefenses(game,team,city))return;
  if(game.s.time<(city.nextDefenseCheckV128||0))return;
  const realm=city.economy.realms[team],stock=realm.resources,all=game.allBuildings(city);
@@ -61,7 +63,7 @@ export function planAIDefenses(game,team,city){
  if(existing.filter(b=>!b.ready).length>=(realm.pop>=BRONZE_FORTIFY_POP_V160?2:1)){
   city.aiDefenseDiagnosticV146={reason:'wall-being-built',checkedAt:game.s.time};return;
  }
- const local=city.economy.buildings.filter(b=>!b.virtual&&b.hp>0);
+ const local=(game.defenseBuildingsV177?.(city)||city.economy.buildings).filter(b=>!b.virtual&&b.hp>0);
  if(!city.defensePlanV139||(city.defensePlanV139.version<176&&!city.defensePlanV139.terrainSurveyV176&&!local.some(b=>b.historicPerimeterV139||b.historicPalisadeV166))){
   // The entire ring is fixed at the time of first fortification.
   const available=id=>!game.buildRule(city,id);
@@ -109,9 +111,9 @@ export function planAIDefenses(game,team,city){
  });
  for(let i=0;i<Math.min(32,viable.length);i++){
   const n=((plan.nextIndex||0)+i)%viable.length,slot=viable[n];
-  const preview=game.previewBuild(city,slot.type,slot);
+  const preview=game.previewDefenseV177?game.previewDefenseV177(city,slot):game.previewBuild(city,slot.type,slot);
   if(preview.error){reasons.site=(reasons.site||0)+1;continue;}
-  const result=game.build(city,slot.type,{...slot,plannedDefense:true});
+  const result=game.buildDefenseV177?game.buildDefenseV177(city,{...slot,plannedDefense:true}):game.build(city,slot.type,{...slot,plannedDefense:true});
   if(!result.building){reasons.build=(reasons.build||0)+1;continue;}
   result.building.plannedDefense=true;
   result.building.historicPerimeterV139=true;

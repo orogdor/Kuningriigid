@@ -40,9 +40,9 @@ assert.notDeepEqual(plans[0].plan.outlineV176,terrainDefensePlanV176({wallTerrai
 // The real AI scheduler buys and persists its organic wall segments using
 // the ordinary game's tech, deposit, collision and material rules.
 const state=JSON.parse(fs.readFileSync('scenarios/ai-stone-v174.json'));
-const game=new Civilization(state),city=game.s.cities.find(c=>c.id===3),team=city.team;
+const game=new Civilization(state),city=game.s.cities.find(c=>c.id===2),team=city.team;
 const fortTypes=new Set(['palisade','woodgate','watchtower','stonewall','stonetower','gatehouse','reinforced_wall']);
-city.economy.buildings=city.economy.buildings.filter(b=>!fortTypes.has(b.type));
+city.economy.buildings=city.economy.buildings.filter(b=>['hall','house','well','lumber','study'].includes(b.type));
 for(const b of city.economy.buildings)b.ready=true;
 delete city.stoneDefensePlanV166;delete city.stoneDefenseReserveV168;
 game.s.ages[team]=0;
@@ -50,6 +50,9 @@ game.s.research[team].known=[...new Set([...game.s.research[team].known,'fortifi
 const stock=city.economy.realms[team].resources;
 Object.assign(stock,{wood:10000,stone:10000,water:10000,bread:10000});
 city.economy.realms[team].pop=Math.max(10,city.economy.realms[team].pop);
+// This scheduling fixture has a vacant defensive corridor; deposit collision
+// has separate real-save regressions and the V177 generated scenario.
+city.world.resources=city.world.resources.filter(r=>['tree','berry','game','fish'].includes(r.kind));
 game.nav(city).rebuild();
 let paid=0;
 for(let step=0;step<100;step++){
@@ -62,7 +65,7 @@ for(let step=0;step<100;step++){
  }
  if(city.aiStoneDefenseStatusV166?.reason==='ring-complete')break;
 }
-assert.equal(city.stoneDefensePlanV166?.version,176,'real scheduler adopts natural plan');
+assert.equal(city.stoneDefensePlanV166?.version,177,'real scheduler adopts natural plan');
 assert.ok(paid>=5,'real AI bought gates and multiple rotated wall sections');
 assert.equal(city.aiStoneDefenseStatusV166?.reason,'ring-complete',JSON.stringify(city.aiStoneDefenseStatusV166));
 assert.ok(city.economy.buildings.some(b=>b.historicPalisadeV166&&Number.isFinite(b.wallAngleV175)),'angle persists on real paid buildings');

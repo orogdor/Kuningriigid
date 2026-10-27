@@ -20,7 +20,7 @@ assert.ok(game.cell(test.mountain).mountain,'genuine mountain survives V4 load')
 assert.ok(city.stoneDefensePlanV166.terrainBackedV176);
 assert.equal(test.townStats.ready,test.townStats.total);
 assert.ok(test.townStats.total>=30);
-for(const slot of city.stoneDefensePlanV166.slots)assert.ok(city.economy.buildings.some(b=>b.type===slot.type&&b.ready&&b.hp>0&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5)),'every advertised defense really exists');
+for(const slot of city.stoneDefensePlanV166.slots)assert.ok(game.defenseBuildingsV177(city).some(b=>b.type===slot.type&&b.ready&&b.hp>0&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5)),'every advertised defense really exists');
 const before=loaded.time;game.tick(2);assert.ok(game.s.time>before,'player can resume');
 assert.equal(city.team,0);
 assert.equal(game.s.winner,null,'isolated snapshot is playable');
@@ -28,7 +28,9 @@ assert.equal(game.s.winner,null,'isolated snapshot is playable');
 const reserved=structuredClone(start.cities[0].stoneDefenseReserveV168);
 const original=new Civilization(structuredClone(start)),originalCity=original.s.cities[0];
 const chosen=bestStoneVillageWallPlan(original,originalCity,originalCity.economy.buildings,original.s.seed);
-assert.deepEqual(chosen.slots,reserved.slots,'technology-time survey keeps the reserved physical contour');
+assert.ok(chosen.closedRingV177,'legacy open reserve upgrades to a closed physical contour');
+originalCity.stoneDefenseReserveV168=structuredClone(chosen);
+assert.deepEqual(bestStoneVillageWallPlan(original,originalCity,originalCity.economy.buildings,original.s.seed).slots,chosen.slots,'new closed reservation remains stable');
 // Ordinary building rules require six metres around an existing field.
 // Protect that same margin even if the oriented thin wall would miss its crop rectangle.
 const field={x:0,z:0,width:48,depth:32};

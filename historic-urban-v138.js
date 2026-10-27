@@ -78,7 +78,7 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
    const civic=CIVIC.has(type),rural=RURAL.has(type),industrial=INDUSTRIAL.has(type);
    const compact=stoneAge&&compactStoneTypesV172(type)?
     compactStonePlotScoreV172(type,gx,gz,coreNeighbours):null;
-   const priority=(dx===0&&dz===0?defensePlotPenaltyV176({x:px,z:pz},type,parent.stoneDefensePlanV166||parent.defensePlanV139||parent.stoneDefenseReserveV168):0)+(compact!=null?compact:stoneAge?stoneTownPlotScore(type,gx,gz,seed):
+   const priority=(defensePlotPenaltyV176({x:px+dx*DETAIL_TILE_X,z:pz+dz*DETAIL_TILE_Z},type,parent.stoneDefensePlanV166||parent.defensePlanV139||parent.stoneDefenseReserveV168))+(compact!=null?compact:stoneAge?stoneTownPlotScore(type,gx,gz,seed):
                     civic?Math.abs(street.radius-42)*.13:
                     rural?-street.radius*.075:
                     industrial?Math.abs(street.radius-170)*.045:
