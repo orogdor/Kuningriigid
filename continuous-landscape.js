@@ -229,11 +229,11 @@ export function roadSpline(game,a,b,count=12,connection=null){
  }
  return pts;
 }
-export function roadNetwork(game){
+export function roadNetwork(game,{includeUnseen=false}={}){
  const edges=[],connection=new Map();
  for(const key of Object.keys(game.s.worldRoads||{})){
   const [a,b]=roadPoints(key);if(!a||!b)continue;
-  const level=roadLevel(roadStrength(game.s,a,b,game.s.time));if(!level||!game.seen(0,a)||!game.seen(0,b))continue;
+  const level=roadLevel(roadStrength(game.s,a,b,game.s.time));if(!level||(!includeUnseen&&(!game.seen(0,a)||!game.seen(0,b))))continue;
   const A=game.cell(a),B=game.cell(b);if(!A||!B)continue;
   edges.push({a,b,level});
   for(const [p,q]of [[a,B],[b,A]]){const id=idx(p),n=connection.get(id)||[];n.push(q);connection.set(id,n)}

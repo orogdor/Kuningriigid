@@ -1,5 +1,5 @@
 import {detailWorldRoadWidth} from './road-width-v89.js';
-import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
+import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 // V67: one topology for each river system and each road network. The atlas
 // and detailed view are different projections of exactly the same vertices,
 // NEVER independently drawn rectangular per-tile water/road chunks.
@@ -213,27 +213,52 @@ export function roadRibbonClearV175(a,b,obstacles=[],extra=0){
  }
  return true;
 }
+// Route the part of an existing strategic road inside the active tile through
+// the same walkable grid as citizens. The outer road graph is preserved.
+export function routeRoadThroughTileV182(points,tile,nav){
+ const local=points.map(p=>worldToLocal(tile,p.x,p.z));
+ const inside=p=>Math.abs(p.x)<=DETAIL_HALF_X+.1&&Math.abs(p.z)<=DETAIL_HALF_Z+.1;
+ const first=local.findIndex(inside),last=local.findLastIndex(inside);
+ if(first<0||last<=first)return null;
+ const a=nav.nearest(local[first],16),b=nav.nearest(local[last],16);
+ if(!a||!b)return null;
+ const path=nav.route(a,b,{preferRoads:true});if(!path?.length)return null;
+ const middle=path.map(p=>localToWorld(tile,p.x,p.z));
+ return [...points.slice(0,first),...middle,...points.slice(last+1)];
+}
+function adjustRibbonForNavV182(x,nav){
+ // Taper the road and verge at gates while retaining a visible continuous bed.
+ for(let k=0;k<8;k++){
+  if(nav.open(x.l.x,x.l.z)&&nav.open(x.r.x,x.r.z))break;
+  for(const p of [x.l,x.r,x.ol,x.or]){p.x=x.m.x+(p.x-x.m.x)*.72;p.z=x.m.z+(p.z-x.m.z)*.72;}
+ }
+}
 export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=null){
  const group=new T.Group();group.name='V67 continuous road graph';group.userData.roadNetwork=true;
  // V149: one lit ribbon per road (soft verge | bed | soft verge) with across/along UVs; the
  // surface (ruts, gravel, cobbles, flagstones) is drawn by the road shader from the road level.
  const pos=[],uv=[],lvl=[],index=[],centrelines=[];
+ const nav=scope==='detail'&&tile&&!game.s.battle?game.nav(tile):null;
+ const owner=scope==='detail'&&tile?game.territoryOwner(tile):null;
+ const dirt=scope==='detail'&&game.s.ages?.[owner?.team??0]===0;
  let roads=0,beds=0;
  for(const edge of roadNetwork(game)){
   if(!visible(tile,edge.points))continue;
-  const pts=scope!=='world'&&obstacles?.length?steerAroundPlots(edge.points,tile,obstacles,detailWorldRoadWidth(edge.level)*.8+1.2):edge.points;
+  const routed=nav?routeRoadThroughTileV182(edge.points,tile,nav):null;
+  const pts=routed||(scope!=='world'&&obstacles?.length?steerAroundPlots(edge.points,tile,obstacles,detailWorldRoadWidth(edge.level)*.8+1.2):edge.points);
   if(scope!=='world'&&tile)centrelines.push(pts.map(p=>worldToLocal(tile,p.x,p.z)));
   const xs=join(pts,game,scope,tile,'road',edge.level);
+  if(routed)for(const x of xs)if(nav.open(x.m.x,x.m.z))adjustRibbonForNavV182(x,nav);
   let along=0,base=pos.length/3;
   for(let i=0;i<xs.length;i++){
    if(i){const p=pts[i],q=pts[i-1];along+=Math.hypot(p.x-q.x,p.z-q.z);}
    const x=xs[i];
-   for(const [v,u] of [[x.ol,-1.5],[x.l,-1],[x.r,1],[x.or,1.5]]){pos.push(v.x,v.y,v.z);uv.push(u,along);lvl.push(edge.level)}
+   for(const [v,u] of [[x.ol,-1.5],[x.l,-1],[x.r,1],[x.or,1.5]]){pos.push(v.x,v.y,v.z);uv.push(u,along);lvl.push(dirt?1:edge.level)}
    if(i){
     const r0=base+(i-1)*4,r1=base+i*4;
     // A smooth curve can cut a blocked corner even if all the generated
     // centre points are legal. Sample the actual outer road ribbon too.
-    const clear=scope==='world'||!obstacles?.length||
+    const clear=routed&&nav.open(xs[i-1].m.x,xs[i-1].m.z)&&nav.open(xs[i].m.x,xs[i].m.z)?nav.clear(xs[i-1].m,xs[i].m):scope==='world'||!obstacles?.length||
       (roadRibbonClearV175(xs[i-1].m,xs[i].m,obstacles)&&
        roadRibbonClearV175(xs[i-1].ol,xs[i].ol,obstacles)&&
        roadRibbonClearV175(xs[i-1].or,xs[i].or,obstacles)&&

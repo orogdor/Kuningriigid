@@ -1,5 +1,4 @@
-import {roadCurve,worldToDetail} from './landscape-shared.js?v=123a';
-import {roadLevel,roadStrength} from './roads.js?v=59';
+import {roadNetwork,worldToLocal} from './continuous-landscape.js?v=162a';
 import {wornStreetCellsV173,visibleTrailStrengthV173} from './living-streets-v173.js';
 export function defenseRoadCellsV177(game,city){
  const parent=game.parentCity(city),out=[];
@@ -7,15 +6,15 @@ export function defenseRoadCellsV177(game,city){
   const b=ctx.world.navBounds,i=(p.z-b.minZ)*b.w+p.x-b.minX;
   out.push({x:p.x+(ctx.c-parent.c)*225,z:p.z+(ctx.r-parent.r)*195,strength:visibleTrailStrengthV173(ctx.world.heat[i],ctx.world.heatLast?.[i],game.s.time)});
  }
- // Strategic roads are distinct from local pedestrian wear. Sample the
- // same canonical world-road curve used by the renderer, in city coordinates.
- for(const ctx of game.contexts(parent))for(const [dc,dr] of [[1,0],[-1,0],[0,1],[0,-1]]){
-  const tile=game.cell(ctx),other=game.cell({c:ctx.c+dc,r:ctx.r+dr});if(!tile||!other)continue;
-  const heat=roadStrength(game.s,tile,other,game.s.time);if(!roadLevel(heat))continue;
-  const points=roadCurve(game,tile,other,96);
-  for(const point of points){const p=worldToDetail(tile,point.x,point.z);
-   if(Math.abs(p.x)>112.5||Math.abs(p.z)>97.5)continue;
-   out.push({x:p.x+(ctx.c-parent.c)*225,z:p.z+(ctx.r-parent.r)*195,strength:Math.max(13,heat),worldRoad:true});
+ // Sample the identical road spline used to draw the highway. The AI may
+ // know its own roads even when the human player has not explored them.
+ const base=game.cell(parent),contexts=game.contexts(parent);
+ for(const edge of roadNetwork(game,{includeUnseen:true})){
+  if(!contexts.some(ctx=>[edge.a,edge.b].some(p=>Math.abs(p.c-ctx.c)<=1&&Math.abs(p.r-ctx.r)<=1)))continue;
+  for(let i=1;i<edge.points.length;i++){
+   const a=worldToLocal(base,edge.points[i-1].x,edge.points[i-1].z),b=worldToLocal(base,edge.points[i].x,edge.points[i].z);
+   const n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/2));
+   for(let j=0;j<=n;j++){const t=j/n;out.push({x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t,strength:Math.max(13,edge.level*25),worldRoad:true});}
   }
  }
  return out;
