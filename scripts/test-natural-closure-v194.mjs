@@ -20,7 +20,7 @@ const split={defenseTerrainKindV176:(_c,x,z)=>x<0&&z>80?'mountain':null,
 const runs=partialNaturalBoundariesV195(split,{},a,b,0,1,'mountain');
 assert.ok(runs.length,'half-width mountain should still close part of the rear');
 assert.ok(runs[0].naturalLengthV194>30);
-const {allowedSuburbJoinV191}=await import('../outer-ring-v184.js');
+const {allowedSuburbJoinV191,allowedSuburbCornerV201}=await import('../outer-ring-v184.js');
 const old={type:'palisade',drawnWallV175:true,x:0,z:0,wallAngleV175:0,palisadeSpanV167:7.52};
 const side={type:'palisade',drawnWallV175:true,outerRingV184:true,x:0,z:4,
  wallAngleV175:-Math.PI/2,palisadeSpanV167:8.52};
@@ -28,4 +28,7 @@ assert.ok(allowedSuburbJoinV191(side,old),'wall may join the middle of a histori
 assert.ok(!allowedSuburbJoinV191({...side,wallAngleV175:0},old),'parallel overlap must not bypass spacing');
 assert.ok(allowedSuburbJoinV191(side,{...old,drawnWallV175:false}),'old, long non-drawn timber section may receive a physical T-junction');
 assert.ok(!allowedSuburbJoinV191(side,{...old,type:'woodgate'}),'never close or bypass an old gate');
-console.log('V196 continuous coastal/cliff closure and safe T-junction PASS');
+const nextOld={...old,x:7,z:0};
+assert.ok(allowedSuburbCornerV201(side,nextOld,[old,nextOld]),'neighbor in same historic curtain does not block linked wall');
+assert.ok(!allowedSuburbCornerV201(side,{...nextOld,x:17},[old,{...nextOld,x:17}]),'unconnected old wall still blocks');
+console.log('V201 physical coast/cliff and safe historic-corner junction PASS');

@@ -45,6 +45,20 @@ export function allowedSuburbJoinV191(a,b){
  });
  return attached&&Math.hypot(a.x-b.x,a.z-b.z)>2.5;
 }
+
+export function allowedSuburbCornerV201(a,b,neighbors=[]){
+ if(!a.outerRingV184||!a.drawnWallV175||
+  !['palisade','stonewall','reinforced_wall'].includes(b.type))return false;
+ const linked=neighbors.filter(w=>w!==b&&allowedSuburbJoinV191(a,w));
+ if(!linked.length)return false;
+ const ends=w=>{
+  const angle=w.wallAngleV175??(w.wallAxis?Math.PI/2:0),half=(w.palisadeSpanV167||7)/2;
+  return [-1,1].map(sign=>({x:w.x+Math.cos(angle)*half*sign,z:w.z-Math.sin(angle)*half*sign}));
+ };
+ const neighborsEnds=ends(b);
+ return linked.some(link=>ends(link).some(p=>neighborsEnds.some(q=>meters(p,q)<=1.7)));
+}
+
 const HOME_TYPES=new Set(['house','hall','market','well','warehouse','cellar','study','chapel','library','scriptorium','inn']);
 const BAD_TERRAIN=new Set(['water','mountain','river']);
 const meters=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
@@ -415,7 +429,7 @@ export function findOuterRingV184(game,city){
    naturalFailures:diagnostic.firstFailures,
    chosen:natural?.kind||'none'};
   return {
-   version:200,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   version:201,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
    historicSuburbV191:true,expandedSuburbV193:true,
    naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
      length:natural.naturalLengthV194,partial:!!natural.partialV195,

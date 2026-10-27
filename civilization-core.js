@@ -1,5 +1,5 @@
 import {planRoadGatesV177} from './road-gates-v177.js';
-import {protectedHousingZoneV184,allowedSuburbJoinV191} from './outer-ring-v184.js?v=200';
+import {protectedHousingZoneV184,allowedSuburbJoinV191,allowedSuburbCornerV201} from './outer-ring-v184.js?v=201';
 import {mountainBlockedV178} from './mountain-foot-v178.js';
 import {wallTerrainErrorV1758,wallEndJoinV1758} from './wall-terrain-v1758.js';
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
@@ -10,7 +10,7 @@ import {objectCrossesWoodenRingV168} from './stone-fort-footprints-v168.js';
 import {allocateTerritory} from './territory-v143.js';
 import {urbanExpansionFits,grownCityRadius} from './city-area-v142.js';
 import {installGameRevisions,citySummary,cityContexts,cityLookup,navigationRevision,resourcesNear,buildingsNear} from './perf-state-v131.js';
-import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js?v=200';
+import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js?v=201';
 import {applyDevelopmentBalance,combatUnit,militaryChoices,readyForNextEra,allowAIResearch} from './ai-development-v128.js';
 import {farmWork,fieldSize,fieldContains,validateField,migrateLegacyFarms,AI_FIELD_WIDTH,AI_FIELD_DEPTH} from './farming-v127.js';
 import {marketFoodGrowth} from './city-growth-v137.js';
@@ -534,7 +534,14 @@ export class Civilization{
   const position=localToWorld(cell,x,z),river=riverNear(this,position.x,position.z);
   return river.distance>=river.width*.97||river.fordStrength>=.75||!!tile.bridge&&river.distance<river.width*1.15;
  }
- placementEnv(city,type){const env=this.env(city);if(isDrawableWallV175(type)){const parent=this.parentCity(city);env.passable=(x,z)=>this.defenseTerrainPassableV177(city,x+(city.c-parent.c)*DETAIL_TILE_X,z+(city.r-parent.r)*DETAIL_TILE_Z);}if(isDrawableWallV175(type)||['woodgate','gatehouse','watchtower','stonetower'].includes(type)){const near=env.nearBuildings;env.nearBuildings=(p,t)=>near(p,t).filter(b=>!wallEndJoinV1758({...p,type},b)&&!allowedSuburbJoinV191({...p,type},b)&&!(p.plannedDefense&&b.plannedDefense&&((['watchtower','stonetower'].includes(type)&&isDrawableWallV175(b.type))||(isDrawableWallV175(type)&&['watchtower','stonetower'].includes(b.type)))));}if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
+ placementEnv(city,type){const env=this.env(city);if(isDrawableWallV175(type)){const parent=this.parentCity(city);env.passable=(x,z)=>this.defenseTerrainPassableV177(city,x+(city.c-parent.c)*DETAIL_TILE_X,z+(city.r-parent.r)*DETAIL_TILE_Z);}if(isDrawableWallV175(type)||['woodgate','gatehouse','watchtower','stonetower'].includes(type)){const near=env.nearBuildings;env.nearBuildings=(p,t)=>{const bs=near(p,t),wall={...p,type};
+ return bs.filter(b=>!wallEndJoinV1758(wall,b)&&!allowedSuburbJoinV191(wall,b)&&
+  !allowedSuburbCornerV201(wall,b,bs)&&
+  !(p.plannedDefense&&b.plannedDefense&&(
+   (['watchtower','stonetower'].includes(type)&&isDrawableWallV175(b.type))||
+   (isDrawableWallV175(type)&&['watchtower','stonetower'].includes(b.type))
+  )));
+ };}if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
  buildingSites(city,type){if(MINERAL_BUILDINGS[type]){const r=mineralSite(city.world,type);return r?[{x:r.x,z:r.z}]:[]}if(COASTAL_BUILDINGS.has(type))return coastalSites(this,this.cell(city),type);const parent=this.parentCity(city);return historicalBuildingPlots(city,parent,type,this.s.seed+parent.id*31,this.s.ages[parent.team]===0)}
  previewBuild(city,type,p){
   const error=this.buildRule(city,type,p||{});if(error)return {error};
