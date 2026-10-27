@@ -2,111 +2,63 @@
   "version": 174,
   "pass": true,
   "seed": 142023,
-  "turn": 107,
-  "sourceTeam": 3,
-  "selectedCity": "Sogn",
-  "selectedCityId": 0,
+  "turn": 151,
+  "sourceTeam": 2,
+  "selectedCity": "Fyrisvellir",
+  "selectedCityId": 3,
   "age": 0,
   "targetTown": {
-    "turn": 107,
-    "team": 3,
-    "name": "Sogn",
-    "id": 0,
+    "turn": 151,
+    "team": 2,
+    "name": "Fyrisvellir",
+    "id": 3,
     "age": 0,
-    "pop": 11,
-    "totalBuildings": 42,
-    "readyBuildings": 42,
-    "houses": 11,
+    "pop": 16,
+    "totalBuildings": 79,
+    "readyBuildings": 76,
+    "houses": 12,
     "halls": 1,
     "markets": 0,
-    "farms": 1,
-    "fields": 1,
-    "lumber": 2,
+    "farms": 2,
+    "fields": 2,
+    "lumber": 1,
     "gates": 2,
     "towers": 4,
-    "walls": 14,
-    "defensesReady": 20,
-    "defensesTotal": 20,
-    "food": 52.814285714285994,
-    "wood": 34,
+    "walls": 44,
+    "defensesReady": 50,
+    "defensesTotal": 50,
+    "food": 81.28571428571443,
+    "wood": 120,
     "stone": 120
   },
-  "meanHouseDistance": 35.615875372990864,
+  "meanHouseDistance": 32.818242880132466,
   "otherTowns": [
     {
-      "turn": 107,
-      "team": 3,
-      "name": "Sogn",
-      "id": 0,
+      "turn": 151,
+      "team": 2,
+      "name": "Fyrisvellir",
+      "id": 3,
       "age": 0,
-      "pop": 11,
-      "totalBuildings": 42,
-      "readyBuildings": 42,
-      "houses": 11,
-      "halls": 1,
-      "markets": 0,
-      "farms": 1,
-      "fields": 1,
-      "lumber": 2,
-      "gates": 2,
-      "towers": 4,
-      "walls": 14,
-      "defensesReady": 20,
-      "defensesTotal": 20,
-      "food": 52.814285714285994,
-      "wood": 34,
-      "stone": 120
-    },
-    {
-      "turn": 109,
-      "team": 1,
-      "name": "Sampola",
-      "id": 2,
-      "age": 0,
-      "pop": 17,
-      "totalBuildings": 41,
-      "readyBuildings": 41,
+      "pop": 16,
+      "totalBuildings": 79,
+      "readyBuildings": 76,
       "houses": 12,
       "halls": 1,
       "markets": 0,
-      "farms": 1,
-      "fields": 1,
+      "farms": 2,
+      "fields": 2,
       "lumber": 1,
       "gates": 2,
       "towers": 4,
-      "walls": 14,
-      "defensesReady": 20,
-      "defensesTotal": 20,
-      "food": 65.81428571428587,
-      "wood": 11,
-      "stone": 120
-    },
-    {
-      "turn": 69,
-      "team": 2,
-      "name": "Vendel",
-      "id": 1,
-      "age": 0,
-      "pop": 9,
-      "totalBuildings": 42,
-      "readyBuildings": 41,
-      "houses": 8,
-      "halls": 1,
-      "markets": 0,
-      "farms": 2,
-      "fields": 1,
-      "lumber": 2,
-      "gates": 2,
-      "towers": 4,
-      "walls": 16,
-      "defensesReady": 22,
-      "defensesTotal": 22,
-      "food": 41.65000000000001,
-      "wood": 115.4,
+      "walls": 44,
+      "defensesReady": 50,
+      "defensesTotal": 50,
+      "food": 81.28571428571443,
+      "wood": 120,
       "stone": 120
     }
   ],
-  "firstBronzeAt": 108,
+  "firstBronzeAt": 152,
   "milestones": [
     {
       "turn": 20,
@@ -196,7 +148,7 @@
       "ages": [
         0,
         0,
-        1,
+        0,
         0
       ],
       "towns": [
@@ -208,17 +160,17 @@
         {
           "team": 2,
           "name": "Vendel",
-          "pop": 13
+          "pop": 9
         },
         {
           "team": 1,
           "name": "Sampola",
-          "pop": 13
+          "pop": 14
         },
         {
           "team": 2,
           "name": "Fyrisvellir",
-          "pop": 11
+          "pop": 9
         }
       ]
     },
@@ -227,19 +179,19 @@
       "ages": [
         0,
         0,
-        1,
+        0,
         0
       ],
       "towns": [
         {
           "team": 3,
           "name": "Sogn",
-          "pop": 10
+          "pop": 16
         },
         {
           "team": 2,
           "name": "Vendel",
-          "pop": 19
+          "pop": 9
         },
         {
           "team": 1,
@@ -249,17 +201,48 @@
         {
           "team": 2,
           "name": "Fyrisvellir",
-          "pop": 17
+          "pop": 9
         }
       ]
     },
     {
-      "turn": 116,
+      "turn": 120,
       "ages": [
         0,
-        1,
-        1,
-        1
+        0,
+        0,
+        0
+      ],
+      "towns": [
+        {
+          "team": 3,
+          "name": "Sogn",
+          "pop": 15
+        },
+        {
+          "team": 2,
+          "name": "Vendel",
+          "pop": 12
+        },
+        {
+          "team": 1,
+          "name": "Sampola",
+          "pop": 19
+        },
+        {
+          "team": 2,
+          "name": "Fyrisvellir",
+          "pop": 12
+        }
+      ]
+    },
+    {
+      "turn": 140,
+      "ages": [
+        0,
+        0,
+        0,
+        0
       ],
       "towns": [
         {
@@ -270,26 +253,67 @@
         {
           "team": 2,
           "name": "Vendel",
-          "pop": 23
+          "pop": 15
         },
         {
           "team": 1,
           "name": "Sampola",
-          "pop": 19
+          "pop": 21
         },
         {
           "team": 2,
           "name": "Fyrisvellir",
-          "pop": 20
+          "pop": 14
         },
         {
           "team": 3,
           "name": "Rogaland",
-          "pop": 4
+          "pop": 3
+        }
+      ]
+    },
+    {
+      "turn": 155,
+      "ages": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "towns": [
+        {
+          "team": 3,
+          "name": "Sogn",
+          "pop": 14
+        },
+        {
+          "team": 2,
+          "name": "Vendel",
+          "pop": 18
+        },
+        {
+          "team": 1,
+          "name": "Sampola",
+          "pop": 21
+        },
+        {
+          "team": 2,
+          "name": "Fyrisvellir",
+          "pop": 17
+        },
+        {
+          "team": 3,
+          "name": "Rogaland",
+          "pop": 8
+        },
+        {
+          "team": 1,
+          "name": "Ainola",
+          "pop": 3
         }
       ]
     }
   ],
-  "gameTimeSeconds": 6420,
-  "savedBytes": 493701
+  "gameTimeSeconds": 9060,
+  "savedBytes": 1183944
 }

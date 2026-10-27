@@ -1,7 +1,7 @@
 // V174: playable real AI settlement near the Stone-to-Bronze transition.
 // Demo fetch does not modify the player's own autosave.
 export async function loadAIStoneV174(fetcher=fetch){
- const response=await fetcher('./scenarios/ai-stone-v174.json?v=174-stone-takeover');
+ const response=await fetcher('./scenarios/ai-stone-v174.json?v=180-coastal-takeover');
  if(!response.ok)throw Error('Kiviaja lõpu AI testsalvestust ei saadud laadida ('+response.status+').');
  const s=await response.json(),test=s.stoneTestV174;
  const city=s.cities?.find(c=>c.id===test?.targetCityId);

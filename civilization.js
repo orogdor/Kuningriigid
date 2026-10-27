@@ -1,4 +1,4 @@
-import {loadAIMountainV176} from './ai-mountain-demo-v176.js?v=179a';
+import {loadAIMountainV176} from './ai-mountain-demo-v176.js?v=180test';
 import {loadIronCityV143} from './ai-iron-demo-v143.js';
 import {loadAIMedievalV144} from './ai-medieval-demo-v144.js';
 import {loadAIMedievalV145} from './ai-medieval-demo-v145.js';
@@ -9,7 +9,7 @@ import {loadAIMedievalV159} from './ai-medieval-demo-v159.js';
 import {loadAIStoneV171} from './ai-stone-demo-v171.js?v=171a';
 import {loadAIStoneV172} from './ai-stone-demo-v172.js?v=172a';
 import {loadAIStoneV173} from './ai-stone-demo-v173.js?v=173a';
-import {loadAIStoneV174} from './ai-stone-demo-v174.js?v=174a';
+import {loadAIStoneV174} from './ai-stone-demo-v174.js?v=180test';
 import {loadAIMedievalV153} from './ai-medieval-demo-v153.js';
 import {cityExtent,nextCityPopulation} from './city-area-v142.js';
 import {loadIronCityV142} from './ai-iron-demo-v142.js';
