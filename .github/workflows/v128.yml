@@ -56,5 +56,7 @@ jobs:
         run: node TEST_V178_CITY_AREA.mjs
       - name: Cliff embedded wall ends and integrated towers (V179)
         run: node TEST_V179_CLIFF_TOWERS.mjs
+      - name: Strategic road gates and usable crossings (V181)
+        run: node TEST_V181_WORLD_ROAD_GATES.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic

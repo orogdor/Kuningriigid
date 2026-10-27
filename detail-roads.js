@@ -109,7 +109,7 @@ export function createDetailTrailLinks(spots,nav,height){
  const blockers=(nav.buildings?.()||[]).filter(b=>b.hp>0&&!b.virtual).flatMap(b=>{
   if(b.type==='woodgate'||b.type==='gatehouse'){
    const wide=b.type==='woodgate'&&b.extendedPalisadeV166,
-    offset=wide?5.2:2.55,post=wide?1.6:2.2;
+    offset=wide?5.2:2.55,post=wide?1.6:1.35;
    return [-1,1].map(sign=>b.wallAxis?
     {b:{x:b.x,z:b.z+sign*offset},f:{rx:.95,rz:post}}:
     {b:{x:b.x+sign*offset,z:b.z},f:{rx:post,rz:.95}});

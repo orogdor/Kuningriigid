@@ -1,9 +1,22 @@
+import {roadCurve,worldToDetail} from './landscape-shared.js?v=123a';
+import {roadLevel,roadStrength} from './roads.js?v=59';
 import {wornStreetCellsV173,visibleTrailStrengthV173} from './living-streets-v173.js';
 export function defenseRoadCellsV177(game,city){
  const parent=game.parentCity(city),out=[];
  for(const ctx of game.contexts(parent))for(const p of wornStreetCellsV173(ctx.world,game.s.time,4)){
   const b=ctx.world.navBounds,i=(p.z-b.minZ)*b.w+p.x-b.minX;
   out.push({x:p.x+(ctx.c-parent.c)*225,z:p.z+(ctx.r-parent.r)*195,strength:visibleTrailStrengthV173(ctx.world.heat[i],ctx.world.heatLast?.[i],game.s.time)});
+ }
+ // Strategic roads are distinct from local pedestrian wear. Sample the
+ // same canonical world-road curve used by the renderer, in city coordinates.
+ for(const ctx of game.contexts(parent))for(const [dc,dr] of [[1,0],[-1,0],[0,1],[0,-1]]){
+  const tile=game.cell(ctx),other=game.cell({c:ctx.c+dc,r:ctx.r+dr});if(!tile||!other)continue;
+  const heat=roadStrength(game.s,tile,other,game.s.time);if(!roadLevel(heat))continue;
+  const points=roadCurve(game,tile,other,96);
+  for(const point of points){const p=worldToDetail(tile,point.x,point.z);
+   if(Math.abs(p.x)>112.5||Math.abs(p.z)>97.5)continue;
+   out.push({x:p.x+(ctx.c-parent.c)*225,z:p.z+(ctx.r-parent.r)*195,strength:Math.max(13,heat),worldRoad:true});
+  }
  }
  return out;
 }
