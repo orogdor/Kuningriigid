@@ -1,3 +1,4 @@
+import {shoreWallCurveV1758} from './wall-terrain-v1758.js';
 // V175.2: touch/mouse wall-stroke geometry. No game globals, no save writes.
 // The builder owns resources, technology, terrain and pathfinding checks.
 // V175.3: short timber overlaps at adjacent joints hide small model-end gaps.
@@ -29,8 +30,9 @@ export function smoothedWallStrokeV175(points=[],shape='straight'){
  }
  return path;
 }
-export function wallStrokePlanV175(points,shape='straight',maxSegments=WALL_DRAW_V175.maxSegments){
- const curve=smoothedWallStrokeV175(points,shape);
+export function wallStrokePlanV175(points,shape='straight',maxSegments=WALL_DRAW_V175.maxSegments,passable=null){
+ let curve=smoothedWallStrokeV175(points,shape);
+ if(passable){const clipped=shoreWallCurveV1758(curve,passable);if(clipped.error)return {...clipped,segments:[]};curve=clipped.curve;}
  if(curve.length<2)return {error:'Lohista müürile vähemalt kaks punkti.',segments:[],curve};
  let length=0;for(let i=1;i<curve.length;i++)length+=dist(curve[i-1],curve[i]);
  if(length<WALL_DRAW_V175.minLength)return {error:'Müür peab olema vähemalt 3 meetrit pikk.',segments:[],curve};

@@ -1,3 +1,4 @@
+import {wallTerrainErrorV1758,wallEndJoinV1758} from './wall-terrain-v1758.js';
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
 import {nordicVillageName} from './folklore-village-names-v164.js?v=165a';
 import {stoneFortificationAgeGate,reserveStoneVillageRingV168} from './stone-village-defenses-v166.js?v=169a';
@@ -449,7 +450,7 @@ export class Civilization{
 
  localWorld(p){const city=this.contextAt(p,false);if(city){consolidateMinerals(city.world,this.cell(p),city.economy.buildings);return city.world;}this.s.tileWorlds??={};const world=this.s.tileWorlds[tileKey(p)]??=this.makeWorld(this.cell(p));if(this.cell(p)?.land&&world.resources.some(r=>r.kind==='fish')){world.resources=world.resources.filter(r=>r.kind!=='fish');world.revision=(world.revision||0)+1}consolidateMinerals(world,this.cell(p));this.ensureBerries(world,this.cell(p));if(!world.foodResourcesVersion){for(const r of this.makeWorld(this.cell(p)).resources.filter(r=>['game','fish'].includes(r.kind)))world.resources.push({...r,id:world.resources.length});world.foodResourcesVersion=1;world.revision++}return world}
  battleNavigation(battle=this.s.battle){if(!this.battleNavs.has(battle))this.battleNavs.set(battle,createBattleNavigation(this,battle));return this.battleNavs.get(battle)}
- nav(p){const city=this.contextAt(p,false),key=tileKey(p),cache=city?this.navs:this.localNavs;if(!cache.has(key)){const world=this.localWorld(p),cell=this.cell(p),coast=isShore(this,cell);world.trailTime=this.s.time;cache.set(key,new Navigation(world,(x,z)=>Math.abs(x)<(coast?DETAIL_HALF_X+19.5:DETAIL_HALF_X-3)&&Math.abs(z)<(coast?DETAIL_HALF_Z+19.5:DETAIL_HALF_Z-3)&&!cell.mountain&&detailHeight(cell,x,z)>.2&&(!coast||localSurface(this,cell,x,z,false)>.15)&&(()=>{
+ nav(p){const city=this.contextAt(p,false),key=tileKey(p),cache=city?this.navs:this.localNavs;if(!cache.has(key)){const world=this.localWorld(p),cell=this.cell(p),coast=isShore(this,cell);world.trailTime=this.s.time;cache.set(key,new Navigation(world,(x,z)=>Math.abs(x)<(coast?DETAIL_HALF_X+19.5:DETAIL_HALF_X-3)&&Math.abs(z)<(coast?DETAIL_HALF_Z+19.5:DETAIL_HALF_Z-3)&&!cell.mountain&&(coast?localSurface(this,cell,x,z,false)>.2:detailHeight(cell,x,z)>.2)&&(()=>{
  const position=localToWorld(cell,x,z),river=riverNear(this,position.x,position.z);
  // Deep river cells are impassable to walkers, but the ankle-deep fords
  // are walkable across the channel (bridges remain separate crossings).
@@ -466,7 +467,19 @@ export class Civilization{
  found(id){const a=this.s.settlers.find(a=>a.id===id);if(!a)return {error:'Asunik puudub.'};if(a.localTarget)return {error:'Oota asuniku saabumist.'};const p={x:Math.round(a.x),z:Math.round(a.z)},error=this.siteRule(a,p);if(error)return {error};const missingNationalResources=nationalResourceNeeds(this,a.team);const idCity=Math.max(-1,...this.s.cities.map(c=>c.id))+1,economy=initialState(this.s.seed);economy.settlers=[];economy.realms[a.team].resources={...START,wood:100,stone:55,plank:0,gold:0,water:40};economy.realms[a.team].pop=3;economy.realms[a.team].growthProgress=0;if(a.cargo)economy.realms[a.team].resources=copy(a.cargo);economy.buildings=[{type:'hall',...p,team:a.team,hp:1200,ready:true}];economy.units=[];economy.cargo=[];const city={id:idCity,team:a.team,c:a.c,r:a.r,foundedAt:this.s.time,name:nordicVillageName({seed:this.s.seed,team:a.team,cityNumber:this.s.cities.filter(c=>c.team===a.team).length+1,existingNames:this.s.cities.map(c=>c.name),factionNames:this.s.factionNames}),economy,world:this.localWorld(a),hp:600};this.s.cities.push(city);if(this.s.tileWorlds)delete this.s.tileWorlds[tileKey(a)];this.s.settlers.splice(this.s.settlers.indexOf(a),1);this.localNavs.delete(tileKey(a));this.prepareCity(city);this.applyUpgrades(city);if(a.team>0&&this.s.ages[a.team]===0)city.stoneDefenseReserveV168=reserveStoneVillageRingV168(this,city);specializeNewCity(this,city,missingNationalResources);return {city}}
  canBuildNow(city,type){const area=this.constructionArea(city);return !!area&&!this.buildRule(city,type)&&canAfford(area.stock,BUILDINGS[type].cost)&&area.pending.length<12}
  buildRule(city,type){if(type==='field'&&!city.economy.buildings.some(b=>b.type==='farm'&&b.ready&&b.hp>0&&!b.disabled))return 'Ehita samale ruudule kõigepealt valmis põllutalu.';if(this.isCountyTile(city,this.parentCity(city))){const rural=new Set(['field','farm','pasture','hunter','fisher','lumber','forester','quarry','mine','coal','coppermine','tinmine','claypit','oilwell','well','bridge','harbor','road_depot','windmill','watermill',...Object.keys(GOOD_BUILDINGS).filter(k=>GOOD_BUILDINGS[k].deposit)]);const error=countyBuildRule(city,type,rural);if(error)return error;}const replacement=this.obsoleteBuilding(city.team,type);if(replacement)return 'Asendatud: '+BUILDINGS[replacement].name;if(this.cell(city)?.mountain)return 'Mäed on läbimatud ja sinna ei saa ehitada.';if(this.territoryOwner(city)?.id!==this.parentCity(city)?.id)return 'See ruut ei kuulu enam selle linna alasse.';if(type==='bridge'){const cell=this.cell(city);if(!cell?.river)return 'Silda saab ehitada ainult jõeruudule.';if(cell.bridge)return 'Sellel ruudul on sild juba olemas.';}if(type==='harbor'&&!isShore(this,city))return 'Sadam vajab rannikuruutu, mille kõrval on meri.';if(type==='fisher'&&!isShore(this,city))return 'Kalamehe onni saab ehitada ainult päris mererannale.';if(type==='watermill'&&!this.cell(city)?.river&&![[1,0],[-1,0],[0,1],[0,-1]].some(([dc,dr])=>this.cells[(city.r+dr)*COLS+city.c+dc]?.river))return 'Vesiveski vajab jõge samal või naaberruudul.';if(type==='windmill'&&!this.cell(city)?.deposits.grain)return 'Tuuleveski vajab avatud viljakat maad.';const tech=BUILD_TECH[type];if(tech&&!this.s.research[city.team].known.includes(tech))return 'Uuri: '+TECHS[tech].name;const age=this.s.ages[city.team],d=BUILDINGS[type];if((BUILD_AGE[type]??9)>age)return 'Vajab ajastut: '+AGES[BUILD_AGE[type]]?.name;const dep={...Object.fromEntries(Object.entries(GOOD_BUILDINGS).map(([k,d])=>[k,d.deposit])),claypit:'clay',coppermine:'copper',tinmine:'tin',lumber:'wood',quarry:'stone',mine:'ore',oilwell:'oil',field:'grain',well:'water',hunter:'game'}[type];if(dep&&!this.cell(city).deposits[dep])return 'Selle linna ruudul puudub '+({clay:'savi',copper:'vasemaak',tin:'tinamaak',wood:'mets',stone:'kivi',ore:'rauamaak',grain:'viljakas põllumaa',water:'mageveeallikas',game:'ulukid',fish:'kalapüügikoht',oil:'naftamaardla',...Object.fromEntries(Object.entries(GOOD_BUILDINGS).filter(([k,d])=>d.deposit).map(([k,d])=>[d.deposit,RESOURCE_NAMES[d.deposit]||d.deposit]))}[dep])+'.';const missing=d.requires.filter(k=>!this.cityReady(city,k)&&!(['oilwell','refinery'].includes(type)&&((type==='oilwell'&&k==='engineworks')||(type==='refinery'&&k==='oilwell'))&&this.s.cities.some(c=>c.team===city.team&&this.cityReady(c,k))));return missing.length?'Vaja: '+missing.map(k=>BUILDINGS[k].name).join(', '):''}
- placementEnv(city,type){const env=this.env(city);if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
+ // Walls can terminate at the actual shoreline or neighbouring mountain,
+ // without inheriting the local worker grid's artificial map-edge margin.
+ wallTerrainPassable(city,x,z){
+  if(!Number.isFinite(x)||!Number.isFinite(z)||Math.abs(x)>DETAIL_HALF_X+.8||Math.abs(z)>DETAIL_HALF_Z+.8)return false;
+  const {dc,dr}=tileDelta(x,z),tile=this.cell({c:city.c+dc,r:city.r+dr});
+  if(!tile||tile.mountain)return false;
+  const p=localTilePoint(x,z,dc,dr);
+  const cell=this.cell(city);
+  if((isShore(this,cell)?localSurface(this,cell,x,z,false):detailHeight(tile,p.x,p.z))<=.2)return false;
+  const position=localToWorld(cell,x,z),river=riverNear(this,position.x,position.z);
+  return river.distance>=river.width*.97||river.fordStrength>=.75||!!tile.bridge&&river.distance<river.width*1.15;
+ }
+ placementEnv(city,type){const env=this.env(city);if(isDrawableWallV175(type)){env.passable=(x,z)=>this.wallTerrainPassable(city,x,z);const near=env.nearBuildings;env.nearBuildings=(p,t)=>near(p,t).filter(b=>!wallEndJoinV1758(p,b));}if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
  buildingSites(city,type){if(MINERAL_BUILDINGS[type]){const r=mineralSite(city.world,type);return r?[{x:r.x,z:r.z}]:[]}if(COASTAL_BUILDINGS.has(type))return coastalSites(this,this.cell(city),type);const parent=this.parentCity(city);return historicalBuildingPlots(city,parent,type,this.s.seed+parent.id*31,this.s.ages[parent.team]===0)}
  previewBuild(city,type,p){
   const error=this.buildRule(city,type);if(error)return {error};
@@ -488,7 +501,10 @@ export class Civilization{
   if(site.error)return site;p=site.p;
   const env=this.placementEnv(city,type);
   if(p?.drawnWallV175&&isDrawableWallV175(type))env.unlimitedBuildingRange=true;
-  if(!COASTAL_BUILDINGS.has(type)){
+  if(p?.drawnWallV175&&isDrawableWallV175(type)){
+   const error=wallTerrainErrorV1758({...p,type},env.passable,(x,z)=>isShore(this,this.cell(city))?localSurface(this,this.cell(city),x,z,false):detailHeight(this.cell(city),x,z));
+   if(error)return {error};
+  }else if(!COASTAL_BUILDINGS.has(type)){
    for(const dx of (type==='market'?[-10,0,10]:[-3,0,3]))for(const dz of (type==='market'?[-9,0,9]:[-2.8,0,2.8]))if(!env.passable(p.x+dx,p.z+dz))return {error:'Kogu hoone peab mahtuma kuivale maale.'};
    const levels=(type==='market'?[[-10,-9],[-10,9],[10,-9],[10,9]]:[[-3,-2.8],[-3,2.8],[3,-2.8],[3,2.8]]).map(([dx,dz])=>detailHeight(this.cell(city),p.x+dx,p.z+dz));
    if(Math.max(...levels)-Math.min(...levels)>1.8)return {error:'Maapind on hoone jaoks liiga järsk.'};
@@ -504,16 +520,7 @@ export class Civilization{
   const rule=placementRule(city.economy,city.team,type,p,env);if(rule.error)return rule;
   const candidate={...p,type,...site},nav=this.nav(city);
   if(p.drawnWallV175&&isDrawableWallV175(type)){
-   const span=type==='palisade'?p.palisadeSpanV167:7;
-   if(!Number.isFinite(p.wallAngleV175)||!Number.isFinite(span)||span<2.4||span>8)
-    return {error:'Müürijupi pikkus või pöördenurk ei sobi.'};
-   // Check the physical stroke corridor; do not rely on a centre-point-only
-   // dry-land check. Endpoints may touch a real neighbouring palisade.
-   for(let i=1;i<=9;i++){
-    const d=(i/10-.5)*span,x=p.x+Math.cos(p.wallAngleV175)*d,
-      z=p.z-Math.sin(p.wallAngleV175)*d;
-    if(!env.passable(x,z))return {error:'Müür läbiks takistust või juba ehitatud müürilõiku.'};
-   }
+   const span=p.palisadeSpanV167||7;
    for(const b of city.economy.buildings.filter(b=>b.hp>0&&!b.virtual&&!['palisade','stonewall','reinforced_wall','woodgate','gatehouse','watchtower','stonetower'].includes(b.type))){
     // Reject wall geometry crossing actual existing houses including the
     // eaves/porch; tangent joins with other palisades remain legal.

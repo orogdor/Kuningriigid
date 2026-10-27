@@ -44,5 +44,7 @@ jobs:
         run: node TEST_V1757A_FORT_HEIGHTS.mjs
       - name: Tier I and Tier II wall costs, saved levels and real placement (V175.7b)
         run: node TEST_V1757B_WALL_LEVELS.mjs
+      - name: Wall ends against sea and mountains (V175.8)
+        run: node TEST_V1758_TERRAIN_ENDS.mjs
       - name: Fast gameplay and road smoke tests
         run: node scripts/test.mjs traffic
