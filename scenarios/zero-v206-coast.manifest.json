@@ -19,10 +19,10 @@
   "cityName": "Fyrisvellir",
   "targetCityId": 3,
   "age": 6,
-  "population": 45,
-  "outside": 16,
-  "connectedOutside": 7,
-  "maxConnectedOutside": 7,
+  "population": 46,
+  "outside": 18,
+  "connectedOutside": 10,
+  "maxConnectedOutside": 10,
   "demandReady": false,
   "secondWallPlanned": 0,
   "secondWallBuilt": 0,
@@ -33,6 +33,6 @@
   "organicAI": true,
   "freeBuildingsAdded": 0,
   "priorSaveLoaded": false,
-  "rulesRevision": 209,
+  "rulesRevision": 215,
   "description": "Replayed from createGame(seed), with normal AI ticks and paid construction only"
 }
