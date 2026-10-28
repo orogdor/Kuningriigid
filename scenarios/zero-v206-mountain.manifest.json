@@ -20,16 +20,16 @@
   "targetCityId": 0,
   "age": 5,
   "population": 43,
-  "outside": 19,
-  "connectedOutside": 17,
-  "maxConnectedOutside": 17,
+  "outside": 20,
+  "connectedOutside": 18,
+  "maxConnectedOutside": 18,
   "demandReady": true,
   "secondWallPlanned": 34,
-  "secondWallBuilt": 13,
-  "secondWallReady": 13,
-  "reason": "Teine hoone on liiga lähedal.",
+  "secondWallBuilt": 32,
+  "secondWallReady": 32,
+  "reason": "complete",
   "firstWall": {
-    "turn": 179,
+    "turn": 180,
     "ready": 1,
     "cluster": 15
   },
@@ -37,6 +37,6 @@
   "organicAI": true,
   "freeBuildingsAdded": 0,
   "priorSaveLoaded": false,
-  "rulesRevision": 209,
+  "rulesRevision": 215,
   "description": "Replayed from createGame(seed), with normal AI ticks and paid construction only"
 }
