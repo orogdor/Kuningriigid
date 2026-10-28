@@ -1,0 +1,57 @@
+{
+  "version": 217,
+  "seed": 9280471,
+  "initial": {
+    "seed": 9280471,
+    "type": "continents",
+    "at": 0,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cities": 0,
+    "settlers": [
+      {
+        "team": 0,
+        "c": 87,
+        "r": 35
+      },
+      {
+        "team": 1,
+        "c": 160,
+        "r": 35
+      },
+      {
+        "team": 2,
+        "c": 158,
+        "r": 142
+      },
+      {
+        "team": 3,
+        "c": 50,
+        "r": 136
+      }
+    ]
+  },
+  "newMap": true,
+  "fromZero": true,
+  "priorSaveLoaded": false,
+  "organicAI": true,
+  "freeMaterialsAdded": 0,
+  "capturedTurn": 247,
+  "bronzeBeganAt": 152,
+  "bronzeTurns": 96,
+  "bronzeCompleted": true,
+  "age": 1,
+  "originalTeam": 1,
+  "cityId": 2,
+  "cityName": "Sampola",
+  "population": 35,
+  "cityBuildings": 121,
+  "fortifications": 59,
+  "worldRoadEdges": 323,
+  "scenarioType": "last-bronze-turn-before-iron",
+  "appliedPatches": "V215 walls, V216 roads, V211 menu"
+}
