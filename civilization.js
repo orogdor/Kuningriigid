@@ -135,6 +135,7 @@ const realZeroV206Demo=['zero-v206-coast','zero-v206-mountain'].includes(demoPar
 const freshBronzeV217Demo=demoParam==='bronze-fresh-v217';
 const freshBronzeV219Demo=demoParam==='bronze-fresh-v219';
 const freshStartV219Demo=demoParam==='fresh-start-v219';
+const freshStartStorageKeyV219='kingdoms-v219-world-5932019';
 const bronzeV183Demo=['bronze-v183-mountain','bronze-v183-coast'].includes(demoParam);
 const aiMountainV176Demo=demoParam==='ai-mountain-v176';
 const aiStoneV174Demo=demoParam==='ai-stone-v174';
@@ -156,7 +157,11 @@ if(siegeDemo)document.body.classList.add('bronze-siege-demo');
 const stoneDemo=demoParam==='stone',bronzeDemo=demoParam==='bronze',medievalDemo=demoParam==='medieval',renaissanceDemo=demoParam==='renaissance',industrialDemo=demoParam==='industrial',sampleDemo=freshStartV219Demo||freshBronzeV219Demo||freshBronzeV217Demo||realZeroV206Demo||wallTakeoverV205Demo||wallV190Demo||wallV184Demo||bronzeV183Demo||aiMountainV176Demo||aiStoneV174Demo||aiStoneV173Demo||aiStoneV172Demo||aiStoneV171Demo||aiMedievalV159Demo||aiMedievalV153Demo||aiMedievalV151Demo||aiMedievalV147Demo||aiMedievalV146Demo||aiMedievalV145Demo||aiMedievalV144Demo||ironCityV143Demo||ironCityV142Demo||trafficDemo||ironAIDemo||aiCityDemo||aiCityV136Demo||aiCityV137Demo||aiCityV138Demo||aiCityV139Demo||aiModernV140Demo||!!replayDemo||patrolDemo||siegeDemo||battleDemo||stoneDemo||bronzeDemo||medievalDemo||renaissanceDemo||industrialDemo;
 let recovered=false,state;
 const validState=v=>v?.version===4&&Number.isFinite(v.seed)&&Array.isArray(v.cities)&&Array.isArray(v.settlers)&&Array.isArray(v.units)&&Array.isArray(v.armies);
-const loadedV73=sampleDemo?{state:freshStartV219Demo?createGame(5932019,'continents'):freshBronzeV219Demo?await loadFreshBronzeV219():freshBronzeV217Demo?await loadFreshBronzeV217():realZeroV206Demo?await loadRealZeroV206(demoParam):wallTakeoverV205Demo?await loadSecondWallTakeoverV205(demoParam):wallV190Demo?await loadOrganicWallV190(demoParam):wallV184Demo?await loadWallV184(demoParam):bronzeV183Demo?await loadBronzeV183(demoParam):aiMountainV176Demo?await loadAIMountainV176():aiStoneV174Demo?await loadAIStoneV174():aiStoneV173Demo?await loadAIStoneV173():aiStoneV172Demo?await loadAIStoneV172():aiStoneV171Demo?await loadAIStoneV171():aiMedievalV159Demo?await loadAIMedievalV159():aiMedievalV153Demo?await loadAIMedievalV153():aiMedievalV151Demo?await loadAIMedievalV151():aiMedievalV147Demo?await loadAIMedievalV147():aiMedievalV146Demo?await loadAIMedievalV146():aiMedievalV145Demo?await loadAIMedievalV145():aiMedievalV144Demo?await loadAIMedievalV144():ironCityV143Demo?await loadIronCityV143():ironCityV142Demo?await loadIronCityV142():trafficDemo?await loadArmyTrafficTest():aiModernV140Demo?await loadAIModernV140():aiCityV139Demo?await loadAICityV139():aiCityV138Demo?await loadAICityV138():aiCityV137Demo?await loadAICityV137():aiCityV136Demo?await loadAICityV136():aiCityDemo?await loadAICityV135():ironAIDemo?await loadIronAITest():replayDemo?createV124ReplayState(replayDemo):patrolDemo?createBronzePatrolState():siegeDemo?(demoParam==='iron-siege'?createIronSiegeState():createBronzeSiegeState()):battleDemo?createBronzeBattleState():stoneDemo?createStoneDemoState():bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
+const loadedV73=sampleDemo?{state:freshStartV219Demo?(()=>{
+ let state=null;
+ try{state=JSON.parse(localStorage.getItem(freshStartStorageKeyV219)||'null')}catch{}
+ return validState(state)&&state.seed===5932019?state:createGame(5932019,'continents');
+})():freshBronzeV219Demo?await loadFreshBronzeV219():freshBronzeV217Demo?await loadFreshBronzeV217():realZeroV206Demo?await loadRealZeroV206(demoParam):wallTakeoverV205Demo?await loadSecondWallTakeoverV205(demoParam):wallV190Demo?await loadOrganicWallV190(demoParam):wallV184Demo?await loadWallV184(demoParam):bronzeV183Demo?await loadBronzeV183(demoParam):aiMountainV176Demo?await loadAIMountainV176():aiStoneV174Demo?await loadAIStoneV174():aiStoneV173Demo?await loadAIStoneV173():aiStoneV172Demo?await loadAIStoneV172():aiStoneV171Demo?await loadAIStoneV171():aiMedievalV159Demo?await loadAIMedievalV159():aiMedievalV153Demo?await loadAIMedievalV153():aiMedievalV151Demo?await loadAIMedievalV151():aiMedievalV147Demo?await loadAIMedievalV147():aiMedievalV146Demo?await loadAIMedievalV146():aiMedievalV145Demo?await loadAIMedievalV145():aiMedievalV144Demo?await loadAIMedievalV144():ironCityV143Demo?await loadIronCityV143():ironCityV142Demo?await loadIronCityV142():trafficDemo?await loadArmyTrafficTest():aiModernV140Demo?await loadAIModernV140():aiCityV139Demo?await loadAICityV139():aiCityV138Demo?await loadAICityV138():aiCityV137Demo?await loadAICityV137():aiCityV136Demo?await loadAICityV136():aiCityDemo?await loadAICityV135():ironAIDemo?await loadIronAITest():replayDemo?createV124ReplayState(replayDemo):patrolDemo?createBronzePatrolState():siegeDemo?(demoParam==='iron-siege'?createIronSiegeState():createBronzeSiegeState()):battleDemo?createBronzeBattleState():stoneDemo?createStoneDemoState():bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
 if(!state)try{state=migrateGame(JSON.parse(localStorage.getItem('kingdoms-v1')))}catch{}
 state??=createGame(Math.floor(Math.random()*2147483647));
 let buildCategory='all',buildSearch='';const tileDoubleTap=new TileDoubleTap();
@@ -393,17 +398,25 @@ const detailTravellers=createDetailTravellers(people);const villageLife=createVi
 function say(text){s.events??=[];if(s.events.at(-1)?.text!==text){s.events.push({time:s.time,text});if(s.events.length>40)s.events.shift()}$('toast').textContent=text;$('toast').style.display='block';toastTime=5}
 const snapshotEncoder=new SnapshotEncoder();let saveGeneration=0,pendingAutosaves=0;
 async function save(){
- if(restarting||sampleDemo)return;
+ if(restarting||(sampleDemo&&!freshStartV219Demo))return;
  const generation=++saveGeneration,savedTime=s.time;pendingAutosaves++;
  try{
   const serialized=await snapshotEncoder.encode(s);
   if(restarting||generation!==saveGeneration)return;
-  const backedUp=writeAutosave(localStorage,serialized,savedTime,s.lastBackupTime||0,validState);
-  if(backedUp)s.lastBackupTime=savedTime;
+  if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,serialized);
+  else {
+   const backedUp=writeAutosave(localStorage,serialized,savedTime,s.lastBackupTime||0,validState);
+   if(backedUp)s.lastBackupTime=savedTime;
+  }
   $('savestatus').textContent='Salvestatud · käik '+(Math.floor(s.time/60)+1);
  }catch{say('Salvestusruum on täis või salvestamine on blokeeritud.')}finally{pendingAutosaves--}
 }
-addEventListener('pagehide',()=>{if(pendingAutosaves&&!restarting&&!sampleDemo){saveGeneration++;try{const backedUp=writeAutosave(localStorage,snapshotV51(),s.time,s.lastBackupTime||0,validState);if(backedUp)s.lastBackupTime=s.time}catch{}}});
+addEventListener('pagehide',()=>{if(pendingAutosaves&&!restarting&&(!sampleDemo||freshStartV219Demo)){saveGeneration++;
+ try{
+  if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,snapshotV51());
+  else {const backedUp=writeAutosave(localStorage,snapshotV51(),s.time,s.lastBackupTime||0,validState);
+   if(backedUp)s.lastBackupTime=s.time;}
+ }catch{}}});
 function activeCity(){return activeTile?game.contextAt(activeTile,true):null}
 function ownCity(){return activeCity()?.team===0?activeCity():s.cities.find(c=>c.team===0)}
 function settlerHere(){return s.settlers.find(a=>a.team===0&&activeTile&&tileKey(a)===tileKey(activeTile)&&a.landed)}
