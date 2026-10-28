@@ -18,7 +18,23 @@ for(const kind of ['mountain','coast']){
  const stuck=city.outerRingV184?.slots?.[city.outerRingV184.nextIndex||0];
  const wood=fortsAll.filter(b=>['palisade','woodgate','watchtower'].includes(b.type));
  const total=Object.fromEntries([...new Set(fortsAll.map(b=>b.type))].map(type=>[type,fortsAll.filter(b=>b.type===type).length]));
- console.log('AUDIT CITY',JSON.stringify({kind,name:city.name,age:s.ages[0],pop:city.economy.realms[0].pop,
+ if(kind==='coast'){
+  const effective=p=>({...p,type:gameEraType(g,city,p)});
+  function gameEraType(game,c,p){
+   const chain=p.type==='palisade'?['stonewall','reinforced_wall','palisade']:
+    p.type==='woodgate'?['gatehouse','woodgate']:
+    p.type==='watchtower'?['stonetower','watchtower']:[p.type];
+   return chain.find(t=>!game.buildRule(c,t))||p.type;
+  }
+  console.log('AUDIT COAST GAP SITES',JSON.stringify(missing.map(x=>{
+   const p=x.slot,e=effective(p),buildings=g.allBuildings(city).filter(b=>b.hp>0&&!b.virtual&&!forts.has(b.type))
+    .map(b=>({type:b.type,x:Math.round(b.x),z:Math.round(b.z),d:Math.round(Math.hypot(b.x-p.x,b.z-p.z)*10)/10}))
+    .sort((a,b)=>a.d-b.d).slice(0,3);
+   return {slot:{x:p.x,z:p.z},type:e.type,rule:g.buildRule(city,e.type),
+    preview:g.previewDefenseV177(city,e).error||'valid',nearBuildings:buildings};
+  })));
+}
+console.log('AUDIT CITY',JSON.stringify({kind,name:city.name,age:s.ages[0],pop:city.economy.realms[0].pop,
   planslots:slots.length,missing:missing.length,missingExamples:missing.slice(0,12),
   built:fortsAll.length,types:total,wood:wood.length,
   outerPlan:city.outerRingV184&&{total:city.outerRingV184.slots.length,at:city.outerRingV184.nextIndex},
