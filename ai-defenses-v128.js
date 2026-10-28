@@ -1,4 +1,5 @@
-import {findOuterRingV184,suburbDemandV204} from './outer-ring-v184.js?v=208';
+import {findOuterRingV184,suburbDemandV204} from './outer-ring-v184.js?v=218';
+import {oldPerimeterStatusV218} from './old-fortification-policy-v218.js';
 import {planRoadGatesV177} from './road-gates-v177.js';
 import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
 import {canAfford} from './economy.js';
@@ -44,34 +45,25 @@ export function defenseEligibility({population,readyHouses,services,waiting,stoc
 }
 export function planWallUpgradesV184(game,team,city){
  const age=game.s.ages[team],realm=city.economy.realms[team],known=game.s.research[team]?.known||[];
- if(!game.wallUpgradeOptionsV184||realm.pop<11||age===0)return false;
- if(!known.includes('stone_fortifications'))return false;
- // V188: do not replace timber with stone while a new outer curtain is pending.
- const allForPriority=game.allBuildings(city),outer=city.outerRingV184;
- const outerPending=outer?.slots?.length&&((outer.nextIndex||0)<outer.slots.length||
-   allForPriority.some(b=>b.outerRingV184&&b.hp>0&&!b.ready));
- const innerBuilding=allForPriority.some(b=>b.hp>0&&!b.ready&&!b.outerRingV184&&DEFENSE_TYPES.has(b.type));
- const surveying=!outer&&(city.outerRingNeedV204?.cluster>=13||city.outerRingPreviewOnlyV190)&&
-  (city.outerRingSurveyFailuresV188||0)>0&&(city.outerRingSurveyFailuresV188||0)<3;
- // V211: if a mature town cannot lay the next exterior segment because of
- // a persistent geometry/placement obstruction, do not indefinitely freeze
- // upgrades to the genuine old timber curtain. Building/material delays still
- // take precedence so a constructible cheap outer ring is built first.
- const outerReason=city.outerRingDiagnosticV184?.reason||'';
- const outerBlocked=age>=4&&outerPending&&!!outerReason&&
-  !['building','finishing','saving-for-outer-ring','construction-backlog','inner-wall-building','complete'].includes(outerReason);
- if(realm.pop>=20&&((outerPending&&!outerBlocked)||innerBuilding||surveying))return false;
- const contexts=game.contexts(city),forts=contexts.flatMap(ctx=>ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&b.ready&&['palisade','woodgate','watchtower'].includes(b.type)).map(b=>({ctx,b})));
+ if(!game.wallUpgradeOptionsV184||age<1||!known.includes('stone_fortifications'))return false;
+ const contexts=game.contexts(city);
+ const forts=contexts.flatMap(ctx=>ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&b.ready&&
+  !b.outerRingV184&&['palisade','woodgate','watchtower'].includes(b.type)).map(b=>({ctx,b})));
  if(!forts.length)return false;
  if(contexts.some(ctx=>ctx.economy.buildings.some(b=>b.wallUpgradeV184)))return true;
  const waiting=game.allBuildings(city).filter(b=>b.hp>0&&!b.ready).length;
+ if(waiting>4)return true;
  const stock=realm.resources;
- if(!defenseEligibility({population:realm.pop,readyHouses:game.allBuildings(city).filter(b=>b.type==='house'&&b.ready&&b.hp>0).length,services:game.allBuildings(city).filter(b=>['well','market','warehouse','study','scriptorium'].includes(b.type)&&b.ready&&b.hp>0).length,waiting,stock}).ok)return false;
  for(const {ctx,b} of forts){
-  const plan=game.wallUpgradeOptionsV184(ctx,b,'stone');if(plan.error)continue;
-  if(!canAfford(stock,plan.cost)||!reserveAfterWalls(stock,plan.cost)){city.aiDefenseDiagnosticV184={reason:'saving-for-upgrade',type:b.type,at:game.s.time};return true;}
-  const result=game.upgradeWallV184(ctx,b,'stone');if(result.upgrade){city.aiDefenseDiagnosticV184={reason:'upgrading',type:b.type,at:game.s.time};return true;}
+  const plan=game.wallUpgradeOptionsV184(ctx,b,'stone');
+  if(plan.error)continue;
+  if(!canAfford(stock,plan.cost)||!reserveAfterWalls(stock,plan.cost)){
+   city.aiDefenseDiagnosticV184={reason:'saving-for-old-wall-upgrade',type:b.type,at:game.s.time};return true;
+  }
+  const result=game.upgradeWallV184(ctx,b,'stone');
+  if(result.upgrade){city.aiDefenseDiagnosticV184={reason:'upgrading-old-wall',type:b.type,at:game.s.time};return true;}
  }
+ city.aiDefenseDiagnosticV184={reason:'old-wall-upgrade-site-error',at:game.s.time};
  return false;
 }
 export function planOuterRingV184(game,team,city){
@@ -82,6 +74,12 @@ export function planOuterRingV184(game,team,city){
  if(all.some(b=>b.wallUpgradeV184))return false;
  const inner=city.stoneDefensePlanV166||city.defensePlanV139;
  if(!inner?.slots?.length)return false;
+ const old=oldPerimeterStatusV218(game,city);
+ if(!city.outerRingPreviewOnlyV190&&(old.missing.length||old.wooden.length||old.constructing.length)){
+  city.outerRingDiagnosticV184={reason:'old-wall-first',missing:old.missing.length,
+    wooden:old.wooden.length,constructing:old.constructing.length,at:game.s.time};
+  return false;
+ }
  const existing=city.outerRingV184;
  if(!existing&&!city.outerRingPreviewOnlyV190){
   const demand=suburbDemandV204(game,city);
@@ -175,8 +173,8 @@ export function planAIDefenses(game,team,city){
  if(planRoadGatesV177(game,city))return;
  if(planStoneVillageDefenses(game,team,city))return;
  if(repairOldPerimeterV215(game,team,city))return;
- if(planOuterRingV184(game,team,city))return;
  if(planWallUpgradesV184(game,team,city))return;
+ if(planOuterRingV184(game,team,city))return;
  if(game.s.time<(city.nextDefenseCheckV128||0))return;
  const realm=city.economy.realms[team],stock=realm.resources,all=game.allBuildings(city);
  city.nextDefenseCheckV128=game.s.time+(realm.pop>=BRONZE_FORTIFY_POP_V160?24:42);

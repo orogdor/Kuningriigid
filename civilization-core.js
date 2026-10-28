@@ -1,5 +1,5 @@
 import {planRoadGatesV177} from './road-gates-v177.js';
-import {protectedHousingZoneV184,allowedSuburbJoinV191,allowedSuburbCornerV201} from './outer-ring-v184.js?v=208';
+import {protectedHousingZoneV184,allowedSuburbJoinV191,allowedSuburbCornerV201} from './outer-ring-v184.js?v=218';
 import {mountainBlockedV178} from './mountain-foot-v178.js';
 import {wallTerrainErrorV1758,wallEndJoinV1758} from './wall-terrain-v1758.js';
 import {clearOfDepositsV212} from './wall-deposit-v212.js';
@@ -12,7 +12,8 @@ import {objectCrossesWoodenRingV168} from './stone-fort-footprints-v168.js';
 import {allocateTerritory} from './territory-v143.js';
 import {urbanExpansionFits,grownCityRadius} from './city-area-v142.js';
 import {installGameRevisions,citySummary,cityContexts,cityLookup,navigationRevision,resourcesNear,buildingsNear} from './perf-state-v131.js';
-import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js?v=215';
+import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js?v=218';
+import {houseUpgradePreviewV218} from './house-upgrade-v218.js';
 import {applyDevelopmentBalance,combatUnit,militaryChoices,readyForNextEra,allowAIResearch} from './ai-development-v128.js';
 import {farmWork,fieldSize,fieldContains,validateField,migrateLegacyFarms,AI_FIELD_WIDTH,AI_FIELD_DEPTH} from './farming-v127.js';
 import {marketFoodGrowth} from './city-growth-v137.js';
@@ -401,6 +402,26 @@ export class Civilization{
   spendResources(stock,plan.cost);const materials=Object.values(plan.cost).reduce((a,n)=>a+n,0);
   b.wallUpgradeV184={type:b.type,targetType:plan.type,targetTier:plan.tier,x:b.x,z:b.z,team:b.team,wallAxis:b.wallAxis,wallAngleV175:b.wallAngleV175,palisadeSpanV167:b.palisadeSpanV167,navWidth:b.navWidth,navDepth:b.navDepth,progress:0,total:plan.total,materialsRemaining:materials,materialsTotal:materials};
   this.uiRevision++;return {upgrade:b.wallUpgradeV184,cost:plan.cost};
+ }
+ houseUpgradeOptionsV218(ctx,b){return houseUpgradePreviewV218(this,ctx,b)}
+ upgradeHouseV218(ctx,b){
+  const plan=this.houseUpgradeOptionsV218(ctx,b);if(plan.error)return plan;
+  const stock=this.parentCity(ctx).economy.realms[ctx.team].resources;
+  if(!canAfford(stock,plan.cost))return {error:'Elamu täiustamiseks ei jätku materjale.'};
+  spendResources(stock,plan.cost);b.houseUpgradeLevelV218=1;
+  const summary=citySummary(this,this.parentCity(ctx));if(summary)delete summary.housing;
+  this.uiRevision++;return {upgrade:true,cost:plan.cost,capacityMultiplier:2};
+ }
+ planAIHouseUpgradesV218(team,city){
+  const realm=city.economy.realms[team];
+  if(!realm||this.s.time<(city.nextHouseUpgradeV218||0))return false;
+  city.nextHouseUpgradeV218=this.s.time+72;
+  if(this.housing(city)>realm.pop+2)return false;
+  for(const ctx of this.contexts(city))for(const b of ctx.economy.buildings){
+   const plan=this.houseUpgradeOptionsV218(ctx,b);
+   if(!plan.error&&canAfford(realm.resources,plan.cost)&&this.upgradeHouseV218(ctx,b).upgrade)return true;
+  }
+  return false;
  }
  constructionTime(type,tier=1){return woodFortBuildTimeV1757(type,tier,BUILDINGS[type].time)*tempoMultiplier(this.s)}
  scienceRate(team){return scienceRate(this.s,team)}
@@ -837,6 +858,7 @@ const science=this.s.research[team];
  // Two paid builders for the mature Bronze core; never conjure completed walls.
   if((age===0&&city.economy.realms[team].pop>=7&&this.s.research[team].known.includes('fortifications'))||(age>=1&&city.economy.realms[team].pop>=18))city.builderCount=Math.max(2,city.builderCount||1);
  planAIDefenses(this,team,city);
+ this.planAIHouseUpgradesV218(team,city);
  if(this.s.time>=(city.aiNextBuildCheck||0)){
   city.aiNextBuildCheck=this.s.time+36;
  const excluded=new Set(Object.entries(city.aiPlacementRetry||{}).filter(([,until])=>until>this.s.time).map(([type])=>type));

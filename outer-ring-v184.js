@@ -1,4 +1,5 @@
 import {wallStrokePlanV175,wallPointInsideV175,wallCrossesGateOpeningV175} from './wall-draw-v175.js';
+import {rejectInsideOuterRingV218} from './old-fortification-policy-v218.js';
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const fort=new Set(['palisade','stonewall','reinforced_wall','woodgate','gatehouse','watchtower','stonetower']);
 function inside(p,poly){
@@ -433,6 +434,9 @@ export function findOuterRingV184(game,city){
    if(stroke.error){invalid=true;break;}
    for(const slot of stroke.segments)segments.push({...slot,type:'palisade',
     plannedDefense:true,outerRingV184:true});
+  }
+  if(!invalid&&rejectInsideOuterRingV218(segments,inner)){
+   invalid=true;diagnostic.insideOldRing=(diagnostic.insideOldRing||0)+1;
   }
   if(invalid||segments.length<3||segments.length>70){
    if(natural)diagnostic.naturalSegmentsReject=(diagnostic.naturalSegmentsReject||0)+1;

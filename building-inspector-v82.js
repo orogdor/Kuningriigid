@@ -40,12 +40,16 @@ export function describeBuilding(game,city,building,ages=[],names={},definitions
   cost:readable(d.cost,names),
   technology:techUnlocks[building.type]||null,
   wallUpgrade:building.wallUpgradeV184?{progress:Math.round(100*(building.wallUpgradeV184.progress||0)/building.wallUpgradeV184.total)}:null,
-  upgradeOptions:owner?['auto','stone'].map(target=>({target,...game.wallUpgradeOptionsV184?.(city,building,target)})).filter(p=>p.type&&!p.error):[],
+  upgradeOptions:owner?[
+    ...['auto','stone'].map(target=>({target,...game.wallUpgradeOptionsV184?.(city,building,target)})).filter(p=>p.type&&!p.error),
+    ...(building.type==='house'?(()=>{const p=game.houseUpgradeOptionsV218?.(city,building);
+     return p&&!p.error?[{target:'house',type:'house',cost:p.cost}]:[];})():[])
+   ]:[],
   position:{x:building.x,z:building.z},
   researchActivity:EDUCATION_TYPES.includes(building.type)?undefined:building.researchActivity,
   science:EDUCATION_TYPES.includes(building.type)?cityScience(home,game.s?.research?.[city.team]?.known||[]):null,
   description:building.type==='field'?'Eraldi põld · '+(building.width||16)+' × '+(building.depth||16)+' ühikut':building.type==='farm'?'Põllutalu · '+(building.farming?.tool||'vajab eraldi põldu')+(building.farming?' · '+building.farming.fields+' põldu · pindala '+building.farming.area+' / tööjõu võimekus '+Math.round(building.farming.capacity):''):building.type==='pasture'?'Loomafarm · kariloomad, liha ja veevajadus':d.out?'Tootmishoone':['library','school','public_school','high_school','study','academy','university','observatory','polytechnic','laboratory','scriptorium'].includes(building.type)?'Haridusasutus · linna teadus ×1,5 (valmis ja aktiivne)':
-   building.type==='house'?'Elamu':building.type==='hall'?'Linna peahoone':'Linnahoone'
+   building.type==='house'?'Elamu · '+(building.houseUpgradeLevelV218?'täiustatud · 2× mahutavus':'tavaline'):building.type==='hall'?'Linna peahoone':'Linnahoone'
  };
 }
 function line(label,value){
@@ -72,7 +76,7 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle,onUpgrade
   root.hidden=false;
   root.setAttribute('aria-label',data.name+' · '+data.eraName);
   const nextKey=[data.type,data.position.x,data.position.z,data.status,data.hp,data.maxHp,data.assigned,
-   data.needed,data.efficiency,data.progress,data.disabled,data.input,data.production,data.age,JSON.stringify(data.wallUpgrade),JSON.stringify(data.upgradeOptions)].join('|');
+   data.needed,data.efficiency,data.progress,data.disabled,data.input,data.production,data.age,JSON.stringify(data.wallUpgrade),JSON.stringify(data.upgradeOptions),data.description].join('|');
   if(currentKey===nextKey)return;
   currentKey=nextKey;
   title.textContent=(data.icon||'⌂')+' '+data.name;
@@ -96,7 +100,7 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle,onUpgrade
   if(data.researchActivity!=null)detail.append(line('Teadustöö aktiivsus',Math.round(data.researchActivity*100)+'%'));
   actions.replaceChildren();
   if(data.owner){
-   for(const option of data.upgradeOptions||[]){const up=document.createElement('button');up.type='button';up.textContent='⬆ '+(option.target==='stone'?'Kiviks':'Kõrgemaks')+' · '+readable(option.cost,{});up.addEventListener('click',()=>onUpgrade?.(option.target));actions.append(up);}
+   for(const option of data.upgradeOptions||[]){const up=document.createElement('button');up.type='button';up.textContent='⬆ '+(option.target==='house'?'Suurem elamu (×2)':option.target==='stone'?'Kiviks':'Kõrgemaks')+' · '+readable(option.cost,{});up.addEventListener('click',()=>onUpgrade?.(option.target));actions.append(up);}
    const staff=document.createElement('button');staff.type='button';staff.textContent='♟ Töölised';
    staff.addEventListener('click',onWorkers);actions.append(staff);
    if(data.ready&&data.type!=='hall'){
