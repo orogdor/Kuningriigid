@@ -1,4 +1,4 @@
-import {findOuterRingV184,suburbDemandV204} from './outer-ring-v184.js?v=204';
+import {findOuterRingV184,suburbDemandV204} from './outer-ring-v184.js?v=207';
 import {planRoadGatesV177} from './road-gates-v177.js';
 import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
 import {canAfford} from './economy.js';

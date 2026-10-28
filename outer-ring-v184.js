@@ -105,13 +105,15 @@ export function suburbDemandV204(game,city){
  const inner=city.stoneDefensePlanV166?.outlineV176||city.defensePlanV139?.outlineV176;
  if(!inner?.length)return {ready:false,count:0,cluster:[],required:13};
  const candidates=suburbBuildingsV204(game,city).filter(b=>!inside(b,inner)&&inner.some((p,i)=>distanceToCourse(b,p,inner[(i+1)%inner.length])<=115));
+ // An approximately one-block (62 m) neighbor gap still describes a connected
+ // suburb; the earlier 48 m cut incorrectly split occupied town-front lots.
  const seen=new Set();let cluster=[];
  for(let i=0;i<candidates.length;i++){
   if(seen.has(i))continue;
   const stack=[i],group=[];seen.add(i);
   while(stack.length){
    const index=stack.pop(),house=candidates[index];group.push(house);
-   for(let j=0;j<candidates.length;j++)if(!seen.has(j)&&meters(house,candidates[j])<=48){seen.add(j);stack.push(j);}
+   for(let j=0;j<candidates.length;j++)if(!seen.has(j)&&meters(house,candidates[j])<=62){seen.add(j);stack.push(j);}
   }
   if(group.length>cluster.length)cluster=group;
  }

@@ -1,0 +1,19 @@
+name: V207 verify suburb survey on genuine from-zero AI town
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/probe-suburb-v207.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/probe-suburb-v207.mjs
