@@ -542,7 +542,7 @@ export class Civilization{
    (['watchtower','stonetower'].includes(type)&&isDrawableWallV175(b.type))||
    (isDrawableWallV175(type)&&['watchtower','stonetower'].includes(b.type))
   )));
- };
+ };} // End wall-specific near-building collision filter.
  if(isDrawableWallV175(type))env.canBuild=p=>clearOfDepositsV212(p,
   resourcesNear(city.world,p.x,p.z,13,13));
  if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
