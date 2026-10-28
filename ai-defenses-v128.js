@@ -132,9 +132,49 @@ export function planOuterRingV184(game,team,city){
  if(unfinished){city.outerRingDiagnosticV184={reason:'finishing',total:plan.slots.length,at:game.s.time};return true;}
  city.outerRingDiagnosticV184={reason:'complete',total:plan.slots.length,at:game.s.time};return false;
 }
+// V215: the original stone-age perimeter and the newer historic perimeter
+// may coexist in a late save. The normal AI only enumerated the latter,
+// leaving a real 15–25m gap in the original ring beside modern gatehouses.
+// Repair missing sections of the FIRST physical curtain before expanding.
+// This always uses normal paid building + builder progress, never free walls.
+export function repairOldPerimeterV215(game,team,city){
+ if((game.s.ages?.[team]||0)<1||!city.stoneDefensePlanV166?.slots?.length||
+    !game.defenseBuildingsV177||!game.buildDefenseV177)return false;
+ if(game.s.time<(city.nextOldWallRepairV215||0))return false;
+ city.nextOldWallRepairV215=game.s.time+24;
+ const live=game.defenseBuildingsV177(city).filter(b=>b.hp>0&&DEFENSE_TYPES.has(b.type));
+ const pending=game.allBuildings(city).filter(b=>b.hp>0&&!b.ready&&DEFENSE_TYPES.has(b.type));
+ if(pending.length>=2)return false;
+ const realm=city.economy.realms[team],stock=realm.resources;
+ for(const old of city.stoneDefensePlanV166.slots){
+  if(live.some(b=>Math.hypot(b.x-old.x,b.z-old.z)<(old.drawnWallV175?1.5:5)))continue;
+  const alternatives=old.type==='palisade'?['stonewall','reinforced_wall']:
+   old.type==='woodgate'?['gatehouse']:
+   old.type==='watchtower'?['stonetower']:[old.type];
+  const type=alternatives.find(t=>!game.buildRule(city,t));
+  if(!type)continue;
+  const slot={...old,type,plannedDefense:true,oldPerimeterRepairV215:true};
+  // If a new road or a building truly occupies the old route, preserve it.
+  // Only safe available segments can be commissioned.
+  if(game.previewDefenseV177(city,slot).error)continue;
+  const cost=game.buildingDefinitions[type]?.cost||{};
+  if(!canAfford(stock,cost)||!reserveAfterWalls(stock,cost)){
+   city.aiOldPerimeterV215={reason:'saving',at:game.s.time,type};return false;
+  }
+  const result=game.buildDefenseV177(city,slot);
+  if(!result.building)continue;
+  result.building.historicPerimeterV139=true;
+  result.building.oldPerimeterRepairV215=true;
+  city.aiOldPerimeterV215={reason:'commissioned',type,x:slot.x,z:slot.z,at:game.s.time};
+  return true;
+ }
+ city.aiOldPerimeterV215={reason:'no-safe-gap',at:game.s.time};
+ return false;
+}
 export function planAIDefenses(game,team,city){
  if(planRoadGatesV177(game,city))return;
  if(planStoneVillageDefenses(game,team,city))return;
+ if(repairOldPerimeterV215(game,team,city))return;
  if(planOuterRingV184(game,team,city))return;
  if(planWallUpgradesV184(game,team,city))return;
  if(game.s.time<(city.nextDefenseCheckV128||0))return;
