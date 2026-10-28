@@ -93,6 +93,30 @@ function sampleLine(a,b,step=2){
  const n=Math.max(1,Math.ceil(meters(a,b)/step));
  return Array.from({length:n+1},(_,i)=>mix(a,b,i/n));
 }
+
+const SUBURB_ROOFS_V204=new Set(['house','market','warehouse','cellar','study','chapel','library','scriptorium','inn','barracks','archery','smith','saw','mason','farm','fisher','lumber','quarry','pottery_kiln','bronze_foundry','school','academy','guildhall','mill','bakery','stable']);
+export function suburbBuildingsV204(game,city){
+ const contexts=typeof game.contexts==='function'?game.contexts(city):[];
+ return contexts.flatMap(ctx=>(ctx.economy?.buildings||[]).filter(b=>b.hp>0&&!b.virtual&&SUBURB_ROOFS_V204.has(b.type)).map(b=>({...b,
+  x:b.x+((ctx.c??city.c??0)-(city.c??0))*225,z:b.z+((ctx.r??city.r??0)-(city.r??0))*195
+ })));
+}
+export function suburbDemandV204(game,city){
+ const inner=city.stoneDefensePlanV166?.outlineV176||city.defensePlanV139?.outlineV176;
+ if(!inner?.length)return {ready:false,count:0,cluster:[],required:13};
+ const candidates=suburbBuildingsV204(game,city).filter(b=>!inside(b,inner)&&inner.some((p,i)=>distanceToCourse(b,p,inner[(i+1)%inner.length])<=115));
+ const seen=new Set();let cluster=[];
+ for(let i=0;i<candidates.length;i++){
+  if(seen.has(i))continue;
+  const stack=[i],group=[];seen.add(i);
+  while(stack.length){
+   const index=stack.pop(),house=candidates[index];group.push(house);
+   for(let j=0;j<candidates.length;j++)if(!seen.has(j)&&meters(house,candidates[j])<=48){seen.add(j);stack.push(j);}
+  }
+  if(group.length>cluster.length)cluster=group;
+ }
+ return {ready:cluster.length>=13,count:candidates.length,cluster,required:13};
+}
 function sitesInside(poly,inner,buildings,game,city){
  // Cheap proxy for buildable lots. A suburb is valuable only if future homes
  // fit between roads, water, the original walls and the new curtain.
@@ -264,6 +288,9 @@ export function findOuterRingV184(game,city){
    ...b,x:b.x+((ctx.c??city.c??0)-(city.c??0))*225,
    z:b.z+((ctx.r??city.r??0)-(city.r??0))*195
   })));
+ const suburb=suburbDemandV204(game,city);
+ const maritime=typeof game.cell==='function'&&
+  (typeof game.contexts==='function'?[city,...game.contexts(city)]:[city]).some(ctx=>!!game.cell(ctx)?.coast);
  const n=inner.length,center=inner.reduce((s,p)=>({x:s.x+p.x/n,z:s.z+p.z/n}),{x:0,z:0});
  const candidates=[],diagnostic={arcs:0,arcWallGaps:0,sites:0,houseCorridor:0,
   raw:0,terrain:0,segments:0,preview:0,rejectedReasons:{},firstFailures:[]};
@@ -299,13 +326,15 @@ export function findOuterRingV184(game,city){
    if(area<1550||area>12500){diagnostic.naturalAreaReject=(diagnostic.naturalAreaReject||0)+1;continue;}
    const plots=sitesInside(poly,inner,buildings,game,city);
    const occupiedHomes=outwardHomes.filter(h=>inside(h,poly)).length;
+   const protectedCluster=suburb.ready?suburb.cluster.filter(h=>inside(h,poly)).length:0;
+   if(suburb.ready&&protectedCluster<3)continue;
    if(plots<3&&occupiedHomes<2){diagnostic.naturalPlotReject=(diagnostic.naturalPlotReject||0)+1;continue;}
    const center=mix(a,b,.5),distanceToCoast=meters(center,coast[Math.floor(coast.length/2)]);
    const score=150+Math.min(8500,area)/170+
       Math.min(22,plots)*3+Math.min(2,oldGates.length)*20+
-      occupiedHomes*12-distanceToCoast*.18;
+      occupiedHomes*12+protectedCluster*85+(maritime&&natural.kind==='water'?320:0)-distanceToCoast*.18;
    candidates.push({arc,points:[a,...coast,b],area,shared,oldGates,
-    plots,occupiedHomes,rank:score,natural});diagnostic.raw++;
+    plots,occupiedHomes,protectedCluster,rank:score,natural});diagnostic.raw++;
   }
   // V193: protect a genuine large residential quarter with room for years
   // of growth. The first ring may now cover two or three V192-size suburbs,
@@ -318,6 +347,8 @@ export function findOuterRingV184(game,city){
     const area=polyArea(poly);
     if(area<1200||area>10500)continue;
     const occupiedHomes=outwardHomes.filter(h=>inside(h,poly)).length;
+    const protectedCluster=suburb.ready?suburb.cluster.filter(h=>inside(h,poly)).length:0;
+    if(suburb.ready&&protectedCluster<3)continue;
     // Reject candidate that puts existing homes inside its curtain material.
     if(buildings.some(h=>points.slice(1).some(p=>meters(p,h)<6))){diagnostic.houseCorridor++;continue;}
     // Screen full wall courses, not just vertices. House/building footprints
@@ -338,9 +369,9 @@ export function findOuterRingV184(game,city){
     const target=4200;
     const value=occupiedHomes*13+Math.min(22,plots)*3+
      Math.min(2,oldGates.length)*20+natural*7+
-     Math.min(7500,area)/180-length*.18-
+     Math.min(7500,area)/180+protectedCluster*85-length*.18-
      Math.max(0,target-area)/115-Math.max(0,area-7500)/250;
-    candidates.push({arc,points,area,shared,oldGates,plots,occupiedHomes,rank:value});diagnostic.raw++;
+    candidates.push({arc,points,area,shared,oldGates,plots,occupiedHomes,protectedCluster,rank:value});diagnostic.raw++;
    }
   }
  }
@@ -447,12 +478,13 @@ export function findOuterRingV184(game,city){
    naturalFailures:diagnostic.firstFailures,
    chosen:natural?.kind||'none'};
   return {
-   version:202,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
+   version:204,shape:natural?'natural-barrier-suburb':'historic-gate-suburb',
    historicSuburbV191:true,expandedSuburbV193:true,
    naturalBoundaryV194:natural?{kind:natural.kind,trace:natural.coast.map(p=>({x:p.x,z:p.z})),
      length:natural.naturalLengthV194,partial:!!natural.partialV195,
      verified:true}:null,
    oldGateCountV191:oldGates.length,plannedHousePlotsV191:plots,
+   protectedSuburbBuildingsV204:candidate.protectedCluster||0,maritimePreferenceV204:maritime,
    sharedLength:shared,newLength:length,sharedFraction:share,
    sharedArc:physicalArc.map(p=>({x:p.x,z:p.z})),boundaryV186:boundary,
    areaEstimateV186:polyArea(boundary),organicOutlineV189:true,
