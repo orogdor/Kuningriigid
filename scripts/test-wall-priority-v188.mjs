@@ -5,7 +5,7 @@ const stock=()=>({gold:500,wood:500,stone:500,water:100,meat:100});
 const oldWall={type:'palisade',ready:true,hp:100};
 const homes=Array.from({length:4},()=>({type:'house',ready:true,hp:100}));
 const services=[{type:'well',ready:true,hp:100},{type:'market',ready:true,hp:100}];
-const city={team:1,stoneDefensePlanV166:{slots:[{}],outlineV176:[]},economy:{realms:{1:{pop:25,resources:stock()}}}};
+const city={team:1,outerRingPreviewOnlyV190:true,stoneDefensePlanV166:{slots:[{}],outlineV176:[]},economy:{realms:{1:{pop:25,resources:stock()}}}}; // V188 fallback test deliberately exercises planning when a V204 demand gate is bypassed
 const ctx={economy:{buildings:[oldWall,...homes,...services]}};
 let upgrades=0;
 const game={
