@@ -1,5 +1,6 @@
 import {defensePlotPenaltyV176} from './terrain-defenses-v176.js';
-import {suburbBuildingsV204} from './outer-ring-v184.js?v=208';
+import {suburbBuildingsV204} from './outer-ring-v184.js?v=220';
+import {urbanGrowthPhaseV220,densityGroupsV220} from './urban-growth-v220.js';
 // V138: historically grown street blocks, continuous over neighboring 225x195 detail tiles.
 // Pure/deterministic: candidate planning cannot change saves or reserve fake buildings.
 import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
@@ -72,9 +73,9 @@ function preferredSuburbAnchorV209(game,parent,poly){
   !pointInOldCurtainV209(b,poly)&&distanceToCurtainV209(b,poly)<=110 &&
   !['lumber','quarry','farm','fisher','hunter'].includes(b.type));
  if(existing.length){
-  const target=existing.map(b=>({b,n:existing.filter(q=>Math.hypot(q.x-b.x,q.z-b.z)<68).length}))
-   .sort((a,b)=>b.n-a.n||Math.hypot(a.b.x,a.b.z)-Math.hypot(b.b.x,b.b.z))[0].b;
-  const group=existing.filter(b=>Math.hypot(b.x-target.x,b.z-target.z)<68);
+  // Grow the largest CONNECTED district, not the single busiest isolated lot.
+  // Exactly the same neighborhood radius is used by the outer-wall demand.
+  const group=densityGroupsV220(existing,62)[0];
   return {x:group.reduce((sum,b)=>sum+b.x,0)/group.length,
    z:group.reduce((sum,b)=>sum+b.z,0)/group.length};
  }
@@ -118,9 +119,10 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
  const nearCliff=type==='house'&&typeof game?.cell==='function'&&
    [-2,-1,0,1,2].some(dc=>[-2,-1,0,1,2].some(dr=>!!game.cell({c:parent.c+dc,r:parent.r+dr})?.mountain));
  const suburbPlan=parent.stoneDefensePlanV166?.outlineV176||parent.defensePlanV139?.outlineV176;
- const pop=parent.economy?.realms?.[parent.team]?.pop||0;
- const suburbPush=!!(suburbPlan?.length>=8&&!stoneAge&&!parent.outerRingV184&&
-  pop>=15&&(type==='house'||CIVIC.has(type)||INDUSTRIAL.has(type)));
+ const growth=urbanGrowthPhaseV220(parent,game?.s?.ages?.[parent.team]??(stoneAge?0:1));
+ const suburbPush=!!(suburbPlan?.length>=8&&!stoneAge&&
+  ['suburb','fortified-suburb'].includes(growth.phase)&&
+  (type==='house'||CIVIC.has(type)||INDUSTRIAL.has(type)));
  const suburbAnchor=suburbPush?preferredSuburbAnchorV209(game,parent,suburbPlan):null;
  const plots=[];
  const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?(stoneAge?10.2:10.6):13.2;
@@ -166,7 +168,8 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
    let suburb=0;
    if(suburbPush){
     const p={x:dx*DETAIL_TILE_X+px,z:dz*DETAIL_TILE_Z+pz};
-    if(pointInOldCurtainV209(p,suburbPlan))suburb=64;
+    if(pointInOldCurtainV209(p,suburbPlan))suburb=
+      growth.phase==='fortified-suburb'?-30:64;
     else{
      const wallDistance=distanceToCurtainV209(p,suburbPlan);
      const anchorDistance=Math.hypot(p.x-suburbAnchor.x,p.z-suburbAnchor.z);

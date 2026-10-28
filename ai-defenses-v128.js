@@ -1,5 +1,5 @@
 import {findOuterRingV184,suburbDemandV204} from './outer-ring-v184.js?v=218';
-import {oldPerimeterStatusV218} from './old-fortification-policy-v218.js';
+import {oldPerimeterStatusV218,rejectInsideOuterRingV218} from './old-fortification-policy-v218.js';
 import {planRoadGatesV177} from './road-gates-v177.js';
 import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
 import {canAfford} from './economy.js';
@@ -81,6 +81,12 @@ export function planOuterRingV184(game,team,city){
   return false;
  }
  const existing=city.outerRingV184;
+ const outline=city.stoneDefensePlanV166?.outlineV176||city.defensePlanV139?.outlineV176;
+ if(existing?.slots?.length&&outline?.length>=3&&
+    rejectInsideOuterRingV218(existing.slots,outline)&&!city.outerRingPreviewOnlyV190){
+  city.outerRingDiagnosticV184={reason:'invalid-interior-outer-wall',at:game.s.time};
+  return false;
+ }
  if(!existing&&!city.outerRingPreviewOnlyV190){
   const demand=suburbDemandV204(game,city);
   city.outerRingNeedV204={outside:demand.count,cluster:demand.cluster.length,required:13};

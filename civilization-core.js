@@ -20,7 +20,8 @@ import {marketFoodGrowth} from './city-growth-v137.js';
 import {historicalTilePlan,historicalTilePriority} from './historical-districts-v137.js';
 import {countyFootprint,countySearchRadius,urbanTile,countyBuildRule,countyBuildingCount,citySpacingAllowed,MIN_CITY_SPACING} from './counties-v126.js?v=136a';
 import {AI_CITY_SPACING,historicalCitySites,historicalDistrictOrder,historicalSiteScore} from './historical-city-v135.js';
-import {historicalBuildingPlots,nextPlotBatch,urbanExpansionEligible} from './historic-urban-v138.js?v=209';
+import {historicalBuildingPlots,nextPlotBatch,urbanExpansionEligible} from './historic-urban-v138.js?v=220';
+import {urbanGrowthPhaseV220,orderedHousingContextScoreV220} from './urban-growth-v220.js';
 import {V139_CORE_HOUSES,cityInfillRank} from './urban-infill-v139.js';
 import {unitSuccessor,buildingSuccessor,suppliesBuilding} from './era-availability-v116.js?v=118a';
 import {migrateBattleAmmunition} from './combat-equipment-v100.js';
@@ -415,8 +416,10 @@ export class Civilization{
  planAIHouseUpgradesV218(team,city){
   const realm=city.economy.realms[team];
   if(!realm||this.s.time<(city.nextHouseUpgradeV218||0))return false;
-  city.nextHouseUpgradeV218=this.s.time+72;
-  if(this.housing(city)>realm.pop+2)return false;
+  city.nextHouseUpgradeV218=this.s.time+36;
+  // Upgrade before paying for new housing when the city approaches capacity.
+  // Reserve a little spare space for natural demographic growth.
+  if(this.housing(city)>realm.pop+5)return false;
   for(const ctx of this.contexts(city))for(const b of ctx.economy.buildings){
    const plan=this.houseUpgradeOptionsV218(ctx,b);
    if(!plan.error&&canAfford(realm.resources,plan.cost)&&this.upgradeHouseV218(ctx,b).upgrade)return true;
@@ -862,6 +865,9 @@ const science=this.s.research[team];
  if(this.s.time>=(city.aiNextBuildCheck||0)){
   city.aiNextBuildCheck=this.s.time+36;
  const excluded=new Set(Object.entries(city.aiPlacementRetry||{}).filter(([,until])=>until>this.s.time).map(([type])=>type));
+ const growth=urbanGrowthPhaseV220(city,age);
+ city.aiUrbanProgressV220={...growth,housing:this.housing(city),
+  outsideDemand:city.outerRingDiagnosticV184?.reason||null,at:this.s.time};
  for(let attempt=0;attempt<6;attempt++){
   const decision=selectAIBuild(this,team,city,excluded);if(!decision)break;
   const next=decision.type;let built=false;
@@ -885,10 +891,8 @@ const science=this.s.research[team];
   }
   const orderedContexts=historicalDistrictOrder(city,contexts);
   if(isHousing)orderedContexts.sort((a,b)=>{
-   const rank=ctx=>{
-    if(ctx.expandV138)return 85; // outer suburb after compact inner quarters
-    return cityInfillRank(city,ctx,next,this);
-   };
+   const rank=ctx=>orderedHousingContextScoreV220(city,ctx,growth.phase,
+    ctx.expandV138?85:cityInfillRank(city,ctx,next,this));
    return rank(a)-rank(b);
   });
   // Once the second ring is complete, exhaust viable protected inner plots
