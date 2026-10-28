@@ -9,7 +9,11 @@ for(const kind of ['mountain','coast']){
  const plan=city.stoneDefensePlanV166||city.defensePlanV139,slots=plan?.slots||[];
  const closest=p=>fortsAll.map(b=>({b,d:Math.hypot(b.x-p.x,b.z-p.z)})).sort((a,b)=>a.d-b.d)[0];
  const missing=slots.filter(p=>{const n=closest(p);return !n||n.d>5.4;}).map(p=>{
-  const n=closest(p);return {type:p.type,x:Math.round(p.x),z:Math.round(p.z),nearest:n&&{type:n.b.type,d:Math.round(n.d*10)/10},preview:g.previewDefenseV177(city,p).error};
+  const n=closest(p);
+  const near=fortsAll.map(b=>({type:b.type,x:Math.round(b.x),z:Math.round(b.z),
+   d:Math.round(Math.hypot(p.x-b.x,p.z-b.z)*10)/10,angle:b.wallAngleV175,
+   span:b.palisadeSpanV167,drawn:!!b.drawnWallV175})).sort((a,b)=>a.d-b.d).slice(0,3);
+  return {slot:p,nearest:near,preview:g.previewDefenseV177(city,p).error};
  });
  const stuck=city.outerRingV184?.slots?.[city.outerRingV184.nextIndex||0];
  const wood=fortsAll.filter(b=>['palisade','woodgate','watchtower'].includes(b.type));
@@ -19,7 +23,9 @@ for(const kind of ['mountain','coast']){
   built:fortsAll.length,types:total,wood:wood.length,
   outerPlan:city.outerRingV184&&{total:city.outerRingV184.slots.length,at:city.outerRingV184.nextIndex},
   stuckSlot:stuck&&{type:stuck.type,x:Math.round(stuck.x),z:Math.round(stuck.z),
-    error:g.previewDefenseV177(city,stuck).error,nearest:closest(stuck)&&{type:closest(stuck).b.type,d:Math.round(closest(stuck).d*10)/10}},
+    error:g.previewDefenseV177(city,stuck).error,
+    near:fortsAll.map(b=>({type:b.type,x:b.x,z:b.z,d:Math.hypot(b.x-stuck.x,b.z-stuck.z),span:b.palisadeSpanV167,angle:b.wallAngleV175,drawn:!!b.drawnWallV175})).sort((a,b)=>a.d-b.d).slice(0,3),
+    slot:stuck},
   diagnostics:{outer:city.outerRingDiagnosticV184,defense:city.aiDefenseDiagnosticV146}}));
  const before=wood.length;
  for(let i=0;i<6;i++)g.tick(12);

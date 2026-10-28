@@ -37,4 +37,15 @@ assert.equal(planOuterRingV184(game,1,city),false);
 assert.equal(city.outerRingDiagnosticV184.reason,'complete');
 assert.equal(planWallUpgradesV184(game,1,city),true);
 assert.equal(upgrades,2);
-console.log('V188: survey fallback, waiting resources, completed ring and upgrade priority OK');
+// V211: an advanced town with a permanently blocked exterior slot must
+// still pay to improve its standing old wooden curtain.
+city.outerRingV184.nextIndex=0;
+ctx.economy.buildings=ctx.economy.buildings.filter(b=>!b.outerRingV184);
+city.economy.realms[1].resources=stock();
+game.s.ages[1]=5;
+game.buildDefenseV177=()=>({error:'Teine hoone on liiga lähedal.'});
+assert.equal(planOuterRingV184(game,1,city),false);
+assert.equal(city.outerRingDiagnosticV184.reason,'Teine hoone on liiga lähedal.');
+assert.equal(planWallUpgradesV184(game,1,city),true);
+assert.equal(upgrades,3,'advanced city should not abandon old timber when extension is blocked');
+console.log('V211: outer survey, paid wall priority and mature blocked-curtain upgrades OK');

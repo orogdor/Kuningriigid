@@ -53,7 +53,14 @@ export function planWallUpgradesV184(game,team,city){
  const innerBuilding=allForPriority.some(b=>b.hp>0&&!b.ready&&!b.outerRingV184&&DEFENSE_TYPES.has(b.type));
  const surveying=!outer&&(city.outerRingNeedV204?.cluster>=13||city.outerRingPreviewOnlyV190)&&
   (city.outerRingSurveyFailuresV188||0)>0&&(city.outerRingSurveyFailuresV188||0)<3;
- if(realm.pop>=20&&(outerPending||innerBuilding||surveying))return false;
+ // V211: if a mature town cannot lay the next exterior segment because of
+ // a persistent geometry/placement obstruction, do not indefinitely freeze
+ // upgrades to the genuine old timber curtain. Building/material delays still
+ // take precedence so a constructible cheap outer ring is built first.
+ const outerReason=city.outerRingDiagnosticV184?.reason||'';
+ const outerBlocked=age>=4&&outerPending&&!!outerReason&&
+  !['building','finishing','saving-for-outer-ring','construction-backlog','inner-wall-building','complete'].includes(outerReason);
+ if(realm.pop>=20&&((outerPending&&!outerBlocked)||innerBuilding||surveying))return false;
  const contexts=game.contexts(city),forts=contexts.flatMap(ctx=>ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&b.ready&&['palisade','woodgate','watchtower'].includes(b.type)).map(b=>({ctx,b})));
  if(!forts.length)return false;
  if(contexts.some(ctx=>ctx.economy.buildings.some(b=>b.wallUpgradeV184)))return true;
@@ -112,7 +119,12 @@ export function planOuterRingV184(game,team,city){
   const slot=plan.slots[plan.nextIndex],cost=game.buildingDefinitions[slot.type].cost;
   if(!canAfford(stock,cost)||!reserveAfterWalls(stock,cost))return true;
   const result=game.buildDefenseV177(city,slot);
-  if(!result.building){city.outerRingDiagnosticV184={reason:result.error||'site-blocked',index:plan.nextIndex,at:game.s.time};return true;}
+  if(!result.building){
+   city.outerRingDiagnosticV184={reason:result.error||'site-blocked',index:plan.nextIndex,at:game.s.time};
+   // In the industrial era an irreparable planned joint must not block ALL
+   // further old-wall upgrades. The same paid slot stays pending for retry.
+   return (game.s.ages[team]||0)<4;
+  }
   Object.assign(result.building,{outerRingV184:true,plannedDefense:true});plan.nextIndex++;
   city.outerRingDiagnosticV184={reason:'building',index:plan.nextIndex,total:plan.slots.length,at:game.s.time};return true;
  }

@@ -1,0 +1,51 @@
+/* V211 – concise, legible strategy-game opening menu on phones and desktop. */
+#startmenu{background:radial-gradient(ellipse at 50% 10%,#2a4640 0%,#112520 48%,#091613 100%);
+ padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));
+ place-items:center;overflow-y:auto;}
+#startmenu .menu-card{width:min(520px,100%);max-width:100%;max-height:calc(100dvh - 24px);
+ overflow-y:auto;overscroll-behavior:contain;padding:24px 26px 20px;
+ border:1px solid #a5ad9452;border-radius:18px;
+ background:linear-gradient(160deg,#1c3530 0%,#122823 58%,#0c1e1c 100%);
+ box-shadow:0 28px 90px #0008,0 1px #eff2dd18 inset;}
+#startmenu .menu-heading{align-items:center;gap:8px;}
+#startmenu #menu-version{font:700 11px/1.5 system-ui,sans-serif;letter-spacing:1.4px;
+ color:#d6c58c;max-width:none;}
+#startmenu h1{font:600 clamp(30px,7vw,41px)/1.08 Georgia,serif;
+ margin:20px 0 10px;letter-spacing:.25px;color:#f3dfae;
+ background:none;padding-bottom:0;}
+#startmenu .menu-intro{font-size:14px;line-height:1.55;color:#dde6dc;
+ margin:0 0 18px;max-width:40ch;}
+#startmenu .menu-language{margin:0!important;display:flex;align-items:center;gap:7px;}
+#startmenu .menu-language select{width:auto;min-width:90px;border-radius:8px;
+ background:#264139;padding:8px;}
+#startmenu #menu-status{border:1px solid #d3bf8950;border-radius:9px;padding:10px 12px;
+ background:#263d3388;color:#e7dfbc;font-size:13px;}
+#startmenu #continue{border-radius:11px;background:#d6ba7c;color:#122521;
+ font-weight:750;min-height:53px;box-shadow:0 4px 14px #0003;}
+#startmenu #seedinfo:empty{display:none;}
+#startmenu #seedinfo{margin:7px 0 10px;font-size:11px;color:#c9d4ca;}
+#startmenu details{background:#152a26;border:1px solid #8eac9a48;
+ border-radius:11px;margin:9px 0;overflow:hidden;}
+#startmenu details>summary{padding:13px 15px;min-height:47px;font-size:14px;
+ font-weight:650;color:#f0e0b7;list-style-position:inside;}
+#startmenu details[open]>summary{background:#23423966;}
+#startmenu .menu-utilities{gap:9px;margin:10px 0;}
+#startmenu .menu-utilities button{border-radius:10px;min-height:45px;
+ border:1px solid #b0c1ad42;background:#203a35;color:#e7eee4;}
+#startmenu .menu-footer{font-size:11px!important;line-height:1.5;color:#aabeb1;
+ padding-top:8px;border-top:1px solid #a6ae9450;}
+#startmenu :is(button,summary,a){touch-action:manipulation;}
+@media(max-width:600px){
+ #startmenu{padding:10px;align-items:center;}
+ #startmenu .menu-card{padding:20px 17px 17px;border-radius:15px;
+ max-height:calc(100dvh - 20px);}
+ #startmenu #menu-version{font-size:10px;letter-spacing:.7px;max-width:none;line-height:1.4;}
+ #startmenu h1{font-size:34px;margin:14px 0 8px;}
+ #startmenu .menu-intro{font-size:13px;margin-bottom:12px;}
+ #startmenu .menu-world-fields{grid-template-columns:1fr;}
+ #startmenu .menu-footer{margin-bottom:0;}
+}
+@media(max-height:660px){
+ #startmenu{align-items:start;}
+ #startmenu .menu-card{max-height:none;margin:auto 0;}
+}
