@@ -3,6 +3,7 @@ import {protectedHousingZoneV184,allowedSuburbJoinV191,allowedSuburbCornerV201} 
 import {mountainBlockedV178} from './mountain-foot-v178.js';
 import {wallTerrainErrorV1758,wallEndJoinV1758} from './wall-terrain-v1758.js';
 import {clearOfDepositsV212} from './wall-deposit-v212.js';
+import {blocksFutureOuterWallV213} from './outer-wall-reservation-v213.js';
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
 import {nordicVillageName} from './folklore-village-names-v164.js?v=165a';
 import {stoneFortificationAgeGate,reserveStoneVillageRingV168} from './stone-village-defenses-v166.js?v=169a';
@@ -557,6 +558,9 @@ export class Civilization{
    if(!canAfford(city.economy.realms[city.team].resources,cost))
     return {error:'Suure puumüüri jaoks ei jätku materjale.'};
   }
+  const parent=this.parentCity(city);
+  if(blocksFutureOuterWallV213(parent,p,type,{x:(city.c-parent.c)*DETAIL_TILE_X,z:(city.r-parent.r)*DETAIL_TILE_Z}))
+   return {error:'Planeeritud linnamüüri koridor peab jääma ehitistest vabaks.'};
   if(type==='field'){const error=validateField(city,p,(x,z)=>this.nav(city).passable(x,z));if(error)return {error};const d=fieldSize(p),heights=[];for(let x=-d.width/2;x<=d.width/2;x+=4)for(let z=-d.depth/2;z<=d.depth/2;z+=4)heights.push(detailHeight(this.cell(city),p.x+x,p.z+z));if(Math.max(...heights)-Math.min(...heights)>1.8)return {error:'Põllu maapind on liiga järsk. Vali väiksem või tasasem ala.'};}
   else if(city.economy.buildings.some(b=>b.type==='field'&&b.hp>0&&fieldContains(b,p,type==='market'?17:6)))return {error:'Hoone ei mahu põllule. Vali koht põllu kõrval.'};
   if(this.constructionArea(city).pending.length>=12)return {error:'Linna ühises ehitusjärjekorras on juba 12 hoonet.'};
