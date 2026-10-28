@@ -196,7 +196,9 @@ export function planAIDefenses(game,team,city){
  const reasons={};
  const viable=candidates.filter(slot=>{
   if(local.some(b=>defendedTypes.has(b.type)&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:5))){reasons.alreadyBuilt=(reasons.alreadyBuilt||0)+1;return false;}
-  if(local.some(b=>['house','market','warehouse','study','scriptorium','well','cellar','hall'].includes(b.type)&&Math.abs(b.x-slot.x)<9&&Math.abs(b.z-slot.z)<9)){reasons.overlapsCore=(reasons.overlapsCore||0)+1;return false;}
+  // V214: a drawn 1m-wide curtain is not a 9m-wide house. Its true
+  // footprint and gate openings are checked by previewDefenseV177 below.
+  if(!slot.drawnWallV175&&local.some(b=>['house','market','warehouse','study','scriptorium','well','cellar','hall'].includes(b.type)&&Math.abs(b.x-slot.x)<9&&Math.abs(b.z-slot.z)<9)){reasons.overlapsCore=(reasons.overlapsCore||0)+1;return false;}
   const locked=game.buildRule(city,slot.type);if(locked){reasons.locked=(reasons.locked||0)+1;city.aiDefenseLockedReasonV146=String(locked);return false;}
   const cost=game.buildingDefinitions[slot.type]?.cost||{};
   if(!canAfford(stock,cost)||!reserveAfterWalls(stock,cost)){reasons.materials=(reasons.materials||0)+1;return false;}

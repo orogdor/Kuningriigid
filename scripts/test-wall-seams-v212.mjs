@@ -1,3 +1,4 @@
+// V214 – the AI uses physical drawn-wall footprint checks, never the 9m rectangle.
 // V212.1: verify the corrected placement environment parses and actually pays for gaps.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
