@@ -1,4 +1,5 @@
 import {defensePlotPenaltyV176} from './terrain-defenses-v176.js';
+import {suburbBuildingsV204} from './outer-ring-v184.js?v=208';
 // V138: historically grown street blocks, continuous over neighboring 225x195 detail tiles.
 // Pure/deterministic: candidate planning cannot change saves or reserve fake buildings.
 import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
@@ -46,6 +47,56 @@ export function cliffShelterScoreV204(game,parent,x,z){
  }
  return sides?-(sides*39+(sides>=2?35:0)):0;
 }
+// V209: a REAL suburban development preference after the first core ring.
+// No buildings are created, no building placement rules are bypassed. This
+// only reorders ordinary house and service construction-site candidates.
+function pointInOldCurtainV209(p,poly){
+ let inside=false;
+ for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+  const a=poly[i],b=poly[j];
+  if((a.z>p.z)!==(b.z>p.z)&&p.x<(b.x-a.x)*(p.z-a.z)/(b.z-a.z)+a.x)inside=!inside;
+ }
+ return inside;
+}
+function distanceToCurtainV209(p,poly){
+ let dist=Infinity;
+ for(let i=0;i<poly.length;i++){
+  const a=poly[i],b=poly[(i+1)%poly.length],dx=b.x-a.x,dz=b.z-a.z,
+   sq=dx*dx+dz*dz,t=sq?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.z-a.z)*dz)/sq)):0;
+  dist=Math.min(dist,Math.hypot(p.x-a.x-t*dx,p.z-a.z-t*dz));
+ }
+ return dist;
+}
+function preferredSuburbAnchorV209(game,parent,poly){
+ const existing=suburbBuildingsV204(game,parent).filter(b=>
+  !pointInOldCurtainV209(b,poly)&&distanceToCurtainV209(b,poly)<=110 &&
+  !['lumber','quarry','farm','fisher','hunter'].includes(b.type));
+ if(existing.length){
+  const target=existing.map(b=>({b,n:existing.filter(q=>Math.hypot(q.x-b.x,q.z-b.z)<68).length}))
+   .sort((a,b)=>b.n-a.n||Math.hypot(a.b.x,a.b.z)-Math.hypot(b.b.x,b.b.z))[0].b;
+  const group=existing.filter(b=>Math.hypot(b.x-target.x,b.z-target.z)<68);
+  return {x:group.reduce((sum,b)=>sum+b.x,0)/group.length,
+   z:group.reduce((sum,b)=>sum+b.z,0)/group.length};
+ }
+ // A seaport grows toward navigable water; a rock-side town favours
+ // land sheltered by cliffs. Sample the actual terrain, not an assumed edge.
+ const center=poly.reduce((p,q)=>({x:p.x+q.x/poly.length,z:p.z+q.z/poly.length}),{x:0,z:0});
+ const sample=game?.defenseTerrainKindV176;
+ if(typeof sample==='function'){
+  let best=null,score=-Infinity;
+  for(let i=0;i<16;i++){
+   const angle=i*Math.PI/8,dx=Math.cos(angle),dz=Math.sin(angle);
+   const kind1=sample.call(game,parent,center.x+dx*94,center.z+dz*94);
+   const kind2=sample.call(game,parent,center.x+dx*130,center.z+dz*130);
+   const value=(kind1==='water'?16:kind1==='mountain'?11:0)+
+     (kind2==='water'?13:kind2==='mountain'?9:0);
+   if(value>score){score=value;best={x:center.x+dx*72,z:center.z+dz*72};}
+  }
+  if(score>0)return best;
+ }
+ return {x:center.x+74,z:center.z};
+}
+
 export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge=false,game=null){
  if(!tile||!parent)return [];
  const dx=tile.c-parent.c,dz=tile.r-parent.r;
@@ -66,6 +117,11 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
  const streetIndex=stoneAge&&type==='house'?indexActiveStreetV174(activeTrails):null;
  const nearCliff=type==='house'&&typeof game?.cell==='function'&&
    [-2,-1,0,1,2].some(dc=>[-2,-1,0,1,2].some(dr=>!!game.cell({c:parent.c+dc,r:parent.r+dr})?.mountain));
+ const suburbPlan=parent.stoneDefensePlanV166?.outlineV176||parent.defensePlanV139?.outlineV176;
+ const pop=parent.economy?.realms?.[parent.team]?.pop||0;
+ const suburbPush=!!(suburbPlan?.length>=8&&!stoneAge&&!parent.outerRingV184&&
+  pop>=15&&(type==='house'||CIVIC.has(type)||INDUSTRIAL.has(type)));
+ const suburbAnchor=suburbPush?preferredSuburbAnchorV209(game,parent,suburbPlan):null;
  const plots=[];
  const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?(stoneAge?10.2:10.6):13.2;
  // Staggered rows and slight bends, not a chessboard; deterministic per tile.
@@ -107,7 +163,18 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
                      streetfrontScoreV174({x:px,z:pz},streetIndex)+
                      (dx===0&&dz===0?courtyardScoreV174({x:gx,z:gz},coreNeighbours):0):0);
    const sheltered=nearCliff?cliffShelterScoreV204(game,parent,dx*DETAIL_TILE_X+px,dz*DETAIL_TILE_Z+pz):0;
-    plots.push({x:px,z:pz,priority:priority+sheltered,globalX:gx,globalZ:gz});
+   let suburb=0;
+   if(suburbPush){
+    const p={x:dx*DETAIL_TILE_X+px,z:dz*DETAIL_TILE_Z+pz};
+    if(pointInOldCurtainV209(p,suburbPlan))suburb=64;
+    else{
+     const wallDistance=distanceToCurtainV209(p,suburbPlan);
+     const anchorDistance=Math.hypot(p.x-suburbAnchor.x,p.z-suburbAnchor.z);
+     suburb=wallDistance<=110?-95+Math.min(120,anchorDistance)*.43+
+       Math.max(0,wallDistance-70)*.3:55;
+    }
+   }
+   plots.push({x:px,z:pz,priority:priority+sheltered+suburb,globalX:gx,globalZ:gz});
   }
  }
  plots.sort((a,b)=>a.priority-b.priority||a.globalZ-b.globalZ||a.globalX-b.globalX);

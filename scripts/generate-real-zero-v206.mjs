@@ -28,7 +28,8 @@ if(kind==='mountain'){
 const initial={seed,initialTime:0,initialAges:[...game.s.ages],
  initialCityCount:game.s.cities.length,initialBuildingCount:game.s.cities.reduce((n,c)=>n+game.allBuildings(c).length,0)};
 const team=kind==='coast'?2:1,cityName=kind==='coast'?'Fyrisvellir':'Kaljuvärava';
-const maxTurn=Number(process.env.V206_MAX_TURNS||360);
+// V209 test covers the suburban growth transition as well as wall construction.
+const maxTurn=Number(process.env.V206_MAX_TURNS||450);
 let target=null,firstWall=null,secondComplete=null,peak=0,turn=0;
 for(turn=1;turn<=maxTurn;turn++){
  for(let j=0;j<5;j++)game.tick(12);
@@ -64,7 +65,7 @@ const meta={version:206,kind,seed,initial,turn:actualTurn,sourceTeam:team,
  secondWallBuilt:built.length,secondWallReady:built.filter(b=>b.ready).length,
  reason:target.outerRingDiagnosticV184?.reason||null,
  firstWall,secondComplete,organicAI:true,freeBuildingsAdded:0,
- priorSaveLoaded:false,description:'Replayed from createGame(seed), with normal AI ticks and paid construction only'};
+ priorSaveLoaded:false,rulesRevision:209,description:'Replayed from createGame(seed), with normal AI ticks and paid construction only'};
 const state=takeOverAI(game.s,team);
 state.demo='zero-v206-'+kind;state.winner=null;state.zeroTestV206=meta;
 state.cities.sort((a,b)=>a.id===target.id?-1:b.id===target.id?1:0);
