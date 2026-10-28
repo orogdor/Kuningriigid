@@ -1,0 +1,59 @@
+{
+  "version": 219,
+  "seed": 5932019,
+  "initial": {
+    "seed": 5932019,
+    "worldType": "continents",
+    "at": 0,
+    "cityCount": 0,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "settlers": [
+      {
+        "team": 0,
+        "c": 135,
+        "r": 26
+      },
+      {
+        "team": 1,
+        "c": 164,
+        "r": 126
+      },
+      {
+        "team": 2,
+        "c": 34,
+        "r": 124
+      },
+      {
+        "team": 3,
+        "c": 47,
+        "r": 58
+      }
+    ]
+  },
+  "newMap": true,
+  "fromZero": true,
+  "priorSaveLoaded": false,
+  "organicAI": true,
+  "freeMaterialsAdded": 0,
+  "age": 1,
+  "bronzeBeganAt": 103,
+  "bronzeTurns": 95,
+  "bronzeCompleted": true,
+  "capturedTurn": 197,
+  "cityId": 0,
+  "cityName": "Untamola",
+  "originalTeam": 1,
+  "population": 32,
+  "buildings": 106,
+  "fortifications": 53,
+  "upgradedHomes": 0,
+  "oldWallUpgrades": 1,
+  "roads": 65,
+  "phase": "final-bronze-turn-before-iron",
+  "enginePatches": "V218.4 original wall repair and residential upgrades; V216 natural roads"
+}
