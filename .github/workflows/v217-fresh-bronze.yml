@@ -1,0 +1,56 @@
+name: V217 new generated map to the end of Bronze Age
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/generate-fresh-bronze-v217.mjs'
+      - '.github/workflows/v217-fresh-bronze.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 42
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node scripts/generate-fresh-bronze-v217.mjs
+      - name: Validate age, authentic zero-start map and playable ownership
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          import {Civilization} from './civilization-core.js';
+          import {loadFreshBronzeV217} from './fresh-bronze-v217.js';
+          const s=JSON.parse(fs.readFileSync('scenarios/bronze-fresh-v217.json','utf8'));
+          const v=await loadFreshBronzeV217(async()=>({ok:true,json:async()=>s}));
+          const m=v.bronzeFreshV217;
+          assert.equal(m.initial.cities,0);assert.equal(m.initial.at,0);
+          assert.deepEqual(m.initial.ages,[0,0,0,0]);assert.equal(v.ages[0],1);
+          assert.ok(m.bronzeTurns>=20);
+          const g=new Civilization(v);g.tick(12);assert.ok(g.s.time>v.time);
+          console.log('V217 VERIFIED FINAL BRONZE',JSON.stringify(m));
+          NODE
+      - name: Publish checkpoint to Pages source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scenarios/bronze-fresh-v217.json scenarios/bronze-fresh-v217.manifest.json
+          git commit -m "V217: generated continent world final-bronze AI playable checkpoint"
+          for attempt in 1 2 3 4; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v217-fresh-bronze-takeover
+          path: |
+            scenarios/bronze-fresh-v217.json
+            scenarios/bronze-fresh-v217.manifest.json
+          if-no-files-found: ignore
