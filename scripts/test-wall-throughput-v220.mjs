@@ -24,6 +24,9 @@ assert.equal(realm.resources.stone,979);
 assert.equal(planWallUpgradesV184(game,1,city),true);
 assert.equal(opened,3,'must never exceed physical builder count');
 assert.equal(planOuterRingV184(game,1,city),false);
+assert.equal(city.outerRingV184.nextIndex,0,'active original-wall upgrades block the second ring');
+for(const b of old)delete b.wallUpgradeV184;
+assert.equal(planOuterRingV184(game,1,city),false);
 assert.equal(city.outerRingDiagnosticV184.reason,'old-wall-first');
 for(const id of ['a','b','c']){
  const s=JSON.parse(fs.readFileSync('scenarios/v220-city-'+id+'.json','utf8'));
