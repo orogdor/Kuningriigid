@@ -2,6 +2,7 @@ import {planRoadGatesV177} from './road-gates-v177.js';
 import {protectedHousingZoneV184,allowedSuburbJoinV191,allowedSuburbCornerV201} from './outer-ring-v184.js?v=208';
 import {mountainBlockedV178} from './mountain-foot-v178.js';
 import {wallTerrainErrorV1758,wallEndJoinV1758} from './wall-terrain-v1758.js';
+import {clearOfDepositsV212} from './wall-deposit-v212.js';
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';
 import {nordicVillageName} from './folklore-village-names-v164.js?v=165a';
 import {stoneFortificationAgeGate,reserveStoneVillageRingV168} from './stone-village-defenses-v166.js?v=169a';
@@ -541,7 +542,10 @@ export class Civilization{
    (['watchtower','stonetower'].includes(type)&&isDrawableWallV175(b.type))||
    (isDrawableWallV175(type)&&['watchtower','stonetower'].includes(b.type))
   )));
- };}if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
+ };
+ if(isDrawableWallV175(type))env.canBuild=p=>clearOfDepositsV212(p,
+  resourcesNear(city.world,p.x,p.z,13,13));
+ if(COASTAL_BUILDINGS.has(type))env.passable=()=>true;if(MINERAL_BUILDINGS[type])env.canBuild=p=>!city.world.resources.some(r=>!r.removed&&!['tree','berry','game','fish',MINERAL_BUILDINGS[type]].includes(r.kind)&&Math.abs(r.x-p.x)<4.5&&Math.abs(r.z-p.z)<4);return env}
  buildingSites(city,type){if(MINERAL_BUILDINGS[type]){const r=mineralSite(city.world,type);return r?[{x:r.x,z:r.z}]:[]}if(COASTAL_BUILDINGS.has(type))return coastalSites(this,this.cell(city),type);const parent=this.parentCity(city);return historicalBuildingPlots(city,parent,type,this.s.seed+parent.id*31,this.s.ages[parent.team]===0,this)}
  previewBuild(city,type,p){
   const error=this.buildRule(city,type,p||{});if(error)return {error};

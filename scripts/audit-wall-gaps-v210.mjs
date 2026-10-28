@@ -16,6 +16,13 @@ for(const kind of ['mountain','coast']){
   return {slot:p,nearest:near,preview:g.previewDefenseV177(city,p).error};
  });
  const stuck=city.outerRingV184?.slots?.[city.outerRingV184.nextIndex||0];
+ if(stuck&&kind==='mountain'){
+  const others=g.allBuildings(city).filter(b=>b.hp>0&&!b.virtual&&!forts.has(b.type))
+   .map(b=>({type:b.type,x:b.x,z:b.z,d:Math.hypot(b.x-stuck.x,b.z-stuck.z)}))
+   .sort((a,b)=>a.d-b.d).slice(0,6);
+  console.log('AUDIT MOUNTAIN OUTER BLOCKERS',JSON.stringify({slot:stuck,nearOther:others,
+   oldPreview:g.previewDefenseV177(city,stuck).error}));
+ }
  const wood=fortsAll.filter(b=>['palisade','woodgate','watchtower'].includes(b.type));
  const total=Object.fromEntries([...new Set(fortsAll.map(b=>b.type))].map(type=>[type,fortsAll.filter(b=>b.type===type).length]));
  if(kind==='coast'){
