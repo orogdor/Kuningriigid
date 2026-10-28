@@ -27,6 +27,7 @@ export async function loadOrganicWallV190(demo,fetcher=fetch){
  // purchased and completed by real builders over time.
  for(const ctx of game.contexts(city))for(const b of ctx.economy.buildings)if(b.hp>0&&!b.ready)b.ready=true;
  realm.pop=Math.max(30,realm.pop);
+ city.outerRingPreviewOnlyV190=true;
  for(let i=0;i<180;i++){
   Object.assign(realm.resources,{wood:120,stone:120,cutstone:100,water:100,meat:100,gold:999});
   planOuterRingV184(game,city.team,city);
@@ -46,6 +47,7 @@ export async function loadOrganicWallV190(demo,fetcher=fetch){
    gates,naturalSurvey:city.naturalSurveyDiagnosticV195,survey:city.historicSurveyDiagnosticV191
   }));
  }
+ delete city.outerRingPreviewOnlyV190;
  realm.resources=originalResources;realm.pop=originalPop;
  game.s.demo=demo;
  game.s.wallTestV190={kind,targetCityId:city.id,controlled:true,
