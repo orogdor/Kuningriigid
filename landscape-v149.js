@@ -206,11 +206,14 @@ export function roadMaterial(scope='world',tile=null){
  vec3 dirt=${detail?'vec3(.39,.32,.23)':'vec3(.45,.38,.28)'}*(.86+n*.22);
  vec3 col=dirt;
  if(lvl<1.5){ // dirt track: two wheel ruts, grassy crown
-  float rut=smoothstep(.20,.0,abs(au-.55));col*=1.0-rut*.22;
-  col=mix(col,vec3(.30,.36,.21)*(.85+nf*.3),smoothstep(.22,.0,au)*.55);
+  float rut=1.0-smoothstep(.06,.20,abs(au-.48));
+  float rut2=1.0-smoothstep(.06,.20,abs(au-.62));
+  col*=1.0-(rut+rut2)*.16;
+  col=mix(col,vec3(.25,.30,.18)*(.85+nf*.25),(1.0-smoothstep(0.0,.28,au))*.45);
+  col*=.90+.12*l149n(wp*1.65+3.1);
  }else if(lvl<2.5){ // gravel
-  col=mix(vec3(.46,.43,.37),vec3(.36,.34,.29),nf)*(.92+n*.12);
-  col*=1.0-smoothstep(.20,.0,abs(au-.5))*.10;
+  col=mix(vec3(.42,.38,.29),vec3(.32,.30,.25),nf)*(.88+n*.20);
+  float rut=1.0-smoothstep(.08,.22,abs(au-.52));col*=1.0-rut*.12;
  }else if(${detail?'false':'true'}){ // V157 world map: paved roads read as smooth grey-brown bands, not tiles
   col=mix(vec3(.47,.44,.38),vec3(.40,.38,.34),nf)*(.93+n*.10);
   col=mix(col,col*.82,smoothstep(.70,.95,au));
@@ -223,14 +226,15 @@ export function roadMaterial(scope='world',tile=null){
   col=mix(rock*(.9+nf*.15),vec3(.22,.21,.18),joint*.75);
  }
  // shoulders: trodden earth breaking into grass
- float shoulder=smoothstep(.92,1.10,au);
- col=mix(col,mix(dirt,vec3(.31,.35,.21),smoothstep(1.05,1.5,au)),shoulder);
- // edge wear and soft blend into the terrain
- float a=1.0-smoothstep(1.05+n*.25,1.5,au);
+ float fray=l149n(wp*1.6+vec2(12.3,4.9))*.15+l149n(wp*3.8-vec2(1.1,8.6))*.055;
+ float shoulder=smoothstep(.77+fray,1.13+fray,au);
+ col=mix(col,mix(dirt,vec3(.29,.35,.23),smoothstep(1.04,1.5,au)),shoulder);
+ float a=1.0-smoothstep(.94+fray,1.42+fray,au);
+ a*=.92+.07*l149n(wp*1.8);
  a*=lvl<1.5?.86:.95;
  diffuseColor=vec4(col,a);`});
  };
- material.customProgramCacheKey=()=>'road-v149-v161-'+scope;
+ material.customProgramCacheKey=()=>'road-v216-natural-'+scope;
  return material;
 }
 

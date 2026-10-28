@@ -1,0 +1,21 @@
+name: V216 realistic historical roads test
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'road-appearance-v216.js'
+      - 'scripts/test-historic-roads-v216.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  road:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --check continuous-landscape-visual.js
+      - run: node --check landscape-v149.js
+      - run: node scripts/test-historic-roads-v216.mjs

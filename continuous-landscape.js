@@ -212,7 +212,8 @@ export function roadSpline(game,a,b,count=12,connection=null){
  if(idx(a)>idx(b))[a,b]=[b,a];
  const aa=game.cell(a),bb=game.cell(b);if(!aa||!bb)return [];
  const dx=bb.x-aa.x,dz=bb.z-aa.z,len=hypot(dx,dz),side=unit(-dz,dx);
- const offset=(game.noise(a.c*7+b.c,a.r*7+b.r)) *2;
+ const offset=Math.max(-1,Math.min(1,game.noise(a.c*7+b.c,a.r*7+b.r)))*2.3;
+ const irregular=game.noise(a.c*17+b.c*3,a.r*11+b.r*7)*1.1;
  let m0={x:dx,z:dz},m1={x:dx,z:dz};
  // For non-branching roads keep tangents in line with adjacent edges.
  if(connection){
@@ -224,7 +225,8 @@ export function roadSpline(game,a,b,count=12,connection=null){
  }
  const pts=[];
  for(let i=0;i<=count;i++){
-  const t=i/count,p=hermite(aa,bb,m0,m1,t),wave=Math.sin(PI*t)*offset;
+  const t=i/count,p=hermite(aa,bb,m0,m1,t);
+  const fade=Math.sin(PI*t)**2,wave=fade*(offset+irregular*Math.sin(PI*2*t));
   pts.push({x:p.x+side.x*wave,z:p.z+side.z*wave});
  }
  return pts;
