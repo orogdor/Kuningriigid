@@ -175,6 +175,14 @@ export function planAIDefenses(game,team,city){
  if(repairOldPerimeterV215(game,team,city))return;
  if(planWallUpgradesV184(game,team,city))return;
  if(planOuterRingV184(game,team,city))return;
+ // V218.2: one old ring, not two concentric incompatible inner planners.
+ // Earlier saves may already contain stray V139 masonry segments, but we
+ // never commission another inside the real V166 first curtain. The initial
+ // wall is instead repaired, upgraded, and reused by the exterior plan.
+ if(city.stoneDefensePlanV166?.slots?.length){
+  city.aiDefenseDiagnosticV146={reason:'keep-original-curtain',checkedAt:game.s.time};
+  return;
+ }
  if(game.s.time<(city.nextDefenseCheckV128||0))return;
  const realm=city.economy.realms[team],stock=realm.resources,all=game.allBuildings(city);
  city.nextDefenseCheckV128=game.s.time+(realm.pop>=BRONZE_FORTIFY_POP_V160?24:42);
