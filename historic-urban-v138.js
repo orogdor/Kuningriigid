@@ -32,7 +32,21 @@ export function ancientStreetSpace(x,z,seed=0){
  const ringDistance=Math.abs(radius-ring);
  return {road:nearestRay<(radius<70?4.2:5.5)||ringDistance<4.5,artery:nearestRay,ring:ringDistance,radius};
 }
-export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge=false){
+// Rock-backed house plots get priority, especially pockets sheltered on 2+ sides.
+export function cliffShelterScoreV204(game,parent,x,z){
+ if(typeof game?.defenseTerrainKindV176!=='function')return 0;
+ let sides=0;
+ for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
+  for(const d of [11,16,21,26]){
+   const px=x+dx*d,pz=z+dz*d;
+   if(game.defenseTerrainKindV176(parent,px,pz)!=='mountain')continue;
+   if(game.defenseTerrainKindV176(parent,px+dz*3,pz+dx*3)==='mountain'||
+      game.defenseTerrainKindV176(parent,px-dz*3,pz-dx*3)==='mountain'){sides++;break;}
+  }
+ }
+ return sides?-(sides*39+(sides>=2?35:0)):0;
+}
+export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge=false,game=null){
  if(!tile||!parent)return [];
  const dx=tile.c-parent.c,dz=tile.r-parent.r;
  const hall=parent.economy?.buildings?.find(b=>b.type==='hall'&&!b.virtual)||{x:0,z:0};
@@ -50,6 +64,8 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
  // Use the read-only V173 traffic sample as the street-front reference;
  // one 12m spatial index per plot batch keeps mobile AI evaluation bounded.
  const streetIndex=stoneAge&&type==='house'?indexActiveStreetV174(activeTrails):null;
+ const nearCliff=type==='house'&&typeof game?.cell==='function'&&
+   [-2,-1,0,1,2].some(dc=>[-2,-1,0,1,2].some(dr=>!!game.cell({c:parent.c+dc,r:parent.r+dr})?.mountain));
  const plots=[];
  const margin=V138_BUILD_MARGIN,grid=type==='market'?25:type==='house'?(stoneAge?10.2:10.6):13.2;
  // Staggered rows and slight bends, not a chessboard; deterministic per tile.
@@ -90,7 +106,8 @@ export function historicalBuildingPlots(tile,parent,type='house',seed=0,stoneAge
                     (stoneAge&&type==='house'?
                      streetfrontScoreV174({x:px,z:pz},streetIndex)+
                      (dx===0&&dz===0?courtyardScoreV174({x:gx,z:gz},coreNeighbours):0):0);
-   plots.push({x:px,z:pz,priority,globalX:gx,globalZ:gz});
+   const sheltered=nearCliff?cliffShelterScoreV204(game,parent,dx*DETAIL_TILE_X+px,dz*DETAIL_TILE_Z+pz):0;
+    plots.push({x:px,z:pz,priority:priority+sheltered,globalX:gx,globalZ:gz});
   }
  }
  plots.sort((a,b)=>a.priority-b.priority||a.globalZ-b.globalZ||a.globalX-b.globalX);
