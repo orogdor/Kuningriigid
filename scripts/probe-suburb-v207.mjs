@@ -11,7 +11,7 @@ const demand=suburbDemandV204(game,city);
 console.log('V207 NATURAL OUTSIDE DENSITY',JSON.stringify({count:demand.count,cluster:demand.cluster.length,required:demand.required}));
 assert.ok(demand.ready,'A 13-building continuous suburb must now be recognized without adding any buildings');
 const plan=findOuterRingV184(game,city);
-console.log('V207 NATURAL PLAN',JSON.stringify(plan?{
+console.log('V208 NATURAL PLAN',JSON.stringify(plan?{
  slots:plan.slots?.length,area:plan.areaEstimateV186,
  protected:plan.protectedSuburbBuildingsV204,
  coast:plan.naturalBoundaryV194?.kind||null,

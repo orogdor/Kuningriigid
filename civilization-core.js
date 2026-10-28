@@ -1,5 +1,5 @@
 import {planRoadGatesV177} from './road-gates-v177.js';
-import {protectedHousingZoneV184,allowedSuburbJoinV191,allowedSuburbCornerV201} from './outer-ring-v184.js?v=207';
+import {protectedHousingZoneV184,allowedSuburbJoinV191,allowedSuburbCornerV201} from './outer-ring-v184.js?v=208';
 import {mountainBlockedV178} from './mountain-foot-v178.js';
 import {wallTerrainErrorV1758,wallEndJoinV1758} from './wall-terrain-v1758.js';
 import {findAIFieldSite,ruralSourceExhausted} from './ai-rural-v143.js';

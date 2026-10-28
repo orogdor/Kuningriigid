@@ -134,6 +134,23 @@ function sitesInside(poly,inner,buildings,game,city){
  }
  return plots;
 }
+// At old-wall corners the chord's perpendicular may be nearly PARALLEL
+// to the actual first historic wall course. Depart normal to the physical
+// wall before turning toward the new quarter, preventing doubled wall strips.
+function orthogonalShoulderV208(anchor,first,oldWalls,outward,depth){
+ const near=oldWalls.filter(b=>['palisade','stonewall','reinforced_wall'].includes(b.type)&&b.hp>0&&b.ready)
+  .map(b=>({wall:b,d:meters(anchor,b)})).sort((a,b)=>a.d-b.d)[0];
+ if(!near||near.d>6)return first;
+ const b=near.wall,ang=b.wallAngleV175??(b.wallAxis?Math.PI/2:0);
+ const tx=Math.cos(ang),tz=-Math.sin(ang),dx=first.x-anchor.x,dz=first.z-anchor.z;
+ const len=Math.hypot(dx,dz);
+ if(len<2||Math.abs((dx*tx+dz*tz)/len)<.89)return first;
+ let px=-tz,pz=tx;
+ if(px*outward.x+pz*outward.z<0){px=-px;pz=-pz;}
+ const distance=Math.max(11,Math.min(19,depth*.21));
+ return {x:anchor.x+px*distance,z:anchor.z+pz*distance};
+}
+
 function historicCurtainV191(a,b,nx,nz,depth,variant=0){
  // Five recognisable courses and three deliberate corners: angled shoulders,
  // a long city-facing front, and two returns. No smooth oval or scallops.
@@ -345,6 +362,8 @@ export function findOuterRingV184(game,city){
    if(depth>128||depth<38)continue;
    for(let variant=0;variant<3;variant++){
     const points=historicCurtainV191(a,b,nx,nz,depth,variant);
+    points[1]=orthogonalShoulderV208(a,points[1],walls,{x:nx,z:nz},depth);
+    points[points.length-2]=orthogonalShoulderV208(b,points[points.length-2],walls,{x:nx,z:nz},depth);
     const poly=[...arc,...points.slice(1,-1).reverse()];
     const area=polyArea(poly);
     if(area<1200||area>10500)continue;
