@@ -24,3 +24,17 @@ const builtResult=g.buildDefenseV177(city,{...valid[0].p,plannedDefense:true});
 assert.ok(builtResult.building,'one gap must build through real paid construction');
 assert.ok(g.s.cities.find(c=>c.id===city.id).economy.realms[0].resources.stone<initial,'building must pay stone');
 console.log('V212 VERIFIED REAL PAID GAP REPAIR',JSON.stringify({missing:gaps.length,valid:valid.length,first:valid[0].p}));
+
+// Verify that the actual automated defense planner, not only a manual build,
+// queues a paid repair for the same historically missing sections.
+const {planAIDefenses}=await import('../ai-defenses-v128.js');
+const ai=new Civilization(JSON.parse(fs.readFileSync('scenarios/zero-v206-coast.json','utf8')));
+const town=ai.s.cities.find(c=>c.id===ai.s.zeroTestV206.targetCityId);
+const known=ai.allBuildings(town).filter(b=>b.hp>0&&!b.virtual&&b.type==='stonewall').length;
+town.nextRoadGateV177=Infinity;
+town.nextDefenseCheckV128=0;
+for(let k=0;k<7;k++){ai.s.time+=180;planAIDefenses(ai,0,town);}
+const commissioned=ai.allBuildings(town).filter(b=>b.hp>0&&!b.virtual&&b.type==='stonewall').length-known;
+console.log('V212 AI COMMISSIONED COASTAL GAPS',JSON.stringify({commissioned,
+  last:town.aiDefenseDiagnosticV146,woods:ai.allBuildings(town).filter(b=>b.type==='palisade'&&b.hp>0).length}));
+assert.ok(commissioned>=1,'AI must commission a real paid wall seam after the deposit rule is corrected');
