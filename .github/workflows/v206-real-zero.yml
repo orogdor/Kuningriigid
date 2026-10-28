@@ -1,0 +1,75 @@
+name: V206 zero-start AI builds coastal and cliff towns
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/generate-real-zero-v206.mjs'
+      - '.github/workflows/v206-real-zero.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: v206-zero-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  generate:
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [coast, mountain]
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Play a genuine new game, no prior save
+        run: node scripts/generate-real-zero-v206.mjs ${{ matrix.kind }}
+      - name: Validate and publish the actual AI outcome
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          import {Civilization} from './civilization-core.js';
+          const kind=process.env.KIND;
+          const s=JSON.parse(fs.readFileSync('scenarios/zero-v206-'+kind+'.json','utf8'));
+          const m=s.zeroTestV206,city=s.cities.find(c=>c.id===m.targetCityId);
+          assert.equal(m.initial.initialTime,0);
+          assert.deepEqual(m.initial.initialAges,[0,0,0,0]);
+          assert.equal(m.freeBuildingsAdded,0);
+          assert.equal(m.priorSaveLoaded,false);
+          assert.equal(city.team,0);
+          assert.ok(m.turn>0);
+          const g=new Civilization(s);
+          const built=g.allBuildings(g.s.cities.find(c=>c.id===city.id)).filter(b=>b.outerRingV184&&b.hp>0);
+          assert.equal(built.length,m.secondWallBuilt);
+          console.log('PUBLISH VALIDATED FROM-ZERO TOWN',JSON.stringify(m));
+          NODE
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scenarios/zero-v206-${{ matrix.kind }}.json scenarios/zero-v206-${{ matrix.kind }}.manifest.json
+          git commit -m "V206: publish real from-zero ${{ matrix.kind }} AI town and wall progress"
+          for attempt in 1 2 3 4; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+        env:
+          KIND: ${{ matrix.kind }}
+      - name: Request Pages publication after AI checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run avaldamine.yml --ref main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v206-zero-${{ matrix.kind }}-game
+          path: |
+            scenarios/zero-v206-${{ matrix.kind }}.json
+            scenarios/zero-v206-${{ matrix.kind }}.manifest.json
+          if-no-files-found: ignore
