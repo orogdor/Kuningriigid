@@ -1,4 +1,4 @@
-import {findOuterRingV184} from './outer-ring-v184.js?v=202';
+import {findOuterRingV184,suburbDemandV204} from './outer-ring-v184.js?v=204';
 import {planRoadGatesV177} from './road-gates-v177.js';
 import {terrainDefensePlanV176} from './terrain-defenses-v176.js';
 import {canAfford} from './economy.js';
@@ -51,7 +51,8 @@ export function planWallUpgradesV184(game,team,city){
  const outerPending=outer?.slots?.length&&((outer.nextIndex||0)<outer.slots.length||
    allForPriority.some(b=>b.outerRingV184&&b.hp>0&&!b.ready));
  const innerBuilding=allForPriority.some(b=>b.hp>0&&!b.ready&&!b.outerRingV184&&DEFENSE_TYPES.has(b.type));
- const surveying=!outer&&(city.outerRingSurveyFailuresV188||0)>0&&(city.outerRingSurveyFailuresV188||0)<3;
+ const surveying=!outer&&city.outerRingNeedV204?.cluster>=13&&
+  (city.outerRingSurveyFailuresV188||0)>0&&(city.outerRingSurveyFailuresV188||0)<3;
  if(realm.pop>=20&&(outerPending||innerBuilding||surveying))return false;
  const contexts=game.contexts(city),forts=contexts.flatMap(ctx=>ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&b.ready&&['palisade','woodgate','watchtower'].includes(b.type)).map(b=>({ctx,b})));
  if(!forts.length)return false;
@@ -75,6 +76,16 @@ export function planOuterRingV184(game,team,city){
  const inner=city.stoneDefensePlanV166||city.defensePlanV139;
  if(!inner?.slots?.length)return false;
  const existing=city.outerRingV184;
+ if(!existing&&!city.outerRingPreviewOnlyV190){
+  const demand=suburbDemandV204(game,city);
+  city.outerRingNeedV204={outside:demand.count,cluster:demand.cluster.length,required:13};
+  if(!demand.ready){
+   city.outerRingDiagnosticV184={reason:'waiting-for-13-outside-buildings',
+    outside:demand.count,cluster:demand.cluster.length,required:13,at:game.s.time};
+   city.outerRingSurveyFailuresV188=0;
+   return false;
+  }
+ }
  const pending=!!(existing?.slots?.length&&((existing.nextIndex||0)<existing.slots.length||
    all.some(b=>b.outerRingV184&&b.hp>0&&!b.ready)));
  const stalled=reason=>{
