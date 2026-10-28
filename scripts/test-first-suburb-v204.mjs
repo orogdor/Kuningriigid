@@ -15,7 +15,7 @@ assert.equal(suburbDemandV204(mockGame,mockCity).ready,false,'fields cannot trig
 mockBuildings.push({x:66,z:70,type:'house',hp:100,ready:true});
 assert.equal(suburbDemandV204(mockGame,mockCity).ready,true,'13 clustered buildings must trigger a second wall');
 assert.equal(suburbDemandV204(mockGame,mockCity).cluster.length,13);
-mockBuildings[12].x=600;
+mockBuildings[13].x=600;
 assert.equal(suburbDemandV204(mockGame,mockCity).ready,false,'remote buildings must not count');
 const cliff=(kind)=>({defenseTerrainKindV176:(_city,x,z)=>kind==='double'?x>19||z>19?'mountain':null:kind==='single'&&x>19?'mountain':null});
 assert.ok(cliffShelterScoreV204(cliff('double'),{},0,0)<cliffShelterScoreV204(cliff('single'),{},0,0),'two protected sides outrank one');
