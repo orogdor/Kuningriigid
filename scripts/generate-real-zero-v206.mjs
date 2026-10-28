@@ -65,7 +65,7 @@ const meta={version:206,kind,seed,initial,turn:actualTurn,sourceTeam:team,
  secondWallBuilt:built.length,secondWallReady:built.filter(b=>b.ready).length,
  reason:target.outerRingDiagnosticV184?.reason||null,
  firstWall,secondComplete,organicAI:true,freeBuildingsAdded:0,
- priorSaveLoaded:false,rulesRevision:209,description:'Replayed from createGame(seed), with normal AI ticks and paid construction only'};
+ priorSaveLoaded:false,rulesRevision:215,description:'Replayed from createGame(seed), with normal AI ticks and paid construction only'};
 const state=takeOverAI(game.s,team);
 state.demo='zero-v206-'+kind;state.winner=null;state.zeroTestV206=meta;
 state.cities.sort((a,b)=>a.id===target.id?-1:b.id===target.id?1:0);
