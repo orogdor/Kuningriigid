@@ -1,0 +1,67 @@
+{
+  "version": 220,
+  "id": "c",
+  "seed": 9622017,
+  "initial": {
+    "seed": 9622017,
+    "at": 0,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cities": 0,
+    "settlers": [
+      {
+        "team": 0,
+        "c": 79,
+        "r": 26
+      },
+      {
+        "team": 1,
+        "c": 144,
+        "r": 139
+      },
+      {
+        "team": 2,
+        "c": 192,
+        "r": 112
+      },
+      {
+        "team": 3,
+        "c": 45,
+        "r": 16
+      }
+    ]
+  },
+  "newMap": true,
+  "organicAI": true,
+  "fromZero": true,
+  "priorSaveLoaded": false,
+  "freeMaterialsAdded": 0,
+  "age": 1,
+  "originalTeam": 1,
+  "bronzeBegan": 125,
+  "bronzeTurns": 96,
+  "bronzeCompleted": true,
+  "turn": 220,
+  "cityId": 1,
+  "cityName": "Tuonela",
+  "population": 27,
+  "buildings": 104,
+  "completedBuildings": 101,
+  "fortifications": 51,
+  "oldWallMissing": 0,
+  "oldWallWooden": 31,
+  "oldWallUpgrading": 1,
+  "outerWallSegments": 0,
+  "upgradedHouses": 1,
+  "housingCapacity": 41.5,
+  "urbanPhase": "renovate",
+  "suburbBuildings": 20,
+  "connectedSuburb": 13,
+  "eligibleForSecondWall": true,
+  "roadEdges": 157,
+  "rules": "V220 unified old core, paid housing renovations, connected suburbs and old-wall-first exterior planning"
+}

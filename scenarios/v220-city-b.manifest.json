@@ -1,0 +1,67 @@
+{
+  "version": 220,
+  "id": "b",
+  "seed": 8419063,
+  "initial": {
+    "seed": 8419063,
+    "at": 0,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cities": 0,
+    "settlers": [
+      {
+        "team": 0,
+        "c": 108,
+        "r": 110
+      },
+      {
+        "team": 1,
+        "c": 52,
+        "r": 71
+      },
+      {
+        "team": 2,
+        "c": 183,
+        "r": 39
+      },
+      {
+        "team": 3,
+        "c": 100,
+        "r": 16
+      }
+    ]
+  },
+  "newMap": true,
+  "organicAI": true,
+  "fromZero": true,
+  "priorSaveLoaded": false,
+  "freeMaterialsAdded": 0,
+  "age": 1,
+  "originalTeam": 3,
+  "bronzeBegan": 97,
+  "bronzeTurns": 95,
+  "bronzeCompleted": true,
+  "turn": 191,
+  "cityId": 4,
+  "cityName": "Rogaland",
+  "population": 32,
+  "buildings": 84,
+  "completedBuildings": 80,
+  "fortifications": 44,
+  "oldWallMissing": 7,
+  "oldWallWooden": 7,
+  "oldWallUpgrading": 2,
+  "outerWallSegments": 0,
+  "upgradedHouses": 6,
+  "housingCapacity": 47.5,
+  "urbanPhase": "suburb",
+  "suburbBuildings": 13,
+  "connectedSuburb": 7,
+  "eligibleForSecondWall": false,
+  "roadEdges": 163,
+  "rules": "V220 unified old core, paid housing renovations, connected suburbs and old-wall-first exterior planning"
+}

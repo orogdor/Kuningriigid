@@ -1,0 +1,67 @@
+{
+  "version": 220,
+  "id": "a",
+  "seed": 7531027,
+  "initial": {
+    "seed": 7531027,
+    "at": 0,
+    "ages": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "cities": 0,
+    "settlers": [
+      {
+        "team": 0,
+        "c": 94,
+        "r": 104
+      },
+      {
+        "team": 1,
+        "c": 87,
+        "r": 28
+      },
+      {
+        "team": 2,
+        "c": 205,
+        "r": 91
+      },
+      {
+        "team": 3,
+        "c": 142,
+        "r": 67
+      }
+    ]
+  },
+  "newMap": true,
+  "organicAI": true,
+  "fromZero": true,
+  "priorSaveLoaded": false,
+  "freeMaterialsAdded": 0,
+  "age": 1,
+  "originalTeam": 2,
+  "bronzeBegan": 142,
+  "bronzeTurns": 96,
+  "bronzeCompleted": true,
+  "turn": 237,
+  "cityId": 2,
+  "cityName": "Svitjod",
+  "population": 34,
+  "buildings": 116,
+  "completedBuildings": 113,
+  "fortifications": 64,
+  "oldWallMissing": 0,
+  "oldWallWooden": 55,
+  "oldWallUpgrading": 1,
+  "outerWallSegments": 0,
+  "upgradedHouses": 4,
+  "housingCapacity": 44.5,
+  "urbanPhase": "suburb",
+  "suburbBuildings": 18,
+  "connectedSuburb": 10,
+  "eligibleForSecondWall": false,
+  "roadEdges": 356,
+  "rules": "V220 unified old core, paid housing renovations, connected suburbs and old-wall-first exterior planning"
+}
