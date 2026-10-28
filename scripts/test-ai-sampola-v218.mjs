@@ -26,5 +26,7 @@ console.log('V218 REAL SAMPOLA AI FOLLOW-UP',JSON.stringify({
  outerDecision:city.outerRingDiagnosticV184,
  repairDecision:city.aiOldPerimeterV215
 }));
+assert.ok(old.missing.length<before.missing.length||old.missing.length===0,
+ 'the original Sampola gateway gap should be closed with a paid, safe fallback');
 assert.ok(final.outer<=initial.outer||old.ready,
  'The AI must not start a new outer wall when the first curtain is incomplete');

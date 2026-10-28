@@ -146,25 +146,32 @@ export function repairOldPerimeterV215(game,team,city){
  const realm=city.economy.realms[team],stock=realm.resources;
  for(const old of city.stoneDefensePlanV166.slots){
   if(live.some(b=>Math.hypot(b.x-old.x,b.z-old.z)<(old.drawnWallV175?1.5:5)))continue;
+  // A failed gateway may be safely sealed with masonry ONLY when at least
+  // one other built passage remains. Never trap all citizens inside.
+  const otherGate=live.some(b=>b.ready&&!b.outerRingV184&&
+   ['woodgate','gatehouse'].includes(b.type)&&
+   Math.hypot(b.x-old.x,b.z-old.z)>9);
   const alternatives=old.type==='palisade'?['stonewall','reinforced_wall']:
-   old.type==='woodgate'?['gatehouse']:
+   old.type==='woodgate'?(otherGate?['gatehouse','stonewall']:['gatehouse']):
    old.type==='watchtower'?['stonetower']:[old.type];
-  const type=alternatives.find(t=>!game.buildRule(city,t));
-  if(!type)continue;
-  const slot={...old,type,plannedDefense:true,oldPerimeterRepairV215:true};
-  // If a new road or a building truly occupies the old route, preserve it.
-  // Only safe available segments can be commissioned.
-  if(game.previewDefenseV177(city,slot).error)continue;
-  const cost=game.buildingDefinitions[type]?.cost||{};
-  if(!canAfford(stock,cost)||!reserveAfterWalls(stock,cost)){
-   city.aiOldPerimeterV215={reason:'saving',at:game.s.time,type};return false;
+  // If a preferred gate is blocked by houses or terrain, still attempt its
+  // valid paid masonry fallback instead of leaving the same gap forever.
+  for(const type of alternatives){
+   if(game.buildRule(city,type))continue;
+   const slot={...old,type,plannedDefense:true,oldPerimeterRepairV215:true};
+   if(game.previewDefenseV177(city,slot).error)continue;
+   const cost=game.buildingDefinitions[type]?.cost||{};
+   if(!canAfford(stock,cost)||!reserveAfterWalls(stock,cost)){
+    city.aiOldPerimeterV215={reason:'saving',at:game.s.time,type};return false;
+   }
+   const result=game.buildDefenseV177(city,slot);
+   if(!result.building)continue;
+   result.building.historicPerimeterV139=true;
+   result.building.oldPerimeterRepairV215=true;
+   city.aiOldPerimeterV215={reason:'commissioned',type,x:slot.x,z:slot.z,at:game.s.time,
+    gateFallback:type==='stonewall'&&old.type==='woodgate'};
+   return true;
   }
-  const result=game.buildDefenseV177(city,slot);
-  if(!result.building)continue;
-  result.building.historicPerimeterV139=true;
-  result.building.oldPerimeterRepairV215=true;
-  city.aiOldPerimeterV215={reason:'commissioned',type,x:slot.x,z:slot.z,at:game.s.time};
-  return true;
  }
  city.aiOldPerimeterV215={reason:'no-safe-gap',at:game.s.time};
  return false;
