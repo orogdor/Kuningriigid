@@ -1,3 +1,4 @@
+// V212.1: verify the corrected placement environment parses and actually pays for gaps.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {clearOfDepositsV212} from '../wall-deposit-v212.js';

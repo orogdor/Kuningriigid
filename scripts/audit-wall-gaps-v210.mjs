@@ -1,3 +1,4 @@
+// V212.1: inspect the actual mountain placement blocker and coastal gap previews.
 import fs from 'node:fs';
 import {Civilization} from '../civilization-core.js';
 import {planOuterRingV184,planWallUpgradesV184} from '../ai-defenses-v128.js';

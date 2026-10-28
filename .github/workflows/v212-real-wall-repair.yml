@@ -17,5 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: node --check civilization-core.js
       - run: node scripts/test-wall-priority-v188.mjs
       - run: node scripts/test-wall-seams-v212.mjs
