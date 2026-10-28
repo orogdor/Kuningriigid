@@ -3,6 +3,7 @@ import {loadSecondWallTakeoverV205} from './second-wall-takeover-v205.js?v=205';
 import {loadRealZeroV206} from './real-zero-takeover-v206.js?v=206';
 import {loadFreshBronzeV217} from './fresh-bronze-v217.js?v=217';
 import {loadFreshBronzeV219} from './fresh-bronze-v219.js?v=219';
+import {loadV220City} from './v220-cities.js?v=220';
 import {loadBronzeV183} from './bronze-ai-v183.js?v=183';
 import {loadAIMountainV176} from './ai-mountain-demo-v176.js?v=180test';
 import {loadIronCityV143} from './ai-iron-demo-v143.js';
@@ -136,6 +137,7 @@ const freshBronzeV217Demo=demoParam==='bronze-fresh-v217';
 const freshBronzeV219Demo=demoParam==='bronze-fresh-v219';
 const freshStartV219Demo=demoParam==='fresh-start-v219';
 const freshStartStorageKeyV219='kingdoms-v219-world-5932019';
+const v220CityDemo=['v220-city-a','v220-city-b','v220-city-c'].includes(demoParam);
 const freshBronzeStorageKeyV219='kingdoms-v219-bronze-takeover-5932019';
 const bronzeV183Demo=['bronze-v183-mountain','bronze-v183-coast'].includes(demoParam);
 const aiMountainV176Demo=demoParam==='ai-mountain-v176';
@@ -155,10 +157,14 @@ const ironCityV142Demo=demoParam==='ai-iron-v142';
 const trafficDemo=demoParam==='army-traffic',patrolDemo=demoParam==='bronze-patrol',ironAIDemo=demoParam==='iron-ai',aiCityDemo=demoParam==='ai-city',aiCityV136Demo=demoParam==='ai-city-v136',aiCityV137Demo=demoParam==='ai-city-v137',aiCityV138Demo=demoParam==='ai-city-v138',aiCityV139Demo=demoParam==='ai-city-v139',aiModernV140Demo=demoParam==='ai-modern-v140';
 const battleDemo=demoParam==='bronze-battle',siegeDemo=['bronze-siege','iron-siege'].includes(demoParam);
 if(siegeDemo)document.body.classList.add('bronze-siege-demo');
-const stoneDemo=demoParam==='stone',bronzeDemo=demoParam==='bronze',medievalDemo=demoParam==='medieval',renaissanceDemo=demoParam==='renaissance',industrialDemo=demoParam==='industrial',sampleDemo=freshStartV219Demo||freshBronzeV219Demo||freshBronzeV217Demo||realZeroV206Demo||wallTakeoverV205Demo||wallV190Demo||wallV184Demo||bronzeV183Demo||aiMountainV176Demo||aiStoneV174Demo||aiStoneV173Demo||aiStoneV172Demo||aiStoneV171Demo||aiMedievalV159Demo||aiMedievalV153Demo||aiMedievalV151Demo||aiMedievalV147Demo||aiMedievalV146Demo||aiMedievalV145Demo||aiMedievalV144Demo||ironCityV143Demo||ironCityV142Demo||trafficDemo||ironAIDemo||aiCityDemo||aiCityV136Demo||aiCityV137Demo||aiCityV138Demo||aiCityV139Demo||aiModernV140Demo||!!replayDemo||patrolDemo||siegeDemo||battleDemo||stoneDemo||bronzeDemo||medievalDemo||renaissanceDemo||industrialDemo;
+const stoneDemo=demoParam==='stone',bronzeDemo=demoParam==='bronze',medievalDemo=demoParam==='medieval',renaissanceDemo=demoParam==='renaissance',industrialDemo=demoParam==='industrial',sampleDemo=v220CityDemo||freshStartV219Demo||freshBronzeV219Demo||freshBronzeV217Demo||realZeroV206Demo||wallTakeoverV205Demo||wallV190Demo||wallV184Demo||bronzeV183Demo||aiMountainV176Demo||aiStoneV174Demo||aiStoneV173Demo||aiStoneV172Demo||aiStoneV171Demo||aiMedievalV159Demo||aiMedievalV153Demo||aiMedievalV151Demo||aiMedievalV147Demo||aiMedievalV146Demo||aiMedievalV145Demo||aiMedievalV144Demo||ironCityV143Demo||ironCityV142Demo||trafficDemo||ironAIDemo||aiCityDemo||aiCityV136Demo||aiCityV137Demo||aiCityV138Demo||aiCityV139Demo||aiModernV140Demo||!!replayDemo||patrolDemo||siegeDemo||battleDemo||stoneDemo||bronzeDemo||medievalDemo||renaissanceDemo||industrialDemo;
 let recovered=false,state;
 const validState=v=>v?.version===4&&Number.isFinite(v.seed)&&Array.isArray(v.cities)&&Array.isArray(v.settlers)&&Array.isArray(v.units)&&Array.isArray(v.armies);
-const loadedV73=sampleDemo?{state:freshStartV219Demo?(()=>{
+const loadedV73=sampleDemo?{state:v220CityDemo?await (async()=>{
+ let saved=null;try{saved=JSON.parse(localStorage.getItem('kingdoms-v220-'+demoParam)||'null')}catch{}
+ return validState(saved)&&saved.v220City?.seed===({a:7531027,b:8419063,c:9622017}[demoParam.slice(-1)])
+  ?saved:loadV220City(demoParam);
+})():freshStartV219Demo?(()=>{
  let state=null;
  try{state=JSON.parse(localStorage.getItem(freshStartStorageKeyV219)||'null')}catch{}
  return validState(state)&&state.seed===5932019?state:createGame(5932019,'continents');
@@ -404,12 +410,13 @@ const detailTravellers=createDetailTravellers(people);const villageLife=createVi
 function say(text){s.events??=[];if(s.events.at(-1)?.text!==text){s.events.push({time:s.time,text});if(s.events.length>40)s.events.shift()}$('toast').textContent=text;$('toast').style.display='block';toastTime=5}
 const snapshotEncoder=new SnapshotEncoder();let saveGeneration=0,pendingAutosaves=0;
 async function save(){
- if(restarting||(sampleDemo&&!freshStartV219Demo&&!freshBronzeV219Demo))return;
+ if(restarting||(sampleDemo&&!freshStartV219Demo&&!freshBronzeV219Demo&&!v220CityDemo))return;
  const generation=++saveGeneration,savedTime=s.time;pendingAutosaves++;
  try{
   const serialized=await snapshotEncoder.encode(s);
   if(restarting||generation!==saveGeneration)return;
-  if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,serialized);
+  if(v220CityDemo)localStorage.setItem('kingdoms-v220-'+demoParam,serialized);
+  else if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,serialized);
   else if(freshBronzeV219Demo)localStorage.setItem(freshBronzeStorageKeyV219,serialized);
   else {
    const backedUp=writeAutosave(localStorage,serialized,savedTime,s.lastBackupTime||0,validState);
@@ -418,9 +425,10 @@ async function save(){
   $('savestatus').textContent='Salvestatud · käik '+(Math.floor(s.time/60)+1);
  }catch{say('Salvestusruum on täis või salvestamine on blokeeritud.')}finally{pendingAutosaves--}
 }
-addEventListener('pagehide',()=>{if(pendingAutosaves&&!restarting&&(!sampleDemo||freshStartV219Demo||freshBronzeV219Demo)){saveGeneration++;
+addEventListener('pagehide',()=>{if(pendingAutosaves&&!restarting&&(!sampleDemo||v220CityDemo||freshStartV219Demo||freshBronzeV219Demo)){saveGeneration++;
  try{
-  if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,snapshotV51());
+  if(v220CityDemo)localStorage.setItem('kingdoms-v220-'+demoParam,snapshotV51());
+  else if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,snapshotV51());
   else if(freshBronzeV219Demo)localStorage.setItem(freshBronzeStorageKeyV219,snapshotV51());
   else {const backedUp=writeAutosave(localStorage,snapshotV51(),s.time,s.lastBackupTime||0,validState);
    if(backedUp)s.lastBackupTime=s.time;}
@@ -1292,6 +1300,12 @@ $('menu-demo-links').append(industrialLink);const battleLink=document.createElem
 }
 for(const [demo,name]of [['bronze-patrol','Rahuaja tornivalvurite patrull'],['bronze-siege','Pronksiaja linnapiiramine'],['iron-siege','Rauaaja linnapiiramine · katapuldid ja ballistad']]){const link=document.createElement('a');link.href='?demo='+demo;link.textContent=name;$('menu-demo-links').append(link);}
 const trafficLink=document.createElement('a');trafficLink.className='model-gallery-link';trafficLink.href='?v=134-20261023&demo=army-traffic';trafficLink.textContent='Linnavärava liikumistest';$('menu-demo-links').append(trafficLink);
+for(const id of ['a','b','c']){
+ const link=document.createElement('a');link.className='model-gallery-link';
+ link.href='?v=220&demo=v220-city-'+id;
+ link.textContent='V220 · Uus AI mandrimaailm '+id.toUpperCase()+' · pronksiaeg';
+ $('menu-demo-links').append(link);
+}
 const freshStartV219Link=document.createElement('a');
 freshStartV219Link.className='model-gallery-link';
 freshStartV219Link.href='?v=219&demo=fresh-start-v219';
@@ -1352,7 +1366,13 @@ function sampleV51FPS(dt){if(menuOpen||document.hidden)return;fpsFrames++;fpsSec
  if(highFpsSeconds>=12&&v51Resolution<1){v51Resolution=1;renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?.85:quality==='medium'?1.15:1.6));highFpsSeconds=0}
 }
 
-$('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();if(s.battle?.fortress&&!s.battle.towerGarrisonVersion){const city=s.cities.find(c=>c.id===s.battle.fortress.cityId);if(city)addTowerGuards(city,s,s.battle);}if(s.battle)initializeMen(s.battle,game.battleNavigation(s.battle));if(s.battle)openTile(game.cell(s.battle.cell));else openWorld();worldSync();if(sampleDemo){menuOpen=false;$('startmenu').hidden=true;const city=freshBronzeV219Demo?s.cities.find(c=>c.id===s.bronzeFreshV219?.cityId):freshBronzeV217Demo?s.cities.find(c=>c.id===s.bronzeFreshV217?.cityId):realZeroV206Demo?s.cities.find(c=>c.id===s.zeroTestV206?.targetCityId):wallTakeoverV205Demo?s.cities.find(c=>c.id===s.wallTakeoverV205?.targetCityId):wallV184Demo?s.cities.find(c=>c.id===s.wallTestV184?.targetCityId):bronzeV183Demo?s.cities.find(c=>c.id===s.bronzeTestV183?.targetCityId):aiMountainV176Demo?s.cities.find(c=>c.id===s.mountainTestV176?.targetCityId):aiStoneV174Demo?s.cities.find(c=>c.id===s.stoneTestV174?.targetCityId):aiStoneV173Demo?s.cities.find(c=>c.id===s.stoneTestV173?.targetCityId):aiStoneV172Demo?s.cities.find(c=>c.id===s.stoneTestV172?.targetCityId):aiStoneV171Demo?s.cities.find(c=>c.id===s.stoneTestV171?.targetCityId):aiMedievalV159Demo?s.cities.find(c=>c.id===s.medievalTestV159?.targetCityId):aiMedievalV153Demo?s.cities.find(c=>c.id===s.medievalTestV153?.targetCityId):aiMedievalV151Demo?s.cities.find(c=>c.id===s.medievalTestV151?.targetCityId):aiMedievalV147Demo?s.cities.find(c=>c.id===s.medievalTestV147?.targetCityId):aiMedievalV146Demo?s.cities.find(c=>c.id===s.medievalTestV146?.targetCityId):aiMedievalV145Demo?s.cities.find(c=>c.id===s.medievalTestV145?.targetCityId):aiMedievalV144Demo?s.cities.find(c=>c.id===s.medievalTestV144?.targetCityId):aiModernV140Demo?s.cities.filter(c=>c.team===0).sort((a,b)=>game.allBuildings(b).filter(x=>x.hp>0&&!x.virtual).length-game.allBuildings(a).filter(x=>x.hp>0&&!x.virtual).length)[0]:s.cities.find(c=>c.team===0);if(city&&!s.battle)openTile(game.cell(city));if(aiMountainV176Demo){paused=true;$('pause').textContent='▶';zoom=200;focus.set(s.mountainTestV176.origin.x,5,s.mountainTestV176.origin.z);say('Kaljuvärava · võtad üle ühe AI linna mäe kõrval, käigul '+s.mountainTestV176.turn+'. ▶ jätkab mängu.');}if(trafficDemo){paused=true;$('pause').textContent='▶';zoom=170;focus.set(0,5,0);say('Salgad liiguvad kohe värava ette ja ootavad seal läbimise järjekorda. Alustamiseks vajuta ▶.');}if(freshStartV219Demo){
+$('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();if(s.battle?.fortress&&!s.battle.towerGarrisonVersion){const city=s.cities.find(c=>c.id===s.battle.fortress.cityId);if(city)addTowerGuards(city,s,s.battle);}if(s.battle)initializeMen(s.battle,game.battleNavigation(s.battle));if(s.battle)openTile(game.cell(s.battle.cell));else openWorld();worldSync();if(sampleDemo){menuOpen=false;$('startmenu').hidden=true;const city=v220CityDemo?s.cities.find(c=>c.id===s.v220City?.cityId):freshBronzeV219Demo?s.cities.find(c=>c.id===s.bronzeFreshV219?.cityId):freshBronzeV217Demo?s.cities.find(c=>c.id===s.bronzeFreshV217?.cityId):realZeroV206Demo?s.cities.find(c=>c.id===s.zeroTestV206?.targetCityId):wallTakeoverV205Demo?s.cities.find(c=>c.id===s.wallTakeoverV205?.targetCityId):wallV184Demo?s.cities.find(c=>c.id===s.wallTestV184?.targetCityId):bronzeV183Demo?s.cities.find(c=>c.id===s.bronzeTestV183?.targetCityId):aiMountainV176Demo?s.cities.find(c=>c.id===s.mountainTestV176?.targetCityId):aiStoneV174Demo?s.cities.find(c=>c.id===s.stoneTestV174?.targetCityId):aiStoneV173Demo?s.cities.find(c=>c.id===s.stoneTestV173?.targetCityId):aiStoneV172Demo?s.cities.find(c=>c.id===s.stoneTestV172?.targetCityId):aiStoneV171Demo?s.cities.find(c=>c.id===s.stoneTestV171?.targetCityId):aiMedievalV159Demo?s.cities.find(c=>c.id===s.medievalTestV159?.targetCityId):aiMedievalV153Demo?s.cities.find(c=>c.id===s.medievalTestV153?.targetCityId):aiMedievalV151Demo?s.cities.find(c=>c.id===s.medievalTestV151?.targetCityId):aiMedievalV147Demo?s.cities.find(c=>c.id===s.medievalTestV147?.targetCityId):aiMedievalV146Demo?s.cities.find(c=>c.id===s.medievalTestV146?.targetCityId):aiMedievalV145Demo?s.cities.find(c=>c.id===s.medievalTestV145?.targetCityId):aiMedievalV144Demo?s.cities.find(c=>c.id===s.medievalTestV144?.targetCityId):aiModernV140Demo?s.cities.filter(c=>c.team===0).sort((a,b)=>game.allBuildings(b).filter(x=>x.hp>0&&!x.virtual).length-game.allBuildings(a).filter(x=>x.hp>0&&!x.virtual).length)[0]:s.cities.find(c=>c.team===0);if(city&&!s.battle)openTile(game.cell(city));if(aiMountainV176Demo){paused=true;$('pause').textContent='▶';zoom=200;focus.set(s.mountainTestV176.origin.x,5,s.mountainTestV176.origin.z);say('Kaljuvärava · võtad üle ühe AI linna mäe kõrval, käigul '+s.mountainTestV176.turn+'. ▶ jätkab mängu.');}if(trafficDemo){paused=true;$('pause').textContent='▶';zoom=170;focus.set(0,5,0);say('Salgad liiguvad kohe värava ette ja ootavad seal läbimise järjekorda. Alustamiseks vajuta ▶.');}if(v220CityDemo){
+  paused=true;$('pause').textContent='▶';zoom=185;
+  const m=s.v220City;
+  say('V220 · '+m.cityName+' · '+(m.bronzeCompleted?'pronksiaja viimane käik':'hiline pronksiaeg')+
+   ' · '+m.population+' elanikku · '+m.urbanPhase+' · vanalinna müüripuidust '+m.oldWallWooden+'. ▶ jätkab.');
+ }
+ if(freshStartV219Demo){
   paused=true;$('pause').textContent='▶';
   say('V219 · Täiesti uus mandrimaailm, seeme 5932019, käik 0. Vali asukoht ja alusta asula rajamist. ▶ jätkab.');
  }

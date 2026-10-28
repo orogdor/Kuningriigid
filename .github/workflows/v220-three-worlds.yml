@@ -1,0 +1,81 @@
+name: V220 three independent AI worlds, Stone through Bronze
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/generate-v220-cities.mjs'
+      - '.github/workflows/v220-three-worlds.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  simulate:
+    strategy:
+      fail-fast: false
+      matrix:
+        id: [a, b, c]
+    runs-on: ubuntu-latest
+    timeout-minutes: 43
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Real AI plays from new map turn zero
+        run: node scripts/generate-v220-cities.mjs ${{ matrix.id }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v220-city-${{ matrix.id }}
+          path: |
+            scenarios/v220-city-${{ matrix.id }}.json
+            scenarios/v220-city-${{ matrix.id }}.manifest.json
+          if-no-files-found: error
+  publish:
+    needs: [simulate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v220-city-*
+          path: scenarios
+          merge-multiple: true
+      - name: Verify all three independently simulated Bronze cities
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          import {Civilization} from './civilization-core.js';
+          import {loadV220City} from './v220-cities.js';
+          const seeds=new Set();
+          for(const id of ['a','b','c']){
+            const s=JSON.parse(fs.readFileSync('scenarios/v220-city-'+id+'.json','utf8'));
+            const actual=await loadV220City('v220-city-'+id,async()=>({ok:true,json:async()=>s}));
+            const m=actual.v220City;
+            assert.deepEqual(m.initial.ages,[0,0,0,0]);
+            assert.equal(m.initial.cities,0);
+            assert.ok(m.bronzeTurns>=25);
+            assert.ok(m.buildings>0&&m.fortifications>0);
+            const check=new Civilization(actual),before=check.s.time;
+            check.tick(12);
+            assert.ok(check.s.time>before);
+            seeds.add(m.seed);
+            console.log('V220 VERIFIED NEW MAP',JSON.stringify(m));
+          }
+          assert.equal(seeds.size,3);
+          NODE
+      - name: Publish three takeover checkpoints in one commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scenarios/v220-city-*.json scenarios/v220-city-*.manifest.json
+          git commit -m "V220: publish three independently simulated Bronze AI city takeovers"
+          for n in 1 2 3 4; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 3
+          done
+          exit 1
