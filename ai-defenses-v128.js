@@ -50,18 +50,33 @@ export function planWallUpgradesV184(game,team,city){
  const forts=contexts.flatMap(ctx=>ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0&&b.ready&&
   !b.outerRingV184&&['palisade','woodgate','watchtower'].includes(b.type)).map(b=>({ctx,b})));
  if(!forts.length)return false;
- if(contexts.some(ctx=>ctx.economy.buildings.some(b=>b.wallUpgradeV184)))return true;
+ // V220.1: the old rule allowed exactly ONE upgrade even with several
+ // real builder crews. A 50-section curtain then consumed multiple eras.
+ // Commission up to the physical builder count (max three), never free walls.
+ const concurrent=Math.min(3,Math.max(1,city.builderCount||1));
+ let active=contexts.reduce((n,ctx)=>n+ctx.economy.buildings.filter(b=>
+  b.hp>0&&!!b.wallUpgradeV184).length,0);
+ if(active>=concurrent)return true;
  const waiting=game.allBuildings(city).filter(b=>b.hp>0&&!b.ready).length;
  if(waiting>4)return true;
  const stock=realm.resources;
+ let ordered=0;
  for(const {ctx,b} of forts){
+  if(active>=concurrent)break;
+  if(b.wallUpgradeV184)continue;
   const plan=game.wallUpgradeOptionsV184(ctx,b,'stone');
   if(plan.error)continue;
   if(!canAfford(stock,plan.cost)||!reserveAfterWalls(stock,plan.cost)){
-   city.aiDefenseDiagnosticV184={reason:'saving-for-old-wall-upgrade',type:b.type,at:game.s.time};return true;
+   city.aiDefenseDiagnosticV184={reason:'saving-for-old-wall-upgrade',
+    type:b.type,active,at:game.s.time};
+   return true;
   }
   const result=game.upgradeWallV184(ctx,b,'stone');
-  if(result.upgrade){city.aiDefenseDiagnosticV184={reason:'upgrading-old-wall',type:b.type,at:game.s.time};return true;}
+  if(result.upgrade){ordered++;active++;}
+ }
+ if(ordered>0||active>0){
+  city.aiDefenseDiagnosticV184={reason:'upgrading-old-wall',active,ordered,at:game.s.time};
+  return true;
  }
  city.aiDefenseDiagnosticV184={reason:'old-wall-upgrade-site-error',at:game.s.time};
  return false;
