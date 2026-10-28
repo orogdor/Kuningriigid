@@ -1,3 +1,4 @@
+// V218.1: dedicated successful test on actual newly generated Sampola checkpoint.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {Civilization,BUILDINGS} from '../civilization-core.js';

@@ -6,6 +6,7 @@ on:
       - 'scripts/test-city-housing-walls-v218.mjs'
       - 'house-upgrade-v218.js'
       - 'old-fortification-policy-v218.js'
+      - 'scripts/test-wall-seams-v212.mjs'
   workflow_dispatch:
 permissions:
   contents: read
