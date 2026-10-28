@@ -69,7 +69,7 @@ export function planWallUpgradesV184(game,team,city){
 }
 export function planOuterRingV184(game,team,city){
  const realm=city.economy.realms[team],stock=realm.resources;
- if((game.s.ages[team]||0)<1||realm.pop<20)return false;
+ if(!realm)return false;
  const all=game.allBuildings(city);
  // Finish any legacy paid upgrade; never commission a new one ahead of a ring.
  if(all.some(b=>b.wallUpgradeV184))return false;
