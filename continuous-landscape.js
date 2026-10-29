@@ -208,6 +208,46 @@ export function localSurface(game,tile,x,z,cache=true){const p=localToWorld(tile
 export function inNeighbourhood(tile,x,z,margin=10){
  return Math.abs(x-tile.x)<75+margin&&Math.abs(z-tile.z)<75+margin;
 }
+// V223: render-only contour following. Strategic road endpoints, traffic and
+// navigation still use the original world-road graph. Gentle lateral offsets
+// reduce abrupt visual cut-throughs on hill slopes; river crossings stay fixed.
+export function contourRoadV223(game,pts){
+ if(pts.length<5)return pts;
+ const count=pts.length-1,offsets=new Float32Array(pts.length);
+ for(let i=2;i<count-1;i+=2){
+  const a=pts[i-1],p=pts[i],b=pts[i+1];
+  const dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz)||1;
+  const nx=-dz/len,nz=dx/len;
+  const h0=baseHeight(game,p.x,p.z);
+  const ha=baseHeight(game,a.x,a.z),hb=baseHeight(game,b.x,b.z);
+  // Leave shallow gradients and all fords, bridges and river approaches alone.
+  if(Math.abs(ha-hb)<3.1 && Math.abs(h0-(ha+hb)*.5)<2.0)continue;
+  const water=riverNear(game,p.x,p.z);
+  if(water.distance<water.width+7)continue;
+  let score=Math.abs(h0-(ha+hb)*.5),best=0;
+  for(const shift of [-1.8,-.9,.9,1.8]){
+   const x=p.x+nx*shift,z=p.z+nz*shift;
+   const near=riverNear(game,x,z);
+   if(near.distance<near.width+5.5)continue;
+   const h=baseHeight(game,x,z);
+   // Prefer the gentler height profile without suddenly climbing sideways.
+   const cost=Math.abs(h-(ha+hb)*.5)+Math.abs(h-h0)*.19+Math.abs(shift)*.12;
+   if(cost+.3<score){score=cost;best=shift;}
+  }
+  offsets[i]=best;
+ }
+ // Keep the original graph nodes: taper offsets smoothly to zero at both ends.
+ const out=pts.map(p=>({...p}));
+ for(let i=1;i<count;i++){
+  const prev=offsets[i-1],next=offsets[i+1];
+  const shift=(offsets[i]*2+prev+next)*.25*Math.sin(PI*i/count)**.5;
+  if(!shift)continue;
+  const a=pts[i-1],b=pts[i+1],len=Math.hypot(b.x-a.x,b.z-a.z)||1;
+  out[i].x+=-(b.z-a.z)/len*shift;
+  out[i].z+=(b.x-a.x)/len*shift;
+ }
+ return out;
+}
 export function roadSpline(game,a,b,count=12,connection=null){
  if(idx(a)>idx(b))[a,b]=[b,a];
  const aa=game.cell(a),bb=game.cell(b);if(!aa||!bb)return [];
@@ -229,7 +269,7 @@ export function roadSpline(game,a,b,count=12,connection=null){
   const fade=Math.sin(PI*t)**2,wave=fade*(offset+irregular*Math.sin(PI*2*t));
   pts.push({x:p.x+side.x*wave,z:p.z+side.z*wave});
  }
- return pts;
+ return contourRoadV223(game,pts);
 }
 export function roadNetwork(game,{includeUnseen=false}={}){
  const edges=[],connection=new Map();
