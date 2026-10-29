@@ -8,7 +8,7 @@ import * as T from './vendor/three.module.js';
 import {releaseMaterial} from './program-keep-v161.js';
 import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=2231';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=162a';
-import {riverNear,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=223';
+import {riverNear,visibleRiverHeight,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=2232';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
@@ -116,8 +116,9 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   const points=polygon.map(p=>{
    // V152: rivers run on through the beach into the sea; near the mouth the surface settles just above
    // sea level and its colour fades to the shallow-sea tone, so it flows into the sea instead of stopping at the shore.
-   let y=isWater?riverNear(game,p.x,p.z).waterHeight||.86:(scope==='world'?surface:visualElevation)(game,p.x,p.z)+.10;
-   if(isWater){const m=mouthBlend(game,p.x,p.z);if(m<1)y=.78+(y-.78)*m;}
+   // V223.2: use exactly the same visible water level used by the
+   // riverbed deformation (including the transition into the sea).
+   let y=isWater?visibleRiverHeight(game,p.x,p.z):(scope==='world'?surface:visualElevation)(game,p.x,p.z)+.10;
    const q=scope==='detail'&&ground&&!isWater?worldToLocal(tile,p.x,p.z):null;
    return {...field(game,p.x,p.z,scope,tile),y:q?ground(q.x,q.z)+.012:vp(game,y,scope,p.x,p.z)};
   });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
