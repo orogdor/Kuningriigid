@@ -5,12 +5,16 @@
 //  - peamaja (hall), maja1 + maja2 (houses), woodcuter (lumber camp), kiviraidur (quarry).
 // If the files fail to load the game keeps its earlier models (ASSETS stays null).
 import * as T from './vendor/three.module.js';
+import {withStoneBuildingLOD,withStoneHumanLOD} from './stone-near-lod.js';
+import {createWebStoneBuilding} from './stone-web-buildings-v2233.js';
 import {animateStoneWorkerV222} from './stone-motion-v222.js';
 import {loadGLB} from './glb-lite-v221.js';
 
 const DIR='./models-v221/';
 async function loadAll(){
- const names=['human_rigged','peamaja','maja1','maja2','woodcuter','kiviraidur'];
+ // The five replacements load in stone-web-buildings-v2233.js. Keep the
+ // existing hall and person, without also preloading the superseded buildings.
+ const names=['human_rigged','peamaja'];
  const files=await Promise.all(names.map(n=>loadGLB(DIR+n+'.glb')));
  const out={};names.forEach((n,i)=>out[n]=files[i]);return out;
 }
@@ -42,9 +46,10 @@ function buildingGeometry(file){
 }
 // Stone Age (age 0) replacements; returns null for anything else.
 export function stoneBuildingModel(type,age,seed=0){
+ const web=createWebStoneBuilding(type,age,seed);if(web)return web;
  if(!ASSETS||age!==0)return null;
  const key=type==='house'?'house'+((seed>>>0)%2):type;
- const def=BUILDINGS[key];if(!def)return null;
+ const def=BUILDINGS[key];if(!def||!ASSETS[def.file])return null;
  const {geo,prim,size}=buildingGeometry(def.file);
  const s=def.size/Math.max(size.x,size.z);
  const root=new T.Group(),m=new T.Mesh(geo,materialFor(def.file,prim,{side:T.DoubleSide}));
@@ -67,7 +72,7 @@ export function stoneBuildingModel(type,age,seed=0){
   root.userData.quarryRockBackfillV2231=true;
  }
  root.userData.animations=[];root.userData.buildingType=type;root.userData.age=0;root.userData.stoneModelV221=key;
- return root;
+ return withStoneBuildingLOD(root,type,def.size,seed);
 }
 
 // ------------------------------------------------------------------ people
@@ -100,7 +105,7 @@ export function createStoneHuman(parent,x,z,color,kind){
  const nodeToBone=new Map(),bones=data.skin.joints.map(j=>{const b=new T.Bone();b.name=j.name;b.position.fromArray(j.translation);nodeToBone.set(j.node,b);return b;});
  data.skin.joints.forEach((j,i)=>{for(const c of j.children)bones[i].add(nodeToBone.get(c));});
  const mesh=new T.SkinnedMesh(prim.geometry,materialFor('human',prim));mesh.castShadow=true;mesh.receiveShadow=false;
- mesh.add(bones[0]);body.add(mesh);mesh.updateMatrixWorld(true);mesh.bind(new T.Skeleton(bones));
+ mesh.add(bones[0]);mesh.updateMatrixWorld(true);mesh.bind(new T.Skeleton(bones));body.add(bones[0]);body.add(withStoneHumanLOD(mesh));
  const B=Object.fromEntries(bones.map(b=>[b.name,b]));
  // a small team-coloured band on the belt keeps factions recognisable
  const band=new T.Mesh(tg('band',()=>new T.TorusGeometry(.105,.012,4,14)),tm(color));band.rotation.x=Math.PI/2;band.scale.set(1,.72,1);band.position.y=.03;B.hips.add(band);

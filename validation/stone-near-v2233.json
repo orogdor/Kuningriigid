@@ -1,0 +1,299 @@
+{
+  "errors": [],
+  "failedRequests": [],
+  "requests": [
+    "http://127.0.0.1:8766/models-stone-near/lumber.glb",
+    "http://127.0.0.1:8766/models-stone-near/quarry.glb",
+    "http://127.0.0.1:8766/models-stone-near/house.glb",
+    "http://127.0.0.1:8766/models-stone-near/well.glb",
+    "http://127.0.0.1:8766/models-stone-near/farm.glb",
+    "http://127.0.0.1:8766/models-stone-near/peamaja.glb",
+    "http://127.0.0.1:8766/models-stone-near/human_rigged.glb"
+  ],
+  "models": [
+    {
+      "type": "lumber",
+      "nearReady": true,
+      "nearActive": true,
+      "highTriangles": 98122,
+      "texture": [
+        1024,
+        1024
+      ],
+      "lowVisible": false,
+      "highVisible": true,
+      "pbr": true
+    },
+    {
+      "type": "quarry",
+      "nearReady": true,
+      "nearActive": true,
+      "highTriangles": 95136,
+      "texture": [
+        1024,
+        1024
+      ],
+      "lowVisible": false,
+      "highVisible": true,
+      "pbr": true
+    },
+    {
+      "type": "house",
+      "nearReady": true,
+      "nearActive": true,
+      "highTriangles": 97949,
+      "texture": [
+        1024,
+        1024
+      ],
+      "lowVisible": false,
+      "highVisible": true,
+      "pbr": true
+    },
+    {
+      "type": "well",
+      "nearReady": true,
+      "nearActive": true,
+      "highTriangles": 99254,
+      "texture": [
+        1024,
+        1024
+      ],
+      "lowVisible": false,
+      "highVisible": true,
+      "pbr": true
+    },
+    {
+      "type": "farm",
+      "nearReady": true,
+      "nearActive": true,
+      "highTriangles": 97392,
+      "texture": [
+        1024,
+        1024
+      ],
+      "lowVisible": false,
+      "highVisible": true,
+      "pbr": true
+    },
+    {
+      "type": "hall",
+      "nearReady": true,
+      "nearActive": true,
+      "highTriangles": 99557,
+      "texture": [
+        2048,
+        2048
+      ],
+      "lowVisible": false,
+      "highVisible": true,
+      "pbr": true
+    },
+    {
+      "type": "human",
+      "nearReady": true,
+      "nearActive": true,
+      "highTriangles": 94692,
+      "texture": [
+        2048,
+        2048
+      ],
+      "lowVisible": false,
+      "highVisible": true,
+      "pbr": true,
+      "sharedSkeleton": true
+    }
+  ],
+  "boundary": [
+    {
+      "distance": 110.66069142318199,
+      "active": false,
+      "low": true
+    },
+    {
+      "distance": 99.66160124958375,
+      "active": true,
+      "low": false
+    },
+    {
+      "distance": 103.66124806329687,
+      "active": true,
+      "low": false
+    },
+    {
+      "distance": 106.66100055712664,
+      "active": false,
+      "low": true
+    },
+    {
+      "distance": 99.66160124958375,
+      "active": true,
+      "low": false
+    }
+  ],
+  "animation": {
+    "samples": [
+      {
+        "name": "idle",
+        "finite": true,
+        "maxExtent": 1.0005338534964372
+      },
+      {
+        "name": "walk",
+        "finite": true,
+        "maxExtent": 1.0077451826382038
+      },
+      {
+        "name": "carry",
+        "finite": true,
+        "maxExtent": 1.0005652484597143
+      },
+      {
+        "name": "mine",
+        "finite": true,
+        "maxExtent": 0.9836733162560362
+      },
+      {
+        "name": "chop",
+        "finite": true,
+        "maxExtent": 0.967913384392884
+      },
+      {
+        "name": "build",
+        "finite": true,
+        "maxExtent": 0.967954740451681
+      },
+      {
+        "name": "work",
+        "finite": true,
+        "maxExtent": 0.967954740451681
+      },
+      {
+        "name": "saw",
+        "finite": true,
+        "maxExtent": 0.967954740451681
+      },
+      {
+        "name": "mill",
+        "finite": true,
+        "maxExtent": 0.967954740451681
+      },
+      {
+        "name": "train",
+        "finite": true,
+        "maxExtent": 0.967954740451681
+      },
+      {
+        "name": "forge",
+        "finite": true,
+        "maxExtent": 0.967913384392884
+      },
+      {
+        "name": "gather",
+        "finite": true,
+        "maxExtent": 0.9150503168018198
+      },
+      {
+        "name": "plant",
+        "finite": true,
+        "maxExtent": 0.9150503168018198
+      },
+      {
+        "name": "farm",
+        "finite": true,
+        "maxExtent": 0.9150503168018198
+      },
+      {
+        "name": "fishing",
+        "finite": true,
+        "maxExtent": 0.9992693392070011
+      },
+      {
+        "name": "hunt",
+        "finite": true,
+        "maxExtent": 0.9992693392070011
+      },
+      {
+        "name": "water",
+        "finite": true,
+        "maxExtent": 0.9991191738411385
+      }
+    ],
+    "roleBones": [
+      {
+        "kind": "stone_builder",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_worker",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_lumber",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_miner",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_forester",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_fisher",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_gatherer",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_watercarrier",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_farmer",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_villager",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_settler",
+        "bones": 17,
+        "toolAttached": true
+      },
+      {
+        "kind": "stone_hunter",
+        "bones": 17,
+        "toolAttached": true
+      }
+    ],
+    "bones": 17,
+    "sharedWithLow": true,
+    "weights": 81227,
+    "vertices": 81227
+  },
+  "sharing": {
+    "geometry": true,
+    "material": true,
+    "laterAgeUnchanged": true
+  },
+  "game": {
+    "city": "Kivimetsa küla",
+    "nearActive": 8
+  },
+  "passed": true
+}

@@ -1,0 +1,107 @@
+[
+  {
+    "game_id": "lumber",
+    "source_triangles": 98122,
+    "triangles": 4000,
+    "vertices": 12000,
+    "texture_size": 512,
+    "bytes": 463140,
+    "build_seconds": 2.3,
+    "bounds": [
+      [
+        -0.44647659946305096,
+        0.0,
+        -0.5
+      ],
+      [
+        0.44647659946305096,
+        0.6055523593465412,
+        0.5
+      ]
+    ]
+  },
+  {
+    "game_id": "quarry",
+    "source_triangles": 95136,
+    "triangles": 4000,
+    "vertices": 12000,
+    "texture_size": 512,
+    "bytes": 480448,
+    "build_seconds": 2.1,
+    "bounds": [
+      [
+        -0.4569242915958014,
+        0.0,
+        -0.5
+      ],
+      [
+        0.4569242915958014,
+        0.39450180461482925,
+        0.5
+      ]
+    ]
+  },
+  {
+    "game_id": "house",
+    "source_triangles": 97949,
+    "triangles": 4000,
+    "vertices": 12000,
+    "texture_size": 512,
+    "bytes": 472376,
+    "build_seconds": 2.0,
+    "bounds": [
+      [
+        -0.5,
+        0.0,
+        -0.48693393965827303
+      ],
+      [
+        0.5,
+        0.5848672298264419,
+        0.48693393965827303
+      ]
+    ]
+  },
+  {
+    "game_id": "well",
+    "source_triangles": 99254,
+    "triangles": 3000,
+    "vertices": 9000,
+    "texture_size": 512,
+    "bytes": 368464,
+    "build_seconds": 1.9,
+    "bounds": [
+      [
+        -0.5,
+        0.0,
+        -0.40231858309147994
+      ],
+      [
+        0.5,
+        0.8183551760196969,
+        0.40231858309147994
+      ]
+    ]
+  },
+  {
+    "game_id": "farm",
+    "source_triangles": 97392,
+    "triangles": 4000,
+    "vertices": 12000,
+    "texture_size": 512,
+    "bytes": 479600,
+    "build_seconds": 2.6,
+    "bounds": [
+      [
+        -0.496039816494922,
+        0.0,
+        -0.5
+      ],
+      [
+        0.496039816494922,
+        0.562307192550939,
+        0.5
+      ]
+    ]
+  }
+]

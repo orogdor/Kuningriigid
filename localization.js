@@ -3,7 +3,7 @@ import {ENGLISH_V120_PAIRS} from './locale-en-v120.js?v=120a';
 import {ENGLISH_V155_PAIRS} from './locale-en-v155.js?v=155a';
 import {TECH_UNLOCKS_EN_V120} from './research-unlocks-en-v120.js?v=120a';
 
-const buildVersion=typeof document!=='undefined'?(document.title.match(/V(\d+)/)?.[1]||'96'):'96';
+const buildVersion=typeof document!=='undefined'?(document.title.match(/V(\d+(?:\.\d+)?)/)?.[1]||'96'):'96';
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
 const english=new Map([...ENGLISH_PAIRS,...ENGLISH_V120_PAIRS,...ENGLISH_V155_PAIRS.filter(([a,b])=>a!==b)]);

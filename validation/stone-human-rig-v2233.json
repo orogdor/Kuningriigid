@@ -1,0 +1,29 @@
+{
+  "vertices": 81227,
+  "triangles": 94692,
+  "bones": 17,
+  "weighted_vertices": 81227,
+  "min_weight": 0.0,
+  "max_weight_sum_error": 3.3306690738754696e-16,
+  "original_buffer_preserved": true,
+  "joint_names": [
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "upperArm_L",
+    "forearm_L",
+    "hand_L",
+    "upperArm_R",
+    "forearm_R",
+    "hand_R",
+    "thigh_L",
+    "shin_L",
+    "foot_L",
+    "thigh_R",
+    "shin_R",
+    "foot_R"
+  ],
+  "bytes": 7223880
+}

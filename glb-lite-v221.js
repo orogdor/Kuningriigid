@@ -34,7 +34,7 @@ export async function loadGLB(url){
   if(!A.NORMAL)g.computeVertexNormals();
   const m=json.materials?.[p.material??0]||{},pbr=m.pbrMetallicRoughness||{};
   const src=pbr.baseColorTexture?texSource(pbr.baseColorTexture.index):undefined;
-  primitives.push({geometry:g,image:src!=null?images[src]:null,color:pbr.baseColorFactor||[1,1,1,1],extras:m.extras||{}});
+  primitives.push({geometry:g,image:src!=null?images[src]:null,color:pbr.baseColorFactor||[1,1,1,1],roughness:pbr.roughnessFactor??1,metalness:pbr.metallicFactor??1,roughnessImage:pbr.metallicRoughnessTexture?images[texSource(pbr.metallicRoughnessTexture.index)]:null,extras:m.extras||{}});
  }
  let skin=null;
  if(json.skins?.length){

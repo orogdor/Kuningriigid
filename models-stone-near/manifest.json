@@ -1,0 +1,99 @@
+{
+  "distance_metres": 100,
+  "return_to_far_metres": 105,
+  "max_parallel_downloads": 2,
+  "original_distant_files_preserved": true,
+  "assets": [
+    {
+      "file": "lumber.glb",
+      "triangles": 98122,
+      "vertices": 92510,
+      "texture": [
+        1024,
+        1024
+      ],
+      "bytes": 4387968,
+      "sha256": "ff3ed13d201c0288c9781da2fbad8ada788a2e277e4d2792328596a3f2b1a0c8",
+      "source_file": "lumber.glb",
+      "source_unchanged": true
+    },
+    {
+      "file": "quarry.glb",
+      "triangles": 95136,
+      "vertices": 74322,
+      "texture": [
+        1024,
+        1024
+      ],
+      "bytes": 3770148,
+      "sha256": "114e8f83c0d467eb33cadd5d7eccd4f8526fa0921e6f59d7a337f2fa7f8623f2",
+      "source_file": "quarry.glb",
+      "source_unchanged": true
+    },
+    {
+      "file": "house.glb",
+      "triangles": 97949,
+      "vertices": 103759,
+      "texture": [
+        1024,
+        1024
+      ],
+      "bytes": 4831016,
+      "sha256": "4e2dac0f041614a42fc76406b245006af676f01938e82f4be4f54efd9f63a525",
+      "source_file": "house.glb",
+      "source_unchanged": true
+    },
+    {
+      "file": "well.glb",
+      "triangles": 99254,
+      "vertices": 118739,
+      "texture": [
+        1024,
+        1024
+      ],
+      "bytes": 5269336,
+      "sha256": "4285fd87d408ed5484b9f307f2df7611884f1785806ad053f1d5891924c19dff",
+      "source_file": "well.glb",
+      "source_unchanged": true
+    },
+    {
+      "file": "farm.glb",
+      "triangles": 97392,
+      "vertices": 99835,
+      "texture": [
+        1024,
+        1024
+      ],
+      "bytes": 4695576,
+      "sha256": "676b85beb4a59abcd6fcdf53999fed6aa8ab5aa860c2f25bf01d58942f413da6",
+      "source_file": "farm.glb",
+      "source_unchanged": true
+    },
+    {
+      "file": "peamaja.glb",
+      "triangles": 99557,
+      "vertices": 91762,
+      "texture": [
+        2048,
+        2048
+      ],
+      "bytes": 4904484,
+      "sha256": "4fa7c0d6433919a7b4f89a82d8eb38a021a0109a7d9172832c931514b0bbac31",
+      "source_file": "peamaja.glb",
+      "source_unchanged": true
+    },
+    {
+      "file": "human_rigged.glb",
+      "triangles": 94692,
+      "vertices": 81227,
+      "texture": [
+        2048,
+        2048
+      ],
+      "bytes": 7223880,
+      "sha256": "0c954f288a81d6bafbde71a3e8ccf6c3b9fccb51730bf85a2168cb9ca46a28e3",
+      "source_file": "human.glb",
+      "source_unchanged": false
+    }
+  ]
+}
