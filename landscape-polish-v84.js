@@ -1,6 +1,6 @@
 // V84 visual dressing shares the exact atlas/detail projection and saved rivers.
 import * as T from './vendor/three.module.js';
-import {getRivers,riverNear,surface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=223';
+import {getRivers,riverNear,surface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=2232';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
 const templates=new Map(),crossingMaps=new WeakMap(),crossingCatalogs=new WeakMap();
