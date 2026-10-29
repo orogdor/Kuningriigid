@@ -4,7 +4,7 @@ import {buildingClearance} from './navigation.js?v=1754a';
 // World edges are projected through the local walkable navigation mesh;
 // local footpaths connect adjacent cells that have accumulated enough traffic.
 import * as T from './vendor/three.module.js';
-import {trailMaterial} from './landscape-v149.js?v=162a';
+import {trailMaterial} from './landscape-v149.js?v=2232';
 import {COLS,ROWS} from './campaign.js';
 import {roadLevel,roadStrength} from './roads.js?v=59';
 import {roadCurve,worldToDetail,segmentTouchesTile} from './landscape-shared.js?v=123a';
@@ -12,18 +12,34 @@ import {roadCurve,worldToDetail,segmentTouchesTile} from './landscape-shared.js?
 const COLORS=['#000000','#b09a73','#bea982','#9e9585','#8f9291'];
 // V149: ribbons carry an across coordinate (uv.x -1..1) so the trail shader can soften the
 // edges and add trodden-earth grain; the visible path width matches the previous hard band.
+// V223.2: village footpaths need exactly the same terrain contact as
+// strategic roads. Old single quads spanned long slopes and sat 30 cm in
+// the air. Tessellate each link and sample the actual rendered land per edge.
 function appendRibbon(vertices,colors,a,b,width,color,height,uvs=null){
  const dx=b.x-a.x,dz=b.z-a.z,length=Math.hypot(dx,dz);
  if(length<.01)return;
- const w=width*(uvs?1.3:1),nx=-dz/length*w*.5,nz=dx/length*w*.5;
- // extend each segment slightly so neighbouring links overlap into one continuous path
- const ex=uvs?dx/length*w*.25:0,ez=uvs?dz/length*w*.25:0;
- const A={x:a.x-ex,z:a.z-ez},B={x:b.x+ex,z:b.z+ez};
- const points=[
-  [A.x+nx,A.z+nz,-1],[B.x+nx,B.z+nz,-1],[B.x-nx,B.z-nz,1],
-  [A.x+nx,A.z+nz,-1],[B.x-nx,B.z-nz,1],[A.x-nx,A.z-nz,1]
- ];
- for(const [x,z,u] of points){vertices.push(x,height(x,z)+.3,z);colors.push(color.r,color.g,color.b);if(uvs)uvs.push(u,0)}
+ const half=width*(uvs?1.3:1)*.5;
+ const nx=-dz/length*half,nz=dx/length*half;
+ const count=Math.max(1,Math.ceil(length/.48));
+ const offset=.014; // just above ground: avoids z-fighting without hovering
+ const put=(x,z,u,v)=>{
+  vertices.push(x,height(x,z)+offset,z);
+  colors.push(color.r,color.g,color.b);
+  if(uvs)uvs.push(u,v);
+ };
+ for(let j=0;j<count;j++){
+  // A tiny overlap hides seams, not an extension of a quarter of road width.
+  const from=Math.max(0,j/count-.015/length);
+  const to=Math.min(1,(j+1)/count+.015/length);
+  const p0={x:a.x+dx*from,z:a.z+dz*from},p1={x:a.x+dx*to,z:a.z+dz*to};
+  const corners=[
+   [p0.x+nx,p0.z+nz,-1,from*length],
+   [p1.x+nx,p1.z+nz,-1,to*length],
+   [p1.x-nx,p1.z-nz,1,to*length],
+   [p0.x-nx,p0.z-nz,1,from*length]
+  ];
+  for(const index of [0,1,2,0,2,3])put(...corners[index]);
+ }
 }
 function roadMesh(vertices,colors,uvs=null){
  const group=new T.Group();
