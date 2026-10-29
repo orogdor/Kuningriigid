@@ -3,7 +3,8 @@ import * as T from './vendor/three.module.js';
 import {graphicsNearDistanceV226} from './graphics-settings-v226.js';
 import {setStoneNearDistanceV226} from './stone-near-lod.js';
 export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,localScene,people,getQuality,getAdaptiveScale}){
- const originals=new WeakMap();
+ const originals=new WeakMap(),originalMaterials=new WeakMap(),convertedMaterials=new WeakMap();
+ let pendingGPU=false,gpuSuccessfulFrames=0;
  let lastDraw=0,lastStats=performance.now(),frames=0,lastPeople=0,overlay=null;
  function pixelRatio(){return Math.min(3,Math.min(devicePixelRatio||1,2)*(settings.resolution/100)*(getAdaptiveScale?.()||1));}
  function peopleShadows(){
@@ -25,6 +26,36 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
    }
   });
  }
+ function convertedMaterial(m,kind){
+  if(!m||(!m.isMeshStandardMaterial&&!m.isMeshPhysicalMaterial)||
+      Object.hasOwn(m,'onBeforeCompile')||Object.hasOwn(m,'customProgramCacheKey'))return m;
+  if(kind==='pbr')return m;
+  let cache=convertedMaterials.get(m);if(!cache){cache={};convertedMaterials.set(m,cache);}
+  if(cache[kind])return cache[kind];
+  const params={color:m.color?.clone(),map:m.map,normalMap:m.normalMap,normalScale:m.normalScale?.clone(),
+   emissive:m.emissive?.clone(),emissiveMap:m.emissiveMap,emissiveIntensity:m.emissiveIntensity,
+   vertexColors:m.vertexColors,alphaTest:m.alphaTest,alphaMap:m.alphaMap,side:m.side,transparent:m.transparent,
+   opacity:m.opacity,depthWrite:m.depthWrite,depthTest:m.depthTest,wireframe:m.wireframe,
+   flatShading:m.flatShading,aoMap:m.aoMap,aoMapIntensity:m.aoMapIntensity,
+   lightMap:m.lightMap,lightMapIntensity:m.lightMapIntensity};
+  let made;
+  if(kind==='classic')made=new T.MeshLambertMaterial(params);
+  else if(kind==='toon')made=new T.MeshToonMaterial(params);
+  else if(kind==='physical')made=new T.MeshPhysicalMaterial({...params,
+   roughness:m.roughness??.85,metalness:m.metalness??0,roughnessMap:m.roughnessMap,metalnessMap:m.metalnessMap,
+   clearcoat:.18,clearcoatRoughness:.42});
+  if(made){made.name=(m.name||'material')+' '+kind;cache[kind]=made;}
+  return made||m;
+ }
+ function applyMaterialEngine(){
+  for(const scene of [worldScene,localScene])scene.traverse(o=>{
+   if(!o.isMesh&&!o.isSkinnedMesh&&!o.isInstancedMesh)return;
+   if(!originalMaterials.has(o))originalMaterials.set(o,o.material);
+   const base=originalMaterials.get(o),mode=settings.lightingEngine||'pbr';
+   if(Array.isArray(base))o.material=base.map(m=>convertedMaterial(m,mode));
+   else o.material=convertedMaterial(base,mode);
+  });
+ }
  function apply(){
   const quality=getQuality?.()||'high';
   atmosphere.setQuality(quality);atmosphere.setGraphics(settings);
@@ -35,7 +66,7 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
   const detail=graphicsNearDistanceV226(settings);
   const units=graphicsNearDistanceV226({...settings,buildingDetail:settings.unitDetail});
   setStoneNearDistanceV226(detail,units);
-  textureFiltering();peopleShadows();
+  applyMaterialEngine();textureFiltering();peopleShadows();
   for(const id of ['startmenu','citypanel','tools','atlaspanel','commandhud']){
    const el=document.getElementById(id);if(el)el.style.zoom=(settings.uiScale/100);
   }
@@ -56,7 +87,24 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
     ' · '+(T.GPU_MODE_V225?'WebGPU':'WebGL');
     frames=0;lastStats=now;}
   }else if(overlay){overlay.hidden=true;lastStats=now;frames=0;}
-  if(now-lastPeople>4000){lastPeople=now;if(!settings.unitShadows)peopleShadows();}
+  if(now-lastPeople>4000){lastPeople=now;applyMaterialEngine();if(!settings.unitShadows)peopleShadows();}
  }
- return {apply,canRender,afterRender,pixelRatio};
+ function render(scene,camera,now){
+  if(T.GPU_MODE_V225||renderer.isWebGPUShimV225){
+   if(pendingGPU)return;
+   if(typeof renderer.renderAsync!=='function'){
+    window.KINGDOMS_WEBGPU_RECOVER_V227?.('WebGPU: async render puudub');return;
+   }
+   pendingGPU=true;
+   Promise.resolve(renderer.readyV225).then(()=>renderer.renderAsync(scene,camera)).then(()=>{
+    pendingGPU=false;gpuSuccessfulFrames++;afterRender(now);
+    // A frame submission with no draw calls cannot display the 3D world.
+    const calls=renderer.info?.render?.calls;
+    if(gpuSuccessfulFrames>=25&&calls===0)window.KINGDOMS_WEBGPU_RECOVER_V227?.('WebGPU esitas 25 tühja 3D-kaadrit');
+   }).catch(error=>{pendingGPU=false;window.KINGDOMS_WEBGPU_RECOVER_V227?.(error);});
+   return;
+  }
+  try{renderer.render(scene,camera);afterRender(now);}catch(error){console.error('WebGL render error',error);throw error;}
+ }
+ return {apply,canRender,afterRender,pixelRatio,render};
 }

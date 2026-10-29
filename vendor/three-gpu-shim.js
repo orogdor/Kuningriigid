@@ -7,6 +7,11 @@ import {WebGPURenderer} from './three.webgpu.js';
 export const GPU_MODE_V225=true;
 export class WebGLRenderer extends WebGPURenderer{
  constructor(opts={}){super({...opts,antialias:opts.antialias??true});this.isWebGPUShimV225=true;
-  this.readyV225=this.init().then(()=>{window.KINGDOMS_GPU_V225={backend:this.backend?.isWebGPUBackend?'webgpu':'webgl2'};})
-   .catch(e=>console.warn('V225 WebGPU init failed',e));}
+  this.readyV225=this.init().then(()=>{
+   const backend=this.backend?.isWebGPUBackend?'webgpu':'webgl2';
+   window.KINGDOMS_GPU_V225={backend};
+   if(backend==='webgpu')this.backend?.device?.lost?.then(info=>window.KINGDOMS_WEBGPU_RECOVER_V227?.('GPU seadme ühendus katkes: '+(info?.message||info?.reason||'')));
+   if(backend!=='webgpu')window.KINGDOMS_WEBGPU_RECOVER_V227?.('WebGPU seade ei loonud WebGPU backend-i');
+  })
+   .catch(e=>{console.error('V227 WebGPU init failed',e);window.KINGDOMS_WEBGPU_RECOVER_V227?.(e);throw e;});}
 }

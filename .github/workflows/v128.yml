@@ -26,6 +26,9 @@ jobs:
           node --check civilization.js
           node --check graphics-settings-v226.js
           node --check graphics-runtime-v226.js
+          node --check webgpu-safety-v227.js
+          node --check vendor/three-gpu-shim.js
+          node --check boot-v83.js
           node --check atmosphere-v158.js
           node --check landscape-v149.js
           node --check sea-v158.js

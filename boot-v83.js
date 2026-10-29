@@ -3,12 +3,13 @@
 const status=document.getElementById('menu-status');
 const english=()=>document.getElementById('menulanguage')?.value!=='et';
 try{
- await import('./civilization.js?v=226');
+ await import('./civilization.js?v=227');
  if(!window.gameDebug)throw new Error('Game initialization did not finish');
  for(const id of ['continue','newgame','quality','v51export','v51import'])document.getElementById(id).disabled=false;
  status.hidden=true;
 }catch(error){
  console.error('Game startup failed:',error);
+ if(window.KINGDOMS_WEBGPU_WANTED_V227){window.KINGDOMS_WEBGPU_RECOVER_V227?.(error);}
  document.getElementById('startmenu').hidden=false;
  status.classList.add('menu-error');status.hidden=false;
  status.textContent=english()?'The game could not start. Error: '+String(error?.message||error):'Mängu käivitamine ebaõnnestus. Viga: '+String(error?.message||error);
