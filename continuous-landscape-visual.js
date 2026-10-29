@@ -86,7 +86,7 @@ const mouthBlend=(game,x,z)=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(x,
 function visible(tile,path,radius=110){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
- const water=[],banks=[],fordShoals=[];
+ const water=[],banks=[],dryBanks=[],fordShoals=[];
  let shallowCrossings=0;
  let riverCount=0,sections=0;
  // A single clipped scalar-field mesh unions ALL tributaries. Every shared
@@ -95,7 +95,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  for(const edge of getRivers(game)){
   if(!visible(tile,edge.points))continue;riverCount++;
   for(const p of edge.points){
-   const radius=p.width*1.55+step*2;
+   const radius=p.width*2.20+step*2;
    for(let gz=Math.floor((p.z-radius)/step);gz<=Math.ceil((p.z+radius)/step);gz++)for(let gx=Math.floor((p.x-radius)/step);gx<=Math.ceil((p.x+radius)/step);gx++)cells.add(gx+','+gz);
   }
  }
@@ -103,13 +103,13 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   const key=gx+','+gz;if(nodes.has(key))return nodes.get(key);
   const x=gx*step,z=gz*step,near=riverNear(game,x,z),w=near.width||1;
   const distance=Math.min(100,near.distance);
-  const p={x,z,d:distance-w,outer:distance-w*1.40,shore:.30-game.atlasHeight(x,z),width:w};nodes.set(key,p);return p;
+  const p={x,z,d:distance-w,outer:distance-w*1.40,outerDry:distance-w*2.18,shore:.30-game.atlasHeight(x,z),width:w};nodes.set(key,p);return p;
  };
  const clip=(polygon,key,invert=false)=>{
   const result=[];for(let i=0;i<polygon.length;i++){
    const a=polygon[i],b=polygon[(i+1)%polygon.length],va=(invert?-1:1)*a[key],vb=(invert?-1:1)*b[key];
    if(va<=0)result.push(a);
-   if((va<=0)!==(vb<=0)){const t=va/(va-vb),p={};for(const k of ['x','z','d','outer','shore','width'])p[k]=a[k]+(b[k]-a[k])*t;result.push(p)}
+   if((va<=0)!==(vb<=0)){const t=va/(va-vb),p={};for(const k of ['x','z','d','outer','outerDry','shore','width'])p[k]=a[k]+(b[k]-a[k])*t;result.push(p)}
   }return result;
  };
  const emit=(polygon,array,isWater)=>{
@@ -127,6 +127,9 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
    const land=clip(triangle,'shore');if(land.length<3)continue;
    emit(clip(land,'d'),water,true);
    emit(clip(clip(land,'outer'),'d',true),banks,false);
+   // V223: second, much softer bank band between wet mud and untouched meadow.
+   // It is clipped using the same scalar field, so tributary joins remain seamless.
+   emit(clip(clip(land,'outerDry'),'outer',true),dryBanks,false);
    sections++;
   }
  }
@@ -159,6 +162,18 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
   return Math.pow(1-t,1.6)*.80;
  }});
+ // Fine gravel, silty sand and grass mingle just beyond the wet mud.
+ const gravel=new T.Color('#a99e80'),silt=new T.Color('#857e65');
+ const dryMesh=buffers(dryBanks,'#a99e80',{standard:true,shade:(x,y,z)=>{
+  const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
+  const t=Math.max(0,Math.min(1,(near.distance-near.width*1.4)/Math.max(.8,near.width*.78)));
+  const grain=.5+.5*Math.sin(p.x*.89+p.z*.63+Math.sin(p.x*2.07)*1.3);
+  return silt.clone().lerp(gravel,.25+.55*grain).multiplyScalar(.87+.13*t);
+ },alpha:(x,y,z)=>{
+  const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
+  const t=Math.max(0,Math.min(1,(near.distance-near.width*1.4)/Math.max(.8,near.width*.78)));
+  return .54*Math.pow(1-t,1.3);
+ }});
  const deep=new T.Color('#1d4a57'),shallowCol=new T.Color('#4f7f74'),seaCol=new T.Color('#62a6a3');
  const waterMesh=buffers(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
@@ -177,11 +192,13 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  }
  const shallowMesh=buffers(fordShoals,'#aaa47e',{standard:false,opacity:.40});
  if(shallowMesh){shallowMesh.name='shallow walkable ford shoals';shallowMesh.renderOrder=11;group.add(shallowMesh)}
+ if(dryMesh){dryMesh.name='V223 gravel and meadow river shoulders';dryMesh.renderOrder=7;group.add(dryMesh)}
  if(bankMesh){bankMesh.name='continuous river banks';bankMesh.renderOrder=8;group.add(bankMesh)}
  if(waterMesh){waterMesh.name='continuous water surface';waterMesh.renderOrder=9;group.add(waterMesh)}
  group.userData.riverEdges=riverCount;
  group.userData.shallowFordCount=shallowCrossings;
  group.userData.riverVertexCount=water.length/3;
+ group.userData.dryBankVertexCount=dryBanks.length/3;
  group.userData.sections=sections;
  // Crossings remain independent STRUCTURES, but share river coordinates and
  // are only placed at actual fixed world passage locations.
