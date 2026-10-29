@@ -86,7 +86,7 @@ const mouthBlend=(game,x,z)=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(x,
 function visible(tile,path,radius=110){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
- const water=[],banks=[],dryBanks=[],fordShoals=[];
+ const water=[],banks=[],dryBanks=[];
  let shallowCrossings=0;
  let riverCount=0,sections=0;
  // A single clipped scalar-field mesh unions ALL tributaries. Every shared
@@ -133,31 +133,12 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
    sections++;
   }
  }
- // Submerged pale gravel shoals highlight truly walkable low-water passages.
- // Geometry and water depth come from the same centreline in both projections.
+ // V223: actual fords are shallow in worldElevation(), and crossing stones
+ // are supplied by createCrossingNetwork(). The old wide shoal billboard
+ // was visually opaque (and narrow replacements looked like straight stripes).
+ // Do not draw an extra flat surface on top of flowing water.
  for(const edge of getRivers(game)){
-  if(!edge.c.ford||edge.c.bridge||!visible(tile,edge.points))continue;
-  const first=edge.points[0],second=edge.points[1]||edge.points[0],len=Math.hypot(second.x-first.x,second.z-first.z)||1;
-  const tx=(second.x-first.x)/len,tz=(second.z-first.z)/len,nx=-tz,nz=tx;
-  // V223: earlier one full-width, flat shoal formed a conspicuous
-  // opaque octagon across the river. Keep only two small, curved gravel
-  // streaks above the shallow ford bed; the stepping stones remain separate.
-  const width=Math.max(1.5,Math.min(first.width*.80,first.width-.35));
-  for(const lane of [-.49,.41]){
-   let last=null;
-   for(const at of [-9,-5,0,5,9]){
-    const fade=Math.abs(at)>=9?.35:Math.abs(at)>=5?.80:1;
-    const centre=lane*width+Math.sin(at*.28+lane*2.7)*Math.min(.28,width*.06);
-    const half=Math.min(.48,width*.12)*fade;
-    const pts=[-half,half].map(offset=>{
-     const x=edge.c.x+tx*at+nx*(centre+offset),z=edge.c.z+tz*at+nz*(centre+offset);
-     return {...field(game,x,z,scope,tile),y:vp(game,(riverNear(game,x,z).waterHeight||.86)+.045,scope,x,z)};
-    });
-    if(last)strip(fordShoals,last[0],last[1],pts[0],pts[1]);
-    last=pts;
-   }
-  }
-  shallowCrossings++;
+  if(edge.c.ford&&!edge.c.bridge&&visible(tile,edge.points))shallowCrossings++;
  }
  // V149: wet, dark mud at the waterline that dries and fades into the surrounding land.
  const toWorld=(x,z)=>scope==='world'?{x,z}:localToWorld(tile,x,z);
@@ -197,8 +178,6 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   }
   waterMesh.geometry.setAttribute('aFlow',new T.BufferAttribute(flow,2));waterMesh.geometry.setAttribute('aShore',new T.BufferAttribute(shore,1));
  }
- const shallowMesh=buffers(fordShoals,'#9c997c',{standard:false,opacity:.23});
- if(shallowMesh){shallowMesh.name='shallow walkable ford shoals';shallowMesh.renderOrder=11;group.add(shallowMesh)}
  if(dryMesh){dryMesh.name='V223 gravel and meadow river shoulders';dryMesh.renderOrder=7;group.add(dryMesh)}
  if(bankMesh){bankMesh.name='continuous river banks';bankMesh.renderOrder=8;group.add(bankMesh)}
  if(waterMesh){waterMesh.name='continuous water surface';waterMesh.renderOrder=9;group.add(waterMesh)}
