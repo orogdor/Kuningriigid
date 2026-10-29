@@ -49,6 +49,20 @@ export function stoneBuildingModel(type,age,seed=0){
  const s=def.size/Math.max(size.x,size.z);
  const root=new T.Group(),m=new T.Mesh(geo,materialFor(def.file,prim,{side:T.DoubleSide}));
  m.scale.setScalar(s*(type==='house'?.94+((seed>>>3)%7)*.02:1));m.castShadow=true;m.receiveShadow=true;root.add(m);
+ // V223.1: the generated quarry mesh has an unclosed rear/side opening.
+ // Add recessed fractured rock cores below the visible source mesh instead of
+ // a floating unsupported shell. Keep the original textured exterior intact.
+ if(type==='quarry'){
+  const stone=new T.MeshStandardMaterial({color:'#746b5d',roughness:1,metalness:0,side:T.DoubleSide});
+  for(const [x,y,z,rx,ry,rz] of [
+   [0,.95,.35,3.24,1.03,2.14],[-2.20,.68,-.30,1.12,.70,1.30],[2.16,.82,-.10,1.04,.88,1.18]
+  ]){
+   const boulder=new T.Mesh(new T.DodecahedronGeometry(1,1),stone);
+   boulder.position.set(x,y,z);boulder.scale.set(rx,ry,rz);
+   boulder.castShadow=true;boulder.receiveShadow=true;root.add(boulder);
+  }
+  root.userData.quarryRockBackfillV2231=true;
+ }
  root.userData.animations=[];root.userData.buildingType=type;root.userData.age=0;root.userData.stoneModelV221=key;
  return root;
 }
