@@ -7,7 +7,7 @@ import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123
 import * as T from './vendor/three.module.js';
 import {releaseMaterial} from './program-keep-v161.js';
 import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=2231';
-import {createCrossingNetwork} from './landscape-polish-v84.js?v=162a';
+import {createCrossingNetwork} from './landscape-polish-v84.js?v=2232';
 import {riverNear,visibleRiverHeight,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=2232';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
