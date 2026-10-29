@@ -203,7 +203,7 @@ const walker=createWalker({scene:localScene,canvas:$('world'),ground:(x,z)=>acti
 const mats=new Map();function mat(color){if(!mats.has(color))mats.set(color,new T.MeshStandardMaterial({color,roughness:.9}));return mats.get(color)}
 function box(parent,x,y,z,w,h,d,color){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat(color));m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m}
 function detailNav(){return s.battle?game.battleNavigation():game.nav(activeTile)}
-function ground(cell,x,z){return localVisualSurface(game,cell,x,z)} // V161: drawing heights (river levees, tall mountains)
+function ground(cell,x,z){return renderedGroundV2231(cell,x,z)} // V223.1: exact triangle surface visible to the FPV camera
 // Only the opt-in V77 sample uses previewAge. Imported V4 sample cities
 // retain their kiviaeg showcase until the faction actually enters Bronze Age.
 function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1){if(woodFortTier===2&&['palisade','woodgate'].includes(type))return createAgeBuilding(type,team,age,2);if(type==='field')return createFieldModel();if(type==='farm')return createFarmhouseModel(age);if(type==='pasture')return createLivestockModel(age);if(['palisade','stonewall','reinforced_wall','gatehouse'].includes(type))return createBronzeCityModel(type,team,stage);if(['bronze-siege','iron-siege'].includes(s.demo)&&team===1){const m=createBronzeCityModel(type,team,stage)||createBronzeTownHouse(type,team);if(m)return m;}const v154=createTownModelV154(type,team,age,seed);if(v154)return v154;return createAgeBuilding(type,team,age)}
@@ -250,6 +250,26 @@ function terrainVertex(gx,gz,sx,sz,nX,nZ){
   const color=detailGroundColor(game,wx,wz,hOld,mountain);if(hOld>.3){const patch=game.smooth(lx/31+8,lz/31+7);color.lerp(new T.Color(patch>.65?'#b8ab76':'#547a4c'),Math.abs(patch-.5)*.28)}color.multiplyScalar(.90+game.smooth(lx/19+20,lz/19+30)*.18);
   block[o]=h;block[o+1]=color.r;block[o+2]=color.g;block[o+3]=color.b;block[o+4]=mountain?1:0;block[o+5]=e;block[o+6]=mask;}
  return o>=0?[block,o]:null;
+}
+// V223.1: sample the ACTUAL detail terrain triangles, not an independent
+// high-frequency height function. Roads, walkers, buildings and resources must
+// touch the same piecewise-linear surface that the GPU draws. The geometry's
+// two triangles per grid cell follow PlaneGeometry indices (a,b,d), (b,c,d).
+function renderedGroundV2231(cell,x,z){
+ if(!cell||!Number.isFinite(x)||!Number.isFinite(z))return 0;
+ if(Math.abs(x)>DETAIL_TILE_X*1.5||Math.abs(z)>DETAIL_TILE_Z*1.5)
+  return localVisualSurface(game,cell,x,z);
+ const sx=675/(quality==='high'?450:quality==='low'?180:300);
+ const sz=585/(quality==='high'?390:quality==='low'?156:261);
+ const nX=Math.round(DETAIL_TILE_X/sx),nZ=Math.round(DETAIL_TILE_Z/sz);
+ const fx=(cell.x*DETAIL_X+x)/sx,fz=(cell.z*DETAIL_Z+z)/sz;
+ const gx=Math.floor(fx),gz=Math.floor(fz);
+ const u=Math.max(0,Math.min(1,fx-gx)),v=Math.max(0,Math.min(1,fz-gz));
+ const sample=(i,j)=>{const pair=terrainVertex(i,j,sx,sz,nX,nZ);return pair[0][pair[1]]};
+ const h00=sample(gx,gz),h10=sample(gx+1,gz),h01=sample(gx,gz+1);
+ if(u+v<=1)return h00*(1-u-v)+h10*u+h01*v;
+ const h11=sample(gx+1,gz+1);
+ return h10*(1-v)+h01*(1-u)+h11*(u+v-1);
 }
 // V161: distant land around the 3x3 detail area (9x9 tiles, coarse), so tall mountains, hills and
 // coasts continue to the horizon instead of ending at the edge of the detail map.
