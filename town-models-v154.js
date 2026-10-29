@@ -5,6 +5,7 @@
 // per-vertex colour and a material channel; one shared shader adds plaster, planks, logs,
 // masonry, brick, roof tiles, thatch, slate and glass detail. Presentation only.
 import * as T from './vendor/three.module.js';
+import {stoneBuildingModel} from './stone-age-models-v221.js';
 
 // ------------------------------------------------------------------ material
 const M={plain:0,plaster:1,boards:2,logs:3,stone:4,brick:5,tile:6,thatch:7,slate:8,glass:9,metal:10,beam:11,dirt:12,leaf:13,cloth:14};
@@ -740,6 +741,7 @@ const HOUSE_TYPES=new Set(['house']);
 export function townModelSupported(type){return HOUSE_TYPES.has(type)||!!SIG[type];}
 export function houseVariantCount(age){return HOUSE_VARIANTS[ERA(age)]||8;}
 export function createTownModelV154(type,team=0,age=0,seed=0){
+ {const stone=stoneBuildingModel(type,Math.max(0,age|0),seed);if(stone)return stone;} // V221 Stone Age models
  if(!townModelSupported(type))return null;
  age=Math.max(0,Math.min(6,age|0));const era=ERA(age);
  const variant=HOUSE_TYPES.has(type)?((seed>>>0)%houseVariantCount(age)):type==='hall'?((seed>>>0)%HALL_VARIANTS_V170):0;

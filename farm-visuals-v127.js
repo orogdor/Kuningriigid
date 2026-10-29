@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.js';
-import {farmhouseGeometry,fieldGeometry,meshV158} from './town-models-v154.js?v=174a';
+import {farmhouseGeometry,fieldGeometry,meshV158} from './town-models-v154.js?v=221';
 const mats=new Map();
 const mat=color=>{if(!mats.has(color))mats.set(color,new T.MeshStandardMaterial({color,roughness:.92}));return mats.get(color)};
 function box(g,x,y,z,w,h,d,color){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat(color));m.position.set(x,y,z);m.castShadow=h>.4;m.receiveShadow=true;g.add(m);return m;}

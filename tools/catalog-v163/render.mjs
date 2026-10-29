@@ -16,7 +16,7 @@ const items=await p.evaluate(async()=>{
  for(const t of types)list.push({cat:'1 Hooned',id:t,label:C.BUILDINGS[t]?.name||t,make:['b',t]});
  for(const t of ['palisade','watchtower'])if(!types.includes(t))list.push({cat:'1 Hooned',id:t,label:t,make:['b',t]});
  const nh=TM.houseVariantCount(0);for(let v=0;v<nh;v++)list.push({cat:'2 Elamud',id:'house#'+v,label:'Elamu variant '+(v+1),make:['house',v]});
- const people=['stone_builder','stone_worker','stone_lumber','stone_miner','stone_forester','stone_fisher','gatherer','watercarrier','farmer','market_woman','villager','settler','scholar','merchant','trainer','shipwright'];
+ const people=['stone_builder','stone_worker','stone_lumber','stone_miner','stone_forester','stone_fisher','stone_gatherer','stone_watercarrier','stone_farmer','stone_hunter','stone_villager','stone_settler']; // V221: Stone Age people (all civilians at age 0)
  for(const k of people)list.push({cat:'3 Inimesed',id:k,label:k,make:['p',k]});
  for(const [k,d] of Object.entries(C.TROOPS))if(d.age===0)list.push({cat:'4 Sõdurid',id:k,label:d.name||k,make:['p',k]});
  for(const k of ['tree','game','fish','berry'])list.push({cat:'5 Loodus ja ressursid',id:k,label:k,make:['r',k]});

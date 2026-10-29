@@ -2,7 +2,7 @@
 // Visual-only citizens use existing V50 character rigs; no save-schema,
 // economy, population, pathfinding or combat changes are necessary.
 import * as T from './vendor/three.module.js';
-import {createSoldier,animateSoldier} from './visuals.js';
+import {createSoldier,animateSoldier} from './visuals.js?v=221';
 
 // One game minute represents one village clock hour. Start new games in morning.
 export const VILLAGE_DAY_SECONDS=24*60;
@@ -103,7 +103,7 @@ function makePerson(group,site,index,ground){
  const role=index===0?'guard':index===3?'child':'resident';
  const person=new T.Group();person.name='V76 '+role+' '+site.id+':'+index;
  person.userData.villagePerson=true;person.userData.role=role;person.userData.site=site.id;
- const figure=createSoldier(person,0,0,role==='guard'?'#a9875d':role==='child'?'#c5a87d':'#a8b38b',role==='guard'?'spearman':'villager');
+ const figure=createSoldier(person,0,0,role==='guard'?'#a9875d':role==='child'?'#c5a87d':'#a8b38b',site.stone?(role==='guard'?'stone_hunter':'stone_villager'):(role==='guard'?'spearman':'villager')); // V221 Stone Age villagers
  dress(figure,role);
  const basket=mesh('basket',person,.4,1,.32);basket.visible=false;
  const p=home(index);person.position.set(p.x,ground(p.x,p.z),p.z);group.add(person);
@@ -138,9 +138,9 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
  function discover(tile){
   if(!game.seen(0,tile))return null;
   const city=game.s.cities.find(c=>c.c===tile.c&&c.r===tile.r&&c.districtOf==null);
-  if(city)return {id:'city:'+city.id,tile,kind:'city',claimedBy:city.team};
+  if(city)return {id:'city:'+city.id,tile,kind:'city',claimedBy:city.team,stone:(game.s.ages?.[city.team]??0)===0};
   const landmark=game.s.landmarks?.find(l=>l.c===tile.c&&l.r===tile.r&&l.kind==='village');
-  return landmark?{id:'landmark:'+landmark.id,tile,kind:'village',claimedBy:landmark.claimedBy}:null;
+  return landmark?{id:'landmark:'+landmark.id,tile,kind:'village',claimedBy:landmark.claimedBy,stone:landmark.claimedBy==null||(game.s.ages?.[landmark.claimedBy]??0)===0}:null;
  }
  function show(tile,parent,{nearby=false}={}){
   const site=discover(tile),key=tile.c+':'+tile.r;

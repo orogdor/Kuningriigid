@@ -584,3 +584,53 @@ Kasutaja soovis pilti kõigist kiviaja hoonetest, inimestest ja muust, et neid �
 - `tools/catalog-v163/render.mjs` renderdab kataloogi uuesti. Iga mudel on omaette väikeses stseenis mängu valgusega.
 - `civilization.js` sai `gameDebug.catalogV163` (mängu enda mudelifunktsioonid ja andmed), boot laeb `civilization.js?v=162b`. Mängu ennast see ei muuda.
 - Tähelepanek kataloogist: `villager`, `scholar` ja `merchant` renderduvad praegu kilbi ja mõõgaga sõdalasena. Külaelu (`village-life-v76`) kasutab külaelanikuks `villager`-it.
+
+---
+
+## V221 – esimesed päris kiviaja mudelid: riggitud inimene ja neli hoonet (Claude, 2026-10-29)
+
+Kasutaja saatis AI 3D-generaatoriga tehtud mudelid: `human`, `peamaja`, `maja1`, `maja2`, `woodcuter`, `kiviraidur`. Igaüks oli umbes 95–100 000 kolmnurka, 2048 px WebP-tekstuuridega, mõõtkavas 1 ja uks +Z suunas.
+
+Ta palus inimesele luustiku, animatsioonid ja mudelite mängu panemise. Töö tehti V220.1 peale, mänguloogikat ei muudetud.
+
+### Teisendus – `tools/stone-models-v221/` (Python, numpy, scipy, Pillow)
+Npm-registrit ega Blenderit tööruumis polnud, seega on tööriistad kirjutatud ise.
+- `qem.py`: quadric edge-collapse lihtsustamine asukoha järgi liidetud võrgul. Servadele lisatakse tasandid, tahkude ümberpööramine on keelatud.
+- `bake.py`: algsed UV-d on väga killustunud (üle poole tippudest on õmblustel), seega luuakse uus atlas kolmnurgapaaridest. Iga teksli värv võetakse algse mudeli lähimast punktist: cKDTree + lähim punkt kolmnurgal + algne UV.
+- `rig.py`: 17 luud mudeli proportsioonide järgi (A-poos). Kaalud arvutatakse kauguse järgi luusegmentideni, piirkondade kaupa. Käe ja kere vaheline lävi sõltub kõrgusest, et seelik ei venituks käega kaasa.
+- `writer.py`: GLB kirjutaja (JPEG-tekstuur, skin).
+- Tulemused kaustas `models-v221/` (kokku umbes 4,6 MB):
+
+| Fail | Kolmnurki | Tekstuur |
+|---|---|---|
+| `human_rigged` | 3000 | 512 |
+| `peamaja` | 8000 | 1024 |
+| `maja1`, `maja2`, `woodcuter` | 6000 | 1024 |
+| `kiviraidur` | 5000 | 1024 |
+
+### Mängus
+- `glb-lite-v221.js`: väike GLB-laadija (vendoris pole GLTFLoaderit).
+- `stone-age-models-v221.js`:
+  - laeb mudelid top-level await'iga. Kui laadimine ebaõnnestub või kood jookseb Node'is, jäävad vanad mudelid;
+  - `stoneBuildingModel(type, age, seed)` kehtib ainult vanuse 0 korral: hall, house (seemne järgi maja1 või maja2, väike suuruse erinevus), lumber, quarry. Kasutab DoubleSide-materjali, et lihtsustamise augud ei paistaks;
+  - `createStoneHuman` / `animateStoneHuman`: SkinnedMesh kõrgusega 1,66, protseduurilised animatsioonid, tööriist käeluu küljes, tiimivärvi vööpael;
+  - rig'il on `legs`, `arms`, `body` ja `head` nagu V50 rig'il, et `village-life` saaks inimesi otse poseerida.
+- `visuals.js`: `createSoldier` suunab tüübid `stone_*` uude mudelisse, `animateSoldier` suunab `rig.stoneHuman`.
+- `town-models-v154.js`: `createTownModelV154` proovib esmalt `stoneBuildingModel`.
+- `civilization.js`:
+  - `workerProfession` vanuse 0 korral annab alati kiviaja ameti (`stone_gatherer`, `stone_watercarrier`, `stone_farmer`, `stone_hunter`, … või `stone_worker`); vana funktsioon on nüüd `workerProfessionV220`;
+  - kiviaja asunik on `stone_settler`.
+- `village-life-v76.js`: kiviaja linnade ja külade elanikud on `stone_villager` ja `stone_hunter`.
+- Versioonid:
+  - `civilization.js?v=221`, `visuals.js?v=221` (import-map ühtlustatud), `town-models-v154.js?v=221` (varem kaks erinevat spetsifikaatorit), `village-life-v76.js?v=221`;
+  - boot on `?v=221`.
+
+### Testid
+- Uus `TEST_V221.mjs`: kiviaja inimesed on SkinnedMesh 17 luuga, liiguvad, ja neli hoonet on uued.
+- PASS: push-CI kiirkontrollid (`test-historic-suburb-v191`, `test-natural-closure-v194`, `test-organic-demo-v190`, `test-wall-priority-v188`, `test.mjs traffic`), `TEST_V221`, `TEST_V154`, `TEST_V148_BROWSER`, `TEST_V156`, `TEST_V157`, `TEST_V159_BROWSER`, `TEST_V160`, `TEST_V161`, `TEST_V123_UI`, `TEST_V170_BROWSER`, `TEST_V174_STONE_BROWSER`.
+- `TEST_V1751_BROWSER` kukub läbi ka V220.1 peal ilma minu muudatusteta („real long walls sampled“).
+- Märkus: `TEST_V174_STONE_BROWSER` desktopi kontroll „game continues on Play“ on swiftshaderis ajaliselt piiri peal, sest kaader võtab umbes 1,7–2 s. Inimeste SkinnedMesh peab kasutama frustum culling'ut (`frustumCulled` jääb tõeseks), muidu esimene kaader venib.
+
+### Edasi
+- Teised kiviaja hooned (kaev, talu, kasarm, kalamaja jne) on endised ja vajavad uusi mudeleid.
+- Naise või lapse mudelit pole: lapsed on vähendatud mees.

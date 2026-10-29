@@ -9,9 +9,9 @@
   ],
   "file": "000_hall.png",
   "size": [
-   9.47,
-   7.22,
-   8.28
+   6.06,
+   4,
+   10.5
   ]
  },
  {
@@ -24,9 +24,9 @@
   ],
   "file": "001_lumber.png",
   "size": [
-   6.98,
-   5.44,
-   6.67
+   6.84,
+   4.01,
+   7.2
   ]
  },
  {
@@ -39,9 +39,9 @@
   ],
   "file": "002_quarry.png",
   "size": [
-   7.34,
-   5.89,
-   6.79
+   8.2,
+   2.56,
+   6.38
   ]
  },
  {
@@ -54,9 +54,9 @@
   ],
   "file": "003_well.png",
   "size": [
-   3.4,
-   2.7,
-   3.5
+   3.09,
+   3.9,
+   3.38
   ]
  },
  {
@@ -84,9 +84,9 @@
   ],
   "file": "005_barracks.png",
   "size": [
-   9.2,
-   5.84,
-   7.82
+   8.8,
+   5.6,
+   7.77
   ]
  },
  {
@@ -114,9 +114,9 @@
   ],
   "file": "007_hunter.png",
   "size": [
-   6.45,
-   5.44,
-   7.12
+   7.51,
+   5.29,
+   6.5
   ]
  },
  {
@@ -144,9 +144,9 @@
   ],
   "file": "009_study.png",
   "size": [
-   7.61,
-   6.19,
-   5.75
+   7.4,
+   6.04,
+   6.17
   ]
  },
  {
@@ -219,9 +219,24 @@
   ],
   "file": "014_palisade.png",
   "size": [
-   7,
-   3.6,
-   3.05
+   7.45,
+   4.39,
+   0.96
+  ]
+ },
+ {
+  "cat": "1 Hooned",
+  "id": "woodgate",
+  "label": "Puidust külavärav",
+  "make": [
+   "b",
+   "woodgate"
+  ],
+  "file": "015_woodgate.png",
+  "size": [
+   7.66,
+   6.96,
+   2.45
   ]
  },
  {
@@ -232,11 +247,11 @@
    "b",
    "watchtower"
   ],
-  "file": "015_watchtower.png",
+  "file": "016_watchtower.png",
   "size": [
-   5.1,
-   8.25,
-   5.1
+   5.15,
+   8.27,
+   5.15
   ]
  },
  {
@@ -247,7 +262,7 @@
    "b",
    "field"
   ],
-  "file": "016_field.png",
+  "file": "017_field.png",
   "size": [
    16.1,
    0.9,
@@ -262,11 +277,11 @@
    "house",
    0
   ],
-  "file": "017_house_0.png",
+  "file": "018_house_0.png",
   "size": [
-   5.68,
-   5,
-   5.68
+   5.83,
+   3.5,
+   5.83
   ]
  },
  {
@@ -277,11 +292,11 @@
    "house",
    1
   ],
-  "file": "018_house_1.png",
+  "file": "019_house_1.png",
   "size": [
-   5.32,
-   4.48,
-   4.48
+   5.83,
+   3.35,
+   5.74
   ]
  },
  {
@@ -292,11 +307,11 @@
    "house",
    2
   ],
-  "file": "019_house_2.png",
+  "file": "020_house_2.png",
   "size": [
-   6.2,
-   4.75,
-   6.2
+   5.83,
+   3.5,
+   5.83
   ]
  },
  {
@@ -307,11 +322,11 @@
    "house",
    3
   ],
-  "file": "020_house_3.png",
+  "file": "021_house_3.png",
   "size": [
-   6.75,
-   4.92,
-   5.94
+   5.83,
+   3.35,
+   5.74
   ]
  },
  {
@@ -322,11 +337,11 @@
    "house",
    4
   ],
-  "file": "021_house_4.png",
+  "file": "022_house_4.png",
   "size": [
-   5.51,
-   5.29,
-   5.03
+   5.83,
+   3.5,
+   5.83
   ]
  },
  {
@@ -337,11 +352,11 @@
    "house",
    5
   ],
-  "file": "022_house_5.png",
+  "file": "023_house_5.png",
   "size": [
-   5.32,
-   4.31,
-   4.38
+   5.83,
+   3.35,
+   5.74
   ]
  },
  {
@@ -352,11 +367,11 @@
    "house",
    6
   ],
-  "file": "023_house_6.png",
+  "file": "024_house_6.png",
   "size": [
-   6.2,
-   4.61,
-   6.2
+   5.83,
+   3.5,
+   5.83
   ]
  },
  {
@@ -367,11 +382,71 @@
    "house",
    7
   ],
-  "file": "024_house_7.png",
+  "file": "025_house_7.png",
   "size": [
-   6.75,
-   4.6,
-   5.27
+   5.83,
+   3.35,
+   5.74
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#8",
+  "label": "Elamu variant 9",
+  "make": [
+   "house",
+   8
+  ],
+  "file": "026_house_8.png",
+  "size": [
+   5.95,
+   3.58,
+   5.95
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#9",
+  "label": "Elamu variant 10",
+  "make": [
+   "house",
+   9
+  ],
+  "file": "027_house_9.png",
+  "size": [
+   5.95,
+   3.42,
+   5.86
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#10",
+  "label": "Elamu variant 11",
+  "make": [
+   "house",
+   10
+  ],
+  "file": "028_house_10.png",
+  "size": [
+   5.95,
+   3.58,
+   5.95
+  ]
+ },
+ {
+  "cat": "2 Elamud",
+  "id": "house#11",
+  "label": "Elamu variant 12",
+  "make": [
+   "house",
+   11
+  ],
+  "file": "029_house_11.png",
+  "size": [
+   5.95,
+   3.42,
+   5.86
   ]
  },
  {
@@ -382,11 +457,11 @@
    "p",
    "stone_builder"
   ],
-  "file": "025_stone_builder.png",
+  "file": "030_stone_builder.png",
   "size": [
-   0.86,
+   0.76,
    1.66,
-   0.74
+   0.35
   ]
  },
  {
@@ -397,11 +472,11 @@
    "p",
    "stone_worker"
   ],
-  "file": "026_stone_worker.png",
+  "file": "031_stone_worker.png",
   "size": [
-   0.77,
+   0.76,
    1.66,
-   0.43
+   0.35
   ]
  },
  {
@@ -412,11 +487,11 @@
    "p",
    "stone_lumber"
   ],
-  "file": "027_stone_lumber.png",
+  "file": "032_stone_lumber.png",
   "size": [
-   1,
+   0.76,
    1.66,
-   0.43
+   0.35
   ]
  },
  {
@@ -427,9 +502,9 @@
    "p",
    "stone_miner"
   ],
-  "file": "028_stone_miner.png",
+  "file": "033_stone_miner.png",
   "size": [
-   1,
+   0.76,
    1.66,
    0.43
   ]
@@ -442,11 +517,11 @@
    "p",
    "stone_forester"
   ],
-  "file": "029_stone_forester.png",
+  "file": "034_stone_forester.png",
   "size": [
-   0.77,
+   0.76,
    1.66,
-   0.43
+   0.35
   ]
  },
  {
@@ -457,161 +532,101 @@
    "p",
    "stone_fisher"
   ],
-  "file": "030_stone_fisher.png",
+  "file": "035_stone_fisher.png",
   "size": [
-   0.77,
-   2.18,
-   0.87
+   0.76,
+   1.83,
+   0.35
   ]
  },
  {
   "cat": "3 Inimesed",
-  "id": "gatherer",
-  "label": "gatherer",
+  "id": "stone_gatherer",
+  "label": "stone_gatherer",
   "make": [
    "p",
-   "gatherer"
+   "stone_gatherer"
   ],
-  "file": "031_gatherer.png",
+  "file": "036_stone_gatherer.png",
   "size": [
-   0.77,
+   0.81,
    1.66,
-   0.43
+   0.35
   ]
  },
  {
   "cat": "3 Inimesed",
-  "id": "watercarrier",
-  "label": "watercarrier",
+  "id": "stone_watercarrier",
+  "label": "stone_watercarrier",
   "make": [
    "p",
-   "watercarrier"
+   "stone_watercarrier"
   ],
-  "file": "032_watercarrier.png",
+  "file": "037_stone_watercarrier.png",
   "size": [
-   0.82,
+   0.8,
    1.66,
-   0.53
+   0.35
   ]
  },
  {
   "cat": "3 Inimesed",
-  "id": "farmer",
-  "label": "farmer",
+  "id": "stone_farmer",
+  "label": "stone_farmer",
   "make": [
    "p",
-   "farmer"
+   "stone_farmer"
   ],
-  "file": "033_farmer.png",
+  "file": "038_stone_farmer.png",
   "size": [
-   0.98,
-   1.68,
-   0.43
-  ]
- },
- {
-  "cat": "3 Inimesed",
-  "id": "market_woman",
-  "label": "market_woman",
-  "make": [
-   "p",
-   "market_woman"
-  ],
-  "file": "034_market_woman.png",
-  "size": [
-   0.77,
+   0.76,
    1.66,
-   0.64
+   0.36
   ]
  },
  {
   "cat": "3 Inimesed",
-  "id": "villager",
-  "label": "villager",
+  "id": "stone_hunter",
+  "label": "stone_hunter",
   "make": [
    "p",
-   "villager"
+   "stone_hunter"
   ],
-  "file": "035_villager.png",
+  "file": "039_stone_hunter.png",
   "size": [
-   1.16,
-   1.66,
-   0.43
+   0.76,
+   1.83,
+   0.35
   ]
  },
  {
   "cat": "3 Inimesed",
-  "id": "settler",
-  "label": "settler",
+  "id": "stone_villager",
+  "label": "stone_villager",
   "make": [
    "p",
-   "settler"
+   "stone_villager"
   ],
-  "file": "036_settler.png",
+  "file": "040_stone_villager.png",
   "size": [
-   0.77,
+   0.76,
    1.66,
-   0.43
+   0.35
   ]
  },
  {
   "cat": "3 Inimesed",
-  "id": "scholar",
-  "label": "scholar",
+  "id": "stone_settler",
+  "label": "stone_settler",
   "make": [
    "p",
-   "scholar"
+   "stone_settler"
   ],
-  "file": "037_scholar.png",
+  "file": "041_stone_settler.png",
   "size": [
-   1.16,
+   0.76,
    1.66,
-   0.43
-  ]
- },
- {
-  "cat": "3 Inimesed",
-  "id": "merchant",
-  "label": "merchant",
-  "make": [
-   "p",
-   "merchant"
-  ],
-  "file": "038_merchant.png",
-  "size": [
-   1.16,
-   1.66,
-   0.43
-  ]
- },
- {
-  "cat": "3 Inimesed",
-  "id": "trainer",
-  "label": "trainer",
-  "make": [
-   "p",
-   "trainer"
-  ],
-  "file": "039_trainer.png",
-  "size": [
-   0.77,
-   1.66,
-   0.43
-  ]
- },
- {
-  "cat": "3 Inimesed",
-  "id": "shipwright",
-  "label": "shipwright",
-  "make": [
-   "p",
-   "shipwright"
-  ],
-  "file": "040_shipwright.png",
-  "size": [
-   0.85,
-   1.66,
-   0.74
+   0.35
   ]
  },
  {
@@ -622,7 +637,7 @@
    "p",
    "scout"
   ],
-  "file": "041_scout.png",
+  "file": "042_scout.png",
   "size": [
    0.59,
    2.36,
@@ -637,7 +652,7 @@
    "p",
    "militia"
   ],
-  "file": "042_militia.png",
+  "file": "043_militia.png",
   "size": [
    1.01,
    2.4,
@@ -652,7 +667,7 @@
    "p",
    "slinger"
   ],
-  "file": "043_slinger.png",
+  "file": "044_slinger.png",
   "size": [
    0.62,
    1.78,
@@ -667,7 +682,7 @@
    "p",
    "spearman"
   ],
-  "file": "044_spearman.png",
+  "file": "045_spearman.png",
   "size": [
    0.58,
    2.4,
@@ -682,7 +697,7 @@
    "p",
    "axeman"
   ],
-  "file": "045_axeman.png",
+  "file": "046_axeman.png",
   "size": [
    0.59,
    1.78,
@@ -697,7 +712,7 @@
    "p",
    "archer"
   ],
-  "file": "046_archer.png",
+  "file": "047_archer.png",
   "size": [
    0.59,
    1.86,
@@ -712,7 +727,7 @@
    "r",
    "tree"
   ],
-  "file": "047_tree.png",
+  "file": "048_tree.png",
   "size": [
    5.85,
    4.67,
@@ -727,7 +742,7 @@
    "r",
    "game"
   ],
-  "file": "048_game.png",
+  "file": "049_game.png",
   "size": [
    1.46,
    1.95,
@@ -742,7 +757,7 @@
    "r",
    "fish"
   ],
-  "file": "049_fish.png",
+  "file": "050_fish.png",
   "size": [
    1.57,
    0.52,
@@ -757,7 +772,7 @@
    "r",
    "berry"
   ],
-  "file": "050_berry.png",
+  "file": "051_berry.png",
   "size": [
    2.53,
    1.96,
@@ -772,7 +787,7 @@
    "d",
    "stone"
   ],
-  "file": "051_deposit_stone.png",
+  "file": "052_deposit_stone.png",
   "size": [
    5.22,
    2.4,
@@ -787,7 +802,7 @@
    "d",
    "ore"
   ],
-  "file": "052_deposit_ore.png",
+  "file": "053_deposit_ore.png",
   "size": [
    4.89,
    2.39,
@@ -802,7 +817,7 @@
    "d",
    "copper"
   ],
-  "file": "053_deposit_copper.png",
+  "file": "054_deposit_copper.png",
   "size": [
    4.32,
    2.17,
@@ -817,7 +832,7 @@
    "d",
    "tin"
   ],
-  "file": "054_deposit_tin.png",
+  "file": "055_deposit_tin.png",
   "size": [
    4.89,
    2.39,
@@ -832,7 +847,7 @@
    "d",
    "clay"
   ],
-  "file": "055_deposit_clay.png",
+  "file": "056_deposit_clay.png",
   "size": [
    5.34,
    0.84,
@@ -847,7 +862,7 @@
    "d",
    "gems"
   ],
-  "file": "056_deposit_gems.png",
+  "file": "057_deposit_gems.png",
   "size": [
    5.36,
    2.52,
@@ -862,7 +877,7 @@
    "d",
    "oil"
   ],
-  "file": "057_deposit_oil.png",
+  "file": "058_deposit_oil.png",
   "size": [
    4.61,
    0.99,
@@ -877,7 +892,7 @@
    "w",
    "oak"
   ],
-  "file": "058_world_oak.png",
+  "file": "059_world_oak.png",
   "size": [
    2.49,
    2.67,
@@ -892,7 +907,7 @@
    "w",
    "lime"
   ],
-  "file": "059_world_lime.png",
+  "file": "060_world_lime.png",
   "size": [
    2.24,
    2.64,
@@ -907,7 +922,7 @@
    "w",
    "birch"
   ],
-  "file": "060_world_birch.png",
+  "file": "061_world_birch.png",
   "size": [
    1.13,
    2.87,
@@ -922,7 +937,7 @@
    "w",
    "pine"
   ],
-  "file": "061_world_pine.png",
+  "file": "062_world_pine.png",
   "size": [
    1.22,
    3.05,
@@ -937,7 +952,7 @@
    "w",
    "spruce"
   ],
-  "file": "062_world_spruce.png",
+  "file": "063_world_spruce.png",
   "size": [
    1.19,
    3.05,
@@ -952,7 +967,7 @@
    "w",
    "palm"
   ],
-  "file": "063_world_palm.png",
+  "file": "064_world_palm.png",
   "size": [
    2.86,
    2.63,
@@ -967,7 +982,7 @@
    "w",
    "cactus"
   ],
-  "file": "064_world_cactus.png",
+  "file": "065_world_cactus.png",
   "size": [
    1,
    1.81,
@@ -982,7 +997,7 @@
    "w",
    "rock"
   ],
-  "file": "065_world_rock.png",
+  "file": "066_world_rock.png",
   "size": [
    2.38,
    1.26,
@@ -997,7 +1012,7 @@
    "w",
    "shrub"
   ],
-  "file": "066_world_shrub.png",
+  "file": "067_world_shrub.png",
   "size": [
    1.13,
    0.58,
@@ -1012,7 +1027,7 @@
    "s",
    1
   ],
-  "file": "067_settlement_1.png",
+  "file": "068_settlement_1.png",
   "size": [
    30.8,
    6.04,
@@ -1027,7 +1042,7 @@
    "s",
    2
   ],
-  "file": "068_settlement_2.png",
+  "file": "069_settlement_2.png",
   "size": [
    30.8,
    6.04,
@@ -1042,7 +1057,7 @@
    "s",
    3
   ],
-  "file": "069_settlement_3.png",
+  "file": "070_settlement_3.png",
   "size": [
    30.8,
    6.04,
@@ -1057,7 +1072,7 @@
    "u",
    "army"
   ],
-  "file": "070_unit_army.png",
+  "file": "071_unit_army.png",
   "size": [
    34,
    33.59,
@@ -1072,7 +1087,7 @@
    "u",
    "settler"
   ],
-  "file": "071_unit_settler.png",
+  "file": "072_unit_settler.png",
   "size": [
    34,
    39.86,
@@ -1087,7 +1102,7 @@
    "u",
    "caravan"
   ],
-  "file": "072_unit_caravan.png",
+  "file": "073_unit_caravan.png",
   "size": [
    34,
    40.02,
