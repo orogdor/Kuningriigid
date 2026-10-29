@@ -206,10 +206,14 @@ export function roadMaterial(scope='world',tile=null){
  vec3 dirt=${detail?'vec3(.39,.32,.23)':'vec3(.45,.38,.28)'}*(.86+n*.22);
  vec3 col=dirt;
  if(lvl<1.5){ // dirt track: two wheel ruts, grassy crown
-  float rut=1.0-smoothstep(.06,.20,abs(au-.48));
-  float rut2=1.0-smoothstep(.06,.20,abs(au-.62));
-  col*=1.0-(rut+rut2)*.16;
+  // V223: ruts wander slowly with the ground rather than following two ruler-straight lines.
+  float bend=(l149n(wp*.20+vec2(4.0,9.0))-.5)*.12;
+  float rut=1.0-smoothstep(.055,.18,abs(au-(.47+bend)));
+  float rut2=1.0-smoothstep(.065,.21,abs(au-(.67+bend*.6)));
+  col*=1.0-(rut+rut2)*.19;
   col=mix(col,vec3(.25,.30,.18)*(.85+nf*.25),(1.0-smoothstep(0.0,.28,au))*.45);
+  float gravelPatch=smoothstep(.64,.79,l149n(wp*.45+vec2(9.0,4.0)));
+  col=mix(col,vec3(.48,.42,.32)*(.8+nf*.25),gravelPatch*.22);
   col*=.90+.12*l149n(wp*1.65+3.1);
  }else if(lvl<2.5){ // gravel
   col=mix(vec3(.42,.38,.29),vec3(.32,.30,.25),nf)*(.88+n*.20);
@@ -225,8 +229,12 @@ export function roadMaterial(scope='world',tile=null){
   vec3 rock=lvl<3.5?mix(vec3(.36,.35,.32),vec3(.47,.45,.40),stone):mix(vec3(.44,.43,.40),vec3(.53,.51,.47),stone);
   col=mix(rock*(.9+nf*.15),vec3(.22,.21,.18),joint*.75);
  }
+ // V223: irregular damp stretches and dusty patches cross the whole road.
+ // The low-frequency pattern remains stationary in world space, including tile seams.
+ float damp=smoothstep(.58,.85,l149n(wp*.092+vec2(18.2,3.7))*.65+l149n(wp*.22+8.2)*.35);
+ col=mix(col,col*vec3(.77,.79,.80),damp*.30);
  // shoulders: trodden earth breaking into grass
- float fray=l149n(wp*1.6+vec2(12.3,4.9))*.15+l149n(wp*3.8-vec2(1.1,8.6))*.055;
+ float fray=l149n(wp*1.6+vec2(12.3,4.9))*.20+l149n(wp*3.8-vec2(1.1,8.6))*.08;
  float shoulder=smoothstep(.77+fray,1.13+fray,au);
  col=mix(col,mix(dirt,vec3(.29,.35,.23),smoothstep(1.04,1.5,au)),shoulder);
  float a=1.0-smoothstep(.94+fray,1.42+fray,au);
@@ -234,7 +242,7 @@ export function roadMaterial(scope='world',tile=null){
  a*=lvl<1.5?.86:.95;
  diffuseColor=vec4(col,a);`});
  };
- material.customProgramCacheKey=()=>'road-v216-natural-'+scope;
+ material.customProgramCacheKey=()=>'road-v223-natural-'+scope;
  return material;
 }
 
