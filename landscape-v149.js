@@ -5,7 +5,7 @@
 // Everything is procedural in the shaders (no texture downloads); geometry counts stay the same.
 import * as T from './vendor/three.module.js';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
-import {CLOUD_TIME} from './atmosphere-v158.js?v=161a';
+import {CLOUD_TIME,CLOUD_SHADE_V226,TERRAIN_BLEND_V226} from './atmosphere-v158.js?v=161a';
 
 export const LANDSCAPE_TIME={value:0};
 const tick=()=>{LANDSCAPE_TIME.value=performance.now()/1000;};
@@ -52,10 +52,12 @@ export function terrainMaterial(scope='world',tile=null){
  const map=worldMapping(scope,tile,true),detail=scope!=='world';
  material.onBeforeCompile=shader=>{
   shader.uniforms.uT158Cloud=CLOUD_TIME;
+  shader.uniforms.uT226CloudShade=CLOUD_SHADE_V226;
+  shader.uniforms.uT226TerrainBlend=TERRAIN_BLEND_V226;
   inject(shader,{map,
    vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':''),
    vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':''),
-   fragHead:'uniform float uT158Cloud;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;float t156G=0.0;':''),
+   fragHead:'uniform float uT158Cloud;uniform float uT226CloudShade;uniform float uT226TerrainBlend;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;float t156G=0.0;':''),
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);
@@ -115,8 +117,8 @@ export function terrainMaterial(scope='world',tile=null){
  // V158 drifting cloud shadows (same world-space clouds in both views)
  vec2 cw=lp*.0035+vec2(uT158Cloud*.010,uT158Cloud*.004);
  float cloud=smoothstep(.52,.78,l149n(cw)*.65+l149n(cw*2.3+4.0)*.35);
- col*=1.0-cloud*.16;
- diffuseColor.rgb=col;`});
+ col*=1.0-cloud*.16*uT226CloudShade;
+ diffuseColor.rgb=mix(diffuseColor.rgb,col,uT226TerrainBlend);`});
   shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n roughnessFactor=1.0;');
   if(detail)shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
  { // V161: relief from the analytic slope of the grass-clump pattern. The V156 screen-space

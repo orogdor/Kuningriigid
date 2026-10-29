@@ -6,6 +6,10 @@
 import * as T from './vendor/three.module.js';
 
 export const CLOUD_TIME={value:0};
+export const WIND_TIME_V226={value:0};
+export const CLOUD_SHADE_V226={value:1};
+export const TERRAIN_BLEND_V226={value:1};
+export const SEA_EFFECT_V226={value:1};
 function skyDome(top,horizon,ground){
  const geo=new T.SphereGeometry(9000,32,16);
  if(T.GPU_MODE_V225){ // V225: the same gradient sky as a node material for the WebGPU renderer
@@ -40,29 +44,53 @@ export function setupAtmosphere({renderer,worldScene,localScene,quality}){
   rigs.set(scene,{sun,hemi,fill,sky,local,extent:0});
  }
  let worldShadows=quality!=='low';
+ let settings={shadows:'medium',shadowDistance:'medium',lighting:'standard',ambient:'normal',daylight:'day',fog:'medium',sky:'enhanced',particles:'medium',wind:true};
  function update(scene,focus,zoom,dt){
   CLOUD_TIME.value+=dt||0;
+  if(settings.wind!==false)WIND_TIME_V226.value+=dt||0;
   const rig=rigs.get(scene);if(!rig)return;
   rig.sky.position.copy(focus);
-  const dir=new T.Vector3(-0.55,1.0,0.62).normalize();
-  const extent=rig.local?Math.max(60,Math.min(300,zoom*1.15)):Math.max(120,Math.min(520,zoom*.9));
+  const angle=settings.daylight==='dynamic'?CLOUD_TIME.value*.006:0;
+  const dir=settings.daylight==='evening'?new T.Vector3(-.91,.37,.3).normalize():settings.daylight==='dynamic'?new T.Vector3(Math.sin(angle)*.65-.55,.63+Math.cos(angle)*.35,.62).normalize():new T.Vector3(-.55,1.0,.62).normalize();
+  const shadowRange={near:.6,medium:1,far:1.45}[settings.shadowDistance]||1;
+  const extent=(rig.local?Math.max(60,Math.min(300,zoom*1.15)):Math.max(120,Math.min(520,zoom*.9)))*shadowRange;
   rig.sun.target.position.copy(focus);rig.sun.position.copy(focus).addScaledVector(dir,extent*2.6);
   // world map shadows only when zoomed in (cheap: only nearby chunks render into the shadow map)
-  rig.sun.castShadow=rig.local?true:(worldShadows&&zoom<480);
+  rig.sun.castShadow=settings.shadows!=='off'&&(rig.local?true:(worldShadows&&zoom<480));
   if(Math.abs(rig.extent-extent)>extent*.06){rig.extent=extent;const c=rig.sun.shadow.camera;c.left=-extent;c.right=extent;c.top=extent;c.bottom=-extent;c.near=1;c.far=extent*6;c.updateProjectionMatrix();}
  }
- function setQuality(q){worldShadows=q!=='low';for(const rig of rigs.values()){const s=q==='high'?2048:1024;if(rig.sun.shadow.mapSize.x!==s){rig.sun.shadow.mapSize.set(s,s);rig.sun.shadow.map?.dispose();rig.sun.shadow.map=null;}}}
+ function setQuality(q){quality=q;worldShadows=q!=='low';setGraphics(settings);}
+ function setGraphics(next){settings={...settings,...next};
+  CLOUD_SHADE_V226.value=settings.clouds===false?0:1;
+  TERRAIN_BLEND_V226.value=settings.terrainBlending===false?0:1;
+  SEA_EFFECT_V226.value=settings.water==='simple'?0:1;
+  const maps={off:512,low:512,medium:1024,high:2048},size=maps[settings.shadows]||1024;
+  for(const [scene,rig] of rigs){
+   const mode={classic:[1.2,2.0,.25],standard:[1.05,2.7,.32],enhanced:[1.28,2.85,.53],cinematic:[1.38,3.15,.65]}[settings.lighting]||[1.05,2.7,.32];
+   const ambient={low:.72,normal:1,bright:1.3}[settings.ambient]||1;
+   rig.hemi.intensity=mode[0]*ambient;rig.sun.intensity=mode[1];rig.fill.intensity=mode[2];
+   rig.sun.color.set(settings.daylight==='evening'?'#ffb37d':settings.lighting==='cinematic'?'#ffe8bd':'#ffe2b8');
+   if(rig.sun.shadow.mapSize.x!==size){rig.sun.shadow.mapSize.set(size,size);rig.sun.shadow.map?.dispose();rig.sun.shadow.map=null;}
+   rig.sky.visible=settings.sky!=='simple';
+   scene.background=settings.sky==='simple'?new T.Color(rig.local?'#b7c9bd':'#87aab0'):null;
+   const ranges=rig.local?[420,1150]:[2100,7600],f={near:.55,medium:.77,far:1,ultra:1.4}[settings.viewDistance]||1,k=({near:.66,medium:1,far:1.55}[settings.fog]||1)*f;
+   scene.fog=settings.fog==='off'?null:new T.Fog(rig.local?'#d3ddd5':'#b9cbc9',ranges[0]*k,ranges[1]*k);
+  }
+  const count={off:0,low:4,medium:12,high:18}[settings.particles]??12;
+  birdsW.mesh.count=Math.min(15,count);birdsL.mesh.count=Math.min(12,count);
+ }
+
  const birdsW=createBirds(15),birdsL=createBirds(12);worldScene.add(birdsW.mesh);localScene.add(birdsL.mesh);
  const updateCore=update;
  function updateAll(scene,focus,zoom,dt){updateCore(scene,focus,zoom,dt);const t=CLOUD_TIME.value;if(scene===worldScene)birdsW.update(focus,zoom,t,false);else birdsL.update(focus,zoom,t,true);}
  function setSkirt(water){if(rigsSkirt.mesh)rigsSkirt.mesh.material.color.set(water?'#4d8a8e':'#7f9560');}
- return {update:updateAll,setQuality,setSkirt};
+ return {update:updateAll,setQuality,setGraphics,setSkirt};
 }
 // Wind: plants sway with height above their base. Works for plain and instanced meshes; each
 // instance gets its own phase from its position. Shadows keep the rest pose (cheap and fine).
 export function addWind(material,{strength=.05,from=.35,key='wind'}={}){
  const prev=material.onBeforeCompile;
- material.onBeforeCompile=(shader,r)=>{prev?.call(material,shader,r);shader.uniforms.uWindT=CLOUD_TIME;
+ material.onBeforeCompile=(shader,r)=>{prev?.call(material,shader,r);shader.uniforms.uWindT=WIND_TIME_V226;
   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float uWindT;')
    .replace('#include <begin_vertex>',`#include <begin_vertex>
   {vec3 base=vec3(0.0);

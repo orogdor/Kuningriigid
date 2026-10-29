@@ -1,0 +1,16 @@
+/* V226 graphics submenu; scrolls inside the existing main-menu card. */
+#startmenu .graphics-v226{border-color:#9fae7b84;background:#10231fe8;}
+#startmenu .graphics-v226>summary{font-size:15px;color:#f2dfa9;}
+#startmenu .graphics-v226-body{padding:11px 13px 15px;max-height:min(63dvh,680px);overflow-y:auto;overscroll-behavior:contain;}
+#startmenu .graphics-v226-note{font-size:12px;line-height:1.5;color:#c0d3c6;margin:4px 0 12px;}
+#startmenu .graphics-v226-fieldset{margin:8px 0 14px;padding:10px;border:1px solid #81968869;background:#102b26;border-radius:9px;min-width:0;}
+#startmenu .graphics-v226-fieldset legend{font-size:13px;color:#e5d8ac;font-weight:750;padding:0 5px;}
+#startmenu .graphics-v226-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(115px,44%);align-items:center;gap:8px;min-height:39px;padding:5px 0;border-bottom:1px solid #ffffff13;color:#dce5d9;font-size:12px;}
+#startmenu .graphics-v226-row:last-child{border-bottom:0;}
+#startmenu .graphics-v226-row>span{line-height:1.35;}
+#startmenu .graphics-v226-row select{width:100%;min-height:36px;font:inherit;font-size:12px;color:#f5eacb;background:#26433b;border:1px solid #82988c7e;border-radius:7px;padding:6px 5px;min-width:0;}
+#startmenu .graphics-v226-actions{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr));}
+#startmenu .graphics-v226-actions button{min-height:42px;padding:7px 8px;font-size:12px;color:#f0ead3;background:#315044;border:1px solid #abbb9970;border-radius:8px;}
+#startmenu .graphics-v226-actions button:last-child:not([hidden]){grid-column:1 / -1;background:#8e713e;color:#fff4d1;}
+#startmenu .graphics-v226-actions [hidden]{display:none!important;}
+@media(max-width:460px){#startmenu .graphics-v226-row{grid-template-columns:minmax(0,1fr) minmax(110px,45%);}#startmenu .graphics-v226-body{max-height:65dvh;padding:9px 8px;}}

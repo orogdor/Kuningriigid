@@ -5,6 +5,8 @@ import {applyStoneSize} from './stone-sizes-v224.js';
 import {loadGLB} from './glb-lite-v221.js';
 
 export const STONE_NEAR_DISTANCE=100;
+let nearDistanceV226=STONE_NEAR_DISTANCE,nearHumanDistanceV226=STONE_NEAR_DISTANCE;
+export function setStoneNearDistanceV226(buildings=100,humans=100){nearDistanceV226=Math.max(25,Math.min(240,Number(buildings)||100));nearHumanDistanceV226=Math.max(25,Math.min(240,Number(humans)||100));}
 const assets=new Map(),queue=[];
 let active=0;
 function pump(){
@@ -51,7 +53,8 @@ class LazyStoneLOD extends T.LOD{
   this.getWorldPosition(this._point??=new T.Vector3());
   camera.getWorldPosition(this._eye??=new T.Vector3());
   const d=this._eye.distanceTo(this._point)/(camera.zoom||1);
-  const near=d<(this.userData.nearActive?105:STONE_NEAR_DISTANCE);
+  const limit=this.userData.stoneHumanV226?nearHumanDistanceV226:nearDistanceV226;
+  const near=d<(this.userData.nearActive?limit*1.05:limit);
   this.userData.cameraDistance=d;
   if(near&&!this.pending){
    this.pending=true;
@@ -98,7 +101,7 @@ export function withStoneBuildingLOD(low,type,size,seed=0){
 }
 
 export function withStoneHumanLOD(low){
- return new LazyStoneLOD(low,async()=>{
+ const lod=new LazyStoneLOD(low,async()=>{
   const asset=await detailedAsset('human_rigged');
   const mesh=new T.SkinnedMesh(asset.geometry,asset.material);
   // Share the animated skeleton, including its original inverse bind pose.
@@ -106,4 +109,5 @@ export function withStoneHumanLOD(low){
   mesh.bind(low.skeleton,low.bindMatrix);mesh.castShadow=true;mesh.receiveShadow=false;
   mesh.userData.stoneDetailedAsset='human_rigged';return mesh;
  });
+ lod.userData.stoneHumanV226=true;return lod;
 }

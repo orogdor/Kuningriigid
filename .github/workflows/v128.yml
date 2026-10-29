@@ -24,6 +24,12 @@ jobs:
       - name: Main game and wall syntax
         run: |
           node --check civilization.js
+          node --check graphics-settings-v226.js
+          node --check graphics-runtime-v226.js
+          node --check atmosphere-v158.js
+          node --check landscape-v149.js
+          node --check sea-v158.js
+          node --check stone-near-lod.js
           node --check civilization-core.js
           node --check ai-defenses-v128.js
           node --check outer-ring-v184.js
@@ -36,5 +42,7 @@ jobs:
         run: node scripts/test-organic-demo-v190.mjs
       - name: Defense construction priority (V188)
         run: node scripts/test-wall-priority-v188.mjs
+      - name: Graphics settings V226 unit test
+        run: node scripts/test-graphics-v226.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
