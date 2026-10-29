@@ -253,7 +253,20 @@ export function routeRoadThroughTileV182(points,tile,nav){
  const a=nav.nearest(local[first],16),b=nav.nearest(local[last],16);
  if(!a||!b)return null;
  const path=nav.route(a,b,{preferRoads:true});if(!path?.length)return null;
- const middle=path.map(p=>localToWorld(tile,p.x,p.z));
+ // V223: soften the stair-stepped A* centreline without cutting across walls
+ // or buildings. Navigation and movement paths themselves are never changed.
+ let smoothPath=path.map(p=>({x:p.x,z:p.z}));
+ for(let pass=0;pass<5;pass++){
+  const next=smoothPath.map(p=>({...p}));
+  for(let i=1;i<smoothPath.length-1;i++){
+   const prev=smoothPath[i-1],cur=smoothPath[i],after=smoothPath[i+1];
+   const candidate={x:cur.x*.50+(prev.x+after.x)*.25,z:cur.z*.50+(prev.z+after.z)*.25};
+   if(nav.open(candidate.x,candidate.z)&&nav.clear(prev,candidate)&&nav.clear(candidate,after))
+    next[i]=candidate;
+  }
+  smoothPath=next;
+ }
+ const middle=smoothPath.map(p=>localToWorld(tile,p.x,p.z));
  return [...points.slice(0,first),...middle,...points.slice(last+1)];
 }
 function adjustRibbonForNavV182(x,nav){
