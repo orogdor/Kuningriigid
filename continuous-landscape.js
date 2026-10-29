@@ -146,21 +146,54 @@ export function baseHeight(game,x,z){
 // visual=true (drawing only): where the rolling ground dips below a river's water level, the banks
 // rise gently to just above the water (natural levees), so the river sits in its bed instead of
 // floating above the land. Navigation keeps calling it without the flag (V161).
+// V223.2: river surface and its visible bank use exactly one water-level
+// function, including estuary blending. The atlas drainage heights and
+// gameplay collision data keep their original (non-visual) computation.
+export function visibleRiverHeight(game,x,z,rawHeight=null){
+ const h=rawHeight??riverNear(game,x,z).waterHeight??.86;
+ const t=smooth((game.atlasHeight(x,z)-.30)/3.7);
+ return .78+(h-.78)*t;
+}
 export function worldElevation(game,x,z,visual=false){
- let base=baseHeight(game,x,z);const {distance:d,width:w,waterHeight,fordStrength=0}=riverNear(game,x,z);
+ let base=baseHeight(game,x,z);
+ const {distance:d,width:w,waterHeight,fordStrength=0}=riverNear(game,x,z);
  if(!Number.isFinite(d))return base;
  const inner=w*1.04,outer=Math.max(inner+3.5,w*1.8+3);
- if(visual){const rim=waterHeight+.6,reach=outer+18;if(base<rim&&d<reach)base+=(rim-base)*(1-smooth((d-outer)/(reach-outer)));}
- // Incise the SAME water elevation into the terrain, even where a mountain
- // ridge crosses the river. Subtracting depth from the ridge left dry spikes.
+ if(visual&&w>.05){
+  const level=visibleRiverHeight(game,x,z,waterHeight);
+  const rim=level+.60,reach=outer+18;
+  if(base<rim&&d<reach)
+   base+=(rim-base)*(1-smooth((d-outer)/(reach-outer)));
+  // The former V161 drawing terrain was 2.2 m below the water all
+  // the way to its OUTER edge. That made a sharp airborne water slab,
+  // even though the centre of the stream was physically underwater.
+  // Keep a deep centre but taper to only 6 cm of water at the shoreline.
+  if(d<=w){
+   const depth=2.2+Math.max(0,1-d/Math.max(.1,inner))*1.4;
+   const fordDepth=depth*(1-fordStrength)+.42*fordStrength;
+   const shallowing=smooth((d-w*.30)/Math.max(.01,w*.70));
+   const visibleDepth=fordDepth*(1-shallowing)+.06*shallowing;
+   return Math.min(base,level-visibleDepth);
+  }
+  // The outside bank rises continuously from that SAME shoreline
+  // towards the raised river meadow. No hollow land below the water
+  // edge, and no detached opaque strip at a tributary or estuary.
+  if(d<outer){
+   const t=smooth((d-w)/(outer-w));
+   return (level-.06)*(1-t)+Math.max(base,level+.10)*t;
+  }
+  return base;
+ }
+ // Physical/gameplay terrain remains unchanged: saves, fords and
+ // collision calculations must not be altered by a graphical fix.
  const deep=2.2+Math.max(0,1-d/inner)*1.4;
  const depth=deep*(1-fordStrength)+.42*fordStrength;
  const bed=waterHeight-depth;
  if(d<=inner)return Math.min(base,bed);
  if(d>=outer)return base;
  return Math.min(base,bed+(base-bed)*smooth((d-inner)/(outer-inner)));
-
 }
+
 export function projectHeight(y,view){return view==='detail'?(y-.7)*DETAIL_Y:y}
 // V161: drawing-only height for detail maps. On mountain cells, ground above 10 rises 0.9 extra per
 // unit, so mountains tower over the tile instead of being flattened to 0.3x. The mask is 0 on every
