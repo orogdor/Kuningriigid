@@ -2,7 +2,7 @@
 // Visual-only citizens use existing V50 character rigs; no save-schema,
 // economy, population, pathfinding or combat changes are necessary.
 import * as T from './vendor/three.module.js';
-import {createSoldier,animateSoldier} from './visuals.js?v=222';
+import {createSoldier,animateSoldier} from './visuals.js?v=2231';
 
 // One game minute represents one village clock hour. Start new games in morning.
 export const VILLAGE_DAY_SECONDS=24*60;
