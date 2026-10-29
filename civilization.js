@@ -1,3 +1,4 @@
+import {nextStoneBuildingLOD} from './stone-next-buildings-v2234.js';
 import {loadWallV184,loadOrganicWallV190} from './wall-demo-v184.js?v=211';
 import {loadSecondWallTakeoverV205} from './second-wall-takeover-v205.js?v=205';
 import {loadRealZeroV206} from './real-zero-takeover-v206.js?v=206';
@@ -219,7 +220,8 @@ function buildingBaseV2231(tile,b){
 }
 // Only the opt-in V77 sample uses previewAge. Imported V4 sample cities
 // retain their kiviaeg showcase until the faction actually enters Bronze Age.
-function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1){if(woodFortTier===2&&['palisade','woodgate'].includes(type))return createAgeBuilding(type,team,age,2);if(type==='field')return createFieldModel();if(type==='farm')return createFarmhouseModel(age);if(type==='pasture')return createLivestockModel(age);if(['palisade','stonewall','reinforced_wall','gatehouse'].includes(type))return createBronzeCityModel(type,team,stage);if(['bronze-siege','iron-siege'].includes(s.demo)&&team===1){const m=createBronzeCityModel(type,team,stage)||createBronzeTownHouse(type,team);if(m)return m;}const v154=createTownModelV154(type,team,age,seed);if(v154)return v154;return createAgeBuilding(type,team,age)}
+function baseTownBuildingModelV2234(type,team,age,stage=0,seed=0,woodFortTier=1){if(woodFortTier===2&&['palisade','woodgate'].includes(type))return createAgeBuilding(type,team,age,2);if(type==='field')return createFieldModel();if(type==='farm')return createFarmhouseModel(age);if(type==='pasture')return createLivestockModel(age);if(['palisade','stonewall','reinforced_wall','gatehouse'].includes(type))return createBronzeCityModel(type,team,stage);if(['bronze-siege','iron-siege'].includes(s.demo)&&team===1){const m=createBronzeCityModel(type,team,stage)||createBronzeTownHouse(type,team);if(m)return m;}const v154=createTownModelV154(type,team,age,seed);if(v154)return v154;return createAgeBuilding(type,team,age)}
+function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1){return nextStoneBuildingLOD(baseTownBuildingModelV2234(type,team,age,stage,seed,woodFortTier),type,age,seed);}
 function visualBuildingAge(b){if(['bronze-siege','iron-siege'].includes(s.demo)&&b.team===1)return 1;return b.previewAge===0&&game.upgrade(b.team)===0?0:game.buildingAge(b.team,b.type)}
 function updateBuildingInfo(){
  if(!buildingInspector){
