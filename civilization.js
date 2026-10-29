@@ -1,4 +1,4 @@
-import {nextStoneBuildingLOD} from './stone-next-buildings-v2234.js?v=2235';
+import {nextStoneBuildingLOD} from './stone-next-buildings-v2234.js';
 import {loadWallV184,loadOrganicWallV190} from './wall-demo-v184.js?v=211';
 import {loadSecondWallTakeoverV205} from './second-wall-takeover-v205.js?v=205';
 import {loadRealZeroV206} from './real-zero-takeover-v206.js?v=206';

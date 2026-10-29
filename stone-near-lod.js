@@ -37,7 +37,7 @@ function detailedAsset(name){
 }
 
 // Renderer updates LODs using the active camera, including walking and preview cameras.
-export class LazyStoneLOD extends T.LOD{
+class LazyStoneLOD extends T.LOD{
  constructor(low,build){
   super();this.low=low;this.high=new T.Group();this.build=build;
   this.addLevel(this.high,0);this.addLevel(low,STONE_NEAR_DISTANCE,.05);
@@ -60,9 +60,9 @@ export class LazyStoneLOD extends T.LOD{
     // shared material used by completed buildings.
     let lowMaterial;this.low.traverse(o=>{if(o.material&&!lowMaterial)lowMaterial=o.material;});
     if(lowMaterial?.transparent&&lowMaterial.opacity<1){
-     mesh.traverse(o=>{if(!o.material)return;o.material=o.material.clone();
-      o.material.transparent=true;o.material.opacity=lowMaterial.opacity;
-      o.material.depthWrite=lowMaterial.depthWrite;o.material.color.copy(lowMaterial.color);});
+     mesh.material=mesh.material.clone();mesh.material.transparent=true;
+     mesh.material.opacity=lowMaterial.opacity;mesh.material.depthWrite=lowMaterial.depthWrite;
+     mesh.material.color.copy(lowMaterial.color);
     }
     this.high.add(mesh);this.userData.nearReady=true;
    }).catch(error=>{this.userData.nearError=String(error);console.warn('Keeping distant Stone Age model',error);});
