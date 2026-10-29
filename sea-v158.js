@@ -26,15 +26,19 @@ float sn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(sh(
  float surf=(1.0-smoothstep(0.0,1.1,d))*smoothstep(.55,.95,band)+(1.0-smoothstep(0.0,.18,d))*.8;
  sea=mix(sea,vec3(.93,.96,.94),clamp(surf,0.0,1.0)*.75);
  diffuseColor.rgb=sea;
- diffuseColor.a=mix(.55,.93,smoothstep(0.0,1.6,d))*(1.0-smoothstep(-.05,0.0,-vSeaD)*0.0);`)
+ // V223.1: only actual submerged terrain carries water. The old full
+ // opacity sea quad could remain visible on beaches and look suspended.
+ float wet=smoothstep(-.12,.20,vSeaD);
+ if(wet<.008)discard;
+ diffuseColor.a=mix(.36,.91,smoothstep(0.0,1.6,d))*wet;`)
    .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
  normal=normalize(normal+vec3(seaRipple-.5,0.0,.5-sn(vSeaP*.31+uSeaT*.2))*.22);`);
  };
- m.customProgramCacheKey=()=>'sea-v158-'+scale.toFixed(2);
+ m.customProgramCacheKey=()=>'sea-v2231-'+scale.toFixed(2);
  return m;
 }
 // Detail map sea: a plane at sea level over the 3×3 area; depth from the local ground height.
-export function createDetailSea(localGround,{halfX=380,halfZ=330,seg=110}={}){
+export function createDetailSea(localGround,{halfX=380,halfZ=330,seg=166}={}){
  const geo=new T.PlaneGeometry(halfX*2,halfZ*2,seg,Math.round(seg*halfZ/halfX));geo.rotateX(-Math.PI/2);
  const p=geo.attributes.position,depth=new Float32Array(p.count);let wet=0;
  for(let i=0;i<p.count;i++){const y=localGround(p.getX(i),p.getZ(i)),worldY=y/.30+.7;depth[i]=.72-worldY;if(depth[i]>-.5)wet++;}
