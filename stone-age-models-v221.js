@@ -5,6 +5,7 @@
 //  - peamaja (hall), maja1 + maja2 (houses), woodcuter (lumber camp), kiviraidur (quarry).
 // If the files fail to load the game keeps its earlier models (ASSETS stays null).
 import * as T from './vendor/three.module.js';
+import {animateStoneWorkerV222} from './stone-motion-v222.js';
 import {loadGLB} from './glb-lite-v221.js';
 
 const DIR='./models-v221/';
@@ -92,44 +93,7 @@ export function createStoneHuman(parent,x,z,color,kind){
   legs:[B.thigh_L,B.thigh_R],arms:[B.upperArm_L,B.upperArm_R],body:B.spine,head:B.head};
  root.userData.rig=rig;parent.add(root);return root;
 }
-const R=(b,x=0,y=0,z=0)=>b.rotation.set(x,y,z);
+// V222: same V221 model, replaced with state-blended job-specific motion.
 export function animateStoneHuman(root,time,moving=false,attack=false){
- const r=root.userData.rig,B=r.bones,t=time+r.phase;
- const action=typeof attack==='object'&&attack?attack.action:null;
- for(const k in B)B[k].rotation.set(0,0,0);
- B.hips.position.y=.50;
- const breath=Math.sin(t*1.8)*.02;
- R(B.chest,breath);R(B.head,.04*Math.sin(t*.7),.12*Math.sin(t*.45),0);
- // relaxed arms (the mesh is in an A-pose)
- R(B.upperArm_L,0,0,.06);R(B.upperArm_R,0,0,-.06);R(B.forearm_L,-.12);R(B.forearm_R,-.12);
- if(moving){
-  const p=t*7.2,s=Math.sin(p);
-  R(B.thigh_L,-s*.55);R(B.thigh_R,s*.55);
-  R(B.shin_L,Math.max(0,Math.sin(p+1.4))*.8);R(B.shin_R,Math.max(0,Math.sin(p+1.4+Math.PI))*.8);
-  R(B.foot_L,-Math.max(0,-s)*.25);R(B.foot_R,-Math.max(0,s)*.25);
-  R(B.upperArm_L,s*.45,0,.06);R(B.upperArm_R,-s*.45,0,-.06);R(B.forearm_L,-.25-Math.max(0,s)*.3);R(B.forearm_R,-.25-Math.max(0,-s)*.3);
-  R(B.spine,.06,Math.sin(p)*.06,0);B.hips.position.y=.50+Math.abs(Math.cos(p))*.012;
- }else if(action){
-  const cyc=t*2*Math.PI*.55;
-  if(['chop','mine','build','forge','hunt','train','work'].includes(action)){
-   const k=action==='build'?1.6:1,st=(Math.sin(cyc*k)+1)/2,hit=Math.pow(st,3);
-   R(B.upperArm_R,-.3-st*2.3,0,-.1);R(B.forearm_R,-.5-st*.6);R(B.upperArm_L,-.25-st*1.6,0,.15);R(B.forearm_L,-.6-st*.4);
-   R(B.spine,.12+(1-hit)*.25,.1*Math.sin(cyc),0);R(B.chest,.05);R(B.thigh_L,-.18);R(B.thigh_R,.12);R(B.shin_L,.18);
-  }else if(['gather','plant','farm'].includes(action)){
-   const sw=Math.sin(cyc*.7);R(B.spine,.55+.15*sw);R(B.chest,.2);R(B.head,-.3);
-   R(B.upperArm_L,-.7+.35*Math.sin(cyc),0,.1);R(B.upperArm_R,-.7-.35*Math.sin(cyc),0,-.1);R(B.forearm_L,-.3);R(B.forearm_R,-.3);
-   R(B.thigh_L,-.35);R(B.thigh_R,-.35);R(B.shin_L,.5);R(B.shin_R,.5);B.hips.position.y=.47;
-  }else if(action==='fishing'){
-   const c=(Math.sin(t*.8)+1)/2;R(B.upperArm_R,-1.2-c*.8);R(B.forearm_R,-.4);R(B.upperArm_L,-.6);R(B.forearm_L,-.9);R(B.spine,.08);
-  }else if(action==='water'){
-   R(B.upperArm_L,-.9+Math.sin(cyc)*.4);R(B.upperArm_R,-.9-Math.sin(cyc)*.4);R(B.forearm_L,-.6);R(B.forearm_R,-.6);R(B.spine,.15);
-  }else{
-   R(B.upperArm_L,-.7+Math.sin(cyc)*.2);R(B.upperArm_R,-.7-Math.sin(cyc)*.2);R(B.forearm_L,-.7);R(B.forearm_R,-.7);R(B.spine,.1);
-  }
- }
- if(action==='carry'){R(B.upperArm_L,-.85,0,.05);R(B.upperArm_R,-.85,0,-.05);R(B.forearm_L,-1.1);R(B.forearm_R,-1.1);}
- const ph=typeof attack==='object'&&attack?attack.phase:(attack?.4:-1);
- if(ph>=0&&ph<=1){const sw=Math.sin(ph*Math.PI);R(B.upperArm_R,-2.3+ph*2.6,0,-.2);R(B.forearm_R,-.4);R(B.spine,.1*sw,-.3+.6*ph,0);}
- if(attack?.hit)R(B.spine,-.2);
- if(r.tool)r.tool.visible=action!=='carry';
+ return animateStoneWorkerV222(root,time,moving,attack);
 }
