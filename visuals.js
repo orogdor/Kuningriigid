@@ -1,7 +1,7 @@
 import {BRONZE_KINDS,createBronzeSoldier} from './bronze-soldiers-v95.js';
 import {visualKind as militaryVisualKind} from './military-v88.js?v=117a';
 import * as T from './vendor/three.module.js';
-import {isStoneHumanKind,createStoneHuman,animateStoneHuman} from './stone-age-models-v221.js?v=2233';
+import {isStoneHumanKind,createStoneHuman,animateStoneHuman} from './stone-age-models-v221.js?v=224';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {createV50CharacterRig} from './model-runtime-v50.js';
 import {hasV148Soldier,createV148Soldier,animateV148Soldier} from './soldier-models-v148.js?v=222';

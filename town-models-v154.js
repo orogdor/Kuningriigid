@@ -5,7 +5,7 @@
 // per-vertex colour and a material channel; one shared shader adds plaster, planks, logs,
 // masonry, brick, roof tiles, thatch, slate and glass detail. Presentation only.
 import * as T from './vendor/three.module.js';
-import {stoneBuildingModel} from './stone-age-models-v221.js?v=2233';
+import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
 
 // ------------------------------------------------------------------ material
 const M={plain:0,plaster:1,boards:2,logs:3,stone:4,brick:5,tile:6,thatch:7,slate:8,glass:9,metal:10,beam:11,dirt:12,leaf:13,cloth:14};

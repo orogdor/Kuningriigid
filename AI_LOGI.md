@@ -634,3 +634,24 @@ Npm-registrit ega Blenderit tööruumis polnud, seega on tööriistad kirjutatud
 ### Edasi
 - Teised kiviaja hooned (kaev, talu, kasarm, kalamaja jne) on endised ja vajavad uusi mudeleid.
 - Naise või lapse mudelit pole: lapsed on vähendatud mees.
+
+---
+
+## V224 – kiviaja hoonete mõõdud ühest tabelist (Claude, 2026-10-29)
+
+Kasutaja: majad olid valedes mõõtudes. Ta palus mõõdud teha esimesena ja GitHubi laadida. Töö tehti V223.4 (a3f0696) peale.
+
+- Uus fail `stone-sizes-v224.js`:
+  - `STONE_SIZES[type] = {size, h}`, kus `size` on põhja pikim külg ja `h` on kõrgus, detailühikutes (1 ühik ≈ 1,05 m, inimene 1,66);
+  - `stoneScale` / `applyStoneSize` skaleerivad põhja ühtlaselt ja kõrguse eraldi, aga ainult vahemikus 0,8–1,35 mudeli loomulikust kõrgusest;
+  - maja skaala kõigub seemne järgi umbes ±5%.
+- Kasutatakse kolmes kohas: `stone-web-buildings-v2233.js` (TRELLIS-i kauged mudelid), `stone-age-models-v221.js` (pealinna kauge mudel) ja `stone-near-lod.js` (lähimudelid, mis varem skaleeriti kauge mudeli ulatuse järgi).
+- Krundid (`navigation.js` FOOTPRINTS) ja mänguloogika ei muutunud. Mõõdud on valitud nii, et need mahuvad endistele kruntidele.
+- Viga parandatud: V223.x muudatuses neelas rea lõpus olev kommentaar `stoneBuildingModel` funktsioonis `root.add(m)`, nii et pealinna kauge mudel oli tühi. See on parandatud.
+- Kauged mudelid hoonetel `barracks`, `archery`, `hunter`, `fisher`, `study` on endiselt vanad protseduurilised, seega 100 m piiril võib suurus veidi hüpata. Lähimudelid on tabeli mõõtudes.
+- Versioonid:
+  - `?v=224`: `stone-near-lod`, `stone-web-buildings-v2233`, `stone-age-models-v221`, `stone-next-buildings-v2234`, `visuals` (ka import-map), `town-models-v154`, `village-life-v76`, `farm-visuals-v127`;
+  - boot ja `civilization.js` on `?v=224`.
+- Testid:
+  - PASS: `TEST_V221`, `TEST_V154`, `test.mjs traffic`, `node --check`;
+  - `TEST_V174_STONE_BROWSER` „real building models visible“ kukub läbi ka V223.4 peal ilma minu muudatuseta. Test loeb ainult `townModelV154` mudeleid, aga V223.3 asendas need kiviaja mudelitega.

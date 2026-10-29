@@ -5,8 +5,9 @@
 //  - peamaja (hall), maja1 + maja2 (houses), woodcuter (lumber camp), kiviraidur (quarry).
 // If the files fail to load the game keeps its earlier models (ASSETS stays null).
 import * as T from './vendor/three.module.js';
-import {withStoneBuildingLOD,withStoneHumanLOD} from './stone-near-lod.js';
-import {createWebStoneBuilding} from './stone-web-buildings-v2233.js';
+import {applyStoneSize} from './stone-sizes-v224.js';
+import {withStoneBuildingLOD,withStoneHumanLOD} from './stone-near-lod.js?v=224';
+import {createWebStoneBuilding} from './stone-web-buildings-v2233.js?v=224';
 import {animateStoneWorkerV222} from './stone-motion-v222.js';
 import {loadGLB} from './glb-lite-v221.js';
 
@@ -53,7 +54,7 @@ export function stoneBuildingModel(type,age,seed=0){
  const {geo,prim,size}=buildingGeometry(def.file);
  const s=def.size/Math.max(size.x,size.z);
  const root=new T.Group(),m=new T.Mesh(geo,materialFor(def.file,prim,{side:T.DoubleSide}));
- m.scale.setScalar(s*(type==='house'?.94+((seed>>>3)%7)*.02:1));m.castShadow=true;m.receiveShadow=true;root.add(m);
+ if(!applyStoneSize(m,type,size,seed))m.scale.setScalar(s*(type==='house'?.94+((seed>>>3)%7)*.02:1));m.castShadow=true;m.receiveShadow=true;root.add(m); /* V224 real sizes */
  // V223.1: the generated quarry mesh has an unclosed rear/side opening.
  // Add recessed fractured rock cores below the visible source mesh instead of
  // a floating unsupported shell. Keep the original textured exterior intact.

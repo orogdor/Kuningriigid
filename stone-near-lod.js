@@ -1,6 +1,7 @@
 // Detailed, user-supplied Stone Age meshes are fetched only within 100 detail metres.
 // The existing distant meshes, dimensions, motion and gameplay remain unchanged.
 import * as T from './vendor/three.module.js';
+import {applyStoneSize} from './stone-sizes-v224.js';
 import {loadGLB} from './glb-lite-v221.js';
 
 export const STONE_NEAR_DISTANCE=100;
@@ -89,7 +90,7 @@ export function withStoneBuildingLOD(low,type,size,seed=0){
   }
   const g=highGeometry.get(name),extent=g.boundingBox.getSize(new T.Vector3());
   const mesh=new T.Mesh(g,asset.material);
-  mesh.scale.setScalar(size/Math.max(extent.x,extent.z)*(type==='house'?.94+((seed>>>3)%7)*.02:1));
+  if(!applyStoneSize(mesh,type,extent,seed))mesh.scale.setScalar(size/Math.max(extent.x,extent.z)*(type==='house'?.94+((seed>>>3)%7)*.02:1)); // V224 real sizes
   mesh.castShadow=true;mesh.receiveShadow=true;mesh.userData.stoneDetailedAsset=name;return mesh;
  });
  Object.assign(root.userData,low.userData);root.userData.stoneNearLOD=true;

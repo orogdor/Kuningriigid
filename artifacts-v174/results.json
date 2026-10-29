@@ -1,0 +1,14 @@
+[
+  {
+    "label": "desktop",
+    "pass": false,
+    "message": "AssertionError [ERR_ASSERTION]: desktop real building models visible\n    at file:///home/claude/orogdor/kuningriigid/TEST_V174_STONE_BROWSER.mjs:53:11",
+    "errors": []
+  },
+  {
+    "label": "mobile",
+    "pass": false,
+    "message": "AssertionError [ERR_ASSERTION]: mobile real building models visible\n    at file:///home/claude/orogdor/kuningriigid/TEST_V174_STONE_BROWSER.mjs:53:11",
+    "errors": []
+  }
+]
