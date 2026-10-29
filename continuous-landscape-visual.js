@@ -224,11 +224,30 @@ export function roadRibbonClearV175(a,b,obstacles=[],extra=0){
 }
 // Route the part of an existing strategic road inside the active tile through
 // the same walkable grid as citizens. The outer road graph is preserved.
-export function routeRoadThroughTileV182(points,tile,nav){
+export function routeRoadThroughTileV182(points,tile,nav,preferNatural=false){
  const local=points.map(p=>worldToLocal(tile,p.x,p.z));
  const inside=p=>Math.abs(p.x)<=DETAIL_HALF_X+.1&&Math.abs(p.z)<=DETAIL_HALF_Z+.1;
  const first=local.findIndex(inside),last=local.findLastIndex(inside);
  if(first<0||last<=first)return null;
+ // V223: when the hand-shaped world spline already clears the entire nav
+ // corridor, preserve it. Re-running A* unconditionally had replaced every
+ // gently curved road by orthogonal 1m-grid kinks even in empty countryside.
+ if(preferNatural){
+  let corridorClear=true,previous=null;
+  for(let i=first;i<=last;i++){
+   const p=local[i],before=local[Math.max(first,i-1)],after=local[Math.min(last,i+1)];
+   const dx=after.x-before.x,dz=after.z-before.z,len=Math.hypot(dx,dz)||1;
+   const nx=-dz/len,nz=dx/len;
+   const left={x:p.x+nx*2.35,z:p.z+nz*2.35};
+   const right={x:p.x-nx*2.35,z:p.z-nz*2.35};
+   if(!nav.open(p.x,p.z)||!nav.open(left.x,left.z)||!nav.open(right.x,right.z)||
+    (previous&&(!nav.clear(previous.p,p)||!nav.clear(previous.left,left)||!nav.clear(previous.right,right)))){
+    corridorClear=false;break;
+   }
+   previous={p,left,right};
+  }
+  if(corridorClear)return null;
+ }
  const a=nav.nearest(local[first],16),b=nav.nearest(local[last],16);
  if(!a||!b)return null;
  const path=nav.route(a,b,{preferRoads:true});if(!path?.length)return null;
@@ -266,7 +285,7 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=
  let roads=0,beds=0;
  for(const edge of roadNetwork(game)){
   if(!visible(tile,edge.points))continue;
-  const routed=nav?routeRoadThroughTileV182(edge.points,tile,nav):null;
+  const routed=nav?routeRoadThroughTileV182(edge.points,tile,nav,true):null;
   const pts=routed||(scope!=='world'&&obstacles?.length?steerAroundPlots(edge.points,tile,obstacles,detailWorldRoadWidth(edge.level)*.8+1.2):edge.points);
   if(scope!=='world'&&tile)centrelines.push(pts.map(p=>worldToLocal(tile,p.x,p.z)));
   const roadTeam=scope==='detail'?owner?.team:
