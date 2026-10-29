@@ -8,6 +8,12 @@ import * as T from './vendor/three.module.js';
 export const CLOUD_TIME={value:0};
 function skyDome(top,horizon,ground){
  const geo=new T.SphereGeometry(9000,32,16);
+ if(T.GPU_MODE_V225){ // V225: the same gradient sky as a node material for the WebGPU renderer
+  const {normalize,positionLocal,mix,uniform,pow,clamp,select}=T,p=normalize(positionLocal),h=p.y,uh=uniform(new T.Color(horizon));
+  const mat=new T.MeshBasicNodeMaterial({side:T.BackSide,depthWrite:false,fog:false});
+  mat.colorNode=select(h.greaterThan(0),mix(uh,uniform(new T.Color(top)),pow(clamp(h.mul(1.6),0,1),.7)),mix(uh,uniform(new T.Color(ground)),clamp(h.negate().mul(6),0,1)));
+  const m=new T.Mesh(geo,mat);m.frustumCulled=false;m.renderOrder=-10;m.name='v158 sky';return m;
+ }
  const mat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,uniforms:{top:{value:new T.Color(top)},horizon:{value:new T.Color(horizon)},ground:{value:new T.Color(ground)}},
   vertexShader:'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);gl_Position.z=gl_Position.w;}',
   fragmentShader:'uniform vec3 top,horizon,ground;varying vec3 vP;void main(){float h=vP.y;vec3 c=h>0.0?mix(horizon,top,pow(clamp(h*1.6,0.0,1.0),.7)):mix(horizon,ground,clamp(-h*6.0,0.0,1.0));gl_FragColor=vec4(c,1.0);\n#include <colorspace_fragment>\n}'});

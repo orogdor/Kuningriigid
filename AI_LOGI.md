@@ -655,3 +655,16 @@ Kasutaja: majad olid valedes mõõtudes. Ta palus mõõdud teha esimesena ja Git
 - Testid:
   - PASS: `TEST_V221`, `TEST_V154`, `test.mjs traffic`, `node --check`;
   - `TEST_V174_STONE_BROWSER` „real building models visible“ kukub läbi ka V223.4 peal ilma minu muudatuseta. Test loeb ainult `townModelV154` mudeleid, aga V223.3 asendas need kiviaja mudelitega.
+
+---
+
+## V225 – valikuline WebGPU-renderdaja (Claude, 2026-10-29)
+
+Kasutaja: three.js jääb nõrgaks ja ta soovis uuemat renderdajat.
+
+- `vendor/three.webgpu.js` on three.js r170 ametlik build. See on sama versioon mis `three.module.js`.
+- `vendor/three-gpu-shim.js` teeb `export *` WebGPU-buildist. Klass `WebGLRenderer` on seal tegelikult `WebGPURenderer`, mis käivitab kohe `init()`. Lipp `GPU_MODE_V225=true`.
+- `index.html`: klassikaline skript pärast põhilist importmapi lisab teise importmapi `./vendor/three.module.js` → shim, kuid ainult siis, kui `?gpu=1` või `localStorage['kingdoms-gpu']==='1'` ja `navigator.gpu` on olemas. Vaikimisi ei muutu midagi.
+- `atmosphere-v158.js`: kui `T.GPU_MODE_V225` on tõene, ehitatakse taevas `MeshBasicNodeMaterial` ja TSL-gradiendiga. Fail laaditakse importmapi kaudu `?v=225`-ga.
+- TODO TSL-i: `onBeforeCompile` failides `landscape-v149.js` (4), `landscape-material-v85.js`, `sea-v158.js`, `civilization.js:396`, `town-models-v154.js:17` ja tuul failis `atmosphere-v158.js:58`. Need ei tööta WebGPU-s.
+- Headless swiftshaderi WebGPU kaotab isegi ühe kuubiku puhul seadme („Device was destroyed“), seega automaattest siin ei tööta. WebGL-režiimis läbis TEST_V221.
