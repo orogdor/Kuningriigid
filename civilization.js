@@ -108,7 +108,7 @@ import {createMedievalDemoState,MEDIEVAL_DEMO_NAME} from './medieval-demo-v80.js
 import {createRenaissanceDemoState,RENAISSANCE_DEMO_NAME} from './renaissance-demo-v81.js?v=81a';
 import {createIndustrialDemoState,INDUSTRIAL_DEMO_NAME} from './industrial-demo-v82.js?v=82a';
 import {createBuildingInspector,describeBuilding} from './building-inspector-v82.js?v=218';
-import {createSoldier,animateSoldier,addTree} from './visuals.js?v=221';
+import {createSoldier,animateSoldier,addTree} from './visuals.js?v=222';
 import {createGroundCover} from './graphics-v46.js?v=123a';
 import {createGroundCoverV156,disposeGroundCover} from './ground-detail-v156.js?v=161a';
 import {createDetailTravellers} from './detail-travellers-v157.js?v=157a';
