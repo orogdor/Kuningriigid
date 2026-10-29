@@ -263,11 +263,18 @@ export function trailMaterial(radial=false){
    color:`
  float r=${radial?'length(vL149U-.5)*2.0':'abs(vL149U.x)'};
  float n=l149n(vL149W.xz*1.3),nf=l149n(vL149W.xz*5.0);
+ // V223: sparse stone grit, damp patches and a surviving grassy crown
+ // break up the artificial monotone of 1m-by-1m village footpath links.
  vec3 c=diffuseColor.rgb*vec3(.74,.68,.60)*(.82+n*.22+nf*.10);
- float a=1.0-smoothstep(${radial?'.45':'.55'}+n*.25,1.0,r);
- diffuseColor=vec4(c,a*.92);`});
+ float pebble=smoothstep(.78,.94,nf);
+ c=mix(c,vec3(.45,.43,.36),pebble*.17);
+ float crown=1.0-smoothstep(.06,.43,r);
+ c=mix(c,c*vec3(.88,.98,.78),crown*(.11+.20*n));
+ float a=1.0-smoothstep(${radial?'.45':'.55'}+n*.24,1.0,r);
+ a*=.78+.20*n;
+ diffuseColor=vec4(c,a*.94);`});
  };
- material.customProgramCacheKey=()=>'trail-v149-'+(radial?'r':'l');
+ material.customProgramCacheKey=()=>'trail-v223-'+(radial?'r':'l');
  return material;
 }
 
