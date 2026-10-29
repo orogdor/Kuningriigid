@@ -12,10 +12,10 @@ import {riverNear,localToWorld,getRivers,roadNetwork,surface,visualSurface,visua
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
-const elev=(game,x,z,view)=>view==='world'?surface(game,x,z,view):visualSurface(game,x,z,view);
+const elev=(game,x,z,view,tile,ground)=>view==='world'?surface(game,x,z,view):ground?ground(worldToLocal(tile,x,z).x,worldToLocal(tile,x,z).z):visualSurface(game,x,z,view);
 const vp=(game,y,view,x,z)=>view==='detail'?visualProject(game,y,x,z):projectHeight(y,view); // V161 drawing heights
 const pos=(game,x,z,y,view,tile)=>({...field(game,x,z,view,tile),y:vp(game,y,view,x,z)});
-function join(pts,game,scope,tile,kind,level=1,age=0){
+function join(pts,game,scope,tile,kind,level=1,age=0,ground=null){
  // V149: atlas roads are drawn wider so they read at map scale (centre lines are unchanged).
  const isRiver=kind==='river',wBase=isRiver?0:[0,.85,1.1,1.4,1.75][level],out=[];
  for(let i=0;i<pts.length;i++){
@@ -30,10 +30,10 @@ function join(pts,game,scope,tile,kind,level=1,age=0){
   const outerL={x:p.x+nx*outer,z:p.z+nz*outer},outerR={x:p.x-nx*outer,z:p.z-nz*outer};
   const waterHeight=Math.max(.85,baseHeight(game,p.x,p.z)-(2.4+Math.min(2.1,p.width*.20)));
   // Lateral terrain samples: no flat raised motorway over rolling dirt.
-  const lift=scope==='world'?.17:.095;
-  const innerY=isRiver?vp(game,waterHeight,scope,p.x,p.z):elev(game,p.x,p.z,scope)+lift;
-  const edgeY=v=>isRiver?innerY:elev(game,v.x,v.z,scope)+lift*.85;
-  const bankY=v=>elev(game,v.x,v.z,scope)+(scope==='world'?.04:.023);
+  const lift=scope==='world'?.12:.018;
+  const innerY=isRiver?vp(game,waterHeight,scope,p.x,p.z):elev(game,p.x,p.z,scope,tile,ground)+lift;
+  const edgeY=v=>isRiver?innerY:elev(game,v.x,v.z,scope,tile,ground)+lift*.85;
+  const bankY=v=>elev(game,v.x,v.z,scope,tile,ground)+(scope==='world'?.035:.014);
   out.push({
    m:{...field(game,p.x,p.z,scope,tile),y:innerY},
    l:{...field(game,left.x,left.z,scope,tile),y:edgeY(left)},
@@ -84,14 +84,14 @@ function riverFlow(game,x,z){
 }
 const mouthBlend=(game,x,z)=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(x,z)-.30)/3.7));return t*t*(3-2*t);};
 function visible(tile,path,radius=110){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
-export function createRiverNetwork(game,scope='world',tile=null,quality='medium'){
+export function createRiverNetwork(game,scope='world',tile=null,quality='medium',ground=null){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
  const water=[],banks=[],dryBanks=[];
  let shallowCrossings=0;
  let riverCount=0,sections=0;
  // A single clipped scalar-field mesh unions ALL tributaries. Every shared
  // grid coordinate has one height; overlapping ribbons and junction fans vanish.
- const step=2.5,cells=new Set(),nodes=new Map();
+ const step=scope==='detail'?1.75:2.5,cells=new Set(),nodes=new Map();
  for(const edge of getRivers(game)){
   if(!visible(tile,edge.points))continue;riverCount++;
   for(const p of edge.points){
@@ -118,7 +118,8 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
    // sea level and its colour fades to the shallow-sea tone, so it flows into the sea instead of stopping at the shore.
    let y=isWater?riverNear(game,p.x,p.z).waterHeight||.86:(scope==='world'?surface:visualElevation)(game,p.x,p.z)+.10;
    if(isWater){const m=mouthBlend(game,p.x,p.z);if(m<1)y=.78+(y-.78)*m;}
-   return {...field(game,p.x,p.z,scope,tile),y:vp(game,y,scope,p.x,p.z)};
+   const q=scope==='detail'&&ground&&!isWater?worldToLocal(tile,p.x,p.z):null;
+   return {...field(game,p.x,p.z,scope,tile),y:q?ground(q.x,q.z)+.012:vp(game,y,scope,p.x,p.z)};
   });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
  };
  for(const key of cells){
@@ -274,7 +275,21 @@ function adjustRibbonForNavV182(x,nav){
   for(const p of [x.l,x.r,x.ol,x.or]){p.x=x.m.x+(p.x-x.m.x)*.72;p.z=x.m.z+(p.z-x.m.z)*.72;}
  }
 }
-export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=null){
+// V223.1: render sub-metre world-space road samples so that no long
+// 18-metre detail segment can form a suspended straight chord over terrain.
+export function densifyRoadV2231(points,maxStep=.62){
+ if(points.length<2)return points;
+ const out=[points[0]];
+ for(let i=1;i<points.length;i++){
+  const a=points[i-1],b=points[i],count=Math.min(50,Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/maxStep)));
+  for(let k=1;k<=count;k++){
+   const t=k/count;
+   out.push(k===count?b:{x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t,width:a.width??b.width});
+  }
+ }
+ return out;
+}
+export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=null,ground=null){
  const group=new T.Group();group.name='V216 natural historical road network';group.userData.roadNetwork=true;
  // V149: one lit ribbon per road (soft verge | bed | soft verge) with across/along UVs; the
  // surface (ruts, gravel, cobbles, flagstones) is drawn by the road shader from the road level.
@@ -286,13 +301,14 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=
  for(const edge of roadNetwork(game)){
   if(!visible(tile,edge.points))continue;
   const routed=nav?routeRoadThroughTileV182(edge.points,tile,nav,true):null;
-  const pts=routed||(scope!=='world'&&obstacles?.length?steerAroundPlots(edge.points,tile,obstacles,detailWorldRoadWidth(edge.level)*.8+1.2):edge.points);
+  const original=routed||(scope!=='world'&&obstacles?.length?steerAroundPlots(edge.points,tile,obstacles,detailWorldRoadWidth(edge.level)*.8+1.2):edge.points);
+  const pts=densifyRoadV2231(original,scope==='detail'?.58:2.5);
   if(scope!=='world'&&tile)centrelines.push(pts.map(p=>worldToLocal(tile,p.x,p.z)));
   const roadTeam=scope==='detail'?owner?.team:
    (game.territoryOwner?.(edge.a)?.team??game.territoryOwner?.(edge.b)?.team??0);
   const roadAge=game.s.ages?.[roadTeam??0]??0;
   const surfaceLevel=roadSurfaceLevelV216(edge.level,roadAge);
-  const xs=join(pts,game,scope,tile,'road',surfaceLevel,roadAge);
+  const xs=join(pts,game,scope,tile,'road',surfaceLevel,roadAge,ground);
   if(routed)for(const x of xs)if(nav.open(x.m.x,x.m.z))adjustRibbonForNavV182(x,nav);
   let along=0,base=pos.length/3;
   for(let i=0;i<xs.length;i++){
