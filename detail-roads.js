@@ -4,7 +4,7 @@ import {buildingClearance} from './navigation.js?v=1754a';
 // World edges are projected through the local walkable navigation mesh;
 // local footpaths connect adjacent cells that have accumulated enough traffic.
 import * as T from './vendor/three.module.js';
-import {trailMaterial} from './landscape-v149.js?v=2232';
+import {trailMaterial} from './landscape-v149.js?v=2231';
 import {COLS,ROWS} from './campaign.js';
 import {roadLevel,roadStrength} from './roads.js?v=59';
 import {roadCurve,worldToDetail,segmentTouchesTile} from './landscape-shared.js?v=123a';
