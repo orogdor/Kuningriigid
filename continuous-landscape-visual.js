@@ -6,7 +6,7 @@ import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123
 // NEVER independently drawn rectangular per-tile water/road chunks.
 import * as T from './vendor/three.module.js';
 import {releaseMaterial} from './program-keep-v161.js';
-import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=223';
+import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=2231';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=162a';
 import {riverNear,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=223';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
