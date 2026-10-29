@@ -65,7 +65,7 @@ import {releaseMaterial} from './program-keep-v161.js';
 import {createWalker} from './fpv-walker-v161.js';
 import {terrainMaterial,mountainShade,smoothedOverview,trailMaterial,bakeRelief,detailGroundColor,setCultivation} from './landscape-v149.js?v=2231';
 import {createDetailBorders} from './detail-borders-v85.js?v=162a';
-import {mountainTint,createMountainOutcrops,createBridgeBuilding,crossingFrame} from './landscape-polish-v84.js?v=223';
+import {mountainTint,createMountainOutcrops,createBridgeBuilding,crossingFrame} from './landscape-polish-v84.js?v=2232';
 import {CommandVisuals} from './command-visuals.js';
 import {initializeLocalization,currentLanguage,changeLanguage,translateEstonian} from './localization.js?v=155a';
 import {visibleNow,knownEnemyCities,actionTips,cityProblems,constructionForecast,armyUnits,activeArmies} from './v51-systems.js';
