@@ -73,7 +73,7 @@ import {CameraKeys} from './map-controls.js';
 import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
-import {createDetailTrailLinks} from './detail-roads.js?v=1754a';
+import {createDetailTrailLinks} from './detail-roads.js?v=2232';
 import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=2231';
 import {surface,localSurface,localVisualSurface,worldElevation,visualElevation,visualProject,mountainMask,projectHeight as projectHeightV161,riverNear,overviewSurface,roadNetwork,worldToLocal} from './continuous-landscape.js?v=223';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=125b';
@@ -585,7 +585,21 @@ function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory
  soldierBatch??=new SoldierBatch(people);soldierBatch.update([...unitModels].filter(([key])=>key.startsWith('unit:')).map(([,model])=>model));
  const feedbackSquads=battle?.individualVersion===1?squads.filter(u=>!u.reserve).flatMap(u=>(u.men||[]).filter(m=>!m.escaped).map(m=>({...m,source:m.id,team:u.team,kind:u.kind,retreated:u.retreated,projectile:m.projectile}))):squads;const selectedFeedback=feedbackSquads.find(m=>m.source===selectedSoldierId),selectedSquadFeedback=battle&&!selectedFeedback&&selectedUnit&&!selectedUnit.retreated&&!selectedUnit.reserve?{...selectedUnit,source:'selected-squad:'+selectedUnit.source,shot:null,projectile:null,attackTime:null}:null;const visibleFeedback=selectedSquadFeedback?[...feedbackSquads,selectedSquadFeedback]:feedbackSquads;battleFeedback.update(visibleFeedback,selectedFeedback||selectedSquadFeedback||selectedUnit,battle,TROOPS);if(battle)return;if(!localTrails){localTrails=new T.InstancedMesh(new T.CircleGeometry(.85,10),trailMaterial(true),4096);localTrails.count=0;localTrails.rotation.x=0;environment.add(localTrails)}if(lastTrailTime>=0&&lastTrailNavVersion===nav.version&&s.time-lastTrailTime<(lastTrailChanges===world.trailChanges?10:2))return;lastTrailTime=s.time;lastTrailChanges=world.trailChanges;lastTrailNavVersion=nav.version;const dummy=new T.Object3D(),roadColors=['#000000','#b3a07e','#c1a781','#a49b8a','#8b9693'];let count=0;
  const spots=Object.keys(world.heat||{}).map(key=>({key:Number(key),heat:nav.roadStrength(Number(key))})).filter(e=>nav.roadLevel(e.key)>0&&nav.open(nav.point(e.key).x,nav.point(e.key).z)).sort((a,b)=>b.heat-a.heat).slice(0,4096);
- for(const{key,heat}of spots){const {x,z}=nav.point(key),level=nav.roadLevel(key);dummy.position.set(x,ground(activeTile,x,z)+.24,z);dummy.rotation.set(-Math.PI/2,0,0);dummy.scale.setScalar([.4,.82,1.06,1.26,1.5][level]);dummy.updateMatrix();localTrails.setMatrixAt(count,dummy.matrix);localTrails.setColorAt(count,new T.Color(roadColors[level]));count++}
+ // V223.2: legacy circular wear decals hovered 24 cm above the land.
+ // Flat disks are only safe on almost-flat patches; elsewhere the new
+ // tessellated path ribbons alone show the trail, with no airborne disks.
+ for(const{key,heat}of spots){
+  const {x,z}=nav.point(key),level=nav.roadLevel(key),radius=[.4,.82,1.06,1.26,1.5][level]*.85;
+  const y=ground(activeTile,x,z);
+  let flat=true;
+  for(const [dx,dz]of [[radius,0],[-radius,0],[0,radius],[0,-radius]]){
+   if(Math.abs(ground(activeTile,x+dx,z+dz)-y)>.045){flat=false;break}
+  }
+  if(!flat)continue;
+  dummy.position.set(x,y+.015,z);dummy.rotation.set(-Math.PI/2,0,0);
+  dummy.scale.setScalar([.4,.82,1.06,1.26,1.5][level]);dummy.updateMatrix();
+  localTrails.setMatrixAt(count,dummy.matrix);localTrails.setColorAt(count,new T.Color(roadColors[level]));count++;
+ }
  localTrails.count=count;localTrails.instanceMatrix.needsUpdate=true;if(localTrails.instanceColor)localTrails.instanceColor.needsUpdate=true;localTrails.computeBoundingSphere();if(localTrailLinks){environment.remove(localTrailLinks);localTrailLinks.traverse(o=>{o.geometry?.dispose();o.material?.dispose()})}localTrailLinks=createDetailTrailLinks(spots,nav,(x,z)=>ground(activeTile,x,z));environment.add(localTrailLinks);
 }
 const peacefulGarrisons=new WeakMap();
