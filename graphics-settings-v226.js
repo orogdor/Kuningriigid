@@ -3,7 +3,7 @@ export const GRAPHICS_KEY_V226='kingdoms-graphics-v226';
 export const GRAPHICS_DEFAULTS_V226=Object.freeze({
  preset:'high',renderer:'webgl',resolution:100,viewDistance:'far',
  shadows:'medium',shadowDistance:'medium',unitShadows:true,
- lighting:'standard',ambient:'normal',daylight:'day',
+ lighting:'standard',lightingEngine:'pbr',ambient:'normal',daylight:'day',
  terrainBlending:true,water:'animated',clouds:true,wind:true,fog:'medium',
  sky:'enhanced',particles:'medium',buildingDetail:'high',unitDetail:'high',
  vegetation:'medium',lod:'balanced',fpsLimit:'60',
@@ -17,6 +17,7 @@ export const GRAPHICS_PRESETS_V226={
  ultra:{lightingEngine:'physical',resolution:125,viewDistance:'ultra',shadows:'high',shadowDistance:'far',unitShadows:true,lighting:'cinematic',ambient:'bright',daylight:'dynamic',terrainBlending:true,water:'animated',clouds:true,wind:true,fog:'far',sky:'enhanced',particles:'high',buildingDetail:'high',unitDetail:'high',vegetation:'high',lod:'quality',fpsLimit:'unlimited',texture:'high',postProcessing:true,adaptiveResolution:false}
 };
 const choices={
+ lightingEngine:[['classic','Classic · Lambert'],['pbr','PBR · Standard'],['physical','PBR · Physical'],['toon','Toon · stiliseeritud']],
  preset:[['low','Low'],['medium','Medium'],['high','High'],['ultra','Ultra'],['custom','Custom']],
  renderer:[['webgl','WebGL · kindel'],['webgpu','WebGPU · katseversioon'],['auto','Auto · WebGL varuvariant']],
  resolution:[[50,'50%'],[70,'70%'],[75,'75%'],[85,'85%'],[100,'100%'],[125,'125%'],[150,'150%']],
@@ -41,7 +42,7 @@ const choices={
 };
 const groups=[
  ['Üldine',[['preset','Graafikaprofiil'],['renderer','Renderdusmootor'],['resolution','Resolutsiooniskaala'],['viewDistance','Nähtavuskaugus'],['antiAlias','Servade silumine'],['fpsLimit','FPS piirang'],['adaptiveResolution','Automaatne resolutsioon']]],
- ['Valgus ja varjud',[['lighting','Valgustussüsteem'],['ambient','Üldvalguse heledus'],['daylight','Päevaaeg / päikese liikumine'],['shadows','Varjude kvaliteet'],['shadowDistance','Varjude kaugus'],['unitShadows','Üksuste varjud']]],
+ ['Valgus ja varjud',[['lightingEngine','Valgustusmootor'],['lighting','Valguse iseloom'],['ambient','Üldvalguse heledus'],['daylight','Päevaaeg / päikese liikumine'],['shadows','Varjude kvaliteet'],['shadowDistance','Varjude kaugus'],['unitShadows','Üksuste varjud']]],
  ['Maailm ja efektid',[['terrainBlending','Maastikutüüpide üleminekud'],['water','Vee kvaliteet'],['clouds','Pilvevarjud'],['wind','Taimede tuuleliikumine'],['fog','Udu'],['sky','Taeva kvaliteet'],['particles','Osakesed ja taevaefektid']]],
  ['Detailid',[['buildingDetail','Hoonete LOD'],['unitDetail','Üksuste detailide kuvamine'],['vegetation','Taimestiku tihedus'],['lod','LOD agressiivsus'],['texture','Tekstuuride filtreerimine']]],
  ['Lisaseaded',[['postProcessing','Filmiline toonikaardistus'],['uiScale','Kasutajaliidese suurus'],['performanceOverlay','FPS ja renderdusstatistika']]]
@@ -75,7 +76,7 @@ export function buildGraphicsMenuV226(settings,onChange){
  const summary=document.createElement('summary');summary.textContent='⚙ Graafika ja jõudlus';root.append(summary);
  const body=document.createElement('div');body.className='graphics-v226-body';root.append(body);
  const description=document.createElement('p');description.className='graphics-v226-note';
- description.textContent='Valikud salvestuvad automaatselt. Automaatne profiil hindab seadet, ei tee jõudlustesti. WebGPU on katseversioon: vee, maastiku ja pilvede mõned šaderid on praegu lihtsamad.';body.append(description);
+ description.textContent='Neli valgustusmootorit muudavad hoonete ja üksuste materjalide valgusarvutust: Lambert (kiire), Standard PBR, Physical PBR ja Toon. Maastiku kohandatud shader jääb eraldi. WebGPU on katseline; 3D vea korral lülitub mäng automaatselt WebGL-i.';body.append(description);
  const controls=new Map(),dirty=new Set();
  function changed(key,value,fromPreset=false){
   if(key==='preset'&&value!=='custom'){Object.assign(settings,GRAPHICS_PRESETS_V226[value]);settings.preset=value;}
@@ -109,7 +110,7 @@ export function buildGraphicsMenuV226(settings,onChange){
  function action(text,cb){const btn=document.createElement('button');btn.type='button';btn.textContent=text;btn.onclick=cb;actions.append(btn);return btn;}
  action('Tuvasta sobiv profiil',()=>changed('preset',autoGraphicsPresetV226()));
  action('Taasta vaikimisi',()=>{Object.assign(settings,GRAPHICS_DEFAULTS_V226);saveGraphicsSettingsV226(settings);controls.forEach((c,k)=>c.value=String(settings[k]));dirty.add('renderer');dirty.add('antiAlias');restart.hidden=false;onChange?.(settings,'preset');status.textContent='Vaikesätted taastatud; renderdaja muutub pärast laadimist.';});
- const restart=action('Rakenda ja laadi mäng uuesti',()=>{try{sessionStorage.removeItem('kingdoms-gpu-error-v227')}catch{} const u=new URL(location.href);u.searchParams.delete('gpuFallback');u.searchParams.set('gpu',settings.renderer==='webgpu'?'1':'0');location.assign(u.toString());});restart.hidden=true;
+ const restart=action('Rakenda ja laadi mäng uuesti',()=>{try{sessionStorage.removeItem('kingdoms-gpu-error-v227')}catch{}const u=new URL(location.href);u.searchParams.delete('gpuFallback');u.searchParams.set('gpu',settings.renderer==='webgpu'?'1':'0');location.assign(u.toString());});restart.hidden=true;
  body.append(actions);
  const status=document.createElement('p');status.className='graphics-v226-note';status.setAttribute('role','status');status.textContent='Muutused rakenduvad kohe, välja arvatud renderdaja ja MSAA.';body.append(status);
  anchor.insertAdjacentElement('afterend',root);
