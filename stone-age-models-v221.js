@@ -53,13 +53,12 @@ export function stoneBuildingModel(type,age,seed=0){
  // Add recessed fractured rock cores below the visible source mesh instead of
  // a floating unsupported shell. Keep the original textured exterior intact.
  if(type==='quarry'){
-  // Share geometry/material across all quarries to avoid GPU churn on mobile.
-  if(!MATERIALS.has('quarry-core'))MATERIALS.set('quarry-core',
-   new T.MeshStandardMaterial({color:'#746b5d',roughness:1,metalness:0,side:T.DoubleSide}));
+  // Share geometry and the ORIGINAL quarry GLB texture: plain brown
+  // placeholder backfill looked like a smooth clay blob next to the rock.
   if(!GEO.has('quarry-core-geo'))GEO.set('quarry-core-geo',new T.DodecahedronGeometry(1,1));
-  const stone=MATERIALS.get('quarry-core'),rockGeo=GEO.get('quarry-core-geo');
+  const stone=materialFor(def.file,prim,{side:T.DoubleSide}),rockGeo=GEO.get('quarry-core-geo');
   for(const [x,y,z,rx,ry,rz] of [
-   [0,.95,.35,3.24,1.03,2.14],[-2.20,.68,-.30,1.12,.70,1.30],[2.16,.82,-.10,1.04,.88,1.18]
+   [0,.93,.42,2.62,.96,1.95],[-2.10,.66,.02,1.04,.78,1.18],[2.06,.78,.04,1.03,.81,1.12]
   ]){
    const boulder=new T.Mesh(rockGeo,stone);
    boulder.position.set(x,y,z);boulder.scale.set(rx,ry,rz);
