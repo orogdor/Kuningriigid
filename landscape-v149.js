@@ -59,8 +59,11 @@ export function terrainMaterial(scope='world',tile=null){
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);
- float nBroad=l149f(lp*.018),nMid=l149n(lp*.13),nFine=l149n(lp*${detail?'2.4':'.55'});
- vec3 land=diffuseColor.rgb*(.90+nBroad*.12+nMid*.07+nFine*.05);
+ float nBroad=l149f(lp*.018),nMid=l149n(lp*.13),nFine=l149n(lp*${detail?'1.05':'.55'});
+ vec3 land=diffuseColor.rgb*(.87+nBroad*.09+nMid*.04+nFine*.016);
+ // V223.1: subtle broad organic soil variation, no high-contrast chequered vertex patches.
+ float earth=smoothstep(.62,.84,l149n(lp*.065+vec2(5.2,2.8))*.64+l149n(lp*.19+8.7)*.36);
+ land=mix(land,land*vec3(.79,.72,.59),earth*.26);
  // above ~70 m the grass thins into yellow-grey alpine turf
  float alpine=smoothstep(70.0,105.0,elev+nBroad*18.0);
  land=mix(land,land*vec3(.86,.90,.72)+vec3(.02,.025,.0),alpine*.6);
@@ -77,9 +80,9 @@ export function terrainMaterial(scope='world',tile=null){
  vec2 q=vL156L;
  float aa=1.0-smoothstep(.35,1.1,(fwidth(q.x)+fwidth(q.y))*1.4);
  float cl=l149n(q*.55),cl2=l149n(q*1.7+4.0);
- land*=1.0+((cl-.5)*.30+(cl2-.5)*.22*aa)*grassy;
+ land*=1.0+((cl-.5)*.12+(cl2-.5)*.08*aa)*grassy;
  float bl=l149n(q*3.1+1.7)*.55+l149n(q*7.3+5.2)*.45;
- land*=1.0+(bl-.5)*.30*grassy*aa;
+ land*=1.0+(bl-.5)*.13*grassy*aa;
  float tuft=smoothstep(.55,.75,l149n(q*2.2+9.0));land=mix(land,land*vec3(.80,.95,.70),tuft*grassy*aa*.35);
  float soil=smoothstep(.80,.90,l149n(q*.048+11.0)*.75+l149n(q*.11+2.0)*.25+(l149n(q*.6)-.5)*.22);
  vec3 soilC=mix(land,vec3(.40,.32,.22),.75)*(.85+l149n(q*2.3)*.28);
@@ -127,7 +130,7 @@ export function terrainMaterial(scope='world',tile=null){
   normal=normalize(normal-(g.x*tX+g.y*tZ)*.45*t156G);
  }`);
  };
- material.customProgramCacheKey=()=>'terrain-v149-v161-'+scope;
+ material.customProgramCacheKey=()=>'terrain-v2231-'+scope;
  return material;
 }
 // Vertex tint for mountain cells (called by the terrain builder): forested lower slopes give way
@@ -352,9 +355,9 @@ export function farmlandTint(game,cell,x,z,color,strength=.34){
 // V161: ONE ground palette for both maps (world map and detail map read the same colour for the
 // same place). Temperate land keeps the detail-map tones; climate biomes (steppe, desert, taiga,
 // tundra, jungle, mesa, snow) get their own tone on both maps.
-const GROUND={grassland:'#92a365',lush_river:'#86a35e',steppe:'#98a463',forest:'#56774c',jungle:'#4b7245',
- taiga:'#5f7457',tundra:'#9aa18a',desert:'#c6b17c',mesa:'#a4876a',snow:'#dfe2d9',mountain:'#7d8274',snow_mountain:'#8b928a'};
-const WOODED={grassland:'#56774c',lush_river:'#56774c',steppe:'#62794e',desert:'#b3a873',tundra:'#7f8a72',taiga:'#4f6a4f',jungle:'#3f6a40'};
+const GROUND={grassland:'#768d55',lush_river:'#718f52',steppe:'#8b9561',forest:'#4b6945',jungle:'#426640',
+ taiga:'#53694c',tundra:'#8e9780',desert:'#b9a573',mesa:'#978067',snow:'#dfe2d9',mountain:'#737b6c',snow_mountain:'#8b928a'};
+const WOODED={grassland:'#4c6946',lush_river:'#4d7046',steppe:'#596f48',desert:'#a59a6d',tundra:'#78836b',taiga:'#475e47',jungle:'#375f39'};
 export function groundBaseColor(cell,out=new T.Color()){
  if(!cell?.land)return out.set('#92a365');
  const vb=cell.visualBiome||(cell.mountain?(cell.h>38?'snow_mountain':'mountain'):cell.biome==='forest'?'forest':'grassland');
@@ -365,7 +368,7 @@ export function groundBaseColor(cell,out=new T.Color()){
  return out.set(GROUND[vb]||GROUND.grassland);
 }
 const detailBase=(cell,out)=>groundBaseColor(cell,out);
-const D_WATER=new T.Color('#8b9c91'),D_SAND=new T.Color('#dbcba0'),D_HIGH=new T.Color('#77856d'),D_ROCK=new T.Color('#8a9188');
+const D_WATER=new T.Color('#799489'),D_SAND=new T.Color('#c4b38b'),D_HIGH=new T.Color('#697964'),D_ROCK=new T.Color('#7c847b');
 export function detailGroundColor(game,wx,wz,h,mountainHere){
  const color=smoothBiomeColor(game,wx,wz,'ground',detailBase);
  if(h<-.15)return color.copy(D_WATER);
