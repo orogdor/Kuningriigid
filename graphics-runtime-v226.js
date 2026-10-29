@@ -4,6 +4,31 @@ import {graphicsNearDistanceV226} from './graphics-settings-v226.js';
 import {setStoneNearDistanceV226} from './stone-near-lod.js';
 export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,localScene,people,getQuality,getAdaptiveScale}){
  const originals=new WeakMap(),originalMaterials=new WeakMap(),convertedMaterials=new WeakMap();
+ const gpuFallbackMaterials=new WeakMap();
+ // WebGPU r170 cannot compile legacy ShaderMaterial/RawShaderMaterial GLSL.
+ // Keep 3D geometries visible with conservative native material stand-ins.
+ function prepareGPUScene(scene){
+  scene.traverse(o=>{
+   if(!o.isMesh&&!o.isSkinnedMesh&&!o.isInstancedMesh)return;
+   function safe(m){
+    if(!m?.isShaderMaterial&&!m?.isRawShaderMaterial)return m;
+    if(gpuFallbackMaterials.has(m))return gpuFallbackMaterials.get(m);
+    const tex=m.uniforms?.map?.value;
+    const name=(o.name||'').toLowerCase();
+    const color=/sea|water|ocean|river/.test(name)?'#377b88':
+      /sky|cloud/.test(name)?'#8fb9cf':'#b0af99';
+    const replacement=new T.MeshBasicMaterial({color,side:m.side,
+     transparent:m.transparent,opacity:m.opacity,depthWrite:m.depthWrite,
+     vertexColors:!!o.geometry?.attributes?.color,map:tex?.isTexture?tex:null,
+     fog:m.fog!==false});
+    replacement.name='WebGPU legacy GLSL fallback';
+    gpuFallbackMaterials.set(m,replacement);
+    return replacement;
+   }
+   if(Array.isArray(o.material))o.material=o.material.map(safe);
+   else o.material=safe(o.material);
+  });
+ }
  let pendingGPU=false,gpuSuccessfulFrames=0;
  let lastDraw=0,lastStats=performance.now(),frames=0,lastPeople=0,overlay=null;
  function pixelRatio(){return Math.min(3,Math.min(devicePixelRatio||1,2)*(settings.resolution/100)*(getAdaptiveScale?.()||1));}
@@ -96,6 +121,7 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
     window.KINGDOMS_WEBGPU_RECOVER_V227?.('WebGPU: async render puudub');return;
    }
    pendingGPU=true;
+   prepareGPUScene(scene);
    Promise.resolve(renderer.readyV225).then(()=>renderer.renderAsync(scene,camera)).then(()=>{
     pendingGPU=false;gpuSuccessfulFrames++;afterRender(now);
     // A frame submission with no draw calls cannot display the 3D world.
