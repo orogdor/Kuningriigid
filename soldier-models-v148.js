@@ -4,6 +4,7 @@
 // The rig keeps the fields the rest of the game already uses (body, head, arms, legs, horseLegs)
 // so nothing outside the soldier visuals has to change.
 import * as T from './vendor/three.module.js';
+import {enhanceStoneWarriorV222} from './stone-motion-v222.js';
 
 const MAGIC = 0x3156534B;
 let quality = 'medium';
@@ -194,4 +195,6 @@ export function animateV148Soldier(root, time, moving = false, attack = false) {
     if (pose) { sample(pose, 0, layerFrame); apply(r, layerFrame, UPPER, Math.min(1, (attack.formed - .4) / .4)); }
   }
   if (attack && typeof attack === 'object' && attack.hit && clips.hit) { sample(clips.hit, .08, layerFrame); apply(r, layerFrame, UPPER, .8); }
+  // V222: distinct spear, axe, sling and bow motion layered over the existing V148 clips.
+  enhanceStoneWarriorV222(root, time, moving, attack);
 }
