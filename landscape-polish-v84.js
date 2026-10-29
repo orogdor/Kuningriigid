@@ -1,6 +1,6 @@
 // V84 visual dressing shares the exact atlas/detail projection and saved rivers.
 import * as T from './vendor/three.module.js';
-import {getRivers,riverNear,surface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=2232';
+import {getRivers,riverNear,visibleRiverHeight,surface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=2232';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
 const templates=new Map(),crossingMaps=new WeakMap(),crossingCatalogs=new WeakMap();
@@ -55,7 +55,7 @@ export function crossingFrame(game,cell,scope='world',tile=null,height=null){
  const left={x:a.x+nx*halfSpan,z:a.z+nz*halfSpan},right={x:a.x-nx*halfSpan,z:a.z-nz*halfSpan};
  const ford=!cell.bridge,LH=(scope==='world'?surface:visualElevation)(game,left.x,left.z),RH=(scope==='world'?surface:visualElevation)(game,right.x,right.z);
  // The ford stones lie on the shallow channel floor, not above a deep-water surface.
- const riverLevel=riverNear(game,a.x,a.z).waterHeight;
+ const riverLevel=visibleRiverHeight(game,a.x,a.z);
  const worldBase=ford?riverLevel-.13:(LH+RH)/2;let rise=ford?0:LH-RH;
  let p=scope==='world'?{x:a.x,z:a.z}:worldToLocal(tile,a.x,a.z),y=scope==='world'?worldBase:visualProject(game,worldBase,a.x,a.z);
  if(scope!=='world'&&height){const L=worldToLocal(tile,left.x,left.z),R=worldToLocal(tile,right.x,right.z);const lh=height(L.x,L.z),rh=height(R.x,R.z);y=ford?visualProject(game,worldBase,a.x,a.z):(lh+rh)/2;rise=ford?0:(lh-rh)/.30}
