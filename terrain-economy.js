@@ -16,7 +16,8 @@ export function terrainYields(game,point){
  if(forest){bonus('lumber',.25);bonus('forester',.20);bonus('saw',.18)}
  if(hills&&cell.deposits?.stone)bonus('quarry',.25);
  if(hills&&cell.deposits?.ore)bonus('mine',.20);
- if(cell.deposits?.grain){bonus('farm',(cell.biome==='plains'?.18:0)+(river?.15:0))}
+ // Fertile soil affects yield, never permission to build a field.
+ if(cell.deposits?.grain){bonus('farm',.20+(cell.biome==='plains'?.18:0)+(river?.15:0))}
  if(river&&cell.deposits?.water)bonus('well',.20);
  if(coast&&cell.deposits?.fish)bonus('fisher',.22);
  return a;

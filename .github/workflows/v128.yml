@@ -47,5 +47,7 @@ jobs:
         run: node scripts/test-wall-priority-v188.mjs
       - name: Graphics settings V226 unit test
         run: node scripts/test-graphics-v226.mjs
+      - name: V233 farm and Stone Age far LOD regression
+        run: node scripts/test-farming-lod-v233.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
