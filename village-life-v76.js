@@ -2,6 +2,7 @@
 // Visual-only citizens use existing V50 character rigs; no save-schema,
 // economy, population, pathfinding or combat changes are necessary.
 import * as T from './vendor/three.module.js';
+import {createStoneLoad} from './stone-equipment-v234.js';
 import {createSoldier,animateSoldier} from './visuals.js?v=224';
 
 // One game minute represents one village clock hour. Start new games in morning.
@@ -91,7 +92,10 @@ function makePerson(group,site,index,ground){
  person.userData.villagePerson=true;person.userData.role=role;person.userData.site=site.id;
  const figure=createSoldier(person,0,0,role==='guard'?'#a9875d':role==='child'?'#c5a87d':'#a8b38b',site.stone?(role==='guard'?'stone_hunter':'stone_villager'):(role==='guard'?'spearman':'villager')); // V221 Stone Age villagers
  dress(figure,role);
- const basket=mesh('basket',person,.4,1,.32);basket.visible=false;
+ const basket=createStoneLoad('basket');basket.visible=false;
+ const hand=site.stone?figure.userData.rig?.bones?.hand_L:null;
+ if(hand){basket.position.set(0,-.04,.04);hand.add(basket);}
+ else{basket.position.set(.36,1,.32);person.add(basket);}
  const p=home(index);person.position.set(p.x,ground(p.x,p.z),p.z);group.add(person);
  return {index,role,person,figure,basket,x:p.x,z:p.z,activity:'home',moving:false};
 }
