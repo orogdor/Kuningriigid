@@ -6,7 +6,7 @@ import {createStoneLoad} from './stone-equipment-v234.js';
 import {createSoldier,animateSoldier} from './visuals.js';
 import {worldTravelSample} from './map-units.js?v=59';
 import {center} from './campaign.js';
-import {scoutSectorPositionV236,blendScoutPositionV236} from './scout-sector-v236.js';
+import {scoutDetailPositionV240,blendScoutPositionV236} from './scout-sector-v236.js';
 import {attachScoutMarkerV238,sizeScoutMarkerV238} from './scout-marker-v238.js';
 
 const TEAM=['#c0ac79','#b98362','#9b88bb','#c2a55c'],FLAG=['#4a7288','#ac5945','#7d5fb0','#c09a2e'];
@@ -51,7 +51,7 @@ export function createDetailTravellers(group){
  function sync({state,game,tile,worldToLocal,ground,age,visible,time,dt,zoom=150,showNames=true,camera=null,firstPerson=false}){
   const live=new Set();
   const consider=(key,entity,kind,team)=>{
-   const pose=worldTravelSample(entity),p=kind==='scout'?scoutSectorPositionV236(pose,tile):worldToLocal(tile,pose.x,pose.z);
+   const pose=worldTravelSample(entity),p=kind==='scout'?scoutDetailPositionV240(pose,tile):worldToLocal(tile,pose.x,pose.z);
    if(Math.abs(p.x)>330||Math.abs(p.z)>285)return;
    if(kind==='boat'&&ground(p.x,p.z)>-.05)return;   // boats only on water
    if(kind!=='boat'&&ground(p.x,p.z)<-.15)return;
