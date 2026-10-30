@@ -1,4 +1,5 @@
 import * as T from './vendor/three.module.js';
+import {createNatureResourceV229} from './nature-visuals-v229.js';
 import {farmhouseGeometry,fieldGeometry,meshV158} from './town-models-v154.js?v=224';
 const mats=new Map();
 const mat=color=>{if(!mats.has(color))mats.set(color,new T.MeshStandardMaterial({color,roughness:.92}));return mats.get(color)};
@@ -22,12 +23,12 @@ export function createLivestockModel(age=0){
  const g=createFarmhouseModel(age);g.scale.set(.75,.75,.75);
  for(const z of [-5,5]){box(g,0,.8,z,12,.12,.12,'#93724b');for(const x of [-6,-3,0,3,6])box(g,x,.6,z,.15,1.2,.15,'#79613e');}
  for(const x of [-6,6])box(g,x,.8,0,.12,.12,10,'#93724b');
- for(const x of [-3,3]){box(g,x,.8,3,1.9,1.1,.8,'#967451');box(g,x+.9,1,3,.6,.7,.6,'#c1a57a');for(const dx of [-.6,.6])for(const dz of [-.25,.25])box(g,x+dx,.25,3+dz,.16,.6,.16,'#72533a');}
+ for(const x of [-3,3]){const ox=createNatureResourceV229('ox');ox.position.set(x,0,3);g.add(ox);}
  return g;
 }
 export function updateFarmEquipment(model,kind){
  if(model.userData.farmEquipmentKind===kind)return;
- const old=model.userData.farmEquipment;if(old){model.remove(old);old.traverse(o=>o.geometry?.dispose());}
+ const old=model.userData.farmEquipment;if(old){model.remove(old);old.traverse(o=>{if(!o.geometry?.userData.shared)o.geometry?.dispose()});}
  const g=new T.Group();
  if(kind==='hand'){box(g,.65,.65,-.6,.08,1.4,.08,'#97734c');box(g,.65,.12,-.6,.5,.12,.25,'#8d8b79');}
  else if(kind==='tractor'){
@@ -36,7 +37,7 @@ export function updateFarmEquipment(model,kind){
   box(g,0,.2,-1.5,3,.2,1,'#858a82');
  }else{
   // Traction animals and a trailing implement, kept outside the human mesh.
-  for(const x of [-.75,.75]){box(g,x,.9,2, .65,.9,1.7,kind==='heavy_plough'||kind==='reaper'?'#79604b':'#a48a65');box(g,x,1.2,3,.5,.6,.6,'#947653');for(const dx of [-.2,.2])for(const dz of [-.5,.5])box(g,x+dx,.35,2+dz,.12,.7,.12,'#66503c');}
+  for(const x of [-.75,.75]){const ox=createNatureResourceV229('ox');ox.position.set(x,0,2);ox.rotation.y=-Math.PI/2;ox.scale.setScalar(.85);g.add(ox);}
   box(g,0,.8,1.5,2.3,.12,.16,'#9c7b4e');box(g,0,.3,-.7,kind==='reaper'?3:1,.18,1.7,kind==='ox_plough'?'#8e704a':'#898a7c');
  }
  model.add(g);model.userData.farmEquipment=g;model.userData.farmEquipmentKind=kind;

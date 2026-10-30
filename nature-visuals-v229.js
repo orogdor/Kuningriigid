@@ -24,10 +24,10 @@ function combine(parts){const group=new T.Group();for(const [name,geos] of Objec
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setAttribute('normal',new T.Float32BufferAttribute(normals,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.computeBoundingSphere();g.userData.shared=true;
  const mesh=new T.Mesh(g,material(name));mesh.castShadow=name!=='leaf'&&name!=='berry';mesh.receiveShadow=true;group.add(mesh);
  }return group;}
-function deer(){
+function deer(ox=false){
  const p={};
  // The body is approximately 1.2 m long; legs reach the ground and the head faces +X.
- sphere(p,'fur',[0,.89,0],[.63,.34,.25]);sphere(p,'fur',[-.43,.84,0],[.29,.31,.25]);
+ sphere(p,'fur',[0,.89,0],ox?[.72,.43,.34]:[.63,.34,.25]);sphere(p,'fur',[-.43,.84,0],ox?[.33,.38,.32]:[.29,.31,.25]);
  sphere(p,'light',[.02,.72,0],[.48,.15,.23]);
  sphere(p,'fur',[.45,1.12,0],[.22,.36,.19],[0,0,-.36]);
  sphere(p,'fur',[.64,1.39,0],[.24,.17,.15],[0,0,-.12]);
@@ -41,10 +41,11 @@ function deer(){
   sphere(p,'fur',[.53,1.53,z*.75],[.13,.055,.055],[z<0?-.25:.25,0,z<0?-.55:.55]);
   sphere(p,'light',[.55,1.54,z*.82],[.09,.025,.03],[0,0,z<0?-.5:.5]);
   sphere(p,'eye',[.72,1.43,z*.78],[.023,.025,.018]);
-  const a=[.56,1.51,z*.7],b=[.53,1.78,z*1.3],c=[.44,1.94,z*1.7];
-  rod(p,'antler',a,b,.028,.022);rod(p,'antler',b,c,.022,.012);
-  rod(p,'antler',[.52,1.75,z*1.25],[.69,1.88,z*1.6],.018,.006);
-  rod(p,'antler',[.47,1.86,z*1.55],[.52,2.02,z*1.8],.014,.004);
+  if(ox){rod(p,'antler',[.55,1.51,z*.7],[.53,1.58,z*1.9],.045,.025);rod(p,'antler',[.53,1.58,z*1.9],[.56,1.69,z*2.35],.025,.005);}
+  else{const a=[.56,1.51,z*.7],b=[.53,1.78,z*1.3],c=[.44,1.94,z*1.7];
+   rod(p,'antler',a,b,.028,.022);rod(p,'antler',b,c,.022,.012);
+   rod(p,'antler',[.52,1.75,z*1.25],[.69,1.88,z*1.6],.018,.006);
+   rod(p,'antler',[.47,1.86,z*1.55],[.52,2.02,z*1.8],.014,.004);}
  }
  return combine(p);
 }
@@ -66,6 +67,6 @@ function berryBush(){
 }
 function fish(){const p={};sphere(p,'fish',[0,.19,0],[.48,.16,.13]);sphere(p,'dark',[.38,.23,.105],[.018,.018,.015]);const tail=new T.ConeGeometry(.19,.28,4);add(p,'fish',tail,[-.48,.19,0],[1,1,.35],[0,0,-Math.PI/2]);return combine(p);}
 export function createNatureResourceV229(kind){
- if(!templates.has(kind))templates.set(kind,kind==='game'?deer():kind==='berry'?berryBush():fish());
+ if(!templates.has(kind))templates.set(kind,kind==='game'?deer():kind==='ox'?deer(true):kind==='berry'?berryBush():fish());
  const g=templates.get(kind).clone(true);g.userData.natureV229=kind;return g;
 }
