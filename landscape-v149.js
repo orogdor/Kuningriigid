@@ -84,6 +84,9 @@ export function terrainMaterial(scope='world',tile=null){
  float cl=l149n(q*.55),cl2=l149n(q*1.7+4.0);
  land*=1.0+((cl-.5)*.12+(cl2-.5)*.08*aa)*grassy;
  float bl=l149n(q*3.1+1.7)*.55+l149n(q*7.3+5.2)*.45;
+ // Fine organic mottling evokes soil and tangled meadow cover at walking height.
+ float organic=l149f(q*.72+vec2(17.0,3.0));
+ land=mix(land,land*vec3(.73,.68,.54),smoothstep(.54,.83,organic)*grassy*.20);
  land*=1.0+(bl-.5)*.13*grassy*aa;
  float tuft=smoothstep(.55,.75,l149n(q*2.2+9.0));land=mix(land,land*vec3(.80,.95,.70),tuft*grassy*aa*.35);
  float soil=smoothstep(.80,.90,l149n(q*.048+11.0)*.75+l149n(q*.11+2.0)*.25+(l149n(q*.6)-.5)*.22);
@@ -132,7 +135,7 @@ export function terrainMaterial(scope='world',tile=null){
   normal=normalize(normal-(g.x*tX+g.y*tZ)*.45*t156G);
  }`);
  };
- material.customProgramCacheKey=()=>'terrain-v2231-'+scope;
+ material.customProgramCacheKey=()=>'terrain-v229-'+scope;
  return material;
 }
 // Vertex tint for mountain cells (called by the terrain builder): forested lower slopes give way
@@ -370,13 +373,15 @@ export function groundBaseColor(cell,out=new T.Color()){
  return out.set(GROUND[vb]||GROUND.grassland);
 }
 const detailBase=(cell,out)=>groundBaseColor(cell,out);
-const D_WATER=new T.Color('#799489'),D_SAND=new T.Color('#c4b38b'),D_HIGH=new T.Color('#697964'),D_ROCK=new T.Color('#7c847b');
+const D_WATER=new T.Color('#799489'),D_SAND=new T.Color('#b2a17c'),D_HIGH=new T.Color('#697964'),D_ROCK=new T.Color('#7c847b'),D_EARTH=new T.Color('#48553a');
 export function detailGroundColor(game,wx,wz,h,mountainHere){
  const color=smoothBiomeColor(game,wx,wz,'ground',detailBase);
  if(h<-.15)return color.copy(D_WATER);
  if(h<.65)return color.copy(D_SAND);
  if(mountainHere&&h>12)color.lerp(D_ROCK,Math.min(1,(h-12)/10)*.6);
  else if(h>8)color.lerp(D_HIGH,Math.min(1,(h-8)/4)*.7);
+ // Mute the bright green lowlands while retaining each biome's own colour.
+ if(!mountainHere&&h<8)color.lerp(D_EARTH,.24).multiplyScalar(.87);
  return color;
 }
 

@@ -2,6 +2,7 @@
 // The models are generated as real Three.js geometry: no flat image impostors.
 import * as T from './vendor/three.module.js';
 import {DETAIL_TILE_X,DETAIL_TILE_Z} from './detail-scale-v123.js';
+import {grassGeo as naturalGrassGeometryV229} from './ground-detail-v156.js?v=229';
 const geoCache=new Map(),matCache=new Map(),accentCache=new Map();
 function geo(k,fn){if(!geoCache.has(k)){const g=fn();g.userData.shared=true;geoCache.set(k,g)}return geoCache.get(k)}
 function mat(c,metal=false){const k=c+metal;if(!matCache.has(k))matCache.set(k,new T.MeshStandardMaterial({color:c,roughness:metal?.43:.94,metalness:metal?.35:0}));return matCache.get(k)}
@@ -24,14 +25,14 @@ export function createArchitecturalDetails(type,team,age){const key=type+':'+tea
  if(age===0&&type!=='bridge'){for(let x of [-2.45,2.45]){add(g,'barrel','#76513a',x,.42,1.3,.11,.84,.11);add(g,'cone','#e5a350',x,.97,1.3,.15,.42,.15)}}
  accentCache.set(key,template)}return template.clone(true)}
 // One draw call per ground-cover type. Placement is deterministic per tile and seed.
-const grassGeo=geo('grassV46',()=>{const g=new T.BufferGeometry();const p=[];for(let k=0;k<3;k++){const a=k*Math.PI/3,dx=Math.cos(a)*.24,dz=Math.sin(a)*.24;p.push(-dx,0,-dz,dx,0,dz,0,.9,0)}g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.computeVertexNormals();return g});
+const grassGeo=geo('grassV229',()=>naturalGrassGeometryV229('short'));
 const pebbleGeo=geo('pebbleV46',()=>new T.DodecahedronGeometry(1,0));
 function hash(x,y,seed){const v=Math.sin(x*127.13+y*311.71+seed*37.1)*43758.5453;return v-Math.floor(v)}
 export function createGroundCover(tile,height,quality='medium'){
  const group=new T.Group();if(!tile.land)return group;const isWoodland=tile.biome==='forest',isHills=tile.mountain||tile.biome==='hills',base=(tile.c*193+tile.r*337)%20000;
- const n=quality==='low'?85:quality==='high'?430:250,grass=new T.InstancedMesh(grassGeo,new T.MeshStandardMaterial({color:'#c5d2a7',side:T.DoubleSide,roughness:1}),n),dummy=new T.Object3D();grass.frustumCulled=true;grass.userData.groundCoverV46=true;
+ const n=quality==='low'?85:quality==='high'?430:250,grass=new T.InstancedMesh(grassGeo,new T.MeshStandardMaterial({color:'#ffffff',vertexColors:true,side:T.DoubleSide,roughness:1}),n),dummy=new T.Object3D();grass.frustumCulled=true;grass.userData.groundCoverV46=true;
  const tint=['#486f44','#5d8046','#79904e','#a1a66c','#8b9157'];
- for(let i=0;i<n;i++){const x=(hash(i,base,10)-.5)*(DETAIL_TILE_X-3),z=(hash(i,base,20)-.5)*(DETAIL_TILE_Z-3),h=height(x,z);dummy.position.set(x,h+.045,z);dummy.scale.setScalar(.6+hash(i,base,30)*1.6);dummy.rotation.set(0,hash(i,base,40)*6.283,0);dummy.updateMatrix();grass.setMatrixAt(i,dummy.matrix);grass.setColorAt(i,new T.Color(tint[Math.floor(hash(i,base,50)*tint.length)]))}
+ for(let i=0;i<n;i++){const x=(hash(i,base,10)-.5)*(DETAIL_TILE_X-3),z=(hash(i,base,20)-.5)*(DETAIL_TILE_Z-3),h=height(x,z);dummy.position.set(x,h+.045,z);dummy.scale.setScalar(.7+hash(i,base,30)*.7);dummy.rotation.set(0,hash(i,base,40)*6.283,0);dummy.updateMatrix();grass.setMatrixAt(i,dummy.matrix);grass.setColorAt(i,new T.Color(tint[Math.floor(hash(i,base,50)*tint.length)]))}
  grass.instanceMatrix.needsUpdate=true;if(grass.instanceColor)grass.instanceColor.needsUpdate=true;group.add(grass);
  const rocksCount=quality==='low'?18:quality==='high'?85:48,rocks=new T.InstancedMesh(pebbleGeo,mat(isHills?'#8e968c':'#978f7b'),rocksCount);
  for(let i=0;i<rocksCount;i++){const x=(hash(i,base,60)-.5)*(DETAIL_TILE_X-4),z=(hash(i,base,70)-.5)*(DETAIL_TILE_Z-4),h=height(x,z),sz=.22+hash(i,base,80)*(isHills?1.4:.55);dummy.position.set(x,h+.12*sz,z);dummy.scale.set(sz,.23*sz,sz*.7);dummy.rotation.set(0,hash(i,base,90)*6.283,0);dummy.updateMatrix();rocks.setMatrixAt(i,dummy.matrix)}rocks.instanceMatrix.needsUpdate=true;rocks.userData.groundCoverV46=true;group.add(rocks);

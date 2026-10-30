@@ -1,8 +1,12 @@
-# Kuningriigid V228
+# Kuningriigid V229
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
 **Mängi:** https://orogdor.github.io/Kuningriigid/?v=2273
+
+## V229 – looduskeskkond
+
+Tumedam looduslik maapind, uus rohi, põõsad ja metsloomad.
 
 ## V228 – kiviaja mängijategelane
 

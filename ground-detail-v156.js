@@ -19,15 +19,18 @@ const fbm=(x,z,seed)=>vnoise(x,z,seed)*.6+vnoise(x*2.1,z*2.1,seed+7)*.3+vnoise(x
 function merged(parts){const pos=[],col=[];for(const [g,color] of parts){const p=(g.index?g.toNonIndexed():g).attributes.position,c=typeof color==='function'?null:new T.Color(color);
  for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));const k=c||color(p.getX(i),p.getY(i),p.getZ(i));col.push(k.r,k.g,k.b);}}
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('color',new T.Float32BufferAttribute(col,3));g.computeVertexNormals();g.computeBoundingSphere();g.userData.shared=true;return g;}
-function blade(w,h,lean,rot){ // tapered blade of 2 triangles, bending outward
- const g=new T.BufferGeometry(),c=Math.cos(rot),s=Math.sin(rot),P=(x,y,z)=>[x*c+z*s,y,-x*s+z*c];
- const tip=P(lean*.9,h,0),m1=P(-w*.35+lean*.35,h*.5,0),m2=P(w*.35+lean*.35,h*.5,0),b1=P(-w/2,0,0),b2=P(w/2,0,0);
- g.setAttribute('position',new T.Float32BufferAttribute([...b1,...b2,...m2,...b1,...m2,...m1,...m1,...m2,...tip],3));return g;}
-function grassGeo(kind){
- const parts=[],n=kind==='tall'?9:7;
- for(let i=0;i<n;i++){const a=i/n*Math.PI*2+hash(i,kind.length,1)*.7,h=(kind==='tall'?1.1:.6)*(.6+hash(i,2,kind.length)*.6),lean=(.12+hash(i,3,1)*.25)*h;
-  const g=blade(.09+hash(i,4,1)*.05,h,lean,a);g.translate(Math.cos(a)*.08,0,Math.sin(a)*.08);
-  parts.push([g,(x,y)=>new T.Color('#587a3a').lerp(new T.Color(kind==='tall'?'#c9c47c':'#a9c46a'),Math.min(1,y/h))]);}
+function blade(w,h,lean,rot){
+ // Narrow, bent blades give a softer silhouette in first person.
+ const g=new T.BufferGeometry(),c=Math.cos(rot),s=Math.sin(rot),P=(x,y,z)=>[x*c+z*s,y,-x*s+z*c],p=[];
+ for(let k=0;k<3;k++){const t=k/3,u=(k+1)/3,half=t=>w*.5*(1-t*.9),shift=t=>lean*t*t;
+  const a=P(shift(t)-half(t),h*t,0),b=P(shift(t)+half(t),h*t,0),d=P(shift(u)-half(u),h*u,0),e=P(shift(u)+half(u),h*u,0);p.push(...a,...b,...e,...a,...e,...d);}
+ g.setAttribute('position',new T.Float32BufferAttribute(p,3));return g;}
+export function grassGeo(kind='short'){
+ const parts=[],n=kind==='tall'?12:10;
+ for(let i=0;i<n;i++){const a=i/n*Math.PI*2+hash(i,kind.length,1)*.5,h=(kind==='tall'?.68:.36)*(.65+hash(i,2,kind.length)*.65),lean=(.15+hash(i,3,1)*.34)*h;
+  const g=blade(.035+hash(i,4,1)*.025,h,lean,a);g.translate(Math.cos(a)*.035,0,Math.sin(a)*.035);
+  const base=new T.Color('#354b29'),tip=new T.Color(kind==='tall'?'#9c9963':'#789056');
+  parts.push([g,(x,y)=>base.clone().lerp(tip,Math.min(1,y/h))]);}
  return merged(parts);}
 function flowerGeo(petal='#ffffff'){const parts=[];for(let i=0;i<5;i++){const a=i/5*Math.PI*2+.3,r=.12+hash(i,9,2)*.12,h=.35+hash(i,5,2)*.25;
   const stem=new T.CylinderGeometry(.012,.016,h,3,1,true);stem.translate(Math.cos(a)*r,h/2,Math.sin(a)*r);parts.push([stem,'#4c6a34']);
@@ -37,8 +40,18 @@ function flowerGeo(petal='#ffffff'){const parts=[];for(let i=0;i<5;i++){const a=
  return merged(parts);}
 function stoneGeo(seed){const g=new T.IcosahedronGeometry(1,1),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),k=.78+hash(Math.round(x*9),Math.round(y*9)+seed,Math.round(z*9))*.4;p.setXYZ(i,x*k,Math.max(-.2,y*k*.55),z*k*.85);}
  return merged([[g,(x,y,z)=>new T.Color('#7c7a72').lerp(new T.Color('#a8a596'),Math.max(0,y)*1.4).lerp(new T.Color('#6f7d4f'),y>.3&&hash(Math.round(x*5),3,Math.round(z*5))>.5?.45:0)]]);}
-function shrubGeo(){const parts=[];for(const [x,z,r] of [[0,0,.55],[.4,.2,.42],[-.35,.25,.45],[.05,-.38,.4],[0,.1,.35]]){const g=new T.IcosahedronGeometry(r,0);g.scale(1,.8,1);g.translate(x,r*.7+(r===.35?.35:0),z);
-  parts.push([g,(xx,y)=>new T.Color('#2f4a25').lerp(new T.Color('#6f8f43'),Math.min(1,y/1.1))]);}return merged(parts);}
+function shrubGeo(){
+ // Irregular woody branches with individual leaves, merged into one instanced mesh.
+ const parts=[];
+ for(let i=0;i<14;i++){
+  const a=i*2.399,rad=.12+(i%4)*.10,x=Math.cos(a)*rad,z=Math.sin(a)*rad,h=.48+(i%5)*.10;
+  const stem=new T.CylinderGeometry(.008,.017,h,4);stem.translate(x,h/2,z);parts.push([stem,'#554b30']);
+  for(let j=0;j<6;j++){const y=.18+j*.10,ang=a+j*2.1,r=.06+(j%3)*.035;
+   const leaf=blade(.11,.23,.06,ang);leaf.rotateZ(j%2?.35:-.35);leaf.translate(x+Math.cos(ang)*r,y,z+Math.sin(ang)*r);
+   const base=new T.Color('#314927'),tip=new T.Color((i+j)%3?'#70834d':'#526c39');parts.push([leaf,(xx,yy)=>base.clone().lerp(tip,Math.min(1,Math.max(0,(yy-y)/.23)))]);
+  }
+ }
+ return merged(parts);}
 function fernGeo(){const parts=[];for(let i=0;i<8;i++){const a=i/8*Math.PI*2,g=new T.PlaneGeometry(.22,.9,1,3),p=g.attributes.position;
   for(let k=0;k<p.count;k++){const y=p.getY(k)+.45;p.setXYZ(k,p.getX(k)*(1-y*.8),y*.55,y*y*.5+y*.2);}g.rotateY(a);parts.push([g,(x,y)=>new T.Color('#2e5527').lerp(new T.Color('#79a24a'),y/.55)]);}return merged(parts);}
 function stumpGeo(){const t=new T.CylinderGeometry(.32,.42,.45,9);t.translate(0,.22,0);const top=new T.CircleGeometry(.32,9);top.rotateX(-Math.PI/2);top.translate(0,.451,0);
@@ -78,8 +91,8 @@ export function createGroundCoverV156(tile,height,quality='medium',avoid={},opts
  const P=(...args)=>steps.push(()=>place(...args));
  const meadow=(x,z)=>fbm(x/38,z/38,seed+11),flowerDrift=(x,z)=>fbm(x/22,z/22,seed+29),stony=(x,z)=>fbm(x/30,z/30,seed+47);
  const grassTint=(i,x,z,c)=>{const m=meadow(x,z);c.setRGB(1,1,1);if(dry)c.setRGB(1.08,1.0,.72);c.multiplyScalar(.82+m*.32);if(m<.35)c.lerp(new T.Color(1.1,1.02,.72),.4);return c;};
- P('grass',budget.grass,{field:(x,z)=>.25+meadow(x,z)*.9,scale:i=>1.0+hash(i,seed,7)*1.3,tint:grassTint});
- P('tall',budget.tall,{field:(x,z)=>Math.max(0,meadow(x,z)-.45)*2.4,scale:i=>1.1+hash(i,seed,8)*1.0,tint:grassTint});
+ P('grass',budget.grass,{field:(x,z)=>.25+meadow(x,z)*.9,scale:i=>.8+hash(i,seed,7)*.65,tint:grassTint});
+ P('tall',budget.tall,{field:(x,z)=>Math.max(0,meadow(x,z)-.45)*2.4,scale:i=>.8+hash(i,seed,8)*.65,tint:grassTint});
  // each flower colour is its own small batch so stems stay green; drifts of one colour form naturally
  if(!dry||tile.biome==='steppe')FLOWERS.forEach((c,k)=>P('flower:'+c,Math.round(budget.flower/FLOWERS.length*(k<2?1.6:.8)),{field:(x,z)=>Math.max(0,flowerDrift(x,z)-.5)*3.2*(Math.floor(fbm(x/45,z/45,seed+61+k)*3)===1?1:.25),
   scale:i=>1.3+hash(i,seed,9)*.8,tint:(i,x,z,c2)=>c2.setScalar(.9+hash(i,seed,10)*.2)}));
