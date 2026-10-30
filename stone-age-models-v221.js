@@ -5,6 +5,7 @@
 //  - peamaja (hall), maja1 + maja2 (houses), woodcuter (lumber camp), kiviraidur (quarry).
 // If the files fail to load the game keeps its earlier models (ASSETS stays null).
 import * as T from './vendor/three.module.js';
+import {createStoneEquipment} from './stone-equipment-v234.js';
 import {applyStoneSize} from './stone-sizes-v224.js';
 import {withStoneBuildingLOD,withStoneHumanLOD} from './stone-near-lod.js?v=224';
 import {createWebStoneBuilding} from './stone-web-buildings-v2233.js?v=224';
@@ -85,19 +86,6 @@ const HEIGHT=1.66;  // the same height as the earlier people (1 unit ≈ 1.05 m)
 const toolMat=new Map();const tm=c=>{if(!toolMat.has(c))toolMat.set(c,new T.MeshStandardMaterial({color:c,roughness:.9}));return toolMat.get(c);};
 const TG=new Map();const tg=(k,f)=>{if(!TG.has(k))TG.set(k,f());return TG.get(k);};
 function part(parent,geo,color,x,y,z,rx=0,ry=0,rz=0){const m=new T.Mesh(geo,tm(color));m.position.set(x,y,z);m.rotation.set(rx,ry,rz);m.castShadow=true;parent.add(m);return m;}
-// tools hang from the hand bone: the handle continues the forearm (local -Y), the head points forward (+Z)
-function addTool(hand,kind){
- const g=new T.Group();g.position.set(0,-.05,.01);hand.add(g);
- const handle=(len)=>part(g,tg('h'+len,()=>new T.CylinderGeometry(.009,.011,len,6)),'#6e5235',0,-len/2+.04,0);
- if(['stone_lumber','stone_forester','stone_worker'].includes(kind)){handle(.34);part(g,tg('axe',()=>new T.BoxGeometry(.022,.07,.09)),'#8f9185',0,-.26,.045);}
- else if(kind==='stone_miner'){handle(.36);part(g,tg('pick',()=>new T.ConeGeometry(.018,.17,5)),'#8f9185',0,-.28,.06,Math.PI/2,0,0);}
- else if(kind==='stone_builder'){handle(.26);part(g,tg('ham',()=>new T.BoxGeometry(.05,.05,.07)),'#8a8478',0,-.2,.02);}
- else if(kind==='stone_fisher'||kind==='stone_hunter'){part(g,tg('spear',()=>new T.CylinderGeometry(.007,.009,.95,6)),'#7a5c3c',0,-.05,0);part(g,tg('tip',()=>new T.ConeGeometry(.014,.07,5)),'#9c9a8e',0,.45,.07);}
- else if(kind==='stone_farmer'){handle(.42);part(g,tg('hoe',()=>new T.BoxGeometry(.02,.03,.1)),'#8f9185',0,-.33,.05);}
- else if(kind==='stone_gatherer'){part(g,tg('basket',()=>new T.CylinderGeometry(.06,.045,.08,8,1,true)),'#a8874e',0,-.06,.03);}
- else if(kind==='stone_watercarrier'){part(g,tg('pot',()=>new T.SphereGeometry(.055,8,6)),'#9b6a45',0,-.07,.02);}
- return g;
-}
 export function createStoneHuman(parent,x,z,color,kind){
  const data=ASSETS.human_rigged,prim=data.primitives[0];
  const root=new T.Group();root.position.set(x,0,z);
@@ -110,7 +98,7 @@ export function createStoneHuman(parent,x,z,color,kind){
  const B=Object.fromEntries(bones.map(b=>[b.name,b]));
  // a small team-coloured band on the belt keeps factions recognisable
  const band=new T.Mesh(tg('band',()=>new T.TorusGeometry(.105,.012,4,14)),tm(color));band.rotation.x=Math.PI/2;band.scale.set(1,.72,1);band.position.y=.03;B.hips.add(band);
- const tool=addTool(B.hand_R,kind);
+ const tool=createStoneEquipment(kind);B.hand_R.add(tool);
  // legs/arms/body/head mirror the older rigs, so code that poses people directly (village life) keeps working
  const rig={stoneHuman:true,kind,bones:B,tool,phase:(Math.abs(x*7.3+z*3.1)%6.28)||Math.random()*6.28,scale:body,
   legs:[B.thigh_L,B.thigh_R],arms:[B.upperArm_L,B.upperArm_R],body:B.spine,head:B.head};
