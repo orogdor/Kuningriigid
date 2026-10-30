@@ -16,7 +16,7 @@ async function loadAll(){
  // The five replacements load in stone-web-buildings-v2233.js. Keep the
  // existing hall and person, without also preloading the superseded buildings.
  const names=['human_rigged','peamaja'];
- const files=await Promise.all(names.map(n=>loadGLB(DIR+n+'.glb'+(n==='human_rigged'?'?v=228':''))));
+ const files=await Promise.all(names.map(n=>loadGLB(n==='human_rigged'?'./models-stone-near/human_far.glb':DIR+n+'.glb')));
  const out={};names.forEach((n,i)=>out[n]=files[i]);return out;
 }
 let ASSETS=null;

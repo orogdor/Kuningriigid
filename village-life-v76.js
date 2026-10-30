@@ -79,20 +79,6 @@ const sharedMat={
 function mesh(kind,parent,x,y,z){
  const model=new T.Mesh(sharedGeo[kind],sharedMat[kind]);model.position.set(x,y,z);parent.add(model);return model;
 }
-function makeCamp(centerHeight){
- const group=new T.Group();group.name='V76 village gathering place';
- group.position.set(0,centerHeight(0,25),25);
- for(const x of [-8,8]){
-  mesh('bench',group,x,.72,-4);
-  for(const off of [-2,2])mesh('post',group,x+off,.3,-4);
- }
- mesh('stone',group,0,.1,0);
- const log1=mesh('wood',group,0,.55,0);log1.rotation.z=Math.PI/2;
- const log2=mesh('wood',group,0,.55,0);log2.rotation.x=Math.PI/2;
- const flame=mesh('fire',group,0,1.2,0);flame.name='V76 fire flame';
- const smoke=mesh('smoke',group,0,2.3,0);smoke.name='V76 fire smoke';
- group.userData.flame=flame;group.userData.smoke=smoke;return group;
-}
 function dress(figure,role){
  // V50 model rigs remain identical; a smaller scale is enough for children.
  if(role==='child')figure.scale.setScalar(.69);
@@ -114,6 +100,7 @@ function animateActivity(actor,time,moving){
  animateSoldier(figure,time,moving,{phase:-1,action:activity==='work'?'build':activity==='carry'?'water':null});
  actor.basket.visible=activity==='carry';
  if(!rig)return;
+ if(rig.stoneHuman){figure.position.y=0;return;}
  if(!moving){
   if(['sit','rest','eat'].includes(activity)){
    figure.position.y=-.42;
@@ -153,7 +140,7 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
   group.userData.villageLife=true;parent.add(group);
   const ground=(x,z)=>groundForTile(tile,x,z);
   const actors=Array.from({length:targetCount},(_,i)=>makePerson(group,site,i,ground));
-  const camp=nearby?null:makeCamp(ground);if(camp)group.add(camp);
+  const camp=null;
   entry={id:site.id,site,group,parent,actors,camp,count:targetCount,nearby,ground};
   sites.set(key,entry);return entry;
  }

@@ -21,6 +21,8 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
  const action=attack&&typeof attack==='object'?attack.action:null;
  const dt=r.lastMotionTime==null?1/30:Math.max(0,Math.min(.12,time-r.lastMotionTime));
  r.lastMotionTime=time;
+ r.workClock=(r.workClock??time)+dt*Math.max(0,Math.min(4,attack?.workRate??1));
+ const workT=r.workClock+r.phase;
  if(r.motionMove==null)r.motionMove=moving?1:0;
  if(r.motionWork==null)r.motionWork=action&&!moving&&action!=='carry'?1:0;
  r.motionMove=damp(r.motionMove,moving?1:0,dt,11);
@@ -57,7 +59,7 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
   const mining=action==='mine',chopping=action==='chop'||action==='forge',building=action==='build'||action==='work'||action==='saw'||action==='mill'||action==='train';
   if(mining||chopping||building){
    const duration=mining?1.85:chopping?1.45:1.12;
-   const u=cycle(t+(r.phase*.06),duration);
+   const u=cycle(workT+(r.phase*.06),duration);
    const wind=ease(.04,.43,u)*(1-ease(.45,.62,u));
    const strike=ease(.44,.61,u)*(1-ease(.63,.90,u));
    const reach=mining?1.0:chopping?.9:.55;
@@ -73,7 +75,7 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
    point(B,'shin_L',.18,0,0,work);
    B.hips.position.y-=.018*work*strike;
   }else if(['gather','plant','farm'].includes(action)){
-   const u=cycle(t,2.2),reach=ease(.12,.4,u)*(1-ease(.68,.93,u));
+   const u=cycle(workT,2.2),reach=ease(.12,.4,u)*(1-ease(.68,.93,u));
    point(B,'spine',.58+.13*reach,0,0,work);
    point(B,'chest',.16,0,0,work);point(B,'head',-.32,0,0,work);
    point(B,'upperArm_L',-.6-.4*reach,0,.10,work);
@@ -83,7 +85,7 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
    point(B,'shin_L',.62,0,0,work);point(B,'shin_R',.44,0,0,work);
    B.hips.position.y-=.035*work;
   }else if(action==='fishing'||action==='hunt'){
-   const u=cycle(t,3.1),cast=ease(.26,.55,u)*(1-ease(.63,.85,u));
+   const u=cycle(workT,3.1),cast=ease(.26,.55,u)*(1-ease(.63,.85,u));
    point(B,'upperArm_R',-1.10-.8*cast,0,-.1,work);
    point(B,'forearm_R',-.6+.26*cast,0,0,work);
    point(B,'upperArm_L',-.72,0,.1,work);
@@ -91,13 +93,13 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
    point(B,'spine',.10-.09*cast,.12*cast,0,work);
    point(B,'thigh_L',-.14,0,0,work);point(B,'thigh_R',.08,0,0,work);
   }else if(action==='water'){
-   const s=Math.sin(t*2.8);
+   const s=Math.sin(workT*2.8);
    point(B,'upperArm_L',-.96+.16*s,0,.18,work);
    point(B,'upperArm_R',-.96-.16*s,0,-.18,work);
    point(B,'forearm_L',-.83,0,0,work);point(B,'forearm_R',-.83,0,0,work);
    point(B,'spine',.10,0,0,work);
   }else {
-   const s=Math.sin(t*3.2);
+   const s=Math.sin(workT*3.2);
    point(B,'upperArm_L',-.54+.25*s,0,.06,work);
    point(B,'upperArm_R',-.54-.25*s,0,-.06,work);
    point(B,'forearm_L',-.55,0,0,work);point(B,'forearm_R',-.55,0,0,work);
