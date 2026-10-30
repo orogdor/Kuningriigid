@@ -53,5 +53,7 @@ jobs:
         run: node scripts/test-equipment-v234.mjs
       - name: V235 day cycle and city torch regression
         run: node scripts/test-daynight-v235.mjs
+      - name: V236 scouts and door torch regressions
+        run: node scripts/test-scout-torch-v236.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
