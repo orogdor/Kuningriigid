@@ -3,7 +3,7 @@ export const GRAPHICS_KEY_V226='kingdoms-graphics-v226';
 export const GRAPHICS_DEFAULTS_V226=Object.freeze({
  preset:'high',renderer:'webgl',resolution:100,viewDistance:'far',
  shadows:'medium',shadowDistance:'medium',unitShadows:true,
- lighting:'standard',lightingEngine:'pbr',ambient:'normal',daylight:'day',
+ lighting:'enhanced',lightingEngine:'pbr',lightingLook:'natural',toneMap:'agx',ambient:'normal',daylight:'dynamic',
  terrainBlending:true,water:'animated',clouds:true,wind:true,fog:'medium',
  sky:'enhanced',particles:'medium',buildingDetail:'high',unitDetail:'high',
  vegetation:'medium',lod:'balanced',fpsLimit:'60',
@@ -11,12 +11,22 @@ export const GRAPHICS_DEFAULTS_V226=Object.freeze({
  uiScale:100,performanceOverlay:false,adaptiveResolution:true
 });
 export const GRAPHICS_PRESETS_V226={
- low:{lightingEngine:'classic',resolution:70,viewDistance:'near',shadows:'off',shadowDistance:'near',unitShadows:false,lighting:'classic',ambient:'normal',daylight:'day',terrainBlending:false,water:'simple',clouds:false,wind:false,fog:'near',sky:'simple',particles:'off',buildingDetail:'low',unitDetail:'low',vegetation:'low',lod:'performance',fpsLimit:'30',texture:'low',postProcessing:false,adaptiveResolution:true},
- medium:{lightingEngine:'pbr',resolution:85,viewDistance:'medium',shadows:'low',shadowDistance:'near',unitShadows:false,lighting:'standard',ambient:'normal',daylight:'day',terrainBlending:true,water:'animated',clouds:false,wind:true,fog:'medium',sky:'enhanced',particles:'low',buildingDetail:'medium',unitDetail:'medium',vegetation:'medium',lod:'balanced',fpsLimit:'60',texture:'medium',postProcessing:true,adaptiveResolution:true},
- high:{lightingEngine:'pbr',resolution:100,viewDistance:'far',shadows:'medium',shadowDistance:'medium',unitShadows:true,lighting:'enhanced',ambient:'normal',daylight:'day',terrainBlending:true,water:'animated',clouds:true,wind:true,fog:'medium',sky:'enhanced',particles:'medium',buildingDetail:'high',unitDetail:'high',vegetation:'high',lod:'balanced',fpsLimit:'60',texture:'high',postProcessing:true,adaptiveResolution:true},
- ultra:{lightingEngine:'physical',resolution:125,viewDistance:'ultra',shadows:'high',shadowDistance:'far',unitShadows:true,lighting:'cinematic',ambient:'bright',daylight:'dynamic',terrainBlending:true,water:'animated',clouds:true,wind:true,fog:'far',sky:'enhanced',particles:'high',buildingDetail:'high',unitDetail:'high',vegetation:'high',lod:'quality',fpsLimit:'unlimited',texture:'high',postProcessing:true,adaptiveResolution:false}
+ low:{lightingEngine:'classic',lightingLook:'fast',toneMap:'none',resolution:70,viewDistance:'near',shadows:'off',shadowDistance:'near',unitShadows:false,lighting:'classic',ambient:'normal',daylight:'dynamic',terrainBlending:false,water:'simple',clouds:false,wind:false,fog:'near',sky:'simple',particles:'off',buildingDetail:'low',unitDetail:'low',vegetation:'low',lod:'performance',fpsLimit:'30',texture:'low',postProcessing:false,adaptiveResolution:true},
+ medium:{lightingEngine:'pbr',lightingLook:'natural',toneMap:'agx',resolution:85,viewDistance:'medium',shadows:'low',shadowDistance:'near',unitShadows:false,lighting:'standard',ambient:'normal',daylight:'dynamic',terrainBlending:true,water:'animated',clouds:false,wind:true,fog:'medium',sky:'enhanced',particles:'low',buildingDetail:'medium',unitDetail:'medium',vegetation:'medium',lod:'balanced',fpsLimit:'60',texture:'medium',postProcessing:true,adaptiveResolution:true},
+ high:{lightingEngine:'pbr',lightingLook:'natural',toneMap:'agx',resolution:100,viewDistance:'far',shadows:'medium',shadowDistance:'medium',unitShadows:true,lighting:'enhanced',ambient:'normal',daylight:'dynamic',terrainBlending:true,water:'animated',clouds:true,wind:true,fog:'medium',sky:'enhanced',particles:'medium',buildingDetail:'high',unitDetail:'high',vegetation:'high',lod:'balanced',fpsLimit:'60',texture:'high',postProcessing:true,adaptiveResolution:true},
+ ultra:{lightingEngine:'physical',lightingLook:'film',toneMap:'agx',resolution:125,viewDistance:'ultra',shadows:'high',shadowDistance:'far',unitShadows:true,lighting:'cinematic',ambient:'bright',daylight:'dynamic',terrainBlending:true,water:'animated',clouds:true,wind:true,fog:'far',sky:'enhanced',particles:'high',buildingDetail:'high',unitDetail:'high',vegetation:'high',lod:'quality',fpsLimit:'unlimited',texture:'high',postProcessing:true,adaptiveResolution:false}
 };
+export const LIGHTING_LOOKS_V235=Object.freeze({
+ natural:{lightingEngine:'pbr',lighting:'enhanced',toneMap:'agx',ambient:'normal',postProcessing:true,shadows:'medium'},
+ film:{lightingEngine:'physical',lighting:'cinematic',toneMap:'agx',ambient:'normal',postProcessing:true,shadows:'high'},
+ soft:{lightingEngine:'pbr',lighting:'standard',toneMap:'neutral',ambient:'bright',postProcessing:true,shadows:'low'},
+ fast:{lightingEngine:'classic',lighting:'classic',toneMap:'none',ambient:'normal',postProcessing:false,shadows:'low'},
+ toon:{lightingEngine:'toon',lighting:'enhanced',toneMap:'neutral',ambient:'bright',postProcessing:true,shadows:'medium'}
+});
 const choices={
+ lightingLook:[['natural','Natural · PBR + AgX'],['film','Filmilik · Physical + AgX'],['soft','Pehme · PBR + Neutral'],['fast','Kiire · Lambert'],['toon','Toon · stiliseeritud'],['custom','Kohandatud']],
+ toneMap:[['agx','AgX · looduslik'],['neutral','Neutral · puhas'],['aces','ACES · filmilik'],['none','Väljas']],
+
  lightingEngine:[['classic','Classic · Lambert'],['pbr','PBR · Standard'],['physical','PBR · Physical'],['toon','Toon · stiliseeritud']],
  preset:[['low','Low'],['medium','Medium'],['high','High'],['ultra','Ultra'],['custom','Custom']],
  renderer:[['webgl','WebGL · kindel'],['webgpu','WebGPU · katseversioon'],['auto','Auto · WebGL varuvariant']],
@@ -26,7 +36,7 @@ const choices={
  shadowDistance:[['near','Lühike'],['medium','Keskmine'],['far','Pikk']],
  lighting:[['classic','Classic'],['standard','Standard'],['enhanced','Enhanced'],['cinematic','Cinematic']],
  ambient:[['low','Tumedam'],['normal','Tavaline'],['bright','Heledam']],
- daylight:[['day','Päev'],['evening','Õhtu'],['dynamic','Dünaamiline päike']],
+ daylight:[['dynamic','24 h tsükkel (1 min = 1 tund)'],['day','Keskpäev · test'],['evening','Õhtu · test'],['night','Öö · test']],
  fog:[['off','Väljas'],['near','Tihe / lähedal'],['medium','Tavaline'],['far','Hõre / kaugel']],
  water:[['simple','Lihtne'],['animated','Animeeritud']],
  sky:[['simple','Lihtne'],['enhanced','Gradienttaevas']],
@@ -42,7 +52,7 @@ const choices={
 };
 const groups=[
  ['Üldine',[['preset','Graafikaprofiil'],['renderer','Renderdusmootor'],['resolution','Resolutsiooniskaala'],['viewDistance','Nähtavuskaugus'],['antiAlias','Servade silumine'],['fpsLimit','FPS piirang'],['adaptiveResolution','Automaatne resolutsioon']]],
- ['Valgus ja varjud',[['lightingEngine','Valgustusmootor'],['lighting','Valguse iseloom'],['ambient','Üldvalguse heledus'],['daylight','Päevaaeg / päikese liikumine'],['shadows','Varjude kvaliteet'],['shadowDistance','Varjude kaugus'],['unitShadows','Üksuste varjud']]],
+ ['Valgus ja varjud',[['lightingLook','Valgustuse võrdlusprofiil'],['toneMap','Värviesitus'],['lightingEngine','Valgustusmootor'],['lighting','Valguse iseloom'],['ambient','Üldvalguse heledus'],['daylight','Päevaaeg / päikese liikumine'],['shadows','Varjude kvaliteet'],['shadowDistance','Varjude kaugus'],['unitShadows','Üksuste varjud']]],
  ['Maailm ja efektid',[['terrainBlending','Maastikutüüpide üleminekud'],['water','Vee kvaliteet'],['clouds','Pilvevarjud'],['wind','Taimede tuuleliikumine'],['fog','Udu'],['sky','Taeva kvaliteet'],['particles','Osakesed ja taevaefektid']]],
  ['Detailid',[['buildingDetail','Hoonete LOD'],['unitDetail','Üksuste detailide kuvamine'],['vegetation','Taimestiku tihedus'],['lod','LOD agressiivsus'],['texture','Tekstuuride filtreerimine']]],
  ['Lisaseaded',[['postProcessing','Filmiline toonikaardistus'],['uiScale','Kasutajaliidese suurus'],['performanceOverlay','FPS ja renderdusstatistika']]]
@@ -76,11 +86,16 @@ export function buildGraphicsMenuV226(settings,onChange){
  const summary=document.createElement('summary');summary.textContent='⚙ Graafika ja jõudlus';root.append(summary);
  const body=document.createElement('div');body.className='graphics-v226-body';root.append(body);
  const description=document.createElement('p');description.className='graphics-v226-note';
- description.textContent='Neli valgustusmootorit muudavad hoonete ja üksuste materjalide valgusarvutust: Lambert (kiire), Standard PBR, Physical PBR ja Toon. Maastiku kohandatud shader jääb eraldi. WebGPU on katseline; 3D vea korral lülitub mäng automaatselt WebGL-i.';body.append(description);
+ description.textContent='V235: PBR + AgX, filmilik, pehme, kiire ja Toon profiil. Päev kestab 24 minutit: 1 päris minut = 1 mängutund. Päikese aega saab visuaalseks võrdluseks fikseerida. WebGPU on katseline; vigade korral kasutatakse WebGL-i.';body.append(description);
  const controls=new Map(),dirty=new Set();
  function changed(key,value,fromPreset=false){
   if(key==='preset'&&value!=='custom'){Object.assign(settings,GRAPHICS_PRESETS_V226[value]);settings.preset=value;}
-  else{settings[key]=value;if(!fromPreset&&key!=='renderer'&&key!=='antiAlias')settings.preset='custom';}
+  else if(key==='lightingLook'&&value!=='custom'){
+   Object.assign(settings,LIGHTING_LOOKS_V235[value]);settings.lightingLook=value;settings.preset='custom';
+  }
+  else{settings[key]=value;
+   if(['lightingEngine','lighting','toneMap','ambient','shadows','postProcessing'].includes(key))settings.lightingLook='custom';
+   if(!fromPreset&&key!=='renderer'&&key!=='antiAlias')settings.preset='custom';}
   if(key==='renderer'||key==='antiAlias')dirty.add(key);
   saveGraphicsSettingsV226(settings);
   controls.forEach((control,k)=>{control.value=String(settings[k]);});
