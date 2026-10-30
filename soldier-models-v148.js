@@ -18,30 +18,32 @@ function replacedStoneWeaponChunk(kind,c){
  if(kind==='archer'&&['bowWeapon','swordWeapon','swordSheath'].includes(c[1]))return true;
  return REPLACED_STONE_WEAPON_COLORS[kind]?.[c[0]]?.includes(c[4])||false;
 }
+import {SOLDIER_KINDS_V241} from './soldier-kinds-v241.js';
+import {requestAssetV241} from './asset-queue-v241.js';
+
 const MAGIC = 0x3156534B;
 let quality = 'medium';
 try { quality = localStorage.getItem('kingdoms-quality') || (innerWidth > 760 ? 'high' : 'medium'); } catch {}
 // 'high' quality (desktop default) gets the detailed pack; 'medium' (phone default) and 'low' get the light one.
 const LOD = quality === 'high' ? 'high' : 'low';
-let PACK = null, BLOB = null;
-try {
-  const res = await fetch(new URL('./models-v148/soldiers-v148-' + LOD + '.bin?v=148a', import.meta.url));
-  if (!res.ok) throw Error('HTTP ' + res.status);
-  let buf = await res.arrayBuffer();
-  if (new Uint8Array(buf, 0, 2)[0] === 0x1f && new Uint8Array(buf, 0, 2)[1] === 0x8b)
-    buf = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
-  const view = new DataView(buf);
-  if (view.getUint32(0, true) !== MAGIC) throw Error('bad soldier pack');
-  const len = view.getUint32(4, true);
-  PACK = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 8, len)));
-  BLOB = buf.slice(8 + len);
-} catch (error) {
-  // Older soldier visuals remain available if the pack cannot be loaded (tests in Node, offline copies).
-  if (typeof window !== 'undefined') console.warn('V148 soldier models unavailable, using previous visuals:', error?.message || error);
+const packs=new Map();
+export const V148_LOD=LOD;
+export const V148_KINDS=SOLDIER_KINDS_V241;
+export const hasV148Soldier=kind=>packs.has(kind);
+export function loadSoldierV241(kind){
+ if(!V148_KINDS.includes(kind))return Promise.resolve(false);
+ return requestAssetV241('soldier:'+LOD+':'+kind,async()=>{
+  const res=await fetch(new URL('./models-v241/'+LOD+'/'+kind+'.bin',import.meta.url));
+  if(!res.ok)throw Error('Soldier '+kind+': HTTP '+res.status);
+  let buf=await res.arrayBuffer();
+  if(new Uint8Array(buf)[0]===31&&new Uint8Array(buf)[1]===139)
+   buf=await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+  const view=new DataView(buf);if(view.getUint32(0,true)!==MAGIC)throw Error('bad soldier pack');
+  const len=view.getUint32(4,true),pack=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,8,len)));
+  if(!pack.kinds[kind])throw Error('missing soldier '+kind);
+  packs.set(kind,{def:pack.kinds[kind],blob:buf.slice(8+len)});return true;
+ });
 }
-export const V148_LOD = LOD;
-export const V148_KINDS = Object.freeze(Object.keys(PACK?.kinds || {}));
-export const hasV148Soldier = kind => !!PACK?.kinds?.[kind];
 
 const Q = 1 / 8000;
 const cloth = new T.MeshStandardMaterial({ vertexColors: true, roughness: .86, metalness: 0 });
@@ -76,7 +78,7 @@ function variantCount(def) {
 // One BufferGeometry per (bone, toggle group, material); team colours are baked in, which keeps
 // every geometry shareable by all soldiers of the same kind, colour, grade and head variant.
 function geometryFor(kind, bone, group, mat, color, grade, variant) {
-  const def = PACK.kinds[kind];
+  const {def,blob:BLOB} = packs.get(kind);
   def.variants ??= variantCount(def);
   const list = def.chunks.filter(c => c[0] === bone && c[1] === group && c[3] === mat && wanted(c[2], grade, variant, def.variants) && !replacedStoneWeaponChunk(kind,c));
   if (!list.length) return null;
@@ -118,7 +120,7 @@ const LEGACY_KIND = {
 };
 
 export function createV148Soldier(parent, x, z, color, kind, grade = 'standard') {
-  const def = PACK.kinds[kind];
+  const {def,blob:BLOB} = packs.get(kind);
   def.variants ??= variantCount(def);
   const variant = Math.abs(Math.round(x * 7.31 + z * 3.17)) % def.variants;
   const root = new T.Group(), bones = {};

@@ -3,40 +3,27 @@
 import * as T from './vendor/three.module.js';
 import {applyStoneSize} from './stone-sizes-v224.js';
 import {loadGLB} from './glb-lite-v221.js';
+import {requestAssetV241} from './asset-queue-v241.js';
 
 export const STONE_NEAR_DISTANCE=100;
 let nearDistanceV226=STONE_NEAR_DISTANCE,nearHumanDistanceV226=STONE_NEAR_DISTANCE;
 export function setStoneNearDistanceV226(buildings=100,humans=100){nearDistanceV226=Math.max(25,Math.min(240,Number(buildings)||100));nearHumanDistanceV226=Math.max(25,Math.min(240,Number(humans)||100));}
-const assets=new Map(),queue=[];
-let active=0;
-function pump(){
- while(active<2&&queue.length){
-  const job=queue.shift();active++;
-  job().finally(()=>{active--;pump();});
- }
-}
 function texture(image,srgb=false){
  if(!image)return null;
  const t=new T.Texture(image);t.flipY=false;
  if(srgb)t.colorSpace=T.SRGBColorSpace;
  t.anisotropy=4;t.needsUpdate=true;return t;
 }
-function detailedAsset(name){
- if(assets.has(name))return assets.get(name);
- const promise=new Promise((resolve,reject)=>{
-  queue.push(async()=>{
-   try{
+export function detailedAsset(name){
+ return requestAssetV241('stone-detail:'+name,async()=>{
     const data=await loadGLB('./models-stone-near/'+name+'.glb');
     if(data.primitives.length!==1)throw new Error('Expected one detailed mesh: '+name);
     const p=data.primitives[0],mr=texture(p.roughnessImage);
     const material=new T.MeshStandardMaterial({map:texture(p.image,true),roughnessMap:mr,metalnessMap:mr,
      roughness:p.roughness,metalness:p.metalness,side:T.DoubleSide,
      color:new T.Color().fromArray(p.color),opacity:p.color[3]});
-    resolve({data,geometry:p.geometry,material});
-   }catch(error){reject(error);}
-  });pump();
+    return {data,geometry:p.geometry,material};
  });
- assets.set(name,promise);return promise;
 }
 
 // V237: all ghost meshes must own their material clones. An asynchronous GLB

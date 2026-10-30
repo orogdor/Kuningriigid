@@ -63,5 +63,9 @@ jobs:
         run: node scripts/test-scout-model-v239.mjs
       - name: V240 scout continuous world/detail movement
         run: node scripts/test-scout-motion-v240.mjs
+      - name: V241 demand loading and V242 detail streaming
+        run: |
+          node scripts/test-demand-v241.mjs
+          node scripts/test-stream-v242.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

@@ -1,3 +1,6 @@
+import {DetailStreamV242} from './detail-stream-v242.js';
+import {createAssetDemandV241} from './asset-demand-v241.js';
+import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
 import {rotateBuilding,pauseConstruction,removeBuilding} from './building-operations-v228.js';
 import {stoneFortLOD} from './stone-forts-detailed.js';
 import {nextStoneBatchLOD} from './stone-next-buildings-v2235.js';
@@ -81,7 +84,7 @@ import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=2232';
-import {createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=2232';
+import {riverNetworkStepsV242,createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=2232';
 import {surface,localSurface,localVisualSurface,worldElevation,visualElevation,visualProject,mountainMask,projectHeight as projectHeightV161,riverNear,overviewSurface,roadNetwork,worldToLocal} from './continuous-landscape.js?v=2232';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=125b';
 import {createShipModel} from './naval-visual.js';
@@ -124,7 +127,7 @@ import {createGroundCoverV156,disposeGroundCover} from './ground-detail-v156.js?
 import {createDetailTravellers} from './detail-travellers-v157.js?v=157a';
 import {setupAtmosphere} from './atmosphere-v158.js?v=161a';
 import {dayClockV235,createCityTorchesV235,updateCityTorchesV235} from './daynight-v235.js';
-import {createDetailSea} from './sea-v158.js?v=226';
+import {detailSeaStepsV242,createDetailSea} from './sea-v158.js?v=226';
 import {buildingClearance} from './navigation.js?v=2273';
 import {door} from './navigation.js?v=2273';
 import {loadProtectedGame,writeAutosave,replaceProtectedGame} from './save-safety-v73.js?v=73a';
@@ -189,6 +192,7 @@ if(!state)try{state=migrateGame(JSON.parse(localStorage.getItem('kingdoms-v1')))
 state??=createGame(Math.floor(Math.random()*2147483647));
 let buildCategory='all',buildSearch='';const tileDoubleTap=new TileDoubleTap();
 let commandMode='select',hoverPoint=null;const cameraKeys=new CameraKeys();let lastMenuRevision=0,lastOverviewStamp='';let selectedShip=null;let cityTab='info';let restarting=false;let game=new Civilization(state),s=game.s,view='world',activeTile=null,chosen=game.cell(s.settlers.find(a=>a.team===0)||s.cities.find(c=>c.team===0)||{c:10,r:11}),selectedMover=s.settlers.find(a=>a.team===0)?.id??null,armySelected=false,selectedArmyId=0,selectedTrade=null,selectedUnit=null,mode=null,wallAxis=0,tab='build',menuOpen=true,paused=false,toastTime=0,zoom=950,drag=null,focus=new T.Vector3(),last=performance.now(),saveTimer=0,uiTimer=0,signature='',localTerrain=null,frameDelta=0,selectedBuilding=null,buildingInspector=null,ghost=null,ghostPoint=null,ghostKey='',lastTrailTime=-1,lastTrailChanges=-1,lastTrailNavVersion=-1;
+const assetDemandV241=createAssetDemandV241(game,{TROOPS,UNIT_TECH,BUILD_TECH,BUILD_AGE});assetDemandV241.update();let assetPollV241=0;
 const graphicsV226=loadGraphicsSettingsV226();
 const renderer=new T.WebGLRenderer({canvas:$('world'),antialias:graphicsV226.antiAlias!=='off'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
 let quality=graphicsV226.preset==='low'?'low':graphicsV226.preset==='medium'?'medium':'high';
@@ -242,7 +246,11 @@ function baseTownBuildingModelV2234(type,team,age,stage=0,seed=0,woodFortTier=1)
   if(age===0){const generated=createTownModelV154(type,team,age,seed);if(generated){generated.userData.farmsteadSourceV237='generated-glb';return generated;}}
   return createFarmhouseModel(age);
  }if(type==='pasture')return createLivestockModel(age);if(['palisade','stonewall','reinforced_wall','gatehouse'].includes(type))return createBronzeCityModel(type,team,stage);if(['bronze-siege','iron-siege'].includes(s.demo)&&team===1){const m=createBronzeCityModel(type,team,stage)||createBronzeTownHouse(type,team);if(m)return m;}const v154=createTownModelV154(type,team,age,seed);if(v154)return v154;return createAgeBuilding(type,team,age)}
-function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1){return stoneFortLOD(nextStoneBatchLOD(nextStoneBuildingLOD(baseTownBuildingModelV2234(type,team,age,stage,seed,woodFortTier),type,age,seed),type,age,seed),type,age,stage,woodFortTier,seed);}
+function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1){
+ const base=baseTownBuildingModelV2234(type,team,age,stage,seed,woodFortTier);
+ const model=base?.userData.stoneNearLOD?base:stoneBuildingModel(type,age,seed,base)||base;
+ return stoneFortLOD(nextStoneBatchLOD(nextStoneBuildingLOD(model,type,age,seed),type,age,seed),type,age,stage,woodFortTier,seed);
+}
 function visualBuildingAge(b){if(['bronze-siege','iron-siege'].includes(s.demo)&&b.team===1)return 1;return b.previewAge===0&&game.upgrade(b.team)===0?0:game.buildingAge(b.team,b.type)}
 function updateBuildingInfo(){
  if(!buildingInspector){
@@ -314,12 +322,19 @@ function renderedGroundV2231(cell,x,z){
 // V161: distant land around the 3x3 detail area (9x9 tiles, coarse), so tall mountains, hills and
 // coasts continue to the horizon instead of ending at the edge of the detail map.
 const distantCache={key:'',map:new Map()};
-function distantTerrain(cell){
+function forestBlendV242(wx,wz){
+ const at=cellAt(wx-25,wz-25);if(!at)return 0;
+ const corner=game.cell(at),fx=Math.max(0,Math.min(1,(wx-corner.x)/50)),fz=Math.max(0,Math.min(1,(wz-corner.z)/50));
+ const forest=(dc,dr)=>['forest','taiga','jungle'].includes(game.cell({c:at.c+dc,r:at.r+dr})?.biome)?1:0;
+ return (forest(0,0)*(1-fx)+forest(1,0)*fx)*(1-fz)+(forest(0,1)*(1-fx)+forest(1,1)*fx)*fz;
+}
+function distantTerrain(cell){const steps=distantTerrainStepsV242(cell);let result;do{result=steps.next();}while(!result.done);return result.value;}
+function* distantTerrainStepsV242(cell,streaming=false){
  const W=DETAIL_TILE_X*9,D=DETAIL_TILE_Z*9,sx=15,sz=13,nx=Math.round(W/sx),nz=Math.round(D/sz);
  const geo=new T.PlaneGeometry(W,D,nx,nz);geo.rotateX(-Math.PI/2);
  const rev=(s.terrainRevision||0)+':'+(s.crossingRevision||0);if(distantCache.key!==rev){distantCache.key=rev;distantCache.map.clear();}
  const p=geo.attributes.position,colors=new Float32Array(p.count*3),aL=new Float32Array(p.count*2),rock=new T.Color('#7d8174'),snow=new T.Color('#dfe2e4');
- for(let i=0;i<p.count;i++){
+ for(let i=0;i<p.count;i++){if(i&&i%192===0)yield;
   const x=p.getX(i),z=p.getZ(i),gx=Math.round((cell.x*DETAIL_X+x)/sx),gz=Math.round((cell.z*DETAIL_Z+z)/sz),key=gx*100000+gz;
   let v=distantCache.map.get(key);
   if(!v){const wx=cell.x+x/DETAIL_X,wz=cell.z+z/DETAIL_Z,e=worldElevation(game,wx,wz,true),h=visualProject(game,e,wx,wz),at=cellAt(wx,wz),mountain=!!at&&!!game.cell(at)?.mountain;
@@ -333,15 +348,23 @@ function distantTerrain(cell){
  // offset was insufficient on steep cliffs and cut through their faces.
  const oldIndex=geo.index.array,kept=[];
  for(let i=0;i<oldIndex.length;i+=3){const a=oldIndex[i],b=oldIndex[i+1],c=oldIndex[i+2],cx=(p.getX(a)+p.getX(b)+p.getX(c))/3,cz=(p.getZ(a)+p.getZ(b)+p.getZ(c))/3;if(Math.abs(cx)<DETAIL_TILE_X*1.5-sx&&Math.abs(cz)<DETAIL_TILE_Z*1.5-sz)continue;kept.push(a,b,c);}
- geo.setIndex(kept);
+ if(!streaming)geo.setIndex(kept);
  geo.setAttribute('color',new T.BufferAttribute(colors,3));geo.setAttribute('aL161',new T.BufferAttribute(aL,2));geo.computeVertexNormals();
- const mesh=new T.Mesh(geo,terrainMaterial('detail',cell));mesh.userData.terrain=true;mesh.receiveShadow=false;mesh.name='v161 distant land';return mesh;
+ const mesh=new T.Mesh(geo,terrainMaterial('detail',cell));mesh.userData.terrain=true;mesh.receiveShadow=false;mesh.name='v161 distant land';
+ if(streaming)mesh.userData.streamHorizonV242={all:oldIndex.slice(),mask:''};return mesh;
 }
-function terrain(scene,cell=null){const world=!cell,battle=!world&&!!s.battle,geo=new T.PlaneGeometry(world?WORLD_WIDTH:battle?1800:675,world?WORLD_DEPTH:battle?1560:585,world?COLS*(quality==='low'?2:3):(quality==='high'?450:quality==='low'?180:300),world?ROWS*(quality==='low'?2:3):(quality==='high'?390:quality==='low'?156:261));geo.rotateX(-Math.PI/2);if(battle)geo.translate(DETAIL_HALF_X,0,DETAIL_HALF_Z);if(world)geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];const cached=!world&&!battle,segX=geo.parameters.widthSegments,segZ=geo.parameters.heightSegments,csx=675/segX,csz=585/segZ,cnX=Math.round(DETAIL_TILE_X/csx),cnZ=Math.round(DETAIL_TILE_Z/csz),mountainV=cached?new Uint8Array(p.count):null,aL161=world?null:new Float32Array(p.count*2);for(let i=0;i<p.count;i++){if(cached){const x=p.getX(i),z=p.getZ(i),gx=Math.round((cell.x*DETAIL_X+x)/csx),gz=Math.round((cell.z*DETAIL_Z+z)/csz),[b,o]=terrainVertex(gx,gz,csx,csz,cnX,cnZ);p.setY(i,b[o]);colors.push(b[o+1],b[o+2],b[o+3]);mountainV[i]=b[o+4];aL161[i*2]=b[o+5];aL161[i*2+1]=b[o+6];continue;}if(aL161){const x=p.getX(i),z=p.getZ(i),wx=cell.x+x/DETAIL_X,wz=cell.z+z/DETAIL_Z;aL161[i*2]=visualElevation(game,wx,wz);aL161[i*2+1]=mountainMask(game,wx,wz);}const x=p.getX(i),z=p.getZ(i),h=world?atlasTerrainHeight(x,z):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
+function terrain(scene,cell=null,chunk=false){const steps=terrainStepsV242(scene,cell,chunk);let result;do{result=steps.next();}while(!result.done);return result.value;}
+function* terrainStepsV242(scene,cell=null,chunk=false){const world=!cell,battle=!world&&!!s.battle,
+ detailNX=quality==='high'?450:quality==='low'?180:300,detailNZ=quality==='high'?390:quality==='low'?156:261,
+ detailSX=675/detailNX,detailSZ=585/detailNZ,
+ geo=new T.PlaneGeometry(world?WORLD_WIDTH:battle?1800:chunk?DETAIL_TILE_X+detailSX*8:675,
+ world?WORLD_DEPTH:battle?1560:chunk?DETAIL_TILE_Z+detailSZ*8:585,
+ world?COLS*(quality==='low'?2:3):chunk?detailNX/3+8:detailNX,
+ world?ROWS*(quality==='low'?2:3):chunk?detailNZ/3+8:detailNZ);geo.rotateX(-Math.PI/2);if(battle)geo.translate(DETAIL_HALF_X,0,DETAIL_HALF_Z);if(world)geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];const cached=!world&&!battle,segX=geo.parameters.widthSegments,segZ=geo.parameters.heightSegments,csx=chunk?detailSX:675/segX,csz=chunk?detailSZ:585/segZ,cnX=Math.round(DETAIL_TILE_X/csx),cnZ=Math.round(DETAIL_TILE_Z/csz),mountainV=cached?new Uint8Array(p.count):null,aL161=world?null:new Float32Array(p.count*2);for(let i=0;i<p.count;i++){if(chunk&&i&&i%192===0)yield;if(cached){const x=p.getX(i),z=p.getZ(i),gx=Math.round((cell.x*DETAIL_X+x)/csx),gz=Math.round((cell.z*DETAIL_Z+z)/csz),[b,o]=terrainVertex(gx,gz,csx,csz,cnX,cnZ);p.setY(i,b[o]);colors.push(b[o+1],b[o+2],b[o+3]);mountainV[i]=b[o+4];aL161[i*2]=b[o+5];aL161[i*2+1]=b[o+6];continue;}if(aL161){const x=p.getX(i),z=p.getZ(i),wx=cell.x+x/DETAIL_X,wz=cell.z+z/DETAIL_Z;aL161[i*2]=visualElevation(game,wx,wz);aL161[i*2+1]=mountainMask(game,wx,wz);}const x=p.getX(i),z=p.getZ(i),h=world?atlasTerrainHeight(x,z):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
  const color=world?atlasColor(game,x,z,h):detailGroundColor(game,cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z,h,mountain);if(!world&&h>.3){const patch=game.smooth((cell.x*DETAIL_X+x)/31+8,(cell.z*DETAIL_Z+z)/31+7);color.lerp(new T.Color(patch>.65?'#9b9570':'#486b46'),Math.abs(patch-.5)*.13)}color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.07);colors.push(color.r,color.g,color.b)}// V69 cliff strata: colour actual steep mesh faces, not the entire mountain tile.
 geo.computeVertexNormals();const norm=geo.attributes.normal;
 const shale=new T.Color('#484743'),sunRock=new T.Color('#9e9481'),peakSnow=new T.Color('#d9d5c5');
-for(let i=0;i<p.count;i++){
+for(let i=0;i<p.count;i++){if(chunk&&i&&i%192===0)yield;
  const x=p.getX(i),z=p.getZ(i),height=p.getY(i);if(mountainV&&!mountainV[i])continue;const at=mountainV?true:world?cellAt(x,z):cellAt(cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z);
  const rocky=mountainV?true:at&&game.cell(at)?.mountain;if(!rocky||height<1)continue;
  const wx=world?x:cell.x+x/DETAIL_X,wz=world?z:cell.z+z/DETAIL_Z,wy=world?height:aL161[i*2];
@@ -349,7 +372,18 @@ for(let i=0;i<p.count;i++){
  const shade=mountainShade(new T.Color(colors[i*3],colors[i*3+1],colors[i*3+2]),wx,wz,wy,ny/(Math.hypot(nx,ny,nz)||1));
  colors[i*3]=shade.r;colors[i*3+1]=shade.g;colors[i*3+2]=shade.b;
 }
-geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));if(aL161)geo.setAttribute('aL161',new T.BufferAttribute(aL161,2));bakeRelief(geo,world?{ring:1}:{ring:4,hScale:DETAIL_X,vScale:.30});const mesh=new T.Mesh(geo,terrainMaterial(world?'world':'detail',cell));mesh.receiveShadow=true;mesh.userData.terrain=true;scene.add(mesh);if(!world&&battle){
+geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));if(aL161)geo.setAttribute('aL161',new T.BufferAttribute(aL161,2));bakeRelief(geo,world?{ring:1}:{ring:4,hScale:DETAIL_X,vScale:.30});
+if(chunk){
+ const forest=new Float32Array(p.count);for(let i=0;i<p.count;i++){if(i&&i%192===0)yield;forest[i]=forestBlendV242(cell.x+p.getX(i)/DETAIL_X,cell.z+p.getZ(i)/DETAIL_Z);}
+ geo.setAttribute('aForestV242',new T.BufferAttribute(forest,1));
+ // Four sampling rows beyond each edge keep normals and relief identical
+ // across tile boundaries; only the central tile's triangles are drawn.
+ const kept=[],index=geo.index.array;
+ for(let i=0;i<index.length;i+=3){const a=index[i],b=index[i+1],c=index[i+2],x=(p.getX(a)+p.getX(b)+p.getX(c))/3,z=(p.getZ(a)+p.getZ(b)+p.getZ(c))/3;
+  if(Math.abs(x)<DETAIL_HALF_X&&Math.abs(z)<DETAIL_HALF_Z)kept.push(a,b,c);}
+ geo.setIndex(kept);geo.computeBoundingBox();geo.computeBoundingSphere();
+}
+const mesh=new T.Mesh(geo,terrainMaterial(world?'world':'detail',chunk?{...cell,streamingV242:true}:cell));mesh.receiveShadow=true;mesh.userData.terrain=true;scene.add(mesh);if(!world&&battle){
  const seaGeo=new T.PlaneGeometry(battle?1800:675,battle?1560:585,quality==='low'?32:64,quality==='low'?28:56);seaGeo.rotateX(-Math.PI/2);if(battle)seaGeo.translate(DETAIL_HALF_X,0,DETAIL_HALF_Z);
  const v=seaGeo.attributes.position,colors=[];
  for(let i=0;i<v.count;i++){
@@ -496,8 +530,8 @@ addEventListener('pagehide',()=>{if(pendingAutosaves&&!restarting&&(!sampleDemo|
 function activeCity(){return activeTile?game.contextAt(activeTile,true):null}
 function ownCity(){return activeCity()?.team===0?activeCity():s.cities.find(c=>c.team===0)}
 function settlerHere(){return s.settlers.find(a=>a.team===0&&activeTile&&tileKey(a)===tileKey(activeTile)&&a.landed)}
-function clearLocal(){cityTorchesV235=null;cityTorchStampV235='';villageLife.clear();detailTravellers.clear();detailObjectHolders.clear();const label=localModels.get('city-label');if(label){label.model.material.map?.dispose();label.model.material.map=null}neighbourTerrains=[];battleFeedback.clear();if(ghost)ghost.traverse(o=>o.material?.dispose());if(localTrails){localTrails.dispose?.();localTrails.geometry.dispose();releaseMaterial(localTrails.material)}for(const roads of [localTrailLinks,detailWorldRoads])if(roads)disposeNetwork(roads);localTrailLinks=null;detailWorldRoads=null;detailRoadStamp='';localBorders=null;localBorderStamp='';selectedBuilding=null;ghost=null;ghostPoint=null;ghostKey='';lastTrailTime=-1;lastTrailChanges=-1;for(const g of environment.children)if(g.userData.groundCoverV156&&!g.userData.coverCached)disposeGroundCover(g);environment.traverse(mesh=>{if(mesh.userData.battleDecoration)mesh.dispose?.();if(mesh.userData.terrain){mesh.geometry.dispose();releaseMaterial(mesh.material)}else if(mesh.parent?.userData?.landscape||mesh.userData?.landscape){if(!mesh.geometry?.userData.sharedLandscape)mesh.geometry?.dispose();releaseMaterial(mesh.material)}});environment.clear();localObjects.clear();people.clear();localModels.clear();resourceModels.clear();workerModels.clear();unitModels.clear();signature='';selectedUnit=null;localTrails=null}
-function openWorld(){villageLife.clear();if(walker.active)walker.exit();walker.cancelPlacing();if(s.battle&&!s.battle.result)return say('Lõpeta lahing või tagane.');if(s.battle?.result){const ended=s.battle;applyBattle();if(ended.result==='retreat'){const own=s.armies.find(a=>a.team===0&&(ended.retreatedArmies||[]).some(r=>r.team===0&&(a.id||0)===r.armyId));if(own)chosen=game.cell(own);}s.battle=null;}document.body.classList.remove('hud-city-open','hud-city-overview','hud-map-open','hud-queue-open');view='world';commandMode='select';hoverPoint=null;mode=null;activeTile=null;zoom=950;const at=center(chosen.c,chosen.r);focus.set(at.x,0,at.z);document.body.classList.remove('battle','settling','enemy-city');document.body.classList.add('atlas');$('settlerpanel').hidden=true;$('battlepanel').hidden=true;$('atlaspanel').hidden=false;renderUI()}
+function clearLocal({streaming=false}={}){cityTorchesV235=null;cityTorchStampV235='';if(!streaming)villageLife.clear();detailTravellers.clear();detailObjectHolders.clear();const label=localModels.get('city-label');if(label){label.model.material.map?.dispose();label.model.material.map=null}neighbourTerrains=[];battleFeedback.clear();if(ghost)ghost.traverse(o=>o.material?.dispose());if(localTrails){localTrails.dispose?.();localTrails.geometry.dispose();releaseMaterial(localTrails.material)}for(const roads of [localTrailLinks,detailWorldRoads])if(roads){roads.removeFromParent();disposeNetwork(roads);}localTrailLinks=null;detailWorldRoads=null;detailRoadStamp='';localBorders=null;localBorderStamp='';selectedBuilding=null;ghost=null;ghostPoint=null;ghostKey='';lastTrailTime=-1;lastTrailChanges=-1;for(const g of environment.children)if(g.userData.groundCoverV156&&!g.userData.coverCached)disposeGroundCover(g);environment.traverse(mesh=>{if(mesh.userData.battleDecoration)mesh.dispose?.();if(mesh.userData.terrain){mesh.geometry.dispose();releaseMaterial(mesh.material)}else if(mesh.parent?.userData?.landscape||mesh.userData?.landscape){if(!mesh.geometry?.userData.sharedLandscape)mesh.geometry?.dispose();releaseMaterial(mesh.material)}});environment.clear();localObjects.clear();people.clear();localModels.clear();resourceModels.clear();workerModels.clear();unitModels.clear();signature='';selectedUnit=null;localTrails=null}
+function openWorld(){if(view==='local'&&activeTile&&!s.battle)stashDetailV242(activeTile);detailStreamV242.pause();villageLife.clear();if(walker.active)walker.exit();walker.cancelPlacing();if(s.battle&&!s.battle.result)return say('Lõpeta lahing või tagane.');if(s.battle?.result){const ended=s.battle;applyBattle();if(ended.result==='retreat'){const own=s.armies.find(a=>a.team===0&&(ended.retreatedArmies||[]).some(r=>r.team===0&&(a.id||0)===r.armyId));if(own)chosen=game.cell(own);}s.battle=null;}document.body.classList.remove('hud-city-open','hud-city-overview','hud-map-open','hud-queue-open');view='world';commandMode='select';hoverPoint=null;mode=null;activeTile=null;zoom=950;const at=center(chosen.c,chosen.r);focus.set(at.x,0,at.z);document.body.classList.remove('battle','settling','enemy-city');document.body.classList.add('atlas');$('settlerpanel').hidden=true;$('battlepanel').hidden=true;$('atlaspanel').hidden=false;renderUI()}
 // V156: ground cover keeps clear of roads and building plots.
 // V157: building plots (local units) of this tile and its neighbours, for roads and ground cover.
 function plotRects(cell,neighbours=true){const rects=[];let stamp='';
@@ -546,7 +580,156 @@ function syncGroundCover(cell){
  for(const [k,e] of coverCache){if(want.has(k))continue;const [c,r]=k.split(':').map(Number);if(Math.max(Math.abs(c-cell.c),Math.abs(r-cell.r))>2||!k.endsWith(':'+graphicsV226.vegetation)){disposeGroundCover(e.group);coverCache.delete(k);}}
 }
 function runCoverJobs(){const t0=performance.now();while(coverJobs.length&&performance.now()-t0<5)coverJobs.shift()();}
-function openTile(cell){const walkerFrom=walkerTile;toggleExploreMenu(false);if(cell&&!game.seen(0,cell)&&!s.battle)return say('See ala on veel avastamata. Liiguta avastaja lähemale.');if(s.battle&&!s.battle.result&&tileKey(s.battle.cell)!==tileKey(cell))return say('Lõpeta lahing või tagane.');const pending=s.settlers.find(a=>a.team===0&&a.c===cell.c&&a.r===cell.r&&!a.path.length&&!game.territoryOwner(cell));if(pending){const error=game.land(pending.id);if(error)return say(error);selectedMover=pending.id}const previousArea=mode&&activeTile?game.territoryOwner(activeTile):null;const nextArea=mode?game.territoryOwner(cell):null;const keepBuildMode=!!mode&&!!previousArea&&!!nextArea&&previousArea.id===nextArea.id&&previousArea.team===nextArea.team;view='local';localScene.fog.near=s.battle?4000:390;localScene.fog.far=s.battle?8000:1020;commandMode='select';hoverPoint=null;activeTile=cell;chosen=cell;if(s.battle)walker.remove();else if(walkerFrom&&walker.placed){walker.shift((cell.c-walkerFrom.c)*DETAIL_TILE_X,(cell.r-walkerFrom.r)*DETAIL_TILE_Z,(x,z)=>Math.abs(x)<DETAIL_TILE_X*1.5&&Math.abs(z)<DETAIL_TILE_Z*1.5);walkerTile=walker.placed?cell:null;}if(!keepBuildMode)mode=null;zoom=s.battle?Math.min(2400,1500/Math.min(1,camera.aspect)):200;
+// V242: stable tile nodes survive a change of the local coordinate origin.
+const detailStreamV242=new DetailStreamV242({scene:localScene,
+ cell:(c,r)=>c>=0&&r>=0&&c<COLS&&r<ROWS?game.cell({c,r}):null,
+ build:buildDetailTileV242,dispose:disposeDetailTileV242,budget:3});
+let streamRevisionV242='';
+function* buildDetailTileV242(entry){
+ const tile=entry.tile;
+ entry.stage='terrain';
+ entry.terrain=yield* terrainStepsV242(entry.root,tile,true);yield;
+ entry.stage='horizon';
+ entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
+ let water=0;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const neighbour=game.cell({c:tile.c+dc,r:tile.r+dr});if(!neighbour||!neighbour.land)water++;}
+ entry.water=water;
+ entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>ground(tile,x,z),{origin:tile});if(entry.sea)entry.decor.add(entry.sea);}yield;
+ entry.stage='rivers';
+ entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
+ entry.stage='outcrops';
+ entry.outcrops=createMountainOutcrops(game,'detail',tile);entry.decor.add(entry.outcrops);yield;
+ entry.stage='ground cover';
+ const cover=createGroundCoverV156(tile,coverHeight(tile),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(tile),{fraction:.55,deferred:true});
+ entry.cover=cover.group;entry.root.add(cover.group);
+ for(const step of cover.steps){step();yield;}
+ entry.stage='local world';entry.world=game.localWorld(tile);entry.sourceIds=new Set(entry.world.resources.map(r=>r.id));
+ const crossing=tile.river&&(tile.bridge||tile.ford)?crossingFrame(game,tile):null;
+ let batch=0;
+ entry.stage='resources';for(const res of entry.world.resources){
+  if(res.removed||res.amount<=0||(res.depositSite&&game.contextAt(tile,false)?.economy.buildings.some(b=>b.depositId===res.id&&b.hp>0)))continue;
+  if(['tree','berry','game'].includes(res.kind)){
+   const water=riverNear(game,tile.x+res.x/DETAIL_X,tile.z+res.z/DETAIL_Z);
+   if(tile.mountain||water.distance<water.width*1.55||insideCrossing(crossing,tile.x+res.x/DETAIL_X,tile.z+res.z/DETAIL_Z))continue;
+  }
+  entry.resources.set(res.id,resourceView(res,tile,entry.scenery));if(++batch%4===0)yield;
+ }
+ const context=game.contextAt(tile,false);
+ entry.stage='buildings';if(context)for(const b of context.economy.buildings){
+  if(b.virtual)continue;
+  const value=makeStreamBuildingV242(b,tile,context);entry.scenery.add(value.model);entry.buildings.set(b,value);yield;
+ }
+ entry.root.updateMatrixWorld(true);
+ entry.stage='navigation';const nav=yield* game.prepareNavV242(tile);entry.navigation=nav;
+ entry.stage='roads';const plots=plotRects(tile),city=game.contextAt(tile,false);
+ entry.roads=createUnifiedRoadNetwork(game,'detail',tile,plots.rects,(x,z)=>ground(tile,x,z));entry.decor.add(entry.roads);
+ entry.roadStamp=tileKey(tile)+':'+(s.roadRevision||0)+':'+(s.visionRevision||0)+':'+nav.version+':'+(city?s.ages[city.team]:s.ages[0])+':'+plots.stamp;yield;
+ entry.borders=createDetailBorders(game,tile);entry.decor.add(entry.borders);entry.borderStamp=game.territoryStamp+':'+(s.visionRevision||0);yield;
+}
+function streamBuildingStampV242(b){return [b.type,b.team,visualBuildingAge(b),b.woodFortTierV1757,b.houseUpgradeLevelV218||0,b.buildingRotationV228,b.x,b.z,b.palisadeSpanV167,b.wallAngleV175].join(':');}
+function makeStreamBuildingV242(b,tile,context){
+  const age=visualBuildingAge(b),model=b.type==='bridge'?createBridgeBuilding(game,tile,(x,z)=>ground(tile,x,z)):townBuildingModel(b.type,b.team,age,0,buildingSeed(b),b.woodFortTierV1757);
+  if(b.type==='field'){const d=fieldSize(b),q=Math.abs(Math.sin(b.buildingRotationV228||0))>.5;model.scale.set((q?d.depth:d.width)/16,1,(q?d.width:d.depth)/16);}
+  if(b.type==='market')model.scale.set(2,1,2);
+  if(b.type==='house'&&b.houseUpgradeLevelV218)model.scale.set(1.12,1.42,1.10);
+  model.position.set(b.x,buildingBaseV2231(tile,b),b.z);
+  if(b.palisadeSpanV167&&isDrawableWallV175(b.type)){
+   const a=b.cliffEmbedStartV179||0,e=b.cliffEmbedEndV179||0,shift=(e-a)/2;model.scale.x=(b.palisadeSpanV167+a+e)/7;
+   model.position.x+=Math.cos(b.wallAngleV175||0)*shift;model.position.z-=Math.sin(b.wallAngleV175||0)*shift;
+  }else if(b.extendedPalisadeV166&&['palisade','woodgate','gatehouse'].includes(b.type))model.scale.x=2;
+  model.rotation.y=b.buildingRotationV228??(b.type==='watchtower'?towerDoorDirectionV1757(context,b).angle:(b.wallAngleV175??b.shoreAngle??((WALL_TYPES.has(b.type)||['woodgate','gatehouse'].includes(b.type))&&b.wallAxis?Math.PI/2:0)));
+  model.scale.y*=b.ready?1:.25;model.userData.buildingRef=b;model.userData.buildingAge=age;
+
+
+ model.userData.streamTeamV242=b.team;
+ return {model,age,stage:0,type:b.type,woodTier:b.woodFortTierV1757,houseTier:b.houseUpgradeLevelV218||0,streamStamp:streamBuildingStampV242(b)};
+}
+function disposeDetailTileV242(entry){
+ villageLife.forget(entry.tile);
+ const occupied=[...s.armies,...s.settlers].some(p=>p.c===entry.tile.c&&p.r===entry.tile.r);
+ if(!occupied&&!game.contextAt(entry.tile,false)&&game.localNavs.get(entry.key)===entry.navigation)game.localNavs.delete(entry.key);
+ disposeGroundCover(entry.cover);
+ entry.terrain?.geometry.dispose();entry.terrain?.material.dispose();
+ for(const network of [entry.roads,entry.rivers,entry.borders])if(network)disposeNetwork(network);
+ for(const mesh of [entry.distant,entry.sea])if(mesh){mesh.geometry.dispose();mesh.material.dispose();}
+ entry.outcrops?.traverse(o=>{if(o.geometry&&!o.geometry.userData.sharedLandscape)o.geometry.dispose();if(o.material)releaseMaterial(o.material);});
+ // Shared GLB geometry, textures and town-model caches belong to their loaders.
+ // Only per-instance buffers owned by this tile may be released here.
+ entry.root.traverse(o=>{if(o.isInstancedMesh&&!o.userData.groundCoverV156)o.dispose();});
+}
+function stashDetailV242(tile){
+ const entry=detailStreamV242.entries.get(tileKey(tile));if(!entry)return;
+ soldierBatch?.update([]); // Restore source meshes before keeping a tile nearby.
+ for(const [id,model] of resourceModels){entry.resources.set(id,model);entry.scenery.add(model);}
+ for(const [b,value] of localModels)if(typeof b==='object'&&value?.model){entry.buildings.set(b,value);entry.scenery.add(value.model);}
+ for(const [id,model] of workerModels){entry.workers.set(id,model);entry.actors.add(model);}
+ for(const [key,node] of [['roads',detailWorldRoads],['rivers',localRivers],['borders',localBorders]])if(node){entry[key]=node;entry.decor.add(node);}
+ entry.roadStamp=detailRoadStamp;entry.borderStamp=localBorderStamp;
+ detailWorldRoads=null;localRivers=null;localBorders=null;
+ // Travelling armies use the existing world/detail proxies on adjacent tiles;
+ // retaining their old root would leave a second scout at the previous location.
+}
+function mountDetailV242(cell){
+ const revision=[quality,graphicsV226.vegetation,s.terrainRevision||0,s.crossingRevision||0].join(':');
+ if(streamRevisionV242!==revision){detailStreamV242.clear();streamRevisionV242=revision;}
+ const entry=detailStreamV242.finish(cell);detailStreamV242.activate(cell);
+ for(const [id,model] of entry.resources){environment.add(model);resourceModels.set(id,model);}
+ for(const [b,value] of entry.buildings){
+  if(TOWER_TYPES.has(b.type)||value.model.userData.streamTeamV242!==b.team){entry.scenery.remove(value.model);entry.buildings.delete(b);continue;}
+  localObjects.add(value.model);localModels.set(b,value);
+ }
+ for(const [id,model] of entry.workers){people.add(model);workerModels.set(id,model);}
+ localTerrain=entry.terrain;refreshStreamHoldersV242();
+ localRivers=entry.rivers;localCrossingRevision=s.crossingRevision||0;
+ detailWorldRoads=entry.roads;detailRoadStamp=entry.roadStamp;
+ localBorders=entry.borders;localBorderStamp=entry.borderStamp;
+ atmosphere.setSkirt(entry.water>=10);
+}
+function refreshStreamHoldersV242(){
+ if(!detailStreamV242.enabled||!activeTile)return;
+ const current=detailStreamV242.entries.get(tileKey(activeTile)),horizon=current?.distant,coarse=horizon?.userData.streamHorizonV242;
+ if(coarse){
+  const ready=new Set([...detailStreamV242.entries.values()].filter(e=>e.terrain&&e.root.visible).map(e=>e.key)),mask=[...ready].sort().join('|');
+  if(mask!==coarse.mask){
+   coarse.mask=mask;const p=horizon.geometry.attributes.position,kept=[];
+   for(let i=0;i<coarse.all.length;i+=3){
+    const a=coarse.all[i],b=coarse.all[i+1],c=coarse.all[i+2],x=(p.getX(a)+p.getX(b)+p.getX(c))/3,z=(p.getZ(a)+p.getZ(b)+p.getZ(c))/3;
+    const dc=Math.floor((x+DETAIL_HALF_X)/DETAIL_TILE_X),dr=Math.floor((z+DETAIL_HALF_Z)/DETAIL_TILE_Z);
+    if(Math.abs(dc)<=1&&Math.abs(dr)<=1&&ready.has((activeTile.c+dc)+':'+(activeTile.r+dr)))continue;
+    kept.push(a,b,c);
+   }
+   horizon.geometry.index.array.set(kept);horizon.geometry.index.needsUpdate=true;horizon.geometry.setDrawRange(0,kept.length);
+  }
+ }
+ const live=new Set();neighbourTerrains=[];let visualUpdates=0;
+ for(const entry of detailStreamV242.entries.values()){
+  if(!entry.root.visible)continue;live.add(entry.key);
+  if(entry.terrain&&entry.tile!==activeTile)neighbourTerrains.push(entry.terrain);
+  detailObjectHolders.set(entry.key,{tile:entry.tile,holder:entry.sites});
+  if(entry.tile!==activeTile&&entry.ready){
+   const context=game.contextAt(entry.tile,false),buildings=context?.economy.buildings||[];
+   for(const [b,value] of entry.buildings)if(!buildings.includes(b)||b.virtual||b.hp<=0){value.model.removeFromParent();entry.buildings.delete(b);}
+   for(const b of buildings){
+    if(b.virtual||b.hp<=0)continue;let value=entry.buildings.get(b);
+    if((!value||value.streamStamp!==streamBuildingStampV242(b))&&visualUpdates<1){
+     const replacement=makeStreamBuildingV242(b,entry.tile,context);value?.model.removeFromParent();entry.scenery.add(replacement.model);entry.buildings.set(b,replacement);value=replacement;visualUpdates++;
+    }
+    if(value){value.model.scale.y=(b.type==='house'&&b.houseUpgradeLevelV218?1.42:1)*(b.ready?1:.15+.85*Math.min(1,(b.progress||0)/game.constructionTime(b.type)));animateBuilding(value.model,s.time,b.status==='Toodab',b.ready);}
+   }
+   for(const res of entry.world.resources){
+    let model=entry.resources.get(res.id);
+    if(!model&&!entry.sourceIds.has(res.id)&&!res.removed&&res.amount>0&&visualUpdates<1){model=resourceView(res,entry.tile,entry.scenery);entry.resources.set(res.id,model);entry.sourceIds.add(res.id);visualUpdates++;}
+    if(model&&(res.removed||res.amount<=0))model.visible=false;
+   }
+  }
+  if(entry.tile!==activeTile)for(const [id,model] of entry.workers){
+   const worker=entry.world?.workers?.[id];if(!worker)continue;
+   model.position.set(worker.x,ground(entry.tile,worker.x,worker.z),worker.z);model.rotation.y=worker.heading||0;
+   animateSoldier(model.children[0],s.time,!!worker.moving,{phase:-1,action:worker.working?(worker.action||'work'):null,workRate:worker.workRate??1});
+  }
+ }
+ for(const key of detailObjectHolders.keys())if(!live.has(key))detailObjectHolders.delete(key);
+}
+function openTile(cell,{seamless=false}={}){const previousTile=view==='local'?activeTile:null;const previousFocus=focus.clone(),previousZoom=zoom;const walkerFrom=walkerTile;toggleExploreMenu(false);if(cell&&!game.seen(0,cell)&&!s.battle)return say('See ala on veel avastamata. Liiguta avastaja lähemale.');if(s.battle&&!s.battle.result&&tileKey(s.battle.cell)!==tileKey(cell))return say('Lõpeta lahing või tagane.');const pending=s.settlers.find(a=>a.team===0&&a.c===cell.c&&a.r===cell.r&&!a.path.length&&!game.territoryOwner(cell));if(pending){const error=game.land(pending.id);if(error)return say(error);selectedMover=pending.id}const previousArea=mode&&activeTile?game.territoryOwner(activeTile):null;const nextArea=mode?game.territoryOwner(cell):null;const keepBuildMode=!!mode&&!!previousArea&&!!nextArea&&previousArea.id===nextArea.id&&previousArea.team===nextArea.team;if(previousTile&&detailStreamV242.enabled)stashDetailV242(previousTile);view='local';localScene.fog.near=s.battle?4000:390;localScene.fog.far=s.battle?8000:1020;commandMode='select';hoverPoint=null;activeTile=cell;chosen=cell;if(s.battle)walker.remove();else if(walkerFrom&&walker.placed){walker.shift((cell.c-walkerFrom.c)*DETAIL_TILE_X,(cell.r-walkerFrom.r)*DETAIL_TILE_Z,(x,z)=>Math.abs(x)<DETAIL_TILE_X*1.5&&Math.abs(z)<DETAIL_TILE_Z*1.5);walkerTile=walker.placed?cell:null;}if(!keepBuildMode)mode=null;zoom=s.battle?Math.min(2400,1500/Math.min(1,camera.aspect)):200;
  focus.set(s.battle?DETAIL_HALF_X:0,0,s.battle?DETAIL_HALF_Z:0);
  // V238: a single scout is only ~2m high and easy to miss when entering
  // a 225×195m detail tile. Centre on its real 8×8 sector when opening a
@@ -559,7 +742,12 @@ function openTile(cell){const walkerFrom=walkerTile;toggleExploreMenu(false);if(
    focus.set(spot.x,0,spot.z);zoom=150;
   }
  }
- clearLocal();installDetailObjectHolder(cell,localObjects);localTerrain=terrain(environment,cell);if(!s.battle)environment.add(distantTerrain(cell));{let water=0;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const n=game.cell({c:cell.c+dc,r:cell.r+dr});if(!n||!n.land)water++;}atmosphere.setSkirt(water>=10);if(water&&!s.battle){const sea=createDetailSea((x,z)=>ground(cell,x,z));if(sea)environment.add(sea);}}syncGroundCover(cell);loadNeighbours(cell);localRivers=createRiverNetwork(game,'detail',s.battle?{...cell,tacticalRadius:345}:cell,quality,(x,z)=>ground(cell,x,z));localCrossingRevision=s.crossingRevision||0;environment.add(localRivers);environment.add(createMountainOutcrops(game,'detail',cell));if(s.battle){batchBattleDecoration(environment);environment.add(createBattleBoundary((x,z)=>ground(cell,x,z)));}document.body.classList.remove('atlas');$('atlaspanel').hidden=true;$('battlepanel').hidden=true;syncLocal();if(s.battle?.wallWalkEnabled){for(const stair of s.battle.wallStairs){const m=createWallStairs(stair.height);m.position.set(stair.groundX,ground(cell,stair.groundX,stair.groundZ),stair.groundZ);m.rotation.y=Math.atan2(stair.x-stair.groundX,stair.z-stair.groundZ)+Math.PI;localObjects.add(m);}}renderUI()}
+ clearLocal({streaming:!s.battle});
+ if(!s.battle){mountDetailV242(cell);}
+ else{detailStreamV242.pause();installDetailObjectHolder(cell,localObjects);localTerrain=terrain(environment,cell);}
+ if(seamless&&previousTile){focus.set(previousFocus.x-(cell.c-previousTile.c)*DETAIL_TILE_X,previousFocus.y,previousFocus.z-(cell.r-previousTile.r)*DETAIL_TILE_Z);zoom=previousZoom;}
+ if(s.battle){syncGroundCover(cell);loadNeighbours(cell);localRivers=createRiverNetwork(game,'detail',{...cell,tacticalRadius:345},quality,(x,z)=>ground(cell,x,z));localCrossingRevision=s.crossingRevision||0;environment.add(localRivers);environment.add(createMountainOutcrops(game,'detail',cell));}
+ if(s.battle){batchBattleDecoration(environment);environment.add(createBattleBoundary((x,z)=>ground(cell,x,z)));}document.body.classList.remove('atlas');$('atlaspanel').hidden=true;$('battlepanel').hidden=true;syncLocal();if(s.battle?.wallWalkEnabled){for(const stair of s.battle.wallStairs){const m=createWallStairs(stair.height);m.position.set(stair.groundX,ground(cell,stair.groundX,stair.groundZ),stair.groundZ);m.rotation.y=Math.atan2(stair.x-stair.groundX,stair.z-stair.groundZ)+Math.PI;localObjects.add(m);}}renderUI()}
 // World atlas and local detail maps share the same V75 site catalog, including
 // claimed villages/ruins from version-4 saves and the V58 forest/rock/bridge GLBs.
 function installDetailObjectHolder(tile,parent){
@@ -571,7 +759,7 @@ function syncDetailWorldObjects(){
  if(view!=='local'||!activeTile||s.battle)return;
  for(const {tile,holder} of detailObjectHolders.values()){
   // Civilians are siblings of the GLB holder so world-prop refreshes cannot detach them.
-  villageLife.show(tile,holder.parent,{nearby:tile.c!==activeTile.c||tile.r!==activeTile.r});
+  villageLife.show(tile,holder.parent,{nearby:false});
   // Check only nearby visible sites. A distant explorer changing fog no longer
   // rebuilds all local 3D models every time its world vision advances.
   const visible=worldProps.siteCatalog.at(tile).filter(site=>game.seen(0,site.cell));
@@ -590,9 +778,23 @@ function loadNeighbours(cell){for(let dr=s.battle?-3:-1;dr<=(s.battle?4:1);dr++)
     else if(b.extendedPalisadeV166&&['palisade','woodgate','gatehouse'].includes(b.type))m.scale.x=2;
     m.rotation.y=b.buildingRotationV228??(b.type==='watchtower'?towerDoorDirectionV1757(ctx,b).angle:(b.wallAngleV175??b.shoreAngle??((WALL_TYPES.has(b.type)||['woodgate','gatehouse'].includes(b.type))&&b.wallAxis?Math.PI/2:0)));
     m.scale.y=b.ready?1:.25;g.add(m)}}}
-function followDetail(){if(view!=='local'||s.battle||!activeTile)return;const dc=focus.x>DETAIL_HALF_X?1:focus.x< -DETAIL_HALF_X?-1:0,dr=focus.z>DETAIL_HALF_Z?1:focus.z< -DETAIL_HALF_Z?-1:0;if(!dc&&!dr)return;const c=activeTile.c+dc,r=activeTile.r+dr;if(c<0||r<0||c>=COLS||r>=ROWS){focus.x=Math.max(-DETAIL_HALF_X+1,Math.min(DETAIL_HALF_X-1,focus.x));focus.z=Math.max(-DETAIL_HALF_Z+1,Math.min(DETAIL_HALF_Z-1,focus.z));return}const x=focus.x-dc*DETAIL_TILE_X,z=focus.z-dr*DETAIL_TILE_Z,currentZoom=zoom;openTile(game.cell({c,r}));focus.set(x,0,z);zoom=currentZoom;}
+function followDetail(){
+ if(view!=='local'||s.battle||!activeTile)return;
+ detailStreamV242.prefetch(focus.x,focus.z);
+ const dc=focus.x>DETAIL_HALF_X?1:focus.x< -DETAIL_HALF_X?-1:0,dr=focus.z>DETAIL_HALF_Z?1:focus.z< -DETAIL_HALF_Z?-1:0;
+ if(!dc&&!dr)return;
+ const target=game.cell({c:activeTile.c+dc,r:activeTile.r+dr});
+ if(!target||!game.seen(0,target)){
+  // Refused transitions must not rebase the camera onto an unopened tile.
+  focus.x=Math.max(-DETAIL_HALF_X+1,Math.min(DETAIL_HALF_X-1,focus.x));focus.z=Math.max(-DETAIL_HALF_Z+1,Math.min(DETAIL_HALF_Z-1,focus.z));return;
+ }
+ const prepared=detailStreamV242.ensure(target);
+ if(!prepared.ready)return; // The existing 3x3 scene remains visible meanwhile.
+ openTile(target,{seamless:true});
+}
+
 function insideCrossing(frame,x,z){if(!frame)return false;const dx=x-frame.x,dz=z-frame.z;return Math.abs(dx*frame.normal.x+dz*frame.normal.z)<frame.halfSpan*1.5&&Math.abs(-dx*frame.normal.z+dz*frame.normal.x)<4.5;}
-function resourceView(r){const g=new T.Group();if(['game','fish','berry'].includes(r.kind))g.add(createWildlife(r.kind));else if(r.kind==='tree')addTree(g,0,0,0,r.id,.9);else if(r.depositSite)g.add(createDepositPile(r.kind));else for(let i=0;i<3;i++){const rock=new T.Mesh(new T.DodecahedronGeometry(.8+i*.2,0),mat(r.kind==='ore'?'#9e7356':'#a4a68e'));rock.position.set((i-1)*.65,.6,i%2*.5);rock.castShadow=true;g.add(rock)}g.position.set(r.x,r.kind==='fish'?.18:ground(activeTile,r.x,r.z),r.z);environment.add(g);return g}
+function resourceView(r,tile=activeTile,parent=environment){const g=new T.Group();if(['game','fish','berry'].includes(r.kind))g.add(createWildlife(r.kind));else if(r.kind==='tree')addTree(g,0,0,0,r.id,.9);else if(r.depositSite)g.add(createDepositPile(r.kind));else for(let i=0;i<3;i++){const rock=new T.Mesh(new T.DodecahedronGeometry(.8+i*.2,0),mat(r.kind==='ore'?'#9e7356':'#a4a68e'));rock.position.set((i-1)*.65,.6,i%2*.5);rock.castShadow=true;g.add(rock)}g.position.set(r.x,r.kind==='fish'?.18:ground(tile,r.x,r.z),r.z);parent.add(g);return g}
 let soldierBatch;
 function troopView(u){
  const group=new T.Group(),count=u.kind==='scout'?1:u.men?.length||u.menCount||soldierCount(u),cols=count>=24?6:4;
@@ -617,11 +819,11 @@ function refreshCityTorchesV235(){
  cityTorchesV235=city?createCityTorchesV235(buildings,(x,z)=>ground(activeTile,x,z)):null;
  if(cityTorchesV235)localObjects.add(cityTorchesV235);
 }
-function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory();const borderStamp=game.territoryStamp+':'+(s.visionRevision||0);if(localBorderStamp!==borderStamp){if(localBorders){environment.remove(localBorders);disposeNetwork(localBorders)}localBorders=createDetailBorders(game,activeTile);environment.add(localBorders);localBorderStamp=borderStamp;}if(localCrossingRevision!==(s.crossingRevision||0)){localCrossingRevision=s.crossingRevision||0;if(localRivers){environment.remove(localRivers);disposeNetwork(localRivers)}localRivers=createRiverNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:345}:activeTile,quality,(x,z)=>ground(activeTile,x,z));environment.add(localRivers);for(const {holder} of detailObjectHolders.values())holder.userData.siteStamp=null;}syncDetailWorldObjects();const city=activeCity(),age=city?game.upgrade(city.team):0,world=game.localWorld(activeTile),nav=detailNav(),vegetationCrossing=activeTile.river&&(activeTile.bridge||activeTile.ford)?crossingFrame(game,activeTile):null;const plots=s.battle?{rects:[],stamp:''}:plotRects(activeTile),roadStamp=tileKey(activeTile)+':'+(s.roadRevision||0)+':'+(s.visionRevision||0)+':'+nav.version+':'+(city?s.ages[city.team]:s.ages[0])+':'+plots.stamp;if(detailRoadStamp!==roadStamp){if(detailWorldRoads){environment.remove(detailWorldRoads);disposeNetwork(detailWorldRoads)}detailWorldRoads=createUnifiedRoadNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:345}:activeTile,plots.rects,(x,z)=>ground(activeTile,x,z));environment.add(detailWorldRoads);detailRoadStamp=roadStamp}for(const r of world.resources){let v=resourceModels.get(r.id);if(!v){v=resourceView(r);resourceModels.set(r.id,v)}v.position.set(r.x,r.kind==='fish'?.18:ground(activeTile,r.x,r.z),r.z);v.visible=!r.removed&&r.amount>0&&!(r.depositSite&&city?.economy.buildings.some(b=>b.depositId===r.id&&b.hp>0));if(['tree','berry','game'].includes(r.kind)){const water=riverNear(game,activeTile.x+r.x/3,activeTile.z+r.z/2.6);v.visible&&=!activeTile.mountain&&water.distance>=water.width*1.55&&!insideCrossing(vegetationCrossing,activeTile.x+r.x/3,activeTile.z+r.z/2.6);}if(r.kind==='game')v.rotation.y=Math.sin(s.time*.18+r.id)*.4;if(r.kind==='fish')v.position.y+=Math.sin(s.time*2+r.id)*.04;if(r.plantedAt!=null)v.scale.setScalar(.25+.75*Math.min(1,(s.time-r.plantedAt)/20))}
+function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory();const borderStamp=game.territoryStamp+':'+(s.visionRevision||0);if(localBorderStamp!==borderStamp){if(localBorders){localBorders.removeFromParent();disposeNetwork(localBorders)}localBorders=createDetailBorders(game,activeTile);environment.add(localBorders);localBorderStamp=borderStamp;}if(localCrossingRevision!==(s.crossingRevision||0)){localCrossingRevision=s.crossingRevision||0;if(localRivers){localRivers.removeFromParent();disposeNetwork(localRivers)}localRivers=createRiverNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:345}:activeTile,quality,(x,z)=>ground(activeTile,x,z));environment.add(localRivers);for(const {holder} of detailObjectHolders.values())holder.userData.siteStamp=null;}syncDetailWorldObjects();const city=activeCity(),age=city?game.upgrade(city.team):0,world=game.localWorld(activeTile),nav=detailNav(),vegetationCrossing=activeTile.river&&(activeTile.bridge||activeTile.ford)?crossingFrame(game,activeTile):null;const plots=s.battle?{rects:[],stamp:''}:plotRects(activeTile),roadStamp=tileKey(activeTile)+':'+(s.roadRevision||0)+':'+(s.visionRevision||0)+':'+nav.version+':'+(city?s.ages[city.team]:s.ages[0])+':'+plots.stamp;if(detailRoadStamp!==roadStamp){if(detailWorldRoads){detailWorldRoads.removeFromParent();disposeNetwork(detailWorldRoads)}detailWorldRoads=createUnifiedRoadNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:345}:activeTile,plots.rects,(x,z)=>ground(activeTile,x,z));environment.add(detailWorldRoads);detailRoadStamp=roadStamp}for(const r of world.resources){let v=resourceModels.get(r.id);if(!v){v=resourceView(r);resourceModels.set(r.id,v)}v.position.set(r.x,r.kind==='fish'?.18:ground(activeTile,r.x,r.z),r.z);v.visible=!r.removed&&r.amount>0&&!(r.depositSite&&city?.economy.buildings.some(b=>b.depositId===r.id&&b.hp>0));if(['tree','berry','game'].includes(r.kind)){const water=riverNear(game,activeTile.x+r.x/3,activeTile.z+r.z/2.6);v.visible&&=!activeTile.mountain&&water.distance>=water.width*1.55&&!insideCrossing(vegetationCrossing,activeTile.x+r.x/3,activeTile.z+r.z/2.6);}if(r.kind==='game')v.rotation.y=Math.sin(s.time*.18+r.id)*.4;if(r.kind==='fish')v.position.y+=Math.sin(s.time*2+r.id)*.04;if(r.plantedAt!=null)v.scale.setScalar(.25+.75*Math.min(1,(s.time-r.plantedAt)/20))}
  if(city&&city.districtOf==null){const parent=game.parentCity(city),title=parent.name+' · '+parent.economy.realms[parent.team].pop;let label=localModels.get('city-label');if(label?.title!==title){if(label){people.remove(label.model);label.model.material.map?.dispose();label.model.material.map=null}const model=cityBanner(title,parent.team),hall=city.economy.buildings.find(b=>b.type==='hall');model.position.set(hall.x,ground(activeTile,hall.x,hall.z)+12,hall.z);people.add(model);localModels.set('city-label',{model,title})}}if(city?.districtOf!=null&&!localModels.has('region-hub')){const hub=new T.Group();box(hub,0,1.7,0,.1,3.4,.1,'#826b47');box(hub,.5,2.8,0,1,.65,.07,city.team?'#b5725c':'#94b7a0');hub.position.y=ground(activeTile,0,0);localObjects.add(hub);localModels.set('region-hub',{model:hub,age})}if(city){for(const b of city.economy.buildings.filter(b=>!b.virtual)){const buildingAge=visualBuildingAge(b),section=s.battle?.siegeSections?.find(w=>w.index===city.economy.buildings.indexOf(b)),stage=(b.bronzeWall||['palisade','stonewall','reinforced_wall','gatehouse'].includes(b.type))?damageStage(section?.hp??b.hp,section?.maxHp??b.damageMaxHp??b.hp):0;let entry=localModels.get(b);if(!entry||entry.age!==buildingAge||entry.stage!==stage||entry.type!==b.type||entry.woodTier!==b.woodFortTierV1757||entry.houseTier!==(b.houseUpgradeLevelV218||0)){if(entry)localObjects.remove(entry.model);const model=b.type==='bridge'?createBridgeBuilding(game,activeTile,(x,z)=>ground(activeTile,x,z)):townBuildingModel(b.type,b.team,buildingAge,stage,buildingSeed(b),b.woodFortTierV1757);
  if(b.type==='field'){const d=fieldSize(b),q=Math.abs(Math.sin(b.buildingRotationV228||0))>.5;model.scale.set((q?d.depth:d.width)/16,1,(q?d.width:d.depth)/16);}if(b.type==='market')model.scale.set(2,1,2);
  if(b.type==='house'&&b.houseUpgradeLevelV218)model.scale.set(1.12,1.42,1.10);
- model.userData.buildingRef=b;model.userData.buildingAge=buildingAge;
+ model.userData.buildingRef=b;model.userData.buildingAge=buildingAge;model.userData.streamTeamV242=b.team;
  if(TOWER_TYPES.has(b.type)){const guard=new T.Group();createSoldier(guard,0,0,b.team?'#b98961':'#a4ab8d','archer');guard.scale.setScalar(.85);guard.position.set(0,towerRoof(b),0);guard.userData.isTowerGuard=true;model.add(guard);model.userData.towerGuard=guard;const ballista=createBallista();ballista.position.y=guard.position.y;model.add(ballista);model.userData.roofBallista=ballista;}
  model.position.set(b.x,buildingBaseV2231(activeTile,b),b.z);if(b.palisadeSpanV167&&isDrawableWallV175(b.type)){const a=b.cliffEmbedStartV179||0,e=b.cliffEmbedEndV179||0,shift=(e-a)/2;model.scale.x=(b.palisadeSpanV167+a+e)/7;model.position.x+=Math.cos(b.wallAngleV175||0)*shift;model.position.z-=Math.sin(b.wallAngleV175||0)*shift;}else if(b.extendedPalisadeV166&&['palisade','woodgate','gatehouse'].includes(b.type))model.scale.x=2;freezeStaticTransforms(model);localObjects.add(model);entry={model,age:buildingAge,stage,type:b.type,woodTier:b.woodFortTierV1757,houseTier:b.houseUpgradeLevelV218||0};localModels.set(b,entry)}if(b.type==='field'){const d=fieldSize(b),q=Math.abs(Math.sin(b.buildingRotationV228||0))>.5;entry.model.scale.x=(q?d.depth:d.width)/16;entry.model.scale.z=(q?d.width:d.depth)/16;}entry.model.scale.y=(b.type==='house'&&b.houseUpgradeLevelV218?1.42:1)*
    (b.ready?1:.15+.85*Math.min(1,(b.progress||0)/game.constructionTime(b.type)));entry.model.rotation.y=b.buildingRotationV228??(b.type==='watchtower'?towerDoorDirectionV1757(city,b).angle:(b.wallAngleV175??b.shoreAngle??((WALL_TYPES.has(b.type)||['gatehouse','woodgate'].includes(b.type))&&b.wallAxis?Math.PI/2:
@@ -1392,7 +1594,7 @@ function refreshAutomaticUI(now){
 // V161: on tall detail-map mountains the camera rides with the ground under the focus
 let camLiftV161=0;const camLookV161=new T.Vector3();
 function fitDepthRange(){const n=Math.max(.1,Math.min(40,zoom*.04));if(Math.abs(camera.near-n)>n*.02){camera.near=n;camera.updateProjectionMatrix();}}
-function frame(now){requestAnimationFrame(frame);if(view==='local'&&coverJobs.length)runCoverJobs();const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}if(view==='local'&&walker.placing)walker.pollPlacing(pick);walker.update(real);if(walker.active&&view==='local'){focus.set(walker.position.x,0,walker.position.z);zoom=45}else updateCameraKeys(real);followDetail();if(view==='world'){updateSpatialBatches(zoom,focus);fadeAtlasGrid(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12 }else{syncLocal();refreshCityTorchesV235();
+function frame(now){requestAnimationFrame(frame);if(now-assetPollV241>1000){assetPollV241=now;assetDemandV241.update();}if(view==='local'&&!s.battle){detailStreamV242.tick();refreshStreamHoldersV242();}if(view==='local'&&coverJobs.length)runCoverJobs();const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}if(view==='local'&&walker.placing)walker.pollPlacing(pick);walker.update(real);if(walker.active&&view==='local'){focus.set(walker.position.x,0,walker.position.z);zoom=45}else updateCameraKeys(real);followDetail();if(view==='world'){updateSpatialBatches(zoom,focus);fadeAtlasGrid(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12 }else{syncLocal();refreshCityTorchesV235();
   const selectedTime=graphicsV226.daylight==='day'?240:graphicsV226.daylight==='evening'?540:graphicsV226.daylight==='night'?840:s.time;
   updateCityTorchesV235(cityTorchesV235,dayClockV235(selectedTime),s.time);
   if(!s.battle)villageLife.update(s.time,frameDelta);updateGhost()}updateCommandVisuals();if(view==='local'&&activeTile){const target=Math.max(0,ground(activeTile,focus.x,focus.z));camLiftV161+=(target-camLiftV161)*Math.min(1,real*5+.02);}else camLiftV161=0;camera.position.set(focus.x+zoom*(view==='world'?.1:.48),camLiftV161+zoom*(view==='world'?.76:.78),focus.z+zoom*(view==='world'?.7:.8));if(view==='local'&&activeTile){const under=ground(activeTile,camera.position.x,camera.position.z)+4;if(camera.position.y<under)camera.position.y=under;}camLookV161.set(focus.x,camLiftV161,focus.z);camera.lookAt(camLookV161);if(walker.active&&view==='local')walker.applyCamera(camera);else fitDepthRange();atmosphere.update(view==='world'?worldScene:localScene,focus,walker.active?60:zoom,real,s.time);
@@ -1561,7 +1763,7 @@ $('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('ki
   say('V205 · Võtsid üle valmis teise müüriga '+(quarter.kind==='coast'?'rannikulinna':'kaljulinna')+
     ' ('+quarter.secondWallSections+' müüriosa). Vajuta ▶ mängu jätkamiseks.');
  }
- if(ironAIDemo){paused=true;$('pause').textContent='▶';say('Juhid endist '+s.takeoverV128.name+' AI riiki · käik '+s.takeoverV128.turn+'. Jätkamiseks vajuta ▶.');}if(aiCityDemo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('Need linnad ehitas AI V135 reeglitega. Ava maailmakaart ja vali linnad; ▶ jätkab mängu.');}if(aiCityV136Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V136 AI-linnad: vaata ümaraid linnapiire, turge, ladusid ja olemasolevaid rannikust lähtuvaid sadamaid. ▶ jätkab mängu.');}if(aiCityV137Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V137: AI ehitatud elurajoonid, 4× turud, 6× põllud ning linna kõigile aladele ulatuv areng. ▶ jätkab mängu.');}if(aiCityV138Demo){paused=true;$('pause').textContent='▶';zoom=165;focus.set(0,5,0);say('V138: AI ehitab ebakorrapäraseid tihedaid kvartaleid kuni detailruudu servadeni ning laieneb kõrvalruudule. ▶ jätkab mängu.');}if(aiCityV139Demo){paused=true;$('pause').textContent='▶';zoom=160;focus.set(0,5,0);say('V139: AI alustab peamaja ümbert, rajab turu ja olulised teenused, ning ehitab varude korral linnamüüri. ▶ jätkab mängu.');}if(aiStoneV174Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V175.1 · Parandatud palisaadiga V174 AI-küla '+(s.stoneTestV174?.targetCityName||'')+' · käik '+(s.stoneTestV174?.turn||'?')+'. Teed tekivad jätkuvalt tegelikust liikumisest. ▶ jätkab mängu.');}if(aiStoneV173Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V173 · Loomulikud teed ja tihe kiviaja AI küla '+(s.stoneTestV173?.targetCityName||'')+' · käik '+(s.stoneTestV173?.turn||'?')+'. ▶ jätkab mängu ning teed tekivad jätkuvalt liiklusest.');}if(aiStoneV172Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V172 · Tihedam kiviaja AI küla '+(s.stoneTestV172?.targetCityName||'')+' · käik '+(s.stoneTestV172?.turn||'?')+'. ▶ jätkab mängu.');}if(aiStoneV171Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V171 · Kiviaja lõpu päris AI asula '+(s.stoneTestV171?.targetCityName||'')+' · käik '+(s.stoneTestV171?.turn||'?')+'. Juhid nüüd seda linna! ▶ jätkab mängu pronksiaja suunas.');}if(aiMedievalV159Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V159 · Keskaeg +30 · '+(s.medievalTestV159?.targetCityName||'')+' · käik '+(s.medievalTestV159?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV153Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V153 · V152 tasakaalustatud keskaeg · '+(s.medievalTestV153?.targetCityName||'')+' · käik '+(s.medievalTestV153?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV151Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V151 · Keskaja I etapp · '+(s.medievalTestV151?.targetCityName||'')+' · käik '+(s.medievalTestV151?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV147Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V147 · Kivimüüride ja väravate AI test · '+(s.medievalTestV147?.targetCityName||'')+' · käik '+(s.medievalTestV147?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV146Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V146 · AI linnakaitse test · '+(s.medievalTestV146?.targetCityName||'')+' · käik '+(s.medievalTestV146?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV145Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V145 · Tasakaalustatud keskaja AI suurim linn '+(s.medievalTestV145?.targetCityName||'')+' · käik '+(s.medievalTestV145?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV144Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V144 · Juhid päris AI ehitatud linna '+(s.medievalTestV144?.targetCityName||'')+' keskaja keskpaigas · käik '+(s.medievalTestV144?.turn||'?')+'. ▶ jätkab mängu.');}if(ironCityV143Demo||ironCityV142Demo){const c=s.cities.filter(c=>c.team===0).sort((a,b)=>b.economy.realms[0].pop-a.economy.realms[0].pop)[0];if(c)openTile(game.cell(c));paused=true;$('pause').textContent='▶';zoom=160;focus.set(0,5,0);say((ironCityV143Demo?'V143':'V142')+' · Päris AI rauaaja test, käik '+(s.ironCityTestV143||s.ironCityTestV142).turn+'. Linnapiir kasvab elanike järgi. ▶ jätkab mängu.');}if(aiModernV140Demo){paused=true;$('pause').textContent='▶';zoom=160;focus.set(0,5,0);say('V140 · AI riigi ülevõtmine, käik '+(s.aiModernTestV140?.turn||'?')+', ajastu '+(s.ages[0]===6?'moodne':s.ages[0])+'. '+(s.aiModernTestV140?.firstModern?'Esimene AI jõudis moodsasse aega.':'Pikk test peatus enne moodsat aega: '+(s.aiModernTestV140?.reason||'piirang'))+' ▶ jätkab mängu.');}if(patrolDemo){openTile(game.cell(s.cities[0]));zoom=140;focus.set(0,5,0);say('Rahuaja patrull: viis kaitsjat torni kohta liiguvad ükshaaval järgmise tornini ja tagasi.');}if(replayDemo||battleDemo||siegeDemo){paused=true;$('pause').textContent='▶';zoom=siegeDemo?Math.min(800,320/Math.min(1,camera.aspect)):Math.min(900,500/Math.min(1,camera.aspect));focus.set(siegeDemo?-60:0,0,0);selectedUnit=s.battle.squads.find(u=>u.team===0);const legend=document.createElement('p');legend.id='battle-factions';legend.style.fontSize='11px';for(const team of [0,1]){const chip=document.createElement('b');chip.textContent=ARMY_COLOR_NAMES[team]+' · '+battleManCount(s.battle,team);chip.style.color='#eee6cc';chip.style.borderLeft='4px solid '+ARMY_COLORS[team];chip.style.padding='2px 5px';chip.style.marginRight='10px';legend.append(chip);}const types=document.createElement('small');types.textContent=siegeDemo?s.demo==='iron-siege'?'Rauaaeg: jalavägi · vibud · ratsavägi · kiviviskemasinad · ballistad':'Pronksiaeg: odamehed · kirvemehed · vibud · kaarikud · redelirünnak':'Odamehed · kirvemehed · vibukütid · sõjavankrid · ratsavägi · katapuldid';types.style.display='block';legend.append(types);$('battlepanel').append(legend);const reset=document.createElement('button');reset.id='battle-demo-restart';reset.textContent='Taasta testlahingu algseis';reset.onclick=()=>location.reload();$('battlepanel').append(reset);say(siegeDemo?(s.demo==='iron-siege'?'Rauaaja linnapiiramine: ratsavägi, kiviviskemasinad ja ballistad. Vali salk ja vajuta ▶.':'Pronksiaja linnapiiramine: odad, kirved, vibud, kaarikud ja redelid. Vali salk ja vajuta ▶.'):'240 vs 240 pronksiaja võitlejat: odad, kirved, vibud ja kaarikud. Vali salk, anna käsk ja vajuta ▶.');renderUI();}}if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={v157:()=>({roads:detailWorldRoads?.userData?.centrelines||[],plots:activeTile?plotRects(activeTile).rects:[],travellers:(()=>{let n=0;people.traverse(o=>{if(o.visible&&['caravan','settler','boat'].includes(o.userData?.kind))n++;});return n})()}),towerGuardStatus:()=>((s.battle||peacefulGarrisons.get(activeCity()))?.squads||[]).filter(u=>u.towerGuard).map(u=>({source:u.source,x:u.x,z:u.z,hp:u.hp,elevation:u.wallElevation,duty:u.guardDuty})),fogStatus:()=>({coverGeometry:fogCoverMesh?.geometry.uuid,sketchGeometries:fogSketchGroup.children.map(m=>m.geometry.uuid),changedCells:visionDelta.changed.length,terrainVertices:atlasLand.geometry.attributes.position.count}),camera,localScene,worldScene,walker,catalogV163:{townBuildingModel,createSoldier,workerProfession,createWildlife,addTree,createDepositPile,createFieldModel,createFarmhouseModel,createLivestockModel,createBronzeCityModel,BUILDINGS,BUILD_AGE,TROOPS},battleDemo,stoneDemo,bronzeDemo,medievalDemo,renaissanceDemo,industrialDemo,
+ if(ironAIDemo){paused=true;$('pause').textContent='▶';say('Juhid endist '+s.takeoverV128.name+' AI riiki · käik '+s.takeoverV128.turn+'. Jätkamiseks vajuta ▶.');}if(aiCityDemo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('Need linnad ehitas AI V135 reeglitega. Ava maailmakaart ja vali linnad; ▶ jätkab mängu.');}if(aiCityV136Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V136 AI-linnad: vaata ümaraid linnapiire, turge, ladusid ja olemasolevaid rannikust lähtuvaid sadamaid. ▶ jätkab mängu.');}if(aiCityV137Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V137: AI ehitatud elurajoonid, 4× turud, 6× põllud ning linna kõigile aladele ulatuv areng. ▶ jätkab mängu.');}if(aiCityV138Demo){paused=true;$('pause').textContent='▶';zoom=165;focus.set(0,5,0);say('V138: AI ehitab ebakorrapäraseid tihedaid kvartaleid kuni detailruudu servadeni ning laieneb kõrvalruudule. ▶ jätkab mängu.');}if(aiCityV139Demo){paused=true;$('pause').textContent='▶';zoom=160;focus.set(0,5,0);say('V139: AI alustab peamaja ümbert, rajab turu ja olulised teenused, ning ehitab varude korral linnamüüri. ▶ jätkab mängu.');}if(aiStoneV174Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V175.1 · Parandatud palisaadiga V174 AI-küla '+(s.stoneTestV174?.targetCityName||'')+' · käik '+(s.stoneTestV174?.turn||'?')+'. Teed tekivad jätkuvalt tegelikust liikumisest. ▶ jätkab mängu.');}if(aiStoneV173Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V173 · Loomulikud teed ja tihe kiviaja AI küla '+(s.stoneTestV173?.targetCityName||'')+' · käik '+(s.stoneTestV173?.turn||'?')+'. ▶ jätkab mängu ning teed tekivad jätkuvalt liiklusest.');}if(aiStoneV172Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V172 · Tihedam kiviaja AI küla '+(s.stoneTestV172?.targetCityName||'')+' · käik '+(s.stoneTestV172?.turn||'?')+'. ▶ jätkab mängu.');}if(aiStoneV171Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V171 · Kiviaja lõpu päris AI asula '+(s.stoneTestV171?.targetCityName||'')+' · käik '+(s.stoneTestV171?.turn||'?')+'. Juhid nüüd seda linna! ▶ jätkab mängu pronksiaja suunas.');}if(aiMedievalV159Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V159 · Keskaeg +30 · '+(s.medievalTestV159?.targetCityName||'')+' · käik '+(s.medievalTestV159?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV153Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V153 · V152 tasakaalustatud keskaeg · '+(s.medievalTestV153?.targetCityName||'')+' · käik '+(s.medievalTestV153?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV151Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V151 · Keskaja I etapp · '+(s.medievalTestV151?.targetCityName||'')+' · käik '+(s.medievalTestV151?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV147Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V147 · Kivimüüride ja väravate AI test · '+(s.medievalTestV147?.targetCityName||'')+' · käik '+(s.medievalTestV147?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV146Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V146 · AI linnakaitse test · '+(s.medievalTestV146?.targetCityName||'')+' · käik '+(s.medievalTestV146?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV145Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V145 · Tasakaalustatud keskaja AI suurim linn '+(s.medievalTestV145?.targetCityName||'')+' · käik '+(s.medievalTestV145?.turn||'?')+'. ▶ jätkab mängu.');}if(aiMedievalV144Demo){paused=true;$('pause').textContent='▶';zoom=155;focus.set(0,5,0);say('V144 · Juhid päris AI ehitatud linna '+(s.medievalTestV144?.targetCityName||'')+' keskaja keskpaigas · käik '+(s.medievalTestV144?.turn||'?')+'. ▶ jätkab mängu.');}if(ironCityV143Demo||ironCityV142Demo){const c=s.cities.filter(c=>c.team===0).sort((a,b)=>b.economy.realms[0].pop-a.economy.realms[0].pop)[0];if(c)openTile(game.cell(c));paused=true;$('pause').textContent='▶';zoom=160;focus.set(0,5,0);say((ironCityV143Demo?'V143':'V142')+' · Päris AI rauaaja test, käik '+(s.ironCityTestV143||s.ironCityTestV142).turn+'. Linnapiir kasvab elanike järgi. ▶ jätkab mängu.');}if(aiModernV140Demo){paused=true;$('pause').textContent='▶';zoom=160;focus.set(0,5,0);say('V140 · AI riigi ülevõtmine, käik '+(s.aiModernTestV140?.turn||'?')+', ajastu '+(s.ages[0]===6?'moodne':s.ages[0])+'. '+(s.aiModernTestV140?.firstModern?'Esimene AI jõudis moodsasse aega.':'Pikk test peatus enne moodsat aega: '+(s.aiModernTestV140?.reason||'piirang'))+' ▶ jätkab mängu.');}if(patrolDemo){openTile(game.cell(s.cities[0]));zoom=140;focus.set(0,5,0);say('Rahuaja patrull: viis kaitsjat torni kohta liiguvad ükshaaval järgmise tornini ja tagasi.');}if(replayDemo||battleDemo||siegeDemo){paused=true;$('pause').textContent='▶';zoom=siegeDemo?Math.min(800,320/Math.min(1,camera.aspect)):Math.min(900,500/Math.min(1,camera.aspect));focus.set(siegeDemo?-60:0,0,0);selectedUnit=s.battle.squads.find(u=>u.team===0);const legend=document.createElement('p');legend.id='battle-factions';legend.style.fontSize='11px';for(const team of [0,1]){const chip=document.createElement('b');chip.textContent=ARMY_COLOR_NAMES[team]+' · '+battleManCount(s.battle,team);chip.style.color='#eee6cc';chip.style.borderLeft='4px solid '+ARMY_COLORS[team];chip.style.padding='2px 5px';chip.style.marginRight='10px';legend.append(chip);}const types=document.createElement('small');types.textContent=siegeDemo?s.demo==='iron-siege'?'Rauaaeg: jalavägi · vibud · ratsavägi · kiviviskemasinad · ballistad':'Pronksiaeg: odamehed · kirvemehed · vibud · kaarikud · redelirünnak':'Odamehed · kirvemehed · vibukütid · sõjavankrid · ratsavägi · katapuldid';types.style.display='block';legend.append(types);$('battlepanel').append(legend);const reset=document.createElement('button');reset.id='battle-demo-restart';reset.textContent='Taasta testlahingu algseis';reset.onclick=()=>location.reload();$('battlepanel').append(reset);say(siegeDemo?(s.demo==='iron-siege'?'Rauaaja linnapiiramine: ratsavägi, kiviviskemasinad ja ballistad. Vali salk ja vajuta ▶.':'Pronksiaja linnapiiramine: odad, kirved, vibud, kaarikud ja redelid. Vali salk ja vajuta ▶.'):'240 vs 240 pronksiaja võitlejat: odad, kirved, vibud ja kaarikud. Vali salk, anna käsk ja vajuta ▶.');renderUI();}}if(recovered)say('Salvestus taastati varukoopiast.');requestAnimationFrame(frame);window.gameDebug={detailStreamV242,activeTileV242:()=>activeTile,assetDemandV241,v157:()=>({roads:detailWorldRoads?.userData?.centrelines||[],plots:activeTile?plotRects(activeTile).rects:[],travellers:(()=>{let n=0;people.traverse(o=>{if(o.visible&&['caravan','settler','boat'].includes(o.userData?.kind))n++;});return n})()}),towerGuardStatus:()=>((s.battle||peacefulGarrisons.get(activeCity()))?.squads||[]).filter(u=>u.towerGuard).map(u=>({source:u.source,x:u.x,z:u.z,hp:u.hp,elevation:u.wallElevation,duty:u.guardDuty})),fogStatus:()=>({coverGeometry:fogCoverMesh?.geometry.uuid,sketchGeometries:fogSketchGroup.children.map(m=>m.geometry.uuid),changedCells:visionDelta.changed.length,terrainVertices:atlasLand.geometry.attributes.position.count}),camera,localScene,worldScene,walker,catalogV163:{townBuildingModel,createSoldier,workerProfession,createWildlife,addTree,createDepositPile,createFieldModel,createFarmhouseModel,createLivestockModel,createBronzeCityModel,BUILDINGS,BUILD_AGE,TROOPS},battleDemo,stoneDemo,bronzeDemo,medievalDemo,renaissanceDemo,industrialDemo,
  buildingInfoStatus:()=>({open:!!buildingInspector?.isOpen(),type:selectedBuilding?.type||null,
   data:selectedBuilding&&activeCity()?describeBuilding(game,activeCity(),selectedBuilding,AGES,RESOURCE_NAMES,BUILDINGS,BUILD_TECH):null}),
  selectBuildingType:(type,index=0)=>{const c=activeCity();return inspectBuilding(c?.economy.buildings.filter(b=>b.type===type)[index])},

@@ -60,7 +60,17 @@ if(previous.minX!==this.minX||previous.minZ!==this.minZ||previous.w!==this.w||pr
  for(const field of ['heat','heatLast']){const mapped={};for(const [key,value]of Object.entries(world[field]||{})){const i=Number(key),x=i%previous.w+previous.minX,z=Math.floor(i/previous.w)+previous.minZ,j=this.index(x,z);if(j>=0)mapped[j]=value;}world[field]=mapped;}
  world.trailChanges=(world.trailChanges||0)+1;
 }
-world.navBounds={minX:this.minX,minZ:this.minZ,w:this.w,h:this.h};this.base=new Uint8Array(this.n);for(let z=0;z<this.h;z++)for(let x=0;x<this.w;x++)this.base[z*this.w+x]=passable(x+this.minX,z+this.minZ)?1:0;this.cache=new WeakMap();this.citizenRoutes=new CitizenRoutes();this.version=0;this.signature='';this.rebuild()}
+world.navBounds={minX:this.minX,minZ:this.minZ,w:this.w,h:this.h};this.base=new Uint8Array(this.n);this.cache=new WeakMap();this.citizenRoutes=new CitizenRoutes();this.version=0;this.signature='';
+ this.preparationV242=this.prepareBaseV242();if(!bounds.deferred)this.finishPreparationV242();}
+*prepareBaseV242(){
+ for(let i=0;i<this.n;i++){
+  if(i&&i%192===0)yield;
+  this.base[i]=this.passable(i%this.w+this.minX,Math.floor(i/this.w)+this.minZ)?1:0;
+ }
+ this.rebuild();
+}
+advancePreparationV242(){if(this.preparationV242?.next().done)this.preparationV242=null;}
+finishPreparationV242(){while(this.preparationV242)this.advancePreparationV242();}
 index(x,z){const xx=Math.round(x)-this.minX,zz=Math.round(z)-this.minZ;return xx>=0&&xx<this.w&&zz>=0&&zz<this.h?zz*this.w+xx:-1}
 point(i){return {x:i%this.w+this.minX,z:Math.floor(i/this.w)+this.minZ}}
 rebuildTerrain(){for(let z=0;z<this.h;z++)for(let x=0;x<this.w;x++)this.base[z*this.w+x]=this.passable(x+this.minX,z+this.minZ)?1:0;this.rebuild()}

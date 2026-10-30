@@ -6,22 +6,17 @@
 // If the files fail to load the game keeps its earlier models (ASSETS stays null).
 import * as T from './vendor/three.module.js';
 import {createStoneEquipment} from './stone-equipment-v234.js';
-import {applyStoneSize} from './stone-sizes-v224.js';
 import {withStoneBuildingLOD,withStoneHumanLOD} from './stone-near-lod.js?v=224';
-import {createWebStoneBuilding} from './stone-web-buildings-v2233.js?v=224';
 import {animateStoneWorkerV222} from './stone-motion-v222.js';
 import {loadGLB} from './glb-lite-v221.js';
+import {requestAssetV241} from './asset-queue-v241.js';
 
-const DIR='./models-v221/';
-async function loadAll(){
- // The five replacements load in stone-web-buildings-v2233.js. Keep the
- // existing hall and person, without also preloading the superseded buildings.
- const names=['human_rigged','peamaja'];
- const files=await Promise.all(names.map(n=>loadGLB(n==='human_rigged'?'./models-stone-near/human_far.glb':DIR+n+'.glb')));
- const out={};names.forEach((n,i)=>out[n]=files[i]);return out;
-}
 let ASSETS=null;
-if(typeof window!=='undefined'&&typeof fetch==='function'){try{ASSETS=await loadAll();}catch(e){console.warn('V221 Stone Age models not loaded, keeping old models',e);}}
+export function loadStoneHumanV241(){
+ return requestAssetV241('stone-human',async()=>{
+  ASSETS={human_rigged:await loadGLB('./models-stone-near/human_far.glb')};return true;
+ });
+}
 export const stoneAssetsReady=()=>!!ASSETS;
 
 function textureOf(prim){
@@ -36,45 +31,11 @@ function materialFor(name,prim,opts={}){
 
 // ------------------------------------------------------------------ buildings
 // size: the longest horizontal side in detail units (≈ metres), close to the old footprints.
-const BUILDINGS={hall:{file:'peamaja',size:10.5},lumber:{file:'woodcuter',size:7.2},quarry:{file:'kiviraidur',size:8.2},
- house0:{file:'maja1',size:6.2},house1:{file:'maja2',size:6.2}};
-const GEO=new Map();
-function buildingGeometry(file){
- if(GEO.has(file))return GEO.get(file);
- const prim=ASSETS[file].primitives[0],g=prim.geometry;g.computeBoundingBox();
- const b=g.boundingBox,c=new T.Vector3();b.getCenter(c);
- const geo=g.clone();geo.translate(-c.x,-b.min.y,-c.z);geo.computeBoundingBox();geo.computeBoundingSphere();
- const entry={geo,prim,size:b.getSize(new T.Vector3())};GEO.set(file,entry);return entry;
-}
-// Stone Age (age 0) replacements; returns null for anything else.
-export function stoneBuildingModel(type,age,seed=0){
- const web=createWebStoneBuilding(type,age,seed);if(web)return web;
- if(!ASSETS||age!==0)return null;
- const key=type==='house'?'house'+((seed>>>0)%2):type;
- const def=BUILDINGS[key];if(!def||!ASSETS[def.file])return null;
- const {geo,prim,size}=buildingGeometry(def.file);
- const s=def.size/Math.max(size.x,size.z);
- const root=new T.Group(),m=new T.Mesh(geo,materialFor(def.file,prim,{side:T.DoubleSide}));
- if(!applyStoneSize(m,type,size,seed))m.scale.setScalar(s*(type==='house'?.94+((seed>>>3)%7)*.02:1));m.castShadow=true;m.receiveShadow=true;root.add(m); /* V224 real sizes */
- // V223.1: the generated quarry mesh has an unclosed rear/side opening.
- // Add recessed fractured rock cores below the visible source mesh instead of
- // a floating unsupported shell. Keep the original textured exterior intact.
- if(type==='quarry'){
-  // Share geometry and the ORIGINAL quarry GLB texture: plain brown
-  // placeholder backfill looked like a smooth clay blob next to the rock.
-  if(!GEO.has('quarry-core-geo'))GEO.set('quarry-core-geo',new T.DodecahedronGeometry(1,1));
-  const stone=materialFor(def.file,prim,{side:T.DoubleSide}),rockGeo=GEO.get('quarry-core-geo');
-  for(const [x,y,z,rx,ry,rz] of [
-   [0,.93,.42,2.62,.96,1.95],[-2.10,.66,.02,1.04,.78,1.18],[2.06,.78,.04,1.03,.81,1.12]
-  ]){
-   const boulder=new T.Mesh(rockGeo,stone);
-   boulder.position.set(x,y,z);boulder.scale.set(rx,ry,rz);
-   boulder.castShadow=true;boulder.receiveShadow=true;root.add(boulder);
-  }
-  root.userData.quarryRockBackfillV2231=true;
- }
- root.userData.animations=[];root.userData.buildingType=type;root.userData.age=0;root.userData.stoneModelV221=key;
- return withStoneBuildingLOD(root,type,def.size,seed);
+const BUILDINGS={hall:10.5,lumber:7.2,quarry:8.2,house:6.2,well:3.4,farm:8.2};
+export function stoneBuildingModel(type,age,seed=0,low=null){
+ if(age!==0||!low||!BUILDINGS[type])return null;
+ low.userData.stoneModelV221=type;
+ return withStoneBuildingLOD(low,type,BUILDINGS[type],seed);
 }
 
 // ------------------------------------------------------------------ people

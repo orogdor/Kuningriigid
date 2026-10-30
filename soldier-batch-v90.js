@@ -5,7 +5,7 @@ export class SoldierBatch{
  update(models){
   // Single scouts render directly; instancing hides their source meshes.
   const included=models.filter(m=>!m.userData.noBatchV239);
-  if(included.length!==this.models.length||included.some((m,i)=>m!==this.models[i])){
+  if(included.length!==this.models.length||included.some((m,i)=>m!==this.models[i]||(m.userData.assetRevisionV241||0)!==(this.assetRevisionsV241?.[i]||0))){
    for(const old of this.models)old.traverse(o=>{
     if(o.userData.batchWasVisible===undefined)return;
     o.visible=o.userData.batchWasVisible;
@@ -13,6 +13,7 @@ export class SoldierBatch{
    });
    for(const b of this.batches)b.mesh.dispose();this.root.clear();this.models=[...included];const groups=new Map();
    for(const model of included)model.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||Array.isArray(o.material))return;if(o.userData.batchWasVisible==null)o.userData.batchWasVisible=o.visible;o.visible=false;const key=o.geometry.uuid+':'+o.material.uuid,list=groups.get(key)||[];list.push(o);groups.set(key,list);});
+   this.assetRevisionsV241=included.map(m=>m.userData.assetRevisionV241||0);
    this.batches=[...groups.values()].map(parts=>{const p=parts[0],mesh=new T.InstancedMesh(p.geometry,p.material,parts.length);mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);mesh.frustumCulled=false;mesh.castShadow=p.castShadow;mesh.receiveShadow=p.receiveShadow;this.root.add(mesh);return {mesh,parts};});
   }
   for(const m of included)m.updateMatrixWorld(true);this.parent.updateWorldMatrix(true,false);const inverse=this.parent.matrixWorld.clone().invert();

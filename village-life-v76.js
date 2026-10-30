@@ -180,5 +180,5 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
   actorCount:e.actors.length,roles:e.actors.map(a=>a.role),activities:e.actors.map(a=>a.activity),
   visible:e.actors.filter(a=>a.person.visible).length,
   campVisible:!!e.group.children.find(o=>o.name==='V76 village gathering place')?.userData.flame.visible}))}
- return {show,update,clear,stats,get count(){return sites.size}};
+ return {show,update,clear,stats,forget(tile){const key=tile.c+':'+tile.r,e=sites.get(key);if(e){e.group.removeFromParent();sites.delete(key);}},get count(){return sites.size}};
 }

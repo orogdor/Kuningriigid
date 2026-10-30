@@ -741,7 +741,11 @@ const HOUSE_TYPES=new Set(['house']);
 export function townModelSupported(type){return HOUSE_TYPES.has(type)||!!SIG[type];}
 export function houseVariantCount(age){return HOUSE_VARIANTS[ERA(age)]||8;}
 export function createTownModelV154(type,team=0,age=0,seed=0){
- {const stone=stoneBuildingModel(type,Math.max(0,age|0),seed);if(stone)return stone;} // V221 Stone Age models
+ if(type==='farm'&&age===0){
+  const low=new T.Group();low.add(meshV158(farmhouseGeometry(0)));
+  Object.assign(low.userData,{animations:[],buildingType:type,age:0});
+  return stoneBuildingModel(type,0,seed,low);
+ }
  if(!townModelSupported(type))return null;
  age=Math.max(0,Math.min(6,age|0));const era=ERA(age);
  const variant=HOUSE_TYPES.has(type)?((seed>>>0)%houseVariantCount(age)):type==='hall'?((seed>>>0)%HALL_VARIANTS_V170):0;
@@ -760,7 +764,7 @@ export function createTownModelV154(type,team=0,age=0,seed=0){
  if(entry.smoke)smokeFrom(root,entry.smoke.x,entry.smoke.y,entry.smoke.z);
  if(entry.lantern)lantern(root,4.3,2.6,2.6);
  root.userData.buildingType=type;root.userData.age=age;root.userData.townModelV154=key;
- return root;
+ return stoneBuildingModel(type,age,seed,root)||root;
 }
 // stable per-building seed from its position
 export function buildingSeed(b){const x=Math.round((b?.x||0)*10),z=Math.round((b?.z||0)*10);let h=(x*73856093)^(z*19349663)^((b?.id||0)*83492791);h=Math.imul(h^(h>>>13),0x5bd1e995);return (h^(h>>>15))>>>0;}

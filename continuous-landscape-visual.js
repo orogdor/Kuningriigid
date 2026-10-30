@@ -46,13 +46,14 @@ function join(pts,game,scope,tile,kind,level=1,age=0,ground=null){
 }
 function tri(arr,a,b,c){V(arr,a);V(arr,b);V(arr,c)}
 function strip(arr,a,b,c,d){tri(arr,a,b,c);tri(arr,c,b,d)}
-function buffers(vertices,color,{standard=false,opacity=1,shade=null,alpha=null}={}){
+function buffers(...args){const steps=buffersStepsV242(...args);let result;do{result=steps.next();}while(!result.done);return result.value;}
+function* buffersStepsV242(vertices,color,{standard=false,opacity=1,shade=null,alpha=null}={}){
  if(!vertices.length)return null;
  // Weld shared vertices into an indexed mesh. Consecutive river/road
  // sections now share actual vertices and normals, instead of separate
  // face triangles placed edge-to-edge (which caused faceting and seams).
  const unique=[],indices=[],lookup=new Map();
- for(let i=0;i<vertices.length;i+=3){
+ for(let i=0;i<vertices.length;i+=3){if(i&&i%576===0)yield;
   const x=vertices[i],y=vertices[i+1],z=vertices[i+2];
   const key=Math.round(x*1000)+','+Math.round(y*1000)+','+Math.round(z*1000);
   let n=lookup.get(key);
@@ -63,7 +64,7 @@ function buffers(vertices,color,{standard=false,opacity=1,shade=null,alpha=null}
  geo.setAttribute('position',new T.Float32BufferAttribute(unique,3));
  geo.setIndex(indices);geo.computeVertexNormals();geo.computeBoundingSphere();
  const tint=new T.Color(color),stride=alpha?4:3,vertexColors=new Float32Array(unique.length/3*stride);
- for(let i=0,j=0;i<unique.length;i+=3,j+=stride){const c=shade?shade(unique[i],unique[i+1],unique[i+2]):tint;vertexColors[j]=c.r;vertexColors[j+1]=c.g;vertexColors[j+2]=c.b;if(alpha)vertexColors[j+3]=alpha(unique[i],unique[i+1],unique[i+2])}
+ for(let i=0,j=0;i<unique.length;i+=3,j+=stride){if(i&&i%576===0)yield;const c=shade?shade(unique[i],unique[i+1],unique[i+2]):tint;vertexColors[j]=c.r;vertexColors[j+1]=c.g;vertexColors[j+2]=c.b;if(alpha)vertexColors[j+3]=alpha(unique[i],unique[i+1],unique[i+2])}
  geo.setAttribute('color',new T.Float32BufferAttribute(vertexColors,stride));
  const mat=standard?new T.MeshStandardMaterial({vertexColors:true,roughness:alpha?.95:.55,metalness:alpha?0:.10,transparent:opacity!==1||!!alpha,opacity,side:T.DoubleSide,depthWrite:opacity===1&&!alpha}):new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  return new T.Mesh(geo,mat);
@@ -84,7 +85,8 @@ function riverFlow(game,x,z){
 }
 const mouthBlend=(game,x,z)=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(x,z)-.30)/3.7));return t*t*(3-2*t);};
 function visible(tile,path,radius=110){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
-export function createRiverNetwork(game,scope='world',tile=null,quality='medium',ground=null){
+export function createRiverNetwork(...args){const steps=riverNetworkStepsV242(...args);let result;do{result=steps.next();}while(!result.done);return result.value;}
+export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='medium',ground=null){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
  const water=[],banks=[],dryBanks=[];
  let shallowCrossings=0;
@@ -94,7 +96,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  const step=scope==='detail'?1.75:2.5,cells=new Set(),nodes=new Map();
  for(const edge of getRivers(game)){
   if(!visible(tile,edge.points))continue;riverCount++;
-  for(const p of edge.points){
+  for(const p of edge.points){yield;
    const radius=p.width*2.20+step*2;
    for(let gz=Math.floor((p.z-radius)/step);gz<=Math.ceil((p.z+radius)/step);gz++)for(let gx=Math.floor((p.x-radius)/step);gx<=Math.ceil((p.x+radius)/step);gx++)cells.add(gx+','+gz);
   }
@@ -123,7 +125,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
    return {...field(game,p.x,p.z,scope,tile),y:q?ground(q.x,q.z)+.012:vp(game,y,scope,p.x,p.z)};
   });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
  };
- for(const key of cells){
+ let batchV242=0;for(const key of cells){if(batchV242++%96===0)yield;
   const [x,z]=key.split(',').map(Number),a=node(x,z),b=node(x+1,z),c=node(x,z+1),d=node(x+1,z+1);
   for(const triangle of [[a,c,b],[b,c,d]]){
    const land=clip(triangle,'shore');if(land.length<3)continue;
@@ -145,7 +147,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  // V149: wet, dark mud at the waterline that dries and fades into the surrounding land.
  const toWorld=(x,z)=>scope==='world'?{x,z}:localToWorld(tile,x,z);
  const mud=new T.Color('#5a523f'),damp=new T.Color('#6e6a4c');
- const bankMesh=buffers(banks,'#6e6a4c',{standard:true,shade:(x,y,z)=>{
+ const bankMesh=yield* buffersStepsV242(banks,'#6e6a4c',{standard:true,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
   return mud.clone().lerp(damp,t).multiplyScalar(.92+.16*Math.sin(p.x*.37+Math.sin(p.z*.29)*2));
  },alpha:(x,y,z)=>{
@@ -154,7 +156,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  }});
  // Fine gravel, silty sand and grass mingle just beyond the wet mud.
  const gravel=new T.Color('#a99e80'),silt=new T.Color('#857e65');
- const dryMesh=buffers(dryBanks,'#a99e80',{standard:true,shade:(x,y,z)=>{
+ const dryMesh=yield* buffersStepsV242(dryBanks,'#a99e80',{standard:true,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
   const t=Math.max(0,Math.min(1,(near.distance-near.width*1.4)/Math.max(.8,near.width*.78)));
   const grain=.5+.5*Math.sin(p.x*.89+p.z*.63+Math.sin(p.x*2.07)*1.3);
@@ -165,7 +167,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
   return .54*Math.pow(1-t,1.3);
  }});
  const deep=new T.Color('#1d4a57'),shallowCol=new T.Color('#4f7f74'),seaCol=new T.Color('#62a6a3');
- const waterMesh=buffers(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
+ const waterMesh=yield* buffersStepsV242(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
   const edge=Math.min(1,near.distance/Math.max(1,near.width));
   return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,1-mouthBlend(game,p.x,p.z)).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
@@ -173,7 +175,7 @@ export function createRiverNetwork(game,scope='world',tile=null,quality='medium'
  if(waterMesh){
   waterMesh.material.dispose();waterMesh.material=waterMaterial(scope,tile);animate(waterMesh);
   const pos=waterMesh.geometry.attributes.position,flow=new Float32Array(pos.count*2),shore=new Float32Array(pos.count);
-  for(let i=0;i<pos.count;i++){
+  for(let i=0;i<pos.count;i++){if(i&&i%192===0)yield;
    const p=toWorld(pos.getX(i),pos.getZ(i)),f=riverFlow(game,p.x,p.z);
    const near=riverNear(game,p.x,p.z),speed=Math.max(.45,Math.min(1.35,1.5-(near.width||3)*.09));
    flow[i*2]=f.x*speed;flow[i*2+1]=f.z*speed;shore[i]=Math.max(0,Math.min(1,near.distance/Math.max(.5,near.width)));

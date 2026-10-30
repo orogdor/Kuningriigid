@@ -2,10 +2,10 @@ import {withNatureLOD} from './nature-lod-v230.js';
 import {BRONZE_KINDS,createBronzeSoldier} from './bronze-soldiers-v95.js';
 import {visualKind as militaryVisualKind} from './military-v88.js?v=117a';
 import * as T from './vendor/three.module.js';
-import {isStoneHumanKind,createStoneHuman,animateStoneHuman} from './stone-age-models-v221.js?v=224';
+import {isStoneHumanKind,createStoneHuman,animateStoneHuman,loadStoneHumanV241,STONE_HUMAN_KINDS} from './stone-age-models-v221.js?v=224';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {createV50CharacterRig} from './model-runtime-v50.js';
-import {hasV148Soldier,createV148Soldier,animateV148Soldier} from './soldier-models-v148.js?v=234';
+import {hasV148Soldier,createV148Soldier,animateV148Soldier,loadSoldierV241,V148_KINDS} from './soldier-models-v148.js?v=234';
 const geometries=new Map(),materials=new Map();
 function geom(key,make){if(!geometries.has(key)){const g=make();g.userData.shared=true;geometries.set(key,g)}return geometries.get(key)}
 function material(color,metal=false){const key=color+metal;if(!materials.has(key))materials.set(key,new T.MeshStandardMaterial({color,roughness:metal?.48:.88,metalness:metal?.55:0}));return materials.get(key)}
@@ -25,6 +25,25 @@ function humanArchetype(kind){
  return 'villager';
 }
 export function createSoldier(parent,x,z,color,kind,grade='standard'){
+ const root=createSoldierNow(parent,x,z,color,kind,grade);
+ const human=STONE_HUMAN_KINDS.has(kind)&&!isStoneHumanKind(kind);
+ if(human||(!hasV148Soldier(kind)&&V148_KINDS.includes(kind))){
+  const fallbackChildren=root.children.slice();
+  root.userData.assetPendingV241=true;
+  (human?loadStoneHumanV241():loadSoldierV241(kind)).then(ready=>{
+   if(!ready)return;
+   const holder=new T.Group(),fresh=human?createStoneHuman(holder,x,z,color,kind):createV148Soldier(holder,x,z,color,kind,grade);
+   // Keep the live root, position, selection, formations and caller metadata.
+   // Only its visual children and animation rig are replaced.
+   fresh.userData.rig.phase=x*2+z;
+   for(const child of fallbackChildren)root.remove(child);
+   root.add(...fresh.children.slice());
+   Object.assign(root.userData,fresh.userData,{assetPendingV241:false,assetRevisionV241:(root.userData.assetRevisionV241||0)+1});
+  }).catch(error=>{root.userData.assetPendingV241=false;console.warn('Keeping soldier fallback',kind,error);});
+ }
+ return root;
+}
+function createSoldierNow(parent,x,z,color,kind,grade='standard'){
  // V221: Stone Age civilians use the new skinned, animated person model.
  if(isStoneHumanKind(kind))return createStoneHuman(parent,x,z,color,kind);
  // V148: soldiers with a new quad model (see soldier-models-v148.js); machines, crews and civilians keep their models.

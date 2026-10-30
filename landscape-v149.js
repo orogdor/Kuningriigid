@@ -50,16 +50,18 @@ export function setCultivation(values){CULTIVATION.data.set(values);CULTIVATION.
 // Lowlands keep their biome colours with a natural, non-repeating grain.
 export function terrainMaterial(scope='world',tile=null){
  const material=new T.MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0});
- const map=worldMapping(scope,tile,true),detail=scope!=='world';
+ const map=worldMapping(scope,tile,true),detail=scope!=='world',stream=!!tile?.streamingV242;
+ material.customProgramCacheKey=()=>`terrain-v242:${scope}:${stream?'stream':'legacy'}`;
+ const groundGLSL=stream?GROUND_GLSL232.replace('uniform float uGroundForest232;','varying float vForestV242;').replaceAll('uGroundForest232','vForestV242'):GROUND_GLSL232;
  material.onBeforeCompile=shader=>{
   if(detail)Object.assign(shader.uniforms,groundUniforms232(tile));
   shader.uniforms.uT158Cloud=CLOUD_TIME;
   shader.uniforms.uT226CloudShade=CLOUD_SHADE_V226;
   shader.uniforms.uT226TerrainBlend=TERRAIN_BLEND_V226;
   inject(shader,{map,
-   vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':''),
-   vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':''),
-   fragHead:'uniform float uT158Cloud;uniform float uT226CloudShade;uniform float uT226TerrainBlend;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;float t156G=0.0;'+GROUND_GLSL232:''),
+   vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':'')+(stream?'attribute float aForestV242;varying float vForestV242;':''),
+   vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':'')+(stream?'vForestV242=aForestV242;':''),
+   fragHead:'uniform float uT158Cloud;uniform float uT226CloudShade;uniform float uT226TerrainBlend;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;float t156G=0.0;'+groundGLSL:''),
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);

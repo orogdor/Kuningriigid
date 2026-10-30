@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import * as T from '../vendor/three.module.js';
+import {DetailStreamV242} from '../detail-stream-v242.js';
+import {Navigation} from '../navigation.js';
+import {Civilization,createGame} from '../civilization-core.js';
+const world=()=>({resources:[],heat:{},heatLast:{},revision:0}),blocked=(x,z)=>Math.abs(x)<3&&z>0;
+const sync=new Navigation(world(),(x,z)=>!blocked(x,z),()=>[],{minX:-12,minZ:-12,w:25,h:25});
+const staged=new Navigation(world(),(x,z)=>!blocked(x,z),()=>[],{minX:-12,minZ:-12,w:25,h:25,deferred:true});
+assert(staged.preparationV242);staged.advancePreparationV242();assert(staged.preparationV242);
+staged.finishPreparationV242();assert.equal(staged.preparationV242,null);
+assert.deepEqual(staged.base,sync.base);assert.deepEqual(staged.mask,sync.mask);assert.deepEqual(staged.components,sync.components);
+const gameA=new Civilization(createGame(8417)),gameB=new Civilization(createGame(8417));
+const tile=gameA.cell(gameA.s.armies[0]);const steps=gameA.prepareNavV242(tile);steps.next();
+const ready=gameA.nav(tile);assert.equal(ready.preparationV242,null,'normal simulation never gets a partial navigation mask');
+let next;do{next=steps.next();}while(!next.done);
+assert.equal(next.value,ready);assert.deepEqual(ready.base,gameB.nav(tile).base);assert.deepEqual(ready.mask,gameB.nav(tile).mask);
+let time=0,disposed=0;
+const tiles=new Map(),cell=(c,r)=>{if(c<0||r<0||c>20||r>20)return null;const key=c+':'+r;if(!tiles.has(key))tiles.set(key,{c,r});return tiles.get(key);};
+const scene=new T.Scene(),stream=new DetailStreamV242({scene,cell,clock:()=>time,budget:3,
+ *build(entry){for(let i=0;i<4;i++){time+=1;yield;}entry.terrain=new T.Mesh();},dispose(){disposed++;}});
+stream.finish(cell(5,5));stream.activate(cell(5,5));
+while(stream.status().ready<9)stream.tick();
+const original=stream.entries.get('5:5').root,old=new Set(stream.entries.keys());
+stream.prefetch(100,0);while(!stream.entries.get('6:5').ready)stream.tick();stream.activate(cell(6,5));
+assert.equal(stream.entries.get('5:5').root,original);assert.equal(original.position.x,-225);
+assert.equal([...stream.entries.values()].filter(e=>e.root.visible&&old.has(e.key)).length,6);
+for(let c=7;c<15;c++){stream.finish(cell(c,5));stream.activate(cell(c,5));assert(stream.entries.size<=25);}
+assert(disposed>0);stream.pause();assert.equal(stream.root.visible,false);
+const count=stream.entries.size;stream.tick();assert.equal(stream.entries.size,count);stream.clear();assert.equal(stream.entries.size,0);
+console.log('V242 shared tile identity, bounded cache, camera offsets and incremental navigation parity PASS');

@@ -3,13 +3,14 @@
 import * as T from './vendor/three.module.js';
 import {CLOUD_TIME,SEA_EFFECT_V226} from './atmosphere-v158.js?v=161a';
 
-export function seaMaterial({scale=1}={}){
+export function seaMaterial({scale=1,scaleZ=scale,origin={x:0,z:0}}={}){
  // scale: model units per world metre on the horizontal plane (1 on the world map, ~4.5 on detail maps)
  const m=new T.MeshStandardMaterial({color:'#ffffff',roughness:.22,metalness:.12,transparent:true,depthWrite:false});
  m.onBeforeCompile=shader=>{
   shader.uniforms.uSeaT=CLOUD_TIME;shader.uniforms.uSeaFXV226=SEA_EFFECT_V226;
-  shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute float aDepth;varying float vSeaD;varying vec2 vSeaP;')
-   .replace('#include <begin_vertex>','#include <begin_vertex>\nvSeaD=aDepth;vSeaP=(modelMatrix*vec4(position,1.0)).xz/'+scale.toFixed(3)+';');
+  shader.uniforms.uSeaOriginV242={value:new T.Vector2(origin.x,origin.z)};
+  shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform vec2 uSeaOriginV242;attribute float aDepth;varying float vSeaD;varying vec2 vSeaP;')
+   .replace('#include <begin_vertex>','#include <begin_vertex>\nvSeaD=aDepth;vSeaP=(modelMatrix*vec4(position,1.0)).xz/vec2('+scale.toFixed(3)+','+scaleZ.toFixed(3)+')+uSeaOriginV242;');
   shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
 uniform float uSeaT;uniform float uSeaFXV226;varying float vSeaD;varying vec2 vSeaP;float seaRipple=0.0;
 float sh(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
@@ -34,15 +35,16 @@ float sn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(sh(
    .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
  normal=normalize(normal+vec3(seaRipple-.5,0.0,.5-sn(vSeaP*.31+uSeaT*.2))*.22*uSeaFXV226);`);
  };
- m.customProgramCacheKey=()=>'sea-v2231-'+scale.toFixed(2);
+ m.customProgramCacheKey=()=>`sea-v242-${scale.toFixed(2)}-${scaleZ.toFixed(2)}`;
  return m;
 }
 // Detail map sea: a plane at sea level over the 3×3 area; depth from the local ground height.
-export function createDetailSea(localGround,{halfX=380,halfZ=330,seg=166}={}){
+export function createDetailSea(...args){const steps=detailSeaStepsV242(...args);let result;do{result=steps.next();}while(!result.done);return result.value;}
+export function* detailSeaStepsV242(localGround,{halfX=380,halfZ=330,seg=166,origin={x:0,z:0}}={}){
  const geo=new T.PlaneGeometry(halfX*2,halfZ*2,seg,Math.round(seg*halfZ/halfX));geo.rotateX(-Math.PI/2);
  const p=geo.attributes.position,depth=new Float32Array(p.count);let wet=0;
- for(let i=0;i<p.count;i++){const y=localGround(p.getX(i),p.getZ(i)),worldY=y/.30+.7;depth[i]=.72-worldY;if(depth[i]>-.5)wet++;}
+ for(let i=0;i<p.count;i++){if(i&&i%192===0)yield;const y=localGround(p.getX(i),p.getZ(i)),worldY=y/.30+.7;depth[i]=.72-worldY;if(depth[i]>-.5)wet++;}
  if(wet<8)return null;
  geo.setAttribute('aDepth',new T.BufferAttribute(depth,1));
- const mesh=new T.Mesh(geo,seaMaterial({scale:4.5}));mesh.position.y=.006;mesh.renderOrder=5;mesh.name='v158 detail sea';mesh.receiveShadow=true;return mesh;
+ const mesh=new T.Mesh(geo,seaMaterial({scale:4.5,scaleZ:3.9,origin}));mesh.position.y=.006;mesh.renderOrder=5;mesh.name='v158 detail sea';mesh.receiveShadow=true;return mesh;
 }
