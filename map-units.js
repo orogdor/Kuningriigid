@@ -15,7 +15,16 @@ export function worldTravelSample(entity){
  const ship=entity.kind==='transport'||entity.kind==='warship';
  const duration=ship?3:entity.travelDuration||0;
  const elapsed=ship?entity.clock||0:entity.travelClock||0;
- if(!next||!(duration>0))return {x:here.x,z:here.z,moving:false,fraction:0};
+ if(!next||!(duration>0)){
+  // V240: a scout ordered to walk on a detail tile keeps its position
+  // in the same world-tile sector when the player returns to the atlas.
+  const local=entity.scoutDetailPoseV240;
+  if(local&&local.c===entity.c&&local.r===entity.r){
+   return {x:here.x+local.x*50/225,z:here.z+local.z*50/195,
+    moving:false,fraction:0,localScout:true};
+  }
+  return {x:here.x,z:here.z,moving:false,fraction:0};
+ }
  const to=center(next.c,next.r);
  const fraction=Math.max(0,Math.min(1,elapsed/duration));
  return {x:here.x+(to.x-here.x)*fraction,z:here.z+(to.z-here.z)*fraction,moving:true,fraction};
