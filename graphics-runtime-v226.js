@@ -85,7 +85,11 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
   const quality=getQuality?.()||'high';
   atmosphere.setQuality(quality);atmosphere.setGraphics(settings);
   renderer.shadowMap.enabled=settings.shadows!=='off';renderer.shadowMap.needsUpdate=true;
-  renderer.toneMapping=settings.postProcessing?T.ACESFilmicToneMapping:T.NoToneMapping;
+  // Compare colour pipelines without switching renderer/backends.
+  const tone={agx:T.AgXToneMapping??T.ACESFilmicToneMapping,
+   neutral:T.NeutralToneMapping??T.ACESFilmicToneMapping,
+   aces:T.ACESFilmicToneMapping,none:T.NoToneMapping};
+  renderer.toneMapping=settings.postProcessing?(tone[settings.toneMap]??T.AgXToneMapping??T.ACESFilmicToneMapping):T.NoToneMapping;
   renderer.toneMappingExposure=settings.lighting==='cinematic'?1.10:1.02;
   renderer.setPixelRatio(pixelRatio());
   const detail=graphicsNearDistanceV226(settings);
