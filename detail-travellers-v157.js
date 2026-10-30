@@ -6,6 +6,7 @@ import {createStoneLoad} from './stone-equipment-v234.js';
 import {createSoldier,animateSoldier} from './visuals.js';
 import {worldTravelSample} from './map-units.js?v=59';
 import {center} from './campaign.js';
+import {scoutSectorPositionV236,blendScoutPositionV236} from './scout-sector-v236.js';
 
 const TEAM=['#c0ac79','#b98362','#9b88bb','#c2a55c'],FLAG=['#4a7288','#ac5945','#7d5fb0','#c09a2e'];
 const mats=new Map();const mat=c=>{if(!mats.has(c))mats.set(c,new T.MeshStandardMaterial({color:c,roughness:.9}));return mats.get(c);};
@@ -18,6 +19,12 @@ function settlerModel(team){
  for(const [x,z] of [[0,-.45],[.9,-1.52]]){const pack=createStoneLoad('settler');pack.position.set(x,1.03,z);g.add(pack);}
  const pole=box(g,-.8,1.6,-1.6,.06,2.6,.06,'#6d5034');box(g,-.55,2.6,-1.6,.5,.35,.03,FLAG[team]||FLAG[0]);
  g.userData.walkers=walkers;return g;
+}
+function scoutModel(team){
+ const g=new T.Group();
+ const fighter=createSoldier(g,0,0,TEAM[team]||TEAM[0],'scout');
+ g.userData.walkers=[fighter];g.name='V236 scout same world sector';
+ return g;
 }
 function caravanModel(team,age){
  const g=new T.Group(),walkers=[];
@@ -42,20 +49,33 @@ export function createDetailTravellers(group){
  function sync({state,game,tile,worldToLocal,ground,age,visible,time,dt}){
   const live=new Set();
   const consider=(key,entity,kind,team)=>{
-   const pose=worldTravelSample(entity),p=worldToLocal(tile,pose.x,pose.z);
+   const pose=worldTravelSample(entity),p=kind==='scout'?scoutSectorPositionV236(pose,tile):worldToLocal(tile,pose.x,pose.z);
    if(Math.abs(p.x)>330||Math.abs(p.z)>285)return;
    if(kind==='boat'&&ground(p.x,p.z)>-.05)return;   // boats only on water
    if(kind!=='boat'&&ground(p.x,p.z)<-.15)return;
    live.add(key);let m=models.get(key);
-   if(!m||m.userData.kind!==kind){if(m)group.remove(m);m=kind==='settler'?settlerModel(team):kind==='boat'?boatModel(team):caravanModel(team,age(team));m.userData.kind=kind;m.scale.setScalar(kind==='boat'?1.6:1.15);group.add(m);models.set(key,m);}
+   if(!m||m.userData.kind!==kind){if(m)group.remove(m);m=kind==='settler'?settlerModel(team):kind==='scout'?scoutModel(team):kind==='boat'?boatModel(team):caravanModel(team,age(team));m.userData.kind=kind;m.scale.setScalar(kind==='boat'?1.6:kind==='scout'?1:1.15);group.add(m);models.set(key,m);}
    // stationary travellers wait a little off the tile centre so they don't stand inside the town hall
-   const off=pose.moving?{x:0,z:0}:{x:14+(entity.id%3)*4,z:10+(entity.id%2)*5};
-   const x=p.x+off.x,z=p.z+off.z;m.position.set(x,kind==='boat'?.25:ground(x,z),z);
+   const off=kind==='scout'||pose.moving?{x:0,z:0}:{x:14+(entity.id%3)*4,z:10+(entity.id%2)*5};
+   const target={x:p.x+off.x,z:p.z+off.z};
+   const spot=kind==='scout'&&m.userData.scoutPlaced?blendScoutPositionV236(m.position,target,dt):target;
+   const x=spot.x,z=spot.z;
+   m.position.set(x,kind==='boat'?.25:ground(x,z),z);
+   if(kind==='scout'){m.userData.scoutPlaced=true;m.userData.sectorV236=[p.sectorX,p.sectorZ];}
    const next=entity.path?.[0];if(next){const t=center(next.c,next.r),here=center(entity.c,entity.r);m.rotation.y=Math.atan2(t.x-here.x,t.z-here.z);}
    m.visible=true;
    for(const w of m.userData.walkers||[])animateSoldier(w,time,pose.moving);
    if(pose.moving){for(const w of m.userData.wheels||[])w.rotation.x-=dt*2.4;(m.userData.legs||[]).forEach((l,i)=>{l.rotation.x=Math.sin(time*6+i*Math.PI)*.35;});}
   };
+  // Same-tile scouts already use the playable inspection unit. Other scouts
+  // in the 3x3 detail neighbourhood use lightweight visual proxies.
+  for(const army of state.armies||[]){
+   if(army.embarked!=null||!visible(army))continue;
+   const units=(state.units||[]).filter(u=>u.team===army.team&&(u.armyId||0)===(army.id||0)&&u.hp>0&&!u.garrison);
+   if(!units.length||!units.every(u=>u.kind==='scout'))continue;
+   if(army.c===tile.c&&army.r===tile.r)continue;
+   consider('scout:'+army.team+':'+(army.id||0),army,'scout',army.team);
+  }
   for(const a of state.settlers||[])if(!a.landed&&visible(a))consider('settler:'+a.id,a,'settler',a.team);
   for(const c of state.shipments||[]){if(!visible(c))continue;if(c.mode==='sea')consider('trade:'+c.id,c,'boat',c.team);else if(c.mode!=='air'&&c.mode!=='rail')consider('trade:'+c.id,c,'caravan',c.team);}
   for(const [key,m] of models)if(!live.has(key))m.visible=false;
