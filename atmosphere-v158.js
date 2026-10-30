@@ -4,6 +4,7 @@
 // land skirt so the detail map fades into haze instead of ending in a void, and moving cloud
 // shadows (a shared uniform the terrain shaders read). Presentation only.
 import * as T from './vendor/three.module.js';
+import {dayClockV235} from './daynight-v235.js';
 
 export const CLOUD_TIME={value:0};
 export const WIND_TIME_V226={value:0};
@@ -27,6 +28,11 @@ export function setupAtmosphere({renderer,worldScene,localScene,quality}){
  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.02;
  renderer.shadowMap.type=T.PCFSoftShadowMap;
  const rigs=new Map(),rigsSkirt={mesh:null};
+ const colorDayTop=new T.Color('#7fa9c8'),colorNightTop=new T.Color('#071225');
+ const colorDayHorizon=new T.Color('#d9e3dc'),colorNightHorizon=new T.Color('#233046'),colorDuskHorizon=new T.Color('#d68d5c');
+ const colorDayGround=new T.Color('#a8b79a'),colorNightGround=new T.Color('#222d3a');
+ const colorFogDay=new T.Color('#d3ddd5'),colorFogNight=new T.Color('#1a263a');
+ const sunDir=new T.Vector3(),tempColor=new T.Color(),skyTop=new T.Color(),skyHorizon=new T.Color(),skyGround=new T.Color(),fogTint=new T.Color();
  for(const [scene,local] of [[worldScene,false],[localScene,true]]){
   // remove the earlier flat light set (hemisphere + 2 directional lights)
   for(const o of [...scene.children])if(o.isHemisphereLight||o.isDirectionalLight)scene.remove(o);
@@ -44,19 +50,40 @@ export function setupAtmosphere({renderer,worldScene,localScene,quality}){
   rigs.set(scene,{sun,hemi,fill,sky,local,extent:0});
  }
  let worldShadows=quality!=='low';
- let settings={shadows:'medium',shadowDistance:'medium',lighting:'standard',ambient:'normal',daylight:'day',fog:'medium',sky:'enhanced',particles:'medium',wind:true};
- function update(scene,focus,zoom,dt){
+ let settings={shadows:'medium',shadowDistance:'medium',lighting:'standard',ambient:'normal',daylight:'dynamic',fog:'medium',sky:'enhanced',particles:'medium',wind:true};
+ function update(scene,focus,zoom,dt,gameTime=0){
   CLOUD_TIME.value+=dt||0;
   if(settings.wind!==false)WIND_TIME_V226.value+=dt||0;
   const rig=rigs.get(scene);if(!rig)return;
   rig.sky.position.copy(focus);
-  const angle=settings.daylight==='dynamic'?CLOUD_TIME.value*.006:0;
-  const dir=settings.daylight==='evening'?new T.Vector3(-.91,.37,.3).normalize():settings.daylight==='dynamic'?new T.Vector3(Math.sin(angle)*.65-.55,.63+Math.cos(angle)*.35,.62).normalize():new T.Vector3(-.55,1.0,.62).normalize();
+  // Game seconds (not wall-clock time) determine the sun, so saves and pause
+  // resume at the exact same hour. Fixed times remain available for comparisons.
+  const chosenTime=settings.daylight==='day'?240:settings.daylight==='evening'?540:settings.daylight==='night'?840:gameTime;
+  const clock=dayClockV235(chosenTime),angle=(clock.hour-6)*Math.PI/12;
+  sunDir.set(Math.cos(angle)*.85,Math.max(.07,clock.elevation),.48).normalize();
+  const twilight=T.MathUtils.clamp(1-Math.abs(clock.elevation)*3,0,1);
+  const mode={classic:[1.2,2.0,.25],standard:[1.05,2.7,.32],enhanced:[1.28,2.85,.53],cinematic:[1.38,3.15,.65]}[settings.lighting]||[1.05,2.7,.32];
+  const ambient={low:.72,normal:1,bright:1.3}[settings.ambient]||1;
+  rig.hemi.intensity=mode[0]*ambient*(.14+.86*clock.daylight);
+  rig.fill.intensity=mode[2]*(.2+.8*clock.daylight);
+  rig.sun.intensity=mode[1]*Math.pow(clock.daylight,1.25);
+  rig.sun.color.set(clock.elevation<.28?'#ffb37d':'#ffe2b8');
+  skyTop.copy(colorNightTop).lerp(colorDayTop,clock.daylight);
+  skyHorizon.copy(colorNightHorizon).lerp(colorDayHorizon,clock.daylight);
+  if(clock.daylight>.05)skyHorizon.lerp(colorDuskHorizon,twilight*.56);
+  skyGround.copy(colorNightGround).lerp(colorDayGround,clock.daylight);
+  if(rig.sky.material.uniforms){
+   rig.sky.material.uniforms.top.value.copy(skyTop);
+   rig.sky.material.uniforms.horizon.value.copy(skyHorizon);
+   rig.sky.material.uniforms.ground.value.copy(skyGround);
+  }
+  if(scene.fog)scene.fog.color.copy(colorFogNight).lerp(colorFogDay,clock.daylight);
+  if(scene.background?.isColor)scene.background.copy(skyHorizon);
   const shadowRange={near:.6,medium:1,far:1.45}[settings.shadowDistance]||1;
   const extent=(rig.local?Math.max(60,Math.min(300,zoom*1.15)):Math.max(120,Math.min(520,zoom*.9)))*shadowRange;
-  rig.sun.target.position.copy(focus);rig.sun.position.copy(focus).addScaledVector(dir,extent*2.6);
+  rig.sun.target.position.copy(focus);rig.sun.position.copy(focus).addScaledVector(sunDir,extent*2.6);
   // world map shadows only when zoomed in (cheap: only nearby chunks render into the shadow map)
-  rig.sun.castShadow=settings.shadows!=='off'&&(rig.local?true:(worldShadows&&zoom<480));
+  rig.sun.castShadow=clock.elevation>.07&&settings.shadows!=='off'&&(rig.local?true:(worldShadows&&zoom<480));
   if(Math.abs(rig.extent-extent)>extent*.06){rig.extent=extent;const c=rig.sun.shadow.camera;c.left=-extent;c.right=extent;c.top=extent;c.bottom=-extent;c.near=1;c.far=extent*6;c.updateProjectionMatrix();}
  }
  function setQuality(q){quality=q;worldShadows=q!=='low';setGraphics(settings);}
@@ -82,7 +109,7 @@ export function setupAtmosphere({renderer,worldScene,localScene,quality}){
 
  const birdsW=createBirds(15),birdsL=createBirds(12);worldScene.add(birdsW.mesh);localScene.add(birdsL.mesh);
  const updateCore=update;
- function updateAll(scene,focus,zoom,dt){updateCore(scene,focus,zoom,dt);const t=CLOUD_TIME.value;if(scene===worldScene)birdsW.update(focus,zoom,t,false);else birdsL.update(focus,zoom,t,true);}
+ function updateAll(scene,focus,zoom,dt,gameTime=0){updateCore(scene,focus,zoom,dt,gameTime);const t=CLOUD_TIME.value;if(scene===worldScene)birdsW.update(focus,zoom,t,false);else birdsL.update(focus,zoom,t,true);}
  function setSkirt(water){if(rigsSkirt.mesh)rigsSkirt.mesh.material.color.set(water?'#4d8a8e':'#7f9560');}
  return {update:updateAll,setQuality,setGraphics,setSkirt};
 }
