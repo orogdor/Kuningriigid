@@ -49,5 +49,7 @@ jobs:
         run: node scripts/test-graphics-v226.mjs
       - name: V233 farm and Stone Age far LOD regression
         run: node scripts/test-farming-lod-v233.mjs
+      - name: V234 Stone Age equipment geometry regression
+        run: node scripts/test-equipment-v234.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
