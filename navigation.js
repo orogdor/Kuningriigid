@@ -43,12 +43,13 @@ export function buildingClearance(b){
  }
  // Include a full walking-grid cell's road-ribbon margin for tall Renaissance façades.
  const v=FOOTPRINTS[b.type]||[5.0,5.0];
- const rx=Math.max(v[0],b.navWidth||0),rz=Math.max(v[1],b.navDepth||0);if(b.shoreAngle!=null){const c=Math.abs(Math.cos(b.shoreAngle)),s=Math.abs(Math.sin(b.shoreAngle));return {rx:c*rx+s*rz,rz:s*rx+c*rz};}return {rx,rz};
+ const rx=Math.max(v[0],b.navWidth||0),rz=Math.max(v[1],b.navDepth||0);const angle=b.buildingRotationV228??b.shoreAngle;if(angle!=null){const c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));return {rx:c*rx+s*rz,rz:s*rx+c*rz};}return {rx,rz};
 }
 export const door=b=>{
  if(b.landEntry)return {...b.landEntry};
  if(b.accessEntry)return {...b.accessEntry};
  const size=buildingClearance(b);
+ if(Number.isFinite(b.buildingRotationV228)){const a=b.buildingRotationV228,front=Math.max((FOOTPRINTS[b.type]||[5,5])[1],b.navDepth||0)+1.15;return {x:b.x+Math.sin(a)*front,z:b.z+Math.cos(a)*front};}
  return {x:b.x,z:b.z+(size?.rz||2.5)+1.15};
 };
 export function clearFootprint(world,b){const size=buildingClearance(b);let changed=false;for(const r of world.resources)if(['tree','berry'].includes(r.kind)&&!r.removed&&Math.abs(r.x-b.x)<Math.max(3.6,size?.rx||0)+.5&&Math.abs(r.z-b.z)<Math.max(3.5,size?.rz||0)+.5){r.removed=true;r.cleared=true;r.amount=0;changed=true}if(changed)world.revision=(world.revision||0)+1;return changed}

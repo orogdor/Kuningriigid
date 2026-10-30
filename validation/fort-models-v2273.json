@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "data": [
+    {
+      "type": "palisade",
+      "ready": true,
+      "active": true,
+      "triangles": 279109,
+      "texture": 2048
+    },
+    {
+      "type": "woodgate",
+      "ready": true,
+      "active": true,
+      "triangles": 53957,
+      "texture": 2048
+    },
+    {
+      "type": "watchtower",
+      "ready": true,
+      "active": true,
+      "triangles": 296588,
+      "texture": 2048
+    }
+  ],
+  "variants": [
+    {
+      "type": "palisade",
+      "later": false,
+      "damaged": false,
+      "tier2": false
+    },
+    {
+      "type": "woodgate",
+      "later": false,
+      "damaged": false,
+      "tier2": false
+    },
+    {
+      "type": "watchtower",
+      "later": false,
+      "damaged": false,
+      "tier2": false
+    }
+  ],
+  "gateHits": 0,
+  "wallWidth": 7,
+  "gateWidth": 7,
+  "title": "Kingdoms V227.3 – Real-Time Strategy",
+  "quality": "high",
+  "errors": []
+}

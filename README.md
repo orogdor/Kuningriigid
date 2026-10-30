@@ -1,8 +1,12 @@
-# Kuningriigid V223.3
+# Kuningriigid V227.3
 
 Eestikeelne (ja ingliskeelne) reaalajas tsivilisatsioonimäng brauseris, mis ühendab maailmakaardi avastamise, linnade ehitamise, teadusarengu, laevastikud ja taktikalised lahingud.
 
-**Mängi:** https://orogdor.github.io/Kuningriigid/?v=2233
+**Mängi:** https://orogdor.github.io/Kuningriigid/?v=2273
+
+## V227.3 – hoonete haldamine ja kiviaja mudelid
+
+Pööra valitud hoonet, kustuta see või peata pooleliolev ehitus. Uued detailsed kiviaja mudelid ja omavahel sobitatud vallid ning värav. [Muudatused ja kontrollid](MUUDATUSED_V2273.md).
 
 ## V223.3 – kiviaja lähivaate mudelid
 
@@ -39,7 +43,7 @@ Jätkamine on kohe nähtav; uue maailma seaded, salvestused ja näidislinnad on 
 ## V82 – tööstusajastu 3D-hooned ja hooneinfo kõigil ajastutel
 - Tööstusajastu (ajastu 5) sai 65 erineva hooneliigiga tekstureeritud 3D-paketi: kõrge korstnaga kõrgahjud, aurumasinatöökojad, raudteejaam, tehnikaülikool, telliskivimajad ja tehasehooned.
 - **Puuduta detailkaardil ükskõik millise ajastu maja katust või seina**: avaneb eraldi väike infokaart nime, ajastu, toodangu, sisendite, töötajate, HP ja ehitusprotsendiga. Oma majadel saab sealt töö peatada ja jätkata.
-- **[Ava Aurulinna tööstusajastu näidislinn](https://orogdor.github.io/Kuningriigid/?v=2233&demo=industrial)** – 41 valmisehitatud hoonet, kõndimisega tekkinud tänavad ja JSON-salvestuse eksport.
+- **[Ava Aurulinna tööstusajastu näidislinn](https://orogdor.github.io/Kuningriigid/?v=2273&demo=industrial)** – 41 valmisehitatud hoonet, kõndimisega tekkinud tänavad ja JSON-salvestuse eksport.
 - V80 teed ei lõiku hoonetega, varasemad arhitektuurid ja salvestused jäävad alles. [MUUDATUSED_V82.md](MUUDATUSED_V82.md).
 
 ## V81 – renessansiaja uued kvaliteetsed 3D-hooned

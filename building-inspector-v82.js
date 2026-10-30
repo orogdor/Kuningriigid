@@ -29,7 +29,7 @@ export function describeBuilding(game,city,building,ages=[],names={},definitions
   name:typeof game.buildingName==='function'?game.buildingName(city.team,building.type):d.name||building.type,
   city:home?.name||city.name||'Linn',team:city.team,owner,age:era,
   eraName:ages[era]?.name||'Ajastu '+era,icon:d.icon||'⌂',
-  status:!complete?'Ehitamisel':building.disabled?'Peatatud':building.status||'Valmis',
+  status:!complete?(building.disabled?'Ehitus peatatud':'Ehitamisel'):building.disabled?'Peatatud':building.status||'Valmis',
   hp:Math.max(0,Math.round(building.hp||0)),maxHp:Math.round(maxHp),
   ready:complete,disabled:!!building.disabled,
   progress:buildPct,remaining:complete?0:Math.max(0,duration-progress),
@@ -58,7 +58,7 @@ function line(label,value){
  const amount=document.createElement('strong');amount.textContent=String(value);
  row.append(name,amount);return row;
 }
-export function createBuildingInspector(root,{close,onWorkers,onToggle,onUpgrade}){
+export function createBuildingInspector(root,{close,onWorkers,onToggle,onUpgrade,onRotate,onDelete,onPauseConstruction}){
  if(!root)throw new Error('Missing building inspector container');
  root.classList.add('binfo');
  const title=document.createElement('h3');title.id='building-inspector-title';
@@ -101,6 +101,8 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle,onUpgrade
   actions.replaceChildren();
   if(data.owner){
    for(const option of data.upgradeOptions||[]){const up=document.createElement('button');up.type='button';up.textContent='⬆ '+(option.target==='house'?'Suurem elamu (×2)':option.target==='stone'?'Kiviks':'Kõrgemaks')+' · '+readable(option.cost,{});up.addEventListener('click',()=>onUpgrade?.(option.target));actions.append(up);}
+   {const rotate=document.createElement('button');rotate.type='button';rotate.dataset.action='rotate';rotate.textContent='⟳ Pööra 90°';rotate.addEventListener('click',onRotate);actions.append(rotate);if(data.type!=='hall'){const remove=document.createElement('button');remove.type='button';remove.dataset.action='delete';remove.textContent='✕ Kustuta hoone';remove.addEventListener('click',onDelete);actions.append(remove);}}
+   if(!data.ready){const pause=document.createElement('button');pause.type='button';pause.dataset.action='pause-construction';pause.textContent=data.disabled?'▶ Jätka ehitust':'Ⅱ Peata ehitus';pause.addEventListener('click',onPauseConstruction);actions.append(pause);}
    const staff=document.createElement('button');staff.type='button';staff.textContent='♟ Töölised';
    staff.addEventListener('click',onWorkers);actions.append(staff);
    if(data.ready&&data.type!=='hall'){

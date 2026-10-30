@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "models": [
+    {
+      "id": "field",
+      "active": true,
+      "triangles": null,
+      "texture": null,
+      "field": true
+    },
+    {
+      "id": "claypit",
+      "active": true,
+      "triangles": 282368,
+      "texture": 2048,
+      "field": false
+    },
+    {
+      "id": "pottery_kiln",
+      "active": true,
+      "triangles": 299791,
+      "texture": 2048,
+      "field": false
+    },
+    {
+      "id": "pasture",
+      "active": true,
+      "triangles": 287603,
+      "texture": 2048,
+      "field": false
+    },
+    {
+      "id": "mason",
+      "active": true,
+      "triangles": 289094,
+      "texture": 2048,
+      "field": false
+    }
+  ],
+  "game": {
+    "title": "Kingdoms V227 – Real-Time Strategy",
+    "types": [
+      {
+        "id": "field",
+        "marked": "field",
+        "later": null
+      },
+      {
+        "id": "claypit",
+        "marked": "claypit",
+        "later": null
+      },
+      {
+        "id": "pottery_kiln",
+        "marked": "pottery_kiln",
+        "later": null
+      },
+      {
+        "id": "pasture",
+        "marked": "pasture",
+        "later": null
+      },
+      {
+        "id": "mason",
+        "marked": "mason",
+        "later": null
+      }
+    ]
+  },
+  "errors": []
+}

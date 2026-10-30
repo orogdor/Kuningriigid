@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "setup": {
+    "x": -90,
+    "z": -38,
+    "ready": true
+  },
+  "rotation": {
+    "angle": 1.5707963267948966,
+    "door": {
+      "x": -85.25,
+      "z": -38
+    },
+    "x": -90,
+    "z": -38
+  },
+  "paused": {
+    "disabled": true,
+    "before": 1,
+    "after": 1,
+    "text": [
+      "✕",
+      "⟳ Pööra 90°",
+      "✕ Kustuta hoone",
+      "▶ Continue under construction",
+      "♟ Workers"
+    ]
+  },
+  "delete": {
+    "before": 16,
+    "after": 15
+  },
+  "errors": []
+}
