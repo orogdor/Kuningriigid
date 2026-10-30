@@ -5,7 +5,19 @@
 // so nothing outside the soldier visuals has to change.
 import * as T from './vendor/three.module.js';
 import {enhanceStoneWarriorV222} from './stone-motion-v222.js';
+import {createStoneEquipment} from './stone-equipment-v234.js';
 
+const REPLACED_STONE_WEAPON_COLORS={
+ spearman:{hand_R:['#86643c','#3d2d1f']},
+ axeman:{hand_R:['#7b5a37','#7f8076','#b9a57a']},
+ slinger:{hand_R:['#b9a57a','#6d4b30'],hand_L:['#9a978a']},
+ scout:{hand_R:['#86643c','#8e8a80','#b9a57a']},
+ militia:{hand_R:['#86643c','#3d2d1f']}
+};
+function replacedStoneWeaponChunk(kind,c){
+ if(kind==='archer'&&['bowWeapon','swordWeapon','swordSheath'].includes(c[1]))return true;
+ return REPLACED_STONE_WEAPON_COLORS[kind]?.[c[0]]?.includes(c[4])||false;
+}
 const MAGIC = 0x3156534B;
 let quality = 'medium';
 try { quality = localStorage.getItem('kingdoms-quality') || (innerWidth > 760 ? 'high' : 'medium'); } catch {}
@@ -66,7 +78,7 @@ function variantCount(def) {
 function geometryFor(kind, bone, group, mat, color, grade, variant) {
   const def = PACK.kinds[kind];
   def.variants ??= variantCount(def);
-  const list = def.chunks.filter(c => c[0] === bone && c[1] === group && c[3] === mat && wanted(c[2], grade, variant, def.variants));
+  const list = def.chunks.filter(c => c[0] === bone && c[1] === group && c[3] === mat && wanted(c[2], grade, variant, def.variants) && !replacedStoneWeaponChunk(kind,c));
   if (!list.length) return null;
   const team = list.some(c => c[4].startsWith('TEAM'));
   const variantKey = list.some(c => /(^|,)v\d+/.test(c[2])) ? variant : 0;
@@ -131,6 +143,16 @@ export function createV148Soldier(parent, x, z, color, kind, grade = 'standard')
     mesh.castShadow = true; mesh.receiveShadow = true;
     if (group) { const holder = new T.Group(); holder.name = group; holder.add(mesh); bones[bone].add(holder); (toggles[group] ??= []).push(holder); }
     else bones[bone].add(mesh);
+  }
+  const stoneWeapons={spearman:'spearman',axeman:'axeman',slinger:'slinger',scout:'scout',militia:'militia'};
+  if(stoneWeapons[kind]&&bones.hand_R)bones.hand_R.add(createStoneEquipment(stoneWeapons[kind]));
+  if(kind==='archer')for(const [bone,group,item] of [
+   ['hand_L','bowWeapon','archer-bow'],
+   ['hand_R','swordWeapon','stone-knife'],
+   ['body','swordSheath','knife-sheath']
+  ]){
+   const prop=createStoneEquipment(item);prop.name=group;
+   bones[bone].add(prop);(toggles[group]??=[]).push(prop);
   }
   const rig = {
     v148: true, def, kind: LEGACY_KIND[kind] || kind, unitKind: kind, bones, toggles,
