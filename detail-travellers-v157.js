@@ -7,6 +7,7 @@ import {createSoldier,animateSoldier} from './visuals.js';
 import {worldTravelSample} from './map-units.js?v=59';
 import {center} from './campaign.js';
 import {scoutSectorPositionV236,blendScoutPositionV236} from './scout-sector-v236.js';
+import {attachScoutMarkerV238,sizeScoutMarkerV238} from './scout-marker-v238.js';
 
 const TEAM=['#c0ac79','#b98362','#9b88bb','#c2a55c'],FLAG=['#4a7288','#ac5945','#7d5fb0','#c09a2e'];
 const mats=new Map();const mat=c=>{if(!mats.has(c))mats.set(c,new T.MeshStandardMaterial({color:c,roughness:.9}));return mats.get(c);};
@@ -23,6 +24,7 @@ function settlerModel(team){
 function scoutModel(team){
  const g=new T.Group();
  const fighter=createSoldier(g,0,0,TEAM[team]||TEAM[0],'scout');
+ attachScoutMarkerV238(fighter,team);
  g.userData.walkers=[fighter];g.name='V236 scout same world sector';
  return g;
 }
@@ -46,7 +48,7 @@ function boatModel(team){
 
 export function createDetailTravellers(group){
  const models=new Map();
- function sync({state,game,tile,worldToLocal,ground,age,visible,time,dt}){
+ function sync({state,game,tile,worldToLocal,ground,age,visible,time,dt,zoom=150}){
   const live=new Set();
   const consider=(key,entity,kind,team)=>{
    const pose=worldTravelSample(entity),p=kind==='scout'?scoutSectorPositionV236(pose,tile):worldToLocal(tile,pose.x,pose.z);
@@ -61,7 +63,8 @@ export function createDetailTravellers(group){
    const spot=kind==='scout'&&m.userData.scoutPlaced?blendScoutPositionV236(m.position,target,dt):target;
    const x=spot.x,z=spot.z;
    m.position.set(x,kind==='boat'?.25:ground(x,z),z);
-   if(kind==='scout'){m.userData.scoutPlaced=true;m.userData.sectorV236=[p.sectorX,p.sectorZ];}
+   if(kind==='scout'){m.userData.scoutPlaced=true;m.userData.sectorV236=[p.sectorX,p.sectorZ];
+    sizeScoutMarkerV238(m.userData.walkers?.[0],zoom);}
    const next=entity.path?.[0];if(next){const t=center(next.c,next.r),here=center(entity.c,entity.r);m.rotation.y=Math.atan2(t.x-here.x,t.z-here.z);}
    m.visible=true;
    for(const w of m.userData.walkers||[])animateSoldier(w,time,pose.moving);
@@ -72,7 +75,7 @@ export function createDetailTravellers(group){
   for(const army of state.armies||[]){
    if(army.embarked!=null||!visible(army))continue;
    const units=(state.units||[]).filter(u=>u.team===army.team&&(u.armyId||0)===(army.id||0)&&u.hp>0&&!u.garrison);
-   if(!units.length||!units.every(u=>u.kind==='scout'))continue;
+   if(!units.some(u=>u.kind==='scout'))continue; // also mixed armies containing a scout
    if(army.c===tile.c&&army.r===tile.r)continue;
    consider('scout:'+army.team+':'+(army.id||0),army,'scout',army.team);
   }
