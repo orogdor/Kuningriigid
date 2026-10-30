@@ -57,5 +57,7 @@ jobs:
         run: node scripts/test-scout-torch-v236.mjs
       - name: V237 farm, field and green-preview regression
         run: node scripts/test-field-green-v237.mjs
+      - name: V238 scout visibility and marker regression
+        run: node scripts/test-scout-marker-v238.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
