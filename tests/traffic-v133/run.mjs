@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import {pathToFileURL} from 'node:url';
-const args=process.argv.slice(2),arg=name=>args.includes(name)?args[args.indexOf(name)+1]:null,root=path.resolve(arg('--source')||new URL('../../',import.meta.url).pathname);
+import {pathToFileURL,fileURLToPath} from 'node:url';
+const args=process.argv.slice(2),arg=name=>args.includes(name)?args[args.indexOf(name)+1]:null,root=path.resolve(arg('--source')||fileURLToPath(new URL('../../',import.meta.url)));
 const load=name=>import(pathToFileURL(path.join(root,name)).href),{tickDeployments}=await load('campaign.js'),{Navigation}=await load('navigation.js'),{TROOPS}=await load('civilization-core.js'),{squadRadius}=await load('soldier-collision-v90.js');
 const cases=JSON.parse(fs.readFileSync(new URL('./cases.json',import.meta.url))),reports=[],allStart=performance.now();let failures=0;
 for(const fixture of cases.filter(c=>!arg('--case')||c.id===arg('--case'))){

@@ -1,5 +1,6 @@
 // Nature resources for the detail map. Shared geometry keeps the number of draw calls low.
 import * as T from './vendor/three.module.js';
+import {withNatureLOD} from './nature-lod-v230.js';
 
 const colors={fur:'#806044',light:'#b89a77',dark:'#493d31',antler:'#7b664e',eye:'#191712',leaf:'#526f3e',berry:'#713d3b',fish:'#718e85'};
 const materials=new Map(),templates=new Map();
@@ -68,5 +69,5 @@ function berryBush(){
 function fish(){const p={};sphere(p,'fish',[0,.19,0],[.48,.16,.13]);sphere(p,'dark',[.38,.23,.105],[.018,.018,.015]);const tail=new T.ConeGeometry(.19,.28,4);add(p,'fish',tail,[-.48,.19,0],[1,1,.35],[0,0,-Math.PI/2]);return combine(p);}
 export function createNatureResourceV229(kind){
  if(!templates.has(kind))templates.set(kind,kind==='game'?deer():kind==='ox'?deer(true):kind==='berry'?berryBush():fish());
- const g=templates.get(kind).clone(true);g.userData.natureV229=kind;return g;
+ const g=templates.get(kind).clone(true);g.userData.natureV229=kind;return withNatureLOD(kind,g);
 }

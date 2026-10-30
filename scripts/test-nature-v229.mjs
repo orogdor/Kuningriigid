@@ -5,7 +5,7 @@ import {createGroundCoverV156,grassGeo} from '../ground-detail-v156.js';
 import {createGroundCover} from '../graphics-v46.js';
 import {terrainMaterial} from '../landscape-v149.js';
 for(const kind of ['game','berry','fish','ox']){
- const g=createNatureResourceV229(kind),box=new T.Box3().setFromObject(g),size=box.getSize(new T.Vector3());
+ const g=createNatureResourceV229(kind).children[0],box=new T.Box3().setFromObject(g),size=box.getSize(new T.Vector3());
  assert.ok(g.children.length>1);assert.ok(Number.isFinite(size.y));assert.ok(box.min.y>=-.02);assert.ok(box.max.y<2.2);
  for(const m of g.children){let p=m.geometry.attributes.position;assert.ok(p.count>0);assert.equal(p.count%3,0);for(const x of p.array)assert.ok(Number.isFinite(x));}
  console.log(kind,'size',size.toArray().map(v=>v.toFixed(2)).join('x'),'draw calls',g.children.length);

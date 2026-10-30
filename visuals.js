@@ -1,3 +1,4 @@
+import {withNatureLOD} from './nature-lod-v230.js';
 import {BRONZE_KINDS,createBronzeSoldier} from './bronze-soldiers-v95.js';
 import {visualKind as militaryVisualKind} from './military-v88.js?v=117a';
 import * as T from './vendor/three.module.js';
@@ -104,8 +105,8 @@ const action=typeof attack==='object'?attack.action:null,cycle=time*2*Math.PI+r.
 export function addTree(parent,x,y,z,seed=0,scale=1){
  // V48 artist-authored quad mesh shared between every nearby tree (also exported as GLB).
  const broadleaf=(Math.floor(Math.abs(seed)*3)%4!==0);
- const model=createV48Mesh(broadleaf?'oak_1000_3':'pine_1000_3');
+ const model=withNatureLOD(broadleaf?'oak':'pine',createV48Mesh(broadleaf?'oak_1000_3':'pine_1000_3'));
  model.position.set(x,y,z);model.rotation.y=seed*.39;
- model.scale.setScalar(scale*(broadleaf?2.1:1.85));
+ model.scale.setScalar(scale);
  parent.add(model);return model;
 }
