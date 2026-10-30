@@ -109,7 +109,7 @@ const TORCH_DOORS={
  baker:{z:3.0,x:[1.3]},mill:{z:3.0,x:[1.4]}
 };
 export function torchLocationsV235(buildings=[]){
- const sites=[],max=24;
+ const sites=[],max=22;
  // Doors and gates first, while respecting the cap on dense towns.
  const ranked=buildings.map((b,i)=>({b,i})).sort((a,b)=>{
   const priority=v=>['woodgate','gatehouse','hall'].includes(v?.type)?0:v?.type==='house'?1:2;
