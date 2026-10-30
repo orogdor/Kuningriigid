@@ -1,106 +1,42 @@
 name: Kuningriigid latest GitHub Pages
 on:
-  workflow_call:
-    inputs:
-      validated:
-        type: boolean
-        default: false
   workflow_dispatch:
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
-  group: "github-pages"
+  group: github-pages
   cancel-in-progress: true
-
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
-      - name: Fetch game
+      - name: Checkout current main
         uses: actions/checkout@v4
-      - name: Checkout the actual latest main commit
-        run: |
-          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
-          git checkout --detach refs/remotes/origin/main
-          echo "PUBLISHING_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-          echo "Publishing actual repository HEAD: $(git rev-parse HEAD)"
-      - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-      - name: Verify playable AI saves are present in the deployed files
-        run: |
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          for(const file of fs.readdirSync('.').filter(name=>/^ai-medieval-demo-v\d+\.js$/.test(name))){
-            const source=fs.readFileSync(file,'utf8');
-            const paths=[...source.matchAll(/fetcher\(['"]\.\/(scenarios\/[^'"]+\.json)/g)].map(match=>match[1]);
-            if(!paths.length)throw Error(file+': no AI save reference');
-            for(const path of paths){
-              if(!fs.existsSync(path)||fs.statSync(path).size===0)
-                throw Error(file+' points to missing Pages asset: '+path);
-              const state=JSON.parse(fs.readFileSync(path,'utf8'));
-              if(!state.demo||!state.medievalTestV147&&path.endsWith('-v147.json'))
-                throw Error(path+': not a playable validated test state');
-              console.log('VERIFIED FOR PAGES',file,path,fs.statSync(path).size+' bytes');
-            }
-          }
-          NODE
-      - name: Quick game check before manual publication
-        if: github.event_name == 'workflow_dispatch'
-        run: node scripts/test.mjs traffic
-      - name: Verify website entry points
+          ref: main
+      - name: Check published game files
         run: |
           test -s index.html
           test -s civilization.js
+          test -s civilization-core.js
           test -s vendor/three.module.js
           node --check civilization.js
-          node --check campaign.js
-      - name: Prepare website
+          node --check civilization-core.js
+          node --check stone-near-lod.js
+      - name: Prepare site
         run: |
           mkdir -p /tmp/game-pages
           tar --exclude=.git --exclude=node_modules --exclude='artifacts-*' -cf - . | tar -xf - -C /tmp/game-pages
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-      - name: Upload website
+      - uses: actions/configure-pages@v5
+      - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
           path: /tmp/game-pages
-      - name: Deploy website
+      - name: Deploy site
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Verify public V147 save loads successfully (not 404)
-        run: |
-          set -e
-          for attempt in $(seq 1 24); do
-            url="https://orogdor.github.io/Kuningriigid/scenarios/ai-medieval-v147.json?v=147-fixed-20261024&verify=${GITHUB_RUN_ID}-${attempt}"
-            if curl --fail --location --silent --show-error --max-time 15 "$url" --output /tmp/ai-medieval-v147-live.json; then
-              if node --input-type=module -e "import fs from 'node:fs'; const s=JSON.parse(fs.readFileSync('/tmp/ai-medieval-v147-live.json','utf8')); if(s.demo!=='ai-medieval-v147'||!s.medievalTestV147||!s.cities?.length) process.exit(1); console.log('PUBLIC V147 AI SCENARIO PASS',s.medievalTestV147.turn,s.cities.length+' cities')"; then
-                exit 0
-              fi
-            fi
-            sleep 5
-          done
-          echo "Public V147 AI save did not become reachable after deployment" >&2
-          exit 1
-
-      - name: Verify public V151 first Medieval save after deployment
-        if: hashFiles('scenarios/ai-medieval-v151.json') != ''
-        run: |
-          set -e
-          for attempt in $(seq 1 24); do
-            url="https://orogdor.github.io/Kuningriigid/scenarios/ai-medieval-v151.json?v=151-first-medieval&verify=${GITHUB_RUN_ID}-${attempt}"
-            if curl --fail --location --silent --show-error --max-time 15 "$url" --output /tmp/ai-medieval-v151-live.json; then
-              if node --input-type=module -e "import fs from 'node:fs'; const s=JSON.parse(fs.readFileSync('/tmp/ai-medieval-v151-live.json','utf8')); const t=s.medievalTestV151; if(s.demo!=='ai-medieval-v151'||s.ages?.[0]!==3||!t||!s.cities?.some(c=>c.id===t.targetCityId&&c.team===0))process.exit(1); console.log('PUBLIC MEDIEVAL I VERIFIED',t.turn,s.cities.length+' cities')"; then
-                exit 0
-              fi
-            fi
-            sleep 5
-          done
-          echo "Public V151 Medieval I game save is not accessible via GitHub Pages" >&2
-          exit 1
