@@ -2,6 +2,7 @@
 // boats) also appear on the detail map, at the matching place and moving the same way.
 // Their position is the world travel pose (same as the world marker) projected into local units.
 import * as T from './vendor/three.module.js';
+import {createStoneLoad} from './stone-equipment-v234.js';
 import {createSoldier,animateSoldier} from './visuals.js';
 import {worldTravelSample} from './map-units.js?v=59';
 import {center} from './campaign.js';
@@ -14,7 +15,7 @@ const cyl=(g,x,y,z,r,h,c,rx=0,rz=0,seg=10)=>{const m=new T.Mesh(new T.CylinderGe
 function settlerModel(team){
  const g=new T.Group(),walkers=[];
  for(const [x,z] of [[0,0],[.9,-1.1],[-.8,-1.4]]){const w=new T.Group();w.position.set(x,0,z);createSoldier(w,0,0,TEAM[team]||TEAM[0],'settler');g.add(w);walkers.push(w.children[0]);}
- box(g,0,1.05,-.45,.7,.8,.45,'#7a6145');box(g,.9,.95,-1.5,.6,.6,.4,'#8d714a'); // packs
+ for(const [x,z] of [[0,-.45],[.9,-1.52]]){const pack=createStoneLoad('settler');pack.position.set(x,1.03,z);g.add(pack);}
  const pole=box(g,-.8,1.6,-1.6,.06,2.6,.06,'#6d5034');box(g,-.55,2.6,-1.6,.5,.35,.03,FLAG[team]||FLAG[0]);
  g.userData.walkers=walkers;return g;
 }
