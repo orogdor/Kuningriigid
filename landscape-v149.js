@@ -4,6 +4,7 @@
 // Visual only: river, road and terrain coordinates, navigation and saves are unchanged.
 // Everything is procedural in the shaders (no texture downloads); geometry counts stay the same.
 import * as T from './vendor/three.module.js';
+import {groundUniforms232,GROUND_GLSL232} from './ground-materials-v232.js';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 import {CLOUD_TIME,CLOUD_SHADE_V226,TERRAIN_BLEND_V226} from './atmosphere-v158.js?v=161a';
 
@@ -51,13 +52,14 @@ export function terrainMaterial(scope='world',tile=null){
  const material=new T.MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0});
  const map=worldMapping(scope,tile,true),detail=scope!=='world';
  material.onBeforeCompile=shader=>{
+  if(detail)Object.assign(shader.uniforms,groundUniforms232(tile));
   shader.uniforms.uT158Cloud=CLOUD_TIME;
   shader.uniforms.uT226CloudShade=CLOUD_SHADE_V226;
   shader.uniforms.uT226TerrainBlend=TERRAIN_BLEND_V226;
   inject(shader,{map,
    vertexHead:'varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;':''),
    vertexBody:`vL149P=${map.pos};vL149N=normalize(${map.nrm});`+(detail?'vL156L=position.xz;':''),
-   fragHead:'uniform float uT158Cloud;uniform float uT226CloudShade;uniform float uT226TerrainBlend;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;float t156G=0.0;':''),
+   fragHead:'uniform float uT158Cloud;uniform float uT226CloudShade;uniform float uT226TerrainBlend;varying vec3 vL149P;varying vec3 vL149N;'+(detail?'varying vec2 vL156L;float t156Bump=0.0;float t156G=0.0;'+GROUND_GLSL232:''),
    color:`
  vec2 lp=vL149P.xz;float elev=vL149P.y;
  float slope=1.0-clamp(abs(normalize(vL149N).y),0.0,1.0);
@@ -121,8 +123,14 @@ export function terrainMaterial(scope='world',tile=null){
  vec2 cw=lp*.0035+vec2(uT158Cloud*.010,uT158Cloud*.004);
  float cloud=smoothstep(.52,.78,l149n(cw)*.65+l149n(cw*2.3+4.0)*.35);
  col*=1.0-cloud*.16*uT226CloudShade;
+ ${detail?`// CC0 surface photographs fade gently into the existing distant landscape.
+ vec3 gw232=groundWeights232(vL156L);
+ float gc232=grassy*(1.0-rock)*(1.0-snow)*uGroundReady232*(1.0-smoothstep(100.0,300.0,length(vViewPosition)));
+ vec3 photo232=groundColor232(vL156L*.5,gw232)*(.90+nBroad*.13);
+ photo232*=1.0-cloud*.16*uT226CloudShade;
+ col=mix(col,photo232,gc232*.88);`:''}
  diffuseColor.rgb=mix(diffuseColor.rgb,col,uT226TerrainBlend);`});
-  shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n roughnessFactor=1.0;');
+  shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n roughnessFactor=1.0;'+(detail?'roughnessFactor=mix(1.0,clamp(groundRough232(vL156L*.5,gw232),.65,1.0),gc232*uT226TerrainBlend);':''));
   if(detail)shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
  { // V161: relief from the analytic slope of the grass-clump pattern. The V156 screen-space
    // derivative bump drew dotted lines along the terrain triangles on phones.
@@ -133,9 +141,11 @@ export function terrainMaterial(scope='world',tile=null){
   vec2 g=vec2(hx-h0,hz-h0)/e;
   vec3 tX=normalize((viewMatrix*vec4(1.0,0.0,0.0,0.0)).xyz),tZ=normalize((viewMatrix*vec4(0.0,0.0,1.0,0.0)).xyz);
   normal=normalize(normal-(g.x*tX+g.y*tZ)*.45*t156G);
+  vec3 photographicNormal232=groundNormal232(vL156L*.5,gw232);
+  normal=normalize(normal+(photographicNormal232.x*tX+photographicNormal232.y*tZ)*.32*gc232*uT226TerrainBlend);
  }`);
  };
- material.customProgramCacheKey=()=>'terrain-v229-'+scope;
+ material.customProgramCacheKey=()=>'terrain-v232-'+scope;
  return material;
 }
 // Vertex tint for mountain cells (called by the terrain builder): forested lower slopes give way
