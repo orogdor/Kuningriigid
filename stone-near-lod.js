@@ -103,7 +103,16 @@ export function withStoneBuildingLOD(low,type,size,seed=0){
 export function withStoneHumanLOD(low){
  const lod=new LazyStoneLOD(low,async()=>{
   const asset=await detailedAsset('human_rigged');
-  const mesh=new T.SkinnedMesh(asset.geometry,asset.material);
+  // The detailed source is centred vertically, while the shared skeleton and
+  // the simplified mesh use feet at zero and height one.
+  if(!highGeometry.has('human_rigged')){
+   const geometry=asset.geometry.clone();geometry.computeBoundingBox();
+   const box=geometry.boundingBox, height=box.max.y-box.min.y;
+   geometry.translate(-(box.min.x+box.max.x)/2,-box.min.y,0);
+   geometry.scale(1/height,1/height,1/height);geometry.computeBoundingBox();geometry.computeBoundingSphere();
+   highGeometry.set('human_rigged',geometry);
+  }
+  const mesh=new T.SkinnedMesh(highGeometry.get('human_rigged'),asset.material);
   // Share the animated skeleton, including its original inverse bind pose.
   // This keeps phase, bone names, direct village poses and hand-held tools.
   mesh.bind(low.skeleton,low.bindMatrix);mesh.castShadow=true;mesh.receiveShadow=false;

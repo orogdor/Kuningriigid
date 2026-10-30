@@ -11,9 +11,10 @@ const MOVE_KEYS=new Set(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','Arro
 
 export function createWalker({scene,canvas,ground,blocked,onExit,onPlace,say}){
  const model=new T.Group();model.name='v161 walker';model.visible=false;
- const body=new T.Group();createSoldier(body,0,0,'#c9a46a','settler');model.add(body);model.scale.setScalar(1.15);scene.add(model);
+ const body=new T.Group();createSoldier(body,0,0,'#c9a46a','stone_settler');model.add(body);scene.add(model);
  const rig=body.children[0];
- const box=new T.Box3().setFromObject(model);const height=Math.max(1.4,box.max.y-box.min.y)||2.1,eye=height*1.02;
+ // Detail units correspond to about 1.05 metres; match the other Stone Age people.
+ const height=1.66,eye=height*.90;
  const pos=new T.Vector3(),vel=new T.Vector3();let yaw=0,pitch=-.08,vy=0,airborne=false,placed=false,active=false,placing=false,time=0,bob=0,moving=false;
  const keys=new Set();const stick={id:null,x:0,y:0,dx:0,dy:0},look={id:null,x:0,y:0};let drag=null;
  let saved=null;
