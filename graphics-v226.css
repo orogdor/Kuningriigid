@@ -14,3 +14,7 @@
 #startmenu .graphics-v226-actions button:last-child:not([hidden]){grid-column:1 / -1;background:#8e713e;color:#fff4d1;}
 #startmenu .graphics-v226-actions [hidden]{display:none!important;}
 @media(max-width:460px){#startmenu .graphics-v226-row{grid-template-columns:minmax(0,1fr) minmax(110px,45%);}#startmenu .graphics-v226-body{max-height:65dvh;padding:9px 8px;}}
+
+/* V235: visible 24-hour time beside the turn counter on desktop and mobile. */
+#dayclock-v235{display:inline-flex;align-items:center;white-space:nowrap;font:700 12px/1.2 system-ui;color:#ffe2ae;background:#1b2c34c7;border:1px solid #b9a16b77;border-radius:7px;padding:4px 7px;font-variant-numeric:tabular-nums;letter-spacing:.03em}
+@media(max-width:540px){#dayclock-v235{font-size:11px;padding:3px 5px}}
