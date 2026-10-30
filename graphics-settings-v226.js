@@ -2,7 +2,7 @@
 export const GRAPHICS_KEY_V226='kingdoms-graphics-v226';
 export const GRAPHICS_DEFAULTS_V226=Object.freeze({
  preset:'high',renderer:'webgl',resolution:100,viewDistance:'far',
- shadows:'medium',shadowDistance:'medium',unitShadows:true,
+ shadows:'medium',shadowDistance:'medium',unitShadows:true,soldierNames:true,
  lighting:'enhanced',lightingEngine:'pbr',lightingLook:'natural',toneMap:'agx',ambient:'normal',daylight:'dynamic',
  terrainBlending:true,water:'animated',clouds:true,wind:true,fog:'medium',
  sky:'enhanced',particles:'medium',buildingDetail:'high',unitDetail:'high',
@@ -54,10 +54,10 @@ const groups=[
  ['Üldine',[['preset','Graafikaprofiil'],['renderer','Renderdusmootor'],['resolution','Resolutsiooniskaala'],['viewDistance','Nähtavuskaugus'],['antiAlias','Servade silumine'],['fpsLimit','FPS piirang'],['adaptiveResolution','Automaatne resolutsioon']]],
  ['Valgus ja varjud',[['lightingLook','Valgustuse võrdlusprofiil'],['toneMap','Värviesitus'],['lightingEngine','Valgustusmootor'],['lighting','Valguse iseloom'],['ambient','Üldvalguse heledus'],['daylight','Päevaaeg / päikese liikumine'],['shadows','Varjude kvaliteet'],['shadowDistance','Varjude kaugus'],['unitShadows','Üksuste varjud']]],
  ['Maailm ja efektid',[['terrainBlending','Maastikutüüpide üleminekud'],['water','Vee kvaliteet'],['clouds','Pilvevarjud'],['wind','Taimede tuuleliikumine'],['fog','Udu'],['sky','Taeva kvaliteet'],['particles','Osakesed ja taevaefektid']]],
- ['Detailid',[['buildingDetail','Hoonete LOD'],['unitDetail','Üksuste detailide kuvamine'],['vegetation','Taimestiku tihedus'],['lod','LOD agressiivsus'],['texture','Tekstuuride filtreerimine']]],
+ ['Detailid',[['buildingDetail','Hoonete LOD'],['unitDetail','Üksuste detailide kuvamine'],['soldierNames','Sõdurite nimed'],['vegetation','Taimestiku tihedus'],['lod','LOD agressiivsus'],['texture','Tekstuuride filtreerimine']]],
  ['Lisaseaded',[['postProcessing','Filmiline toonikaardistus'],['uiScale','Kasutajaliidese suurus'],['performanceOverlay','FPS ja renderdusstatistika']]]
 ];
-const booleans=new Set(['unitShadows','terrainBlending','clouds','wind','postProcessing','performanceOverlay','adaptiveResolution']);
+const booleans=new Set(['soldierNames','unitShadows','terrainBlending','clouds','wind','postProcessing','performanceOverlay','adaptiveResolution']);
 function validate(base){const out={...GRAPHICS_DEFAULTS_V226};for(const [key,value] of Object.entries(base||{})){
  if(!(key in out))continue;
  if(booleans.has(key)){if(typeof value==='boolean')out[key]=value;}
