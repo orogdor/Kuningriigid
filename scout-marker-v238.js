@@ -18,12 +18,12 @@ function material(team){
  ctx.fillStyle='#1a2328';ctx.font='bold 30px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('✦',45,57);
  ctx.fillStyle='#fff5d7';ctx.font='bold 43px Arial,sans-serif';ctx.textAlign='left';ctx.fillText('SCOUT',83,68);
  const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
- const mat=new T.SpriteMaterial({map:texture,transparent:true,depthTest:false,depthWrite:false,fog:false});
+ const mat=new T.SpriteMaterial({map:texture,transparent:true,depthTest:true,depthWrite:false,fog:true});
  cache.set(color,mat);return mat;
 }
 const ringGeo=new T.RingGeometry(1.25,1.55,30);
 ringGeo.rotateX(-Math.PI/2);ringGeo.userData.shared=true;
-const rings=colors.map(c=>new T.MeshBasicMaterial({color:c,side:T.DoubleSide,transparent:true,opacity:.82,depthWrite:false,depthTest:false}));
+const rings=colors.map(c=>new T.MeshBasicMaterial({color:c,side:T.DoubleSide,transparent:true,opacity:.68,depthWrite:false,depthTest:true}));
 export function attachScoutMarkerV238(root,team=0){
  if(root.userData.scoutMarkerV238)return root.userData.scoutMarkerV238;
  const holder=new T.Group();
@@ -32,18 +32,29 @@ export function attachScoutMarkerV238(root,team=0){
  const ring=new T.Mesh(ringGeo,rings[Math.abs(team|0)%rings.length]);
  ring.position.y=.13;ring.renderOrder=45;holder.add(ring);
  const sprite=new T.Sprite(material(team));
- sprite.position.set(0,4.9,0);
- sprite.scale.set(13.4,4.7,1);
- sprite.renderOrder=300;holder.add(sprite);
+ sprite.position.set(0,2.8,0);
+ sprite.scale.set(2.6,.91,1);
+ sprite.renderOrder=4;holder.add(sprite);
  root.add(holder);
  root.userData.scoutMarkerV238=holder;
  return holder;
 }
-export function sizeScoutMarkerV238(root,zoom=150){
- const holder=root?.userData?.scoutMarkerV238;
- if(!holder)return;
- const s=Math.max(.78,Math.min(1.85,(Number(zoom)||150)/145));
- const sprite=holder.children.find(c=>c.isSprite);
- if(sprite){sprite.scale.set(13.4*s,4.7*s,1);sprite.position.y=4.9*s;}
+// V239: bounded world-unit labels never obscure a nearby first-person camera.
+const markerPointV239=new T.Vector3(),eyePointV239=new T.Vector3();
+export function sizeScoutMarkerV238(root,zoom=150,options={}){
+ const holder=root?.userData?.scoutMarkerV238;if(!holder)return;
+ const scale=Math.max(.72,Math.min(1.55,(Number(zoom)||150)/145));
+ const sprite=holder.children.find(c=>c.isSprite),ring=holder.children.find(c=>c.isMesh);
+ let distance=Infinity;
+ if(options.camera?.getWorldPosition){
+  root.getWorldPosition(markerPointV239);
+  options.camera.getWorldPosition(eyePointV239);
+  distance=markerPointV239.distanceTo(eyePointV239);
+ }
+ if(sprite){
+  sprite.visible=options.names!==false&&!(options.firstPerson&&distance<9);
+  sprite.position.y=2.8;sprite.scale.set(2.6*scale,.91*scale,1);
+ }
+ if(ring)ring.visible=options.ring!==false;
  holder.visible=true;
 }
