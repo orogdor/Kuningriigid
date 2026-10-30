@@ -48,7 +48,7 @@ function boatModel(team){
 
 export function createDetailTravellers(group){
  const models=new Map();
- function sync({state,game,tile,worldToLocal,ground,age,visible,time,dt,zoom=150}){
+ function sync({state,game,tile,worldToLocal,ground,age,visible,time,dt,zoom=150,showNames=true,camera=null,firstPerson=false}){
   const live=new Set();
   const consider=(key,entity,kind,team)=>{
    const pose=worldTravelSample(entity),p=kind==='scout'?scoutSectorPositionV236(pose,tile):worldToLocal(tile,pose.x,pose.z);
@@ -64,7 +64,7 @@ export function createDetailTravellers(group){
    const x=spot.x,z=spot.z;
    m.position.set(x,kind==='boat'?.25:ground(x,z),z);
    if(kind==='scout'){m.userData.scoutPlaced=true;m.userData.sectorV236=[p.sectorX,p.sectorZ];
-    sizeScoutMarkerV238(m.userData.walkers?.[0],zoom);}
+    sizeScoutMarkerV238(m.userData.walkers?.[0],zoom,{names:showNames,camera,firstPerson});}
    const next=entity.path?.[0];if(next){const t=center(next.c,next.r),here=center(entity.c,entity.r);m.rotation.y=Math.atan2(t.x-here.x,t.z-here.z);}
    m.visible=true;
    for(const w of m.userData.walkers||[])animateSoldier(w,time,pose.moving);
