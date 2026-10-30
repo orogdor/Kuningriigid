@@ -51,5 +51,7 @@ jobs:
         run: node scripts/test-farming-lod-v233.mjs
       - name: V234 Stone Age equipment geometry regression
         run: node scripts/test-equipment-v234.mjs
+      - name: V235 day cycle and city torch regression
+        run: node scripts/test-daynight-v235.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
