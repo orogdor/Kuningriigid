@@ -5,7 +5,7 @@ import * as T from './vendor/three.module.js';
 import {isStoneHumanKind,createStoneHuman,animateStoneHuman} from './stone-age-models-v221.js?v=224';
 import {createV48Mesh} from './model-runtime-v48.js';
 import {createV50CharacterRig} from './model-runtime-v50.js';
-import {hasV148Soldier,createV148Soldier,animateV148Soldier} from './soldier-models-v148.js?v=222';
+import {hasV148Soldier,createV148Soldier,animateV148Soldier} from './soldier-models-v148.js?v=234';
 const geometries=new Map(),materials=new Map();
 function geom(key,make){if(!geometries.has(key)){const g=make();g.userData.shared=true;geometries.set(key,g)}return geometries.get(key)}
 function material(color,metal=false){const key=color+metal;if(!materials.has(key))materials.set(key,new T.MeshStandardMaterial({color,roughness:metal?.48:.88,metalness:metal?.55:0}));return materials.get(key)}
