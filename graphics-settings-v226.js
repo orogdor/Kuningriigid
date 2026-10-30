@@ -68,6 +68,16 @@ export function loadGraphicsSettingsV226(){
  if(!obj){let old='high';try{old=localStorage.getItem('kingdoms-quality')||'high'}catch{}
   let oldGPU=false;try{oldGPU=localStorage.getItem('kingdoms-gpu')==='1'}catch{}
   return validate({...GRAPHICS_DEFAULTS_V226,...(GRAPHICS_PRESETS_V226[old]||GRAPHICS_PRESETS_V226.high),preset:old==='low'?'low':old==='medium'?'medium':'high',renderer:oldGPU?'webgpu':'webgl'});}
+ // Existing V234 users usually have the old fixed 'day' saved. Migrate it
+ // exactly once, then respect any explicit fixed-hour test selection.
+ try{
+  const key='kingdoms-v235-cycle-migrated';
+  if(!localStorage.getItem(key)){
+   if(obj.daylight==='day')obj.daylight='dynamic';
+   localStorage.setItem(key,'1');
+   localStorage.setItem(GRAPHICS_KEY_V226,JSON.stringify(obj));
+  }
+ }catch{}
  return validate(obj);
 }
 export function saveGraphicsSettingsV226(settings){try{localStorage.setItem(GRAPHICS_KEY_V226,JSON.stringify(validate(settings)));localStorage.setItem('kingdoms-quality',settings.preset==='low'?'low':settings.preset==='medium'?'medium':'high');}catch{}}
