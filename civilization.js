@@ -682,7 +682,7 @@ function inspection(){if(!activeTile)return [];const groups=s.armies.filter(a=>a
   d.scoutDetailActiveV240=false;d.target=null;d.moving=false;
  }
  return {...d,...(exact&&!locallyWalking?{x:exact.x,z:exact.z}:{}),
-  ...(army&&!locallyWalking?{moving:pose.moving}:{}),...(g?{x:g.x+(g.wallAxis?0:((g.slot??0)-.5)*1.6),z:g.z+(g.wallAxis?((g.slot??0)-.5)*1.6:0),guardPost:true,wallType:g.wallType||'palisade',heading:g.wallAxis?Math.PI/2:0}:{}),source:i,team:u.team,armyId:u.armyId||0,grade:u.grade||'standard',experienceMultiplier:u.experienceMultiplier||1,kind:u.kind,menCount:u.menCount,soldiers:u.soldiers,hp:u.hp,maxHp:u.maxHp||TROOPS[u.kind]?.hp||u.hp}})}
+  ...(army?{moving:locallyWalking?!!d.target&&!!d.moving:!!pose.moving}:{}),...(g?{x:g.x+(g.wallAxis?0:((g.slot??0)-.5)*1.6),z:g.z+(g.wallAxis?((g.slot??0)-.5)*1.6:0),guardPost:true,wallType:g.wallType||'palisade',heading:g.wallAxis?Math.PI/2:0}:{}),source:i,team:u.team,armyId:u.armyId||0,grade:u.grade||'standard',experienceMultiplier:u.experienceMultiplier||1,kind:u.kind,menCount:u.menCount,soldiers:u.soldiers,hp:u.hp,maxHp:u.maxHp||TROOPS[u.kind]?.hp||u.hp}})}
 let resourceArea='';
 const MAX_ATLAS_RESOURCE_ICONS=160,MAX_ATLAS_FISH_ICONS=46;
 function refreshResourceArea(){
@@ -1579,7 +1579,7 @@ $('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('ki
  scoutDetailStatusV238:()=>({
   activeTile:activeTile&&{c:activeTile.c,r:activeTile.r},
   scouts:s.armies.filter(a=>a.embarked==null&&armyUnits(s,a).some(u=>u.kind==='scout')).map(a=>{
-   const pose=worldTravelSample(a),local=activeTile?scoutSectorPositionV236(pose,activeTile):null;
+   const pose=worldTravelSample(a),local=activeTile?scoutDetailPositionV240(pose,activeTile):null;
    const u=armyUnits(s,a).find(u=>u.kind==='scout');
    const model=[...unitModels].find(([k,m])=>k==='unit:'+s.units.indexOf(u))?.[1];
    return {team:a.team,id:a.id??0,c:a.c,r:a.r,
