@@ -97,7 +97,8 @@ import {tempoMultiplier,tempoName} from './tempo.js';
 import {renderResearchUI} from './research-ui.js?v=125a';
 import {BUILD_CATEGORIES,buildingCategory,matchesBuilding,appendBuildingCard,renderBuildingCategories} from './build-catalog-v121.js?v=127a';
 import {TileDoubleTap,detailWheelTransition} from './map-gestures-v121.js?v=123a';
-import {createWildlife,createWorldUnit,updateWorldUnit} from './map-units.js?v=59';
+import {createWildlife,createWorldUnit,updateWorldUnit,worldTravelSample} from './map-units.js?v=59';
+import {scoutSectorPositionV236} from './scout-sector-v236.js';
 import {atlasColor,createAtlasDecor,createCityMiniature,cityBanner} from './atlas-style.js?v=162a';
 import {createWorldAtlasProps} from './world-props.js?v=123a';
 import {buildDetailWorldObjects} from './detail-world-objects.js?v=123a';
@@ -579,7 +580,7 @@ function workerIsVisible(ctx,w,id){if(w.kind==='market_woman')return w.visible!=
 function refreshCityTorchesV235(){
  if(view!=='local'||!activeTile)return;
  const city=activeCity(),buildings=city?.economy?.buildings||[];
- const stamp=tileKey(activeTile)+'|'+buildings.map(b=>[b.type,b.x,b.z,b.ready?1:0,b.hp>0?1:0].join(':')).join(';');
+ const stamp=tileKey(activeTile)+'|'+buildings.map(b=>[b.type,b.x,b.z,b.ready?1:0,b.hp>0?1:0,b.buildingRotationV228??'',b.wallAngleV175??'',b.wallAxis??''].join(':')).join(';');
  if(stamp===cityTorchStampV235)return;
  cityTorchStampV235=stamp;
  if(cityTorchesV235)localObjects.remove(cityTorchesV235);
@@ -635,7 +636,10 @@ function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory
 }
 const peacefulGarrisons=new WeakMap();
 function peaceTowerGuards(){const city=activeCity();if(!city)return [];let b=peacefulGarrisons.get(city);const stamp=city.team+':'+s.ages[city.team]+':'+city.economy.buildings.map(x=>[x.type,x.ready,x.disabled,x.hp>0].join(',')).join(';');if(!b||b.stamp!==stamp){b={stamp,squads:[],wallWalkEnabled:true,elapsed:s.time,fortress:{team:city.team},siegeSections:city.economy.buildings.flatMap((x,i)=>x.ready&&x.hp>0&&!x.disabled&&['palisade','woodgate','stonewall','reinforced_wall','gatehouse'].includes(x.type)?[siegeSection(x,i)]:[])};addTowerGuards(city,s,b);peacefulGarrisons.set(city,b);}b.elapsed=s.time;tickPeaceTowerPatrolV1757(city,b,game.nav(city),frameDelta);tickTowerGuards(b,frameDelta);persistTowerGuards(city,b);return b.squads;}
-function inspection(){if(!activeTile)return [];const groups=s.armies.filter(a=>a.embarked==null&&tileKey(a)===tileKey(activeTile));return s.units.map((u,i)=>({u,i})).filter(({u})=>u.hp>0&&(u.garrison?(u.garrison.c===activeTile.c&&u.garrison.r===activeTile.r):groups.some(a=>a.team===u.team&&(a.id||0)===(u.armyId||0)))).map(({u,i},j)=>{const d=deploymentFor(s,activeTile,i,u,j),g=u.garrison;return {...d,...(g?{x:g.x+(g.wallAxis?0:((g.slot??0)-.5)*1.6),z:g.z+(g.wallAxis?((g.slot??0)-.5)*1.6:0),guardPost:true,wallType:g.wallType||'palisade',heading:g.wallAxis?Math.PI/2:0}:{}),source:i,team:u.team,armyId:u.armyId||0,grade:u.grade||'standard',experienceMultiplier:u.experienceMultiplier||1,kind:u.kind,menCount:u.menCount,soldiers:u.soldiers,hp:u.hp,maxHp:u.maxHp||TROOPS[u.kind]?.hp||u.hp}})}
+function inspection(){if(!activeTile)return [];const groups=s.armies.filter(a=>a.embarked==null&&tileKey(a)===tileKey(activeTile));return s.units.map((u,i)=>({u,i})).filter(({u})=>u.hp>0&&(u.garrison?(u.garrison.c===activeTile.c&&u.garrison.r===activeTile.r):groups.some(a=>a.team===u.team&&(a.id||0)===(u.armyId||0)))).map(({u,i},j)=>{const d=deploymentFor(s,activeTile,i,u,j),g=u.garrison;
+ const army=u.kind==='scout'&&!g?groups.find(a=>a.team===u.team&&(a.id||0)===(u.armyId||0)):null;
+ const exact=army?scoutSectorPositionV236(worldTravelSample(army),activeTile):null;
+ return {...d,...(exact?{x:exact.x,z:exact.z}:{}),...(g?{x:g.x+(g.wallAxis?0:((g.slot??0)-.5)*1.6),z:g.z+(g.wallAxis?((g.slot??0)-.5)*1.6:0),guardPost:true,wallType:g.wallType||'palisade',heading:g.wallAxis?Math.PI/2:0}:{}),source:i,team:u.team,armyId:u.armyId||0,grade:u.grade||'standard',experienceMultiplier:u.experienceMultiplier||1,kind:u.kind,menCount:u.menCount,soldiers:u.soldiers,hp:u.hp,maxHp:u.maxHp||TROOPS[u.kind]?.hp||u.hp}})}
 let resourceArea='';
 const MAX_ATLAS_RESOURCE_ICONS=160,MAX_ATLAS_FISH_ICONS=46;
 function refreshResourceArea(){
