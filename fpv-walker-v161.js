@@ -9,7 +9,7 @@ import {createSoldier,animateSoldier} from './visuals.js';
 
 const MOVE_KEYS=new Set(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight','Space']);
 
-export function createWalker({scene,canvas,ground,blocked,onExit,onPlace,say}){
+export function createWalker({scene,canvas,ground,blocked,onExit,onPlace,say,onToggleNames,getNamesEnabled}){
  const model=new T.Group();model.name='v161 walker';model.visible=false;
  const body=new T.Group();createSoldier(body,0,0,'#c9a46a','stone_settler');model.add(body);scene.add(model);
  const rig=body.children[0];
@@ -21,9 +21,18 @@ export function createWalker({scene,canvas,ground,blocked,onExit,onPlace,say}){
 
  // ---------------------------------------------------------------- HUD
  const hud=document.createElement('div');hud.id='fpv-hud';hud.hidden=true;
- hud.innerHTML='<div class="fpv-cross"></div><div class="fpv-bar"><b>First person</b><span class="fpv-help">WASD move · mouse look (click to lock) · Shift run · Space jump · Esc exit</span><button type="button" data-fpv="place">Move character</button><button type="button" data-fpv="exit">Exit</button></div><div class="fpv-stick" hidden><i></i></div>';
+ hud.innerHTML='<div class="fpv-cross"></div><div class="fpv-bar"><b>First person</b><span class="fpv-help">WASD move · mouse look (click to lock) · Shift run · Space jump · Esc exit</span><button type="button" data-fpv="names" aria-pressed="true">Nimed: sees</button><button type="button" data-fpv="place">Move character</button><button type="button" data-fpv="exit">Exit</button></div><div class="fpv-stick" hidden><i></i></div>';
  document.body.append(hud);
  const stickEl=hud.querySelector('.fpv-stick'),knob=stickEl.querySelector('i');
+ const namesButton=hud.querySelector('[data-fpv="names"];
+ function refreshNamesButton(){
+  const enabled=getNamesEnabled?.()!==false;
+  namesButton.textContent=enabled?'Nimed: sees':'Nimed: väljas';
+  namesButton.setAttribute('aria-pressed',String(enabled));
+  namesButton.title='Lülita sõdurite nimed sisse või välja';
+ }
+ namesButton.onclick=()=>{onToggleNames?.();refreshNamesButton();};
+ refreshNamesButton();
  hud.querySelector('[data-fpv="exit"]').onclick=()=>exit();
  hud.querySelector('[data-fpv="place"]').onclick=()=>{exit();startPlacing();};
  const hint=document.createElement('div');hint.id='fpv-place-hint';hint.hidden=true;hint.textContent='Click on the map where the character should stand · Esc cancels';document.body.append(hint);
@@ -90,7 +99,7 @@ export function createWalker({scene,canvas,ground,blocked,onExit,onPlace,say}){
  function place(x,z,faceYaw=null){pos.set(x,ground(x,z),z);placed=true;if(faceYaw!=null)yaw=faceYaw;model.visible=!active;syncModel();}
 
  // ---------------------------------------------------------------- enter / exit
- function enter(){if(!placed)return startPlacing();active=true;keys.clear();model.visible=false;hud.hidden=false;document.body.classList.add('fpv-mode');}
+ function enter(){if(!placed)return startPlacing();refreshNamesButton();active=true;keys.clear();model.visible=false;hud.hidden=false;document.body.classList.add('fpv-mode');}
  function exit(){if(!active)return;active=false;keys.clear();drag=null;stick.id=look.id=null;stickEl.hidden=true;
   if(document.pointerLockElement===canvas)document.exitPointerLock?.();
   hud.hidden=true;document.body.classList.remove('fpv-mode');model.visible=placed;syncModel();onExit?.(pos);}
@@ -138,5 +147,5 @@ export function createWalker({scene,canvas,ground,blocked,onExit,onPlace,say}){
  function shift(dx,dz,inside){if(!placed)return;pos.x-=dx;pos.z-=dz;if(!inside(pos.x,pos.z)){if(active)exit();placed=false;model.visible=false;return;}syncModel();}
  function remove(){if(active)exit();cancelPlacing();placed=false;model.visible=false;}
  return {model,update,applyCamera,restoreCamera,enter,exit,startPlacing,cancelPlacing,pollPlacing,place,shift,remove,
-  get active(){return active},get placing(){return placing},get placed(){return placed},get position(){return pos},get yaw(){return yaw},eye};
+  get active(){return active},get placing(){return placing},get placed(){return placed},get position(){return pos},get yaw(){return yaw},refreshNamesButton,eye};
 }
