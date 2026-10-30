@@ -61,5 +61,7 @@ jobs:
         run: node scripts/test-scout-marker-v238.mjs
       - name: V239 visible scout meshes and names toggle
         run: node scripts/test-scout-model-v239.mjs
+      - name: V240 scout continuous world/detail movement
+        run: node scripts/test-scout-motion-v240.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
