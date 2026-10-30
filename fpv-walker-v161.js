@@ -24,7 +24,7 @@ export function createWalker({scene,canvas,ground,blocked,onExit,onPlace,say,onT
  hud.innerHTML='<div class="fpv-cross"></div><div class="fpv-bar"><b>First person</b><span class="fpv-help">WASD move · mouse look (click to lock) · Shift run · Space jump · Esc exit</span><button type="button" data-fpv="names" aria-pressed="true">Nimed: sees</button><button type="button" data-fpv="place">Move character</button><button type="button" data-fpv="exit">Exit</button></div><div class="fpv-stick" hidden><i></i></div>';
  document.body.append(hud);
  const stickEl=hud.querySelector('.fpv-stick'),knob=stickEl.querySelector('i');
- const namesButton=hud.querySelector('[data-fpv="names"];
+ const namesButton=hud.querySelector('[data-fpv="names"]');
  function refreshNamesButton(){
   const enabled=getNamesEnabled?.()!==false;
   namesButton.textContent=enabled?'Nimed: sees':'Nimed: väljas';
