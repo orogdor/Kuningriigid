@@ -21,3 +21,16 @@ export function blendScoutPositionV236(current,target,dt){
  const k=Math.min(1,Math.max(0,(dt||0)*7));
  return {x:current.x+(target.x-current.x)*k,z:current.z+(target.z-current.z)*k};
 }
+
+// V240: retain 8x8 sector identity, but interpolate the actual movement
+// continuously instead of jumping 28 metres from sector centre to centre.
+export function scoutDetailPositionV240(pose,tile){
+ const sector=scoutSectorPositionV236(pose,tile);
+ const x=(pose.x-tile.x)*225/ATLAS_TILE_METRES_V236;
+ const z=(pose.z-tile.z)*195/ATLAS_TILE_METRES_V236;
+ return {...sector,x,z};
+}
+export function scoutWorldFromDetailV240(tile,detail){
+ return {x:tile.x+detail.x*ATLAS_TILE_METRES_V236/225,
+  z:tile.z+detail.z*ATLAS_TILE_METRES_V236/195};
+}
