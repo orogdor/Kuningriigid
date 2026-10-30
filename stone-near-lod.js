@@ -39,6 +39,26 @@ function detailedAsset(name){
  assets.set(name,promise);return promise;
 }
 
+// V237: all ghost meshes must own their material clones. An asynchronous GLB
+// that enters the preview later must NEVER alter the shared real-building PBR
+// material or inherit an accidental tint outside the preview.
+export function setStonePreviewV237(root,color='#9fc877',opacity=.48){
+ if(!root)return root;
+ root.traverse(o=>{
+  if(o.userData?.stoneNearLOD){o.userData.stonePreviewV237=true;o.userData.previewColorV237=color;o.userData.previewOpacityV237=opacity;}
+  if(!o.material)return;
+  if(!o.userData.previewMaterialsIsolatedV237){
+   o.material=Array.isArray(o.material)?o.material.map(m=>m?.clone?.()||m):o.material.clone();
+   o.userData.previewMaterialsIsolatedV237=true;
+  }
+  for(const m of Array.isArray(o.material)?o.material:[o.material]){
+   if(!m)continue;
+   m.transparent=true;m.opacity=opacity;m.depthWrite=false;
+   m.color?.set(color);
+  }
+ });
+ return root;
+}
 // Renderer updates LODs using the active camera, including walking and preview cameras.
 class LazyStoneLOD extends T.LOD{
  constructor(low,build,buildFar=null){
@@ -50,6 +70,7 @@ class LazyStoneLOD extends T.LOD{
   // The old mesh is only a placeholder while the original GLB streams.
   if(buildFar)Promise.resolve().then(buildFar).then(mesh=>{
    if(!mesh)return;
+   if(this.userData.stonePreviewV237)setStonePreviewV237(mesh,this.userData.previewColorV237,this.userData.previewOpacityV237);
    const old=this.low;this.remove(old);this.low=mesh;
    this.addLevel(mesh,STONE_NEAR_DISTANCE,.05);
    mesh.visible=!this.userData.nearActive;
@@ -69,15 +90,10 @@ class LazyStoneLOD extends T.LOD{
   if(near&&!this.pending){
    this.pending=true;
    this.build().then(mesh=>{
-    // Placement ghosts customise the already-present low material before the
-    // detailed file arrives. Carry that presentation over without changing the
-    // shared material used by completed buildings.
-    let lowMaterial;this.low.traverse(o=>{if(o.material&&!lowMaterial)lowMaterial=o.material;});
-    if(lowMaterial?.transparent&&lowMaterial.opacity<1){
-     mesh.material=mesh.material.clone();mesh.material.transparent=true;
-     mesh.material.opacity=lowMaterial.opacity;mesh.material.depthWrite=lowMaterial.depthWrite;
-     mesh.material.color.copy(lowMaterial.color);
-    }
+    // Distinguish the preview via an explicit flag, rather than a globally
+    // shared low material that may be transparent for unrelated reasons.
+    if(this.userData.stonePreviewV237)
+     setStonePreviewV237(mesh,this.userData.previewColorV237,this.userData.previewOpacityV237);
     this.high.add(mesh);this.userData.nearReady=true;
    }).catch(error=>{this.userData.nearError=String(error);console.warn('Keeping distant Stone Age model',error);});
   }
