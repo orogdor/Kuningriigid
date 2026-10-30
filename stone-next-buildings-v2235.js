@@ -9,18 +9,48 @@ function makeField(){
  const ground=new T.BoxGeometry(16,.12,16),furrow=new T.BoxGeometry(1.36,.23,15.5),stem=new T.CylinderGeometry(.018,.03,.8,5),head=new T.SphereGeometry(.075,5,4);
  fieldShared={soil,ridge,stalkMat,ground,furrow,stem,head};return fieldShared;
 }
-function fieldLOD(low){
- const a=makeField(),high=new T.Group();let m=new T.Mesh(a.ground,a.soil);m.position.y=.06;m.receiveShadow=true;high.add(m);
- for(let r=0;r<8;r++){m=new T.Mesh(a.furrow,a.ridge);m.position.set(-7+2*r,.16,0);m.receiveShadow=true;high.add(m)}
- const count=8*23*3,stems=new T.InstancedMesh(a.stem,a.stalkMat,count),heads=new T.InstancedMesh(a.head,a.stalkMat,count),dummy=new T.Object3D();let index=0;
- for(let r=0;r<8;r++)for(let z=0;z<23;z++)for(let k=0;k<3;k++){
-  const wobble=Math.sin(r*77+z*19+k*7),height=.66+.17*Math.sin(r*15+z*3+k*11);
-  const x=-7+2*r+(k-1)*.23+wobble*.06,zz=-7.55+z*.68+wobble*.12;
-  dummy.position.set(x,.27+height*.5,zz);dummy.scale.set(1,height/.8,1);dummy.rotation.z=wobble*.10;dummy.updateMatrix();stems.setMatrixAt(index,dummy.matrix);
-  dummy.position.set(x+wobble*.04,.27+height,zz);dummy.scale.set(.7,1.7,.7);dummy.rotation.set(0,0,0);dummy.updateMatrix();heads.setMatrixAt(index,dummy.matrix);index++;
+// V237: near and far use the same crop and soil palette. Never fall back
+// to the unrelated V158 cubic-field geometry when crossing the LOD threshold.
+// Repeat a small grain stem/ear mesh to support fields of any dimensions.
+function fieldVisual(shared,far=false){
+ const group=new T.Group();group.name=far?'V237 field far':'V237 field near';
+ const soil=new T.Mesh(shared.ground,shared.soil);soil.position.y=.06;soil.receiveShadow=true;group.add(soil);
+ for(let row=0;row<8;row++){
+  const furrow=new T.Mesh(shared.furrow,shared.ridge);
+  furrow.position.set(-7+2*row,.16,0);furrow.receiveShadow=true;group.add(furrow);
  }
- stems.castShadow=true;heads.castShadow=true;high.add(stems,heads);
- const root=new T.LOD();root.addLevel(high,0);root.addLevel(low,100,.05);Object.assign(root.userData,low.userData);root.userData.stoneModelV2235='field';root.userData.proceduralStoneField=true;return root;
+ const clumps=far?12:23,stalks=far?2:3,count=8*clumps*stalks;
+ const stems=new T.InstancedMesh(shared.stem,shared.stalkMat,count);
+ const heads=new T.InstancedMesh(shared.head,shared.stalkMat,count);
+ const dummy=new T.Object3D();
+ let n=0;
+ for(let row=0;row<8;row++)for(let z=0;z<clumps;z++)for(let k=0;k<stalks;k++){
+  const wobble=Math.sin(row*77+z*19+k*7),height=.66+.17*Math.sin(row*15+z*3+k*11);
+  const x=-7+2*row+(k-(stalks-1)/2)*.23+wobble*.06;
+  const zz=-7.55+z*15.1/(clumps-1)+wobble*.12;
+  dummy.position.set(x,.27+height*.5,zz);
+  dummy.scale.set(1,height/.8,1);dummy.rotation.set(0,0,wobble*.10);dummy.updateMatrix();
+  stems.setMatrixAt(n,dummy.matrix);
+  dummy.position.set(x+wobble*.04,.27+height,zz);
+  dummy.scale.set(.7,1.7,.7);dummy.rotation.set(0,0,0);dummy.updateMatrix();
+  heads.setMatrixAt(n,dummy.matrix);n++;
+ }
+ stems.instanceMatrix.needsUpdate=true;heads.instanceMatrix.needsUpdate=true;
+ stems.castShadow=!far;heads.castShadow=!far;stems.receiveShadow=true;heads.receiveShadow=true;
+ stems.name=far?'V237 distant stalks':'V237 near stalks';
+ heads.name=far?'V237 distant grain heads':'V237 near grain heads';
+ group.add(stems,heads);group.userData.fieldPlantsV237=count;
+ return group;
+}
+function fieldLOD(low){
+ const shared=makeField(),near=fieldVisual(shared,false),far=fieldVisual(shared,true);
+ const root=new T.LOD();root.addLevel(near,0);root.addLevel(far,100,.05);
+ Object.assign(root.userData,low.userData);
+ root.userData.stoneModelV2235='field';root.userData.proceduralStoneField=true;
+ root.userData.fieldSourceV237='matched near and far';
+ root.userData.fieldNearPlantsV237=near.userData.fieldPlantsV237;
+ root.userData.fieldFarPlantsV237=far.userData.fieldPlantsV237;
+ return root;
 }
 export function nextStoneBatchLOD(low,type,age,seed=0){
  if(!low||age!==0)return low;
