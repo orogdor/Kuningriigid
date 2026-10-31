@@ -40,6 +40,8 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 
 - V258: teiste detailkaartide armeed kuvatakse kõigi salkadega; liikuva armee kujutis järgib maailmakaardi asukohta. Asunike, armeede ja maismaakaupmeeste maailmakaardi kiirus kasutab detailruudu mõõtmeid ning tee- ja üksusekiirust; olemasolev teekond säilitab suhtelise asukoha. Veesõit ja rongid on eraldi. Kontrollid ja piirangud: `MUUDATUSED_V258.md`.
 
+- V259: kirvemees, odamees, lingumees kasutavad TRELLIS.2 tekstuuriga GLB-mudeleid. Uutel mudelitel puudub luustik, seega liigub kogu mudel; V148 jääb varuvariandiks.
+
 ## Järgmine töö
 
 - Lamba GLB TRELLIS.2-ga (MIT; tausta eemaldamiseks mitte BRIA-RMBG-2.0, mis on mittekommertslik). Ootab kasutajalt GLB-faili või HF Space'ide käivitamise lubamist.

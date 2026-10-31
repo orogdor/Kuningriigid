@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {join} from 'node:path';
+const root = new URL('../', import.meta.url);
+const files={axeman:'kirvemees',spearman:'odamees',slinger:'lingumees'};
+const raw=file=>readFileSync(new URL(file,root));
+for(const [kind,name] of Object.entries(files)){
+ const glb=raw('models-trellis-v259/'+name+'_trellis2_game.glb');
+ assert.equal(glb.toString('utf8',0,4),'glTF',kind+' header');
+ assert.equal(glb.readUInt32LE(8),glb.length,kind+' GLB size');
+ const jsonLength=glb.readUInt32LE(12);
+ const json=JSON.parse(glb.toString('utf8',20,20+jsonLength));
+ assert.ok(json.meshes?.length===1,kind+' single mesh');
+ assert.equal(json.meshes[0].primitives.length,1,kind+' single primitive');
+ assert.ok(json.images.length>=1,kind+' textured');
+ assert.ok(!json.skins?.length,kind+' expected unrigged');
+ const p=json.meshes[0].primitives[0];
+ assert.ok(p.attributes.POSITION!=null&&p.attributes.TEXCOORD_0!=null,kind+' mesh+uv');
+ const a=json.accessors[p.attributes.POSITION];
+ const d=a.max.map((v,i)=>v-a.min[i]);
+ const up=kind==='slinger'?d[2]:d[1];
+ assert.ok(up>.01&&up<2,kind+' normalizable height');
+ console.log(kind+': GLB valid, vertices '+a.count+', original bounds '+d.map(v=>v.toFixed(3)).join('x'));
+}
+const src=file=>raw(file).toString('utf8');
+assert.match(src('visuals.js'),/hasTrellisStoneV259\(kind\)/);
+assert.match(src('visuals.js'),/animateTrellisStoneV259/);
+assert.match(src('visuals.js'),/parent\.userData\.assetRevisionV241/);
+assert.match(src('stone-trellis-v259.js'),/HEIGHT\/size\.y/);
+assert.match(src('asset-demand-v241.js'),/loadTrellisStoneV259/);
+assert.match(src('civilization.js'),/visuals\.js\?v=259/);
+assert.match(src('index.html'),/civilization\.js\?v=259/);
+console.log('V259 TRELLIS GLB and integration wiring PASS');

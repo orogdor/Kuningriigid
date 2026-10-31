@@ -1,5 +1,6 @@
 // Only presentation assets are gated. Simulation/research rules stay available.
 import {loadSoldierV241,V148_KINDS} from './soldier-models-v148.js?v=234';
+import {hasTrellisStoneV259,loadTrellisStoneV259} from './stone-trellis-v259.js';
 import {detailedAsset} from './stone-near-lod.js?v=224';
 import {V118_ERA_IDS} from './tech-tree-data-v118.js?v=118a';
 const stone={hall:'peamaja',house:'house',lumber:'lumber',quarry:'quarry',well:'well',farm:'farm',
@@ -36,7 +37,7 @@ export function createAssetDemandV241(game,definitions){
    const next=game.s.research.map((r,t)=>[game.s.ages[t],r.active,...r.known].join(',')).join('|');
    if(!force&&next===stamp)return;stamp=next;
    const desired=desiredAssetsV241(game,definitions);
-   pending=[...desired.soldiers.map(loadSoldierV241),...desired.buildings.map(detailedAsset)];
+   pending=[...desired.soldiers.map(kind=>hasTrellisStoneV259(kind)?loadTrellisStoneV259(kind):loadSoldierV241(kind)),...desired.buildings.map(detailedAsset)];
    // Failures retain the existing procedural visuals; no unhandled rejections.
    for(const promise of pending)promise.catch(error=>console.warn('Asset prefetch unavailable',error));
   },
