@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>V246 sea WebGL vs WebGPU</title>
+<style>html,body{margin:0;background:#c9b48a}</style>
+<script>(function(){if(new URLSearchParams(location.search).get('gpu')==='1'){var m=document.createElement('script');m.type='importmap';m.textContent=JSON.stringify({imports:{'../../vendor/three.module.js':'../../vendor/three-gpu-shim.js?v=245','./vendor/three.module.js':'../../vendor/three-gpu-shim.js?v=245'}});document.currentScript.after(m);}else{var m=document.createElement('script');m.type='importmap';m.textContent=JSON.stringify({imports:{'./vendor/three.module.js':'../../vendor/three.module.js'}});document.currentScript.after(m);}})();</script>
+<script type="module">
+// V246 check: the sea material must look the same in WebGL (onBeforeCompile) and WebGPU (TSL).
+// A strip from beach (depth -1) to deep water (depth 24); sand is visible through the cut-out.
+import * as T from '../../vendor/three.module.js';
+import {seaMaterial} from '../../sea-v158.js';
+const r=new T.WebGLRenderer({antialias:true});r.setSize(640,360);document.body.appendChild(r.domElement);
+const scene=new T.Scene();scene.background=new T.Color('#c9b48a');
+scene.add(new T.HemisphereLight(0xe6eedb,0x536246,1.6));const sun=new T.DirectionalLight(0xffe1b0,2.5);sun.position.set(-30,60,30);scene.add(sun);
+const cam=new T.PerspectiveCamera(40,640/360,1,1000);cam.position.set(0,120,90);cam.lookAt(0,0,0);
+const geo=new T.PlaneGeometry(200,100,100,10);geo.rotateX(-Math.PI/2);const p=geo.attributes.position,d=new Float32Array(p.count);
+for(let i=0;i<p.count;i++)d[i]=-1+(p.getX(i)+100)/200*25;geo.setAttribute('aDepth',new T.BufferAttribute(d,1));
+scene.add(new T.Mesh(geo,seaMaterial()));
+const ground=new T.Mesh(new T.PlaneGeometry(220,120),new T.MeshBasicMaterial({color:'#c9b48a'}));ground.rotation.x=-Math.PI/2;ground.position.y=-1;scene.add(ground);
+(async()=>{if(r.readyV225)await r.readyV225;for(let i=0;i<3;i++){r.render(scene,cam);await new Promise(q=>requestAnimationFrame(q));}window.V246_DONE=window.KINGDOMS_GPU_V225?.backend||'webgl';})().catch(e=>{window.V246_DONE='error '+e.message;});
+</script>

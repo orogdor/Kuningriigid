@@ -1,6 +1,6 @@
 # Kuningriigid – ühine tööjärg
 
-Viimati kokku lepitud seis: **V245**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
+Viimati kokku lepitud seis: **V246**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
 
 - Mäng ja avalik eelvaade: https://orogdor.github.io/Kuningriigid/
 - Lähtekood: https://github.com/orogdor/Kuningriigid
@@ -9,6 +9,7 @@ Viimati kokku lepitud seis: **V245**, GitHubi `main`-harus. Enne töö alustamis
 - V243: müüri saab ühendada torni või väravapostiga. Ehitamisel pöörab Ctrl + hiireratas eelvaadet 2° kaupa; juhis on ekraanil. Silla paigutus peab ühendama kaldad.
 - V244 (Claude): jõudlus ilma graafikat halvendamata. Puud ja põõsad joonistatakse instancing'uga, kiviaja hoonetel on kolm detailsuse astet (`models-stone-lod-v244/`), WebGPU varulahendus on rangem. Üksikasjad: `MUUDATUSED_V244.md`.
 - V245 (Claude): WebGPU must ekraan parandatud. Põhjus oli three r170 instancing'u uniform-puhvri viga (`vendor/three.webgpu.js` patch). Üksikasjad: `MUUDATUSED_V245.md`.
+- V246 (Claude): WebGPU maailmakaardil oli näha ainult udu. Udu kate ja meri on nüüd TSL-is, sest WebGPU eirab `onBeforeCompile`-t. Kontroll: `tests/webgpu-v246/sea.html?gpu=0|1`. Üksikasjad: `MUUDATUSED_V246.md`.
 - V243 muudatuste ja kontrollide üksikasjad: `MUUDATUSED_V243.md`; eelmised versioonid: `MUUDATUSED_V241.md` ja `MUUDATUSED_V242.md`.
 
 ## Koostöö
@@ -25,4 +26,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 ## Järgmine töö
 
 - Tõrvikud (225 eraldi tükki) ja varustus tuleb liita. Kasutaja soovis selle hilisemaks eraldi ja põhjalikumaks läbivaatuseks.
-- WebGPU töötab kasutaja NVIDIA kaardil. Kaadrisagedust WebGPU ja WebGL-i vahel pole veel võrreldud. Mitu onBeforeCompile-efekti (maastiku sujuvad üleminekud, mere lained, pilvede varjud, tuul) puudub WebGPU-s, need tuleb ümber kirjutada TSL-i.
+- WebGPU töötab kasutaja NVIDIA kaardil. Kaadrisagedust WebGPU ja WebGL-i vahel pole veel võrreldud. Udu kate ja meri on V246-s TSL-is. Maastiku sujuvad üleminekud, pilvede varjud ja tuul puuduvad WebGPU-s endiselt ja tuleb ümber kirjutada TSL-i.
+- WebGPU udu on WebGL-ist hallim, sest three r170 WebGPU rakendab ACES-toonivastenduse kogu kaadrile ja eirab `toneMapped:false`.

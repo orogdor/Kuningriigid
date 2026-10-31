@@ -5,6 +5,7 @@ import {CLOUD_TIME,SEA_EFFECT_V226} from './atmosphere-v158.js?v=161a';
 
 export function seaMaterial({scale=1,scaleZ=scale,origin={x:0,z:0}}={}){
  // scale: model units per world metre on the horizontal plane (1 on the world map, ~4.5 on detail maps)
+ if(T.GPU_MODE_V225)return seaNodeMaterialV246({scale,scaleZ,origin});
  const m=new T.MeshStandardMaterial({color:'#ffffff',roughness:.22,metalness:.12,transparent:true,depthWrite:false});
  m.onBeforeCompile=shader=>{
   shader.uniforms.uSeaT=CLOUD_TIME;shader.uniforms.uSeaFXV226=SEA_EFFECT_V226;
@@ -36,6 +37,31 @@ float sn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(sh(
  normal=normalize(normal+vec3(seaRipple-.5,0.0,.5-sn(vSeaP*.31+uSeaT*.2))*.22*uSeaFXV226);`);
  };
  m.customProgramCacheKey=()=>`sea-v242-${scale.toFixed(2)}-${scaleZ.toFixed(2)}`;
+ return m;
+}
+// V246: WebGPU ignores onBeforeCompile, so the sea was drawn as an opaque white sheet (also over
+// beaches). The same depth colour, ripples, surf, wet-edge cut-out and normal wobble as TSL nodes.
+function seaNodeMaterialV246({scale,scaleZ,origin}){
+ const {Fn,vec2,vec3,float,floor,fract,sin,dot,mix,max,clamp,smoothstep,normalize,positionWorld,attribute,uniform,normalView}=T;
+ const uT=uniform(CLOUD_TIME.value).onRenderUpdate(()=>CLOUD_TIME.value),uFX=uniform(SEA_EFFECT_V226.value).onRenderUpdate(()=>SEA_EFFECT_V226.value);
+ const sh=p=>{const a=fract(p.mul(vec2(123.34,456.21))),b=a.add(dot(a,a.add(45.32)));return fract(b.x.mul(b.y));};
+ const sn=Fn(([p])=>{const i=floor(p),f0=fract(p),f=f0.mul(f0).mul(float(3).sub(f0.mul(2)));
+  return mix(mix(sh(i),sh(i.add(vec2(1,0))),f.x),mix(sh(i.add(vec2(0,1))),sh(i.add(vec2(1,1))),f.x),f.y);});
+ const depthRaw=attribute('aDepth','float'),d=max(depthRaw,0);
+ const p=positionWorld.xz.div(vec2(scale,scaleZ)).add(vec2(origin.x,origin.z));
+ let sea=mix(vec3(.42,.70,.66),vec3(.16,.45,.52),smoothstep(.3,4.0,d));sea=mix(sea,vec3(.05,.20,.32),smoothstep(4.0,22.0,d));
+ const r1=sn(p.mul(.18).add(vec2(uT.mul(.22),uT.mul(.10)))),r2=sn(p.mul(.47).sub(vec2(uT.mul(.15),uT.mul(-.27))).add(3));
+ const ripple=r1.mul(.6).add(r2.mul(.4));
+ sea=sea.mul(uFX.mul(ripple.mul(.12).sub(.06)).add(1));
+ const band=sin(d.mul(7).sub(uT.mul(1.6)).add(sn(p.mul(.35)).mul(4))).mul(.5).add(.5);
+ const surf=float(1).sub(smoothstep(0,1.1,d)).mul(smoothstep(.55,.95,band)).add(float(1).sub(smoothstep(0,.18,d)).mul(.8));
+ sea=mix(sea,vec3(.93,.96,.94),clamp(surf,0,1).mul(.75).mul(uFX));
+ const wet=smoothstep(-.12,.20,depthRaw);
+ const m=new T.MeshStandardNodeMaterial({roughness:.22,metalness:.12,transparent:true,depthWrite:false});
+ m.colorNode=sea;
+ m.opacityNode=mix(float(.36),float(.91),smoothstep(0,1.6,d)).mul(wet);
+ m.alphaTest=.0025; // wet<.008 is discarded in the GLSL version (alpha stays ≥ .36·wet)
+ m.normalNode=normalize(normalView.add(vec3(ripple.sub(.5),0,float(.5).sub(sn(p.mul(.31).add(uT.mul(.2))))).mul(.22).mul(uFX)));
  return m;
 }
 // Detail map sea: a plane at sea level over the 3×3 area; depth from the local ground height.

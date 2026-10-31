@@ -450,8 +450,24 @@ function refreshFogCover(){
   const geometry=new T.PlaneGeometry(WORLD_WIDTH+400,WORLD_DEPTH+400,1,1);geometry.rotateX(-Math.PI/2);geometry.translate(WORLD_CENTER_X,120,WORLD_CENTER_Z);
   const pos=geometry.attributes.position,uv=geometry.attributes.uv;for(let i=0;i<pos.count;i++)uv.setXY(i,pos.getX(i)/50.8,pos.getZ(i)/50.8);
   const map=fogCoverTexture();map.wrapS=map.wrapT=T.RepeatWrapping;map.needsUpdate=true;
-  const material=new T.MeshBasicMaterial({map,side:T.DoubleSide,transparent:true,depthTest:false,depthWrite:false,toneMapped:false});
-  material.onBeforeCompile=shader=>{
+  let material;
+  if(T.GPU_MODE_V225){
+   // V246: WebGPU ignores onBeforeCompile, so the explored-area cut-out was missing and the opaque
+   // parchment hid the whole world map. Same warp, mask and tint as the GLSL below, as TSL nodes.
+   const {Fn,vec2,vec4,float,floor,fract,sin,dot,mix,smoothstep,positionLocal,texture,uv}=T;
+   const fogH=p=>fract(sin(dot(p,vec2(127.1,311.7))).mul(43758.5453));
+   const fogN=Fn(([p])=>{const i=floor(p),f0=fract(p),f=f0.mul(f0).mul(float(3).sub(f0.mul(2)));
+    return mix(mix(fogH(i),fogH(i.add(vec2(1,0))),f.x),mix(fogH(i.add(vec2(0,1))),fogH(i.add(vec2(1,1))),f.x),f.y);});
+   const w=positionLocal.xz;
+   const fw=w.add(vec2(fogN(w.mul(.021)).sub(.5),fogN(w.mul(.021).add(17)).sub(.5)).mul(38)).add(vec2(fogN(w.mul(.08).add(3)).sub(.5),fogN(w.mul(.08).add(9)).sub(.5)).mul(10));
+   const su=vec2(fw.x.sub(ORIGIN_X).div(WORLD_WIDTH),fw.y.sub(ORIGIN_Z).div(WORLD_DEPTH));
+   const seen=texture(seenTex,su).r;
+   const paper=texture(map,uv());
+   material=new T.MeshBasicNodeMaterial({side:T.DoubleSide,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false});
+   material.colorNode=vec4(paper.rgb.mul(smoothstep(0,.30,seen).mul(.06).add(.94)),paper.a);
+   material.opacityNode=float(1).sub(smoothstep(.30,.62,seen));
+  }else material=new T.MeshBasicMaterial({map,side:T.DoubleSide,transparent:true,depthTest:false,depthWrite:false,toneMapped:false});
+  if(!T.GPU_MODE_V225)material.onBeforeCompile=shader=>{
    shader.uniforms.uSeen={value:seenTex};
    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 vFogW;').replace('#include <begin_vertex>','#include <begin_vertex>\nvFogW=position.xz;');
    shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
