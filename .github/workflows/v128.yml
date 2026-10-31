@@ -49,8 +49,10 @@ jobs:
         run: node scripts/test-graphics-v226.mjs
       - name: V233 farm and Stone Age far LOD regression
         run: node scripts/test-farming-lod-v233.mjs
-      - name: V234 Stone Age equipment geometry regression
-        run: node scripts/test-equipment-v234.mjs
+      - name: V234 equipment and V261 rigged warrior regressions
+        run: |
+          node scripts/test-equipment-v234.mjs
+          node scripts/test-stone-warriors-v261.mjs
       - name: V235 day cycle and city torch regression
         run: node scripts/test-daynight-v235.mjs
       - name: V236 scouts and door torch regressions
