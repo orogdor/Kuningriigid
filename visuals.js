@@ -1,5 +1,5 @@
 import {withNatureLOD} from './nature-lod-v230.js';
-import {hasTrellisStoneV259,loadTrellisStoneV259,createTrellisStoneV259,animateTrellisStoneV259} from './stone-trellis-v259.js';
+import {hasTrellisStoneV259,loadTrellisStoneV259,createTrellisStoneV259,animateTrellisStoneV259} from './stone-trellis-v259.js?v=260';
 import {BRONZE_KINDS,createBronzeSoldier} from './bronze-soldiers-v95.js';
 import {visualKind as militaryVisualKind} from './military-v88.js?v=117a';
 import * as T from './vendor/three.module.js';
