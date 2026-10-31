@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {Civilization,createGame} from './civilization-core.js';
 import {MIN_CITY_SPACING,citySpacingAllowed} from './counties-v126.js';
-assert.equal(MIN_CITY_SPACING,17);
-assert.equal(citySpacingAllowed({c:16,r:16},[{c:0,r:0}]),false,'diagonal crowding is blocked');
-assert.equal(citySpacingAllowed({c:17,r:0},[{c:0,r:0}]),true);
+assert.equal(MIN_CITY_SPACING,10); // V254
+assert.equal(citySpacingAllowed({c:9,r:9},[{c:0,r:0}]),false,'diagonal crowding is blocked');
+assert.equal(citySpacingAllowed({c:10,r:0},[{c:0,r:0}]),true);
 const file='scenarios/iron-ai-v129.json';
 assert.ok(fs.existsSync(file),'new natural AI test state is required');
 {

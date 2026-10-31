@@ -48,9 +48,9 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
   // groves, steppe has scattered trees and many shrubs, desert has cacti, dry bushes and rocks (and
   // palms by water), tundra has dwarf shrubs and a few stunted spruces, rain forest and taiga are dense.
   const b=biome.replace('coastal_','');
-  if(b==='forest'){density=8;list=species.forest;bush=1.2}
-  else if(b==='jungle'){density=9;list=species.jungle;bush=2}
-  else if(b==='taiga'){density=8;list=species.taiga;bush=.8}
+  if(b==='forest'){density=11.5;list=species.forest;bush=1.2} // V254: denser forests
+  else if(b==='jungle'){density=12.5;list=species.jungle;bush=2}
+  else if(b==='taiga'){density=11;list=species.taiga;bush=.8}
   else if(b==='grassland'){density=2.6;list=species.grass;bush=2}
   else if(b==='lush_river'){density=4.5;list=species.lush;bush=1.8}
   else if(b==='steppe'){density=.8;list=species.steppe;bush=2.6}

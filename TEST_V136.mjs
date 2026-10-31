@@ -19,7 +19,7 @@ for(const radius of [1,2,3,4]){
   assert.equal(county.length,countyTileLimit(radius),'rural county population capacity unchanged');
  }
 }
-assert.equal(MIN_CITY_SPACING,17,'human city spacing unchanged');
+assert.equal(MIN_CITY_SPACING,10,'human city spacing (V254: 10 tiles)');
 assert.equal(BUILD_AGE.market,1,'market must not be ahistorically available during Stone Age');
 assert.equal(BUILD_AGE.harbor,1,'shipyard starts at Bronze Age');
 const g=new Civilization(JSON.parse(fs.readFileSync('scenarios/iron-ai-v129.json'))),team=1;

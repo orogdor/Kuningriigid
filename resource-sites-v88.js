@@ -57,7 +57,7 @@ export function mineralPlacement(world,type,p,buildings=[]){
 export function harvestMineral(world,b,d,dt,multiplier=1){
  const r=world.resources?.[b.depositId];
  if(!r||r.removed||r.amount<=0){b.status='Maardla on ammendunud';return 0;}
- b.status='Kaevandab';b.extractionTimer=(b.extractionTimer||0)+dt*multiplier;
+ b.status='Kaevandab';b.extractionTimer=(b.extractionTimer||0)+dt*multiplier*(b.type==='quarry'?.5:1); // V254: stone quarrying twice as slow
  if(b.extractionTimer<d.cycle)return 0;
  b.extractionTimer-=d.cycle;const amount=Math.min(d.rate,r.amount);r.amount-=amount;
  if(r.amount<=0){r.removed=true;world.revision++;}

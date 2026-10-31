@@ -12,7 +12,6 @@ export const heightCacheStats=game=>{const c=scalarCaches.get(game);return c?{si
 export function freezeStaticTransforms(root){
  const dynamic=new Set((root.userData.animations||[]).map(a=>a.node));
  for(const key of ['smoke','towerGuard','roofBallista'])if(root.userData[key])dynamic.add(root.userData[key]);
- if(root.userData.lifeV252?.group)dynamic.add(root.userData.lifeV252.group); // V252 animated building props
  function visit(node,animated=false){animated=animated||dynamic.has(node);if(!animated){node.updateMatrix();node.matrixAutoUpdate=false}for(const child of node.children)visit(child,animated)}
  visit(root);return root;
 }
