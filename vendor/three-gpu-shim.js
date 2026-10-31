@@ -2,8 +2,8 @@
 // only when the browser has WebGPU, so every game module gets the same three.js r170 classes from
 // the WebGPU build. The game creates "WebGLRenderer"; here that name is a WebGPURenderer that
 // starts its backend at once (the first frames before init are skipped by three.js itself).
-export * from './three.webgpu.js';
-import {WebGPURenderer} from './three.webgpu.js';
+export * from './three.webgpu.js?v=245';
+import {WebGPURenderer} from './three.webgpu.js?v=245';
 export const GPU_MODE_V225=true;
 export class WebGLRenderer extends WebGPURenderer{
  constructor(opts={}){super({...opts,antialias:opts.antialias??true});this.isWebGPUShimV225=true;

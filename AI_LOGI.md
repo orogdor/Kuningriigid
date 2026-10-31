@@ -696,3 +696,16 @@ Kasutaja: three.js jääb nõrgaks ja ta soovis uuemat renderdajat.
   - `graphics-runtime-v226.js`: kasutab `info.render.drawCalls`.
 - Headless swiftshaderi WebGPU kaotab seadme ka ühe kuubiku puhul, seega päris WebGPU vajab kontrolli kasutaja arvutis.
 - Testid PASS: `TEST_V221`, `TEST_V154`, `scripts/test.mjs traffic`, `test-stream-v242`, `test-build-v243`.
+
+---
+
+## V245 – WebGPU must ekraan parandatud (Claude, 2026-10-31)
+
+- Kasutaja: „WebGPU peaks sees olema, aga ei tööta.“
+- Diagnoos kasutaja arvutis Claude'i rakenduse brauseripaanis (NVIDIA Turing):
+  - eraldi `WebGPURenderer` joonistas `gameDebug.worldScene`; `uncapturederror` andis `Binding size (166784) > 65536`;
+  - kogu kaadri käsupuhver oli kehtetu ja `drawCalls` = 0.
+- Põhjus: three r170 `InstanceNode.setup` kasutab `instanceMesh.count <= 1000` uniform-puhvri valikuks, kuid seob terve `instanceMatrix.array`.
+- Parandus failis `vendor/three.webgpu.js`: tingimus on nüüd `instanceAttribute.count <= 1000 && usage !== DynamicDrawUsage`. Shim ja bundle on `?v=245`.
+- Kontroll sama meetodiga (ajutine prototüübi parandus kasutaja brauseris): vigu pole, 1 146 joonistuskäsku, 4,6 mln kolmnurka, pikslid nähtavad.
+- NB! Kui three.js-i uuendatakse, tuleb see parandus uuesti teha või kontrollida, kas upstream on vea parandanud.

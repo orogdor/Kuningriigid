@@ -43931,7 +43931,11 @@ class InstanceNode extends Node {
 
 			// Both WebGPU and WebGL backends have UBO max limited to 64kb. Matrix count number bigger than 1000 ( 16 * 4 * 1000 = 64kb ) will fallback to attribute.
 
-			if ( instanceMesh.count <= 1000 ) {
+			// Kuningriigid V245 patch: decide by the ARRAY capacity, not by the current draw count. A mesh
+			// allocated for more than 1000 instances but drawing fewer (spatial chunks, growing batches)
+			// bound the whole array as a >64 KB uniform buffer and WebGPU rejected every frame (black
+			// screen). Dynamic batches always use the attribute path, which follows later updates.
+			if ( instanceAttribute.count <= 1000 && instanceAttribute.usage !== DynamicDrawUsage ) {
 
 				instanceMatrixNode = buffer( instanceAttribute.array, 'mat4', Math.max( instanceMesh.count, 1 ) ).element( instanceIndex );
 
