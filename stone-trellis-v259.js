@@ -10,7 +10,10 @@ function bandMaterial(color){
  if(!bandMaterials.has(color))bandMaterials.set(color,new T.MeshStandardMaterial({color,roughness:.85}));
  return bandMaterials.get(color);
 }
-export const hasTrellisStoneV259=kind=>Object.prototype.hasOwnProperty.call(FILES,kind);
+// V260 hotfix: the generated TRELLIS meshes are not yet visually verified.
+// Preserve the V148 soldier appearances by default; ?trellis259=1 enables experimental GLBs.
+const EXPERIMENTAL_TRELLIS_V260=typeof window!=='undefined' && new URLSearchParams(window.location.search).get('trellis259')==='1';
+export const hasTrellisStoneV259=kind=>EXPERIMENTAL_TRELLIS_V260&&Object.prototype.hasOwnProperty.call(FILES,kind);
 function texture(image,srgb=false){
  if(!image)return null;
  const tex=new T.Texture(image);tex.flipY=false;tex.anisotropy=4;
