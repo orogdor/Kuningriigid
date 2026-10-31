@@ -16,7 +16,9 @@ export function spatialInstances(source,size=600){
   // Older Three versions lack instance bounds; retain correctness there.
   mesh.frustumCulled=typeof mesh.computeBoundingSphere==='function';mesh.computeBoundingSphere?.();near.add(mesh);
  }
- source.visible=false;group.add(source,near);group.userData.instanceCount=source.count;
+ // V244: the whole-source mesh is only shown far out (zoom > 3000), where a tree is a few pixels;
+ // it no longer renders a full shadow pass of every tree on the map.
+ source.visible=false;source.castShadow=false;group.add(source,near);group.userData.instanceCount=source.count;
  group.userData.chunkCount=near.children.length;batches.add({source,near,size,lod:source.userData.lodGeometries||null});return group;
 }
 // V152: optional level of detail. Chunks near the camera focus use the detailed model, the rest

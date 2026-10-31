@@ -6,6 +6,24 @@ import {loadGLB} from './glb-lite-v221.js';
 import {requestAssetV241} from './asset-queue-v241.js';
 
 export const STONE_NEAR_DISTANCE=100;
+// V244: buildings have three levels. The full ~100k-triangle model only within this share of the
+// near distance (40 m by default), a baked ~6k-triangle model from there to the near distance,
+// and a baked ~1.5k-triangle model beyond it. Both baked files are made offline from the same GLB
+// (tools/stone-models-v221/build_static.py) and placed with the original model's bounding box.
+export const STONE_DETAIL_SHARE=.4;
+const LOD_DIR='./models-stone-lod-v244/';
+let lodManifest=null;
+function stoneLodManifest(){return lodManifest??=fetch(LOD_DIR+'manifest.json').then(r=>r.ok?r.json():null).catch(()=>null);}
+export function stoneLodAsset(name,level){
+ return requestAssetV241('stone-lod:'+name+':'+level,async()=>{
+  const manifest=await stoneLodManifest(),box=manifest?.boxes?.[name];
+  if(!box)throw new Error('No V244 '+level+' model for '+name);
+  const data=await loadGLB(LOD_DIR+name+'_'+level+'.glb'),p=data.primitives[0],mr=texture(p.roughnessImage);
+  const material=new T.MeshStandardMaterial({map:texture(p.image,true),roughnessMap:mr,metalnessMap:mr,
+   roughness:Math.min(1,p.roughness??1),metalness:Math.min(0,p.metalness??0),side:T.DoubleSide,color:new T.Color().fromArray(p.color)});
+  return {data,geometry:p.geometry,material,box:new T.Box3(new T.Vector3().fromArray(box.min),new T.Vector3().fromArray(box.max))};
+ });
+}
 let nearDistanceV226=STONE_NEAR_DISTANCE,nearHumanDistanceV226=STONE_NEAR_DISTANCE;
 export function setStoneNearDistanceV226(buildings=100,humans=100){nearDistanceV226=Math.max(25,Math.min(240,Number(buildings)||100));nearHumanDistanceV226=Math.max(25,Math.min(240,Number(humans)||100));}
 function texture(image,srgb=false){
@@ -48,8 +66,9 @@ export function setStonePreviewV237(root,color='#9fc877',opacity=.48){
 }
 // Renderer updates LODs using the active camera, including walking and preview cameras.
 class LazyStoneLOD extends T.LOD{
- constructor(low,build,buildFar=null){
-  super();this.low=low;this.high=new T.Group();this.build=build;
+ constructor(low,build,buildFar=null,buildMid=null){
+  super();this.low=low;this.high=new T.Group();this.mid=new T.Group();this.build=build;this.buildMid=buildMid;
+  this.add(this.mid);this.mid.visible=false;this.userData.midReady=false;
   this.addLevel(this.high,0);this.addLevel(low,STONE_NEAR_DISTANCE,.05);
   this.high.visible=false;this.low.visible=true;this.userData.stoneNearLOD=true;
   this.userData.nearReady=false;this.userData.nearActive=false;
@@ -74,6 +93,21 @@ class LazyStoneLOD extends T.LOD{
   const limit=this.userData.stoneHumanV226?nearHumanDistanceV226:nearDistanceV226;
   const near=d<(this.userData.nearActive?limit*1.05:limit);
   this.userData.cameraDistance=d;
+  // V244: between the detail distance and the near distance use the baked middle model
+  if(this.buildMid&&!this.midFailed){
+   const detailLimit=limit*STONE_DETAIL_SHARE,detail=d<(this.userData.detailActive?detailLimit*1.08:detailLimit);
+   if(near&&!this.midPending){this.midPending=true;this.buildMid().then(mesh=>{
+     if(this.userData.stonePreviewV237)setStonePreviewV237(mesh,this.userData.previewColorV237,this.userData.previewOpacityV237);
+     this.mid.add(mesh);this.userData.midReady=true;}).catch(error=>{this.midFailed=true;this.userData.midError=String(error);});}
+   if(detail&&!this.pending){this.pending=true;this.build().then(mesh=>{
+     if(this.userData.stonePreviewV237)setStonePreviewV237(mesh,this.userData.previewColorV237,this.userData.previewOpacityV237);
+     this.high.add(mesh);this.userData.nearReady=true;}).catch(error=>{this.userData.nearError=String(error);});}
+   const showHigh=detail&&this.userData.nearReady,showMid=near&&!showHigh&&this.userData.midReady;
+   this.high.visible=showHigh;this.mid.visible=showMid;this.low.visible=!showHigh&&!showMid;
+   this.userData.detailActive=showHigh;this.userData.nearActive=showHigh||showMid;this.userData.stoneLevelV244=showHigh?'detail':showMid?'mid':'far';
+   return;
+  }
+  this.mid.visible=false;
   if(near&&!this.pending){
    this.pending=true;
    this.build().then(mesh=>{
@@ -140,7 +174,23 @@ function normalizedStoneGeometry(name,asset,type){
 }
 export function withStoneBuildingLOD(low,type,size,seed=0){
  const name=type==='hall'?'peamaja':type;
+ // V244: baked middle/far files; if a file is missing, fall back to the earlier path
+ async function makeBaked(level){
+  const asset=await stoneLodAsset(name,level),g=asset.geometry;
+  if(!g.userData.normalizedV244){
+   const c=asset.box.getCenter(new T.Vector3());g.translate(-c.x,-asset.box.min.y,-c.z);
+   if(['lumber','house'].includes(type))g.rotateY(-Math.PI/2);else if(type==='farm')g.rotateY(Math.PI/2);
+   g.computeBoundingBox();g.computeBoundingSphere();g.userData.normalizedV244=true;g.userData.shared=true;
+  }
+  const box=asset.box.getSize(new T.Vector3()),extent=['lumber','house','farm'].includes(type)?new T.Vector3(box.z,box.y,box.x):box;
+  const mesh=new T.Mesh(g,asset.material);
+  if(!applyStoneSize(mesh,type,extent,seed))mesh.scale.setScalar(size/Math.max(extent.x,extent.z)*(type==='house'?.94+((seed>>>3)%7)*.02:1));
+  mesh.castShadow=level==='mid';mesh.receiveShadow=true;mesh.userData.stoneDetailedAsset=name;mesh.userData.stoneBakedLevelV244=level;
+  if(level==='far')mesh.userData.stoneFarDerivedFromDetail=true;
+  return mesh;
+ }
  async function makeMesh(far){
+  if(far){try{return await makeBaked('far');}catch(e){}}
   const asset=await detailedAsset(name);
   const high=normalizedStoneGeometry(name,asset,type);
   if(far&&!farGeometry.has(name))farGeometry.set(name,simplifyStoneFarGeometry(high));
@@ -154,7 +204,7 @@ export function withStoneBuildingLOD(low,type,size,seed=0){
   if(far)mesh.userData.stoneFarDerivedFromDetail=true;
   return mesh;
  }
- const root=new LazyStoneLOD(low,()=>makeMesh(false),()=>makeMesh(true));
+ const root=new LazyStoneLOD(low,()=>makeMesh(false),()=>makeMesh(true),()=>makeBaked('mid'));
  Object.assign(root.userData,low.userData);root.userData.stoneNearLOD=true;
  return root;
 }
