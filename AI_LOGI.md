@@ -668,3 +668,31 @@ Kasutaja: three.js jääb nõrgaks ja ta soovis uuemat renderdajat.
 - `atmosphere-v158.js`: kui `T.GPU_MODE_V225` on tõene, ehitatakse taevas `MeshBasicNodeMaterial` ja TSL-gradiendiga. Fail laaditakse importmapi kaudu `?v=225`-ga.
 - TODO TSL-i: `onBeforeCompile` failides `landscape-v149.js` (4), `landscape-material-v85.js`, `sea-v158.js`, `civilization.js:396`, `town-models-v154.js:17` ja tuul failis `atmosphere-v158.js:58`. Need ei tööta WebGPU-s.
 - Headless swiftshaderi WebGPU kaotab isegi ühe kuubiku puhul seadme („Device was destroyed“), seega automaattest siin ei tööta. WebGL-režiimis läbis TEST_V221.
+
+---
+
+## V244 – jõudlus ilma graafikat halvendamata (Claude, 2026-10-31)
+
+- `nature-lod-v230.js`:
+  - madala detailsusega mudel joonistatakse stseeni ja liigi kohta jagatud `InstancedMesh`-iga;
+  - puhvrid ehitatakse iga kaadri jooksul `LOD.update` ajal ning nullitakse rAF-tick'is ja kaamera vahetusel;
+  - puu enda grupp, varumudel ja `userData` (`lowReady`, `highReady`, `nearActive`) jäid alles;
+  - kõrge detailsus ainult kuni `NATURE_NEAR_METRES=40` (päris kaugus, ei jagata enam `camera.zoom`-iga).
+- `stone-near-lod.js`:
+  - `LazyStoneLOD` saab `buildMid` parameetri;
+  - detailne mudel `< limit*STONE_DETAIL_SHARE` (0,4), vahepealne `< limit`, kauge muul juhul;
+  - `userData.stoneLevelV244` näitab taset, `nearActive` = detailne või vahepealne;
+  - vahepealne mudel kasutab `detailedAsset(name).material`, sest UV atlas on sama;
+  - kauge mudel tuleb failist `models-stone-lod-v244/<name>_far.glb`. Kui faili pole, kasutatakse vana käitusaegset `simplifyStoneFarGeometry`-t;
+  - asend arvutatakse originaali bboxist (`models-stone-lod-v244/manifest.json`).
+- `tools/stone-models-v221/lod_cluster.py` ja `qem.py` (`uv=` režiim):
+  - keevitamine positsiooni ja UV järgi, õmblused jäävad servadeks;
+  - tipud liiguvad ainult otspunktidesse ja võtavad üle nende UV ning normaali, flip-test on sees;
+  - Vertex clustering (UV keskmistamine) ja ümberküpsetus (`build_static.py`) andsid õlgkatustele tumedaid täppe, seega neid ei kasutata.
+- `spatial-batches-v86.js`: kogu allika mesh (nähtav ainult suumil > 3000) ei heida varju.
+- WebGPU:
+  - `atmosphere-v158.js`: sõlmmaterjali taevas saab `mat.uniforms={top,horizon,ground}` (TSL uniform-sõlmed);
+  - `webgpu-safety-v227.js`: globaalsed `error` ja `unhandledrejection` päästikud eemaldatud;
+  - `graphics-runtime-v226.js`: kasutab `info.render.drawCalls`.
+- Headless swiftshaderi WebGPU kaotab seadme ka ühe kuubiku puhul, seega päris WebGPU vajab kontrolli kasutaja arvutis.
+- Testid PASS: `TEST_V221`, `TEST_V154`, `scripts/test.mjs traffic`, `test-stream-v242`, `test-build-v243`.

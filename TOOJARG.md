@@ -1,12 +1,13 @@
 # Kuningriigid – ühine tööjärg
 
-Viimati kokku lepitud seis: **V243**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
+Viimati kokku lepitud seis: **V244**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
 
 - Mäng ja avalik eelvaade: https://orogdor.github.io/Kuningriigid/
 - Lähtekood: https://github.com/orogdor/Kuningriigid
 - V241: mängumudelid laaditakse vajaduse järgi; sõduritüübid on eraldi failides.
 - V242: detailkaardi naaberalad valmistatakse ette ja taaskasutatakse. Üleminekul säilivad ühine maastik ja kaamera asukoht.
 - V243: müüri saab ühendada torni või väravapostiga. Ehitamisel pöörab Ctrl + hiireratas eelvaadet 2° kaupa; juhis on ekraanil. Silla paigutus peab ühendama kaldad.
+- V244 (Claude): jõudlus ilma graafikat halvendamata. Puud ja põõsad joonistatakse instancing'uga, kiviaja hoonetel on kolm detailsuse astet (`models-stone-lod-v244/`), WebGPU varulahendus on rangem. Üksikasjad: `MUUDATUSED_V244.md`.
 - V243 muudatuste ja kontrollide üksikasjad: `MUUDATUSED_V243.md`; eelmised versioonid: `MUUDATUSED_V241.md` ja `MUUDATUSED_V242.md`.
 
 ## Koostöö
@@ -22,4 +23,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 
 ## Järgmine töö
 
-Kasutaja uut ülesannet ei ole veel määranud.
+- Tõrvikud (225 eraldi tükki) ja varustus tuleb liita. Kasutaja soovis selle hilisemaks eraldi ja põhjalikumaks läbivaatuseks.
+- WebGPU tuleb kontrollida päris brauseris (`?gpu=1`). Headless-testis see ei tööta.
