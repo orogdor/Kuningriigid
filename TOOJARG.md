@@ -1,6 +1,6 @@
 # Kuningriigid – ühine tööjärg
 
-Viimati kokku lepitud seis: **V248**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
+Viimati kokku lepitud seis: **V249**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
 
 - Mäng ja avalik eelvaade: https://orogdor.github.io/Kuningriigid/
 - Lähtekood: https://github.com/orogdor/Kuningriigid
@@ -10,6 +10,7 @@ Viimati kokku lepitud seis: **V248**, GitHubi `main`-harus. Enne töö alustamis
 - V244 (Claude): jõudlus ilma graafikat halvendamata. Puud ja põõsad joonistatakse instancing'uga, kiviaja hoonetel on kolm detailsuse astet (`models-stone-lod-v244/`), WebGPU varulahendus on rangem. Üksikasjad: `MUUDATUSED_V244.md`.
 - V245 (Claude): WebGPU must ekraan parandatud. Põhjus oli three r170 instancing'u uniform-puhvri viga (`vendor/three.webgpu.js` patch). Üksikasjad: `MUUDATUSED_V245.md`.
 - V246 (Claude): WebGPU maailmakaardil oli näha ainult udu. Udu kate ja meri on nüüd TSL-is, sest WebGPU eirab `onBeforeCompile`-t. Kontroll: `tests/webgpu-v246/sea.html?gpu=0|1`. Üksikasjad: `MUUDATUSED_V246.md`.
+- V249 (Claude): jõesuudmed. Kõigil kaartidel (ainult joonistus) laskub jõgi merre ilma kaldavalli ja kastita ning jõe vesi hajub merre. Uutes „Loogilise maailma“ mängudes (`geographyVersion 6`) algab jõgi peenikesena ja laieneb, suue on lehtrikujuline, kõik jõed jõuavad merre ja laiad lõigud on `riverNavigable`. V248 mängud jäävad versioonile 5. Üksikasjad: `MUUDATUSED_V249.md`.
 - V248 (Claude): uus kaarditüüp „Loogiline maailm“ (`world-tectonic-v248.js`, `geographyVersion:5`): laamad, mäeahelikud laamapiiridel, erosioon, tuulte ja vihmavarjuga kliima. See on uue mängu vaikevalik; vanad kaardid ja salvestused ei muutunud. Ajutine menüünupp „Kogu kaart“ (vaikimisi sees) eemaldab udu. Üksikasjad: `MUUDATUSED_V248.md`.
 - V247 (Claude): Deno ja Chrome'i kiirtest (`tests/deno-bench-v247/`): sama three.js WebGPU stseen brauseris ja Denos ilma brauserita. Pilvekonteineris (SwiftShader) töötavad mõlemad ja annavad sama 1 767 joonistuskäsku. Päris mõõtmine on veel tegemata ja tuleb teha kasutaja arvutis. Mäng ise ei muutunud.
 - V243 muudatuste ja kontrollide üksikasjad: `MUUDATUSED_V243.md`; eelmised versioonid: `MUUDATUSED_V241.md` ja `MUUDATUSED_V242.md`.
@@ -27,6 +28,8 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 
 ## Järgmine töö
 
+- `TEST_V139.mjs` kukub läbi (`ai-defenses-v128.js:47`, `city.economy.realms[team]` puudub). Viga on olemas ka V248-s.
+- Jõelaevandus: `cell.riverNavigable` (V249) märgib laiad jõelõigud, kuid laevad neid veel ei kasuta.
 - V248 maailmakaart: kasutaja vaatab uued kaardid üle. Seejärel tuleb ajutine „Kogu kaart“ nupp eemaldada (`index.html` `#reveal-v248`, `civilization-core.js` `seen()`, `fog-delta-v88.js`). Võimalik täpsustus: stepi osakaal (26–31% maast).
 - V247 mõõtmine kasutaja arvutis: Chrome 100,8 fps, Deno 51,2 fps (sama stseen). Brauserita lahendus ei ole kiirem; rakenduseks sobib Tauri/Electron + Capacitor.
 

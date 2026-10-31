@@ -174,7 +174,8 @@ export function smoothedOverview(sample,x,z,spacing){
 // ---------------------------------------------------------------- water
 // attributes: aFlow (downstream direction * relative speed), aShore (0 mid-channel .. 1 at the bank)
 export function waterMaterial(scope='world',tile=null){
- const material=new T.MeshStandardMaterial({vertexColors:true,roughness:.16,metalness:.04,side:T.DoubleSide});
+ // V249: transparent, so river water can thin out into the sea (alpha comes from the vertex colours)
+ const material=new T.MeshStandardMaterial({vertexColors:true,roughness:.16,metalness:.04,side:T.DoubleSide,transparent:true,depthWrite:false});
  const map=worldMapping(scope,tile);
  material.onBeforeCompile=shader=>{
   shader.uniforms.uL149Time=LANDSCAPE_TIME;

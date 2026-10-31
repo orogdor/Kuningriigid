@@ -30,8 +30,9 @@ function prep(game){
   e.points=sampleRiver(game,e.c,12,graph);
   for(let i=1;i<e.points.length;i++){
    const a=e.points[i-1],b=e.points[i];
-   const minX=Math.min(a.x,b.x)-19,maxX=Math.max(a.x,b.x)+19;
-   const minZ=Math.min(a.z,b.z)-19,maxZ=Math.max(a.z,b.z)+19;
+   const reach=Math.max(19,Math.max(a.width,b.width)*2.4+4); // wide estuaries stay visible from every cell they cover
+   const minX=Math.min(a.x,b.x)-reach,maxX=Math.max(a.x,b.x)+reach;
+   const minZ=Math.min(a.z,b.z)-reach,maxZ=Math.max(a.z,b.z)+reach;
    const p=cellAt(minX,minZ),q=cellAt(maxX,maxZ);
    const cc0=p?.c??clamp(Math.floor((minX+650)/50),0,COLS-1),cc1=q?.c??clamp(Math.floor((maxX+650)/50),0,COLS-1);
    const rr0=p?.r??clamp(Math.floor((minZ+550)/50),0,ROWS-1),rr1=q?.r??clamp(Math.floor((maxZ+550)/50),0,ROWS-1);
@@ -76,11 +77,19 @@ export function sampleRiver(game,cell,count=12,graph=null){
  const pts=[];
  for(let i=0;i<=count;i++){
   const t=i/count,p=hermite(cell,to,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t);
-  pts.push({...p,width:source+(target-source)*smooth(t),flow:cell.riverFlow||0});
+  let width=source+(target-source)*smooth(t);
+  // V249 (new worlds): the last stretch opens into a funnel-shaped estuary towards the sea.
+  if(game.s?.geographyVersion>=6)width*=1+1.5*estuaryV249(game,p.x,p.z);
+  pts.push({...p,width,flow:cell.riverFlow||0});
  }
  return pts;
 }
 export const getRivers=game=>prep(game).edges;
+// V249: 0 inland, rising to 1 where the river meets sea level (coast and open sea).
+export function estuaryV249(game,x,z){return 1-smooth((game.atlasHeight(x,z)-.30)/6);}
+// V249: 1 on dry land, 0 on the beach and in the sea. River banks, levees and raised meadows
+// only exist on land; at the mouth the riverbed runs down into the sea floor instead.
+export function landnessV249(game,x,z){return smooth((game.atlasHeight(x,z)-1.2)/4);}
 export function riverNear(game,x,z){
  const pos=cellAt(x,z);if(!pos)return {distance:Infinity,width:0};
  const bucket=prep(game).bucket.get(idx(pos));if(!bucket)return {distance:Infinity,width:0};
@@ -161,9 +170,9 @@ export function worldElevation(game,x,z,visual=false){
  const inner=w*1.04,outer=Math.max(inner+3.5,w*1.8+3);
  if(visual&&w>.05){
   const level=visibleRiverHeight(game,x,z,waterHeight);
-  const rim=level+.60,reach=outer+18;
+  const rim=level+.60,reach=outer+18,land=landnessV249(game,x,z);
   if(base<rim&&d<reach)
-   base+=(rim-base)*(1-smooth((d-outer)/(reach-outer)));
+   base+=(rim-base)*(1-smooth((d-outer)/(reach-outer)))*land; // V249: no levee wall out into the sea
   // The former V161 drawing terrain was 2.2 m below the water all
   // the way to its OUTER edge. That made a sharp airborne water slab,
   // even though the centre of the stream was physically underwater.
@@ -180,7 +189,9 @@ export function worldElevation(game,x,z,visual=false){
   // edge, and no detached opaque strip at a tributary or estuary.
   if(d<outer){
    const t=smooth((d-w)/(outer-w));
-   return (level-.06)*(1-t)+Math.max(base,level+.10)*t;
+   const bank=(level-.06)*(1-t)+Math.max(base,level+.10)*t;
+   // V249: towards the sea the bank follows the beach/sea floor down instead of a sand bar
+   return Math.min(base,bank)*(1-land)+bank*land;
   }
   return base;
  }

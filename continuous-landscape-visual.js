@@ -105,13 +105,15 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   const key=gx+','+gz;if(nodes.has(key))return nodes.get(key);
   const x=gx*step,z=gz*step,near=riverNear(game,x,z),w=near.width||1;
   const distance=Math.min(100,near.distance);
-  const p={x,z,d:distance-w,outer:distance-w*1.40,outerDry:distance-w*2.18,shore:.30-game.atlasHeight(x,z),width:w};nodes.set(key,p);return p;
+  const atlas=game.atlasHeight(x,z);
+  // V249: banks stop at the shore (shore), but the water itself runs on into the sea (sea) and fades there
+  const p={x,z,d:distance-w,outer:distance-w*1.40,outerDry:distance-w*2.18,shore:.30-atlas,sea:-2.5-atlas,width:w};nodes.set(key,p);return p;
  };
  const clip=(polygon,key,invert=false)=>{
   const result=[];for(let i=0;i<polygon.length;i++){
    const a=polygon[i],b=polygon[(i+1)%polygon.length],va=(invert?-1:1)*a[key],vb=(invert?-1:1)*b[key];
    if(va<=0)result.push(a);
-   if((va<=0)!==(vb<=0)){const t=va/(va-vb),p={};for(const k of ['x','z','d','outer','outerDry','shore','width'])p[k]=a[k]+(b[k]-a[k])*t;result.push(p)}
+   if((va<=0)!==(vb<=0)){const t=va/(va-vb),p={};for(const k of ['x','z','d','outer','outerDry','shore','sea','width'])p[k]=a[k]+(b[k]-a[k])*t;result.push(p)}
   }return result;
  };
  const emit=(polygon,array,isWater)=>{
@@ -128,8 +130,9 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  let batchV242=0;for(const key of cells){if(batchV242++%96===0)yield;
   const [x,z]=key.split(',').map(Number),a=node(x,z),b=node(x+1,z),c=node(x,z+1),d=node(x+1,z+1);
   for(const triangle of [[a,c,b],[b,c,d]]){
-   const land=clip(triangle,'shore');if(land.length<3)continue;
-   emit(clip(land,'d'),water,true);
+   const land=clip(triangle,'shore'),wet=clip(triangle,'sea');
+   if(wet.length>=3)emit(clip(wet,'d'),water,true);
+   if(land.length<3)continue;
    emit(clip(clip(land,'outer'),'d',true),banks,false);
    // V223: second, much softer bank band between wet mud and untouched meadow.
    // It is clipped using the same scalar field, so tributary joins remain seamless.
@@ -147,12 +150,14 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  // V149: wet, dark mud at the waterline that dries and fades into the surrounding land.
  const toWorld=(x,z)=>scope==='world'?{x,z}:localToWorld(tile,x,z);
  const mud=new T.Color('#5a523f'),damp=new T.Color('#6e6a4c');
+ // V249: mud and gravel banks fade out on the beach instead of ending in a hard edge at the shore
+ const shoreFadeV249=p=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(p.x,p.z)-.3)/2.2));return t*t*(3-2*t);};
  const bankMesh=yield* buffersStepsV242(banks,'#6e6a4c',{standard:true,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
   return mud.clone().lerp(damp,t).multiplyScalar(.92+.16*Math.sin(p.x*.37+Math.sin(p.z*.29)*2));
  },alpha:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
-  return Math.pow(1-t,1.6)*.80;
+  return Math.pow(1-t,1.6)*.80*shoreFadeV249(p);
  }});
  // Fine gravel, silty sand and grass mingle just beyond the wet mud.
  const gravel=new T.Color('#a99e80'),silt=new T.Color('#857e65');
@@ -164,13 +169,17 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  },alpha:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
   const t=Math.max(0,Math.min(1,(near.distance-near.width*1.4)/Math.max(.8,near.width*.78)));
-  return .54*Math.pow(1-t,1.3);
+  return .54*Math.pow(1-t,1.3)*shoreFadeV249(p);
  }});
  const deep=new T.Color('#1d4a57'),shallowCol=new T.Color('#4f7f74'),seaCol=new T.Color('#62a6a3');
  const waterMesh=yield* buffersStepsV242(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
   const edge=Math.min(1,near.distance/Math.max(1,near.width));
   return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,1-mouthBlend(game,p.x,p.z)).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
+ },alpha:(x,y,z)=>{
+  // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
+  const p=toWorld(x,z),a=game.atlasHeight(p.x,p.z),t=Math.max(0,Math.min(1,(a+2.2)/2.6));
+  return .94*t*t*(3-2*t);
  }});
  if(waterMesh){
   waterMesh.material.dispose();waterMesh.material=waterMaterial(scope,tile);animate(waterMesh);
