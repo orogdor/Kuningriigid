@@ -242,6 +242,9 @@ function fixtureModel(kind,withLight){
  return {root,flame,halo,light,pool,sparks,smoke,kind,haloScale,poolScale};
 }
 function torchModel(withLight=false){return fixtureModel('torch',withLight);}
+// V252: the same animated fire for camp fires, kilns and hand-held torches.
+export function createFireV252(scale=1){const g=new T.Group();addFire(g,scale,0);addFire(g,scale*.65,.02).rotation.y=.5;addFire(g,scale*.4,.03).rotation.y=1.1;return g;}
+export function tickFireV252(time){FIRE_TIME.value=time;}
 // The mesh doors face +Z (town-models-v154 doorway(...,'f',...)); transform
 // their thresholds by the same Y rotation as the building.
 const TORCH_DOORS={

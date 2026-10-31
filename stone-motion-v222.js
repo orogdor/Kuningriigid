@@ -98,6 +98,43 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
    point(B,'upperArm_R',-.96-.16*s,0,-.18,work);
    point(B,'forearm_L',-.83,0,0,work);point(B,'forearm_R',-.83,0,0,work);
    point(B,'spine',.10,0,0,work);
+  }else if(action==='dig'){ // V252 clay pit: two-handed digging stick, thrust down and lever up
+   const u=cycle(workT,1.7),lift=ease(.05,.40,u)*(1-ease(.42,.58,u)),push=ease(.42,.58,u)*(1-ease(.70,.95,u));
+   point(B,'upperArm_R',-.95-.75*lift+.45*push,0,-.12,work);point(B,'forearm_R',-.70-.30*lift,0,0,work);
+   point(B,'upperArm_L',-.70-.65*lift+.40*push,0,.12,work);point(B,'forearm_L',-.85-.25*lift,0,0,work);
+   point(B,'spine',.30+.25*push,0,0,work);point(B,'chest',.08,0,0,work);point(B,'head',-.18,0,0,work);
+   point(B,'thigh_L',-.30-.15*push,0,.06,work);point(B,'thigh_R',.10,0,-.05,work);point(B,'shin_L',.35+.2*push,0,0,work);
+   B.hips.position.y-=.03*work*push;
+  }else if(action==='pottery'){ // V252 potter: crouched, hands shaping a coil pot in slow circles
+   const a=workT*1.6;
+   point(B,'thigh_L',-1.05,0,.12,work);point(B,'thigh_R',-1.0,0,-.12,work);point(B,'shin_L',1.45,0,0,work);point(B,'shin_R',1.4,0,0,work);
+   point(B,'spine',.42,0,0,work);point(B,'chest',.12,0,0,work);point(B,'head',-.35,.06*Math.sin(a*.5),0,work);
+   point(B,'upperArm_L',-.55+.10*Math.sin(a),0,.22+.10*Math.cos(a),work);point(B,'upperArm_R',-.55+.10*Math.sin(a+PI),0,-.22-.10*Math.cos(a+PI),work);
+   point(B,'forearm_L',-1.05+.15*Math.cos(a),0,0,work);point(B,'forearm_R',-1.05+.15*Math.cos(a+PI),0,0,work);
+   B.hips.position.y-=.20*work;
+  }else if(action==='chisel'){ // V252 stoneworker: kneeling, left hand holds the chisel, right hand taps with a hammer stone
+   const u=cycle(workT,.62),up=ease(.0,.55,u)*(1-ease(.58,.72,u)),hit=ease(.58,.70,u)*(1-ease(.72,1,u));
+   point(B,'thigh_L',-1.1,0,.10,work);point(B,'thigh_R',-.35,0,-.12,work);point(B,'shin_L',1.5,0,0,work);point(B,'shin_R',1.9,0,0,work);
+   point(B,'spine',.45,0,0,work);point(B,'head',-.30,0,0,work);
+   point(B,'upperArm_L',-.70,0,.18,work);point(B,'forearm_L',-.90,0,0,work);
+   point(B,'upperArm_R',-.80-.75*up+.25*hit,0,-.15,work);point(B,'forearm_R',-.85-.35*up,0,0,work);
+   B.hips.position.y-=.24*work;
+  }else if(action==='study'){ // V252 elder/teacher: draws signs on the ground with a stick, pauses to explain
+   const u=cycle(workT,5.0),draw=ease(.0,.15,u)*(1-ease(.55,.65,u)),talk=ease(.62,.7,u)*(1-ease(.92,1,u));
+   point(B,'spine',.25*draw+.05,.10*talk,0,work);point(B,'head',-.30*draw+.05*talk,.15*talk*Math.sin(workT*2),0,work);
+   point(B,'upperArm_R',-.60-.25*draw+(-.6)*talk,.15*Math.sin(workT*3)*draw,-.10,work);point(B,'forearm_R',-.40-.5*talk,0,0,work);
+   point(B,'upperArm_L',-.20-.3*talk,0,.12,work);point(B,'forearm_L',-.45-.4*talk*Math.max(0,Math.sin(workT*2.4)),0,0,work);
+  }else if(action==='herd'){ // V252 herder: leans on a staff, looks over the flock, raises the staff now and then
+   const u=cycle(workT,6.0),wave=ease(.70,.78,u)*(1-ease(.85,.95,u));
+   point(B,'upperArm_R',-.85-.9*wave,0,-.18,work);point(B,'forearm_R',-.65+.3*wave,0,0,work);
+   point(B,'upperArm_L',-.25,0,.10,work);point(B,'forearm_L',-.40,0,0,work);
+   point(B,'spine',.06,.25*Math.sin(workT*.4),0,work);point(B,'head',0,.45*Math.sin(workT*.33),0,work);
+   point(B,'thigh_L',-.06,0,.05,work);
+  }else if(action==='talk'){ // V252 conversation: hand gestures, nods, weight shifts
+   const g1=Math.max(0,Math.sin(workT*1.9)),g2=Math.max(0,Math.sin(workT*1.3+2.1));
+   point(B,'upperArm_R',-.30-.55*g1,0,-.12-.15*g1,work);point(B,'forearm_R',-.55-.75*g1,0,0,work);
+   point(B,'upperArm_L',-.20-.35*g2,0,.10+.1*g2,work);point(B,'forearm_L',-.45-.55*g2,0,0,work);
+   point(B,'head',-.06+.08*Math.sin(workT*2.7),.18*Math.sin(workT*.7),0,work);point(B,'spine',.03,.08*Math.sin(workT*.5),0,work);
   }else {
    const s=Math.sin(workT*3.2);
    point(B,'upperArm_L',-.54+.25*s,0,.06,work);

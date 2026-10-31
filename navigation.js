@@ -172,7 +172,9 @@ repairEntrances(){
 preservesAccess(building,cargo=[]){
  this.refresh();const size=buildingClearance(building);if(!size)return true;
  const existing=this.buildings().filter(b=>b.hp>0&&buildingClearance(b));
- for(const b of existing){const other=buildingClearance(b);if(Math.abs(b.x-building.x)<other.rx+size.rx+.75&&Math.abs(b.z-building.z)<other.rz+size.rz+.75)return false;}
+ // V252: buildings may stand closer: the walking margins around them may overlap a little (the models are
+ // ~85-95 % of the clearance box). The flood-fill below still guarantees every door stays reachable.
+ for(const b of existing){const other=buildingClearance(b);if(Math.abs(b.x-building.x)<(other.rx+size.rx)*.95+.3&&Math.abs(b.z-building.z)<(other.rz+size.rz)*.95+.3)return false;}
  const hall=existing.find(b=>b.type==='hall');if(!hall)return true;
  const from=this.nearest(door(hall));if(!from)return false;
  const anchors=[...existing.map(door),...Object.values(this.world.workers||{}).filter(w=>(w.carried||0)>0),...cargo];
