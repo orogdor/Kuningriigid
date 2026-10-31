@@ -1,6 +1,6 @@
 # Kuningriigid – ühine tööjärg
 
-Viimane muudatus: **V256**. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
+Enne töö alustamist kontrolli GitHubi `main`-haru tegelikku seisu ja töökoopia muudatusi.
 
 - Mäng ja avalik eelvaade: https://orogdor.github.io/Kuningriigid/
 - Lähtekood: https://github.com/orogdor/Kuningriigid
@@ -35,6 +35,10 @@ Enne avaldamist käivita CI kiirkontrolli testid (`.github/workflows/v128.yml`, 
 Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node scripts/test-build-v243.mjs`, müüride puhul `node TEST_V1754_GATES.mjs` ja detailalade puhul `node scripts/test-stream-v242.mjs`. Mängu põhikontroll on `node scripts/test.mjs traffic`. Brauseritestide käivitamiseks on vaja Puppeteeri ja sobivat brauserit.
 
 - V256: gzip-pakitud automaat- ja käsitsisalvestused koos vanade JSON-salvestuste toega; pakkimist kasutab ka varukoopia. Looma põgenemise kattumise ja lamamis-/söömisasendi parandus, karja kaadrisagedusest sõltumatu liikumine, käsitõrviku tuleaja parandus. Üksikasjad `MUUDATUSED_V256.md`.
+
+- V257: hirve mudeli +X telg pööratakse liikumissuunaga kohakuti; käes olev tõrvik kinnitub animeeritud parema käe külge ja püsib püsti, valge leek on asendatud väikse värvilise leegiga. Vastaste linnade maailmakaardil kuvamise lahknevus (Kogu kaart vs visibleNow) on uuritud, mitte parandatud.
+
+- V258: teiste detailkaartide armeed kuvatakse kõigi salkadega; liikuva armee kujutis järgib maailmakaardi asukohta. Asunike, armeede ja maismaakaupmeeste maailmakaardi kiirus kasutab detailruudu mõõtmeid ning tee- ja üksusekiirust; olemasolev teekond säilitab suhtelise asukoha. Veesõit ja rongid on eraldi. Kontrollid ja piirangud: `MUUDATUSED_V258.md`.
 
 ## Järgmine töö
 

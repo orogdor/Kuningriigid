@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import * as T from '../vendor/three.module.js';
+import {createPeopleLifeV252} from '../people-life-v252.js';
+const scene=new T.Group(),holder=new T.Group(),figure=new T.Group(),hand=new T.Bone(),tool=new T.Group();
+scene.add(holder);holder.add(figure);figure.add(hand);hand.add(tool);
+figure.userData.rig={bones:{hand_R:hand},tool};holder.rotation.y=1.1;hand.rotation.set(.8,.4,-1.3);
+const life=createPeopleLifeV252();life.handLight(holder,true,0,1);
+let torch=holder.userData.handLightV252;assert.equal(torch.parent,hand);assert.equal(tool.visible,false);
+scene.updateMatrixWorld(true);const up=new T.Vector3(0,1,0).transformDirection(torch.matrixWorld);
+assert.ok(up.dot(new T.Vector3(0,1,0))>.9999,'torch stands upright regardless of wrist rotation');
+const replacement=new T.Bone();figure.remove(hand);figure.add(replacement);figure.userData.rig.bones.hand_R=replacement;
+replacement.rotation.set(-.7,.3,.8);life.handLight(holder,true,0,2);assert.equal(torch.parent,replacement,'reattaches when detailed rig replaces fallback');
+scene.updateMatrixWorld(true);assert.ok(new T.Vector3(0,1,0).transformDirection(torch.matrixWorld).y>.9999);
+life.handLight(holder,false,0,3);assert.equal(torch.visible,false);assert.equal(tool.visible,true,'tool returns when torch is put away');
+const fallback=new T.Group(),f=new T.Group(),arm=new T.Group();fallback.add(f);f.add(arm);f.userData.rig={arms:[new T.Group(),arm]};life.handLight(fallback,true,0,0);assert.equal(fallback.userData.handLightV252.parent,arm,'fallback torch follows the arm');
+console.log('V257 handheld torch: hand attachment, upright flame, rig replacement and fallback PASS');

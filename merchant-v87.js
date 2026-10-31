@@ -4,6 +4,7 @@ import {FOOD_KEYS,recordDelivery} from './economy.js';
 import {cityReserves} from './trade-network.js';
 import {merchantAccess,atWar} from './diplomacy-v87.js';
 import {harborExit,seaPath,seaAllowed} from './naval.js';
+import {worldLandDurationV258,rescaleWorldTravelV258} from './world-movement-v258.js';
 export const MERCHANT_RANGE={road:32,sea:72};
 const stock=c=>c.economy.realms[c.team].resources;
 const distance=(a,b)=>Math.abs(a.c-b.c)+Math.abs(a.r-b.r);
@@ -16,7 +17,9 @@ export function merchantRoute(game,from,to,team){
    if(distance(a,b)<=MERCHANT_RANGE.road)path=game.landPath(a,b,team);
    if(path?.length>MERCHANT_RANGE.road)path=null;
    if(!path&&a.port&&b.port&&distance(a.exit,b.exit)<=MERCHANT_RANGE.sea){const sea=seaPath(game,{...a.exit,team},b.exit);if(sea&&sea.length+2<=MERCHANT_RANGE.sea){path=[a.exit,...sea,{c:b.c,r:b.r}];mode='sea';}}
-   if(path===null)continue;const cost=best.get(a.id)+path.length*(mode==='sea'?1.5:4)+6;
+   if(path===null)continue;let cursor=a,travel=0;
+   for(const step of path){travel+=mode==='sea'?1.5:worldLandDurationV258(cursor,step,3,roadBoost(game.s,cursor,step,game.s.time));cursor=step;}
+   const cost=best.get(a.id)+travel+6;
    if(cost>=(best.get(b.id)??Infinity))continue;best.set(b.id,cost);prev.set(b.id,{from:a,leg:{stop:b,mode,path}});if(!queue.some(p=>p.id===b.id))queue.push(b);
   }
  }
@@ -38,8 +41,11 @@ export function planMerchants(game){let count=0;const towns=game.s.cities.filter
  }
  }return count;}
 export function payVisit(game,cargo,city){const r=stock(city),paid={};for(const[k,n]of Object.entries(cargo.goods)){const fee=n*.05;cargo.goods[k]=n-fee;r[k]=(r[k]||0)+fee;paid[k]=fee;}cargo.fees??=[];cargo.fees.push({city:city.id,time:game.s.time,goods:paid});}
-export function advanceMerchant(game,cargo,dt){const leg=cargo.legs[cargo.leg],city=game.s.cities.find(c=>c.id===leg?.stop.cityId);if(!leg||!city||!merchantAccess(game.s,cargo.team,city)||city.tradeDisabled||atWar(game.s,cargo.team,city.team)){cargo.status='Ootab: peatumisluba puudub';cargo.blocked=true;return;}cargo.blocked=false;cargo.status='Teel';cargo.travelClock=(cargo.travelClock||0)+dt;const seconds=cargo.mode==='sea'?1.5:4/roadBoost(game.s,cargo,cargo.path[0]||cargo,game.s.time);cargo.travelDuration=seconds;
- while(cargo.travelClock>=seconds&&cargo.path.length){const next=cargo.path[0],land=game.cell(next)?.land,valid=cargo.mode==='sea'?(land?next.c===leg.stop.c&&next.r===leg.stop.r:seaAllowed(game,cargo.team,next)):game.canTraverse(cargo.team,next);if(!valid||cargo.rangeLeft<=0){cargo.blocked=true;cargo.status='Ootab: teekond suletud';return;}cargo.travelClock-=seconds;const from={c:cargo.c,r:cargo.r};Object.assign(cargo,cargo.path.shift());if(cargo.mode==='road')recordWorldStep(game.s,from,cargo,'caravan',game.s.time);cargo.rangeLeft--;}
+export function advanceMerchant(game,cargo,dt){const leg=cargo.legs[cargo.leg],city=game.s.cities.find(c=>c.id===leg?.stop.cityId);if(!leg||!city||!merchantAccess(game.s,cargo.team,city)||city.tradeDisabled||atWar(game.s,cargo.team,city.team)){cargo.status='Ootab: peatumisluba puudub';cargo.blocked=true;return;}cargo.blocked=false;cargo.status='Teel';
+ const duration=()=>cargo.mode==='sea'?1.5:worldLandDurationV258(cargo,cargo.path[0],3,roadBoost(game.s,cargo,cargo.path[0],game.s.time));
+ if(!cargo.path.length)return;
+ rescaleWorldTravelV258(cargo,duration());cargo.travelClock=(cargo.travelClock||0)+dt;
+ while(cargo.path.length){const seconds=duration();cargo.travelDuration=seconds;if(cargo.travelClock<seconds)break;const next=cargo.path[0],land=game.cell(next)?.land,valid=cargo.mode==='sea'?(land?next.c===leg.stop.c&&next.r===leg.stop.r:seaAllowed(game,cargo.team,next)):game.canTraverse(cargo.team,next);if(!valid||cargo.rangeLeft<=0){cargo.blocked=true;cargo.status='Ootab: teekond suletud';return;}cargo.travelClock-=seconds;const from={c:cargo.c,r:cargo.r};Object.assign(cargo,cargo.path.shift());if(cargo.mode==='road')recordWorldStep(game.s,from,cargo,'caravan',game.s.time);cargo.rangeLeft--;}
 }
 export function receiveMerchant(game,cargo){if(!game.s.shipments.includes(cargo))return;if(cargo.blocked||cargo.path.length)return;const leg=cargo.legs[cargo.leg],city=game.s.cities.find(c=>c.id===leg?.stop.cityId);if(!city||!merchantAccess(game.s,cargo.team,city))return;
  if(!cargo.visitPaid){payVisit(game,cargo,city);cargo.visitPaid=true;}

@@ -1,9 +1,13 @@
 // V255: shy game and real hunting, herder with the flock out by day and home at night.
 import assert from 'node:assert/strict';
 import * as T from '../../vendor/three.module.js';
-import {createWildlifeV255} from '../../wildlife-v255.js';
+import {createWildlifeV255,wildlifeVisualHeadingV257} from '../../wildlife-v255.js';
 import {createHerdingV255} from '../../herding-v255.js';
 const open=()=>true;
+for(const [dx,dz] of [[1,0],[0,1],[-1,0],[0,-1],[.6,.8]]){
+ const heading=Math.atan2(dx,dz),axis=new T.Vector3(1,0,0).applyAxisAngle(new T.Vector3(0,1,0),wildlifeVisualHeadingV257(heading));
+ assert.ok(Math.abs(axis.x-dx)<1e-7&&Math.abs(axis.z-dz)<1e-7,'deer faces its actual direction of travel');
+}
 // Overlapping human and deer must still give the deer a direction to flee.
 {const W=createWildlifeV255(),r={id:14,x:0,z:0};const st=W.update(r,{time:1,dt:.2,people:[{x:0,z:0}],hunters:[],open});assert.ok(Math.hypot(st.x,st.z)>.1,'deer escapes overlap');
  const root=new T.Group(),body=new T.Group();root.add(body);W.pose(root,{grazing:true},1);assert.equal(body.rotation.x,0);assert.ok(body.rotation.z<0,'grazing pitches toward muzzle');W.pose(root,{lying:true},2);assert.ok(body.rotation.x>1,'deer rolls onto its side');}

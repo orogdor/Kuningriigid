@@ -8,7 +8,6 @@
 // This is a drawing layer: the economy still moves workers on its own nav grid with unchanged timing;
 // only where and how they are drawn changes. No save or gameplay data is written.
 import * as T from './vendor/three.module.js';
-import {createFireV252} from './daynight-v235.js';
 
 const IDLE_DELAY=3.5,WALK=2.6,CATCH_UP=7,RADIUS=.85,CHAT_RANGE=26,GROUP=3;
 const hash=s=>{let n=2166136261;for(const c of String(s))n=Math.imul(n^c.charCodeAt(0),16777619);return n>>>0;};
@@ -17,11 +16,27 @@ const torchWood=new T.MeshStandardMaterial({color:'#5d3f27',roughness:1});
 const torchBark=new T.MeshStandardMaterial({color:'#d9cfb6',roughness:1});
 const stickGeo=new T.CylinderGeometry(.018,.024,.42,6),barkGeo=new T.CylinderGeometry(.04,.028,.12,6);
 stickGeo.userData.shared=barkGeo.userData.shared=true;
+const handFlameGeo=new T.ConeGeometry(.045,.17,9,3),handCoreGeo=new T.ConeGeometry(.023,.085,7);
+const flamePosition=handFlameGeo.getAttribute('position'),flameColors=[],flameBase=new T.Color('#ffcc4a'),flameTip=new T.Color('#f45a10');
+for(let i=0;i<flamePosition.count;i++){
+ const y=(flamePosition.getY(i)+.085)/.17;
+ flamePosition.setX(i,flamePosition.getX(i)+.012*y*y);
+ const c=flameBase.clone().lerp(flameTip,Math.max(0,Math.min(1,y)));flameColors.push(c.r,c.g,c.b);
+}
+handFlameGeo.setAttribute('color',new T.Float32BufferAttribute(flameColors,3));handFlameGeo.computeVertexNormals();
+handFlameGeo.userData.shared=handCoreGeo.userData.shared=true;
+const handFlameMat=new T.MeshBasicMaterial({vertexColors:true,toneMapped:false});
+const handCoreMat=new T.MeshBasicMaterial({color:'#ffc447',toneMapped:false});
+const handRotation=new T.Quaternion();
 function handTorch(){
  const g=new T.Group();g.name='V253 hand torch';
  const stick=new T.Mesh(stickGeo,torchWood);stick.position.y=.12;g.add(stick);
  const bark=new T.Mesh(barkGeo,torchBark);bark.position.y=.34;g.add(bark);
- const fire=createFireV252(.2);fire.position.y=.39;g.add(fire);
+ // Solid, small flame: crossed additive planes produced an overexposed white patch.
+ const fire=new T.Group();fire.position.y=.40;g.add(fire);
+ const outer=new T.Mesh(handFlameGeo,handFlameMat);outer.position.y=.075;fire.add(outer);
+ const inner=new T.Mesh(handCoreGeo,handCoreMat);inner.position.set(0,.04,.012);fire.add(inner);
+ g.userData.flame=fire;
  return g;
 }
 export function handLightKindV252(age=0){return age<=3?'torch':null;} // later eras: lanterns (to do with those eras)
@@ -107,14 +122,21 @@ export function createPeopleLifeV252(){
   anchor(id,on){const p=people.get(id);if(p)p.anchor=on;},
   position(id){const p=people.get(id);return p?{x:+(p.x+p.ox).toFixed(2),z:+(p.z+p.oz).toFixed(2),plan:p.plan,group:p.group?.members?.length||0,home:p.home,inside:p.inside,idle:p.isIdle,idleSince:p.idleSince}:null;},
   // hand-held light at night (torch in the right hand)
-  handLight(model,show,age){
+  handLight(model,show,age,time=0){
    let light=model.userData.handLightV252;
-   if(show&&!light&&handLightKindV252(age)){
-    light=handTorch();const hand=model.children[0]?.userData?.rig?.bones?.hand_R;
-    if(hand){hand.add(light);light.position.set(0,-.02,.04);light.rotation.set(-.4,0,0);}else{model.add(light);light.position.set(-.25,.9,.25);}
-    model.userData.handLightV252=light;
-   }
-   if(light)light.visible=!!show;
+   const rig=model.children[0]?.userData?.rig;
+   const hand=rig?.bones?.hand_R||rig?.arms?.[1]||null;
+   const visible=!!show&&!!hand&&!!handLightKindV252(age);
+   if(visible&&!light){light=handTorch();model.userData.handLightV252=light;}
+   if(rig?.tool)rig.tool.visible=!visible;
+   if(!light)return;
+   light.visible=visible;
+   if(!visible)return;
+   if(light.parent!==hand)hand.add(light); // Reattach after the detailed rig loads.
+   light.position.set(0,rig?.bones?.hand_R?0:-.5,rig?.bones?.hand_R?0:.12);
+   hand.updateWorldMatrix(true,false);
+   hand.getWorldQuaternion(handRotation);light.quaternion.copy(handRotation).invert();
+   const flicker=1+.09*Math.sin(time*11);light.userData.flame.scale.set(1,flicker,1);
   },
   clear(){people.clear();frame=[];lastTime=null;}
  };

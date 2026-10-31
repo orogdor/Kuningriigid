@@ -74,5 +74,9 @@ jobs:
           node TEST_V73.mjs
           node tests/save-compression-v256.mjs
           node tests/wildlife-v255/run.mjs
+      - name: V257 handheld torch and animal facing
+        run: node tests/torch-hand-v257.mjs
+      - name: V258 world and detail movement
+        run: node tests/world-movement-v258.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

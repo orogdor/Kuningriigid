@@ -8,6 +8,7 @@ import {worldTravelSample} from './map-units.js?v=59';
 import {center} from './campaign.js';
 import {scoutDetailPositionV240,blendScoutPositionV236} from './scout-sector-v236.js';
 import {attachScoutMarkerV238,sizeScoutMarkerV238} from './scout-marker-v238.js';
+import {soldierCount} from './soldier-collision-v90.js';
 
 const TEAM=['#c0ac79','#b98362','#9b88bb','#c2a55c'],FLAG=['#4a7288','#ac5945','#7d5fb0','#c09a2e'];
 const mats=new Map();const mat=c=>{if(!mats.has(c))mats.set(c,new T.MeshStandardMaterial({color:c,roughness:.9}));return mats.get(c);};
@@ -27,6 +28,19 @@ function scoutModel(team){
  attachScoutMarkerV238(fighter,team);
  g.userData.walkers=[fighter];g.name='V236 scout same world sector';
  return g;
+}
+function armyModel(team,units){
+ const g=new T.Group(),walkers=[];
+ for(let s=0;s<units.length;s++){
+  const u=units[s],count=u.menCount||soldierCount(u),columns=4;
+  for(let i=0;i<count;i++){
+   const x=(s%3-1)*5+(i%columns-1.5)*.7,z=Math.floor(s/3)*5+Math.floor(i/columns)*.8;
+   const fighter=createSoldier(g,x,z,TEAM[team]||TEAM[0],u.kind,u.grade);
+   if(u.kind==='scout')attachScoutMarkerV238(fighter,team);
+   walkers.push(fighter);
+  }
+ }
+ g.userData.walkers=walkers;g.name='V258 travelling army';return g;
 }
 function caravanModel(team,age){
  const g=new T.Group(),walkers=[];
@@ -50,34 +64,37 @@ export function createDetailTravellers(group){
  const models=new Map();
  function sync({state,game,tile,worldToLocal,ground,age,visible,time,dt,zoom=150,showNames=true,camera=null,firstPerson=false}){
   const live=new Set();
-  const consider=(key,entity,kind,team)=>{
-   const pose=worldTravelSample(entity),p=kind==='scout'?scoutDetailPositionV240(pose,tile):worldToLocal(tile,pose.x,pose.z);
+  const consider=(key,entity,kind,team,units=[])=>{
+   const pose=worldTravelSample(entity),p=kind==='scout'||kind==='army'?scoutDetailPositionV240(pose,tile):worldToLocal(tile,pose.x,pose.z);
    if(Math.abs(p.x)>330||Math.abs(p.z)>285)return;
    if(kind==='boat'&&ground(p.x,p.z)>-.05)return;   // boats only on water
    if(kind!=='boat'&&ground(p.x,p.z)<-.15)return;
    live.add(key);let m=models.get(key);
-   if(!m||m.userData.kind!==kind){if(m)group.remove(m);m=kind==='settler'?settlerModel(team):kind==='scout'?scoutModel(team):kind==='boat'?boatModel(team):caravanModel(team,age(team));m.userData.kind=kind;m.scale.setScalar(kind==='boat'?1.6:kind==='scout'?1:1.15);group.add(m);models.set(key,m);}
+   const armyStamp=kind==='army'?units.map(u=>[u.kind,u.grade,u.menCount||soldierCount(u)].join(':')).join('|'):'';
+   if(!m||m.userData.kind!==kind||m.userData.armyStamp!==armyStamp){if(m)group.remove(m);m=kind==='settler'?settlerModel(team):kind==='scout'?scoutModel(team):kind==='army'?armyModel(team,units):kind==='boat'?boatModel(team):caravanModel(team,age(team));m.userData.kind=kind;m.userData.armyStamp=armyStamp;m.scale.setScalar(kind==='boat'?1.6:kind==='scout'||kind==='army'?1:1.15);group.add(m);models.set(key,m);}
+   m.userData.travellerKeyV258=key;
    // stationary travellers wait a little off the tile centre so they don't stand inside the town hall
-   const off=kind==='scout'||pose.moving?{x:0,z:0}:{x:14+(entity.id%3)*4,z:10+(entity.id%2)*5};
+   const off=kind==='scout'||kind==='army'||pose.moving?{x:0,z:0}:{x:14+(entity.id%3)*4,z:10+(entity.id%2)*5};
    const target={x:p.x+off.x,z:p.z+off.z};
-   const spot=kind==='scout'&&m.userData.scoutPlaced?blendScoutPositionV236(m.position,target,dt):target;
+   const spot=target;
    const x=spot.x,z=spot.z;
    m.position.set(x,kind==='boat'?.25:ground(x,z),z);
    if(kind==='scout'){m.userData.scoutPlaced=true;m.userData.sectorV236=[p.sectorX,p.sectorZ];
     sizeScoutMarkerV238(m.userData.walkers?.[0],zoom,{names:showNames,camera,firstPerson});}
+   if(kind==='army')for(const w of m.userData.walkers||[])if(w.userData.scoutMarkerV238)sizeScoutMarkerV238(w,zoom,{names:showNames,camera,firstPerson});
    const next=entity.path?.[0];if(next){const t=center(next.c,next.r),here=center(entity.c,entity.r);m.rotation.y=Math.atan2(t.x-here.x,t.z-here.z);}
    m.visible=true;
    for(const w of m.userData.walkers||[])animateSoldier(w,time,pose.moving);
    if(pose.moving){for(const w of m.userData.wheels||[])w.rotation.x-=dt*2.4;(m.userData.legs||[]).forEach((l,i)=>{l.rotation.x=Math.sin(time*6+i*Math.PI)*.35;});}
   };
-  // Same-tile scouts already use the playable inspection unit. Other scouts
-  // in the 3x3 detail neighbourhood use lightweight visual proxies.
+  // Same-tile armies use playable inspection units. Draw all neighbouring
+  // armies, not just scouts, at their interpolated strategic positions.
   for(const army of state.armies||[]){
    if(army.embarked!=null||!visible(army))continue;
    const units=(state.units||[]).filter(u=>u.team===army.team&&(u.armyId||0)===(army.id||0)&&u.hp>0&&!u.garrison);
-   if(!units.some(u=>u.kind==='scout'))continue; // also mixed armies containing a scout
+   if(!units.length)continue;
    if(army.c===tile.c&&army.r===tile.r)continue;
-   consider('scout:'+army.team+':'+(army.id||0),army,'scout',army.team);
+   consider('army:'+army.team+':'+(army.id||0),army,'army',army.team,units);
   }
   for(const a of state.settlers||[])if(!a.landed&&visible(a))consider('settler:'+a.id,a,'settler',a.team);
   for(const c of state.shipments||[]){if(!visible(c))continue;if(c.mode==='sea')consider('trade:'+c.id,c,'boat',c.team);else if(c.mode!=='air'&&c.mode!=='rail')consider('trade:'+c.id,c,'caravan',c.team);}

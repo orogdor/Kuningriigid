@@ -197,8 +197,8 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
      let cx=0,cz=0,n=0;for(const o of actors)if(o!==actor&&o.activity==='chat'&&Math.hypot(o.x-actor.x,o.z-actor.z)<3.5){cx+=o.x;cz+=o.z;n++;}
      actor.person.rotation.y=n?Math.atan2(cx/n-actor.x,cz/n-actor.z):(actor.index%2?Math.PI/2:-Math.PI/2);
     }
-    if(site.stone)entry.life.handLight(actor.person,dark&&!asleep&&!['sit','eat','rest'].includes(activity),0);
     animateActivity(actor,time,actor.moving);
+    if(site.stone)entry.life.handLight(actor.person,dark&&!asleep&&!['sit','eat','rest'].includes(activity),0,time);
    }
    if(site.stone){entry.life.finish(lifeCtx);for(const actor of actors){const q=entry.life.position(actor.person.name);if(q&&actor.person.visible)actor.person.position.set(q.x,ground(q.x,q.z),q.z);}}
   }

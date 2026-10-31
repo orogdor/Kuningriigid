@@ -8,6 +8,8 @@
 // Nothing here changes resource amounts, positions in the save, or worker timing.
 const FLEE_RANGE=9,SAFE_RANGE=17,STALK_RANGE=14,WANDER=3.2;
 const hash=n=>{let h=Math.imul(n|0,2654435761)>>>0;h^=h>>>15;return (h>>>0)/4294967296;};
+// The deer GLBs and fallback face +X; travel headings use +Z as forward.
+export const wildlifeVisualHeadingV257=heading=>heading-Math.PI/2;
 
 export function createWildlifeV255(){
  const animals=new Map();

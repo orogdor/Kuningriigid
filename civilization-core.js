@@ -15,6 +15,7 @@ import {installGameRevisions,citySummary,cityContexts,cityLookup,navigationRevis
 import {DEFENSE_TYPES,planAIDefenses} from './ai-defenses-v128.js?v=2201';
 import {houseUpgradePreviewV218} from './house-upgrade-v218.js';
 import {applyDevelopmentBalance,combatUnit,militaryChoices,readyForNextEra,allowAIResearch} from './ai-development-v128.js';
+import {worldLandDurationV258,rescaleWorldTravelV258} from './world-movement-v258.js';
 import {farmWork,fieldSize,fieldContains,validateField,migrateLegacyFarms,AI_FIELD_WIDTH,AI_FIELD_DEPTH} from './farming-v127.js';
 import {marketFoodGrowth} from './city-growth-v137.js';
 import {historicalTilePlan,historicalTilePriority} from './historical-districts-v137.js';
@@ -337,15 +338,20 @@ export class Civilization{
  advanceWorldMovers(dt){
   const travel=(entity,kind)=>{
    if(entity.embarked!=null||!entity.path?.length)return;
+   const first=entity.path[0],firstMultiplier=kind==='army'?armyTravelMultiplier(this.s,entity,TROOPS):1;
+   const personSpeed=kind==='settler'&&entity.team>0?2.2:3;
+   const initialDuration=kind==='train'?1:worldLandDurationV258(entity,first,personSpeed*firstMultiplier,roadBoost(this.s,entity,first,this.s.time))*(kind==='caravan'&&entity.wagon?.78:1);
+   rescaleWorldTravelV258(entity,initialDuration);
    entity.travelClock=(entity.travelClock||0)+dt;
    for(let guard=0;guard<6&&entity.path.length;guard++){
     const next=entity.path[0];if(!this.canTraverse(entity.team,next)){entity.path=[];entity.travelClock=0;break}
     const speedMultiplier=kind==='army'?armyTravelMultiplier(this.s,entity,TROOPS):1;
-    const duration=kind==='train'?1:(3/roadBoost(this.s,entity,next,this.s.time))*(kind==='caravan'&&entity.wagon?.78:1)/speedMultiplier;
+    const duration=kind==='train'?1:worldLandDurationV258(entity,next,personSpeed*speedMultiplier,roadBoost(this.s,entity,next,this.s.time))*(kind==='caravan'&&entity.wagon?.78:1);
     entity.travelDuration=duration;
     if(entity.travelClock+1e-7<duration)break;
     entity.travelClock=Math.max(0,entity.travelClock-duration);
     const from={c:entity.c,r:entity.r};Object.assign(entity,entity.path.shift());
+    if(kind==='army')entity.worldArrivalV258={c:entity.c,r:entity.r,serial:(entity.worldArrivalV258?.serial||0)+1};
     recordWorldStep(this.s,from,entity,kind==='caravan'&&entity.roadCrew?'roadworks':kind,this.s.time);
     if(kind==='settler'||(kind==='army'&&armyUnits(this.s,entity).some(u=>u.kind==='scout'))){this.reveal(entity.team,entity,2);collectLandmark(this,entity.team,entity)}
     if(kind==='settler')entity.landed=false;
