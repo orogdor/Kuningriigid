@@ -13,7 +13,7 @@ Vanad tõrvikud nägid välja nagu tänavalambid: peenike post ja klaaskera mood
 - kera asemel pehme kuma, mis on alati kaamera poole (`Sprite`);
 - iga tõrviku all soe valguslaik maapinnal.
 
-Päris valgusallikate tugevus ja ulatus tõusid 25% (`TORCH_LIGHT_V250`: tugevus 1,94, ulatus 20 m). Valgusallikaga tõrvikuid on linnas nüüd 5, varem 4.
+Päris valgusallikate tugevus ja ulatus tõusid 25% (`TORCH_LIGHT_V250`: tugevus 1,94, ulatus 20 m). Valgusallikaga tõrvikuid on linnas endiselt kõige rohkem 4; see on jõudluse piirang, mida testid V235 ja V236 kontrollivad. Ülejäänud tõrvikuid valgustavad maapinna valguslaik ja kuma.
 
 ## Jõed
 - **Kriipsjooned on kadunud.** Need tekkisid vee varjutajas: muster arvutati korrutisest `dot(maailmakoordinaat, voolusuund)`. Kuna maailma koordinaadid on suured, tekitas iga väike suunamuutus kolmnurkade vahel mustrisse hüppe, mis paistis valgete kriipsudena. Nüüd liigub muster voolu suunas kahe ristsulandatud faasiga (flow map) ja hüppeid pole (`landscape-v149.js`). Kehtib kõigil kaartidel.
@@ -60,6 +60,7 @@ Puiduvaru (`deposits.wood`) on metsas, džunglis, taigas, jõeäärsel aasal ja 
   - suur ja väike jõgi maailma- ja detailkaardil;
   - kõrb (seeme „sahara“) ja rohumaa (seeme „kuningas“).
 - WebGPU: uus maailm töötab, ilma tagasilanguseta WebGL-ile. `demo=medieval` kukub WebGPU-s tarkvaralisel graafikal läbi sama veaga ka V249 koodiga, see on varasem viga.
+- CI kiirkontrolli kõik sammud käivitati ka kohalikult: süntaksikontroll, V188–V243 testid ja `traffic`, kõik PASS. Esimene V250 avaldus kukkus CI-s läbi, sest seal oli valgusallikaga tõrvikuid 5, aga lubatud on kõige rohkem 4. Parandatud.
 - `node scripts/test.mjs traffic`: PASS.
 - `node scripts/test-stream-v242.mjs`, `node scripts/test-build-v243.mjs`, `node TEST_V1754_GATES.mjs`: PASS.
 - `node scripts/test.mjs rules --jobs 2`: 20 testi 21-st läbisid. `TEST_V139.mjs` kukub läbi samamoodi nagu V249-s (varasem viga, `ai-defenses-v128.js:47`).

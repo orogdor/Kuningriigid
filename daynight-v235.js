@@ -69,7 +69,7 @@ function mesh(parent,geo,material,x=0,y=0,z=0){
 // V250: a rustic torch instead of a "street lamp": thick hewn stave, iron basket, a big multi-tongue
 // fire with sparks, a soft camera-facing glow (no glass-ball halo) and a warm pool of light on the
 // ground under every torch (only a few torches carry a real light, the pools are cheap). Light +25 %.
-export const TORCH_LIGHT_V250={intensity:1.55*1.25,distance:16*1.25,count:5};
+export const TORCH_LIGHT_V250={intensity:1.55*1.25,distance:16*1.25,count:4}; // at most 4 real lights per town (performance; tests V235/V236)
 function radialTexture(stops){
  const c=typeof document!=='undefined'?document.createElement('canvas'):null;if(!c)return null;
  c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);
