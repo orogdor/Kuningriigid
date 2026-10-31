@@ -1,6 +1,6 @@
 # Kuningriigid – ühine tööjärg
 
-Viimati kokku lepitud seis: **V254**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
+Viimati kokku lepitud seis: **V255**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
 
 - Mäng ja avalik eelvaade: https://orogdor.github.io/Kuningriigid/
 - Lähtekood: https://github.com/orogdor/Kuningriigid
@@ -10,6 +10,7 @@ Viimati kokku lepitud seis: **V254**, GitHubi `main`-harus. Enne töö alustamis
 - V244 (Claude): jõudlus ilma graafikat halvendamata. Puud ja põõsad joonistatakse instancing'uga, kiviaja hoonetel on kolm detailsuse astet (`models-stone-lod-v244/`), WebGPU varulahendus on rangem. Üksikasjad: `MUUDATUSED_V244.md`.
 - V245 (Claude): WebGPU must ekraan parandatud. Põhjus oli three r170 instancing'u uniform-puhvri viga (`vendor/three.webgpu.js` patch). Üksikasjad: `MUUDATUSED_V245.md`.
 - V246 (Claude): WebGPU maailmakaardil oli näha ainult udu. Udu kate ja meri on nüüd TSL-is, sest WebGPU eirab `onBeforeCompile`-t. Kontroll: `tests/webgpu-v246/sea.html?gpu=0|1`. Üksikasjad: `MUUDATUSED_V246.md`.
+- V255 (Claude): uluk kardab inimesi ja põgeneb, jahimees hiilib ligi ja viskab oda, loom kukub. Karjus viib lambakarja hommikul karjamaalt välja, karjatab ja toob õhtul tagasi (kiviaeg, joonistuskiht). Lammas on ajutine protseduuriline mudel. TRELLIS.2 (MIT) mudelit ei saanud siit teha, sest HF Space'ide käivitamine on ühenduses keelatud; juhis on failis `MUUDATUSED_V255.md`.
 - V254 (Claude): mängija linnade vahe on 10 ruutu (oli 17). V252 hoonete lisadetailid on eemaldatud. Puu- ja kivitöö on poole aeglasem. Mets on tihedam (detailkaardil 1,6×, maailmakaardil umbes 1,4×). Üksikasjad: `MUUDATUSED_V254.md`.
 - V253 (Claude): kiviaja tõrvik on puukepp kasetohu ja vaiguga, väiksem leek; ukse tõrvikud paigutatakse mudeli mõõtude järgi väljapoole maju (0 hoone sees). Külaelanikud käivad ümber majade, hoiavad isiklikku ruumi, vestlevad üksteise poole, kannavad öösel tõrvikut ja neil on päris poosid. Kükitamise ja istumise poosid on parandatud. Üksikasjad: `MUUDATUSED_V253.md`.
 - V252 (Claude): kiviaja kõik hooned on animeeritud (suits, lõke, potikeder, kaevuämber, kuivatusrestid jne) ja töötajatel on uued tööliigutused (savikaevamine, potid, kiviraidumine, õpetamine, karjatamine). Tegevuseta inimesed ajavad juttu või lähevad koju, keegi ei käi teisest läbi ja öösel on käes tõrvik (`people-life-v252.js`, joonistuskiht). Majad saab ehitada lähemale. Pronksiaeg jäi kasutaja soovil muutmata. Üksikasjad: `MUUDATUSED_V252.md`.
@@ -34,6 +35,8 @@ Enne avaldamist käivita CI kiirkontrolli testid (`.github/workflows/v128.yml`, 
 Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node scripts/test-build-v243.mjs`, müüride puhul `node TEST_V1754_GATES.mjs` ja detailalade puhul `node scripts/test-stream-v242.mjs`. Mängu põhikontroll on `node scripts/test.mjs traffic`. Brauseritestide käivitamiseks on vaja Puppeteeri ja sobivat brauserit.
 
 ## Järgmine töö
+
+- Lamba GLB TRELLIS.2-ga (MIT; tausta eemaldamiseks mitte BRIA-RMBG-2.0, mis on mittekommertslik). Ootab kasutajalt GLB-faili või HF Space'ide käivitamise lubamist.
 
 - Kasutaja soov: kiviaeg lõpuni, siis pronksiaeg. Pronksiaja ülevaatusel leitud: hoonetel (`bronze-buildings-v79.js`, `town-models-v154.js`) on vähe animatsioone, ja paljudel pronksiaja töötajatel pole oma liigutust (savikoda, potikoda, kiviraidur, valukoda, vankrimeister, turg, ait, pagar, kudumine), vaid üldine `work`.
 

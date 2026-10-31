@@ -172,6 +172,14 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
   point(B,'forearm_R',-1.07,0,0,hold);
   point(B,'chest',-.04,0,0,.55);
  }
+ // V255 stalking hunter: creeps forward bent low, spear held ready, eyes on the game
+ if(action==='stalk'){
+  const k=.9;
+  point(B,'spine',.55,0,0,k);point(B,'chest',.12,0,0,k);point(B,'head',-.38,0,0,k);
+  point(B,'upperArm_R',-1.0,0,-.18,k);point(B,'forearm_R',-.85,0,0,k);
+  point(B,'upperArm_L',-.65,0,.15,k);point(B,'forearm_L',-.7,0,0,k);
+  B.hips.position.y-=.09*k;
+ }
  const phase=attack&&typeof attack==='object'?(attack.phase??-1):(attack?.4:-1);
  if(phase>=0&&phase<=1){
   const wind=ease(0,.27,phase)*(1-ease(.31,.50,phase));
