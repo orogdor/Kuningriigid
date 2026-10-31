@@ -137,6 +137,52 @@ function bodyDetails(bones,kind,grade,color){
  flag.rotation.z=-.12;
 }
 
+// Merge the rigid, bone-attached details into one draw per bone.
+// A 17-bone skinned human stays intact. This matters for 12–24-man formations.
+const mergedGeometryV261=new Map();
+const mergedMaterialV261=new T.MeshStandardMaterial({vertexColors:true,roughness:.91,metalness:0,side:T.DoubleSide});
+function collapseRigidDecorV261(parent,key){
+ const children=parent.children.filter(o=>!o.isBone&&!o.isSkinnedMesh&&!o.isLOD);
+ if(!children.length)return;
+ let g=mergedGeometryV261.get(key);
+ if(!g){
+  const positions=[],normals=[],colors=[];
+  const point=new T.Vector3(),normal=new T.Vector3(),normalMatrix=new T.Matrix3();
+  function visit(obj,transform){
+   obj.updateMatrix();
+   const matrix=transform.clone().multiply(obj.matrix);
+   if(obj.isMesh&&obj.geometry?.getAttribute('position')){
+    const geom=obj.geometry,src=geom.getAttribute('position');
+    if(!geom.getAttribute('normal'))geom.computeVertexNormals();
+    const nor=geom.getAttribute('normal'),idx=geom.getIndex();
+    const c=obj.material?.color||new T.Color('#83715b');
+    normalMatrix.getNormalMatrix(matrix);
+    const count=idx?idx.count:src.count;
+    for(let i=0;i<count;i++){
+     const j=idx?idx.getX(i):i;
+     point.fromBufferAttribute(src,j).applyMatrix4(matrix);positions.push(point.x,point.y,point.z);
+     normal.fromBufferAttribute(nor,j).applyMatrix3(normalMatrix).normalize();normals.push(normal.x,normal.y,normal.z);
+     colors.push(c.r,c.g,c.b);
+    }
+    return;
+   }
+   if(!obj.isBone&&!obj.isSkinnedMesh&&!obj.isLOD)
+    for(const ch of obj.children)visit(ch,matrix);
+  }
+  for(const child of children)visit(child,new T.Matrix4());
+  if(!positions.length)return;
+  g=new T.BufferGeometry();
+  g.setAttribute('position',new T.Float32BufferAttribute(positions,3));
+  g.setAttribute('normal',new T.Float32BufferAttribute(normals,3));
+  g.setAttribute('color',new T.Float32BufferAttribute(colors,3));
+  g.computeBoundingBox();g.computeBoundingSphere();g.userData.shared=true;
+  mergedGeometryV261.set(key,g);
+ }
+ for(const child of children)parent.remove(child);
+ const mesh=new T.Mesh(g,mergedMaterialV261);
+ mesh.name='Merged V261 bone clothing';mesh.castShadow=true;mesh.receiveShadow=false;parent.add(mesh);
+}
+
 export function createRiggedStoneWarriorV261(parent,x,z,color,kind,grade='standard'){
  if(!WARRIORS.has(kind))throw new Error('No V261 Stone Age warrior: '+kind);
  const model=createStoneHuman(parent,x,z,color,'stone_villager');
@@ -147,6 +193,11 @@ export function createRiggedStoneWarriorV261(parent,x,z,color,kind,grade='standa
  const tool=createStoneEquipment(kind);tool.name='V261 '+kind+' handheld weapon';
  B.hand_R.add(tool);
  hideTunic(B,kind);capeAndFur(B,kind);bodyDetails(B,kind,grade,color);
+ collapseRigidDecorV261(tool,kind+'|weapon');
+ for(const boneName of ['hips','chest','head','upperArm_L','upperArm_R',
+  'forearm_L','forearm_R','shin_L','shin_R','hand_L']){
+  collapseRigidDecorV261(B[boneName],kind+'|'+grade+'|'+color+'|'+boneName);
+ }
  Object.assign(rig,{stoneHuman:true,riggedWarriorV261:true,kind,unitKind:kind,tool,phase:x*2+z});
  Object.assign(model.userData,{unitKind:kind,grade,factionColor:color,riggedWarriorV261:true});
  model.name='V261 rigged Stone Age '+kind;
