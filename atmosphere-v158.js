@@ -14,9 +14,11 @@ export const SEA_EFFECT_V226={value:1};
 function skyDome(top,horizon,ground){
  const geo=new T.SphereGeometry(9000,32,16);
  if(T.GPU_MODE_V225){ // V225: the same gradient sky as a node material for the WebGPU renderer
-  const {normalize,positionLocal,mix,uniform,pow,clamp,select}=T,p=normalize(positionLocal),h=p.y,uh=uniform(new T.Color(horizon));
+  const {normalize,positionLocal,mix,uniform,pow,clamp,select}=T,p=normalize(positionLocal),h=p.y,uh=uniform(new T.Color(horizon)),ut=uniform(new T.Color(top)),ug=uniform(new T.Color(ground));
   const mat=new T.MeshBasicNodeMaterial({side:T.BackSide,depthWrite:false,fog:false});
-  mat.colorNode=select(h.greaterThan(0),mix(uh,uniform(new T.Color(top)),pow(clamp(h.mul(1.6),0,1),.7)),mix(uh,uniform(new T.Color(ground)),clamp(h.negate().mul(6),0,1)));
+  mat.colorNode=select(h.greaterThan(0),mix(uh,ut,pow(clamp(h.mul(1.6),0,1),.7)),mix(uh,ug,clamp(h.negate().mul(6),0,1)));
+  // V244: same {top,horizon,ground}.value shape as the GLSL sky, so the day/night cycle also tints the WebGPU sky
+  mat.uniforms={top:ut,horizon:uh,ground:ug};
   const m=new T.Mesh(geo,mat);m.frustumCulled=false;m.renderOrder=-10;m.name='v158 sky';return m;
  }
  const mat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,uniforms:{top:{value:new T.Color(top)},horizon:{value:new T.Color(horizon)},ground:{value:new T.Color(ground)}},

@@ -21,13 +21,10 @@
  }
  window.KINGDOMS_WEBGPU_RECOVER_V227=recover;
  window.KINGDOMS_WEBGPU_WANTED_V227=wants;
- if(wants){
-  window.addEventListener('unhandledrejection',e=>recover(e.reason||'WebGPU render promise rejected'));
-  window.addEventListener('error',e=>{
-   const message=String(e.message||'');
-   if(/webgpu|shader|wgsl|gpu device|renderer|node material|material|WebGPU/i.test(message))recover(message);
-  });
- }
+ // V244: no global error/unhandledrejection triggers any more. Any unrelated game error (a missing
+ // model file, an aborted download, a typo containing the word "material") used to switch the
+ // player back to WebGL. Only real renderer failures call recover(): WebGPU init failure, device
+ // loss and a rejected renderAsync (vendor/three-gpu-shim.js, graphics-runtime-v226.js).
  function banner(){
   if(params.get('gpuFallback')!=='1')return;
   const el=document.createElement('aside');el.id='webgpu-recovery-v227';

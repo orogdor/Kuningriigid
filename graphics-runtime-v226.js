@@ -112,7 +112,7 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
    if(!overlay){overlay=document.createElement('div');overlay.id='graphics-fps-v226';overlay.style.cssText='position:fixed;left:8px;bottom:85px;z-index:99;background:#071b17df;color:#d7efdd;padding:8px 10px;border-radius:7px;font:12px/1.5 monospace;pointer-events:none';document.body.append(overlay);}
    overlay.hidden=false;
    if(now-lastStats>=1000){overlay.textContent='FPS '+Math.round(frames*1000/Math.max(1,now-lastStats))+
-    ' · draw calls '+(renderer.info?.render?.calls??0)+' · triangles '+(renderer.info?.render?.triangles??0)+
+    ' · draw calls '+((T.GPU_MODE_V225?renderer.info?.render?.drawCalls:renderer.info?.render?.calls)??0)+' · triangles '+(renderer.info?.render?.triangles??0)+
     ' · '+(T.GPU_MODE_V225?'WebGPU':'WebGL');
     frames=0;lastStats=now;}
   }else if(overlay){overlay.hidden=true;lastStats=now;frames=0;}
@@ -129,7 +129,7 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
    Promise.resolve(renderer.readyV225).then(()=>renderer.renderAsync(scene,camera)).then(()=>{
     pendingGPU=false;gpuSuccessfulFrames++;afterRender(now);
     // A frame submission with no draw calls cannot display the 3D world.
-    const calls=renderer.info?.render?.calls;
+    const calls=renderer.info?.render?.drawCalls; // V244: WebGPU counts draws in drawCalls (render.calls counts render() calls)
     if(gpuSuccessfulFrames>=25&&calls===0)window.KINGDOMS_WEBGPU_RECOVER_V227?.('WebGPU esitas 25 tühja 3D-kaadrit');
    }).catch(error=>{pendingGPU=false;window.KINGDOMS_WEBGPU_RECOVER_V227?.(error);});
    return;
