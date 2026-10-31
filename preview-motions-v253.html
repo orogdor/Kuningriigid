@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>V253 Stone Age motions</title>
+<style>html,body{margin:0;background:#334942;font:12px system-ui;color:#fff}#l{position:fixed;left:0;right:0;top:2px;display:grid;grid-template-columns:repeat(6,1fr);text-align:center}#l2{position:fixed;left:0;right:0;top:47%;display:grid;grid-template-columns:repeat(6,1fr);text-align:center}</style>
+<div id="l"></div><div id="l2"></div>
+<script type="importmap">{"imports":{"./vendor/three.module.js":"./vendor/three.module.js"}}</script>
+<script type="module">
+// V253 check: every Stone Age work and village motion on the skeletal rig, side by side.
+import * as T from './vendor/three.module.js';
+import {createSoldier,animateSoldier} from './visuals.js';
+const ACTIONS=['dig','pottery','chisel','study','herd','talk','sit','eat','play','guard','chop','mine'];
+const r=new T.WebGLRenderer({antialias:true});r.setSize(innerWidth,innerHeight);document.body.appendChild(r.domElement);
+const scene=new T.Scene();scene.background=new T.Color('#334942');scene.add(new T.HemisphereLight('#e3eeed','#6b684d',2));const sun=new T.DirectionalLight('#ffedcb',2);sun.position.set(-3,6,5);scene.add(sun);
+const actors=ACTIONS.map((a,i)=>{const g=new T.Group();g.position.set((i%6-2.5)*1.75,Math.floor(i/6)*-2.7,0);scene.add(g);const s=createSoldier(g,0,0,'#8b9e67','stone_worker');s.rotation.y=-.5;
+ const el=document.createElement('span');el.textContent=a;document.getElementById(i<6?'l':'l2').append(el);return s;});
+const cam=new T.OrthographicCamera(-5.4,5.4,3.3,-3.3,.1,100);cam.position.set(0,-.6,9);cam.lookAt(0,-.6,0);cam.aspect=innerWidth/innerHeight;cam.left=-3.3*cam.aspect;cam.right=3.3*cam.aspect;cam.updateProjectionMatrix();
+const T0=+new URLSearchParams(location.search).get('t')||1.3;
+window.renderAt=t=>{for(const [i,s] of actors.entries()){const a=s.children[0]?.userData?.rig?s.children[0]:s;animateSoldier(a,t,false,{phase:-1,action:ACTIONS[i]});}r.render(scene,cam);};
+setTimeout(()=>{for(let k=0;k<3;k++)window.renderAt(T0+k*.05);window.V253_DONE=true;},6000);
+</script>

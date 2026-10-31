@@ -12,15 +12,16 @@ import {createFireV252} from './daynight-v235.js';
 
 const IDLE_DELAY=3.5,WALK=2.6,CATCH_UP=7,RADIUS=.85,CHAT_RANGE=26,GROUP=3;
 const hash=s=>{let n=2166136261;for(const c of String(s))n=Math.imul(n^c.charCodeAt(0),16777619);return n>>>0;};
+// V253: a small Stone Age hand torch: a short stick with a bundle of birch bark and resin
 const torchWood=new T.MeshStandardMaterial({color:'#5d3f27',roughness:1});
-const torchWrap=new T.MeshStandardMaterial({color:'#a08866',roughness:1});
-const stickGeo=new T.CylinderGeometry(.025,.032,.62,6),wrapGeo=new T.CylinderGeometry(.045,.04,.12,6);
-stickGeo.userData.shared=wrapGeo.userData.shared=true;
+const torchBark=new T.MeshStandardMaterial({color:'#d9cfb6',roughness:1});
+const stickGeo=new T.CylinderGeometry(.018,.024,.42,6),barkGeo=new T.CylinderGeometry(.04,.028,.12,6);
+stickGeo.userData.shared=barkGeo.userData.shared=true;
 function handTorch(){
- const g=new T.Group();g.name='V252 hand torch';
- const stick=new T.Mesh(stickGeo,torchWood);stick.position.y=.2;g.add(stick);
- const wrap=new T.Mesh(wrapGeo,torchWrap);wrap.position.y=.5;g.add(wrap);
- const fire=createFireV252(.34);fire.position.y=.55;g.add(fire);
+ const g=new T.Group();g.name='V253 hand torch';
+ const stick=new T.Mesh(stickGeo,torchWood);stick.position.y=.12;g.add(stick);
+ const bark=new T.Mesh(barkGeo,torchBark);bark.position.y=.34;g.add(bark);
+ const fire=createFireV252(.2);fire.position.y=.39;g.add(fire);
  return g;
 }
 export function handLightKindV252(age=0){return age<=3?'torch':null;} // later eras: lanterns (to do with those eras)
@@ -30,7 +31,7 @@ export function createPeopleLifeV252(){
  function blocked(open,a,b){const d=Math.hypot(b.x-a.x,b.z-a.z),n=Math.max(1,Math.ceil(d/1.2));for(let i=1;i<n;i++){const t=i/n;if(!open(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t))return true;}return false;}
  function moveToward(p,target,speed,dt){const dx=target.x-p.x,dz=target.z-p.z,d=Math.hypot(dx,dz);if(d<.05){p.x=target.x;p.z=target.z;return false;}const k=Math.min(1,speed*dt/d);p.x+=dx*k;p.z+=dz*k;p.heading=Math.atan2(dx,dz);return d>.18;}
  function begin(ctx){
-  const dt=lastTime==null?0:Math.max(0,Math.min(.25,ctx.time-lastTime));lastTime=ctx.time;
+  const dt=lastTime==null?0:Math.max(0,Math.min(.25,ctx.time-lastTime));lastTime=ctx.time;ctx.dtV253=dt;
   // idle people from the previous frame are grouped into chats here (stable, deterministic order)
   // anyone idle and still outdoors can be invited, also people who were about to walk home
   const free=frame.filter(p=>p.isIdle&&p.plan&&!p.inside&&!p.group).sort((a,b)=>a.id<b.id?-1:1);
@@ -50,14 +51,14 @@ export function createPeopleLifeV252(){
   for(const p of frame)if(p.plan==='chat'&&!p.group&&ctx.time-p.planAt>1.5)p.plan='home';
   frame=[];return dt;
  }
- function step(id,sim,ctx,dt){const r=stepInner(id,sim,ctx,dt),p=people.get(id);p.anchor=!!sim.working||r.action==='talk';p.isIdle=ctx.enabled&&sim.visible&&!sim.moving&&!sim.working&&!sim.carrying;return r;}
+ function step(id,sim,ctx,dt){const r=stepInner(id,sim,ctx,dt),p=people.get(id);r.x+=p.ox;r.z+=p.oz;p.anchor=!!sim.working||r.action==='talk';p.isIdle=ctx.enabled&&sim.visible&&!sim.moving&&!sim.working&&!sim.carrying;return r;}
  function stepInner(id,sim,ctx,dt){
   let p=people.get(id);
-  if(!p){p={id,x:sim.x,z:sim.z,heading:sim.heading||0,idleSince:null,plan:null,planAt:0,group:null,spot:null,home:null,inside:false};people.set(id,p);}
+  if(!p){p={id,x:sim.x,z:sim.z,ox:0,oz:0,heading:sim.heading||0,idleSince:null,plan:null,planAt:0,group:null,spot:null,home:null,inside:false};people.set(id,p);}
   p.simX=sim.x;p.simZ=sim.z;p.seen=ctx.time;
   const idle=sim.visible&&!sim.moving&&!sim.working&&!sim.carrying;
   let action=sim.working?sim.action:null,moving=false;
-  if(!ctx.enabled||!idle){
+  if(!ctx.enabled||!idle||ctx.idleLife===false){ // idleLife:false = the caller schedules activities (village life)
    // back to the real job: leave the house / chat circle and catch up with the simulated worker
    p.idleSince=null;p.plan=null;p.group=null;p.spot=null;p.inside=false;
    const far=Math.hypot(sim.x-p.x,sim.z-p.z);
@@ -85,21 +86,26 @@ export function createPeopleLifeV252(){
   // waiting for a partner / nowhere to go: look around, shift weight
   frame.push(p);return {x:p.x,z:p.z,heading:p.heading+.6*Math.sin(ctx.time*.3+hash(id)%10),moving:false,action:null,hidden:p.inside};
  }
- // personal space: one relaxation pass per frame, walkers yield to workers and talkers
- function separate(ctx){
-  const list=frame.filter(p=>!p.inside);
-  for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){
-   const a=list[i],b=list[j],dx=b.x-a.x,dz=b.z-a.z,d=Math.hypot(dx,dz);if(d>=RADIUS*2||d<1e-4)continue;
-   const push=(RADIUS*2-d)/2,nx=dx/d,nz=dz/d,wa=a.anchor?.15:1,wb=b.anchor?.15:1,s=wa+wb;
-   const ax=a.x-nx*push*2*wa/s,az=a.z-nz*push*2*wa/s,bx=b.x+nx*push*2*wb/s,bz=b.z+nz*push*2*wb/s;
-   if(ctx.open(ax,az)){a.x=ax;a.z=az;}if(ctx.open(bx,bz)){b.x=bx;b.z=bz;}
+ // personal space: a persistent offset on top of each person's position (independent of frame time);
+ // walkers yield to people who work or talk, the offset fades when the crowd moves on.
+ function separate(ctx,dt){
+  const list=frame.filter(p=>!p.inside),fade=Math.pow(.25,dt);
+  for(const p of list){p.ox*=fade;p.oz*=fade;}
+  for(let pass=0;pass<3;pass++)for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){
+   const a=list[i],b=list[j],ax0=a.x+a.ox,az0=a.z+a.oz,bx0=b.x+b.ox,bz0=b.z+b.oz;let dx=bx0-ax0,dz=bz0-az0,d=Math.hypot(dx,dz);
+   if(d>=RADIUS*2)continue;if(d<1e-4){const k=hash(a.id+b.id)%628/100;dx=Math.cos(k);dz=Math.sin(k);d=1e-4;}
+   const push=(RADIUS*2-d),nx=dx/Math.max(d,1e-4),nz=dz/Math.max(d,1e-4),wa=a.anchor?.15:1,wb=b.anchor?.15:1,s=wa+wb;
+   const ma=push*wa/s,mb=push*wb/s;
+   if(ctx.open(ax0-nx*ma,az0-nz*ma)){a.ox-=nx*ma;a.oz-=nz*ma;}
+   if(ctx.open(bx0+nx*mb,bz0+nz*mb)){b.ox+=nx*mb;b.oz+=nz*mb;}
   }
+  for(const p of list){const m=Math.hypot(p.ox,p.oz);if(m>2.2){p.ox*=2.2/m;p.oz*=2.2/m;}}
  }
  return {
   begin,step,
-  finish(ctx){separate(ctx);for(const [id,p] of people)if(ctx.time-p.seen>5)people.delete(id);},
+  finish(ctx){separate(ctx,ctx.dtV253??.05);for(const [id,p] of people)if(ctx.time-p.seen>5)people.delete(id);},
   anchor(id,on){const p=people.get(id);if(p)p.anchor=on;},
-  position(id){const p=people.get(id);return p?{x:+p.x.toFixed(2),z:+p.z.toFixed(2),plan:p.plan,group:p.group?.members?.length||0,home:p.home,inside:p.inside,idle:p.isIdle,idleSince:p.idleSince}:null;},
+  position(id){const p=people.get(id);return p?{x:+(p.x+p.ox).toFixed(2),z:+(p.z+p.oz).toFixed(2),plan:p.plan,group:p.group?.members?.length||0,home:p.home,inside:p.inside,idle:p.isIdle,idleSince:p.idleSince}:null;},
   // hand-held light at night (torch in the right hand)
   handLight(model,show,age){
    let light=model.userData.handLightV252;

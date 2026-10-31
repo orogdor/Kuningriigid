@@ -5,6 +5,8 @@ const PI = Math.PI;
 const clamp = (x, a=0, b=1) => Math.max(a, Math.min(b, x));
 const ease = (a,b,t) => { const x=clamp((t-a)/(b-a)); return x*x*(3-2*x); };
 const cycle = (t,seconds) => ((t/seconds)%1+1)%1;
+// V253 hip drops that keep the feet / knee / seat on the ground (rig hips stand at .50)
+const KNEEL_DROP=.235,SIT_DROP=.40;
 const damp = (old,target,dt,speed=9) => old+(target-old)*(1-Math.exp(-clamp(dt,0,.12)*speed));
 function point(B,name,x,y=0,z=0,w=1){
  const b=B[name];if(!b||w<=0)return;
@@ -107,18 +109,18 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
    B.hips.position.y-=.03*work*push;
   }else if(action==='pottery'){ // V252 potter: crouched, hands shaping a coil pot in slow circles
    const a=workT*1.6;
-   point(B,'thigh_L',-1.05,0,.12,work);point(B,'thigh_R',-1.0,0,-.12,work);point(B,'shin_L',1.45,0,0,work);point(B,'shin_R',1.4,0,0,work);
+   point(B,'thigh_L',-1.5,0,.12,work);point(B,'shin_L',1.5,0,0,work);point(B,'thigh_R',.05,0,-.1,work);point(B,'shin_R',1.55,0,0,work); // V253 kneel: feet stay on the ground
    point(B,'spine',.42,0,0,work);point(B,'chest',.12,0,0,work);point(B,'head',-.35,.06*Math.sin(a*.5),0,work);
    point(B,'upperArm_L',-.55+.10*Math.sin(a),0,.22+.10*Math.cos(a),work);point(B,'upperArm_R',-.55+.10*Math.sin(a+PI),0,-.22-.10*Math.cos(a+PI),work);
    point(B,'forearm_L',-1.05+.15*Math.cos(a),0,0,work);point(B,'forearm_R',-1.05+.15*Math.cos(a+PI),0,0,work);
-   B.hips.position.y-=.20*work;
+   B.hips.position.y-=KNEEL_DROP*work;
   }else if(action==='chisel'){ // V252 stoneworker: kneeling, left hand holds the chisel, right hand taps with a hammer stone
    const u=cycle(workT,.62),up=ease(.0,.55,u)*(1-ease(.58,.72,u)),hit=ease(.58,.70,u)*(1-ease(.72,1,u));
-   point(B,'thigh_L',-1.1,0,.10,work);point(B,'thigh_R',-.35,0,-.12,work);point(B,'shin_L',1.5,0,0,work);point(B,'shin_R',1.9,0,0,work);
+   point(B,'thigh_L',-1.5,0,.10,work);point(B,'shin_L',1.5,0,0,work);point(B,'thigh_R',.05,0,-.12,work);point(B,'shin_R',1.55,0,0,work); // V253 kneel
    point(B,'spine',.45,0,0,work);point(B,'head',-.30,0,0,work);
    point(B,'upperArm_L',-.70,0,.18,work);point(B,'forearm_L',-.90,0,0,work);
    point(B,'upperArm_R',-.80-.75*up+.25*hit,0,-.15,work);point(B,'forearm_R',-.85-.35*up,0,0,work);
-   B.hips.position.y-=.24*work;
+   B.hips.position.y-=KNEEL_DROP*work;
   }else if(action==='study'){ // V252 elder/teacher: draws signs on the ground with a stick, pauses to explain
    const u=cycle(workT,5.0),draw=ease(.0,.15,u)*(1-ease(.55,.65,u)),talk=ease(.62,.7,u)*(1-ease(.92,1,u));
    point(B,'spine',.25*draw+.05,.10*talk,0,work);point(B,'head',-.30*draw+.05*talk,.15*talk*Math.sin(workT*2),0,work);
@@ -130,6 +132,24 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
    point(B,'upperArm_L',-.25,0,.10,work);point(B,'forearm_L',-.40,0,0,work);
    point(B,'spine',.06,.25*Math.sin(workT*.4),0,work);point(B,'head',0,.45*Math.sin(workT*.33),0,work);
    point(B,'thigh_L',-.06,0,.05,work);
+  }else if(action==='sit'||action==='eat'){ // V253 villagers resting on the ground; eating brings food to the mouth
+   const u=cycle(workT,3.2),bite=action==='eat'?ease(.1,.3,u)*(1-ease(.45,.6,u)):0;
+   point(B,'thigh_L',-1.5,0,.22,work);point(B,'thigh_R',-1.5,0,-.22,work);point(B,'shin_L',.08,0,0,work);point(B,'shin_R',.16,0,0,work); // V253 seated on the ground, legs forward
+   point(B,'spine',.12,0,0,work);point(B,'head',-.06+.04*Math.sin(workT*.6),.2*Math.sin(workT*.4),0,work);
+   point(B,'upperArm_L',-.45,0,.18,work);point(B,'forearm_L',-.6,0,0,work);
+   point(B,'upperArm_R',-.45-.75*bite,0,-.18,work);point(B,'forearm_R',-.6-1.25*bite,0,0,work);
+   B.hips.position.y-=SIT_DROP*work;
+  }else if(action==='play'){ // V253 children hop and wave
+   const hop=Math.max(0,Math.sin(workT*5.2));
+   point(B,'upperArm_L',-1.6-.4*hop,0,.4,work);point(B,'upperArm_R',-1.5-.5*hop,0,-.4,work);
+   point(B,'forearm_L',-.3,0,0,work);point(B,'forearm_R',-.3,0,0,work);
+   point(B,'thigh_L',-.35*hop,0,.05,work);point(B,'thigh_R',-.35*hop,0,-.05,work);point(B,'shin_L',.6*hop,0,0,work);point(B,'shin_R',.6*hop,0,0,work);
+   B.hips.position.y+=.10*work*hop;
+  }else if(action==='guard'){ // V253 guard: weight on one leg, spear arm raised, scanning the surroundings
+   point(B,'upperArm_R',-1.05,0,-.22,work);point(B,'forearm_R',-.85,0,0,work);
+   point(B,'upperArm_L',-.15,0,.12,work);point(B,'forearm_L',-.3,0,0,work);
+   point(B,'thigh_L',-.08,0,.08,work);point(B,'thigh_R',.06,0,-.04,work);
+   point(B,'spine',.02,.30*Math.sin(workT*.35),0,work);point(B,'head',0,.55*Math.sin(workT*.27+1),0,work);
   }else if(action==='talk'){ // V252 conversation: hand gestures, nods, weight shifts
    const g1=Math.max(0,Math.sin(workT*1.9)),g2=Math.max(0,Math.sin(workT*1.3+2.1));
    point(B,'upperArm_R',-.30-.55*g1,0,-.12-.15*g1,work);point(B,'forearm_R',-.55-.75*g1,0,0,work);

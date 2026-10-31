@@ -1,6 +1,6 @@
 # Kuningriigid – ühine tööjärg
 
-Viimati kokku lepitud seis: **V252**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
+Viimati kokku lepitud seis: **V253**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
 
 - Mäng ja avalik eelvaade: https://orogdor.github.io/Kuningriigid/
 - Lähtekood: https://github.com/orogdor/Kuningriigid
@@ -10,6 +10,7 @@ Viimati kokku lepitud seis: **V252**, GitHubi `main`-harus. Enne töö alustamis
 - V244 (Claude): jõudlus ilma graafikat halvendamata. Puud ja põõsad joonistatakse instancing'uga, kiviaja hoonetel on kolm detailsuse astet (`models-stone-lod-v244/`), WebGPU varulahendus on rangem. Üksikasjad: `MUUDATUSED_V244.md`.
 - V245 (Claude): WebGPU must ekraan parandatud. Põhjus oli three r170 instancing'u uniform-puhvri viga (`vendor/three.webgpu.js` patch). Üksikasjad: `MUUDATUSED_V245.md`.
 - V246 (Claude): WebGPU maailmakaardil oli näha ainult udu. Udu kate ja meri on nüüd TSL-is, sest WebGPU eirab `onBeforeCompile`-t. Kontroll: `tests/webgpu-v246/sea.html?gpu=0|1`. Üksikasjad: `MUUDATUSED_V246.md`.
+- V253 (Claude): kiviaja tõrvik on puukepp kasetohu ja vaiguga, väiksem leek; ukse tõrvikud paigutatakse mudeli mõõtude järgi väljapoole maju (0 hoone sees). Külaelanikud käivad ümber majade, hoiavad isiklikku ruumi, vestlevad üksteise poole, kannavad öösel tõrvikut ja neil on päris poosid. Kükitamise ja istumise poosid on parandatud. Üksikasjad: `MUUDATUSED_V253.md`.
 - V252 (Claude): kiviaja kõik hooned on animeeritud (suits, lõke, potikeder, kaevuämber, kuivatusrestid jne) ja töötajatel on uued tööliigutused (savikaevamine, potid, kiviraidumine, õpetamine, karjatamine). Tegevuseta inimesed ajavad juttu või lähevad koju, keegi ei käi teisest läbi ja öösel on käes tõrvik (`people-life-v252.js`, joonistuskiht). Majad saab ehitada lähemale. Pronksiaeg jäi kasutaja soovil muutmata. Üksikasjad: `MUUDATUSED_V252.md`.
 - V251 (Claude): teedel on jälle tasemed ja pind vastab ajastule (jalgrada → vankritee → kruus → munakivi → sillutis → makadam → asfalt); maantee on 1,5× laiem ja 10% kiirem. Tõrvikul on päris tule varjutaja. Valgusti vahetub ajastuga: tõrvik → õlilatern → gaasilamp → elektrivalgusti. Jõevesi peegeldab taevast ja lainetel on valgus. Üksikasjad: `MUUDATUSED_V251.md`.
 - V250 (Claude): kõik teed näevad välja ühesugused (kruus); maantee (tase 4) on 1,5× laiem ja 10% kiirem. Uued tõrvikud annavad 25% rohkem valgust (päris valgusallikaid on endiselt kõige rohkem 4) ja maapinnale tekib valguslaik. Jõgedel pole enam katkendjooni, vee värv on sügavuse järgi ja uutes maailmades jõed looklevad. Taimestik järgib biomi (rohumaa salud, kõrbes kaktused, tundras kääbuspõõsad). Uued mängud saavad `geographyVersion 7`. Üksikasjad: `MUUDATUSED_V250.md`.
@@ -37,6 +38,7 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 
 - WebGPU: `demo=medieval` kukub tarkvaralisel WebGPU-l läbi (`three.webgpu.js` `dispose` null) ja lülitub WebGL-ile. Viga on olemas ka V249-s.
 - WebGPU: jõe vesi (`waterMaterial`) ja teede ajastupinnad (`roadMaterial`) on `onBeforeCompile` varjutajad ega tööta WebGPU-s; need tuleb kirjutada TSL-i. Tuli töötab ka WebGPU-s (TSL).
+- `TEST_V76.mjs` kukub läbi („evening gathering place has a lit fire“), sest küla lõkkekoht (`camp`) on varem eemaldatud. Viga on olemas ka V252-s.
 - `TEST_V139.mjs` kukub läbi (`ai-defenses-v128.js:47`, `city.economy.realms[team]` puudub). Viga on olemas ka V248-s.
 - Jõelaevandus: `cell.riverNavigable` (V249) märgib laiad jõelõigud, kuid laevad neid veel ei kasuta.
 - V248 maailmakaart: kasutaja vaatab uued kaardid üle. Seejärel tuleb ajutine „Kogu kaart“ nupp eemaldada (`index.html` `#reveal-v248`, `civilization-core.js` `seen()`, `fog-delta-v88.js`). Võimalik täpsustus: stepi osakaal (26–31% maast).

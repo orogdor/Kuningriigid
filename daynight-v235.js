@@ -117,12 +117,14 @@ const bigFlames={
 //    Ages, oil lanterns on posts in the Renaissance, cast-iron gas lamps in the Industrial era and
 //    electric street lights in the Modern era. Lamps give stronger, whiter light than open flame.
 export const FIXTURE_LIGHT_V251={
+ stone_torch:{color:'#ff9a45',intensity:1.5,distance:15},
  torch:{color:'#ffab50',intensity:1.55*1.25,distance:20},
  lantern:{color:'#ffb866',intensity:2.1,distance:21},
  gas:{color:'#ffe2a8',intensity:2.6,distance:24},
  electric:{color:'#fff1da',intensity:3.4,distance:28}
 };
-export function fixtureForAgeV251(age=0){age=Math.floor(Number(age)||0);return age>=6?'electric':age===5?'gas':age===4?'lantern':'torch';}
+// V253: the Stone Age has no iron: a stake with a bundle of birch bark and resin, a smaller flame.
+export function fixtureForAgeV251(age=0){age=Math.floor(Number(age)||0);return age>=6?'electric':age===5?'gas':age===4?'lantern':age===0?'stone_torch':'torch';}
 const FIRE_TIME={value:0};
 let fireMat=null;
 function fireMaterial(){
@@ -187,11 +189,22 @@ const lampGeos={
  bulbFace:new T.BoxGeometry(.7,.03,.24)
 };
 for(const g of Object.values(lampGeos))g.userData.shared=true;
+const stoneTorchGeos={stake:new T.CylinderGeometry(.03,.045,1.2,6),bark:new T.CylinderGeometry(.075,.05,.24,7),tie:new T.TorusGeometry(.068,.01,4,10),resin:new T.SphereGeometry(.07,7,5)};
+for(const g of Object.values(stoneTorchGeos))g.userData.shared=true;
+const stoneTorchMats={bark:new T.MeshStandardMaterial({color:'#d9cfb6',roughness:1}),tie:new T.MeshStandardMaterial({color:'#6d5a3c',roughness:1}),resin:new T.MeshStandardMaterial({color:'#2a1a10',emissive:'#5a1c06',emissiveIntensity:.6,roughness:.7})};
 function fixtureModel(kind,withLight){
  const root=new T.Group();root.name='V251 '+kind;
  const gm=torchGlowMaterials(),cfg=FIXTURE_LIGHT_V251[kind];
  let flame,lightY,haloY,haloScale,poolScale;
- if(kind==='torch'){
+ if(kind==='stone_torch'){
+  const stake=mesh(root,stoneTorchGeos.stake,mats.wood,0,.6,0);stake.rotation.z=.06;stake.rotation.x=-.04;
+  mesh(root,stoneTorchGeos.bark,stoneTorchMats.bark,.04,1.2,0);
+  for(const y of [1.12,1.28]){const t=mesh(root,stoneTorchGeos.tie,stoneTorchMats.tie,.04,y,0);t.rotation.x=Math.PI/2;}
+  mesh(root,stoneTorchGeos.resin,stoneTorchMats.resin,.04,1.34,0);
+  flame=new T.Group();flame.position.set(.04,1.36,0);root.add(flame);
+  addFire(flame,.62,0);addFire(flame,.42,.02).rotation.y=.6;addFire(flame,.26,.03).rotation.y=1.2;
+  lightY=1.6;haloY=1.62;haloScale=[.8,1.0];poolScale=4.6;
+ }else if(kind==='torch'){
   const stave=mesh(root,torchGeos.stave,mats.wood,0,.875,0);stave.rotation.z=.035;
   for(const y of [.35,1.45])mesh(root,torchGeos.band,mats.iron,0,y,0);
   mesh(root,torchGeos.rag,mats.wrap,0,1.79,0);mesh(root,torchGeos.basket,mats.iron,0,1.92,0);
@@ -227,8 +240,8 @@ function fixtureModel(kind,withLight){
   lightY=5.9;haloY=5.95;haloScale=[1.6,1.0];poolScale=12;
  }
  const sparks=[];
- if(kind==='torch')for(let i=0;i<6;i++){const sp=new T.Mesh(torchGeos.spark,gm?.spark||mats.core);sp.userData.seed=i*1.37;flame.add(sp);sparks.push(sp);}
- const smoke=[];const sm=kind==='torch'?smokeMaterial():null;
+ if(kind==='torch'||kind==='stone_torch')for(let i=0;i<(kind==='stone_torch'?3:6);i++){const sp=new T.Mesh(torchGeos.spark,gm?.spark||mats.core);sp.userData.seed=i*1.37;flame.add(sp);sparks.push(sp);}
+ const smoke=[];const sm=kind==='torch'||kind==='stone_torch'?smokeMaterial():null;
  if(sm)for(let i=0;i<3;i++){const s=new T.Sprite(sm);s.userData.seed=i/3;s.renderOrder=11;flame.add(s);smoke.push(s);}
  let halo=null,pool=null;
  const fx=flame.position.x;
@@ -261,7 +274,8 @@ const TORCH_DOORS={
  study:{z:3.0,x:[1.3]},blacksmith:{z:3.0,x:[1.4]},
  baker:{z:3.0,x:[1.3]},mill:{z:3.0,x:[1.4]}
 };
-export function torchLocationsV235(buildings=[]){
+// V253 boundsOf(b) -> {maxZ,halfW} of the building model (door side +Z): torches stand outside the walls/eaves
+export function torchLocationsV235(buildings=[],boundsOf=null){
  const sites=[],max=22;
  // Doors and gates first, while respecting the cap on dense towns.
  const ranked=buildings.map((b,i)=>({b,i})).sort((a,b)=>{
@@ -275,7 +289,8 @@ export function torchLocationsV235(buildings=[]){
    Number.isFinite(b.wallAngleV175)?b.wallAngleV175:(b.wallAxis?Math.PI/2:0);
   const sin=Math.sin(angle),cos=Math.cos(angle);
   for(const dx of door.x){
-   const x=b.x+dx*cos+door.z*sin,z=b.z-dx*sin+door.z*cos;
+   const bd=boundsOf?.(b),dz=bd?Math.max(door.z,bd.maxZ+.6):door.z,lx=bd?Math.sign(dx||1)*Math.min(Math.max(.9,Math.abs(dx)),Math.max(.9,bd.halfW*.6)):dx;
+   const x=b.x+lx*cos+dz*sin,z=b.z-lx*sin+dz*cos;
    if(sites.some(p=>Math.hypot(p.x-x,p.z-z)<1.0))continue;
    sites.push({x,z,kind:b.type,doorX:b.x,doorZ:b.z,angle});
    if(sites.length>=max)return sites;
@@ -283,9 +298,9 @@ export function torchLocationsV235(buildings=[]){
  }
  return sites;
 }
-export function createCityTorchesV235(buildings,heightAt,{age=0}={}){
+export function createCityTorchesV235(buildings,heightAt,{age=0,boundsOf=null}={}){
  const group=new T.Group();group.name='V251 town lights';
- const kind=fixtureForAgeV251(age),locations=torchLocationsV235(buildings),models=[];
+ const kind=fixtureForAgeV251(age),locations=torchLocationsV235(buildings,boundsOf),models=[];
  locations.forEach((p,i)=>{
   const model=fixtureModel(kind,i<TORCH_LIGHT_V250.count);
   model.root.position.set(p.x,(Number(heightAt(p.x,p.z))||0)+.035,p.z);
@@ -301,10 +316,10 @@ export function updateCityTorchesV235(group,clock,elapsed=0){
  const power=clock?.torch??0,visible=power>.04;
  for(const [i,o] of group.userData.torchModelsV235.entries()){
   o.flame.visible=visible;if(o.halo)o.halo.visible=visible;if(o.pool)o.pool.visible=visible;
-  const fire=o.kind==='torch'||o.kind==='lantern'||!o.kind;
+  const fire=o.kind==='torch'||o.kind==='stone_torch'||o.kind==='lantern'||!o.kind;
   const w=fire?Math.sin(elapsed*10+i*3.7)*.11+Math.sin(elapsed*15+i*2.1)*.075+Math.sin(elapsed*23+i)*.03:Math.sin(elapsed*2+i)*.01;
   if(visible){
-   if(o.kind==='torch'||!o.kind){o.flame.rotation.z=w*.18;o.flame.scale.set(1+w*.6,.95+w*.5,1+w*.4);}
+   if(o.kind==='torch'||o.kind==='stone_torch'||!o.kind){o.flame.rotation.z=w*.18;o.flame.scale.set(1+w*.6,.95+w*.5,1+w*.4);}
    const hs=o.haloScale||[1.5,1.9];
    if(o.halo)o.halo.scale.set((hs[0]+w*.25)*(.7+.3*power),(hs[1]+w*.3)*(.7+.3*power),1);
    if(o.pool){const k=((o.poolScale||7)+w*1.2)*(.6+.4*power);o.pool.scale.set(k,1,k);}

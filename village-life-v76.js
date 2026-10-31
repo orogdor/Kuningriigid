@@ -4,6 +4,11 @@
 import * as T from './vendor/three.module.js';
 import {createStoneLoad} from './stone-equipment-v234.js';
 import {createSoldier,animateSoldier} from './visuals.js?v=224';
+import {createPeopleLifeV252} from './people-life-v252.js';
+import {dayClockV235} from './daynight-v235.js';
+import {door} from './navigation.js';
+// V253 Stone Age villagers: real poses for every activity on the skeletal Stone Age rig
+const STONE_ACTION_V253={chat:'talk',work:'build',carry:'carry',sit:'sit',rest:'sit',eat:'eat',play:'play',celebrate:'play',guard:'guard'};
 
 // One game minute represents one village clock hour. Start new games in morning.
 export const VILLAGE_DAY_SECONDS=24*60;
@@ -101,6 +106,7 @@ function makePerson(group,site,index,ground){
 }
 function animateActivity(actor,time,moving){
  const {figure,activity}=actor,rig=figure.userData.rig;
+ if(rig?.stoneHuman){animateSoldier(figure,time,moving,{phase:-1,action:STONE_ACTION_V253[activity]||null});actor.basket.visible=activity==='carry';figure.position.y=0;return;}
  animateSoldier(figure,time,moving,{phase:-1,action:activity==='work'?'build':activity==='carry'?'water':null});
  actor.basket.visible=activity==='carry';
  if(!rig)return;
@@ -126,6 +132,10 @@ function animateActivity(actor,time,moving){
 }
 export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={}){
  const sites=new Map();
+ // V253: villagers live like townsfolk: paths around buildings, real house doors as homes,
+ // personal space, chats facing each other, a torch at night (drawing only, no gameplay data).
+ const cityAt=tile=>game.s.cities.find(c=>c.c===tile.c&&c.r===tile.r&&c.districtOf==null);
+ const navAt=tile=>{const c=cityAt(tile);try{return c?game.nav(c):null}catch{return null}};
  function discover(tile){
   if(!game.seen(0,tile))return null;
   const city=game.s.cities.find(c=>c.c===tile.c&&c.r===tile.r&&c.districtOf==null);
@@ -145,7 +155,7 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
   const ground=(x,z)=>groundForTile(tile,x,z);
   const actors=Array.from({length:targetCount},(_,i)=>makePerson(group,site,i,ground));
   const camp=null;
-  entry={id:site.id,site,group,parent,actors,camp,count:targetCount,nearby,ground};
+  entry={id:site.id,site,group,parent,actors,camp,count:targetCount,nearby,ground,life:createPeopleLifeV252()};
   sites.set(key,entry);return entry;
  }
  function update(time=game.s.time,dt=0){
@@ -156,23 +166,41 @@ export function createVillageLife(game,groundForTile,{quality=()=> 'medium'}={})
     if(lit){camp.userData.flame.scale.y=1+.13*Math.sin(time*5);
      camp.userData.smoke.position.y=2.3+Math.sin(time*.9)*.35;}
    }
+   const nav=navAt(site.tile),city=site.kind==='city'?cityAt(site.tile):null;
+   const homes=city?(city.economy?.buildings||[]).filter(b=>b.type==='house'&&b.ready&&b.hp>0).map(b=>door(b)):[];
+   const dark=dayClockV235(time).torch>.3;
+   const lifeCtx={time,enabled:!!site.stone,idleLife:false,night:dark,open:nav?(x,z)=>nav.open(x,z):()=>true,homes:[]};
+   const lifeDt=entry.life.begin(lifeCtx);
    for(const actor of actors){
     const activity=villageActivity(site.id,actor.index,time,threat);
     actor.activity=activity;actor.person.userData.activity=activity;
-    const dest=villageDestination(site.id,actor.index,activity,time);
-    const dx=dest.x-actor.x,dz=dest.z-actor.z,d=Math.hypot(dx,dz);
-    // The visible NPCs are decorative. No collision/pushing into nav paths and
-    // no real worker/population counts are affected by these visual journeys.
+    let dest=villageDestination(site.id,actor.index,activity,time);
+    if(homes.length&&['sleep','home'].includes(activity))dest=homes[actor.index%homes.length];
+    // follow a route around buildings (pure path query, no traffic or road wear is recorded)
+    const key=Math.round(dest.x*2)+':'+Math.round(dest.z*2);
+    if(actor.pathKey!==key){actor.pathKey=key;let goal=dest;if(nav){const n=nav.nearest(dest);if(n)goal=n;}
+     actor.path=(nav&&nav.route({x:actor.x,z:actor.z},goal,{preferRoads:true}))||[goal];actor.goal=goal;}
+    while(actor.path?.length>1&&Math.hypot(actor.path[0].x-actor.x,actor.path[0].z-actor.z)<.35)actor.path.shift();
+    const next=actor.path?.[0]||dest,dx=next.x-actor.x,dz=next.z-actor.z,d=Math.hypot(dx,dz);
+    const left=Math.hypot((actor.goal||dest).x-actor.x,(actor.goal||dest).z-actor.z);
     const speed=activity==='panic'?5.5:activity==='play'?3:activity==='patrol'?1.8:2.1;
     const travel=Math.min(d,Math.min(.2,Math.max(0,dt))*speed);
-    if(d>.22&&travel>0){actor.x+=dx/d*travel;actor.z+=dz/d*travel;}
-    actor.moving=d>.35;
-    actor.person.visible=!(activity==='sleep'&&d<.8);
-    actor.person.position.set(actor.x,ground(actor.x,actor.z),actor.z);
-    if(d>.1)actor.person.rotation.y=Math.atan2(dx,dz);
-    if(activity==='chat'&&d<=.4)actor.person.rotation.y=actor.index%2?Math.PI/2:-Math.PI/2;
+    if(d>.05&&travel>0){actor.x+=dx/d*travel;actor.z+=dz/d*travel;}
+    actor.moving=left>.35;
+    const asleep=(activity==='sleep'||(dark&&activity==='home'))&&left<.8;
+    const working=['chat','sit','rest','eat','work','guard'].includes(activity)&&!actor.moving;
+    const shown=site.stone?entry.life.step(actor.person.name,{x:actor.x,z:actor.z,heading:actor.person.rotation.y,moving:actor.moving,working,carrying:false,visible:!asleep,action:activity},lifeCtx,lifeDt):{x:actor.x,z:actor.z,heading:actor.person.rotation.y,moving:actor.moving};
+    actor.person.visible=!asleep;
+    actor.person.position.set(shown.x,ground(shown.x,shown.z),shown.z);
+    if(actor.moving&&d>.1)actor.person.rotation.y=Math.atan2(dx,dz);
+    if(activity==='chat'&&!actor.moving){ // face the others in the circle
+     let cx=0,cz=0,n=0;for(const o of actors)if(o!==actor&&o.activity==='chat'&&Math.hypot(o.x-actor.x,o.z-actor.z)<3.5){cx+=o.x;cz+=o.z;n++;}
+     actor.person.rotation.y=n?Math.atan2(cx/n-actor.x,cz/n-actor.z):(actor.index%2?Math.PI/2:-Math.PI/2);
+    }
+    if(site.stone)entry.life.handLight(actor.person,dark&&!asleep&&!['sit','eat','rest'].includes(activity),0);
     animateActivity(actor,time,actor.moving);
    }
+   if(site.stone){entry.life.finish(lifeCtx);for(const actor of actors){const q=entry.life.position(actor.person.name);if(q&&actor.person.visible)actor.person.position.set(q.x,ground(q.x,q.z),q.z);}}
   }
  }
  function clear(){for(const e of sites.values())e.group.removeFromParent();sites.clear()}
