@@ -16,7 +16,7 @@ for(const seed of seeds){
  for(const p of game.startLocations){const cell=game.cell(p);if(!cell?.land||cell.mountain)problems.push(`start ${p.c}:${p.r} not on open land`);}
  // every faction reaches enough land on foot from its start
  for(const p of game.startLocations){const seen=new Set([p.c+':'+p.r]),q=[p];while(q.length&&seen.size<400){const a=q.pop();for(const [dc,dr] of [[1,0],[-1,0],[0,1],[0,-1]]){const b={c:a.c+dc,r:a.r+dr},k=b.c+':'+b.r;if(seen.has(k)||!game.canTraverse(0,b))continue;seen.add(k);q.push(b);}}if(seen.size<150)problems.push(`start ${p.c}:${p.r} reaches only ${seen.size} cells`);}
- if(game.s.geographyVersion!==6)problems.push('geographyVersion '+game.s.geographyVersion);
+ if(game.s.geographyVersion!==7)problems.push('geographyVersion '+game.s.geographyVersion);
  const top=Object.entries(biomes).sort((a,b)=>b[1]-a[1]).map(([k,v])=>k+' '+(v/land.length*100).toFixed(0)+'%').join(', ');
  console.log(`seed ${seed}: ${problems.length?'FAIL':'ok'} ${Date.now()-t} ms | land ${(land.length/cells.length*100).toFixed(0)}% mountains ${(mountains.length/land.length*100).toFixed(1)}% rivers ${rivers.length} | ${top}${problems.length?' | '+problems.join('; '):''}`);
  if(problems.length)failed++;

@@ -60,6 +60,10 @@ function hermite(a,b,m0,m1,t){
  return {x:h00*a.x+h10*m0.x+h01*b.x+h11*m1.x,
  z:h00*a.z+h10*m0.z+h01*b.z+h11*m1.z};
 }
+function hermiteTangent(a,b,m0,m1,t){
+ const t2=t*t,d00=6*t2-6*t,d10=3*t2-4*t+1,d01=-6*t2+6*t,d11=3*t2-2*t;
+ return {x:d00*a.x+d10*m0.x+d01*b.x+d11*m1.x,z:d00*a.z+d10*m0.z+d01*b.z+d11*m1.z};
+}
 function tangent(game,graph,cell,previous=null){
  const up=previous||graph.incoming.get(idx(cell))?.[0]||null;
  const downstream=cell.riverTo?game.cell(cell.riverTo):null;
@@ -78,6 +82,15 @@ export function sampleRiver(game,cell,count=12,graph=null){
  for(let i=0;i<=count;i++){
   const t=i/count,p=hermite(cell,to,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t);
   let width=source+(target-source)*smooth(t);
+  // V250 (new worlds): rivers meander between cell centres instead of running like canals along the
+  // grid. Cell centres (fords, bridges, confluences) stay fixed; the bend side and size drift smoothly
+  // over the map, lowland rivers swing more than mountain streams.
+  if(game.s?.geographyVersion>=7&&i>0&&i<count){
+   const d=hermiteTangent(cell,to,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t),dl=Math.hypot(d.x,d.z)||1;
+   const mx=(cell.x+to.x)/2,mz=(cell.z+to.z)/2,side=(game.smooth(mx/110+13.7,mz/110+5.1)-.5)*2;
+   const low=1-smooth(((cell.h+to.h)/2-18)/14),amp=Math.min(13,3.5+width*.7)*low*side*Math.sin(PI*t);
+   p.x+=-d.z/dl*amp;p.z+=d.x/dl*amp;
+  }
   // V249 (new worlds): the last stretch opens into a funnel-shaped estuary towards the sea.
   if(game.s?.geographyVersion>=6)width*=1+1.5*estuaryV249(game,p.x,p.z);
   pts.push({...p,width,flow:cell.riverFlow||0});

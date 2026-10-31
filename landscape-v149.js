@@ -184,18 +184,22 @@ export function waterMaterial(scope='world',tile=null){
    vertexBody:`vL149P=${map.pos};vL149F=aFlow;vL149S=aShore;`,
    fragHead:'uniform float uL149Time;varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;',
    color:`
- vec2 wp=vL149P.xz;float spd=length(vL149F)+.001;vec2 fd=vL149F/spd;vec2 side=vec2(-fd.y,fd.x);
- vec2 q=vec2(dot(wp,fd),dot(wp,side));
- float t=uL149Time*(.55+spd*.9);
- float r1=l149n(vec2(q.x*.45-t*1.3,q.y*1.6));
- float r2=l149n(vec2(q.x*1.10-t*2.1+7.1,q.y*2.6+3.3));
+ // V250: flow-map animation. The noise is sampled in plain world coordinates and only SHIFTED along
+ // the flow (two phases cross-faded). The former rotated coordinates dot(wp,flow) jumped wherever the
+ // flow direction changed between triangles, which drew dashed white lines across every river.
+ vec2 wp=vL149P.xz;float spd=length(vL149F)+.001;vec2 fd=vL149F/spd;
+ float t=uL149Time*(.35+spd*.55);
+ float ph1=fract(t*.22),ph2=fract(t*.22+.5),mixw=abs(ph1*2.0-1.0);
+ vec2 o1=fd*ph1*3.2,o2=fd*ph2*3.2;
+ float r1=mix(l149n((wp-o1)*.45),l149n((wp-o2)*.45+5.3),mixw);
+ float r2=mix(l149n((wp-o1*1.6)*1.15+7.1),l149n((wp-o2*1.6)*1.15+2.9),mixw);
  float ripple=r1*.6+r2*.4;
- vec3 water=diffuseColor.rgb*(.92+ripple*.12);
- // glints where ripples crest
- water+=vec3(.05,.06,.06)*smoothstep(.84,.97,r2)*(1.0-vL149S*.6);
- // foam lines on the shallows near the banks
- float foam=smoothstep(.86,1.0,vL149S)*smoothstep(.55,.85,l149n(vec2(q.x*.9-t*1.2,q.y*2.2)));
- water=mix(water,vec3(.66,.72,.70),foam*.30);
+ vec3 water=diffuseColor.rgb*(.93+ripple*.10);
+ // sky glints on the ripple crests, mostly mid-stream
+ water+=vec3(.045,.055,.06)*smoothstep(.80,.96,r2)*(1.0-vL149S*.7);
+ // soft foam only right at the banks
+ float foam=smoothstep(.90,1.0,vL149S)*smoothstep(.60,.88,r1);
+ water=mix(water,vec3(.70,.74,.70),foam*.22);
  diffuseColor.rgb=water;
  vL149Ripple=ripple;`});
   shader.fragmentShader=shader.fragmentShader.replace('uniform float uL149Time;','uniform float uL149Time;float vL149Ripple=0.0;')

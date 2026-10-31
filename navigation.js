@@ -117,7 +117,7 @@ clear(a,b){const n=Math.max(1,Math.ceil(length(a,b)*4));for(let i=0;i<=n;i++)if(
 // A single local walk creates wear, not a visible road. Repeated visits build permanent paths.
 roadStrength(i){const h=this.world.heat[i]||0;if(!h)return 0;const now=this.world.trailTime||0,last=this.world.heatLast[i];if(last==null){this.world.heatLast[i]=now;return h}const elapsed=Math.max(0,now-last),rate=h>=64?.0012:h>=30?.0028:h>=13?.006:h>=4?.009:.013;return Math.max(0,h-rate*elapsed)}
 roadLevel(i){const h=this.roadStrength(i);return h>=64?4:h>=30?3:h>=13?2:h>=4?1:0}
-roadBoost(i){return this.roadLevel(i)>=1?1.5:1}
+roadBoost(i){const level=this.roadLevel(i);return level>=4?1.65:level>=1?1.5:1} // V250: highway +10 %
 weight(i){return 1/this.roadBoost(i)}
 // Deposit footsteps along the whole travelled segment, not just the final
 // coordinate. At 3m/s with coarse ticks the old code skipped road cells,

@@ -1,4 +1,4 @@
-import {detailWorldRoadWidth} from './road-width-v89.js';
+import {detailWorldRoadWidth,roadWidthScaleV250} from './road-width-v89.js';
 import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216} from './road-appearance-v216.js';
 import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 // V67: one topology for each river system and each road network. The atlas
@@ -17,14 +17,14 @@ const vp=(game,y,view,x,z)=>view==='detail'?visualProject(game,y,x,z):projectHei
 const pos=(game,x,z,y,view,tile)=>({...field(game,x,z,view,tile),y:vp(game,y,view,x,z)});
 function join(pts,game,scope,tile,kind,level=1,age=0,ground=null){
  // V149: atlas roads are drawn wider so they read at map scale (centre lines are unchanged).
- const isRiver=kind==='river',wBase=isRiver?0:[0,.85,1.1,1.4,1.75][level],out=[];
+ const isRiver=kind==='river',wBase=isRiver?0:1.1*roadWidthScaleV250(level),out=[]; // V250: one road look, highway 1.5× wider
  for(let i=0;i<pts.length;i++){
   const p=pts[i],before=pts[Math.max(0,i-1)],after=pts[Math.min(pts.length-1,i+1)];
   const tX=after.x-before.x,tZ=after.z-before.z,d=Math.hypot(tX,tZ)||1;
   const nx=-tZ/d,nz=tX/d;
   const width=isRiver?p.width:(
    scope==='detail'?detailWorldRoadWidth(level)/2/Math.hypot(nx*DETAIL_X,nz*DETAIL_Z):wBase
-  )*roadWidthRatioV216(level,age)*roadEdgeVarianceV216(p.x,p.z);
+  )*.86*roadEdgeVarianceV216(p.x,p.z);
   const left={x:p.x+nx*width,z:p.z+nz*width},right={x:p.x-nx*width,z:p.z-nz*width};
   const outer=isRiver?width+Math.max(1.4,width*.32)*(1+.24*Math.sin(p.x*.17+p.z*.13)):width*1.6;
   const outerL={x:p.x+nx*outer,z:p.z+nz*outer},outerR={x:p.x-nx*outer,z:p.z-nz*outer};
@@ -171,7 +171,8 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   const t=Math.max(0,Math.min(1,(near.distance-near.width*1.4)/Math.max(.8,near.width*.78)));
   return .54*Math.pow(1-t,1.3)*shoreFadeV249(p);
  }});
- const deep=new T.Color('#1d4a57'),shallowCol=new T.Color('#4f7f74'),seaCol=new T.Color('#62a6a3');
+ // V250: deep, slightly green-blue middle; olive-green shallows where the bed shows through; sea tone at the mouth
+ const deep=new T.Color('#1f4b55'),shallowCol=new T.Color('#5e8466'),seaCol=new T.Color('#62a6a3');
  const waterMesh=yield* buffersStepsV242(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
   const edge=Math.min(1,near.distance/Math.max(1,near.width));
@@ -179,7 +180,9 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  },alpha:(x,y,z)=>{
   // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
   const p=toWorld(x,z),a=game.atlasHeight(p.x,p.z),t=Math.max(0,Math.min(1,(a+2.2)/2.6));
-  return .94*t*t*(3-2*t);
+  // V250: clear water at the banks (the bed shows through), denser mid-stream
+  const near=riverNear(game,p.x,p.z),edge=Math.min(1,near.distance/Math.max(1,near.width));
+  return (.94-.36*Math.pow(edge,2.5))*t*t*(3-2*t);
  }});
  if(waterMesh){
   waterMesh.material.dispose();waterMesh.material=waterMaterial(scope,tile);animate(waterMesh);
@@ -319,14 +322,15 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=
   const roadTeam=scope==='detail'?owner?.team:
    (game.territoryOwner?.(edge.a)?.team??game.territoryOwner?.(edge.b)?.team??0);
   const roadAge=game.s.ages?.[roadTeam??0]??0;
-  const surfaceLevel=roadSurfaceLevelV216(edge.level,roadAge);
-  const xs=join(pts,game,scope,tile,'road',surfaceLevel,roadAge,ground);
+  // V250: all roads share the ordinary (gravel) surface; the traffic level only sets the width
+  const surfaceLevel=2;
+  const xs=join(pts,game,scope,tile,'road',edge.level,roadAge,ground);
   if(routed)for(const x of xs)if(nav.open(x.m.x,x.m.z))adjustRibbonForNavV182(x,nav);
   let along=0,base=pos.length/3;
   for(let i=0;i<xs.length;i++){
    if(i){const p=pts[i],q=pts[i-1];along+=Math.hypot(p.x-q.x,p.z-q.z);}
    const x=xs[i];
-   for(const [v,u] of [[x.ol,-1.5],[x.l,-1],[x.r,1],[x.or,1.5]]){pos.push(v.x,v.y,v.z);uv.push(u,along);lvl.push(dirt?1:surfaceLevel)}
+   for(const [v,u] of [[x.ol,-1.5],[x.l,-1],[x.r,1],[x.or,1.5]]){pos.push(v.x,v.y,v.z);uv.push(u,along);lvl.push(surfaceLevel)}
    if(i){
     const r0=base+(i-1)*4,r1=base+i*4;
     // A smooth curve can cut a blocked corner even if all the generated

@@ -11,7 +11,9 @@ export function roadLevel(heat){return heat>=ROAD_THRESHOLDS[3]?4:heat>=ROAD_THR
 // A well-trodden road erodes much more slowly than a casual footpath.
 export function ageTraffic(heat,elapsed){let h=clamp(heat),t=Math.max(0,elapsed);while(t>0&&h>0){const level=roadLevel(h);const rate=[.004,.0035,.0018,.0007,.0002][level];const floor=[0,...ROAD_THRESHOLDS][level];if(!level)return Math.max(0,h-rate*t);const step=Math.max(0,(h-floor)/rate);if(step>=t){h-=rate*t;break}h= floor-.00001;t-=step;}return h<.02?0:h}
 export function roadStrength(state,a,b,now=state.time||0){const edge=state.worldRoads?.[roadKey(a,b)];return edge?ageTraffic(edge.heat,now-edge.last):0}
-export function roadBoost(state,a,b,now){return roadLevel(roadStrength(state,a,b,now))?ROAD_SPEED:1}
+// V250: a highway (level 4) is 10 % faster than an ordinary road.
+export const HIGHWAY_SPEED=ROAD_SPEED*1.1;
+export function roadBoost(state,a,b,now){const level=roadLevel(roadStrength(state,a,b,now));return level>=4?HIGHWAY_SPEED:level?ROAD_SPEED:1}
 export function recordWorldStep(state,a,b,kind='army',now=state.time||0){if(!a||!b||Math.abs(a.c-b.c)+Math.abs(a.r-b.r)!==1)return;
  const key=roadKey(a,b),roads=state.worldRoads??={};const old=roads[key];const previous=old?ageTraffic(old.heat,now-old.last):0;
  const amount=kind==='roadworks'?8:kind==='caravan'?5.5:kind==='settler'?2.5:kind==='builder'?3:3.5;

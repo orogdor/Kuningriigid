@@ -37,28 +37,35 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
  const startSet=new Set((game.startLocations||[]).map(p=>p.c+':'+p.r));
  const tints=['#ffffff','#f3f7e6','#e6efd6','#fff4de','#e2ead9','#f7f1d4'];
  const species={forest:[['oak',.5],['lime',.28],['birch',.22]],taiga:[['spruce',.48],['pine',.4],['birch',.12]],grass:[['oak',.45],['lime',.3],['birch',.25]],
-  lush:[['birch',.35],['lime',.35],['oak',.3]],steppe:[['oak',.6],['lime',.4]],jungle:[['palm',.6],['lime',.4]],desert:[['cactus',1]]};
+  lush:[['birch',.35],['lime',.35],['oak',.3]],steppe:[['oak',.6],['lime',.4]],jungle:[['palm',.6],['lime',.4]],desert:[['cactus',1]],oasis:[['palm',.75],['cactus',.25]],tundra:[['spruce',.7],['birch',.3]]};
  const pick=(list,k)=>{let acc=0;for(const [n,w] of list){acc+=w;if(k<acc)return n;}return list[list.length-1][0];};
  let biomes={};
  for(const cell of game.cells){
   const biome=cell.visualBiome||cell.biome;biomes[biome]=(biomes[biome]||0)+1;
   if(!cell.land||cell.mountain||cell.river||startSet.has(cell.c+':'+cell.r))continue;
   const j=game.noise;let density=0,list=species.grass,bush=0;
-  if(['forest','coastal_forest'].includes(biome)){density=6;list=species.forest;bush=1}
-  else if(biome==='jungle'||biome==='coastal_jungle'){density=7;list=species.jungle;bush=1.5}
-  else if(biome==='taiga'){density=7;list=species.taiga;bush=.6}
-  else if(biome==='grassland'||biome==='coastal_grassland'){density=1.0;list=species.grass;bush=1.4}
-  else if(biome==='lush_river'){density=3;list=species.lush;bush=1.4}
-  else if(biome==='steppe'||biome==='coastal_steppe'){density=.5;list=species.steppe;bush=1.6}
-  else if(biome==='desert'){density=.7;list=species.desert;bush=.3}
-  else if(biome==='tundra'){bush=.9}
+  // V250: vegetation that follows real-world logic. Grassland is a park-like savanna/meadow with
+  // groves, steppe has scattered trees and many shrubs, desert has cacti, dry bushes and rocks (and
+  // palms by water), tundra has dwarf shrubs and a few stunted spruces, rain forest and taiga are dense.
+  const b=biome.replace('coastal_','');
+  if(b==='forest'){density=8;list=species.forest;bush=1.2}
+  else if(b==='jungle'){density=9;list=species.jungle;bush=2}
+  else if(b==='taiga'){density=8;list=species.taiga;bush=.8}
+  else if(b==='grassland'){density=2.6;list=species.grass;bush=2}
+  else if(b==='lush_river'){density=4.5;list=species.lush;bush=1.8}
+  else if(b==='steppe'){density=.8;list=species.steppe;bush=2.6}
+  else if(b==='desert'){const oasis=[[1,0],[-1,0],[0,1],[0,-1]].some(([dc,dr])=>game.cell({c:cell.c+dc,r:cell.r+dr})?.river);density=oasis?4.5:3.6;list=oasis?species.oasis:species.desert;bush=2.6}
+  else if(b==='tundra'){density=.35;list=species.tundra;bush=2.2}
+  else if(b==='mesa'){density=.5;list=species.desert;bush=.8}
+  // groves and clearings: the same number of trees per biome, gathered into clumps
+  density*=.45+1.1*game.smooth(cell.c/6+41.3,cell.r/6+17.9);
   const effective=density*factor,count=Math.floor(effective+(j(cell.c+17,cell.r+201)<effective%1?1:0));
   for(let i=0;i<count;i++){
    const nx=j(cell.c*29+i*1.7,cell.r*7+i*13.2),nz=j(cell.c*11+i*17.8,cell.r*23+i*4.9);
    const x=cell.x+(nx-.5)*39,z=cell.z+(nz-.5)*39,y=surface(game,x,z,'world'),stream=riverNear(game,x,z);
    if(y<3||y>45||stream.distance<stream.width+3.2)continue;
    const k=j(cell.c*13+i*4.1,cell.r*19+i*2.9),kind=pick(list,j(cell.c*5+i*7.3,cell.r*3+i*1.1)),size=3.8+k*4.2,rot=k*6.28;
-   const div=kind==='pine'||kind==='spruce'||kind==='cactus'?1.7:kind==='birch'?1.6:1.45;
+   const div=kind==='cactus'?1.25:kind==='pine'||kind==='spruce'?1.7:kind==='birch'?1.6:1.45;
    sets[kind].push({x,y,z,scale:size/div,rot,tint:tints[Math.floor(j(cell.c+i*3.7,cell.r*2+i)*tints.length)%tints.length]});
   }
   const shrubs=Math.floor(bush*factor*1.5+(j(cell.c+71,cell.r+9)<(bush*factor*1.5)%1?1:0));
@@ -66,9 +73,11 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
    const x=cell.x+(j(cell.c*7+i*5.1,cell.r*13+i)-.5)*42,z=cell.z+(j(cell.c*3+i,cell.r*17+i*2.3)-.5)*42,y=surface(game,x,z,'world'),stream=riverNear(game,x,z);
    if(y<2.5||y>45||stream.distance<stream.width+2.5)continue;
    const k=j(cell.c+i*9.1,cell.r+i*4.4);
-   sets.shrub.push({x,y,z,scale:2.2+k*2.6,rot:k*6.28,tint:biome==='desert'||biome==='steppe'?'#e8dfb4':tints[i%tints.length]});
+   const dryTint=b==='desert'||b==='mesa'?'#d9c48e':b==='steppe'?'#e8dfb4':b==='tundra'?'#c9cdb0':null;
+   sets.shrub.push({x,y,z,scale:(b==='desert'||b==='tundra'?1.5:2.2)+k*(b==='desert'||b==='tundra'?1.6:2.6),rot:k*6.28,tint:dryTint||tints[i%tints.length]});
   }
-  if(['steppe','desert','tundra','mesa','coastal_steppe'].includes(biome)&&j(cell.c+126,cell.r+113)>.72){
+  const rockChance={desert:.15,mesa:.15,tundra:.4,steppe:.62,coastal_steppe:.62}[biome];
+  if(rockChance!==undefined&&j(cell.c+126,cell.r+113)>rockChance){
    const x=cell.x+(j(cell.c+31,cell.r+72)-.5)*33,z=cell.z+(j(cell.c+13,cell.r+61)-.5)*33,y=surface(game,x,z,'world'),size=2.2+j(cell.c+7,cell.r+99)*4;
    sets.rock.push({x,y:y-.15,z,scale:size/1.5,rot:j(cell.c,cell.r)*6.28});
   }
