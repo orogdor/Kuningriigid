@@ -3,7 +3,7 @@
 // The source body's skin weights, textured high LOD and skeleton remain intact.
 import * as T from './vendor/three.module.js';
 import {loadStoneHumanV241,createStoneHuman} from './stone-age-models-v221.js?v=224';
-import {createStoneEquipment} from './stone-equipment-v234.js';
+import {createStoneEquipment} from './stone-equipment-v234.js?v=261r';
 import {animateStoneWorkerV222} from './stone-motion-v222.js';
 
 const WARRIORS=new Set(['axeman','spearman','slinger']);
