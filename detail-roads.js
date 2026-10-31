@@ -146,7 +146,7 @@ export function createDetailTrailLinks(spots,nav,height){
    // Leave room beside the building walls and exterior props.
    const width=clearRibbonWidth(a,{x,z},detailTrailWidth(useLevel),blockers);
    if(width<=0)continue;
-   appendRibbon(vertices,colors,a,{x,z},width,new T.Color(COLORS[2]),height,uvs); // V250: one road colour
+   appendRibbon(vertices,colors,a,{x,z},width,new T.Color(COLORS[useLevel]),height,uvs);
   }
  }
  return roadMesh(vertices,colors,uvs);

@@ -828,11 +828,12 @@ function workerIsVisible(ctx,w,id){if(w.kind==='market_woman')return w.visible!=
 function refreshCityTorchesV235(){
  if(view!=='local'||!activeTile)return;
  const city=activeCity(),buildings=city?.economy?.buildings||[];
- const stamp=tileKey(activeTile)+'|'+buildings.map(b=>[b.type,b.x,b.z,b.ready?1:0,b.hp>0?1:0,b.buildingRotationV228??'',b.wallAngleV175??'',b.wallAxis??''].join(':')).join(';');
+ const ageV251=city?(s.ages?.[city.team]??0):0;
+ const stamp=tileKey(activeTile)+'|'+ageV251+'|'+buildings.map(b=>[b.type,b.x,b.z,b.ready?1:0,b.hp>0?1:0,b.buildingRotationV228??'',b.wallAngleV175??'',b.wallAxis??''].join(':')).join(';');
  if(stamp===cityTorchStampV235)return;
  cityTorchStampV235=stamp;
  if(cityTorchesV235)localObjects.remove(cityTorchesV235);
- cityTorchesV235=city?createCityTorchesV235(buildings,(x,z)=>ground(activeTile,x,z)):null;
+ cityTorchesV235=city?createCityTorchesV235(buildings,(x,z)=>ground(activeTile,x,z),{age:ageV251}):null; // V251: torch, lantern, gas lamp or electric light by era
  if(cityTorchesV235)localObjects.add(cityTorchesV235);
 }
 function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory();const borderStamp=game.territoryStamp+':'+(s.visionRevision||0);if(localBorderStamp!==borderStamp){if(localBorders){localBorders.removeFromParent();disposeNetwork(localBorders)}localBorders=createDetailBorders(game,activeTile);environment.add(localBorders);localBorderStamp=borderStamp;}if(localCrossingRevision!==(s.crossingRevision||0)){localCrossingRevision=s.crossingRevision||0;if(localRivers){localRivers.removeFromParent();disposeNetwork(localRivers)}localRivers=createRiverNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:345}:activeTile,quality,(x,z)=>ground(activeTile,x,z));environment.add(localRivers);for(const {holder} of detailObjectHolders.values())holder.userData.siteStamp=null;}syncDetailWorldObjects();const city=activeCity(),age=city?game.upgrade(city.team):0,world=game.localWorld(activeTile),nav=detailNav(),vegetationCrossing=activeTile.river&&(activeTile.bridge||activeTile.ford)?crossingFrame(game,activeTile):null;const plots=s.battle?{rects:[],stamp:''}:plotRects(activeTile),roadStamp=tileKey(activeTile)+':'+(s.roadRevision||0)+':'+(s.visionRevision||0)+':'+nav.version+':'+(city?s.ages[city.team]:s.ages[0])+':'+plots.stamp;if(detailRoadStamp!==roadStamp){if(detailWorldRoads){detailWorldRoads.removeFromParent();disposeNetwork(detailWorldRoads)}detailWorldRoads=createUnifiedRoadNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:345}:activeTile,plots.rects,(x,z)=>ground(activeTile,x,z));environment.add(detailWorldRoads);detailRoadStamp=roadStamp}for(const r of world.resources){let v=resourceModels.get(r.id);if(!v){v=resourceView(r);resourceModels.set(r.id,v)}v.position.set(r.x,r.kind==='fish'?.18:ground(activeTile,r.x,r.z),r.z);v.visible=!r.removed&&r.amount>0&&!(r.depositSite&&city?.economy.buildings.some(b=>b.depositId===r.id&&b.hp>0));if(['tree','berry','game'].includes(r.kind)){const water=riverNear(game,activeTile.x+r.x/3,activeTile.z+r.z/2.6);v.visible&&=!activeTile.mountain&&water.distance>=water.width*1.55&&!insideCrossing(vegetationCrossing,activeTile.x+r.x/3,activeTile.z+r.z/2.6);}if(r.kind==='game')v.rotation.y=Math.sin(s.time*.18+r.id)*.4;if(r.kind==='fish')v.position.y+=Math.sin(s.time*2+r.id)*.04;if(r.plantedAt!=null)v.scale.setScalar(.25+.75*Math.min(1,(s.time-r.plantedAt)/20))}
@@ -871,7 +872,7 @@ function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory
  // Flat disks are only safe on almost-flat patches; elsewhere the new
  // tessellated path ribbons alone show the trail, with no airborne disks.
  for(const{key,heat}of spots){
-  const {x,z}=nav.point(key),level=nav.roadLevel(key),radius=.82*(level>=4?1.5:1)*.85; // V250: one road width, highway 1.5×
+  const {x,z}=nav.point(key),level=nav.roadLevel(key),radius=[.4,.7,.82,.95,1.43][level]*.85; // V251: width by level, highway 1.5×
   const y=ground(activeTile,x,z);
   let flat=true;
   for(const [dx,dz]of [[radius,0],[-radius,0],[0,radius],[0,-radius]]){
@@ -1526,7 +1527,7 @@ function drawOverview(){
   for(const key of Object.keys(s.worldRoads||{})){
    const[a,b]=roadPoints(key),level=roadLevel(roadStrength(s,a,b,s.time));
    if(!level||!game.seen(0,a)||!game.seen(0,b))continue;
-   base.strokeStyle='#bc995f';base.lineWidth=level>=4?.75:.5; // V250: one road look, highway wider
+   base.strokeStyle=['','#a57941','#bc995f','#dac18c','#eadbc1'][level];base.lineWidth=[0,.35,.5,.6,.9][level]; // V251: levels again, highway widest
    base.beginPath();base.moveTo(a.c*2+1,a.r*2+1);base.lineTo(b.c*2+1,b.r*2+1);base.stroke();
   }
   for(const key of Object.keys(s.railEdges||{})){

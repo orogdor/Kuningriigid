@@ -1,0 +1,16 @@
+<!doctype html><meta charset="utf-8"><title>V251 town lights by era</title>
+<style>html,body{margin:0;background:#0b0f16}</style>
+<script>(function(){var gpu=new URLSearchParams(location.search).get('gpu')==='1';var m=document.createElement('script');m.type='importmap';
+m.textContent=JSON.stringify({imports:{'./vendor/three.module.js':gpu?'../../vendor/three-gpu-shim.js?v=245':'../../vendor/three.module.js','../../vendor/three.module.js':gpu?'../../vendor/three-gpu-shim.js?v=245':'../../vendor/three.module.js'}});document.currentScript.after(m);})();</script>
+<script type="module">
+// V251 check: torch, oil lantern, gas lamp and electric light at night, WebGL (?gpu=0) and WebGPU (?gpu=1).
+import * as T from '../../vendor/three.module.js';
+import {createCityTorchesV235,updateCityTorchesV235} from '../../daynight-v235.js';
+const r=new T.WebGLRenderer({antialias:true});r.setSize(innerWidth,innerHeight);document.body.appendChild(r.domElement);
+const scene=new T.Scene();scene.background=new T.Color('#0b0f16');scene.add(new T.HemisphereLight(0x223355,0x111111,.6));
+const ground=new T.Mesh(new T.PlaneGeometry(80,40),new T.MeshStandardMaterial({color:'#4a4036',roughness:1}));ground.rotation.x=-Math.PI/2;scene.add(ground);
+const groups=[0,4,5,6].map((age,i)=>{const g=createCityTorchesV235([{type:'house',x:0,z:-3.5,ready:true,hp:1}],()=>0,{age});g.position.x=(i-1.5)*8;scene.add(g);return g;});
+const cam=new T.PerspectiveCamera(40,innerWidth/innerHeight,.1,200);cam.position.set(0,7,17);cam.lookAt(0,2.5,0);
+(async()=>{if(r.readyV225)await r.readyV225;for(let f=0;f<6;f++){for(const g of groups)updateCityTorchesV235(g,{torch:1},f*.1+1);r.render(scene,cam);await new Promise(q=>requestAnimationFrame(q));}
+ window.V251_DONE=window.KINGDOMS_GPU_V225?.backend||'webgl';})().catch(e=>{console.error(e);window.V251_DONE='error '+e.message;});
+</script>

@@ -1,5 +1,5 @@
 import {detailWorldRoadWidth,roadWidthScaleV250} from './road-width-v89.js';
-import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216} from './road-appearance-v216.js';
+import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216,roadSurfaceV251} from './road-appearance-v216.js';
 import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 // V67: one topology for each river system and each road network. The atlas
 // and detailed view are different projections of exactly the same vertices,
@@ -17,7 +17,7 @@ const vp=(game,y,view,x,z)=>view==='detail'?visualProject(game,y,x,z):projectHei
 const pos=(game,x,z,y,view,tile)=>({...field(game,x,z,view,tile),y:vp(game,y,view,x,z)});
 function join(pts,game,scope,tile,kind,level=1,age=0,ground=null){
  // V149: atlas roads are drawn wider so they read at map scale (centre lines are unchanged).
- const isRiver=kind==='river',wBase=isRiver?0:1.1*roadWidthScaleV250(level),out=[]; // V250: one road look, highway 1.5× wider
+ const isRiver=kind==='river',wBase=isRiver?0:1.1*roadWidthScaleV250(level),out=[]; // V251: width by traffic level, highway 1.5×
  for(let i=0;i<pts.length;i++){
   const p=pts[i],before=pts[Math.max(0,i-1)],after=pts[Math.min(pts.length-1,i+1)];
   const tX=after.x-before.x,tZ=after.z-before.z,d=Math.hypot(tX,tZ)||1;
@@ -322,8 +322,8 @@ export function createUnifiedRoadNetwork(game,scope='world',tile=null,obstacles=
   const roadTeam=scope==='detail'?owner?.team:
    (game.territoryOwner?.(edge.a)?.team??game.territoryOwner?.(edge.b)?.team??0);
   const roadAge=game.s.ages?.[roadTeam??0]??0;
-  // V250: all roads share the ordinary (gravel) surface; the traffic level only sets the width
-  const surfaceLevel=2;
+  // V251: surface by era and traffic level; +10 marks a highway (centre line on modern roads)
+  const surfaceLevel=roadSurfaceV251(edge.level,roadAge)+(edge.level>=4?10:0);
   const xs=join(pts,game,scope,tile,'road',edge.level,roadAge,ground);
   if(routed)for(const x of xs)if(nav.open(x.m.x,x.m.z))adjustRibbonForNavV182(x,nav);
   let along=0,base=pos.length/3;

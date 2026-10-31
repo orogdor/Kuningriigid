@@ -11,6 +11,8 @@ export const WIND_TIME_V226={value:0};
 export const CLOUD_SHADE_V226={value:1};
 export const TERRAIN_BLEND_V226={value:1};
 export const SEA_EFFECT_V226={value:1};
+// V251: the sky colour reflected by river water (horizon blended toward the zenith), follows the day cycle
+export const WATER_SKY_V251={value:new T.Color('#b9cbd2')};
 function skyDome(top,horizon,ground){
  const geo=new T.SphereGeometry(9000,32,16);
  if(T.GPU_MODE_V225){ // V225: the same gradient sky as a node material for the WebGPU renderer
@@ -81,6 +83,7 @@ export function setupAtmosphere({renderer,worldScene,localScene,quality}){
   }
   if(scene.fog)scene.fog.color.copy(colorFogNight).lerp(colorFogDay,clock.daylight);
   if(scene.background?.isColor)scene.background.copy(skyHorizon);
+  WATER_SKY_V251.value.copy(skyHorizon).lerp(skyTop,.45);
   const shadowRange={near:.6,medium:1,far:1.45}[settings.shadowDistance]||1;
   const extent=(rig.local?Math.max(60,Math.min(300,zoom*1.15)):Math.max(120,Math.min(520,zoom*.9)))*shadowRange;
   rig.sun.target.position.copy(focus);rig.sun.position.copy(focus).addScaledVector(sunDir,extent*2.6);

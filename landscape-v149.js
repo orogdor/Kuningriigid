@@ -6,7 +6,7 @@
 import * as T from './vendor/three.module.js';
 import {groundUniforms232,GROUND_GLSL232} from './ground-materials-v232.js';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
-import {CLOUD_TIME,CLOUD_SHADE_V226,TERRAIN_BLEND_V226} from './atmosphere-v158.js?v=161a';
+import {CLOUD_TIME,CLOUD_SHADE_V226,TERRAIN_BLEND_V226,WATER_SKY_V251} from './atmosphere-v158.js?v=161a';
 
 export const LANDSCAPE_TIME={value:0};
 const tick=()=>{LANDSCAPE_TIME.value=performance.now()/1000;};
@@ -175,10 +175,10 @@ export function smoothedOverview(sample,x,z,spacing){
 // attributes: aFlow (downstream direction * relative speed), aShore (0 mid-channel .. 1 at the bank)
 export function waterMaterial(scope='world',tile=null){
  // V249: transparent, so river water can thin out into the sea (alpha comes from the vertex colours)
- const material=new T.MeshStandardMaterial({vertexColors:true,roughness:.16,metalness:.04,side:T.DoubleSide,transparent:true,depthWrite:false});
+ const material=new T.MeshStandardMaterial({vertexColors:true,roughness:.14,metalness:.02,side:T.DoubleSide,transparent:true,depthWrite:false});
  const map=worldMapping(scope,tile);
  material.onBeforeCompile=shader=>{
-  shader.uniforms.uL149Time=LANDSCAPE_TIME;
+  shader.uniforms.uL149Time=LANDSCAPE_TIME;shader.uniforms.uWaterSky=WATER_SKY_V251;
   inject(shader,{map,
    vertexHead:'attribute vec2 aFlow;attribute float aShore;varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;',
    vertexBody:`vL149P=${map.pos};vL149F=aFlow;vL149S=aShore;`,
@@ -202,11 +202,23 @@ export function waterMaterial(scope='world',tile=null){
  water=mix(water,vec3(.70,.74,.70),foam*.22);
  diffuseColor.rgb=water;
  vL149Ripple=ripple;`});
-  shader.fragmentShader=shader.fragmentShader.replace('uniform float uL149Time;','uniform float uL149Time;float vL149Ripple=0.0;')
+  shader.fragmentShader=shader.fragmentShader.replace('uniform float uL149Time;','uniform float uL149Time;uniform vec3 uWaterSky;float vL149Ripple=0.0;vec2 vL251Grad=vec2(0.0);')
+   .replace('diffuseColor.rgb=water;',`diffuseColor.rgb=water;
+ // V251: ripple slope from the same flow-mapped noise (finite differences), for lit, moving wavelets
+ {float e=.35;vec2 a1=(wp-o1)*.45,a2=(wp-o2)*.45+5.3,b1=(wp-o1*1.6)*1.15+7.1,b2=(wp-o2*1.6)*1.15+2.9;
+  float rx=mix(l149n(a1+vec2(e,0.0)),l149n(a2+vec2(e,0.0)),mixw)*.6+mix(l149n(b1+vec2(e*2.5,0.0)),l149n(b2+vec2(e*2.5,0.0)),mixw)*.4;
+  float rz=mix(l149n(a1+vec2(0.0,e)),l149n(a2+vec2(0.0,e)),mixw)*.6+mix(l149n(b1+vec2(0.0,e*2.5)),l149n(b2+vec2(0.0,e*2.5)),mixw)*.4;
+  vL251Grad=vec2(rx-ripple,rz-ripple)/e;}`)
    .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
- normal=normalize(normal+vec3(vL149Ripple-.5,0.0,.5-vL149Ripple)*.12);`);
+ // world-space wavelet normal (water is level) turned into view space
+ normal=normalize((viewMatrix*vec4(normalize(vec3(-vL251Grad.x*.32,1.0,-vL251Grad.y*.32)),0.0)).xyz);`)
+   .replace('#include <opaque_fragment>',`// V251: Fresnel reflection of the sky: glassy at grazing angles, clear looking straight down
+ {vec3 V=normalize(vViewPosition);float cosT=clamp(dot(V,normal),0.0,1.0);float fres=.03+.97*pow(1.0-cosT,5.0);
+  outgoingLight=mix(outgoingLight,uWaterSky*(.78+.22*vL149Ripple),clamp(fres*.75,0.0,.75));
+  diffuseColor.a=clamp(diffuseColor.a+fres*.35,0.0,1.0);}
+#include <opaque_fragment>`);
  };
- material.customProgramCacheKey=()=>'water-v149-v161-'+scope;
+ material.customProgramCacheKey=()=>'water-v251-'+scope;
  material.userData.animated=true;
  return material;
 }
@@ -226,48 +238,81 @@ export function roadMaterial(scope='world',tile=null){
    vertexBody:`vL149P=${map.pos};vL149U=uv;vL149L=aLevel;`,
    fragHead:'varying vec3 vL149P;varying vec2 vL149U;varying float vL149L;',
    color:`
- float u=vL149U.x,v=vL149U.y,au=abs(u);float lvl=floor(vL149L+.5);
+ // V251: era-appropriate road surfaces. aLevel = surface (1..7) + 10 for a highway (traffic level 4).
+ //  1 footpath (Stone Age, no wheels yet)  2 cart track with wheel ruts  3 gravel road with crown and ditches
+ //  4 cobblestones  5 dressed stone setts with kerbs  6 macadam (crushed stone)  7 asphalt (centre line on highways)
+ float u=vL149U.x,v=vL149U.y,au=abs(u);float code=floor(vL149L+.5);float hw=step(9.5,code);float sf=code-hw*10.0;
  vec2 wp=vL149P.xz;float n=l149n(wp*${detail?'.9':'.35'}),nf=l149n(wp*${detail?'4.0':'1.2'}+5.0);
  vec3 dirt=${detail?'vec3(.39,.32,.23)':'vec3(.45,.38,.28)'}*(.86+n*.22);
- vec3 col=dirt;
- if(lvl<1.5){ // dirt track: two wheel ruts, grassy crown
-  // V223: ruts wander slowly with the ground rather than following two ruler-straight lines.
+ vec3 grass=vec3(.29,.35,.23);
+ vec3 col=dirt;float paved=0.0;
+ if(sf<1.5){ // footpath: a trodden earth line, worn darker in the middle, grass closing in
+  float wear=1.0-smoothstep(.15,.75,au+(n-.5)*.25);
+  col=mix(mix(dirt,grass,.35),dirt*.92,wear);
+  col*=.92+.10*l149n(wp*2.3+1.7);
+ }else if(sf<2.5){ // cart track: two wheel ruts, grassy crown
   float bend=(l149n(wp*.20+vec2(4.0,9.0))-.5)*.12;
   float rut=1.0-smoothstep(.055,.18,abs(au-(.47+bend)));
   float rut2=1.0-smoothstep(.065,.21,abs(au-(.67+bend*.6)));
   col*=1.0-(rut+rut2)*.19;
-  col=mix(col,vec3(.25,.30,.18)*(.85+nf*.25),(1.0-smoothstep(0.0,.28,au))*.45);
-  float gravelPatch=smoothstep(.64,.79,l149n(wp*.45+vec2(9.0,4.0)));
-  col=mix(col,vec3(.48,.42,.32)*(.8+nf*.25),gravelPatch*.22);
+  col=mix(col,grass*(.85+nf*.25),(1.0-smoothstep(0.0,.28,au))*.45);
   col*=.90+.12*l149n(wp*1.65+3.1);
- }else if(lvl<2.5){ // gravel
-  col=mix(vec3(.42,.38,.29),vec3(.32,.30,.25),nf)*(.88+n*.20);
-  float rut=1.0-smoothstep(.08,.22,abs(au-.52));col*=1.0-rut*.12;
- }else if(${detail?'false':'true'}){ // V157 world map: paved roads read as smooth grey-brown bands, not tiles
-  col=mix(vec3(.47,.44,.38),vec3(.40,.38,.34),nf)*(.93+n*.10);
-  col=mix(col,col*.82,smoothstep(.70,.95,au));
- }else{ // cobbles (3) / flagstones (4)
-  vec2 cell=lvl<3.5?vec2(u*3.2,v*${detail?'1.6':'.55'}):vec2(u*1.6,v*${detail?'.8':'.28'});
-  cell.x+=floor(cell.y)*.5;
-  vec2 f=fract(cell)-.5;float stone=l149h(floor(cell));
-  float joint=smoothstep(.40,.48,max(abs(f.x),abs(f.y)));
-  vec3 rock=lvl<3.5?mix(vec3(.36,.35,.32),vec3(.47,.45,.40),stone):mix(vec3(.44,.43,.40),vec3(.53,.51,.47),stone);
-  col=mix(rock*(.9+nf*.15),vec3(.22,.21,.18),joint*.75);
+ }else if(sf<3.5){ // gravel: pebbles, lighter cambered crown, darker ditches
+  float peb=${detail?'l149h(floor(wp*7.0))':'.5'};
+  col=mix(vec3(.47,.43,.35),vec3(.36,.34,.29),nf)*(.86+peb*.22);
+  col*=1.06-.14*smoothstep(.15,.9,au);
+  col=mix(col,vec3(.30,.28,.22),smoothstep(.86,1.0,au)*.55);
+  float track=1.0-smoothstep(.06,.2,abs(au-.45));col*=1.0-track*.07;
+ }else if(sf<4.5){ // cobblestones: rounded, uneven, earth in the joints
+  paved=1.0;
+  // packed irregular stones: Voronoi cells around jittered centres, narrow earthy joints
+  vec2 g=vec2(u*4.0,v*${detail?'2.3':'.9'});vec2 gi=floor(g),gf=fract(g);float d1=8.0,d2=8.0;vec2 sid=vec2(0.0);
+  for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec2 o=vec2(float(i),float(j));vec2 c=o+.5+(vec2(l149h(gi+o),l149h(gi+o+7.3))-.5)*.7;
+   float d=length((gf-c)*vec2(1.0,1.1));if(d<d1){d2=d1;d1=d;sid=gi+o;}else if(d<d2)d2=d;}
+  float stone=l149h(sid+3.1),edge=d2-d1;
+  vec3 rock=mix(vec3(.36,.34,.30),vec3(.52,.49,.43),stone)*(.9+nf*.14);
+  rock*=.86+.22*smoothstep(.0,.35,edge); // rounded tops catch the light
+  col=mix(vec3(.21,.19,.15),rock,smoothstep(.03,.09,edge));
+ }else if(sf<5.5){ // dressed setts in running bond between kerbstones
+  paved=1.0;
+  vec2 g=vec2(u*5.0,v*${detail?'2.6':'1.0'});g.x+=floor(g.y)*.5;vec2 id=floor(g),f=fract(g)-.5;
+  float stone=l149h(id);vec3 rock=mix(vec3(.50,.47,.42),vec3(.60,.57,.51),stone)*(.92+nf*.12);
+  float joint=max(smoothstep(.42,.48,abs(f.x)),smoothstep(.40,.48,abs(f.y)));
+  col=mix(rock,vec3(.26,.24,.21),joint*.85);
+  float kerb=smoothstep(.84,.88,au)*(1.0-smoothstep(1.0,1.04,au));
+  col=mix(col,vec3(.62,.60,.56)*(.9+nf*.15),kerb);
+ }else if(sf<6.5){ // macadam: compacted crushed stone, paler wheel bands, kerbs
+  paved=1.0;
+  float grit=${detail?'l149h(floor(wp*11.0))':'.5'};
+  col=vec3(.43,.42,.40)*(.88+grit*.18+nf*.06);
+  float band=1.0-smoothstep(.07,.22,abs(au-.42));col*=1.0+band*.07;
+  float kerb=smoothstep(.88,.92,au)*(1.0-smoothstep(1.0,1.04,au));
+  col=mix(col,vec3(.58,.57,.54),kerb*.8);
+ }else{ // asphalt with a white edge line; dashed centre line on highways
+  paved=1.0;
+  float agg=${detail?'l149h(floor(wp*14.0))':'.5'};
+  col=vec3(.21,.215,.22)*(.9+agg*.16+nf*.08);
+  float patchy=smoothstep(.70,.80,l149n(wp*.35+vec2(3.0,1.0)));col=mix(col,col*.80,patchy*.5);
+  float worn=1.0-smoothstep(.06,.2,abs(au-.45));col*=1.0+worn*.10;
+  float edgeLine=smoothstep(.86,.875,au)*(1.0-smoothstep(.905,.92,au));
+  col=mix(col,vec3(.86,.85,.80),edgeLine*.85);
+  float dash=step(.5,fract(v*${detail?'.08':'.04'}));
+  float centre=(1.0-smoothstep(.018,.035,au))*dash*hw;
+  col=mix(col,vec3(.90,.85,.55),centre*.9);
  }
- // V223: irregular damp stretches and dusty patches cross the whole road.
- // The low-frequency pattern remains stationary in world space, including tile seams.
+ // irregular damp stretches and dust, stationary in world space across tile seams
  float damp=smoothstep(.58,.85,l149n(wp*.092+vec2(18.2,3.7))*.65+l149n(wp*.22+8.2)*.35);
- col=mix(col,col*vec3(.77,.79,.80),damp*.30);
- // shoulders: trodden earth breaking into grass
- float fray=l149n(wp*1.6+vec2(12.3,4.9))*.20+l149n(wp*3.8-vec2(1.1,8.6))*.08;
- float shoulder=smoothstep(.77+fray,1.13+fray,au);
- col=mix(col,mix(dirt,vec3(.29,.35,.23),smoothstep(1.04,1.5,au)),shoulder);
- float a=1.0-smoothstep(.94+fray,1.42+fray,au);
+ col=mix(col,col*vec3(.77,.79,.80),damp*(.30-paved*.15));
+ // shoulders: unpaved roads fray into grass, paved roads end at a firm edge
+ float fray=(l149n(wp*1.6+vec2(12.3,4.9))*.20+l149n(wp*3.8-vec2(1.1,8.6))*.08)*(1.0-paved*.75);
+ float shoulder=smoothstep(.77+fray+paved*.18,1.13+fray,au);
+ col=mix(col,mix(dirt,grass,smoothstep(1.04,1.5,au)),shoulder);
+ float a=1.0-smoothstep(.94+fray,1.42+fray-paved*.2,au);
  a*=.92+.07*l149n(wp*1.8);
- a*=lvl<1.5?.86:.95;
+ a*=sf<1.5?.78:sf<2.5?.86:.96;
  diffuseColor=vec4(col,a);`});
  };
- material.customProgramCacheKey=()=>'road-v223-natural-'+scope;
+ material.customProgramCacheKey=()=>'road-v251-eras-'+scope;
  return material;
 }
 
