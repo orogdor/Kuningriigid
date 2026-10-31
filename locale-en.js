@@ -1226,6 +1226,10 @@ export const ENGLISH_PAIRS=[
   "World Type"
  ],
  [
+  "Loogiline maailm: laamad ja kliima (uus)",
+  "Logical World: Plates and Climate (new)"
+ ],
+ [
   "Juhuslikud 2–4 kontinenti",
   "Random 2–4 Continents"
  ],
