@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>V247 Chrome WebGPU test</title>
+<style>body{margin:0;background:#222;color:#eee;font:14px system-ui}canvas{width:960px;height:540px;display:block}pre{padding:8px}</style>
+<pre id="out">Töötab… (umbes 10–30 s)</pre>
+<script type="module">
+// V247: the same test scene and loop as bench-deno.js, in the browser (1920×1080 canvas, shown at half size).
+import * as T from '../../vendor/three.webgpu.js';
+import {buildScene,runBench} from './scene.js';
+const QUICK=location.search.includes('quick'),W=QUICK?320:1920,H=QUICK?180:1080,out=document.getElementById('out');
+try{
+ const adapter=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});
+ const device=await adapter.requestDevice({requiredLimits:{maxBufferSize:adapter.limits.maxBufferSize,maxStorageBufferBindingSize:adapter.limits.maxStorageBufferBindingSize}});
+ const renderer=new T.WebGPURenderer({device,antialias:true});document.body.appendChild(renderer.domElement);
+ await renderer.init();renderer.setPixelRatio(1);renderer.setSize(W,H,false);renderer.shadowMap.enabled=true;
+ const head='Chrome '+(navigator.userAgent.match(/Chrome\/(\S+)/)?.[1]||'?')+' | GPU: '+JSON.stringify(adapter.info||{});
+ const r=await runBench(renderer,device,buildScene(T,{width:W,height:H}),{log:()=>{},...(QUICK?{frames:5,warmup:1}:{})});
+ out.textContent=head+'\n'+JSON.stringify(r,null,1);window.V247_RESULT=r;
+}catch(e){out.textContent='Viga: '+e.message;window.V247_RESULT={error:e.message};}
+</script>
