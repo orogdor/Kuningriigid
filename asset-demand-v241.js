@@ -1,6 +1,6 @@
 // Only presentation assets are gated. Simulation/research rules stay available.
 import {loadSoldierV241,V148_KINDS} from './soldier-models-v148.js?v=234';
-import {hasTrellisStoneV259,loadTrellisStoneV259} from './stone-trellis-v259.js';
+import {hasTrellisStoneV259,loadTrellisStoneV259} from './stone-trellis-v259.js?v=260';
 import {detailedAsset} from './stone-near-lod.js?v=224';
 import {V118_ERA_IDS} from './tech-tree-data-v118.js?v=118a';
 const stone={hall:'peamaja',house:'house',lumber:'lumber',quarry:'quarry',well:'well',farm:'farm',
