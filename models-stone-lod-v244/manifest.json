@@ -2,11 +2,11 @@
  "note": "V244: bounding box of the original detailed GLB, so mid/far files sit exactly where the detailed model sits",
  "levels": {
   "mid": {
-   "triangles": 20000,
-   "texture": 1024
+   "triangles": "25% of the original, at least 20000",
+   "texture": "none: uses the detailed GLB material (same uv atlas)"
   },
   "far": {
-   "triangles": 6000,
+   "triangles": "6% of the original, at least 6000",
    "texture": 512
   }
  },

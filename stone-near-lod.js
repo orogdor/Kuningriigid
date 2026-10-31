@@ -183,7 +183,10 @@ export function withStoneBuildingLOD(low,type,size,seed=0){
    g.computeBoundingBox();g.computeBoundingSphere();g.userData.normalizedV244=true;g.userData.shared=true;
   }
   const box=asset.box.getSize(new T.Vector3()),extent=['lumber','house','farm'].includes(type)?new T.Vector3(box.z,box.y,box.x):box;
-  const mesh=new T.Mesh(g,asset.material);
+  // V244: the middle level keeps the ORIGINAL uv atlas, so it uses the detailed model's own PBR material
+  // (texture + roughness/metalness maps) and looks the same; the far level uses its own small texture.
+  const material=level==='mid'?(await detailedAsset(name)).material:asset.material;
+  const mesh=new T.Mesh(g,material);
   if(!applyStoneSize(mesh,type,extent,seed))mesh.scale.setScalar(size/Math.max(extent.x,extent.z)*(type==='house'?.94+((seed>>>3)%7)*.02:1));
   mesh.castShadow=level==='mid';mesh.receiveShadow=true;mesh.userData.stoneDetailedAsset=name;mesh.userData.stoneBakedLevelV244=level;
   if(level==='far')mesh.userData.stoneFarDerivedFromDetail=true;

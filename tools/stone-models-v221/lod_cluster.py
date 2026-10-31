@@ -62,8 +62,10 @@ if __name__=='__main__':
     # clustering flips some small triangles; a flipped one shows its dark back side (DoubleSide
     # material), which looked like dark speckles on thatch. Re-orient each triangle to agree with
     # the averaged original normals of its corners.
+    if cells<0: flip_fix=False
+    else: flip_fix=True
     face=np.cross(P[F[:,1]]-P[F[:,0]],P[F[:,2]]-P[F[:,0]]);flip=(face*(N[F[:,0]]+N[F[:,1]]+N[F[:,2]])).sum(1)<0
-    F[flip]=F[flip][:,[0,2,1]]
+    if flip_fix: F[flip]=F[flip][:,[0,2,1]]  # QEM keeps the original winding (its own flip test)
     print('re-oriented',int(flip.sum()),'of',len(F))
     img=m['images'].get('base');
     if img is not None and max(img.size)>px:img=img.resize((px,px),Image.LANCZOS)
