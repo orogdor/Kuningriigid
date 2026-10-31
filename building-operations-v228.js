@@ -13,9 +13,10 @@ export function rotateBuilding(game,ctx,b){
  if(b.wallUpgradeV184)return {error:'Oota müüri uuendamise lõppu.'};
  if(game.wallGuards?.(ctx,b)?.length)return {error:'Kutsu esmalt müüril olevad sõdurid tagasi.'};
  const candidate={...b},old=buildingClearance(b);
- if(b.type==='field'){const d=fieldSize(b);candidate.width=d.depth;candidate.depth=d.width;candidate.buildingRotationV228=((b.buildingRotationV228||0)+Math.PI/2)%(2*Math.PI);const check={...ctx,economy:{...ctx.economy,buildings:ctx.economy.buildings.filter(x=>x!==b)}};const error=validateField(check,candidate,game.nav(ctx).passable);if(error)return {error};Object.assign(b,candidate);changed(game,ctx);return {ok:true};}
+ if(b.type==='field'){const d=fieldSize(b);candidate.width=b.freeRotationV243?d.width:d.depth;candidate.depth=b.freeRotationV243?d.depth:d.width;candidate.buildingRotationV228=((b.buildingRotationV228||0)+Math.PI/2)%(2*Math.PI);const check={...ctx,economy:{...ctx.economy,buildings:ctx.economy.buildings.filter(x=>x!==b)}};const error=validateField(check,candidate,game.nav(ctx).passable);if(error)return {error};Object.assign(b,candidate);changed(game,ctx);return {ok:true};}
  if(WALLS.has(b.type)||GATES.has(b.type)){
   candidate.wallAngleV175=(Number.isFinite(b.wallAngleV175)?b.wallAngleV175:(b.wallAxis?Math.PI/2:0))+Math.PI/2;
+  if(Number.isFinite(b.buildingRotationV228))candidate.buildingRotationV228=(b.buildingRotationV228+Math.PI/2)%(2*Math.PI);
   candidate.wallAxis=b.wallAxis?0:1;
   if(WALLS.has(b.type)){candidate.navWidth=0;candidate.navDepth=0;configureWallFootprint(candidate)}
  }else candidate.buildingRotationV228=((b.buildingRotationV228||0)+Math.PI/2)%(2*Math.PI);

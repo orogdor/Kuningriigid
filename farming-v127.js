@@ -5,7 +5,7 @@ export function fieldRect(a,b){
  return {x:Math.round((a.x+b.x)/4)*2,z:Math.round((a.z+b.z)/4)*2,width,depth};
 }
 export const fieldSize=b=>({width:b.width??AI_FIELD_WIDTH,depth:b.depth??AI_FIELD_DEPTH});
-export function fieldContains(field,p,margin=0){const {width,depth}=fieldSize(field);return Math.abs(field.x-p.x)<width/2+margin&&Math.abs(field.z-p.z)<depth/2+margin;}
+export function fieldContains(field,p,margin=0){const {width,depth}=fieldSize(field),angle=field.freeRotationV243?(field.buildingRotationV228||0):0,c=Math.cos(angle),s=Math.sin(angle),dx=p.x-field.x,dz=p.z-field.z;return Math.abs(dx*c-dz*s)<width/2+margin&&Math.abs(dx*s+dz*c)<depth/2+margin;}
 export function farmingProfile(age,known=[],powered=false){
  const has=id=>known.includes(id);
  if(age>=6&&has('combustion')&&powered)return {id:'tractor',name:'Traktor ja kombain',speed:5,areaPerWorker:768,output:2.8};
@@ -39,7 +39,8 @@ export function farmWork(game,ctx,farm,dt){
   const w=world.workers[id]??={x:farm.x,z:farm.z+6,team:ctx.team,kind:'farm',building:index,row:i,pass:0};
   w.visible=true;w.equipment=profile.id;
   const rows=Math.max(1,Math.floor((size.depth-4)/3)),row=(w.row||0)%rows;
-  const target={x:field.x+(w.pass%2?1:-1)*(size.width/2-2),z:field.z-size.depth/2+2+row*3};
+  const x=(w.pass%2?1:-1)*(size.width/2-2),z=-size.depth/2+2+row*3,angle=field.freeRotationV243?(field.buildingRotationV228||0):0,c=Math.cos(angle),s=Math.sin(angle);
+  const target={x:field.x+x*c+z*s,z:field.z-x*s+z*c};
   const point=nav.nearest(target,4);if(!point)continue;
   const movingDistance=Math.hypot(w.x-point.x,w.z-point.z);
   if(!nav.moveCitizen(w,point,dt,profile.speed)){w.working=fieldContains(field,w);w.action=w.working?'farm':null;}
@@ -56,11 +57,13 @@ export function farmWork(game,ctx,farm,dt){
 export function validateField(ctx,p,passable){
  const {width,depth}=fieldSize(p);
  if(!Number.isFinite(p.x)||!Number.isFinite(p.z)||!Number.isFinite(width)||!Number.isFinite(depth)||width<FIELD_MIN||depth<FIELD_MIN||width>FIELD_MAX||depth>FIELD_MAX)return 'Põllu küljed peavad olema 8–64 ühikut. Lohista väiksem ristkülik.';
- if(Math.abs(p.x)+width/2>DETAIL_HALF_X-4||Math.abs(p.z)+depth/2>DETAIL_HALF_Z-4)return 'Põld peab mahtuma ühele detailkaardile.';
- for(let x=-width/2;x<=width/2;x+=2)for(let z=-depth/2;z<=depth/2;z+=2)if(!passable(p.x+x,p.z+z))return 'Kogu põld peab olema kuival ja ligipääsetaval maal.';
+ const angle=p.freeRotationV243?(p.buildingRotationV228||0):0,c=Math.cos(angle),s=Math.sin(angle),rx=Math.abs(c)*width/2+Math.abs(s)*depth/2,rz=Math.abs(s)*width/2+Math.abs(c)*depth/2;
+ if(Math.abs(p.x)+rx>DETAIL_HALF_X-4||Math.abs(p.z)+rz>DETAIL_HALF_Z-4)return 'Põld peab mahtuma ühele detailkaardile.';
+ for(let x=-width/2;x<=width/2;x+=2)for(let z=-depth/2;z<=depth/2;z+=2)if(!passable(p.x+x*c+z*s,p.z-x*s+z*c))return 'Kogu põld peab olema kuival ja ligipääsetaval maal.';
  for(const b of ctx.economy.buildings.filter(b=>!b.virtual&&b.hp>0)){
   const d=b.type==='field'?fieldSize(b):b.type==='market'?{width:24,depth:23}:{width:12,depth:12};
-  if(Math.abs(b.x-p.x)<(width+d.width)/2+1&&Math.abs(b.z-p.z)<(depth+d.depth)/2+1)return 'Põld kattub teise põllu või hoonega.';
+  const ba=b.freeRotationV243?(b.buildingRotationV228||0):0,bc=Math.abs(Math.cos(ba)),bs=Math.abs(Math.sin(ba)),brx=(d.width*bc+d.depth*bs)/2,brz=(d.width*bs+d.depth*bc)/2;
+  if(Math.abs(b.x-p.x)<rx+brx+1&&Math.abs(b.z-p.z)<rz+brz+1)return 'Põld kattub teise põllu või hoonega.';
  }
  if(ctx.world.resources.some(r=>r.depositSite&&!r.removed&&fieldContains(p,r,3)))return 'Maardla peale ei saa põldu rajada.';
  return '';

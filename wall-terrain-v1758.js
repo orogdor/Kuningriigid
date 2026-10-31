@@ -48,11 +48,21 @@ export function wallTerrainErrorV1758(wall,passable,height){
 // six-metre building spacing would reject a paid 4-5m shoreline section.
 export function wallEndJoinV1758(a,b){
  const gates=['woodgate','gatehouse'];
+ const towers=['watchtower','stonetower'];
+ if(towers.includes(a.type)&&b.drawnWallV175)return wallEndJoinV1758(b,a);
+ if(a.drawnWallV175&&towers.includes(b.type)){
+  const angle=a.wallAngleV175??(a.wallAxis?Math.PI/2:0),half=(a.palisadeSpanV167||7)/2;
+  const ends=[-1,1].map(sign=>({x:a.x+sign*Math.cos(angle)*half,z:a.z-sign*Math.sin(angle)*half}));
+  const towerAngle=b.buildingRotationV228??0,c=Math.cos(towerAngle),s=Math.sin(towerAngle);
+  const local=p=>({x:(p.x-b.x)*c-(p.z-b.z)*s,z:(p.x-b.x)*s+(p.z-b.z)*c});
+  const inside=p=>Math.max(Math.abs(p.x),Math.abs(p.z))<3.7;
+  return ends.some((p,i)=>{const q=local(p),other=local(ends[1-i]);if(Math.max(Math.abs(q.x),Math.abs(q.z))<3.2||Math.max(Math.abs(q.x),Math.abs(q.z))>5.5||inside(other))return false;for(let j=1;j<20;j++)if(inside({x:q.x+(other.x-q.x)*j/20,z:q.z+(other.z-q.z)*j/20}))return false;return true;});
+ }
  if(gates.includes(a.type)&&b.drawnWallV175)return wallEndJoinV1758(b,a);
  if(!a.drawnWallV175||(!b.drawnWallV175&&!gates.includes(b.type)))return false;
- const angle=b.wallAngleV175??(b.wallAxis?Math.PI/2:0),dx=a.x-b.x,dz=a.z-b.z;
+ const angle=b.buildingRotationV228??b.wallAngleV175??(b.wallAxis?Math.PI/2:0),dx=a.x-b.x,dz=a.z-b.z;
  if(Math.abs(dx*Math.cos(angle)-dz*Math.sin(angle))<(b.palisadeSpanV167||7)/2-.8&&Math.abs(dx*Math.sin(angle)+dz*Math.cos(angle))<.4)return false;
- const ends=w=>{const angle=w.wallAngleV175??(w.wallAxis?Math.PI/2:0),half=(w.palisadeSpanV167||7)/2;
+ const ends=w=>{const angle=w.buildingRotationV228??w.wallAngleV175??(w.wallAxis?Math.PI/2:0),half=(w.palisadeSpanV167||(w.extendedPalisadeV166?14:7))/2;
   return [-1,1].map(sign=>({x:w.x+sign*Math.cos(angle)*half,z:w.z-sign*Math.sin(angle)*half}));};
  return ends(a).some(p=>ends(b).some(q=>Math.hypot(p.x-q.x,p.z-q.z)<=.8));
 }

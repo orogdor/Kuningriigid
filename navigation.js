@@ -23,7 +23,7 @@ const FOOTPRINTS=Object.freeze({
 });
 export function buildingClearance(b){
  if(!b||b.type==='bridge'||b.type==='field')return null;
- if(b.bronzeWall&&b.type==='gatehouse')return {rx:b.wallAxis?2.2:3.5,rz:b.wallAxis?3.5:2.2};
+ if(b.bronzeWall&&b.type==='gatehouse'){if(Number.isFinite(b.buildingRotationV228)){const c=Math.abs(Math.cos(b.buildingRotationV228)),s=Math.abs(Math.sin(b.buildingRotationV228));return {rx:3.5*c+2.2*s,rz:3.5*s+2.2*c};}return {rx:b.wallAxis?2.2:3.5,rz:b.wallAxis?3.5:2.2};}
  if(b.bronzeWall&&b.type==='stonetower')return {rx:2.4,rz:2.4};
  // Fortification walls are thin *oriented segments*, not wide buildings.
  // The fortification controller supplies these half-extents according to

@@ -7,6 +7,26 @@ export const WALL_DRAW_V175=Object.freeze({spacing:7,maxSegments:10,minLength:3,
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t});
 export const isDrawableWallV175=type=>['palisade','stonewall','reinforced_wall'].includes(type);
+// Snap only the two ends of a stroke. Gate centres remain open for traffic.
+export function snapWallEndsV243(points,buildings,range=4){
+ if(points.length<2)return points;
+ const result=points.map(p=>({...p}));
+ for(const i of [0,result.length-1]){
+  const p=result[i],other=result[i===0?result.length-1:0];let best=null,bestScore=Infinity;
+  for(const b of buildings){
+   if(b.hp<=0||b.virtual||!['watchtower','stonetower','woodgate','gatehouse'].includes(b.type))continue;
+   const angle=b.buildingRotationV228??b.wallAngleV175??(b.wallAxis?Math.PI/2:0),c=Math.cos(angle),s=Math.sin(angle),dx=p.x-b.x,dz=p.z-b.z;
+   const x=dx*c-dz*s,z=dx*s+dz*c;let candidates;
+   const gate=['woodgate','gatehouse'].includes(b.type),h=gate?(b.extendedPalisadeV166?7:3.5):4.7;
+   if(gate)candidates=[{x:-h,z:0},{x:h,z:0}];
+   else candidates=[{x:-h,z:Math.max(-h,Math.min(h,z))},{x:h,z:Math.max(-h,Math.min(h,z))},{x:Math.max(-h,Math.min(h,x)),z:-h},{x:Math.max(-h,Math.min(h,x)),z:h}];
+   const inside=gate?Math.abs(x)<=h&&Math.abs(z)<=2:Math.abs(x)<=h&&Math.abs(z)<=h,limit=inside?Math.max(range,h+.5):range;
+   for(const q of candidates){const target={x:b.x+q.x*c+q.z*s,z:b.z-q.x*s+q.z*c},d=dist(p,target),score=d+dist(target,other)*.0001;if(d<=limit&&score<bestScore){bestScore=score;best=target;}}
+  }
+  if(best)result[i]=best;
+ }
+ return result;
+}
 export function cleanWallStrokeV175(points=[]){
  const filtered=[];
  for(const p of points){if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.z))continue;

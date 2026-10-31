@@ -67,5 +67,7 @@ jobs:
         run: |
           node scripts/test-demand-v241.mjs
           node scripts/test-stream-v242.mjs
+      - name: V243 wall connections and building rotation
+        run: node scripts/test-build-v243.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

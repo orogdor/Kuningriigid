@@ -1,0 +1,12 @@
+#buildhint:not([hidden]) {
+  top: 130px;
+  bottom: auto;
+  right: 16px;
+  left: auto;
+  transform: none;
+  max-width: min(440px, 65vw);
+  z-index: 15;
+}
+@media (max-width: 760px) {
+  #buildhint:not([hidden]) { top: 105px; right: 8px; max-width: 70vw; }
+}

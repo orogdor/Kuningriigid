@@ -592,22 +592,34 @@ export class Civilization{
   const parent=this.parentCity(city);
   if(blocksFutureOuterWallV213(parent,p,type,{x:(city.c-parent.c)*DETAIL_TILE_X,z:(city.r-parent.r)*DETAIL_TILE_Z}))
    return {error:'Planeeritud linnamüüri koridor peab jääma ehitistest vabaks.'};
-  if(type==='field'){const error=validateField(city,p,(x,z)=>this.nav(city).passable(x,z));if(error)return {error};const d=fieldSize(p),heights=[];for(let x=-d.width/2;x<=d.width/2;x+=4)for(let z=-d.depth/2;z<=d.depth/2;z+=4)heights.push(detailHeight(this.cell(city),p.x+x,p.z+z));if(Math.max(...heights)-Math.min(...heights)>1.8)return {error:'Põllu maapind on liiga järsk. Vali väiksem või tasasem ala.'};}
+  if(type==='field'){const error=validateField(city,p,(x,z)=>this.nav(city).passable(x,z));if(error)return {error};const d=fieldSize(p),heights=[];for(let x=-d.width/2;x<=d.width/2;x+=4)for(let z=-d.depth/2;z<=d.depth/2;z+=4)heights.push(detailHeight(this.cell(city),p.x+x*Math.cos(p.freeRotationV243?p.buildingRotationV228||0:0)+z*Math.sin(p.freeRotationV243?p.buildingRotationV228||0:0),p.z-x*Math.sin(p.freeRotationV243?p.buildingRotationV228||0:0)+z*Math.cos(p.freeRotationV243?p.buildingRotationV228||0:0)));if(Math.max(...heights)-Math.min(...heights)>1.8)return {error:'Põllu maapind on liiga järsk. Vali väiksem või tasasem ala.'};}
   else if(city.economy.buildings.some(b=>b.type==='field'&&b.hp>0&&fieldContains(b,p,type==='market'?17:6)))return {error:'Hoone ei mahu põllule. Vali koht põllu kõrval.'};
   if(this.constructionArea(city).pending.length>=12)return {error:'Linna ühises ehitusjärjekorras on juba 12 hoonet.'};
-  if(type==='bridge')return {ok:true,p:{x:0,z:0}};
+  if(type==='bridge'){
+   if(p?.freeRotationV243&&Number.isFinite(p.buildingRotationV228)){
+    const a=((p.buildingRotationV228%Math.PI)+Math.PI)%Math.PI;
+    if(Math.min(a,Math.PI-a)>Math.PI/12)return {error:'Sild peab ulatuma mõlemale jõekaldale.'};
+   }
+   return {ok:true,p:{x:0,z:0}};
+  }
   let site={p};
   if(MINERAL_BUILDINGS[type])site=mineralPlacement(city.world,type,p,city.economy.buildings);
   if(COASTAL_BUILDINGS.has(type))site=coastalPlacement(this,this.cell(city),type,p);
-  if(site.error)return site;p=site.p;
+  if(site.error)return site;const requestedRotation=p?.buildingRotationV228,freeRotation=!!p?.freeRotationV243;p=Number.isFinite(requestedRotation)?{...site.p,buildingRotationV228:requestedRotation,freeRotationV243:freeRotation}:site.p;site.p=p;
+  if(COASTAL_BUILDINGS.has(type)&&freeRotation&&site.landEntry){
+   const a=requestedRotation-(site.shoreAngle||0),c=Math.cos(a),s=Math.sin(a),dx=site.landEntry.x-p.x,dz=site.landEntry.z-p.z;
+   site.landEntry={x:p.x+dx*c+dz*s,z:p.z-dx*s+dz*c};
+   if(detailHeight(this.cell(city),site.landEntry.x,site.landEntry.z)<=.2||localSurface(this,this.cell(city),site.landEntry.x,site.landEntry.z)<=.15)return {error:'Pööratud rannahoone sissepääs vajab kuiva maad.'};
+  }
   const env=this.placementEnv(city,type);
   if(p?.drawnWallV175&&isDrawableWallV175(type))env.unlimitedBuildingRange=true;
   if(p?.drawnWallV175&&isDrawableWallV175(type)){
    const error=wallTerrainErrorV1758({...p,type},env.passable,(x,z)=>isShore(this,this.cell(city))?localSurface(this,this.cell(city),x,z,false):detailHeight(this.cell(city),x,z));
    if(error)return {error};
   }else if(!COASTAL_BUILDINGS.has(type)){
-   for(const dx of (type==='market'?[-10,0,10]:[-3,0,3]))for(const dz of (type==='market'?[-9,0,9]:[-2.8,0,2.8]))if(!env.passable(p.x+dx,p.z+dz))return {error:'Kogu hoone peab mahtuma kuivale maale.'};
-   const levels=(type==='market'?[[-10,-9],[-10,9],[10,-9],[10,9]]:[[-3,-2.8],[-3,2.8],[3,-2.8],[3,2.8]]).map(([dx,dz])=>detailHeight(this.cell(city),p.x+dx,p.z+dz));
+   const angle=p.freeRotationV243?(p.buildingRotationV228||0):0,c=Math.cos(angle),s=Math.sin(angle),rotate=(dx,dz)=>({x:p.x+dx*c+dz*s,z:p.z-dx*s+dz*c});
+   for(const dx of (type==='market'?[-10,0,10]:[-3,0,3]))for(const dz of (type==='market'?[-9,0,9]:[-2.8,0,2.8])){const q=rotate(dx,dz);if(!env.passable(q.x,q.z))return {error:'Kogu hoone peab mahtuma kuivale maale.'};}
+   const levels=(type==='market'?[[-10,-9],[-10,9],[10,-9],[10,9]]:[[-3,-2.8],[-3,2.8],[3,-2.8],[3,2.8]]).map(([dx,dz])=>{const q=rotate(dx,dz);return detailHeight(this.cell(city),q.x,q.z);});
    if(Math.max(...levels)-Math.min(...levels)>1.8)return {error:'Maapind on hoone jaoks liiga järsk.'};
   }else{
    const nav=this.nav(city),hall=city.economy.buildings.find(b=>b.type==='hall'),from=nav.nearest(door(hall),15),to=nav.nearest(site.landEntry,3);
@@ -638,7 +650,7 @@ export class Civilization{
   if(!nav.preservesAccess(candidate,city.economy.cargo))return {error:'Hoone sulgeks sissepääsu või töötaja tagasitee. Jäta majade vahele läbipääs.'};
   return {...rule,...site};
  }
- build(city,type,p){const check=this.previewBuild(city,type,p);if(check.error)return check;p=check.p||p;if(type==='bridge'){const r=city.economy.realms[city.team],cost=BUILDINGS.bridge.cost;if(!canAfford(r.resources,cost))return {error:'Silla jaoks napib materjale.'};spendResources(r.resources,cost);const building={type:'bridge',x:0,z:0,team:city.team,hp:350,progress:0,ready:false};city.economy.buildings.push(building);this.uiRevision++;return {building}}const env=this.placementEnv(city,type);if(p.drawnWallV175&&isDrawableWallV175(type))env.unlimitedBuildingRange=true;const result=placeBuilding(city.economy,city.team,type,p,env);if(result.building){
+ build(city,type,p){const requestedAngleV243=p?.buildingRotationV228,freeV243=!!p?.freeRotationV243;const check=this.previewBuild(city,type,p);if(check.error)return check;p=check.p||p;if(type==='bridge'){const r=city.economy.realms[city.team],cost=BUILDINGS.bridge.cost;if(!canAfford(r.resources,cost))return {error:'Silla jaoks napib materjale.'};spendResources(r.resources,cost);const building={type:'bridge',x:0,z:0,team:city.team,hp:350,progress:0,ready:false};if(Number.isFinite(requestedAngleV243)){building.buildingRotationV228=requestedAngleV243;building.freeRotationV243=freeV243;}city.economy.buildings.push(building);this.uiRevision++;return {building}}const env=this.placementEnv(city,type);if(p.drawnWallV175&&isDrawableWallV175(type))env.unlimitedBuildingRange=true;const result=placeBuilding(city.economy,city.team,type,p,env);if(result.building){
  // The ordinary economy charges the tier-I price. Once the placement has
  // succeeded, charge ONLY the difference and store the variant on the new
  // building. This avoids altering AI prices or legacy V4 save data.
@@ -674,7 +686,7 @@ if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plan
   const destination=this.cell({c:city.c+dc,r:city.r+dr});
   if(!destination?.land||this.territoryOwner(destination)?.id!==parent.id)
    return {error:'Valitud ruut ei kuulu selle linna ühisesse ehitusalasse.'};
-  const raw=localTilePoint(at.x,at.z,dc,dr),point={x:Math.round(raw.x/2)*2,z:Math.round(raw.z/2)*2};if(at.woodFortTierV1757===2)point.woodFortTierV1757=2;
+  const raw=localTilePoint(at.x,at.z,dc,dr),point={x:Math.round(raw.x/2)*2,z:Math.round(raw.z/2)*2};if(at.woodFortTierV1757===2)point.woodFortTierV1757=2;if(Number.isFinite(at.buildingRotationV228)){point.buildingRotationV228=at.buildingRotationV228;point.freeRotationV243=!!at.freeRotationV243;}
   // The destination remains a separate *physical* tile but not a city.
   const ctx=this.contextAt(destination,true);
   return {ctx,point};
@@ -683,12 +695,12 @@ if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plan
  previewInArea(city,type,at){
   const site=COASTAL_BUILDINGS.has(type)?this.resolveCoastalSite(city,type,at):this.resolveAreaSite(city,at);
   if(site.error)return site;
-  if(type==='field')Object.assign(site.point,fieldSize(at));const check=this.previewBuild(site.ctx,type,site.point);return {...site,...check,point:check.p||site.point};
+  if(Number.isFinite(at.buildingRotationV228)){site.point.buildingRotationV228=at.buildingRotationV228;site.point.freeRotationV243=!!at.freeRotationV243;}if(type==='field')Object.assign(site.point,fieldSize(at));const check=this.previewBuild(site.ctx,type,site.point);return {...site,...check,point:check.p||site.point};
  }
  buildInArea(city,type,at){
   const site=COASTAL_BUILDINGS.has(type)?this.resolveCoastalSite(city,type,at):this.resolveAreaSite(city,at);
   if(site.error)return site;
-  if(type==='field')Object.assign(site.point,fieldSize(at));return {...this.build(site.ctx,type,site.point),...site};
+  if(Number.isFinite(at.buildingRotationV228)){site.point.buildingRotationV228=at.buildingRotationV228;site.point.freeRotationV243=!!at.freeRotationV243;}if(type==='field')Object.assign(site.point,fieldSize(at));return {...this.build(site.ctx,type,site.point),...site};
  }
  wallGuards(city,b){return wallGuards(this.s,city,b)}
  stationWall(city,b,source=null){return stationWall(this,city,b,source)}
