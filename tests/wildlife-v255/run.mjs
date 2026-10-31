@@ -4,6 +4,9 @@ import * as T from '../../vendor/three.module.js';
 import {createWildlifeV255} from '../../wildlife-v255.js';
 import {createHerdingV255} from '../../herding-v255.js';
 const open=()=>true;
+// Overlapping human and deer must still give the deer a direction to flee.
+{const W=createWildlifeV255(),r={id:14,x:0,z:0};const st=W.update(r,{time:1,dt:.2,people:[{x:0,z:0}],hunters:[],open});assert.ok(Math.hypot(st.x,st.z)>.1,'deer escapes overlap');
+ const root=new T.Group(),body=new T.Group();root.add(body);W.pose(root,{grazing:true},1);assert.equal(body.rotation.x,0);assert.ok(body.rotation.z<0,'grazing pitches toward muzzle');W.pose(root,{lying:true},2);assert.ok(body.rotation.x>1,'deer rolls onto its side');}
 // 1. a person walking up startles the deer; it runs away and later comes back
 {const W=createWildlifeV255(),r={id:3,x:0,z:0};let st,maxD=0,t=0;
  for(let f=0;f<40;f++){t+=.1;st=W.update(r,{time:t,dt:.1,people:[{x:4,z:0}],hunters:[],open});maxD=Math.max(maxD,Math.hypot(st.x,st.z));}

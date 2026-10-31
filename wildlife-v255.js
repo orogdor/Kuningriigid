@@ -32,7 +32,9 @@ export function createWildlifeV255(){
     for(const p of ctx.people){if(hunter&&p.hunterOf===r.id)continue;const d=Math.hypot(p.x-a.x,p.z-a.z);if(d<td){td=d;threat=p;}}
     if(threat&&td<FLEE_RANGE){a.mode='flee';a.from={x:threat.x,z:threat.z};a.until=t+3;}
     if(a.mode==='flee'){
-     const dx=a.x-a.from.x,dz=a.z-a.from.z,d=Math.hypot(dx,dz)||1,goal={x:a.x+dx/d*3,z:a.z+dz/d*3};
+     let dx=a.x-a.from.x,dz=a.z-a.from.z,d=Math.hypot(dx,dz);
+     if(d<1e-6){dx=Math.sin(a.heading);dz=Math.cos(a.heading);d=1;}
+     const goal={x:a.x+dx/d*3,z:a.z+dz/d*3};
      running=step(a,goal,6.5,dt,ctx.open);moving=running;
      if(!running){const side={x:a.x-dz/d*3,z:a.z+dx/d*3};running=step(a,side,6.5,dt,ctx.open);moving=running;} // blocked: veer sideways
      if(d>SAFE_RANGE||t>a.until+4)a.mode='return';
@@ -47,9 +49,11 @@ export function createWildlifeV255(){
   // pose the deer model: grazing dips the body forward, running bounds, a shot animal lies on its side
   pose(model,s,time,seed=0){
    const body=model.children[0]||model;
-   if(s.lying){body.rotation.set(0,0,Math.PI/2*.92);body.position.y=.35;return;}
+   // The deer model faces +X. Roll about its length when down; pitch about Z
+   // for grazing, instead of leaning sideways while it feeds.
+   if(s.lying){body.rotation.set(Math.PI/2*.92,0,0);body.position.y=.35;return;}
    body.position.y=s.running?Math.abs(Math.sin(time*9+seed))*.35:0;
-   body.rotation.set(s.grazing?.18+.06*Math.sin(time*.9+seed):s.running?-.08*Math.sin(time*9+seed):0,0,0);
+   body.rotation.set(0,0,s.grazing?-.18-.06*Math.sin(time*.9+seed):s.running?.08*Math.sin(time*9+seed):0);
   },
   clear(){animals.clear();}
  };

@@ -1,3 +1,4 @@
+import {packSave,unpackSave} from './save-compression-v256.js';
 import {DetailStreamV242} from './detail-stream-v242.js';
 import {createAssetDemandV241} from './asset-demand-v241.js';
 import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
@@ -138,7 +139,7 @@ function peopleLifeCtxV252(city,age){if(!city)return {time:s.time,enabled:false,
 import {detailSeaStepsV242,createDetailSea} from './sea-v158.js?v=226';
 import {buildingClearance} from './navigation.js?v=2273';
 import {door} from './navigation.js?v=2273';
-import {loadProtectedGame,writeAutosave,replaceProtectedGame} from './save-safety-v73.js?v=73a';
+import {loadProtectedGame,writeAutosave,replaceProtectedGame} from './save-safety-v73.js?v=256';
 import {loadAICityV135} from './ai-city-demo-v135.js';
 import {loadAICityV136} from './ai-city-demo-v136.js';
 import {loadAICityV137} from './ai-city-demo-v137.js';
@@ -183,16 +184,16 @@ const stoneDemo=demoParam==='stone',bronzeDemo=demoParam==='bronze',medievalDemo
 let recovered=false,state;
 const validState=v=>v?.version===4&&Number.isFinite(v.seed)&&Array.isArray(v.cities)&&Array.isArray(v.settlers)&&Array.isArray(v.units)&&Array.isArray(v.armies);
 const loadedV73=sampleDemo?{state:v220CityDemo?await (async()=>{
- let saved=null;try{saved=JSON.parse(localStorage.getItem('kingdoms-v220-'+demoParam)||'null')}catch{}
+ let saved=null;try{saved=JSON.parse(unpackSave(localStorage.getItem('kingdoms-v220-'+demoParam)||'null'))}catch{}
  return validState(saved)&&saved.v220City?.seed===({a:7531027,b:8419063,c:9622017}[demoParam.slice(-1)])
   ?saved:loadV220City(demoParam);
 })():freshStartV219Demo?(()=>{
  let state=null;
- try{state=JSON.parse(localStorage.getItem(freshStartStorageKeyV219)||'null')}catch{}
+ try{state=JSON.parse(unpackSave(localStorage.getItem(freshStartStorageKeyV219)||'null'))}catch{}
  return validState(state)&&state.seed===5932019?state:createGame(5932019,'continents');
 })():freshBronzeV219Demo?await (async()=>{
  let stored=null;
- try{stored=JSON.parse(localStorage.getItem(freshBronzeStorageKeyV219)||'null')}catch{}
+ try{stored=JSON.parse(unpackSave(localStorage.getItem(freshBronzeStorageKeyV219)||'null'))}catch{}
  return validState(stored)&&stored.seed===5932019&&stored.bronzeFreshV219?.seed===5932019
   ?stored:loadFreshBronzeV219();
 })():freshBronzeV217Demo?await loadFreshBronzeV217():realZeroV206Demo?await loadRealZeroV206(demoParam):wallTakeoverV205Demo?await loadSecondWallTakeoverV205(demoParam):wallV190Demo?await loadOrganicWallV190(demoParam):wallV184Demo?await loadWallV184(demoParam):bronzeV183Demo?await loadBronzeV183(demoParam):aiMountainV176Demo?await loadAIMountainV176():aiStoneV174Demo?await loadAIStoneV174():aiStoneV173Demo?await loadAIStoneV173():aiStoneV172Demo?await loadAIStoneV172():aiStoneV171Demo?await loadAIStoneV171():aiMedievalV159Demo?await loadAIMedievalV159():aiMedievalV153Demo?await loadAIMedievalV153():aiMedievalV151Demo?await loadAIMedievalV151():aiMedievalV147Demo?await loadAIMedievalV147():aiMedievalV146Demo?await loadAIMedievalV146():aiMedievalV145Demo?await loadAIMedievalV145():aiMedievalV144Demo?await loadAIMedievalV144():ironCityV143Demo?await loadIronCityV143():ironCityV142Demo?await loadIronCityV142():trafficDemo?await loadArmyTrafficTest():aiModernV140Demo?await loadAIModernV140():aiCityV139Demo?await loadAICityV139():aiCityV138Demo?await loadAICityV138():aiCityV137Demo?await loadAICityV137():aiCityV136Demo?await loadAICityV136():aiCityDemo?await loadAICityV135():ironAIDemo?await loadIronAITest():replayDemo?createV124ReplayState(replayDemo):patrolDemo?createBronzePatrolState():siegeDemo?(demoParam==='iron-siege'?createIronSiegeState():createBronzeSiegeState()):battleDemo?createBronzeBattleState():stoneDemo?createStoneDemoState():bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
@@ -535,9 +536,9 @@ async function save(){
  try{
   const serialized=await snapshotEncoder.encode(s);
   if(restarting||generation!==saveGeneration)return;
-  if(v220CityDemo)localStorage.setItem('kingdoms-v220-'+demoParam,serialized);
-  else if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,serialized);
-  else if(freshBronzeV219Demo)localStorage.setItem(freshBronzeStorageKeyV219,serialized);
+  if(v220CityDemo)localStorage.setItem('kingdoms-v220-'+demoParam,packSave(serialized));
+  else if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,packSave(serialized));
+  else if(freshBronzeV219Demo)localStorage.setItem(freshBronzeStorageKeyV219,packSave(serialized));
   else {
    const backedUp=writeAutosave(localStorage,serialized,savedTime,s.lastBackupTime||0,validState);
    if(backedUp)s.lastBackupTime=savedTime;
@@ -547,9 +548,9 @@ async function save(){
 }
 addEventListener('pagehide',()=>{if(pendingAutosaves&&!restarting&&(!sampleDemo||v220CityDemo||freshStartV219Demo||freshBronzeV219Demo)){saveGeneration++;
  try{
-  if(v220CityDemo)localStorage.setItem('kingdoms-v220-'+demoParam,snapshotV51());
-  else if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,snapshotV51());
-  else if(freshBronzeV219Demo)localStorage.setItem(freshBronzeStorageKeyV219,snapshotV51());
+  if(v220CityDemo)localStorage.setItem('kingdoms-v220-'+demoParam,packSave(snapshotV51()));
+  else if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,packSave(snapshotV51()));
+  else if(freshBronzeV219Demo)localStorage.setItem(freshBronzeStorageKeyV219,packSave(snapshotV51()));
   else {const backedUp=writeAutosave(localStorage,snapshotV51(),s.time,s.lastBackupTime||0,validState);
    if(backedUp)s.lastBackupTime=s.time;}
  }catch{}}});
@@ -1661,9 +1662,9 @@ const V51_SLOT_PREFIX='kingdoms-v51-slot-';
 function snapshotV51(){return serializeSnapshot(s)}
 function slotUI(){const root=$('v51slots');root.replaceChildren();for(let i=1;i<=3;i++){
  const row=document.createElement('div');row.className='v51slot';const text=document.createElement('span'),stored=localStorage.getItem(V51_SLOT_PREFIX+i);
- let turns='Tühi';if(stored)try{const j=JSON.parse(stored);turns='Käik '+(Math.floor(j.time/60)+1)}catch{turns='Vigane'}text.textContent=i+'. '+turns;row.append(text);
- const saveButton=document.createElement('button');saveButton.textContent='Salvesta';saveButton.disabled=sampleDemo;saveButton.onclick=async()=>{try{const serialized=await snapshotEncoder.encode(s);if(restarting)return;localStorage.setItem(V51_SLOT_PREFIX+i,serialized);slotUI();say('Salvestatud kohta '+i)}catch{say('Salvestusruum on täis')}};row.append(saveButton);
- const load=document.createElement('button');load.textContent='Laadi';load.disabled=sampleDemo||!stored;load.onclick=()=>{if(!confirm('Laadin salvestuskoha '+i+'. Praegune automaatsalvestus asendatakse.'))return;try{const obj=JSON.parse(localStorage.getItem(V51_SLOT_PREFIX+i));if(!validState(obj))throw Error('Vigane salvestus');replaceProtectedGame(localStorage,JSON.stringify(obj),validState);restarting=true;location.reload()}catch{restarting=false;say('Salvestus on vigane')}};row.append(load);root.append(row)
+ let turns='Tühi';if(stored)try{const j=JSON.parse(unpackSave(stored));turns='Käik '+(Math.floor(j.time/60)+1)}catch{turns='Vigane'}text.textContent=i+'. '+turns;row.append(text);
+ const saveButton=document.createElement('button');saveButton.textContent='Salvesta';saveButton.disabled=sampleDemo;saveButton.onclick=async()=>{try{const serialized=await snapshotEncoder.encode(s);if(restarting)return;localStorage.setItem(V51_SLOT_PREFIX+i,packSave(serialized));slotUI();say('Salvestatud kohta '+i)}catch{say('Salvestusruum on täis')}};row.append(saveButton);
+ const load=document.createElement('button');load.textContent='Laadi';load.disabled=sampleDemo||!stored;load.onclick=()=>{if(!confirm('Laadin salvestuskoha '+i+'. Praegune automaatsalvestus asendatakse.'))return;try{const obj=JSON.parse(unpackSave(localStorage.getItem(V51_SLOT_PREFIX+i)));if(!validState(obj))throw Error('Vigane salvestus');replaceProtectedGame(localStorage,JSON.stringify(obj),validState);restarting=true;location.reload()}catch{restarting=false;say('Salvestus on vigane')}};row.append(load);root.append(row)
  }}
 // V124: the menu HTML starts with disabled buttons while the game loads; explicitly enable export when the state is ready.
 $('v51export').disabled=false;

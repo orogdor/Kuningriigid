@@ -1,0 +1,20 @@
+const fs=require('fs'),http=require('http'),path=require('path'),assert=require('assert');
+const puppeteer=require(process.env.PUPPETEER_MODULE||'puppeteer'),root=path.resolve(__dirname,'..');
+const server=http.createServer((req,res)=>{const u=new URL(req.url,'http://localhost');if(u.pathname==='/blank'){res.end('test');return;}const file=path.resolve(root,'.'+(u.pathname==='/'?'/index.html':decodeURIComponent(u.pathname)));if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}fs.readFile(file,(err,data)=>{if(err){res.writeHead(404);return res.end();}res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.glb':'model/gltf-binary','.webp':'image/webp'})[path.extname(file)]||'application/octet-stream');res.end(data)});});
+(async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;try{
+ browser=await puppeteer.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--enable-webgl','--ignore-gpu-blocklist','--no-sandbox']});
+ const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1280,height:800});const base='http://127.0.0.1:'+server.address().port;
+ await page.goto(base+'/blank');await page.evaluate(async()=>{const {createGame}=await import('/civilization-core.js');const game=createGame(73142,'continents');game.time=123;localStorage.setItem('kingdoms-civ4',JSON.stringify(game));});
+ await page.goto(base+'/?gpu=0',{waitUntil:'load',timeout:120000});await page.waitForFunction(()=>window.gameDebug&&document.querySelector('#continue')&&!document.querySelector('#continue').disabled,{timeout:120000});
+ assert.equal(await page.evaluate(()=>gameDebug.gameV249().s.seed),73142,'legacy save loads');
+ await page.evaluate(()=>{document.querySelector('#menu-saves').open=true;document.querySelector('#v51slots button').click()});
+ await page.waitForFunction(()=>localStorage.getItem('kingdoms-v51-slot-1')?.startsWith('kingdoms-gzip-v1:'),{timeout:30000});
+ const state=await page.evaluate(async()=>{const {unpackSave}=await import('/save-compression-v256.js');return JSON.parse(unpackSave(localStorage.getItem('kingdoms-v51-slot-1')))});assert.equal(state.seed,73142);
+ await page.evaluate(()=>document.querySelector('#continue').click());await page.waitForFunction(()=>localStorage.getItem('kingdoms-civ4')?.startsWith('kingdoms-gzip-v1:'),{timeout:40000});
+ await page.reload({waitUntil:'load',timeout:120000});await page.waitForFunction(()=>window.gameDebug&&!document.querySelector('#continue').disabled,{timeout:120000});assert.equal(await page.evaluate(()=>gameDebug.gameV249().s.seed),73142,'compressed autosave reloads');
+ await page.screenshot({path:path.join(root,'tests','qa-v256-game.png')});
+ await page.goto(base+'/?demo=stone&gpu=0',{waitUntil:'load',timeout:120000});await page.waitForFunction(()=>window.gameDebug&&gameDebug.activeTileV242()&&gameDebug.torchesV250().length,{timeout:120000});
+ const visual=await page.evaluate(()=>{const g=gameDebug.gameV249();g.s.time=840;const torches=gameDebug.torchesV250();if(torches.length)gameDebug.focusV250(torches[0].x,torches[0].z,30);return {torches:torches.length};});
+ await new Promise(r=>setTimeout(r,3000));await page.screenshot({path:path.join(root,'tests','qa-v256-night.png')});
+ assert.ok(visual.torches>0,'night scene has torches');assert.deepEqual(errors,[]);console.log('V256 browser PASS: legacy load, manual save, autosave, reload and night scene',JSON.stringify(visual));
+ }finally{if(browser)await browser.close();server.close();}})().catch(e=>{console.error(e);server.close();process.exitCode=1});

@@ -311,8 +311,8 @@ export function createCityTorchesV235(buildings,heightAt,{age=0,boundsOf=null}={
  return group;
 }
 export function updateCityTorchesV235(group,clock,elapsed=0){
- if(!group?.userData?.torchModelsV235)return;
  FIRE_TIME.value=elapsed;
+ if(!group?.userData?.torchModelsV235)return;
  const power=clock?.torch??0,visible=power>.04;
  for(const [i,o] of group.userData.torchModelsV235.entries()){
   o.flame.visible=visible;if(o.halo)o.halo.visible=visible;if(o.pool)o.pool.visible=visible;

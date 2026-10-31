@@ -56,7 +56,8 @@ export function createHerdingV255(parent){
     seen.add(p.key);let h=herds.get(p.key);
     if(!h){const group=new T.Group();group.name='V255 herd '+p.key;parent.add(group);
      const sheep=Array.from({length:FLOCK},(_,i)=>{const s=createSheepV255(i+p.key.length);group.add(s);return s;});
-     h={group,sheep,herder:makeHerder(),day:-1,spot:null,path:null,offsets:sheep.map((_,i)=>({a:i*1.05,r:1.6+(i%3)*.9}))};group.add(h.herder);herds.set(p.key,h);}
+     h={group,sheep,herder:makeHerder(),day:-1,spot:null,path:null,lastTime:null,offsets:sheep.map((_,i)=>({a:i*1.05,r:1.6+(i%3)*.9}))};group.add(h.herder);herds.set(p.key,h);}
+    const dt=h.lastTime==null?0:Math.max(0,Math.min(.25,time-h.lastTime));h.lastTime=time;
     const day=Math.floor((time/60+8)/24),phase=phaseOf(hour);
     if(h.day!==day){h.day=day;h.spot=grazeSpot(nav,p.door,day+p.key.length);h.path=h.spot?nav.route(p.door,h.spot,{preferRoads:false}):null;}
     const out=phase!=='inside'&&h.spot&&h.path;
@@ -75,7 +76,7 @@ export function createHerdingV255(parent){
     h.sheep.forEach((s,i)=>{const o=h.offsets[i],spread=moving?1:1.8,back=moving?-2.2-(i%3)*.8:0;
      const sx=pos.x+Math.sin(pos.heading)*back+Math.cos(o.a+time*.05)*o.r*spread,sz=pos.z+Math.cos(pos.heading)*back+Math.sin(o.a+time*.05)*o.r*spread;
      const prev=s.position,dx=sx-prev.x,dz=sz-prev.z,d=Math.hypot(dx,dz);
-     let x=sx,z=sz;if(s.userData.placed&&d<6){const k=Math.min(1,(moving?4:.6)*.05/Math.max(d,1e-3));x=prev.x+dx*Math.min(1,k*20);z=prev.z+dz*Math.min(1,k*20);}
+     let x=sx,z=sz;if(s.userData.placed&&d<6){const k=Math.min(1,(moving?4:.6)*dt/Math.max(d,1e-3));x=prev.x+dx*k;z=prev.z+dz*k;}
      if(!nav.open(x,z)){x=prev.x;z=prev.z;}
      const walking=Math.hypot(x-prev.x,z-prev.z)>.01;if(walking)s.rotation.y=Math.atan2(x-prev.x,z-prev.z);
      s.position.set(x,ground(x,z),z);s.userData.placed=true;poseSheepV255(s,time,walking);});

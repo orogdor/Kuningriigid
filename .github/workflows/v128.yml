@@ -69,5 +69,10 @@ jobs:
           node scripts/test-stream-v242.mjs
       - name: V243 wall connections and building rotation
         run: node scripts/test-build-v243.mjs
+      - name: V256 save compression and wildlife
+        run: |
+          node TEST_V73.mjs
+          node tests/save-compression-v256.mjs
+          node tests/wildlife-v255/run.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

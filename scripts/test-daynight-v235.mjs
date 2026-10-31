@@ -1,7 +1,7 @@
 // V235: time-of-day is saved-game deterministic and street torches remain bounded.
 import assert from 'node:assert/strict';
 import * as T from '../vendor/three.module.js';
-import {DAY_LENGTH_V235,START_HOUR_V235,dayClockV235,torchLocationsV235,createCityTorchesV235,updateCityTorchesV235} from '../daynight-v235.js';
+import {DAY_LENGTH_V235,START_HOUR_V235,dayClockV235,torchLocationsV235,createCityTorchesV235,updateCityTorchesV235,createFireV252} from '../daynight-v235.js';
 import {GRAPHICS_DEFAULTS_V226,LIGHTING_LOOKS_V235} from '../graphics-settings-v226.js';
 assert.equal(DAY_LENGTH_V235,1440,'one game day must be 24 real minutes');
 assert.equal(START_HOUR_V235,8);
@@ -15,6 +15,8 @@ assert.equal(dayClockV235(840).night,true);
 assert.equal(dayClockV235(240).night,false);
 assert.ok(dayClockV235(840).torch>.9,'torches glow at night');
 assert.equal(dayClockV235(240).torch,0,'torches off by day');
+const handheld=createFireV252(.2);let fireMaterial;handheld.traverse(o=>{if(o.material?.uniforms?.uTime)fireMaterial=o.material});
+updateCityTorchesV235(null,null,123);assert.equal(fireMaterial.uniforms.uTime.value,123,'handheld flames animate even when no town torches exist');
 assert.ok(GRAPHICS_DEFAULTS_V226.daylight==='dynamic');
 assert.ok(GRAPHICS_DEFAULTS_V226.toneMap==='agx');
 assert.ok(LIGHTING_LOOKS_V235.natural.toneMap==='agx');

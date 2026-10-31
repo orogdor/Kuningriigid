@@ -1,3 +1,4 @@
+import {packSave,unpackSave} from './save-compression-v256.js';
 // V73: preserve V71/V72 localStorage format (version 4) and previous autosaves.
 // This module has no DOM dependencies and can be tested in Node or the browser.
 export const ACTIVE_SAVE_KEY='kingdoms-civ4';
@@ -5,7 +6,7 @@ export const BACKUP_SAVE_KEY='kingdoms-civ4-backup';
 
 export function decodeValidGame(raw,isValid){
  if(typeof raw!=='string'||!raw.trim())return null;
- try{const value=JSON.parse(raw);return isValid(value)?value:null}catch{return null}
+ try{const value=JSON.parse(unpackSave(raw));return isValid(value)?value:null}catch{return null}
 }
 
 export function loadProtectedGame(storage,isValid){
@@ -21,16 +22,14 @@ export function loadProtectedGame(storage,isValid){
 // Preserve the legacy snapshot exactly; do not change the version or cargo fields.
 export function writeAutosave(storage,serialized,time,lastBackupTime,isValid){
  let backedUp=false;
+ let old=null;
  if(time-lastBackupTime>=60){
-  try{
-   const old=storage.getItem(ACTIVE_SAVE_KEY);
-   if(decodeValidGame(old,isValid)){
-    storage.setItem(BACKUP_SAVE_KEY,old);
-    backedUp=true;
-   }
-  }catch{/* keep writing the main slot even if the backup fails */}
+  try{old=storage.getItem(ACTIVE_SAVE_KEY)}catch{}
  }
- storage.setItem(ACTIVE_SAVE_KEY,serialized);
+ storage.setItem(ACTIVE_SAVE_KEY,packSave(serialized));
+ if(decodeValidGame(old,isValid))try{
+  storage.setItem(BACKUP_SAVE_KEY,packSave(unpackSave(old)));backedUp=true;
+ }catch{/* A backup must never prevent the current game from being saved. */}
  return backedUp;
 }
 
@@ -39,13 +38,10 @@ export function writeAutosave(storage,serialized,time,lastBackupTime,isValid){
 export function replaceProtectedGame(storage,serialized,isValid){
  if(!decodeValidGame(serialized,isValid))throw Error('Vigane või ühildumatu mänguseis');
  let backedUp=false;
- try{
-  const old=storage.getItem(ACTIVE_SAVE_KEY);
-  if(decodeValidGame(old,isValid)){
-   storage.setItem(BACKUP_SAVE_KEY,old);
-   backedUp=true;
-  }
+ let old=null;try{old=storage.getItem(ACTIVE_SAVE_KEY)}catch{}
+ storage.setItem(ACTIVE_SAVE_KEY,packSave(serialized));
+ if(decodeValidGame(old,isValid))try{
+  storage.setItem(BACKUP_SAVE_KEY,packSave(unpackSave(old)));backedUp=true;
  }catch{/* do not prevent importing a valid saved game */}
- storage.setItem(ACTIVE_SAVE_KEY,serialized);
  return {backedUp};
 }

@@ -1,6 +1,6 @@
 # Kuningriigid – ühine tööjärg
 
-Viimati kokku lepitud seis: **V255**, GitHubi `main`-harus. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
+Viimane muudatus: **V256**. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt. Enne töö alustamist kontrolli alati GitHubi tegelikku viimast seisu; seda faili ei uuendata automaatselt.
 
 - Mäng ja avalik eelvaade: https://orogdor.github.io/Kuningriigid/
 - Lähtekood: https://github.com/orogdor/Kuningriigid
@@ -33,6 +33,8 @@ Viimati kokku lepitud seis: **V255**, GitHubi `main`-harus. Enne töö alustamis
 Enne avaldamist käivita CI kiirkontrolli testid (`.github/workflows/v128.yml`, töö `quick-check`), eriti `scripts/test-daynight-v235.mjs` ja `scripts/test-scout-torch-v236.mjs`.
 
 Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node scripts/test-build-v243.mjs`, müüride puhul `node TEST_V1754_GATES.mjs` ja detailalade puhul `node scripts/test-stream-v242.mjs`. Mängu põhikontroll on `node scripts/test.mjs traffic`. Brauseritestide käivitamiseks on vaja Puppeteeri ja sobivat brauserit.
+
+- V256: gzip-pakitud automaat- ja käsitsisalvestused koos vanade JSON-salvestuste toega; pakkimist kasutab ka varukoopia. Looma põgenemise kattumise ja lamamis-/söömisasendi parandus, karja kaadrisagedusest sõltumatu liikumine, käsitõrviku tuleaja parandus. Üksikasjad `MUUDATUSED_V256.md`.
 
 ## Järgmine töö
 
