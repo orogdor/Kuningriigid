@@ -20,7 +20,9 @@ def plane_quadric(n, d, w):
     v = np.concatenate([n, [d]])
     return w * np.outer(v, v)
 
-def simplify(P, F, target, boundary_weight=8.0, verbose=False):
+def simplify(P, F, target, boundary_weight=8.0, verbose=False, uv=None):
+    # V244: with uv (per-vertex, mesh welded by position+uv so seams are borders) vertices only move
+    # onto an existing endpoint and take its uv, so the ORIGINAL texture atlas stays valid.
     P = P.astype(np.float64).copy()
     nV = len(P)
     a, b, c = P[F[:, 0]], P[F[:, 1]], P[F[:, 2]]
@@ -64,7 +66,10 @@ def simplify(P, F, target, boundary_weight=8.0, verbose=False):
         Qs = Q[i] + Q[j]
         A = Qs.copy(); A[3] = [0, 0, 0, 1]
         cands = [P[i], P[j], (P[i] + P[j]) / 2]
+        if uv is not None:
+            cands = [P[i], P[j]]
         try:
+            if uv is not None: raise np.linalg.LinAlgError
             if abs(np.linalg.det(A)) > 1e-12:
                 x = np.linalg.solve(A, [0, 0, 0, 1])[:3]
                 # keep the optimum near the edge (avoid spikes)
@@ -121,6 +126,8 @@ def simplify(P, F, target, boundary_weight=8.0, verbose=False):
         vf[i] -= shared
         vf[j] = set()
         alive_v[j] = False
+        if uv is not None and np.array_equal(p, P[j]):
+            uv[i] = uv[j]
         P[i] = p
         Q[i] += Q[j]
         ver[i] += 1
@@ -134,4 +141,6 @@ def simplify(P, F, target, boundary_weight=8.0, verbose=False):
     Fo = np.array([faces[f] for f in range(len(faces)) if alive_f[f]], np.int64)
     used = np.unique(Fo)
     remap = -np.ones(nV, np.int64); remap[used] = np.arange(len(used))
+    if uv is not None:
+        return P[used], remap[Fo], uv[used]
     return P[used], remap[Fo]

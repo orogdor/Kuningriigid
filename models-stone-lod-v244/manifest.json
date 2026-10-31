@@ -1,14 +1,14 @@
 {
  "note": "V244: bounding box of the original detailed GLB, so mid/far files sit exactly where the detailed model sits",
  "levels": {
-  "mid": [
-   6000,
-   1024
-  ],
-  "far": [
-   1500,
-   512
-  ]
+  "mid": {
+   "triangles": 20000,
+   "texture": 1024
+  },
+  "far": {
+   "triangles": 6000,
+   "texture": 512
+  }
  },
  "boxes": {
   "archery": {
@@ -227,5 +227,6 @@
     0.074633
    ]
   }
- }
+ },
+ "method": "QEM edge collapse with flip test on a mesh welded by position+uv (tools/stone-models-v221/lod_cluster.py, negative cell argument); vertices keep their original uv and normal, the original texture is reused (no re-bake)"
 }
