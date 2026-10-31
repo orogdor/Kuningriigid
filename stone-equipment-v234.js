@@ -12,7 +12,7 @@ const palettes={
   pottery:['#a16d4c',1,0], darkpot:['#754a35',1,0]
 };
 function geo(k,make){if(!geometry.has(k)){const g=make();g.userData.shared=true;geometry.set(k,g);}return geometry.get(k);}
-function mat(k){if(!materials.has(k)){const c=palettes[k];materials.set(k,()=>new T.MeshStandardMaterial({color:c[0],roughness:c[1],metalness:c[2],side:T.DoubleSide}));}return materials.get(k);}
+function mat(k){if(!materials.has(k)){const c=palettes[k];materials.set(k,new T.MeshStandardMaterial({color:c[0],roughness:c[1],metalness:c[2],side:T.DoubleSide}));}return materials.get(k);}
 function add(g,key,m,x=0,y=0,z=0){
  const o=new T.Mesh(geo(key,typeof m==='function'?m:()=>m),mat(key.startsWith('flint')?'flint':key.startsWith('edge')?'edge':key.startsWith('reed')?'reed':key.startsWith('weave')?'weave':key.startsWith('pottery')?'pottery':key.startsWith('darkpot')?'darkpot':key.startsWith('cord')?'cord':key.startsWith('leather')?'leather':key.startsWith('hide')?'hide':key.startsWith('bark')?'bark':'shaft'));
  o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);return o;
