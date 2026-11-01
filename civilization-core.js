@@ -453,6 +453,13 @@ export class Civilization{
    // Consumption follows actual population, not number of buildings. Market
    // deliveries are already deducted from the stock when picked up.
    const parent=this.parentCity(ctx),houses=this.allBuildings(parent).filter(b=>b.type==='house'&&b.ready&&b.hp>0);
+   // V267: without a well, people carry water from a river within two tiles. It covers the need but
+   // costs working time (cityNeeds: -10% productivity) and satisfaction (one need step, -5%).
+   parent.waterFetchV267=false;
+   if(!this.cityReady(parent,'well')){
+    let river=false;for(let dr=-2;dr<=2&&!river;dr++)for(let dc=-2;dc<=2&&!river;dc++){const c=parent.c+dc,rr=parent.r+dr;if(c<0||rr<0||c>=COLS)continue;const cell=this.cells[rr*COLS+c];if(cell?.river||cell?.lake)river=true;}
+    if(river){const lack=Math.max(0,waterNeed-(r.resources.water||0));if(lack>0){r.resources.water=(r.resources.water||0)+lack;parent.waterFetchV267=true;}}
+   }
    const market=this.cityReady(parent,'market');
    const consume=(key,amount,house=null)=>{
      const heldKey=key==='bread'?'foodHeld':'waterHeld';

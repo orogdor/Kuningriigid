@@ -69,3 +69,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V265: vana teal-stiil asendatud (`ui-theme-v265.css`), ♜ → pikkmaja, V264 sildid keelepõhised.
 
 - V266: kiviaja avastuste järjekord parandatud (MUUDATUSED_V266.md); mustandharu ühendatud.
+
+- V267: vesi jõest ilma kaevuta (−10% töö, −5% rahulolu), kaitserajatised vajavad ainult kivitööriistu.

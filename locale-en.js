@@ -1274,6 +1274,10 @@ export const ENGLISH_PAIRS=[
   "Copper mine; tin comes with bronze casting"
  ],
  [
+  " · vett tuuakse jõest, kaev puudub (−10% töö, −5% rahulolu)",
+  " · water carried from the river, no well (−10% work, −5% satisfaction)"
+ ],
+ [
   "Pronksiaeg, tinakaevandus, pronksisulatus, pronksriistad ja pronksiaja ehitaja (×1.20)",
   "Bronze Age, tin mine, bronze foundry, bronze tools and Bronze Age builders (×1.20)"
  ],
