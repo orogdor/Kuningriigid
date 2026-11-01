@@ -212,12 +212,12 @@ if(w.phase==='plantWork'){w.action='plant';b.status='Istutab puud';w.working=tru
 // a stump site within 9 units of living mature trees may sprout a seedling (more neighbours, more likely).
 // Nothing sprouts on building sites, fields, roads or cleared ground, and seedlings take 1.5x longer.
 export const TREE_GROW_V274=480;
-export function naturalRegrowthV274(s,world,nav,dt){
+export function naturalRegrowthV274(s,world,nav,dt,buildings=s.buildings||[]){
  world.regrowClockV274=(world.regrowClockV274||0)+dt;if(world.regrowClockV274<30)return 0;world.regrowClockV274=0;
  const trees=world.resources.filter(r=>r.kind==='tree');let sprouted=0;
  for(const r of trees){
   if(!r.removed||r.cleared||sprouted>=3)continue;
-  if(s.buildings.some(b=>Math.abs(r.x-b.x)<4.5&&Math.abs(r.z-b.z)<4.5))continue;
+  if(buildings.some(b=>Math.abs(r.x-b.x)<4.5&&Math.abs(r.z-b.z)<4.5))continue;
   if(nav&&(!nav.passable(r.x,r.z)||nav.roadStrength(nav.index(r.x,r.z))>=1))continue;
   let near=0;for(const t of trees){if(t.removed||t===r||t.matureAt>s.time)continue;if(Math.abs(t.x-r.x)<9&&Math.abs(t.z-r.z)<9&&++near>=4)break;}
   if(!near)continue;

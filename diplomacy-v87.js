@@ -1,6 +1,9 @@
 const pair=(a,b)=>[a,b].sort((x,y)=>x-y).join(':');
 export function relation(s,a,b){return a===b?'own':s.relations?.[pair(a,b)]?.status||'neutral';}
-export const atWar=(s,a,b)=>a!==b&&relation(s,a,b)==='war';
+// V276: new games start with 20 minutes of peace (s.peaceUntilV276): nobody can attack anyone before that
+export const PEACE_SECONDS_V276=1200;
+export const peaceV276=s=>(s?.peaceUntilV276||0)>(s?.time||0);
+export const atWar=(s,a,b)=>a!==b&&!peaceV276(s)&&relation(s,a,b)==='war';
 export function setRelation(s,a,b,status){if(a===b||!['neutral','friendly','war'].includes(status))return;const key=pair(a,b),old=s.relations?.[key];(s.relations??={})[key]={tension:old?.tension||0,status};s.events??=[];s.events.push({time:s.time,text:`Riigid ${a+1} / ${b+1}: ${status==='war'?'sõda':status==='friendly'?'sõprus':'neutraalne'}`});}
 export function merchantAccess(s,team,city){return team===city.team||relation(s,team,city.team)==='friendly'&&!city.blockedMerchants?.[team];}
 export function blockMerchants(s,city,team,blocked){(city.blockedMerchants??={})[team]=blocked;if(!blocked)return;const key=pair(city.team,team),r=(s.relations??={})[key]??={status:'neutral',tension:0};r.tension=Math.min(100,r.tension+15);}

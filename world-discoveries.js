@@ -1,5 +1,6 @@
 // V55: seeded points of interest, one-time exploration rewards, and BFS frontier navigation.
 import {COLS,ROWS} from './campaign.js';
+import {villageTypeV276} from './villages-v276.js';
 const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
 export const LANDMARK_NAMES={village:'Sõbralik küla',ruins:'Muistsed varemed'};
 const hash=(a,b,seed)=>{let x=Math.imul((a+143)*374761393,(b+197)*668265263)^Math.imul(seed|0,2246822519);x=Math.imul(x^(x>>>13),1274126177);return ((x^(x>>>16))>>>0)/4294967296};
@@ -45,6 +46,7 @@ export function findExplorationPath(game,army){
 }
 export function collectLandmark(game,team,pos){
  const landmark=game.s.landmarks?.find(l=>l.claimedBy==null&&l.c===pos.c&&l.r===pos.r);if(!landmark)return null;
+ if(villageTypeV276(landmark)==='raiders')return null; // V276: a raiders' village gives nothing to a scout
  landmark.claimedBy=team;landmark.claimedAt=game.s.time;
  const earned=[];
  for(const [kind,amount] of Object.entries(landmark.reward)){

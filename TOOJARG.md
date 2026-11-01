@@ -87,3 +87,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V274: rahvasteränne (esimene minut, 4 töölist + sõdur, 5x kiirus, linnakoha valik), skaut koera ja odaga, puude kasv/looduslik uuenemine, kaev avastuse taha.
 
 - V275: rahvasteränne 2 min ja 7,5x, maailmakaardil detailkaardi mudelid (asunikud, skaut), järvede laiad väljavoolud merre.
+
+- V276: külad 2 tüüpi (röövlid/kaupmehed) mängija hoonetest, kauplemine, röövretked+hoiatused, 20 min rahu, kiviaja armeed 3x väiksemad, jõekaldale kalamees + jõekalad; PARANDUS V274 puude uuenemise viga.

@@ -21,4 +21,5 @@ ok(city,'first town founded at the start of the Stone Age');
 const hall=city.economy.buildings.find(b=>b.type==='hall');
 ok(Math.hypot(hall.x-pick.x,hall.z-pick.z)<=1,'town on the chosen site');
 ok(!army.hiddenInBandV274&&army.c===city.c&&army.r===city.r,'scout appears at the new town');
+for(let i=0;i<45;i++)g.tick(1); // regression: the town's first minutes must tick without errors (V276 regrowth fix)
 console.log('migration V274 ok:',city.name,'ai towns',g.s.cities.filter(c=>c.team>0).length);

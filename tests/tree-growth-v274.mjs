@@ -14,3 +14,6 @@ ok(r[4].removed,'no seedling far from living trees');
 ok(r[5].removed,'nothing sprouts on a building site');
 ok(r[3].natural&&r[3].matureAt-r[3].plantedAt===TREE_GROW_V274*1.5,'natural seedling takes 1.5x the planted growth time');
 console.log('tree growth V274 ok, sprouted',total);
+// regression: the live game passes the global state (no .buildings) plus the city's building list
+{const st={time:0};const w={resources:[{id:0,kind:'tree',x:0,z:0,amount:24,capacity:24,removed:false},{id:1,kind:'tree',x:3,z:0,amount:0,capacity:24,removed:true}],revision:0};
+ for(let t=0;t<600;t+=30){st.time=t;naturalRegrowthV274(st,w,null,30,[{x:50,z:50}]);}console.log('regrowth with global state ok');}

@@ -49,7 +49,7 @@ function fallback(kind){
  templates.set(kind,g);return g.clone(true);
 }
 const sizeByKind={village:35,ruins:30,forest:28,rock:23,bridge:28};
-export function buildDetailWorldObjects(game,worldProps,tile,height){
+export function buildDetailWorldObjects(game,worldProps,tile,height,opts={}){
  const holder=new T.Group();
  holder.name='V75 detail world objects '+tile.c+':'+tile.r;
  const sites=worldProps.siteCatalog.at(tile),ids=[];
@@ -65,6 +65,7 @@ export function buildDetailWorldObjects(game,worldProps,tile,height){
   }
   // V270: a forest clump or rock outcrop would stand in the middle of a town that was built here
   if((site.kind==='forest'||site.kind==='rock')&&game.contextAt(site.cell,false))continue;
+  if(site.kind==='village'&&opts.villageModel){const v=opts.villageModel(site);if(v){v.userData.worldSiteId=site.id;v.name='detail-world-site '+site.id;holder.add(v);ids.push(site.id);continue;}}
   const model=worldProps.detailModel(site.kind)||fallback(site.kind);
   const box=new T.Box3().setFromObject(model);
   const width=Math.max(.01,box.max.x-box.min.x,box.max.z-box.min.z);

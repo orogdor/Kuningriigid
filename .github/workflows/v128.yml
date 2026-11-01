@@ -87,5 +87,7 @@ jobs:
           node tests/tree-growth-v274.mjs
           node tests/migration-v274.mjs
           node tests/lake-outlets-v275.mjs
+          node tests/river-bank-v276.mjs
+          node tests/villages-v276.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

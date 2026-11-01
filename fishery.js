@@ -19,7 +19,11 @@ export function initializeFisheries(game){
  for(const cell of game.cells){
   const key=cell.r*COLS+cell.c,dist=game.fishDistance[key];
   cell.fishDepth=dist;
-  if(cell.land){cell.coast=isShore(game,cell);cell.deposits.fish=false;continue}
+  if(cell.land){cell.coast=isShore(game,cell);cell.deposits.fish=!!cell.river;
+   // V276: rivers have fish too: shallow, reachable from the bank (depth 1); schools sit on the river course
+   if(cell.river){cell.fishDepth=1;const to=cell.riverTo||cell;const dc=to.c-cell.c,dr=to.r-cell.r;
+    for(const t of [.22,.62]){const x=dc*112*t+(game.noise(cell.c*13+t*7,cell.r+71)-.5)*4,z=dr*97*t+(game.noise(cell.c+t*5,cell.r*17+29)-.5)*4;cell.detail.resources.push([4,x,z]);}}
+   continue}
   cell.deposits.fish=fishAt(game,cell,dist);
   // All simulated fish are in water, including the visible detail-world meshes.
   if(cell.deposits.fish){
@@ -46,8 +50,9 @@ function takeFish(game,cell,count){
 }
 // A bank is reachable from a shoreline hut only when both its distance from
 // the original shore and its open-water depth fit the current fishing technology.
+export const nearRiverV276=(game,p)=>[[0,0],...offsets].some(([dc,dr])=>game.cell({c:p.c+dc,r:p.r+dr})?.river);
 export function fishingBanks(game,p,age){
- if(!isShore(game,p))return [];
+ if(!isShore(game,p)&&!nearRiverV276(game,p))return [];
  const reach=fishingRange(age),banks=[],limit=Math.min(reach+1,30);
  for(let dr=-limit;dr<=limit;dr++)for(let dc=-limit;dc<=limit;dc++){
   const c=p.c+dc,r=p.r+dr,dist=Math.hypot(dc,dr);

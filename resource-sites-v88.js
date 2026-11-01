@@ -1,5 +1,5 @@
 import {detailHeight} from './world-details.js?v=123a';
-import {localSurface} from './continuous-landscape.js?v=162a';
+import {localSurface,riverNear} from './continuous-landscape.js?v=162a';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 
 export const MINERAL_BUILDINGS=Object.freeze({quarry:'stone',mine:'ore',coppermine:'copper',tinmine:'tin',claypit:'clay',gem_mine:'gems',oilwell:'oil'});
@@ -67,7 +67,29 @@ export function harvestMineral(world,b,d,dt,multiplier=1){
 const shoreCache=new WeakMap();
 // Local +Z is inland; -Z is the pier. Sample the actual rendered sea edge,
 // not rivers or merely a world-map tile marked as coastal.
+// V276: fisher huts (and harbours on navigable rivers) can stand on a river bank as well as on the sea shore.
+// The pier side faces the river: the hut centre is placed just outside the river's water edge.
+export function riverBankPlacement(game,cell,type,p){
+ const wx=cell.x+p.x/DETAIL_X,wz=cell.z+p.z/DETAIL_Z,r=riverNear(game,wx,wz);
+ if(!(r.distance<r.width+6))return {error:'Vali mererand või jõekallas.'};
+ if(type==='harbor'&&r.width<6)return {error:'Sadam vajab laevatatavat (laia) jõge.'};
+ const e=.25,g={x:riverNear(game,wx+e,wz).distance-riverNear(game,wx-e,wz).distance,z:riverNear(game,wx,wz+e).distance-riverNear(game,wx,wz-e).distance};
+ const gl=Math.hypot(g.x,g.z);if(gl<1e-4)return {error:'Vali jõekallas, mitte jõe keskkoht.'};
+ const inlandW={x:g.x/gl,z:g.z/gl},target=r.width+1.4,shift=target-r.distance;            // world units
+ const q={x:p.x+inlandW.x*shift*DETAIL_X,z:p.z+inlandW.z*shift*DETAIL_Z};
+ const inD={x:inlandW.x*DETAIL_X,z:inlandW.z*DETAIL_Z},il=Math.hypot(inD.x,inD.z),inland={x:inD.x/il,z:inD.z/il};
+ if(Math.abs(q.x)>129||Math.abs(q.z)>114)return {error:'Kogu hoone peab mahtuma sellele detailkaardile.'};
+ const height=(x,z)=>localSurface(game,cell,x,z),entry={x:q.x+inland.x*11.5,z:q.z+inland.z*11.5};
+ if(height(q.x+inland.x*6,q.z+inland.z*6)<=.15||height(entry.x,entry.z)<=.15||detailHeight(cell,entry.x,entry.z)<=.2)return {error:'Kaldal puudub kuiv ligipääs.'};
+ return {p:{x:q.x,z:q.z},shoreAngle:Math.atan2(inland.x,inland.z),landEntry:entry,baseY:.22,riverBankV276:true};
+}
 export function coastalPlacement(game,cell,type,p){
+ const sea=seaPlacementV276(game,cell,type,p);
+ if(!sea.error)return sea;
+ const river=riverBankPlacement(game,cell,type,p);
+ return river.error?sea:river;
+}
+function seaPlacementV276(game,cell,type,p){
  const height=(x,z)=>localSurface(game,cell,x,z);
  const dx=height(p.x+2,p.z)-height(p.x-2,p.z),dz=height(p.x,p.z+2)-height(p.x,p.z-2);
  const len=Math.hypot(dx,dz);if(len<.001)return {error:'Vali mererand: pool hoonest peab jääma merre ja pool maale.'};
