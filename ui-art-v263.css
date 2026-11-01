@@ -1,0 +1,68 @@
+/* V263: painted UI art made by the player (ChatGPT images, ui-art-v263/). Pure decoration: if an image is
+   missing the old text/glyph layout still works. */
+:root{--v263-hide:url('ui-art-v263/panel_stone.webp')}
+#resources span[data-resource]{position:relative;padding-left:30px!important}
+#resources span[data-resource]::before{content:'';position:absolute;left:2px;top:50%;width:26px;height:26px;transform:translateY(-50%);background:center/contain no-repeat;filter:drop-shadow(0 1px 1px #0008)}
+#resources span[data-resource="bread"]::before{background-image:url('ui-art-v263/res_food.webp')}
+#resources span[data-resource="water"]::before{background-image:url('ui-art-v263/res_water.webp')}
+#resources span[data-resource="wood"]::before{background-image:url('ui-art-v263/res_wood.webp')}
+#resources span[data-resource="stone"]::before{background-image:url('ui-art-v263/res_stone.webp')}
+#resources span[data-resource="plank"]::before{background-image:url('ui-art-v263/res_plank.webp')}
+#resources span[data-resource="gold"]::before{background-image:url('ui-art-v263/res_gold.webp')}
+#resources span[data-resource="cutstone"]::before{background-image:url('ui-art-v263/res_cutstone.webp')}
+#resources span[data-resource="copper"]::before{background-image:url('ui-art-v263/res_copper.webp')}
+#resources span[data-resource="tin"]::before{background-image:url('ui-art-v263/res_tin.webp')}
+#resources span[data-resource="bronze"]::before{background-image:url('ui-art-v263/res_bronze.webp')}
+#resources span[data-resource="clay"]::before{background-image:url('ui-art-v263/res_clay.webp')}
+#resources span[data-resource="pottery"]::before{background-image:url('ui-art-v263/res_pottery.webp')}
+#resources span[data-resource="coal"]::before{background-image:url('ui-art-v263/res_coal.webp')}
+#resources span[data-resource="ore"]::before{background-image:url('ui-art-v263/res_ore.webp')}
+#resources span[data-resource="iron"]::before{background-image:url('ui-art-v263/res_iron.webp')}
+#resources span[data-resource="weapons"]::before{background-image:url('ui-art-v263/res_weapons.webp')}
+#resources span[data-resource="grain"]::before{background-image:url('ui-art-v263/res_grain.webp')}
+#resources span[data-resource="flour"]::before{background-image:url('ui-art-v263/res_flour.webp')}
+#citypanel .v121-build-card[data-building] .v121-card-icon.v263-art,.v121-build-card[data-building] .v121-card-icon.v263-art{font-size:0!important;flex:0 0 40px!important;width:40px!important;height:40px!important;background-color:transparent!important;background-position:center!important;background-size:contain!important;background-repeat:no-repeat!important;filter:drop-shadow(0 1px 2px #0009)}
+#citypanel .v121-build-card[data-building="hall"] .v121-card-icon.v263-art,.v121-build-card[data-building="hall"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_hall.webp')!important}
+#citypanel .v121-build-card[data-building="house"] .v121-card-icon.v263-art,.v121-build-card[data-building="house"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_house.webp')!important}
+#citypanel .v121-build-card[data-building="lumber"] .v121-card-icon.v263-art,.v121-build-card[data-building="lumber"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_lumber.webp')!important}
+#citypanel .v121-build-card[data-building="forester"] .v121-card-icon.v263-art,.v121-build-card[data-building="forester"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_forester.webp')!important}
+#citypanel .v121-build-card[data-building="quarry"] .v121-card-icon.v263-art,.v121-build-card[data-building="quarry"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_quarry.webp')!important}
+#citypanel .v121-build-card[data-building="hunter"] .v121-card-icon.v263-art,.v121-build-card[data-building="hunter"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_hunter.webp')!important}
+#citypanel .v121-build-card[data-building="well"] .v121-card-icon.v263-art,.v121-build-card[data-building="well"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_well.webp')!important}
+#citypanel .v121-build-card[data-building="farm"] .v121-card-icon.v263-art,.v121-build-card[data-building="farm"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_farm.webp')!important}
+#citypanel .v121-build-card[data-building="pasture"] .v121-card-icon.v263-art,.v121-build-card[data-building="pasture"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_pasture.webp')!important}
+#citypanel .v121-build-card[data-building="cellar"] .v121-card-icon.v263-art,.v121-build-card[data-building="cellar"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_cellar.webp')!important}
+#citypanel .v121-build-card[data-building="mason"] .v121-card-icon.v263-art,.v121-build-card[data-building="mason"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_mason.webp')!important}
+#citypanel .v121-build-card[data-building="watchtower"] .v121-card-icon.v263-art,.v121-build-card[data-building="watchtower"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_watchtower.webp')!important}
+#citypanel .v121-build-card[data-building="stonewall"] .v121-card-icon.v263-art,.v121-build-card[data-building="stonewall"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_stonewall.webp')!important}
+#citypanel .v121-build-card[data-building="barracks"] .v121-card-icon.v263-art,.v121-build-card[data-building="barracks"] .v121-card-icon.v263-art{background-image:url('ui-art-v263/bld_barracks.webp')!important}
+button.v263-btn{display:inline-flex;align-items:center;gap:6px}
+button.v263-btn::before{content:'';flex:0 0 auto;width:22px;height:22px;background:center/contain no-repeat;filter:drop-shadow(0 1px 1px #0009)}
+#hud-build.v263-btn::before{background-image:url('ui-art-v263/cmd_build.webp')}
+#hud-army.v263-btn::before{background-image:url('ui-art-v263/cmd_army.webp')}
+#hud-city.v263-btn::before{background-image:url('ui-art-v263/cmd_city.webp')}
+#hud-explore.v263-btn::before{background-image:url('ui-art-v263/cmd_explore.webp')}
+#maptoggle.v263-btn::before{background-image:url('ui-art-v263/cmd_map.webp')}
+#techtoggle.v263-btn::before{background-image:url('ui-art-v263/cmd_research.webp')}
+#pause.v263-btn::before{background-image:url('ui-art-v263/cmd_pause.webp')}
+#commandmove.v263-btn::before{background-image:url('ui-art-v263/cmd_move.webp')}
+#commandattack.v263-btn::before{background-image:url('ui-art-v263/cmd_attack.webp')}
+#commandstop.v263-btn::before{background-image:url('ui-art-v263/cmd_stop.webp')}
+#selectarmy.v263-btn::before{background-image:url('ui-art-v263/cmd_army.webp')}
+#autoexplore.v263-btn::before{background-image:url('ui-art-v263/cmd_explore.webp')}
+#opencity.v263-btn::before{background-image:url('ui-art-v263/cmd_city.webp')}
+#attackcity.v263-btn::before{background-image:url('ui-art-v263/cmd_attack.webp')}
+#attackall.v263-btn::before{background-image:url('ui-art-v263/cmd_attack.webp')}
+#foundcity.v263-btn::before{background-image:url('ui-art-v263/cmd_city.webp')}
+/* tanned-hide panels */
+header,#tools,#tray,#citypanel,#commandhud,#researchpanel,#battlepanel,#settlerpanel,#hud-explore-panel{background-image:linear-gradient(rgba(24,16,9,.62),rgba(24,16,9,.72)),var(--v263-hide)!important;background-size:auto,384px 256px!important}
+.v121-build-card{background-image:linear-gradient(rgba(30,20,11,.55),rgba(30,20,11,.7)),var(--v263-hide)!important;background-size:auto,384px 256px!important}
+/* bottom bar (hud-v74 draws an emoji in ::before and the label in ::after) */
+#tools button.v263-btn:not([hidden])::before{content:''!important;display:block;width:30px;height:30px;margin:0 auto 1px;font-size:0}
+#tools #maptoggle.v263-btn::before{background-image:url('ui-art-v263/cmd_map.webp')}
+#tools #hud-city.v263-btn::before{background-image:url('ui-art-v263/cmd_city.webp')}
+#tools #hud-explore.v263-btn::before{background-image:url('ui-art-v263/cmd_explore.webp')}
+#tools #techtoggle.v263-btn::before{background-image:url('ui-art-v263/cmd_research.webp')}
+#tools #hud-army.v263-btn::before{background-image:url('ui-art-v263/cmd_army.webp')}
+#tools #hud-build.v263-btn::before{background-image:url('ui-art-v263/cmd_build.webp')}
+#commandhud button.v263-btn::before{width:24px;height:24px}
