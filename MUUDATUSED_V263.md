@@ -7,6 +7,7 @@
 - Ehitusmenüü kaardid: 14 kiviaja ehitise pilti.
 - Paneelid (ülemine/alumine riba, linnapaneel, ehituskaardid, käsupaneel jne) on parkitud naha taustaga.
 - Kõik on `ui-art-v263.css` + `ui-art-v263.js` (eemaldab nuppudelt vana sümboli). Kui pilt puudub, jääb vana tekst.
-- Veel kasutamata: üksuste portreed (`unit_*`), `panel_frame`, mõned ressursid (vask, tina, pronks jne
+- V263c: valikupaneelil üksuse portree (asunik, avastaja, kirvemees, odamees, lingmees) ja ülemisel ribal rahvaarvu lahter.
+- Veel kasutamata: `unit_worker`, `panel_frame`, mõned ressursid (vask, tina, pronks jne
   ilmuvad ribale alles siis, kui neid on). Puuduvad pildid: `res_population` on olemas, kuid ribal
   rahvaarvu lahtrit pole.

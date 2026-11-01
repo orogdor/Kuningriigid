@@ -66,3 +66,7 @@ header,#tools,#tray,#citypanel,#commandhud,#researchpanel,#battlepanel,#settlerp
 #tools #hud-army.v263-btn::before{background-image:url('ui-art-v263/cmd_army.webp')}
 #tools #hud-build.v263-btn::before{background-image:url('ui-art-v263/cmd_build.webp')}
 #commandhud button.v263-btn::before{width:24px;height:24px}
+/* V263b: population cell and unit portraits on the selection panel */
+#resources span[data-resource="population"]::before{background-image:url('ui-art-v263/res_population.webp')}
+#commandhud.v263-has-portrait{padding-left:100px!important}
+#commandhud .v263-portrait{position:absolute;left:12px;top:14px;width:80px;height:80px;object-fit:contain;z-index:3;pointer-events:none;filter:drop-shadow(0 2px 3px #000a)}
