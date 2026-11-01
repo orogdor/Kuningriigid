@@ -5,11 +5,14 @@ import * as T from './vendor/three.module.js';
 import {loadStoneHumanV241,createStoneHuman} from './stone-age-models-v221.js?v=224';
 import {createStoneEquipment} from './stone-equipment-v234.js?v=261r';
 import {animateStoneWorkerV222} from './stone-motion-v222.js';
+import {loadTrellisRigV262,trellisRigReadyV262,applyTrellisRigV262} from './stone-trellis-rig-v262.js?v=262a';
 
 const WARRIORS=new Set(['axeman','spearman','slinger']);
 export const isRiggedStoneWarriorV261=kind=>WARRIORS.has(kind);
 export function loadRiggedStoneWarriorV261(kind){
- return WARRIORS.has(kind)?loadStoneHumanV241():Promise.resolve(false);
+ if(!WARRIORS.has(kind))return Promise.resolve(false);
+ // V262: the TRELLIS.2 look is optional; if it fails to load the V261 dressed human is used
+ return Promise.all([loadStoneHumanV241(),loadTrellisRigV262(kind).catch(e=>{console.warn('V262 TRELLIS warrior',kind,e);return false;})]).then(([ok])=>ok);
 }
 
 const materials=new Map(),geometries=new Map();
@@ -190,6 +193,17 @@ export function createRiggedStoneWarriorV261(parent,x,z,color,kind,grade='standa
  if(!rig.stoneHuman||!B.hips||!B.head||!B.hand_R||!B.hand_L)
   throw new Error('V261 expected the actual V221 17-bone skinned human');
  if(rig.tool){rig.tool.removeFromParent();}
+ if(trellisRigReadyV262(kind)&&applyTrellisRigV262(model,kind)){
+  // V262: clothing and weapon are part of the TRELLIS model; only the faction strip is added
+  const flag=piece(B.chest,'Faction cloth strip',geometry('banner',()=>{
+   const shape=new T.Shape();shape.moveTo(-.035,0);shape.lineTo(.035,0);
+   shape.lineTo(.025,-.16);shape.lineTo(-.02,-.20);shape.closePath();
+   return new T.ExtrudeGeometry(shape,{depth:.003,bevelEnabled:false});
+  }),color,[.10,-.09,.125]);flag.rotation.z=-.12;
+  Object.assign(rig,{stoneHuman:true,riggedWarriorV261:true,kind,unitKind:kind,tool:null,phase:x*2+z});
+  Object.assign(model.userData,{unitKind:kind,grade,factionColor:color,riggedWarriorV261:true,trellisV262:true});
+  model.name='V262 TRELLIS Stone Age '+kind;return model;
+ }
  const tool=createStoneEquipment(kind);tool.name='V261 '+kind+' handheld weapon';
  B.hand_R.add(tool);
  hideTunic(B,kind);capeAndFur(B,kind);bodyDetails(B,kind,grade,color);

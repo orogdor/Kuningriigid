@@ -59,3 +59,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - Tõrvikud (225 eraldi tükki) ja varustus tuleb liita. Kasutaja soovis selle hilisemaks eraldi ja põhjalikumaks läbivaatuseks.
 - WebGPU töötab kasutaja NVIDIA kaardil. Kaadrisagedust WebGPU ja WebGL-i vahel pole veel võrreldud. Udu kate ja meri on V246-s TSL-is. Maastiku sujuvad üleminekud, pilvede varjud ja tuul puuduvad WebGPU-s endiselt ja tuleb ümber kirjutada TSL-i.
 - WebGPU udu on WebGL-ist hallim, sest three r170 WebGPU rakendab ACES-toonivastenduse kogu kaadrile ja eirab `toneMapped:false`.
+
+- V262: TRELLIS.2 kirvemees/odamees/lingmees on mängus kiviaja sõdurite asemel, seotud V221 17 luuga luustikule (`stone-trellis-rig-v262.js`). Kimodo (NVIDIA) vajab GPU-d, pole kasutatud. Vana välimus: `?trellis262=0`.

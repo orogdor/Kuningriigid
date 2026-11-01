@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><title>V262 TRELLIS warriors</title>
+<body style="margin:0;background:#9aa5aa"><script type="module">
+// Visual check: three V262 warriors x (rest, walk, attack wind-up, strike). Serve the repo root and open preview-trellis-v262.html
+
+import * as T from './vendor/three.module.js';
+import {loadRiggedStoneWarriorV261,createRiggedStoneWarriorV261,animateRiggedStoneWarriorV261} from './stone-warriors-v261.js?v=262a';
+const W=1600,H=900,r=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});r.setSize(W,H);r.outputColorSpace=T.SRGBColorSpace;document.body.append(r.domElement);
+const s=new T.Scene();s.background=new T.Color('#9aa5aa');s.add(new T.HemisphereLight('#fff','#665',1.7));const d=new T.DirectionalLight('#fff',2.2);d.position.set(2,4,5);s.add(d);
+const kinds=['axeman','spearman','slinger'],poses=[[0,false,false],[.33,true,false],[0,false,{phase:.3}],[0,false,{phase:.5}]];
+for(const k of kinds)await loadRiggedStoneWarriorV261(k);
+const out=[];
+kinds.forEach((k,row)=>poses.forEach(([t,mv,at],col)=>{const m=createRiggedStoneWarriorV261(s,(col-1.5)*1.5,0,'#c0392b',k);m.position.y=(1-row)*2.05-.8;m.rotation.y=col===3?-.6:.35;animateRiggedStoneWarriorV261(m,t+1,mv,at);out.push(m.userData.trellisV262?1:0);}));
+const cam=new T.PerspectiveCamera(30,W/H,.1,50);cam.position.set(0,0,12);r.render(s,cam);window.trellis=out;window.done=true;
+</script>

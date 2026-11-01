@@ -1,5 +1,5 @@
 import {withNatureLOD} from './nature-lod-v230.js';
-import {isRiggedStoneWarriorV261,loadRiggedStoneWarriorV261,createRiggedStoneWarriorV261,animateRiggedStoneWarriorV261} from './stone-warriors-v261.js?v=261s';
+import {isRiggedStoneWarriorV261,loadRiggedStoneWarriorV261,createRiggedStoneWarriorV261,animateRiggedStoneWarriorV261} from './stone-warriors-v261.js?v=262a';
 import {hasTrellisStoneV259,loadTrellisStoneV259,createTrellisStoneV259,animateTrellisStoneV259} from './stone-trellis-v259.js?v=260';
 import {BRONZE_KINDS,createBronzeSoldier} from './bronze-soldiers-v95.js';
 import {visualKind as militaryVisualKind} from './military-v88.js?v=117a';
