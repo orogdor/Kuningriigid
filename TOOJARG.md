@@ -85,3 +85,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V273: maailmakaardi linn 1–5× nii, et mahub alati oma ruutu.
 
 - V274: rahvasteränne (esimene minut, 4 töölist + sõdur, 5x kiirus, linnakoha valik), skaut koera ja odaga, puude kasv/looduslik uuenemine, kaev avastuse taha.
+
+- V275: rahvasteränne 2 min ja 7,5x, maailmakaardil detailkaardi mudelid (asunikud, skaut), järvede laiad väljavoolud merre.

@@ -1,9 +1,9 @@
 // V274: Migration of Peoples - first game minute: no town can be built, the site can be chosen, bands move 5x;
 // at the start of the Stone Age the first town appears on the chosen site and the scout appears there.
-import {Civilization,createGame,MIGRATION_SPEED_V274} from '../civilization-core.js';
+import {Civilization,createGame,MIGRATION_SPEED_V274,MIGRATION_SECONDS_V274} from '../civilization-core.js';
 const ok=(c,m)=>{if(!c){console.error('FAIL',m);process.exit(1);}};
 const g=new Civilization(Object.assign(createGame(20261102),{migrationV274:{until:60}}));
-ok(g.migrationActiveV274(),'migration is active at the start');ok(MIGRATION_SPEED_V274===5,'5x speed');
+ok(g.migrationActiveV274(),'migration is active at the start');ok(MIGRATION_SPEED_V274===7.5&&MIGRATION_SECONDS_V274===120,'two minutes, 7.5x speed');
 const a=g.s.settlers.find(s=>s.team===0);
 ok(!g.land(a.id),'band can stop on its tile');
 let pick=null;for(let x=-16;x<=16&&!pick;x+=4)for(let z=-16;z<=16&&!pick;z+=4)if(!g.siteRule(a,{x,z}))pick={x,z};

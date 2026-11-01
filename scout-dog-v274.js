@@ -29,9 +29,9 @@ export function createSpearV274(){
  const tip=new T.Mesh(G.tip,flint);tip.position.y=1.98;g.add(tip);return g;
 }
 // dog trots at the scout's left heel, the spear is held upright at the right side
-export function addScoutCompanionsV274(root){
- if(root.userData.scoutDogV274)return;
+export function addScoutCompanionsV274(root,{spear=true}={}){
+ if(!root||root.userData.scoutDogV274)return root;
  const dog=createDogV274();dog.position.set(.55,0,-.15);root.add(dog);
- const spear=createSpearV274();spear.position.set(-.32,.02,.1);spear.rotation.z=.06;root.add(spear);
- root.userData.scoutDogV274=dog;root.userData.scoutSpearV274=spear;
+ let held=null;if(spear){held=createSpearV274();held.position.set(-.32,.02,.1);held.rotation.z=.06;root.add(held);}
+ root.userData.scoutDogV274=dog;root.userData.scoutSpearV274=held;return root;
 }

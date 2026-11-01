@@ -3,7 +3,7 @@
 // Their position is the world travel pose (same as the world marker) projected into local units.
 import * as T from './vendor/three.module.js';
 import {createStoneLoad} from './stone-equipment-v234.js';
-import {createSoldier,animateSoldier} from './visuals.js';
+import {createSoldier,animateSoldier} from './visuals.js';import {addScoutCompanionsV274} from './scout-dog-v274.js';
 import {worldTravelSample} from './map-units.js?v=59';
 import {center} from './campaign.js';
 import {scoutDetailPositionV240,blendScoutPositionV236} from './scout-sector-v236.js';
@@ -24,7 +24,7 @@ function settlerModel(team){
 }
 function scoutModel(team){
  const g=new T.Group();
- const fighter=createSoldier(g,0,0,TEAM[team]||TEAM[0],'scout');
+ const fighter=addScoutCompanionsV274(createSoldier(g,0,0,TEAM[team]||TEAM[0],'stone_hunter'),{spear:false});
  attachScoutMarkerV238(fighter,team);
  g.userData.walkers=[fighter];g.name='V236 scout same world sector';
  return g;

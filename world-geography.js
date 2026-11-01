@@ -85,3 +85,48 @@ export function openStartingPassages(cells, starts, minRegion=120){
  }
  return waypoints;
 }
+
+// V275: some large lakes drain to the sea through a wide river. For every lake (inland water body not
+// connected to the open sea) of at least minSize cells, a seeded choice (~60 %) opens an outlet: the
+// lowest-cost land path from the lake shore to the sea (Dijkstra, cost = height), marked as a wide,
+// navigable river flowing away from the lake. Existing rivers it meets are widened downstream.
+const wiggleV275=(c,r)=>{const v=Math.sin(c*12.9898+r*78.233)*43758.5453;return v-Math.floor(v);};
+export function addLakeOutletsV275(cells,noise,starts=[],{minSize=10,chance=.6}={}){
+ const n=cells.length,isWater=i=>!cells[i].land,comp=new Int32Array(n).fill(-1),sizes=[],edge=[];
+ for(let i=0;i<n;i++){if(!isWater(i)||comp[i]>=0)continue;const id=sizes.length;let size=0,touches=false;const st=[i];comp[i]=id;
+  while(st.length){const j=st.pop();size++;const p=cells[j];if(p.c===0||p.r===0||p.c===COLS-1||p.r===ROWS-1)touches=true;
+   for(const [dc,dr] of steps){const c=p.c+dc,r=p.r+dr;if(c<0||r<0||c>=COLS||r>=ROWS)continue;const k=r*COLS+c;if(comp[k]<0&&isWater(k)){comp[k]=id;st.push(k);}}}
+  sizes.push(size);edge.push(touches);}
+ // the open sea = water components that touch the map edge or are very large
+ const sea=id=>edge[id]||sizes[id]>600;
+ let outlets=0;
+ for(let id=0;id<sizes.length;id++){
+  if(sea(id)||sizes[id]<minSize)continue;
+  const any=comp.indexOf(id),p0=cells[any];if(noise(p0.c*3+11,p0.r*5+7)>chance)continue;
+  // Dijkstra over land from every shore cell of this lake to the first sea cell
+  const dist=new Float64Array(n).fill(Infinity),prev=new Int32Array(n).fill(-1),heap=new Heap();
+  for(let i=0;i<n;i++)if(comp[i]===id)for(const [dc,dr] of steps){const c=cells[i].c+dc,r=cells[i].r+dr;if(c<0||r<0||c>=COLS||r>=ROWS)continue;const k=r*COLS+c;
+   if(cells[k].land&&!cells[k].mountain&&dist[k]>cells[k].h){dist[k]=cells[k].h;prev[k]=i;heap.push(dist[k],k);}}
+  let end=-1;
+  while(heap.length){const [d,i]=heap.pop();if(d>dist[i])continue;
+   let reached=-1;for(const [dc,dr] of steps){const c=cells[i].c+dc,r=cells[i].r+dr;if(c<0||r<0||c>=COLS||r>=ROWS)continue;const k=r*COLS+c;if(isWater(k)&&comp[k]!==id&&sea(comp[k])){reached=k;break;}}
+   if(reached>=0){end=i;prev[reached]=i;break;}
+   if(d>4000)break;
+   for(const [dc,dr] of steps){const c=cells[i].c+dc,r=cells[i].r+dr;if(c<0||r<0||c>=COLS||r>=ROWS)continue;const k=r*COLS+c;
+    if(!cells[k].land||cells[k].mountain)continue;const nd=d+1+Math.max(0,cells[k].h)*.6+wiggleV275(cells[k].c,cells[k].r)*4;if(nd<dist[k]){dist[k]=nd;prev[k]=i;heap.push(nd,k);}}}
+  if(end<0)continue;
+  // walk back lake -> sea, then mark the river flowing towards the sea
+  const path=[];for(let i=end;i>=0&&cells[i].land;i=prev[i])path.push(i);path.reverse();
+  if(path.length<2||path.length>90)continue;
+  const sea_=cells.find((c,i)=>prev[i]===end&&!c.land&&comp[i]!==id);
+  const width=Math.min(16,7+sizes[id]*.08);
+  path.forEach((i,k)=>{const cell=cells[i],to=k<path.length-1?cells[path[k+1]]:sea_;if(!to)return;
+   if(starts.some(s=>Math.abs(s.c-cell.c)+Math.abs(s.r-cell.r)<2))return;
+   cell.river=true;cell.riverTo={c:to.c,r:to.r};cell.riverDir=to.c!==cell.c?'h':'v';
+   cell.riverWidth=Math.min(16,Math.max(cell.riverWidth||0,width+k*.04));cell.riverNavigable=true;cell.riverClass='major';cell.lakeOutletV275=true;
+   cell.riverFlow=Math.max(cell.riverFlow||0,sizes[id]*12);
+   cell.ford=!cell.mountain&&!!cell.ford&&k%9===4;});
+  outlets++;
+ }
+ return outlets;
+}

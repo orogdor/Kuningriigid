@@ -86,5 +86,6 @@ jobs:
           node tests/world-city-scale-v273.mjs
           node tests/tree-growth-v274.mjs
           node tests/migration-v274.mjs
+          node tests/lake-outlets-v275.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
