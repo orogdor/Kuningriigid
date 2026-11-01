@@ -15,8 +15,8 @@ const MODEL={hall:'peamaja',house:'house',lumber:'lumber',forester:'lumber',saw:
  coppermine:'quarry',tinmine:'quarry',bronze_foundry:'pottery_kiln',road_depot:'lumber'};
 // footprint size (detail units) for types missing from STONE_SIZES
 const EXTRA_SIZE={pasture:9,mason:8,claypit:7,pottery_kiln:6,watchtower:4,palisade:7,woodgate:6,stonewall:7,stonetower:5,cellar:5,storage:7,warehouse:8,mill:7,bakery:6,coppermine:8,tinmine:8,bronze_foundry:7,forester:7,saw:7,road_depot:7};
-const EXAGGERATE=4.5; // 1:1 with the detail map relative to the tile (same factor as SPREAD)
-const SPREAD=4.5;     // the layout is spread by the same uniform factor, so the town keeps its detail-map shape
+const EXAGGERATE=1; // true 1:1 with the detail map: a detail tile (225 x 195) is one world tile (50 x 50)
+const SPREAD=1;     // positions too: the whole town stays inside its own world tile
 const SKIP=new Set(['field','road','bridge']);
 
 let assets=null,loading=null;
@@ -67,7 +67,7 @@ export function clearNatureUnderTownV269(root,spots){
  if(!spots.length)return 0;let hidden=0;const m=new T.Matrix4(),p=new T.Vector3();
  let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;for(const s of spots){minX=Math.min(minX,s.x-s.r);maxX=Math.max(maxX,s.x+s.r);minZ=Math.min(minZ,s.z-s.r);maxZ=Math.max(maxZ,s.z+s.r);}
  root.traverse(o=>{
-  if(!o.isInstancedMesh||!(o.userData.v152Model||/^(world |atlas1000_(forest|rock))/.test(o.name||'')))return;
+  if(!o.isInstancedMesh||!(o.userData.v152Model||/^(world |forest |atlas1000_(forest|rock))/.test(o.name||'')))return;
   o.updateMatrixWorld();let changed=false;
   for(let i=0;i<o.count;i++){
    o.getMatrixAt(i,m);p.setFromMatrixPosition(m).applyMatrix4(o.matrixWorld);
@@ -81,6 +81,8 @@ export function clearNatureUnderTownV269(root,spots){
 // world-space footprints of a town's buildings (same placement as createWorldCityV269)
 export function townSpotsV269(buildings,origin){
  const out=[];for(const b of buildings){if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;
-  out.push({x:origin.x+b.x/DETAIL_X*SPREAD,z:origin.z+b.z/DETAIL_Z*SPREAD,r:footprint(b.type)/DETAIL_X*EXAGGERATE*.62});}
+  out.push({x:origin.x+b.x/DETAIL_X*SPREAD,z:origin.z+b.z/DETAIL_Z*SPREAD,r:Math.max(2.4,footprint(b.type)/DETAIL_X*EXAGGERATE*.9)});}
+ // the whole town area: forest clumps / rock outcrops are centred on the tile, not on a building
+ if(out.length){let far=0;for(const o of out)far=Math.max(far,Math.hypot(o.x-origin.x,o.z-origin.z)+o.r);out.push({x:origin.x,z:origin.z,r:far});}
  return out;
 }

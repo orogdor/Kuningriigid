@@ -79,3 +79,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V270: näidisküla ?demo=stonetown, maailmakaardi linnad 4×, tihedamad metsad ja ühine metsatukkade väli mõlemal kaardil.
 
 - V271: maailmakaardi linnad 1:1 detailkaardiga, puud väiksemad ja 3× tihedamad.
+
+- V272: maailmakaardi linn täpselt 1:1 (oma ruudu sees), linnaala puudest puhas.
