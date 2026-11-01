@@ -63,3 +63,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V262: TRELLIS.2 kirvemees/odamees/lingmees on mängus kiviaja sõdurite asemel, seotud V221 17 luuga luustikule (`stone-trellis-rig-v262.js`). Kimodo (NVIDIA) vajab GPU-d, pole kasutatud. Vana välimus: `?trellis262=0`.
 
 - V263: maalitud UI-ikoonid (`ui-art-v263/`, `ui-art-v263.css/.js`). Portreed valikupaneelil ja rahvaarv ribal (V263c); raam veel kasutamata.
+
+- V264: armeede/linnade nimekiri maailmakaardil, ressursid 3 grupis hoveriga, päeva number kella kõrval, uus peamenüü (`ui-v264.js/.css`).
