@@ -61,3 +61,4 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - WebGPU udu on WebGL-ist hallim, sest three r170 WebGPU rakendab ACES-toonivastenduse kogu kaadrile ja eirab `toneMapped:false`.
 
 - V262: TRELLIS.2 kirvemees/odamees/lingmees on mängus kiviaja sõdurite asemel, seotud V221 17 luuga luustikule (`stone-trellis-rig-v262.js`). Kimodo (NVIDIA) vajab GPU-d, pole kasutatud. Vana välimus: `?trellis262=0`.
+- TRELLIS.2 lingmees (4975 kolmn.) ja kirvemees nr 2 (5083) kaustas `models-trellis-tests/`, harul `claude/trellis-5000-lingmees-kirvemees`. Mängu pole ühendatud. Skriptid: `tools/trellis_reduce_5000_blender.py` ja `tools/trellis_bake_5000_blender.py` (kui Blenderi collapse jääb kinni).
