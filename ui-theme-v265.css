@@ -1,0 +1,59 @@
+/* V265: one warm "tanned hide + gold" look for the panels that still used the old teal theme.
+   Loaded last; colours only (no layout changes). */
+:root{
+ --t-ink:#f3e3c3;--t-muted:#c8b48e;--t-gold:#d9b673;--t-gold2:#f0d39c;--t-line:rgba(217,182,115,.38);
+ --t-panel:linear-gradient(rgba(30,20,11,.88),rgba(20,13,7,.94)),url('ui-art-v263/panel_stone.webp') 0 0/384px 256px;
+ --t-btn:linear-gradient(rgba(70,48,26,.92),rgba(46,31,17,.95));--t-btn-hover:linear-gradient(rgba(96,66,34,.95),rgba(62,42,22,.97));
+ --t-active:linear-gradient(#e7c27a,#c99b4c)}
+
+/* ---- floating panels */
+#v51insights,#atlasoverview,#commandhud,#settlerpanel,#battlepanel,#hud-explore-panel,#toast,#citypanel,#researchpanel .research-window,#atlaspanel,#hud-tile-resources{
+ background:var(--t-panel)!important;border-color:var(--t-line)!important;color:var(--t-ink)!important}
+#toast{border:1px solid var(--t-line)!important;box-shadow:0 8px 22px #0009!important}
+#v51insights strong,#atlasoverview>span,#atlasoverview .label,#researchpanel .eyebrow,#citypanel .eyebrow{color:var(--t-gold)!important}
+#atlasminimap{border-color:var(--t-line)!important}
+
+/* ---- buttons inside those panels and the top bar */
+#v51tips button,#commandhud button,#hud-resource-toggle,#hud-map-details,#pause,#settlerpanel button,#battlepanel button,
+#hud-explore-panel button,#citypanel button:not(.v121-build-card),#researchpanel button:not(.tech-card),#closeresearch,#atlaspanel button,#hud-close-map{
+ background:var(--t-btn)!important;border:1px solid var(--t-line)!important;color:var(--t-ink)!important;box-shadow:none!important}
+#v51tips button:hover,#commandhud button:hover,#hud-resource-toggle:hover,#hud-map-details:hover,#pause:hover,#settlerpanel button:hover,#battlepanel button:hover,
+#hud-explore-panel button:hover,#citypanel button:not(.v121-build-card):hover,#researchpanel button:not(.tech-card):hover,#atlaspanel button:hover{background:var(--t-btn-hover)!important;border-color:var(--t-gold)!important}
+#commandhud button[aria-pressed="true"],#commandhud button.active,#citypanel button[aria-selected="true"],#citypanel button.active,#researchpanel button:not(.tech-card).active,
+#researchpanel button:not(.tech-card)[aria-pressed="true"],#v51tips button.active{background:var(--t-active)!important;color:#2a1a0b!important;border-color:#f3dca3!important}
+#v51tips button small,#v51tips button span{color:var(--t-muted)!important}
+button:disabled{opacity:.55}
+
+/* ---- day clock chip and pause */
+#dayclock-v235{background:var(--t-btn)!important;border:1px solid var(--t-line)!important;color:var(--t-ink)!important;border-radius:8px}
+#pause{border-radius:10px!important}
+
+/* ---- the castle glyph in the top-left corner -> painted longhouse */
+header .brand{font-size:0!important;width:44px;height:44px;background:url('ui-art-v263/bld_hall.webp') center/contain no-repeat!important;filter:drop-shadow(0 1px 2px #000a)}
+header .brand *{display:none!important}
+
+/* ---- research window */
+#researchpanel .research-window{border:1px solid var(--t-line)!important}
+#researchpanel h1,#researchpanel h2,#researchpanel h3{color:var(--t-gold2)!important}
+#researchpanel p,#researchpanel summary,#researchpanel small{color:var(--t-ink)!important}
+#researchtree .tech-map-viewport,#researchtree .tech-inspector{background:rgba(16,10,5,.55)!important;border-color:var(--t-line)!important}
+#researchtree [class*="tech-era"],#researchtree [class*="era-band"],#researchtree [class*="tech-column"]{background:rgba(60,40,20,.28)!important;border-color:rgba(217,182,115,.25)!important}
+#researchtree .tech-card{background:linear-gradient(rgba(70,48,26,.95),rgba(44,29,15,.97))!important;color:var(--t-ink)!important;border-color:rgba(217,182,115,.45)!important}
+#researchtree .tech-card.available{border-color:var(--t-gold)!important}
+#researchtree .tech-card.is-selected{box-shadow:0 0 0 2px var(--t-gold2),0 6px 18px #000a!important}
+#researchtree .tech-card.researched,#researchtree .tech-card.done{background:linear-gradient(rgba(110,82,38,.95),rgba(70,50,24,.97))!important}
+#researchtree .tech-card.locked,#researchtree .tech-card[class*="locked"],#researchtree .tech-card[class*="preview"]{background:linear-gradient(rgba(48,40,32,.9),rgba(32,27,22,.95))!important;border-color:rgba(200,180,140,.22)!important;color:#cfc3ad!important}
+#researchtree .tech-card b,#researchtree .tech-card strong{color:#fff!important}
+
+/* ---- city management tabs */
+#citypanel [role="tab"],#citypanel .tabs button{background:transparent!important;border-color:transparent!important;color:var(--t-muted)!important}
+#citypanel [role="tab"][aria-selected="true"],#citypanel .tabs button.active{background:var(--t-active)!important;color:#2a1a0b!important}
+
+/* ---- bottom bar active tab, research status chip, focus rings */
+#tools button.active,#tools button[aria-pressed="true"],#tools button[aria-current="true"],body.atlas #tools #maptoggle{background:linear-gradient(rgba(217,182,115,.32),rgba(150,110,50,.28))!important;border-color:var(--t-gold)!important;box-shadow:0 0 0 1px rgba(240,211,156,.35) inset!important;color:var(--t-ink)!important}
+#researchstatus{background:var(--t-panel)!important;border-color:var(--t-line)!important;color:var(--t-ink)!important}
+#researchstatus *{color:inherit}
+#closeresearch:focus-visible,#researchpanel button:focus-visible,#commandhud button:focus-visible{outline:2px solid var(--t-gold2)!important;outline-offset:2px}
+#closeresearch{outline:none!important}
+#researchtree .tech-card.is-selected{background:linear-gradient(rgba(110,78,36,.97),rgba(72,50,24,.98))!important}
+body:has(#researchpanel:not([hidden])) #tools #techtoggle,#tools #techtoggle:focus,#tools button:focus{background:linear-gradient(rgba(217,182,115,.32),rgba(150,110,50,.28))!important;border-color:var(--t-gold)!important;color:var(--t-ink)!important}

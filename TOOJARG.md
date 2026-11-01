@@ -65,3 +65,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V263: maalitud UI-ikoonid (`ui-art-v263/`, `ui-art-v263.css/.js`). Portreed valikupaneelil ja rahvaarv ribal (V263c); raam veel kasutamata.
 
 - V264: armeede/linnade nimekiri maailmakaardil, ressursid 3 grupis hoveriga, päeva number kella kõrval, uus peamenüü (`ui-v264.js/.css`).
+
+- V265: vana teal-stiil asendatud (`ui-theme-v265.css`), ♜ → pikkmaja, V264 sildid keelepõhised.

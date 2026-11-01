@@ -6,10 +6,11 @@
 //  - Main menu: painted warrior portraits above the title (styling in ui-v264.css).
 const $=id=>document.getElementById(id);
 const GROUPS=[
- {id:'food',name:'Toit ja vesi',icon:'res_food',keys:['bread','water','grain','flour','fish','meat'],main:['bread','water']},
- {id:'build',name:'Ehitusmaterjalid',icon:'res_wood',keys:['wood','plank','stone','cutstone','clay','copper','tin','bronze','ore','coal','iron','steel','weapons'],main:['wood','stone','plank']},
- {id:'lux',name:'Kaubad ja luksus',icon:'res_gold',keys:['gold','pottery','paper','cloth','wine','jewelry','spices','salt'],main:['gold','pottery']}
+ {id:'food',name:'Toit ja vesi',en:'Food & water',icon:'res_food',keys:['bread','water','grain','flour','fish','meat'],main:['bread','water']},
+ {id:'build',name:'Ehitusmaterjalid',en:'Building materials',icon:'res_wood',keys:['wood','plank','stone','cutstone','clay','copper','tin','bronze','ore','coal','iron','steel','weapons'],main:['wood','stone','plank']},
+ {id:'lux',name:'Kaubad ja luksus',en:'Goods & luxury',icon:'res_gold',keys:['gold','pottery','paper','cloth','wine','jewelry','spices','salt'],main:['gold','pottery']}
 ];
+const gname=g=>(document.documentElement.lang||'').startsWith('en')?g.en:g.name;
 const groupOf=k=>GROUPS.find(g=>g.keys.includes(k))||GROUPS[1];
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 
@@ -28,9 +29,9 @@ function regroup(){
   const items=spans.filter(s=>s.dataset.resource!=='population'&&groupOf(s.dataset.resource)===g);
   if(!items.length)continue;
   const chip=document.createElement('div');chip.className='v264-chip';chip.dataset.group=g.id;chip.tabIndex=0;chip.setAttribute('role','button');
-  chip.setAttribute('aria-label',g.name);chip.title=g.name;
+  chip.setAttribute('aria-label',gname(g));chip.title=gname(g);
   const mains=g.main.map(k=>items.find(s=>s.dataset.resource===k)).filter(Boolean);
-  chip.innerHTML=`<img class="v264-gicon" src="ui-art-v263/${g.icon}.webp" alt=""><div class="v264-vals">${mains.map(s=>`<div class="v264-val"><img src="ui-art-v263/${iconOf(s.dataset.resource)}.webp" alt=""><i>${esc(val(s,'b')||'0')}</i></div>`).join('')}</div><div class="v264-gname">${esc(g.name)}${items.length>mains.length?' +'+(items.length-mains.length):''}</div>`;
+  chip.innerHTML=`<img class="v264-gicon" src="ui-art-v263/${g.icon}.webp" alt=""><div class="v264-vals">${mains.map(s=>`<div class="v264-val"><img src="ui-art-v263/${iconOf(s.dataset.resource)}.webp" alt=""><i>${esc(val(s,'b')||'0')}</i></div>`).join('')}</div><div class="v264-gname">${esc(gname(g))}${items.length>mains.length?' +'+(items.length-mains.length):''}</div>`;
   frag.append(chip);
  }
  for(const s of spans){if(s.dataset.resource==='population'){s.dataset.v264='1';continue;}store.append(s);}
@@ -53,7 +54,7 @@ function popEl(){
 function fillPop(id){
  const g=GROUPS.find(g=>g.id===id),el=popEl(),store=$('resources')?.querySelector('.v264-store');if(!g||!store)return;
  const items=[...store.querySelectorAll('span[data-resource]')].filter(s=>groupOf(s.dataset.resource)===g);
- el.innerHTML=`<strong>${esc(g.name)}</strong>`+items.map(s=>`<div class="v264-rrow${s.dataset.resource==='bread'?' clickable':''}" role="listitem" data-key="${esc(s.dataset.resource)}" title="${esc(s.title||'')}"><img src="ui-art-v263/${iconOf(s.dataset.resource)}.webp" alt=""><span class="n">${esc(val(s,'small'))}</span><b>${esc(val(s,'b'))}<em>${esc(val(s,'em'))}</em></b><span class="k">kuningriik ${esc(val(s,'i'))}</span></div>`).join('');
+ el.innerHTML=`<strong>${esc(gname(g))}</strong>`+items.map(s=>`<div class="v264-rrow${s.dataset.resource==='bread'?' clickable':''}" role="listitem" data-key="${esc(s.dataset.resource)}" title="${esc(s.title||'')}"><img src="ui-art-v263/${iconOf(s.dataset.resource)}.webp" alt=""><span class="n">${esc(val(s,'small'))}</span><b>${esc(val(s,'b'))}<em>${esc(val(s,'em'))}</em></b><span class="k">${(document.documentElement.lang||'').startsWith('en')?'kingdom':'kuningriik'} ${esc(val(s,'i'))}</span></div>`).join('');
 }
 function showPop(chip){
  clearTimeout(hideTimer);const id=chip.dataset.group;shown=id;fillPop(id);const el=popEl(),r=chip.getBoundingClientRect();
