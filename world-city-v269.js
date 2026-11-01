@@ -15,7 +15,7 @@ const MODEL={hall:'peamaja',house:'house',lumber:'lumber',forester:'lumber',saw:
  coppermine:'quarry',tinmine:'quarry',bronze_foundry:'pottery_kiln',road_depot:'lumber'};
 // footprint size (detail units) for types missing from STONE_SIZES
 const EXTRA_SIZE={pasture:9,mason:8,claypit:7,pottery_kiln:6,watchtower:4,palisade:7,woodgate:6,stonewall:7,stonetower:5,cellar:5,storage:7,warehouse:8,mill:7,bakery:6,coppermine:8,tinmine:8,bronze_foundry:7,forester:7,saw:7,road_depot:7};
-const EXAGGERATE=18; // 4x the detail-map size relative to the tile (layout itself is spread by SPREAD)
+const EXAGGERATE=4.5; // 1:1 with the detail map relative to the tile (same factor as SPREAD)
 const SPREAD=4.5;     // the layout is spread by the same uniform factor, so the town keeps its detail-map shape
 const SKIP=new Set(['field','road','bridge']);
 
