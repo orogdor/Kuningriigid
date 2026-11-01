@@ -67,3 +67,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V264: armeede/linnade nimekiri maailmakaardil, ressursid 3 grupis hoveriga, päeva number kella kõrval, uus peamenüü (`ui-v264.js/.css`).
 
 - V265: vana teal-stiil asendatud (`ui-theme-v265.css`), ♜ → pikkmaja, V264 sildid keelepõhised.
+
+- V266: kiviaja avastuste järjekord parandatud (MUUDATUSED_V266.md); mustandharu ühendatud.
