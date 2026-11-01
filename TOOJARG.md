@@ -59,3 +59,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - Tõrvikud (225 eraldi tükki) ja varustus tuleb liita. Kasutaja soovis selle hilisemaks eraldi ja põhjalikumaks läbivaatuseks.
 - WebGPU töötab kasutaja NVIDIA kaardil. Kaadrisagedust WebGPU ja WebGL-i vahel pole veel võrreldud. Udu kate ja meri on V246-s TSL-is. Maastiku sujuvad üleminekud, pilvede varjud ja tuul puuduvad WebGPU-s endiselt ja tuleb ümber kirjutada TSL-i.
 - WebGPU udu on WebGL-ist hallim, sest three r170 WebGPU rakendab ACES-toonivastenduse kogu kaadrile ja eirab `toneMapped:false`.
+
+- TRELLIS.2 lingmees (4975 kolmn.) ja kirvemees nr 2 (5083) kaustas `models-trellis-tests/`, harul `claude/trellis-5000-lingmees-kirvemees`. Mängu pole ühendatud. Skriptid: `tools/trellis_reduce_5000_blender.py` ja `tools/trellis_bake_5000_blender.py` (kui Blenderi collapse jääb kinni).
