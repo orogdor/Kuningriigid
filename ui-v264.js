@@ -81,13 +81,36 @@ function fill(){
  const row=(img,title,sub,on,extra)=>{const b=document.createElement('button');b.type='button';b.className='v264-row';b.innerHTML=`<img src="ui-art-v263/${img}.webp" alt=""><span><b>${esc(title)}</b><small>${esc(sub)}</small></span>`;b.onclick=on;if(extra)b.append(extra);rows.append(b);return b;};
  if(mode==='army'){
   panel.querySelector('.v264-head strong').textContent='Armeed';
-  const list=a.armies().filter(x=>!q||('armee '+(x.id+1)+' '+Object.keys(x.kinds).join(' ')).toLowerCase().includes(q));
-  if(!list.length)rows.innerHTML='<p class="v264-empty">Armeid pole. Värba sõdalasi linnas.</p>';
+  const here=a.here?.()||null;
+  const list=a.armies().filter(x=>!q||('armee '+(x.id+1)+' '+Object.keys(x.kinds).join(' ')).toLowerCase().includes(q))
+   .map(x=>({...x,d:here?Math.abs(x.c-here.c)+Math.abs(x.r-here.r):null})).sort((p,q2)=>(p.d??0)-(q2.d??0));
+  if(here&&a.recruit){const rb=document.createElement('button');rb.type='button';rb.className='v276-recruit';rb.textContent='⚔ Värba väed selles linnas';rb.onclick=()=>{a.recruit();close();};rows.append(rb);}
+  if(!list.length)rows.insertAdjacentHTML('beforeend','<p class="v264-empty">Armeid pole. Värba sõdalasi linnas.</p>');
+  // V276: on the detail map, armies on this tile come first, the rest under "farther away"
+  const section=t=>{const h=document.createElement('div');h.className='v276-head';h.textContent=t;rows.append(h);};
+  let lastGroup=null;
   for(const x of list){
+   if(here){const g=x.d===0?'Selles ruudus':'Kaugemal';if(g!==lastGroup){section(g);lastGroup=g;}}
    const kinds=Object.entries(x.kinds).map(([n,c])=>c+'× '+n).join(', ')||'tühi';
    const icon=x.count&&Object.keys(x.kinds).length===1&&/avasta|scout/i.test(Object.keys(x.kinds)[0])?'unit_scout':'cmd_army';
-   const b=row(icon,'Armee '+(x.id+1)+' · '+x.count+' meest',kinds+' · ruut '+(x.c+1)+':'+(x.r+1)+(x.ship?' · laeval':'')+(x.auto?' · avastab':''),()=>{a.selectArmy(x.id);close();});
+   const where=x.d?' · '+x.d+' ruutu eemal':'';
+   const b=row(icon,'Armee '+(x.id+1)+' · '+x.count+' meest',kinds+' · ruut '+(x.c+1)+':'+(x.r+1)+where+(x.ship?' · laeval':'')+(x.auto?' · avastab':''),()=>{if(here&&x.d===0&&a.selectArmyHere)a.selectArmyHere(x.id);else a.selectArmy(x.id);close();});
    if(x.selected)b.classList.add('active');
+  }
+ }else if(mode==='trade'){
+  panel.querySelector('.v264-head strong').textContent='Kaubandus';
+  // V276: trade with the trader villages you have discovered (from your nearest town in range)
+  const traders=(a.traders?.()||[]).filter(t=>!q||(t.name+' '+(t.town||'')).toLowerCase().includes(q)).sort((x,y)=>(y.town?1:0)-(x.town?1:0));
+  if(!traders.length)rows.innerHTML='<p class="v264-empty">Ühtegi kaupmeeste küla pole veel avastatud. Saada skaut maailma avastama.</p>';
+  for(const t of traders){
+   const card=document.createElement('div');card.className='v276-trader';
+   card.innerHTML=`<div class="v276-title"><img src="ui-art-v263/res_gold.webp" alt=""><span><b>${esc(t.name)}</b><small>${t.town?'kaupleb linn '+esc(t.town):'ükski linn pole piisavalt lähedal'} · ruut ${t.c+1}:${t.r+1}</small></span></div>`;
+   card.querySelector('.v276-title').onclick=()=>a.focusVillage(t.id);
+   const offers=document.createElement('div');offers.className='v276-offers';
+   for(const o of t.offers){const b=document.createElement('button');b.type='button';b.disabled=!t.town;
+    const fmt=obj=>Object.entries(obj).map(([k,v])=>v+' '+k).join(', ');b.title=fmt(o.give)+' → '+fmt(o.get);
+    b.textContent=o.label+' ('+fmt(o.get)+')';b.onclick=e=>{e.stopPropagation();a.trade(t.id,o.id);fill();};offers.append(b);}
+   card.append(offers);rows.append(card);
   }
  }else{
   panel.querySelector('.v264-head strong').textContent='Linnad';
@@ -99,26 +122,13 @@ function fill(){
    enter.onclick=e=>{e.stopPropagation();a.openCity(x.id);close();};
    row('cmd_city',x.name,x.pop+' elanikku · ruut '+(x.cc+1)+':'+(x.r+1),()=>{a.focusCity('city',x.id);},enter);
   }
-  // V276: trade with trader villages you have discovered (from your nearest town in range)
-  const traders=a.traders?.()||[];
-  if(traders.length){const h=document.createElement('div');h.className='v276-head';h.textContent='Kaubavahetus · kaupmeeste külad';rows.append(h);}
-  for(const t of traders){
-   const card=document.createElement('div');card.className='v276-trader';
-   card.innerHTML=`<div class="v276-title"><img src="ui-art-v263/res_gold.webp" alt=""><span><b>${esc(t.name)}</b><small>${t.town?'kaupleb linn '+esc(t.town):'ükski linn pole piisavalt lähedal'} · ruut ${t.c+1}:${t.r+1}</small></span></div>`;
-   card.querySelector('.v276-title').onclick=()=>a.focusVillage(t.id);
-   const offers=document.createElement('div');offers.className='v276-offers';
-   for(const o of t.offers){const b=document.createElement('button');b.type='button';b.disabled=!t.town;
-    const fmt=obj=>Object.entries(obj).map(([k,v])=>v+' '+k).join(', ');b.title=fmt(o.give)+' → '+fmt(o.get);
-    b.textContent=o.label+' ('+fmt(o.get)+')';b.onclick=e=>{e.stopPropagation();a.trade(t.id,o.id);fill();};offers.append(b);}
-   card.append(offers);rows.append(card);
-  }
  }
 }
 function toggle(kind){
  if(!panel)build();
  if(!panel.hidden&&mode===kind){close();return;}
  mode=kind;panel.querySelector('input').value='';panel.hidden=false;panel.dataset.kind=kind;fill();
- const btn=$(kind==='army'?'hud-army':'hud-city');
+ const btn=$(kind==='army'?'hud-army':kind==='trade'?'hud-trade-v276':'hud-city');
  if(btn){const r=btn.getBoundingClientRect();panel.style.left=Math.max(8,Math.min(window.innerWidth-340,r.left+r.width/2-160))+'px';}
 }
 window.uiListsV264={toggle,close};
@@ -132,8 +142,13 @@ function menuArt(){
 }
 
 // ---------------------------------------------------------------- wiring
+function tradeButtonV276(){
+ const army=$('hud-army');if(!army||$('hud-trade-v276'))return;
+ const b=document.createElement('button');b.type='button';b.id='hud-trade-v276';b.title='Kaubandus kaupmeeste küladega';b.textContent='Kaubandus';
+ b.onclick=e=>{e.stopPropagation();toggle('trade');};army.after(b);
+}
 function start(){
- menuArt();regroup();
+ menuArt();regroup();tradeButtonV276();
  const bar=$('resources');
  if(bar){new MutationObserver(()=>{if(!regrouping)regroup();}).observe(bar,{childList:true});
   bar.addEventListener('mouseover',e=>{const c=e.target.closest('.v264-chip');if(c)showPop(c);});
@@ -142,10 +157,10 @@ function start(){
   bar.addEventListener('keydown',e=>{const c=e.target.closest('.v264-chip');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();showPop(c);}});}
  document.addEventListener('click',e=>{
   if(!e.target.closest('.v264-chip,#v264-respop'))hidePop();
-  if(panel&&!panel.hidden&&!e.target.closest('#v264-listpanel,#hud-army,#hud-city'))close();
+  if(panel&&!panel.hidden&&!e.target.closest('#v264-listpanel,#hud-army,#hud-city,#hud-trade-v276'))close();
  });
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel&&!panel.hidden)close();});
  // the list only makes sense on the world map
- setInterval(()=>{if(panel&&!panel.hidden){if(api()?.view()!=='world')close();else fill();}},1500);
+ setInterval(()=>{if(panel&&!panel.hidden&&!panel.matches(':hover'))fill();},1500);
 }
 if(typeof document!=='undefined'){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();}

@@ -78,3 +78,9 @@
 #v264-listpanel .v276-offers button{font:600 10.5px/1.2 Inter,Arial,sans-serif;padding:5px 6px;border-radius:7px;border:1px solid var(--v264-line);background:linear-gradient(rgba(70,48,26,.92),rgba(46,31,17,.95));color:var(--v264-ink);cursor:pointer;text-align:left}
 #v264-listpanel .v276-offers button:hover:not(:disabled){border-color:var(--v264-gold)}
 #v264-listpanel .v276-offers button:disabled{opacity:.45;cursor:default}
+/* V276 trade button in the bottom bar (hud-v74 draws icon in ::before and label in ::after) */
+#tools #hud-trade-v276{order:4}
+#tools #hud-trade-v276::before{content:''!important;display:block;width:30px;height:30px;margin:0 auto 1px;background:url('ui-art-v263/res_gold.webp') center/contain no-repeat;filter:drop-shadow(0 1px 1px #0009)}
+#tools #hud-trade-v276::after{content:'Kaubandus';display:block;font:600 10px/13px Inter,Arial,sans-serif}
+html[lang^="en"] #tools #hud-trade-v276::after{content:'Trade'}
+#v264-listpanel .v276-recruit{margin:2px 0 4px;padding:7px 10px;border-radius:9px;border:1px solid #f3dca3;background:linear-gradient(#e7c27a,#c99b4c);color:#2a1a0b;font:700 12px/1.2 Inter,Arial,sans-serif;cursor:pointer}

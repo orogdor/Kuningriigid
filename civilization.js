@@ -279,6 +279,7 @@ function detailVillageV276(site,tile){
  }
  g.userData.worldProp='village';g.userData.villageTypeV276=raiders?'raiders':'traders';return g;
 }
+let villageGlowTexV276=null;function villageGlowTextureV276(){if(villageGlowTexV276)return villageGlowTexV276;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');if(g?.createRadialGradient){const r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(255,220,150,1)');r.addColorStop(.35,'rgba(255,170,80,.55)');r.addColorStop(1,'rgba(255,140,40,0)');g.fillStyle=r;g.fillRect(0,0,128,128);}villageGlowTexV276=new T.CanvasTexture(c);villageGlowTexV276.colorSpace=T.SRGBColorSpace;return villageGlowTexV276;}
 function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1){
  const base=baseTownBuildingModelV2234(type,team,age,stage,seed,woodFortTier);
  const model=base?.userData.stoneNearLOD?base:stoneBuildingModel(type,age,seed,base)||base;
@@ -995,6 +996,8 @@ function worldSync(){refreshCultivation();worldProps.update();refreshResourceAre
  if(landmark.kind==='village'&&!marker.userData.worldPropAdded){if(worldCityModelsReadyV269()){const lay=villageLayoutV276(landmark),baseY=surface(game,game.cell(landmark).x,game.cell(landmark).z),town=createWorldCityV269(lay,(x,z)=>surface(game,game.cell(landmark).x+x,game.cell(landmark).z+z)-baseY);if(town){marker.add(town);marker.userData.worldPropAdded=true;if(marker.children[1])marker.children[1].visible=false;const vt=villageTypeV276(landmark);if(marker.children[0]){marker.children[0].material.color?.set(vt==='raiders'?'#ff8a70':'#f6cf87');}clearNatureUnderTownV269(worldScene,townSpotsV269(lay,game.cell(landmark)));}}else loadWorldCityModelsV269();}
  if(landmark.kind!=='village'&&worldProps.ready&&!marker.userData.worldPropAdded){const source=worldProps.landmark(landmark.kind);if(source){marker.add(source);marker.userData.worldPropAdded=true;if(marker.children[1])marker.children[1].visible=false;}}
  const cell=game.cell(landmark);marker.position.set(cell.x,surface(game,cell.x,cell.z)+1,cell.z);
+ // V276: villages glow at night on the world map (warm firelight, brighter as the night deepens)
+ if(landmark.kind==='village'){let glow=marker.userData.glowV276;if(!glow){glow=new T.Sprite(new T.SpriteMaterial({map:villageGlowTextureV276(),color:'#ffb35c',transparent:true,depthWrite:false,blending:T.AdditiveBlending}));glow.scale.set(34,34,1);glow.position.y=5;glow.renderOrder=5;marker.add(glow);marker.userData.glowV276=glow;}const clk=dayClockV235(s.time),flick=.9+.1*Math.sin(s.time*3.1+cell.c);glow.visible=clk.torch>.02;glow.material.opacity=Math.min(.9,clk.torch*.85*flick);}
  marker.scale.setScalar(landmark.claimedBy==null?1:.76);
  }
  // Bronze Age and later fishing crews travel to offshore schools by boat.
@@ -1501,9 +1504,13 @@ window.kingdomsUiV264={
  // V276: trader villages you have seen, the town that would trade, and the offers
  traders:()=>(s.landmarks||[]).filter(l=>villageTypeV276(l)==='traders'&&game.seen(0,l)).map(l=>{const t=tradeTownV276(game,l,0);return {id:l.id,name:VILLAGE_NAMES_V276.traders,c:l.c,r:l.r,town:t?.name||null,offers:TRADE_OFFERS_V276.map(o=>({id:o.id,label:o.label,give:o.give,get:o.get}))};}),
  trade(id,offer){const r=tradeWithVillageV276(game,id,offer,0);say(r.error||('Kaubavahetus: '+r.text));renderUI();return r;},
+ // V276: army list also on the detail map: armies on this tile first; recruiting stays one click away
+ here:()=>view==='local'&&activeTile?{c:activeTile.c,r:activeTile.r}:null,
+ recruit(){if(view==='local'&&activeCity()){selectedUnit=null;setCityTab('build');tab='army';renderUI();document.body.classList.add('hud-city-open')}else say('Sõjaväe värbamiseks ava oma linn.');},
+ selectArmyHere(id){const a=s.armies.find(a=>a.team===0&&(a.id||0)===id);if(!a)return;selectedArmyId=id;selectedTrade=null;selectedMover=null;selectedShip=null;armySelected=true;commandMode='select';renderUI();say('Armee '+(id+1)+' valitud. Liikumiseks vajuta M.');},
  focusVillage(id){const l=(s.landmarks||[]).find(x=>x.id===id);if(!l)return;chosen=game.cell(l);if(view!=='world')openWorld();const p=center(l.c,l.r);focus.set(p.x,0,p.z);renderUI();}
 };
-$('hud-army').onclick=()=>{if(view==='world'&&window.uiListsV264){window.uiListsV264.toggle('army');return}if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){selectedUnit=null;setCityTab('build');tab='army';renderUI();document.body.classList.add('hud-city-open')}else say('Sõjaväe värbamiseks raja esmalt linn.')};
+$('hud-army').onclick=()=>{if(window.uiListsV264&&!s.battle){window.uiListsV264.toggle('army');return}if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){selectedUnit=null;setCityTab('build');tab='army';renderUI();document.body.classList.add('hud-city-open')}else say('Sõjaväe värbamiseks raja esmalt linn.')};
 $('hud-walk').onclick=()=>{if(view!=='local')return say('Open a detail map first, then press Walk.');if(s.battle)return say('Walking is not available during a battle.');if(walker.active)return walker.exit();if(walker.placed)walker.enter();else walker.startPlacing();};$('hud-build').onclick=()=>{if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){selectedUnit=null;setCityTab('build');tab='build';renderUI();document.body.classList.add('hud-city-open')}else say('Ehitamiseks raja esmalt linn.')};$('opencity').onclick=()=>{const city=ownCity(),a=s.settlers.find(a=>a.team===0);if(city)openTile(game.cell(city));else if(a){chosen=game.cell(a);openTile(chosen)}};$('viewenemy').onclick=()=>{const c=s.cities.find(c=>c.team!==0&&game.visibleNow(0,c))||s.settlers.find(a=>a.team!==0&&game.visibleNow(0,a));if(c)openTile(game.cell(c));else say('Vastast pole veel avastatud. Saada avastaja.');};$('attackcity').onclick=()=>{
  const target=game.cityAt(chosen)?.team!==0?game.cityAt(chosen):null;
  const city=target||s.cities.find(c=>c.team!==0&&game.seen(0,c))

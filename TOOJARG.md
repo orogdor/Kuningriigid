@@ -89,3 +89,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V275: rahvasteränne 2 min ja 7,5x, maailmakaardil detailkaardi mudelid (asunikud, skaut), järvede laiad väljavoolud merre.
 
 - V276: külad 2 tüüpi (röövlid/kaupmehed) mängija hoonetest, kauplemine, röövretked+hoiatused, 20 min rahu, kiviaja armeed 3x väiksemad, jõekaldale kalamees + jõekalad; PARANDUS V274 puude uuenemise viga.
+
+- V277: kaubanduse eraldi menüü (nupp Kaubandus), armeede nimekiri ka detailkaardil (selles ruudus/kaugemal), külade öine kuma.
