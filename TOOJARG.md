@@ -71,3 +71,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V266: kiviaja avastuste järjekord parandatud (MUUDATUSED_V266.md); mustandharu ühendatud.
 
 - V267: vesi jõest ilma kaevuta (−10% töö, −5% rahulolu), kaitserajatised vajavad ainult kivitööriistu.
+
+- V268: veekandjad (jõest vesi ilma kaevuta), test CI-s. GitHubi väljalase v268.
