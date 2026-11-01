@@ -73,3 +73,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V267: vesi jõest ilma kaevuta (−10% töö, −5% rahulolu), kaitserajatised vajavad ainult kivitööriistu.
 
 - V268: veekandjad (jõest vesi ilma kaevuta), test CI-s. GitHubi väljalase v268.
+
+- V269: maailmakaardi kiviaja linnad detailkaardi paigutusega, ülilihtsad mudelid (`world-city-v269.js`, `models-world-v269/`).
