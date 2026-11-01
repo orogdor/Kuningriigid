@@ -91,3 +91,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V276: külad 2 tüüpi (röövlid/kaupmehed) mängija hoonetest, kauplemine, röövretked+hoiatused, 20 min rahu, kiviaja armeed 3x väiksemad, jõekaldale kalamees + jõekalad; PARANDUS V274 puude uuenemise viga.
 
 - V277: kaubanduse eraldi menüü (nupp Kaubandus), armeede nimekiri ka detailkaardil (selles ruudus/kaugemal), külade öine kuma.
+
+- V278: loomulik kaldajoon (uued maailmad), puud mitte vette/liivale, barbarimüür kinnine (tornid müüris, värav müüris), külad lähima riigi ajastus (hooned, kaubad, röövsalgad).

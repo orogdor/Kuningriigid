@@ -131,7 +131,7 @@ import {setupAtmosphere} from './atmosphere-v158.js?v=161a';
 import {dayClockV235,createCityTorchesV235,updateCityTorchesV235} from './daynight-v235.js';
 import {createPeopleLifeV252} from './people-life-v252.js';
 import {createWildlifeV255,wildlifeVisualHeadingV257} from './wildlife-v255.js';
-import {createHerdingV255} from './herding-v255.js';import {createWaterCarriersV268,nearestRiverPointV268} from './water-carriers-v268.js';import {worldToDetail as worldToDetailV276} from './landscape-shared.js?v=123a';import {villageTypeV276,villageLayoutV276,VILLAGE_NAMES_V276,TRADE_OFFERS_V276,tradeWithVillageV276,tradeTownV276,raidPositionV276} from './villages-v276.js';import {loadWorldCityModelsV269,worldCityModelsReadyV269,worldCityStampV269,createWorldCityV269,clearNatureUnderTownV269,townSpotsV269} from './world-city-v269.js';
+import {createHerdingV255} from './herding-v255.js';import {createWaterCarriersV268,nearestRiverPointV268} from './water-carriers-v268.js';import {worldToDetail as worldToDetailV276} from './landscape-shared.js?v=123a';import {villageTypeV276,villageLayoutV276,VILLAGE_NAMES_V276,TRADE_OFFERS_V276,tradeWithVillageV276,tradeTownV276,raidPositionV276,villageAgeV278,tradeOffersV278} from './villages-v276.js';import {loadWorldCityModelsV269,worldCityModelsReadyV269,worldCityStampV269,createWorldCityV269,clearNatureUnderTownV269,townSpotsV269} from './world-city-v269.js';
 // V269: Stone Age towns on the world map use their real detail-map layout with very low-poly models
 function syncWorldCityV269(model,city,p){
  if(game.upgrade(city.team)!==0||new URLSearchParams(location.search).get('worldcity269')==='0')return;
@@ -274,7 +274,7 @@ function detailVillageV276(site,tile){
  const g=new T.Group();g.name='V276 village '+l.id;const raiders=villageTypeV276(l)==='raiders',team=raiders?1:2;
  const c=worldToDetailV276(tile,site.cell.x,site.cell.z);
  for(const [i,b] of villageLayoutV276(l).entries()){
-  const m=townBuildingModel(b.type,team,0,0,i*37+7,1);if(!m)continue;
+  const m=townBuildingModel(b.type,team,villageAgeV278(game,l),0,i*37+7,1);if(!m)continue;
   const x=c.x+b.x,z=c.z+b.z;m.position.set(x,ground(tile,x,z),z);m.rotation.y=b.buildingRotationV228||0;g.add(m);
  }
  g.userData.worldProp='village';g.userData.villageTypeV276=raiders?'raiders':'traders';return g;
@@ -993,8 +993,8 @@ function worldSync(){refreshCultivation();worldProps.update();refreshResourceAre
  const key='landmark:'+landmark.id;live.add(key);let marker=worldMarkers.get(key);
  if(!marker){marker=new T.Group();const badge=icon(landmark.kind==='village'?'⌂':'✦',landmark.kind==='village'?'#f6cf87':'#c5adf5');badge.scale.set(22,22,1);badge.position.y=16;marker.add(badge);const plinth=new T.Mesh(new T.CylinderGeometry(landmark.kind==='village'?7:5,8,4,6),mat(landmark.kind==='village'?'#a38d60':'#938ca2'));plinth.position.y=3;marker.add(plinth);worldObjects.add(marker);worldMarkers.set(key,marker)}
  // V276: villages are drawn from the same Stone Age buildings as the towns (raiders: palisade + towers)
- if(landmark.kind==='village'&&!marker.userData.worldPropAdded){if(worldCityModelsReadyV269()){const lay=villageLayoutV276(landmark),baseY=surface(game,game.cell(landmark).x,game.cell(landmark).z),town=createWorldCityV269(lay,(x,z)=>surface(game,game.cell(landmark).x+x,game.cell(landmark).z+z)-baseY);if(town){marker.add(town);marker.userData.worldPropAdded=true;if(marker.children[1])marker.children[1].visible=false;const vt=villageTypeV276(landmark);if(marker.children[0]){marker.children[0].material.color?.set(vt==='raiders'?'#ff8a70':'#f6cf87');}clearNatureUnderTownV269(worldScene,townSpotsV269(lay,game.cell(landmark)));}}else loadWorldCityModelsV269();}
- if(landmark.kind!=='village'&&worldProps.ready&&!marker.userData.worldPropAdded){const source=worldProps.landmark(landmark.kind);if(source){marker.add(source);marker.userData.worldPropAdded=true;if(marker.children[1])marker.children[1].visible=false;}}
+ if(landmark.kind==='village'&&!marker.userData.worldPropAdded&&villageAgeV278(game,landmark)===0){if(worldCityModelsReadyV269()){const lay=villageLayoutV276(landmark),baseY=surface(game,game.cell(landmark).x,game.cell(landmark).z),town=createWorldCityV269(lay,(x,z)=>surface(game,game.cell(landmark).x+x,game.cell(landmark).z+z)-baseY);if(town){marker.add(town);marker.userData.worldPropAdded=true;if(marker.children[1])marker.children[1].visible=false;const vt=villageTypeV276(landmark);if(marker.children[0]){marker.children[0].material.color?.set(vt==='raiders'?'#ff8a70':'#f6cf87');}clearNatureUnderTownV269(worldScene,townSpotsV269(lay,game.cell(landmark)));}}else loadWorldCityModelsV269();}
+ if((landmark.kind!=='village'||villageAgeV278(game,landmark)>0)&&worldProps.ready&&!marker.userData.worldPropAdded){const source=worldProps.landmark(landmark.kind);if(source){marker.add(source);marker.userData.worldPropAdded=true;if(marker.children[1])marker.children[1].visible=false;}}
  const cell=game.cell(landmark);marker.position.set(cell.x,surface(game,cell.x,cell.z)+1,cell.z);
  // V276: villages glow at night on the world map (warm firelight, brighter as the night deepens)
  if(landmark.kind==='village'){let glow=marker.userData.glowV276;if(!glow){glow=new T.Sprite(new T.SpriteMaterial({map:villageGlowTextureV276(),color:'#ffb35c',transparent:true,depthWrite:false,blending:T.AdditiveBlending}));glow.scale.set(34,34,1);glow.position.y=5;glow.renderOrder=5;marker.add(glow);marker.userData.glowV276=glow;}const clk=dayClockV235(s.time),flick=.9+.1*Math.sin(s.time*3.1+cell.c);glow.visible=clk.torch>.02;glow.material.opacity=Math.min(.9,clk.torch*.85*flick);}
@@ -1502,7 +1502,7 @@ window.kingdomsUiV264={
  focusCity(type,id){if(type==='settler'){const a=s.settlers.find(a=>a.team===0&&a.id===id);if(!a)return;selectedShip=null;selectedTrade=null;selectedMover=a.id;armySelected=false;chosen=game.cell(a);if(view!=='world')openWorld();const p=center(a.c,a.r);focus.set(p.x,0,p.z);renderUI();return}const c=s.cities[id];if(!c)return;chosen=game.cell(c);const p=center(c.c,c.r);focus.set(p.x,0,p.z);renderUI();},
  openCity(id){const c=s.cities[id];if(c)openTile(game.cell(c));},
  // V276: trader villages you have seen, the town that would trade, and the offers
- traders:()=>(s.landmarks||[]).filter(l=>villageTypeV276(l)==='traders'&&game.seen(0,l)).map(l=>{const t=tradeTownV276(game,l,0);return {id:l.id,name:VILLAGE_NAMES_V276.traders,c:l.c,r:l.r,town:t?.name||null,offers:TRADE_OFFERS_V276.map(o=>({id:o.id,label:o.label,give:o.give,get:o.get}))};}),
+ traders:()=>(s.landmarks||[]).filter(l=>villageTypeV276(l)==='traders'&&game.seen(0,l)).map(l=>{const t=tradeTownV276(game,l,0);return {id:l.id,name:VILLAGE_NAMES_V276.traders,c:l.c,r:l.r,town:t?.name||null,offers:tradeOffersV278(villageAgeV278(game,l)).map(o=>({id:o.id,label:o.label,give:o.give,get:o.get})),age:villageAgeV278(game,l)};}),
  trade(id,offer){const r=tradeWithVillageV276(game,id,offer,0);say(r.error||('Kaubavahetus: '+r.text));renderUI();return r;},
  // V276: army list also on the detail map: armies on this tile first; recruiting stays one click away
  here:()=>view==='local'&&activeTile?{c:activeTile.c,r:activeTile.r}:null,

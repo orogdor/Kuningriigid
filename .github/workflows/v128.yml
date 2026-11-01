@@ -89,5 +89,6 @@ jobs:
           node tests/lake-outlets-v275.mjs
           node tests/river-bank-v276.mjs
           node tests/villages-v276.mjs
+          node tests/natural-shore-v278.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
