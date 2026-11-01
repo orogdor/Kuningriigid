@@ -81,6 +81,8 @@ jobs:
       - name: V258 world and detail movement
         run: node tests/world-movement-v258.mjs
       - name: V268 water carriers and river water
-        run: node tests/water-carriers-v268.mjs
+        run: |
+          node tests/water-carriers-v268.mjs
+          node tests/world-city-scale-v273.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

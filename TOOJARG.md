@@ -81,3 +81,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V271: maailmakaardi linnad 1:1 detailkaardiga, puud väiksemad ja 3× tihedamad.
 
 - V272: maailmakaardi linn täpselt 1:1 (oma ruudu sees), linnaala puudest puhas.
+
+- V273: maailmakaardi linn 1–5× nii, et mahub alati oma ruutu.

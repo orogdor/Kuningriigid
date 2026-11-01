@@ -15,8 +15,15 @@ const MODEL={hall:'peamaja',house:'house',lumber:'lumber',forester:'lumber',saw:
  coppermine:'quarry',tinmine:'quarry',bronze_foundry:'pottery_kiln',road_depot:'lumber'};
 // footprint size (detail units) for types missing from STONE_SIZES
 const EXTRA_SIZE={pasture:9,mason:8,claypit:7,pottery_kiln:6,watchtower:4,palisade:7,woodgate:6,stonewall:7,stonetower:5,cellar:5,storage:7,warehouse:8,mill:7,bakery:6,coppermine:8,tinmine:8,bronze_foundry:7,forester:7,saw:7,road_depot:7};
-const EXAGGERATE=1; // true 1:1 with the detail map: a detail tile (225 x 195) is one world tile (50 x 50)
-const SPREAD=1;     // positions too: the whole town stays inside its own world tile
+// V273: each town is scaled uniformly (positions and sizes) around the tile centre by a factor between
+// 1 and 5: small towns are drawn up to 5x the detail-map size, larger towns less, so the town always
+// fits inside its own world tile (detail tile 225 x 195 = world tile 50 x 50, half = 25).
+const MAX_SCALE=5,TILE_HALF=24.5;
+export function townScaleV273(buildings){
+ let ext=0;for(const b of buildings){if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;const r=(STONE_SIZES[b.type]?.size??EXTRA_SIZE[b.type]??6)/DETAIL_X*.5;
+  ext=Math.max(ext,Math.abs(b.x/DETAIL_X)+r,Math.abs(b.z/DETAIL_Z)+r);}
+ return ext>0?Math.max(1,Math.min(MAX_SCALE,TILE_HALF/ext)):1;
+}
 const SKIP=new Set(['field','road','bridge']);
 
 let assets=null,loading=null;
@@ -39,7 +46,7 @@ export function worldCityStampV269(buildings){
 }
 // buildings: detail-map buildings of the city (x,z relative to the tile centre); height(dx,dz): ground offset
 export function createWorldCityV269(buildings,height=()=>0){
- if(!assets)return null;
+ if(!assets)return null;const EXAGGERATE=townScaleV273(buildings),SPREAD=EXAGGERATE;
  const byModel=new Map();
  for(const b of buildings){
   if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;
@@ -80,7 +87,7 @@ export function clearNatureUnderTownV269(root,spots){
 }
 // world-space footprints of a town's buildings (same placement as createWorldCityV269)
 export function townSpotsV269(buildings,origin){
- const out=[];for(const b of buildings){if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;
+ const EXAGGERATE=townScaleV273(buildings),SPREAD=EXAGGERATE;const out=[];for(const b of buildings){if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;
   out.push({x:origin.x+b.x/DETAIL_X*SPREAD,z:origin.z+b.z/DETAIL_Z*SPREAD,r:Math.max(2.4,footprint(b.type)/DETAIL_X*EXAGGERATE*.9)});}
  // the whole town area: forest clumps / rock outcrops are centred on the tile, not on a building
  if(out.length){let far=0;for(const o of out)far=Math.max(far,Math.hypot(o.x-origin.x,o.z-origin.z)+o.r);out.push({x:origin.x,z:origin.z,r:far});}
