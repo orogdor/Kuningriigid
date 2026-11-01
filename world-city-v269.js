@@ -15,7 +15,7 @@ const MODEL={hall:'peamaja',house:'house',lumber:'lumber',forester:'lumber',saw:
  coppermine:'quarry',tinmine:'quarry',bronze_foundry:'pottery_kiln',road_depot:'lumber'};
 // footprint size (detail units) for types missing from STONE_SIZES
 const EXTRA_SIZE={pasture:9,mason:8,claypit:7,pottery_kiln:6,watchtower:4,palisade:7,woodgate:6,stonewall:7,stonetower:5,cellar:5,storage:7,warehouse:8,mill:7,bakery:6,coppermine:8,tinmine:8,bronze_foundry:7,forester:7,saw:7,road_depot:7};
-const EXAGGERATE=6; // world trees and units are drawn ~3-4x true scale; buildings follow them
+const EXAGGERATE=18; // 4x the detail-map size relative to the tile (layout itself is spread by SPREAD)
 const SPREAD=4.5;     // the layout is spread by the same uniform factor, so the town keeps its detail-map shape
 const SKIP=new Set(['field','road','bridge']);
 
@@ -67,7 +67,7 @@ export function clearNatureUnderTownV269(root,spots){
  if(!spots.length)return 0;let hidden=0;const m=new T.Matrix4(),p=new T.Vector3();
  let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;for(const s of spots){minX=Math.min(minX,s.x-s.r);maxX=Math.max(maxX,s.x+s.r);minZ=Math.min(minZ,s.z-s.r);maxZ=Math.max(maxZ,s.z+s.r);}
  root.traverse(o=>{
-  if(!o.isInstancedMesh||!(o.userData.v152Model||/^world /.test(o.name||'')))return;
+  if(!o.isInstancedMesh||!(o.userData.v152Model||/^(world |atlas1000_(forest|rock))/.test(o.name||'')))return;
   o.updateMatrixWorld();let changed=false;
   for(let i=0;i<o.count;i++){
    o.getMatrixAt(i,m);p.setFromMatrixPosition(m).applyMatrix4(o.matrixWorld);

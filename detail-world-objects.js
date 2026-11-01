@@ -63,6 +63,8 @@ export function buildDetailWorldObjects(game,worldProps,tile,height){
    model.userData.worldSiteId=site.id;model.userData.worldProp=site.kind;model.name='detail-world-site '+site.id;
    holder.add(model);ids.push(site.id);continue;
   }
+  // V270: a forest clump or rock outcrop would stand in the middle of a town that was built here
+  if((site.kind==='forest'||site.kind==='rock')&&game.contextAt(site.cell,false))continue;
   const model=worldProps.detailModel(site.kind)||fallback(site.kind);
   const box=new T.Box3().setFromObject(model);
   const width=Math.max(.01,box.max.x-box.min.x,box.max.z-box.min.z);

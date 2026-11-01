@@ -1,5 +1,6 @@
 // World-scale foliage and geological landmarks, light-weight instanced geometry.
 // This module affects only the presentation. No gameplay pathfinding or yield changes.
+import {treeKeepV270,KEEP_MEAN_V270,FOREST_BIOMES_V270} from './forest-clumps-v270.js';
 import * as T from './vendor/three.module.js';
 import {surface,riverNear} from './continuous-landscape.js?v=162a';
 
@@ -48,9 +49,9 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
   // groves, steppe has scattered trees and many shrubs, desert has cacti, dry bushes and rocks (and
   // palms by water), tundra has dwarf shrubs and a few stunted spruces, rain forest and taiga are dense.
   const b=biome.replace('coastal_','');
-  if(b==='forest'){density=11.5;list=species.forest;bush=1.2} // V254: denser forests
-  else if(b==='jungle'){density=12.5;list=species.jungle;bush=2}
-  else if(b==='taiga'){density=11;list=species.taiga;bush=.8}
+  if(b==='forest'){density=18;list=species.forest;bush=1.2} // V254: denser forests
+  else if(b==='jungle'){density=19;list=species.jungle;bush=2}
+  else if(b==='taiga'){density=17;list=species.taiga;bush=.8}
   else if(b==='grassland'){density=2.6;list=species.grass;bush=2}
   else if(b==='lush_river'){density=4.5;list=species.lush;bush=1.8}
   else if(b==='steppe'){density=.8;list=species.steppe;bush=2.6}
@@ -58,12 +59,14 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
   else if(b==='tundra'){density=.35;list=species.tundra;bush=2.2}
   else if(b==='mesa'){density=.5;list=species.desert;bush=.8}
   // groves and clearings: the same number of trees per biome, gathered into clumps
-  density*=.45+1.1*game.smooth(cell.c/6+41.3,cell.r/6+17.9);
+  // V270: trees follow the shared clump field (same clearings/groves as the detail map)
+  const forestV270=FOREST_BIOMES_V270.has(b);density/=forestV270?KEEP_MEAN_V270.forest:KEEP_MEAN_V270.open;
   const effective=density*factor,count=Math.floor(effective+(j(cell.c+17,cell.r+201)<effective%1?1:0));
   for(let i=0;i<count;i++){
    const nx=j(cell.c*29+i*1.7,cell.r*7+i*13.2),nz=j(cell.c*11+i*17.8,cell.r*23+i*4.9);
    const x=cell.x+(nx-.5)*39,z=cell.z+(nz-.5)*39,y=surface(game,x,z,'world'),stream=riverNear(game,x,z);
    if(y<3||y>45||stream.distance<stream.width+3.2)continue;
+   if(j(cell.c*31+i*2.3,cell.r*41+i*5.7)>treeKeepV270(x,z,forestV270))continue;
    const k=j(cell.c*13+i*4.1,cell.r*19+i*2.9),kind=pick(list,j(cell.c*5+i*7.3,cell.r*3+i*1.1)),size=3.8+k*4.2,rot=k*6.28;
    const div=kind==='cactus'?1.25:kind==='pine'||kind==='spruce'?1.7:kind==='birch'?1.6:1.45;
    sets[kind].push({x,y,z,scale:size/div,rot,tint:tints[Math.floor(j(cell.c+i*3.7,cell.r*2+i)*tints.length)%tints.length]});

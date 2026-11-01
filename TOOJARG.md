@@ -75,3 +75,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V268: veekandjad (jõest vesi ilma kaevuta), test CI-s. GitHubi väljalase v268.
 
 - V269: maailmakaardi kiviaja linnad detailkaardi paigutusega, ülilihtsad mudelid (`world-city-v269.js`, `models-world-v269/`).
+
+- V270: näidisküla ?demo=stonetown, maailmakaardi linnad 4×, tihedamad metsad ja ühine metsatukkade väli mõlemal kaardil.

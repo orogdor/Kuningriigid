@@ -1274,6 +1274,10 @@ export const ENGLISH_PAIRS=[
   "Copper mine; tin comes with bronze casting"
  ],
  [
+  "Kiviaja küla (suur näidislinn)",
+  "Stone Age village (large sample town)"
+ ],
+ [
   " · vett tuuakse jõest, kaev puudub (−10% töö, −5% rahulolu)",
   " · water carried from the river, no well (−10% work, −5% satisfaction)"
  ],
