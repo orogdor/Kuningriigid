@@ -83,3 +83,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V272: maailmakaardi linn täpselt 1:1 (oma ruudu sees), linnaala puudest puhas.
 
 - V273: maailmakaardi linn 1–5× nii, et mahub alati oma ruutu.
+
+- V274: rahvasteränne (esimene minut, 4 töölist + sõdur, 5x kiirus, linnakoha valik), skaut koera ja odaga, puude kasv/looduslik uuenemine, kaev avastuse taha.

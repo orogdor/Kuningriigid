@@ -205,4 +205,27 @@ if(w.phase==='plantReturn'){b.status='Naaseb istutamast';if(nav.moveCitizen(w,do
 if(w.site&&!valid(w.site)){cancel();return}
 if(w.phase==='plantSeek'){b.status=world.forestCredits[b.team]>=quota?'Otsib istutuskohta':'Ootab raiutud metsa';w.retry=Math.max(0,(w.retry||0)-dt);if(w.retry||world.forestCredits[b.team]<quota)return;const sites=world.resources.filter(r=>r.kind==='tree'&&r.removed&&!r.cleared&&length(r,b)<55).map(r=>({x:r.x,z:r.z,id:r.id}));for(let r=8;r<=28;r+=4)for(let k=0;k<12;k++)sites.push({x:Math.round(b.x+Math.cos(k*Math.PI/6)*r),z:Math.round(b.z+Math.sin(k*Math.PI/6)*r)});sites.sort((a,c)=>length(a,w)-length(c,w));for(const site of sites){if(!valid(site,true)||Object.values(world.workers).some(a=>a!==w&&a.site&&length(a.site,site)<3))continue;const p=nav.nearest({x:site.x+2.3,z:site.z},3);if(p&&nav.reachable(w,p)){w.site=site;w.goal=p;w.phase='plantOut';w.reserved=quota;world.forestCredits[b.team]-=quota;w.work=0;break}}if(!w.site)w.retry=4;return}
 if(w.phase==='plantOut'){b.status='Viib istikut metsa';if(nav.moveCitizen(w,w.goal,dt,3)){w.phase='plantWork';w.stuck=0}else if(!w.moving){w.stuck=(w.stuck||0)+dt;if(w.stuck>8)cancel()}return}
-if(w.phase==='plantWork'){w.action='plant';b.status='Istutab puud';w.working=true;w.heading=Math.atan2(w.site.x-w.x,w.site.z-w.z);w.work+=dt;if(w.work<d.cycle||!valid(w.site,true))return;let resource=w.site.id!=null?world.resources[w.site.id]:null;if(!resource){resource={id:world.resources.length,kind:'tree',x:w.site.x,z:w.site.z};world.resources.push(resource)}Object.assign(resource,{amount:quota,capacity:quota,removed:false,cleared:false,plantedAt:s.time,matureAt:s.time+20,plantedBy:b.team});world.forestryStats.planted[b.team]=(world.forestryStats.planted[b.team]||0)+quota;world.revision++;w.reserved=0;w.site=null;w.phase='plantReturn';w.work=0;}}
+if(w.phase==='plantWork'){w.action='plant';b.status='Istutab puud';w.working=true;w.heading=Math.atan2(w.site.x-w.x,w.site.z-w.z);w.work+=dt;if(w.work<d.cycle||!valid(w.site,true))return;let resource=w.site.id!=null?world.resources[w.site.id]:null;if(!resource){resource={id:world.resources.length,kind:'tree',x:w.site.x,z:w.site.z};world.resources.push(resource)}Object.assign(resource,{amount:quota,capacity:quota,removed:false,cleared:false,plantedAt:s.time,matureAt:s.time+TREE_GROW_V274,plantedBy:b.team});world.forestryStats.planted[b.team]=(world.forestryStats.planted[b.team]||0)+quota;world.revision++;w.reserved=0;w.site=null;w.phase='plantReturn';w.work=0;}}
+
+// V274: trees grow like real trees. A planted sapling needs TREE_GROW_V274 game seconds (8 turns) before it
+// can be felled and is drawn growing. Cut forest also comes back by itself: seeds fall from mature trees, so
+// a stump site within 9 units of living mature trees may sprout a seedling (more neighbours, more likely).
+// Nothing sprouts on building sites, fields, roads or cleared ground, and seedlings take 1.5x longer.
+export const TREE_GROW_V274=480;
+export function naturalRegrowthV274(s,world,nav,dt){
+ world.regrowClockV274=(world.regrowClockV274||0)+dt;if(world.regrowClockV274<30)return 0;world.regrowClockV274=0;
+ const trees=world.resources.filter(r=>r.kind==='tree');let sprouted=0;
+ for(const r of trees){
+  if(!r.removed||r.cleared||sprouted>=3)continue;
+  if(s.buildings.some(b=>Math.abs(r.x-b.x)<4.5&&Math.abs(r.z-b.z)<4.5))continue;
+  if(nav&&(!nav.passable(r.x,r.z)||nav.roadStrength(nav.index(r.x,r.z))>=1))continue;
+  let near=0;for(const t of trees){if(t.removed||t===r||t.matureAt>s.time)continue;if(Math.abs(t.x-r.x)<9&&Math.abs(t.z-r.z)<9&&++near>=4)break;}
+  if(!near)continue;
+  const seed=Math.sin((r.id+1)*12.9898+Math.floor(s.time/30)*78.233)*43758.5453,roll=seed-Math.floor(seed);
+  if(roll>.03*near)continue;
+  Object.assign(r,{removed:false,amount:r.capacity||24,capacity:r.capacity||24,plantedAt:s.time,matureAt:s.time+TREE_GROW_V274*1.5,natural:true});
+  sprouted++;
+ }
+ if(sprouted)world.revision=(world.revision||0)+1;
+ return sprouted;
+}
