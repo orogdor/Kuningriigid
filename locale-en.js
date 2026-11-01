@@ -1230,6 +1230,54 @@ export const ENGLISH_PAIRS=[
   "Logical World: Plates and Climate (new)"
  ],
  [
+  "Külanõukogud",
+  "Village Councils"
+ ],
+ [
+  "Küla ühine otsustamine: +3% toidu ja vee tootmist",
+  "Early settlement administration: +3% food and water production"
+ ],
+ [
+  "Viljaaidad",
+  "Grain Storage"
+ ],
+ [
+  "Saviga vooderdatud viljaaidad: +5% toidu tootmist",
+  "Clay-lined grain stores: +5% food production"
+ ],
+ [
+  "Kaubateed",
+  "Trade Roads"
+ ],
+ [
+  "Hooldatud vankriteed: +7% puitu ja ehitusmaterjale",
+  "Maintained wagon routes: +7% wood and construction materials"
+ ],
+ [
+  "Põldude kanalid",
+  "Field Channels"
+ ],
+ [
+  "Kanalite hooldus: +8% põllusaaki",
+  "Canal maintenance: +8% farm production"
+ ],
+ [
+  "Maamõõtmine",
+  "Land Surveying"
+ ],
+ [
+  "Mõõdetud põllud ja kaevandused: +4% tooret",
+  "Surveyed fields and mines: +4% resource output"
+ ],
+ [
+  "Vasekaevandus; tina tuleb pronksivaluga",
+  "Copper mine; tin comes with bronze casting"
+ ],
+ [
+  "Pronksiaeg, tinakaevandus, pronksriistad ja pronksiaja ehitaja (×1.20)",
+  "Bronze Age, tin mine, bronze tools and Bronze Age builders (×1.20)"
+ ],
+ [
   "Juhuslikud 2–4 kontinenti",
   "Random 2–4 Continents"
  ],
