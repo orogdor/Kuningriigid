@@ -39,8 +39,11 @@ export function cityProblems(game,city){
  const r=city.economy.realms[city.team],stock=r.resources,issues=[];
  const active=game.allBuildings(city).filter(b=>b.hp>0);
  if(foodTotal(stock)<r.pop*2)issues.push({level:3,text:'Toiduvaru lõppemas',action:'Ehita või käivita jahimehe onn, kalamehe onn või talu'});
- if((stock.water||0)<r.pop*1.5)issues.push({level:3,text:'Vett napib',action:'Ehita või käivita kaev'});
- if(active.some(b=>!b.ready&&b.workerLimit!==0&&b.efficiency===0))issues.push({level:2,text:'Ehitusel puudub tööjõud',action:'Määra tööjõu menüüst ehitajaid'});
+ // V282: water carried from a river or spring covers the need: no shortage warning, at most a hint to build a well
+ const parent=game.parentCity?.(city)||city,carried=!!parent.waterFetchV267,wellKnown=!BUILD_TECH.well||game.s.research[city.team]?.known?.includes(BUILD_TECH.well);
+ if(carried){if(wellKnown)issues.push({level:1,text:parent.waterFetchFarV280?'Vett tuuakse kaugelt allikast (−20% tööaega)':'Vett tuuakse jõest (−10% tööaega)',action:'Ehita kaev'});}
+ else if((stock.water||0)<r.pop*1.5)issues.push({level:3,text:'Vett napib',action:'Ehita või käivita kaev'});
+ if(active.some(b=>!b.ready&&b.workerLimit!==0&&b.efficiency===0)&&!((game.parentCity?.(city)||city).buildersAssigned>=.5))issues.push({level:2,text:'Ehitusel puudub tööjõud',action:'Määra tööjõu menüüst ehitajaid'});
  if(active.some(b=>/pole ligipääsetavat|maardla puudub|puudub tee/i.test(b.status||'')))issues.push({level:2,text:'Tooraine või tee on blokeeritud',action:'Raja tootmine uude maardlaruutu või kontrolli ühendust'});
  const research=game.s.research[city.team];
  if(research?.ageWait){const missing=ageDeficit(game.s,city.team,research.ageWait.id),names=Object.entries(missing).filter(([,n])=>n>0).map(([key,n])=>`${Math.ceil(n)} ${key}`);if(names.length)issues.push({level:2,text:'Ajastuvahetus ootab materjale: '+names.join(', '),action:'Suurenda puuduva ressursi tootmist või lao mahtu'});}
@@ -54,7 +57,10 @@ export function actionTips(game,team=0){
  if(!r.active){const id=Object.keys(TECHS).find(id=>!techBlock(r,id));if(id)tips.push({text:'Uuri '+TECHS[id].name,why:'Teadus ei ole aktiivne',weight:4});}
  for(const city of cities){const buildings=game.allBuildings(city);
   if(!buildings.some(b=>b.type==='house'&&b.ready)&&s.ages[team]===0)tips.push({text:'Ehita esimene elamu',why:city.name+' vajab uut elamispinda',weight:2,city});
-  if(buildings.some(b=>!b.ready&&(b.materialsRemaining||0)>0))tips.push({text:'Kontrolli ehitusmaterjalide vedu',why:city.name+' · ehitusel on veel materjale puudu',weight:2,city});
+  // V282: only when the stores cannot cover the waiting constructions (not merely while builders carry them)
+  {const need={};for(const b of buildings)if(!b.ready&&(b.materialsRemaining||0)>0)for(const [k,n] of Object.entries(BUILDINGS[b.type]?.cost||{}))need[k]=(need[k]||0)+n;
+   const stock=city.economy.realms[city.team].resources,short=Object.entries(need).filter(([k,n])=>(stock[k]||0)<n).map(([k])=>k);
+   if(short.length)tips.push({text:'Kontrolli ehitusmaterjalide vedu',why:city.name+' · ehitusel on veel materjale puudu',weight:2,city});}
  }
  if(!tips.length)tips.push({text:'Avasta uusi alasid või arenda oma linnu',why:'Kiireloomulisi puudujääke ei leitud',weight:1});
  return tips.sort((a,b)=>(b.weight||0)-(a.weight||0)).slice(0,3);

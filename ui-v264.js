@@ -31,7 +31,7 @@ function regroup(){
   const chip=document.createElement('div');chip.className='v264-chip';chip.dataset.group=g.id;chip.tabIndex=0;chip.setAttribute('role','button');
   chip.setAttribute('aria-label',gname(g));chip.title=gname(g);
   const mains=g.main.map(k=>items.find(s=>s.dataset.resource===k)).filter(Boolean);
-  chip.innerHTML=`<img class="v264-gicon" src="ui-art-v263/${g.icon}.webp" alt=""><div class="v264-vals">${mains.map(s=>`<div class="v264-val"><img src="ui-art-v263/${iconOf(s.dataset.resource)}.webp" alt=""><i>${esc(val(s,'b')||'0')}</i></div>`).join('')}</div><div class="v264-gname">${esc(gname(g))}${items.length>mains.length?' +'+(items.length-mains.length):''}</div>`;
+  chip.innerHTML=`<img class="v264-gicon" src="ui-art-v263/${g.icon}.webp" alt=""><div class="v264-vals">${mains.map(s=>`<div class="v264-val" data-k="${esc(s.dataset.resource)}"><img src="ui-art-v263/${iconOf(s.dataset.resource)}.webp" alt=""><i>${esc(val(s,'b')||'0')}</i></div>`).join('')}</div><div class="v264-gname">${esc(gname(g))}${items.length>mains.length?' +'+(items.length-mains.length):''}</div>`;
   frag.append(chip);
  }
  for(const s of spans){if(s.dataset.resource==='population'){s.dataset.v264='1';continue;}store.append(s);}
@@ -94,14 +94,14 @@ function fill(){
    const kinds=Object.entries(x.kinds).map(([n,c])=>c+'× '+n).join(', ')||'tühi';
    const icon=x.count&&Object.keys(x.kinds).length===1&&/avasta|scout/i.test(Object.keys(x.kinds)[0])?'unit_scout':'cmd_army';
    const where=x.d?' · '+x.d+' ruutu eemal':'';
-   const b=row(icon,'Armee '+(x.id+1)+' · '+x.count+' meest',kinds+' · ruut '+(x.c+1)+':'+(x.r+1)+where+(x.ship?' · laeval':'')+(x.auto?' · avastab':''),()=>{if(here&&x.d===0&&a.selectArmyHere)a.selectArmyHere(x.id);else a.selectArmy(x.id);close();});
+   const b=row(icon,'Armee '+(x.id+1)+' · '+x.count+(x.count===1?' mees':' meest'),kinds+' · ruut '+(x.c+1)+':'+(x.r+1)+where+(x.ship?' · laeval':'')+(x.auto?' · avastab':''),()=>{if(here&&x.d===0&&a.selectArmyHere)a.selectArmyHere(x.id);else a.selectArmy(x.id);close();});
    if(x.selected)b.classList.add('active');
   }
  }else if(mode==='trade'){
   panel.querySelector('.v264-head strong').textContent='Kaubandus';
   // V280: the treasury: gold speeds up the current discovery
-  {const box=document.createElement('div');box.className='v276-trader';const act=a.research?.().active;
-   box.innerHTML=`<div class="v276-title"><img src="ui-art-v263/cmd_research.webp" alt=""><span><b>Kuningriigi kassa</b><small>${act?'Käimas: '+esc(act):'Ühtegi uuringut pole käimas'}</small></span></div>`;
+  {const box=document.createElement('div');box.className='v276-trader';const act=a.research?.().active; /* V282: show the discovery's name, not its id */
+   box.innerHTML=`<div class="v276-title"><img src="ui-art-v263/cmd_research.webp" alt=""><span><b>Kuningriigi kassa</b><small>${act?'Käimas: '+esc(a.research().name||act):'Ühtegi uuringut pole käimas'}</small></span></div>`;
    const offers=document.createElement('div');offers.className='v276-offers';const b=document.createElement('button');b.type='button';b.disabled=!act;
    b.textContent='Kiirenda uuringut (40 kulda → +12 punkti)';b.onclick=e=>{e.stopPropagation();a.boostResearch();fill();};offers.append(b);box.append(offers);rows.append(box);}
   // V276: trade with the trader villages you have discovered (from your nearest town in range)
@@ -113,8 +113,9 @@ function fill(){
    card.querySelector('.v276-title').onclick=()=>a.focusVillage(t.id);
    const offers=document.createElement('div');offers.className='v276-offers';
    for(const o of t.offers){const b=document.createElement('button');b.type='button';b.disabled=!t.town;
-    const fmt=obj=>Object.entries(obj).map(([k,v])=>v+' '+k).join(', ');b.title=fmt(o.give)+' → '+fmt(o.get);
-    b.textContent=o.label+' ('+fmt(o.get)+')';b.onclick=e=>{e.stopPropagation();a.trade(t.id,o.id);fill();};offers.append(b);}
+    // V282: the price in gold (cost for a purchase, income for a sale) instead of raw resource keys
+    const price=o.give.gold?o.give.gold+' kulda':o.get.gold?'+'+o.get.gold+' kulda':'';b.title=o.label+(price?' · '+price:'');
+    b.textContent=o.label+(price?' ('+price+')':'');b.onclick=e=>{e.stopPropagation();a.trade(t.id,o.id);fill();};offers.append(b);}
    card.append(offers);rows.append(card);
   }
  }else{

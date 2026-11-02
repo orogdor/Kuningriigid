@@ -32,9 +32,9 @@ export function setupAtmosphere({renderer,worldScene,localScene,quality}){
  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.02;
  renderer.shadowMap.type=T.PCFSoftShadowMap;
  const rigs=new Map(),rigsSkirt={mesh:null};
- const colorDayTop=new T.Color('#7fa9c8'),colorNightTop=new T.Color('#071225');
- const colorDayHorizon=new T.Color('#d9e3dc'),colorNightHorizon=new T.Color('#233046'),colorDuskHorizon=new T.Color('#d68d5c');
- const colorDayGround=new T.Color('#a8b79a'),colorNightGround=new T.Color('#222d3a');
+ const colorDayTop=new T.Color('#7fa9c8'),colorNightTop=new T.Color('#0d1c36');
+ const colorDayHorizon=new T.Color('#d9e3dc'),colorNightHorizon=new T.Color('#33456a'),colorDuskHorizon=new T.Color('#d68d5c');
+ const colorDayGround=new T.Color('#a8b79a'),colorNightGround=new T.Color('#33425a');
  const colorFogDay=new T.Color('#d3ddd5'),colorFogNight=new T.Color('#1a263a');
  const sunDir=new T.Vector3(),tempColor=new T.Color(),skyTop=new T.Color(),skyHorizon=new T.Color(),skyGround=new T.Color(),fogTint=new T.Color();
  for(const [scene,local] of [[worldScene,false],[localScene,true]]){
@@ -65,13 +65,16 @@ export function setupAtmosphere({renderer,worldScene,localScene,quality}){
   const chosenTime=settings.daylight==='day'?240:settings.daylight==='evening'?540:settings.daylight==='night'?840:gameTime;
   const clock=dayClockV235(chosenTime),angle=(clock.hour-6)*Math.PI/12;
   sunDir.set(Math.cos(angle)*.85,Math.max(.07,clock.elevation),.48).normalize();
+  // V282: moonlight: at night the key light comes from a high moon, so towns stay readable (was near darkness)
+  const moon=T.MathUtils.clamp(1-clock.daylight*2.2,0,1);
+  if(clock.elevation<0){const ma=angle+Math.PI;sunDir.set(Math.cos(ma)*.7,Math.max(.35,Math.sin(ma)),.55).normalize();}
   const twilight=T.MathUtils.clamp(1-Math.abs(clock.elevation)*3,0,1);
   const mode={classic:[1.2,2.0,.25],standard:[1.05,2.7,.32],enhanced:[1.28,2.85,.53],cinematic:[1.38,3.15,.65]}[settings.lighting]||[1.05,2.7,.32];
   const ambient={low:.72,normal:1,bright:1.3}[settings.ambient]||1;
-  rig.hemi.intensity=mode[0]*ambient*(.14+.86*clock.daylight);
-  rig.fill.intensity=mode[2]*(.2+.8*clock.daylight);
-  rig.sun.intensity=mode[1]*Math.pow(clock.daylight,1.25);
-  rig.sun.color.set(clock.elevation<.28?'#ffb37d':'#ffe2b8');
+  rig.hemi.intensity=mode[0]*ambient*(.32+.68*clock.daylight);
+  rig.fill.intensity=mode[2]*(.36+.64*clock.daylight);
+  rig.sun.intensity=mode[1]*(Math.pow(clock.daylight,1.25)+.24*moon);
+  rig.sun.color.set(clock.elevation<0?'#aebfff':clock.elevation<.28?'#ffb37d':'#ffe2b8');
   skyTop.copy(colorNightTop).lerp(colorDayTop,clock.daylight);
   skyHorizon.copy(colorNightHorizon).lerp(colorDayHorizon,clock.daylight);
   if(clock.daylight>.05)skyHorizon.lerp(colorDuskHorizon,twilight*.56);

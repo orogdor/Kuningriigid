@@ -1,0 +1,46 @@
+/* V282: last UI pass of the Bronze Age test: the old teal panels take the warm hide-and-gold look, the
+   phone top bar fits, a clicked bottom-bar button no longer stays highlighted. Loaded last. */
+:root{--v282-panel:linear-gradient(rgba(30,20,11,.92),rgba(20,13,7,.96)),url('ui-art-v263/panel_stone.webp') 0 0/384px 256px;
+ --v282-card:linear-gradient(rgba(70,48,26,.94),rgba(44,29,15,.97));--v282-card-hover:linear-gradient(rgba(96,66,34,.96),rgba(62,42,22,.98));
+ --v282-field:rgba(12,8,4,.55);--v282-line:rgba(217,182,115,.42);--v282-ink:#f3e3c3;--v282-gold:#d9b673}
+
+/* ---- build cards and search (were teal) */
+html body #citypanel #citypane-build #tray>button.v121-build-card,html body #citypanel button.v121-build-card{background:var(--v282-card)!important;border-color:var(--v282-line)!important;color:var(--v282-ink)!important}
+html body #citypanel #citypane-build #tray>button.v121-build-card:not(:disabled):hover{background:var(--v282-card-hover)!important;border-color:#f0d39c!important}
+html body #citypanel .v121-build-card small,html body #citypanel .v121-build-card .v121-card-meta{color:#d8c39a!important}
+#buildsearch,#citypanel input[type=search],#v264-listpanel input,#startmenu input,#startmenu select,#startmenu .graphics-v226-row select{background:var(--v282-field)!important;border:1px solid var(--v282-line)!important;color:var(--v282-ink)!important}
+#buildsearch::placeholder,#startmenu input::placeholder{color:#b9a684!important}
+#citypanel details,#citypanel summary{background:rgba(60,40,20,.35)!important;border-color:var(--v282-line)!important;color:var(--v282-ink)!important}
+#startmenu details[open]>summary{background:rgba(217,182,115,.08)!important}
+#startmenu details[open]{background:rgba(40,27,14,.55)!important}
+
+/* ---- kingdom journal (was teal) */
+#journalpanel{background:rgba(14,9,5,.86)!important}
+#journalpanel .journal-window{background:var(--v282-panel)!important;border:1px solid var(--v282-line)!important;border-radius:14px!important;color:var(--v282-ink)!important;box-shadow:0 18px 44px #000c}
+#journalpanel .journal-window h2{color:#f4d9a0!important}
+#journalpanel .journal-window p{border-bottom:1px solid rgba(217,182,115,.18)!important;color:#ead8b4}
+#journalpanel #closejournal{background:var(--v282-card)!important;border:1px solid var(--v282-line)!important;color:var(--v282-ink)!important;border-radius:9px}
+
+
+/* ---- the suggestions box shows whole cards */
+@media (min-width:761px){#v51insights{max-height:min(260px,40vh)!important}#v51insights #v51tips{max-height:none!important;overflow:visible!important}}
+
+/* ---- phone: compact top bar that always starts with food */
+@media (max-width:760px){
+ #resources.v264-grouped{justify-content:flex-start!important;flex:1 1 auto!important;min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;gap:3px!important;flex-wrap:nowrap!important}
+ #resources.v264-grouped::-webkit-scrollbar{display:none}
+ #resources .v264-chip{min-height:30px!important;padding:2px 4px!important;gap:2px!important}
+ #resources .v264-gicon,#resources .v264-gname{display:none!important}
+ #resources .v264-vals{gap:4px!important}
+ #resources .v264-val{font-size:12px!important;gap:2px!important}
+ #resources .v264-val img{width:14px!important;height:14px!important}
+ #resources .v264-val[data-k=plank],#resources .v264-val[data-k=pottery]{display:none!important}
+ #resources span[data-resource="population"]{flex:0 0 auto!important;padding:2px 4px 2px 20px!important;min-height:30px!important}
+ #resources span[data-resource="population"] small{display:none!important}
+ #resources span[data-resource="population"]::before{width:16px!important;height:16px!important;min-width:16px!important;background-size:contain!important;margin:0 2px 0 0!important}
+ #resources span[data-resource="population"] b{font-size:12px!important}
+ #dayclock-v235 .v264-day{display:none!important}
+ header .time #turn{display:none!important} /* the turn/age text was cut to "T…"; the day clock stays */
+ header .time{flex:0 0 auto!important;min-width:0!important;gap:4px!important}
+ #tools #menubtn::after,#tools button::after{line-height:13px!important}
+}

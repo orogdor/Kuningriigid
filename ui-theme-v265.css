@@ -56,4 +56,4 @@ header .brand *{display:none!important}
 #closeresearch:focus-visible,#researchpanel button:focus-visible,#commandhud button:focus-visible{outline:2px solid var(--t-gold2)!important;outline-offset:2px}
 #closeresearch{outline:none!important}
 #researchtree .tech-card.is-selected{background:linear-gradient(rgba(110,78,36,.97),rgba(72,50,24,.98))!important}
-body:has(#researchpanel:not([hidden])) #tools #techtoggle,#tools #techtoggle:focus,#tools button:focus{background:linear-gradient(rgba(217,182,115,.32),rgba(150,110,50,.28))!important;border-color:var(--t-gold)!important;color:var(--t-ink)!important}
+body:has(#researchpanel:not([hidden])) #tools #techtoggle,#tools #techtoggle:focus-visible,#tools button:focus-visible{background:linear-gradient(rgba(217,182,115,.32),rgba(150,110,50,.28))!important;border-color:var(--t-gold)!important;color:var(--t-ink)!important}

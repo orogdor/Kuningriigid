@@ -19,10 +19,27 @@ const EXTRA_SIZE={pasture:9,mason:8,claypit:7,pottery_kiln:6,watchtower:4,palisa
 // 1 and 5: small towns are drawn up to 5x the detail-map size, larger towns less, so the town always
 // fits inside its own world tile (detail tile 225 x 195 = world tile 50 x 50, half = 25).
 const MAX_SCALE=5,TILE_HALF=24.5;
+// V282: the scale follows the town core (hall, homes, well, stores, school). Workplaces out in the forest, quarries,
+// fishing huts, farms, barracks and walls no longer shrink the whole town to 1:1: they are pulled in to the tile edge.
+export const CORE_V282=new Set(['hall','house','well','study','cellar','storage','warehouse','market','bakery','mill','scriptorium','inn','granary']);
+export const OUTLYING_V282={has:t=>!CORE_V282.has(t)};
 export function townScaleV273(buildings){
- let ext=0;for(const b of buildings){if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;const r=(STONE_SIZES[b.type]?.size??EXTRA_SIZE[b.type]??6)/DETAIL_X*.5;
-  ext=Math.max(ext,Math.abs(b.x/DETAIL_X)+r,Math.abs(b.z/DETAIL_Z)+r);}
- return ext>0?Math.max(1,Math.min(MAX_SCALE,TILE_HALF/ext)):1;
+ let ext=0,core=0;for(const b of buildings){if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;const r=(STONE_SIZES[b.type]?.size??EXTRA_SIZE[b.type]??6)/DETAIL_X*.5;
+  const e=Math.max(Math.abs(b.x/DETAIL_X)+r,Math.abs(b.z/DETAIL_Z)+r);ext=Math.max(ext,e);if(!OUTLYING_V282.has(b.type))core=Math.max(core,e);}
+ const basis=core||ext;
+ return basis>0?Math.max(1,Math.min(MAX_SCALE,TILE_HALF/basis)):1;
+}
+// V282: world position and size of every drawn building (outlying ones clamped inside the tile). Buildings are drawn
+// 1.4x their scaled footprint (positions are not) so a town reads at map zoom.
+const SIZE_BOOST_V282=1.4;
+export function worldCityPlacementV282(buildings){
+ const k=townScaleV273(buildings),out=[];
+ for(const b of buildings){if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;
+  const size=footprint(b.type)/DETAIL_X*k*SIZE_BOOST_V282,half=size*.5,lim=Math.max(0,TILE_HALF-half);
+  let x=b.x/DETAIL_X*k,z=b.z/DETAIL_Z*k;
+  if(Math.abs(x)>lim||Math.abs(z)>lim){const f=Math.min(lim/Math.max(1e-6,Math.abs(x)),lim/Math.max(1e-6,Math.abs(z)),1);x*=f;z*=f;}
+  out.push({b,x,z,size});}
+ return {scale:k,list:out};
 }
 const SKIP=new Set(['field','road','bridge']);
 
@@ -46,18 +63,17 @@ export function worldCityStampV269(buildings){
 }
 // buildings: detail-map buildings of the city (x,z relative to the tile centre); height(dx,dz): ground offset
 export function createWorldCityV269(buildings,height=()=>0){
- if(!assets)return null;const EXAGGERATE=townScaleV273(buildings),SPREAD=EXAGGERATE;
+ if(!assets)return null;
  const byModel=new Map();
- for(const b of buildings){
-  if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;
-  const name=MODEL[b.type]||'house';(byModel.get(name)||byModel.set(name,[]).get(name)).push(b);
+ for(const p of worldCityPlacementV282(buildings).list){
+  const name=MODEL[p.b.type]||'house';(byModel.get(name)||byModel.set(name,[]).get(name)).push(p);
  }
  const group=new T.Group();group.name='V269 world city';group.userData.worldCityV269=true;
  const m=new T.Matrix4(),q=new T.Quaternion(),pos=new T.Vector3(),scl=new T.Vector3(),up=new T.Vector3(0,1,0);
  for(const [name,list] of byModel){
   const mesh=new T.InstancedMesh(assets.get(name),material,list.length);mesh.castShadow=true;mesh.receiveShadow=true;
-  list.forEach((b,i)=>{
-   const x=b.x/DETAIL_X*SPREAD,z=b.z/DETAIL_Z*SPREAD,size=footprint(b.type)/DETAIL_X*EXAGGERATE*(b.ready?1:.75);
+  list.forEach(({b,x,z,size:full},i)=>{
+   const size=full*(b.ready?1:.75);
    const rot=b.buildingRotationV228??b.wallAngleV175??b.shoreAngle??0;
    pos.set(x,height(x,z),z);q.setFromAxisAngle(up,rot);scl.set(size,size*(b.ready?1:.5),size);
    mesh.setMatrixAt(i,m.compose(pos,q,scl));
@@ -87,9 +103,10 @@ export function clearNatureUnderTownV269(root,spots){
 }
 // world-space footprints of a town's buildings (same placement as createWorldCityV269)
 export function townSpotsV269(buildings,origin){
- const EXAGGERATE=townScaleV273(buildings),SPREAD=EXAGGERATE;const out=[];for(const b of buildings){if(SKIP.has(b.type)||b.hp<=0||b.virtual)continue;
-  out.push({x:origin.x+b.x/DETAIL_X*SPREAD,z:origin.z+b.z/DETAIL_Z*SPREAD,r:Math.max(2.4,footprint(b.type)/DETAIL_X*EXAGGERATE*.9)});}
- // the whole town area: forest clumps / rock outcrops are centred on the tile, not on a building
- if(out.length){let far=0;for(const o of out)far=Math.max(far,Math.hypot(o.x-origin.x,o.z-origin.z)+o.r);out.push({x:origin.x,z:origin.z,r:far});}
+ const out=[];let far=0;for(const {b,x,z,size} of worldCityPlacementV282(buildings).list){
+  const o={x:origin.x+x,z:origin.z+z,r:Math.max(2.4,size*.9)};out.push(o);
+  if(!OUTLYING_V282.has(b.type))far=Math.max(far,Math.hypot(x,z)+o.r);} // V282: camps in the forest keep the forest
+ // the town core area: forest clumps / rock outcrops are centred on the tile, not on a building
+ if(far>0)out.push({x:origin.x,z:origin.z,r:far});
  return out;
 }

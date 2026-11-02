@@ -99,3 +99,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V280: kiviaja testmängu parandused (toit +50%, talu ilma saeveskita, vesi 4 ruudu raadiusest + kauge allikas, ladu 240, kassa uuringu kiirendus, AI ei jää uuringuta, tuli esimesena, palisaad ainult ohu korral, röövlid 28 ruutu, AI kaupleb, AI iseloomud, tühje maju pole, asunik varem, rände soovitatud linnakohad, maagid kõvale maale, 45 min AI test).
 
 - V281: teise kiviaja testmängu parandused (metsalaager metsarikkale naaberruudule, puidu/kivi ost külast, kassa plaan + piir 80, madala rannikumetsa puude kadumise viga, sõjakas kaupleb ja alustab sõda lihtsamalt, aga värbab vähem, asunik kuni 16 ruutu, ehitajal 2 ehitajat, talu tasuvaks, üks röövsalk linna kohta + vangid, vee näit „jõest“, erinevad algusuuringud, test kaardil 7741).
+
+- V282: graafika ja UI (maailmakaardi linn südamiku järgi 2–4× + hooned 1,4×, nimesilt serval, maavarade märgid ressursipiltidega ja vähem, kuuvalgus, telefoni ülariba mahub, ~200 ingliskeelset tõlget + mustrid, pruun stiil ehitusmenüüle/päevikule/vormidele, vee teated, aktiivne nupp, soovituste loogika).
