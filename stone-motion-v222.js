@@ -189,7 +189,7 @@ export function animateStoneWorkerV222(root,time,moving=false,attack=false){
   point(B,'spine',.05,.20*wind-.18*jab,0,.83);
  }
  if(attack?.hit)offset(B,'spine',-.23,.09,.10);
- if(r.tool)r.tool.visible=action!=='carry';
+ if(r.tool)r.tool.visible=action!=='carry'||r.kind==='stone_watercarrier'; // V283: the water carrier brings the jug back full
  r.animationV222=true;
  return true;
 }

@@ -104,6 +104,10 @@ export function createStoneEquipment(kind){
  }else if(['stone_farmer','hoe'].includes(kind)){
   pole(g,.60,-.12,.012);const head=stone(g,'hoe',.08,-.39,.005,.8);head.rotation.z=-.26;
   band(g,0,-.36,0,.018);
+ }else if(['stone_herder','stone_elder'].includes(kind)){ // V283: a plain walking staff, grip a little below its top
+  pole(g,kind==='stone_herder'?1.25:.95,-.38,.014);
+ }else if(kind==='stone_digger'){ // V283: fire-hardened digging stick, point outwards
+  pole(g,.82,-.30,.013);const tip=stone(g,'pick',0,-.72,0,.45);tip.rotation.z=Math.PI;
  }else if(['stone_fisher','stone_hunter','spearman','scout','militia'].includes(kind)){
   pole(g,1.00,0,.0085);stone(g,'spear',0,.53,0,.73);
   for(const y of [.425,.464])band(g,0,y,0,.011);

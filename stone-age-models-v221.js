@@ -40,7 +40,11 @@ export function stoneBuildingModel(type,age,seed=0,low=null){
 
 // ------------------------------------------------------------------ people
 export const STONE_HUMAN_KINDS=new Set(['stone_builder','stone_worker','stone_lumber','stone_miner','stone_forester','stone_fisher',
- 'stone_gatherer','stone_watercarrier','stone_farmer','stone_villager','stone_settler','stone_hunter']);
+ 'stone_gatherer','stone_watercarrier','stone_farmer','stone_villager','stone_settler','stone_hunter',
+ 'stone_herder','stone_elder','stone_potter','stone_digger']); // V283: herder (staff), teacher (stick), potter (hands), clay digger (digging stick)
+// V283: the hand bone's +Y points back up the forearm. Tools built with their head at +Y (axe, pick, hammer, spear)
+// were held by the head with the haft sticking out; they are turned round (and slid out so the hand grips the haft).
+const TOOL_FLIP_V283={stone_lumber:-.18,stone_forester:-.18,stone_worker:-.18,stone_miner:-.18,stone_builder:-.15,stone_fisher:-.08,stone_hunter:-.08};
 export const isStoneHumanKind=k=>!!ASSETS&&STONE_HUMAN_KINDS.has(k);
 const HEIGHT=1.66;  // the same height as the earlier people (1 unit ≈ 1.05 m)
 
@@ -59,7 +63,7 @@ export function createStoneHuman(parent,x,z,color,kind){
  const B=Object.fromEntries(bones.map(b=>[b.name,b]));
  // a small team-coloured band on the belt keeps factions recognisable
  const band=new T.Mesh(tg('band',()=>new T.TorusGeometry(.105,.012,4,14)),tm(color));band.rotation.x=Math.PI/2;band.scale.set(1,.72,1);band.position.y=.03;B.hips.add(band);
- const tool=createStoneEquipment(kind);B.hand_R.add(tool);
+ const tool=createStoneEquipment(kind);if(kind in TOOL_FLIP_V283){tool.rotation.z=Math.PI;tool.position.y=TOOL_FLIP_V283[kind];}if(kind==='stone_herder')tool.rotation.x=globalThis.HERD_TILT_V283??1.4; /* V283: the staff stands on the ground */B.hand_R.add(tool);
  // legs/arms/body/head mirror the older rigs, so code that poses people directly (village life) keeps working
  const rig={stoneHuman:true,kind,bones:B,tool,phase:(Math.abs(x*7.3+z*3.1)%6.28)||Math.random()*6.28,scale:body,
   legs:[B.thigh_L,B.thigh_R],arms:[B.upperArm_L,B.upperArm_R],body:B.spine,head:B.head};

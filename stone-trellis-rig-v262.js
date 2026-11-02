@@ -67,13 +67,17 @@ function skin(kind,skeleton,bones){
  if(kind==='spearman'){
   // fit the shaft as a straight line through its top (above the head) and its butt (at the feet)
   const top=[0,0,0,0],bot=[0,0,0,0];
-  for(let i=0;i<n;i++){p.fromBufferAttribute(P,i);if(p.x<-.18&&p.y>.85){top[0]+=p.x;top[1]+=p.y;top[2]+=p.z;top[3]++;}}
-  if(top[3]){const t=top.map(v=>v/top[3]);shaft={t,b:[t[0],0,t[2]]};} // the spear is held upright
+  for(let i=0;i<n;i++){p.fromBufferAttribute(P,i);if(p.x<-.24&&p.y>.75){top[0]+=p.x;top[1]+=p.y;top[2]+=p.z;top[3]++;}
+   if(p.x<-.24&&p.y<.3){bot[0]+=p.x;bot[1]+=p.y;bot[2]+=p.z;bot[3]++;}} // V283: only the shaft lies this far out (feet end at x -.19)
+  // V283: the axis runs through the shaft's real top and butt (the spear leans a little); before, an upright
+  // axis missed the lower shaft, which then followed the legs and the spear bent like a bow
+  if(top[3]){const t=top.map(v=>v/top[3]);shaft={t,b:bot[3]?bot.map(v=>v/bot[3]):[t[0],0,t[2]]};}
  }
  for(let i=0;i<n;i++){
   p.fromBufferAttribute(P,i);
   if(shaft){const k=(p.y-shaft.b[1])/(shaft.t[1]-shaft.b[1]),ax=shaft.b[0]+(shaft.t[0]-shaft.b[0])*k,az=shaft.b[2]+(shaft.t[2]-shaft.b[2])*k;
-   if(Math.hypot(p.x-ax,p.z-az)<.04&&(p.y>handR.a.y+.05||p.y<handR.a.y-.09)){idx[i*4]=boneIndex(handR);wts[i*4]=1;locked[i]=1;continue;}}
+   // V283: the whole shaft is rigid in the hand (also the grip section), within 6 cm of the axis
+   if(p.y>.1&&Math.hypot(p.x-ax,p.z-az)<.045&&(p.y>handR.a.y+.05||p.y<handR.a.y-.09||Math.hypot(p.x-ax,p.z-az)<.025)){idx[i*4]=boneIndex(handR);wts[i*4]=1;locked[i]=1;continue;}}
   if(false){idx[i*4]=boneIndex(handR);wts[i*4]=1;continue;}
   const side=p.x>.03?'L':p.x<-.03?'R':null;
   const best=[];
@@ -93,6 +97,11 @@ function skin(kind,skeleton,bones){
   top.forEach(([,s],k)=>{idx[i*4+k]=boneIndex(s);wts[i*4+k]=w[k]/sum;});
  }
  smooth(g,idx,wts,order.length,locked);
+ // V283: where the spear butt touches the boot the generated mesh joins them; those few faces stretched into a
+ // long sheet when the spear swung. Drop faces that join the rigid shaft to the body below the hand.
+ if(shaft&&g.index){const I=g.index.array,keep=[];for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],c=I[t+2],l=locked[a]+locked[b]+locked[c];
+   if(l>0&&l<3&&Math.min(P.getY(a),P.getY(b),P.getY(c))<handR.a.y-.12)continue;keep.push(a,b,c);}
+  g.setIndex(keep);}
  g.setAttribute('skinIndex',new T.Uint16BufferAttribute(idx,4));g.setAttribute('skinWeight',new T.Float32BufferAttribute(wts,4));
  g.computeBoundingBox();g.computeBoundingSphere();g.userData.shared=true;d.skinned=true;return g;
 }

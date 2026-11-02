@@ -28,6 +28,9 @@ function humanArchetype(kind){
  return 'villager';
 }
 export function createSoldier(parent,x,z,color,kind,grade='standard'){
+ // V283: the scout is the same fur-clad Stone Age person as everyone else (spear in hand) with his dog,
+ // instead of the old boxy V148 soldier figure
+ if(kind==='scout'){const root=createSoldier(parent,x,z,color,'stone_hunter',grade);root.userData.scoutV283=true;addScoutCompanionsV274(root,{spear:false});return root;}
  const root=createSoldierNow(parent,x,z,color,kind,grade);
  const human=STONE_HUMAN_KINDS.has(kind)&&!isStoneHumanKind(kind);
  const rigged=isRiggedStoneWarriorV261(kind);
