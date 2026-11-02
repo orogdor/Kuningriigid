@@ -7,6 +7,9 @@ import fs from 'fs';
 const ok=(c,m)=>{if(!c){console.error('FAIL',m);process.exit(1);}};
 ok(WORK_SPOTS_V284.quarry.onTop&&WORK_SPOTS_V284.quarry.action==='mine','quarry: on the terrace, pick');
 ok(!WORK_SPOTS_V284.mason.onTop&&WORK_SPOTS_V284.mason.action==='build','mason: on the floor, hammer');
+// V285: the other Stone Age workplaces
+for(const [t,a] of [['claypit','dig'],['pottery_kiln','pottery'],['study','study'],['well','water']])ok(WORK_SPOTS_V284[t]?.action===a,'work spot '+t+' -> '+a);
+ok(WORK_SPOTS_V284.claypit.onTop&&WORK_SPOTS_V284.claypit.chipColor,'the clay digger stands in the pit, clods fly');
 // a stepped box stands in for the quarry: the upper half (back, -z) is 2 high, the front half 1 high
 const g=new T.BufferGeometry().copy(new T.BoxGeometry(10,1,10).translate(0,.5,0));
 const back=new T.Mesh(new T.BoxGeometry(10,2,5).translate(0,1,-2.5),new T.MeshBasicMaterial());

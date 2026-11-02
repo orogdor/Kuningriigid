@@ -105,3 +105,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V283: kiviaja animatsioonid (tööriistad õiget pidi käes, karjusele kepp, õpetaja/pottsepp/savikaevaja/kiviraidur õiged tööriistad, veekandja kann ka tagasiteel, odamehe oda ei paindu, skaut kiviaja inimese mudeliga + uus koer).
 
 - V284: kivimurru töötaja ronib kivihunniku astmele ja raiub kaljuseina, kiviraidur töötab koja tööpingi taga; kivikillud lendavad löögi hetkel (stone-work-spots-v284.js).
+
+- V285: töökohad hoone mudelil ka savikaevandusele (kaevab lohus), pottsepale (ahju ees), õpetajale (kivilaua juures) ja kaevule (veekandja ringi ääres).

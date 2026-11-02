@@ -1,4 +1,5 @@
 // V284: Stone Age workers work ON their building model instead of in front of its door.
+// V285: also the clay pit (digs in the pit), pottery kiln (kneels at the kiln), elders' hut (at the stone table) and well.
 //  - quarry (kivimurd): the stonecutter climbs onto the middle terrace of the rock heap and cuts at the upper
 //    terrace wall with his pick; chips fly from the wall at every blow.
 //  - mason (kiviraiduri koda): the mason stands between the back wall and the stone workbench under the roof, facing
@@ -10,7 +11,12 @@ import * as T from './vendor/three.module.js';
 // spot / target in the model's normalised footprint (-.5..+.5; +z is the front/door side), job motion, chip timing
 export const WORK_SPOTS_V284={
  quarry:{spot:[-.05,-.27],look:[-.05,-.5],onTop:true,action:'mine',period:1.85,hit:.6,chipAt:[0,.2,1.05]},
- mason:{spot:[.04,.05],look:[.04,.24],onTop:false,action:'build',period:1.12,hit:.6,chipAt:[0,.95,.55]}
+ mason:{spot:[.04,.05],look:[.04,.24],onTop:false,action:'build',period:1.12,hit:.6,chipAt:[0,.95,.55]},
+ // V285: the other Stone Age workplaces
+ claypit:{spot:[-.12,0],look:[-.45,0],onTop:true,action:'dig',period:1.7,hit:.55,chipAt:[-.05,.08,.55],chipColor:'#8a5632',chipFromTool:false}, // down the steps into the pit, digs its wall; clods fly
+ pottery_kiln:{spot:[.40,.33],look:[.45,.10],onTop:false,action:'pottery',chips:false}, // kneels at the kiln mouth beside the pots
+ study:{spot:[-.22,.56],look:[-.22,.30],onTop:false,action:'study',chips:false}, // the elder at the stone table on the porch
+ well:{spot:[.05,.46],look:[.05,0],onTop:false,action:'water',chips:false} // draws water at the well ring
 };
 const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),v=new T.Vector3(),w2=new T.Vector3();
 // the detailed (near) mesh if it is in place, otherwise the middle/far level: all share the same footprint frame
@@ -37,10 +43,11 @@ export function workSpotV284(type,buildingModel,peopleLayer){
  buildingModel.userData.workSpotV284={key,spot};return spot;
 }
 // a few stone chips that burst from the struck stone at every blow (shared geometry and material)
-const chipGeo=new T.TetrahedronGeometry(.075,0),chipMat=new T.MeshStandardMaterial({color:'#b9b2a3',roughness:.9,flatShading:true});chipGeo.userData.shared=true;
-function chips(model){
+const chipGeo=new T.TetrahedronGeometry(.075,0),chipMats=new Map();chipGeo.userData.shared=true;
+const chipMat=c=>{if(!chipMats.has(c))chipMats.set(c,new T.MeshStandardMaterial({color:c,roughness:.9,flatShading:true}));return chipMats.get(c);};
+function chips(model,color='#b9b2a3'){
  if(model.userData.chipsV284)return model.userData.chipsV284;
- const g=new T.Group();g.name='V284 stone chips';for(let i=0;i<6;i++){const m=new T.Mesh(chipGeo,chipMat);m.userData.dir=[(i/5-.5)*1.8,.9+((i*7)%5)*.25,.4+((i*3)%4)*.3];g.add(m);}
+ const g=new T.Group();g.name='V284 stone chips';for(let i=0;i<6;i++){const m=new T.Mesh(chipGeo,chipMat(color));m.userData.dir=[(i/5-.5)*1.8,.9+((i*7)%5)*.25,.4+((i*3)%4)*.3];g.add(m);}
  model.add(g);model.userData.chipsV284=g;return g;
 }
 // blend: 0 = at the door (normal motion), 1 = at the work spot (climbed up / behind the bench)
@@ -51,11 +58,13 @@ export function applyWorkSpotV284(model,spot,working,time,dt,base){
  const e=k*k*(3-2*k),climb=spot.spec.onTop?Math.sin(Math.PI*e)*.25:0; // a little hop while climbing the terraces
  model.position.set(base.x+(spot.x-base.x)*e,base.y+(spot.y-base.y)*e+climb,base.z+(spot.z-base.z)*e);
  if(k>.5)model.rotation.y=spot.heading;
- const g=chips(model),spec=spot.spec;g.visible=k>=1;
+ const spec=spot.spec;if(spec.chips===false)return {moving:k>0&&k<1,blend:k};
+ const g=chips(model,spec.chipColor);g.visible=k>=1;
  // the chips fly at the moment of the blow: use the same work clock as the job motion (stone-motion-v222)
  const rig=model.children[0]?.userData?.rig,wt=rig?.workClock!=null?rig.workClock+rig.phase+rig.phase*.06:time;
  if(g.visible){const u_=((wt/spec.period)%1+1)%1,t=(u_-spec.hit)*spec.period,on=t>=0&&t<.45;
   // the burst starts where the tool's stone head is at the moment of the blow (fixed point on the spec as fallback)
+  if(on&&!u.chipOriginV284&&spec.chipFromTool===false)u.chipOriginV284=new T.Vector3(...spec.chipAt);
   if(on&&!u.chipOriginV284){model.updateMatrixWorld(true);const hand=rig?.tool?.parent?.getWorldPosition(new T.Vector3());let best=null,far=-1;
    rig?.tool?.traverse(o=>{if(!o.isMesh||!hand)return;if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();const p=o.localToWorld(o.geometry.boundingSphere.center.clone()),d=p.distanceTo(hand);if(d>far){far=d;best=p;}});
    u.chipOriginV284=best?model.worldToLocal(best):new T.Vector3(...spec.chipAt);}
