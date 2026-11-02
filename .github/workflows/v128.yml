@@ -94,5 +94,6 @@ jobs:
           node tests/stone-age-economy-v281.mjs
           node tests/ui-v282.mjs
           node tests/stone-animation-v283.mjs
+          node tests/work-spots-v284.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

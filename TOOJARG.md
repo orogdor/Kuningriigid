@@ -103,3 +103,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V282: graafika ja UI (maailmakaardi linn südamiku järgi 2–4× + hooned 1,4×, nimesilt serval, maavarade märgid ressursipiltidega ja vähem, kuuvalgus, telefoni ülariba mahub, ~200 ingliskeelset tõlget + mustrid, pruun stiil ehitusmenüüle/päevikule/vormidele, vee teated, aktiivne nupp, soovituste loogika).
 
 - V283: kiviaja animatsioonid (tööriistad õiget pidi käes, karjusele kepp, õpetaja/pottsepp/savikaevaja/kiviraidur õiged tööriistad, veekandja kann ka tagasiteel, odamehe oda ei paindu, skaut kiviaja inimese mudeliga + uus koer).
+
+- V284: kivimurru töötaja ronib kivihunniku astmele ja raiub kaljuseina, kiviraidur töötab koja tööpingi taga; kivikillud lendavad löögi hetkel (stone-work-spots-v284.js).
