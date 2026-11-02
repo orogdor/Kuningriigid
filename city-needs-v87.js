@@ -18,8 +18,8 @@ export function cityNeeds(city,age=0){
  const missing=Math.max(0,need.food-foods.length)+Math.max(0,need.luxury-luxuries.length);
  const extra=Math.max(0,foods.length-need.food)+Math.max(0,luxuries.length-need.luxury);
  // V267: carrying water from the river (no well) costs work time and satisfaction
- const waterFetch=!!city.waterFetchV267;
- return {need,foods,luxuries,threshold,missing,extra,waterFetch,productivity:(1-.05*(missing+(waterFetch?1:0))+.02*extra)*(waterFetch?.9:1)};
+ const waterFetch=!!city.waterFetchV267,far=!!city.waterFetchFarV280; // V280: a far spring costs 20 % work instead of 10 %
+ return {need,foods,luxuries,threshold,missing,extra,waterFetch,waterFar:far,productivity:(1-.05*(missing+(waterFetch?1:0))+.02*extra)*(waterFetch?(far?.8:.9):1)};
 }
 export function nationalStock(s,team){const total={};for(const city of s.cities.filter(c=>c.team===team&&c.districtOf==null))for(const[k,v]of Object.entries(city.economy.realms[team].resources))total[k]=(total[k]||0)+v;return total;}
 export const GOOD_BUILDINGS={

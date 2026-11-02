@@ -41,7 +41,7 @@ import {atWar,tickDiplomacy,setRelation} from './diplomacy-v87.js';
 import {advanceMerchant,receiveMerchant,planMerchants} from './merchant-v87.js?v=125a';
 import {availableLabor} from './gameplay-flow-v86.js?v=86a';
 import {visibleNow,updateEnemyIntel,armyUnits,activeArmies,splitArmy,mergeArmies,cityProblems} from './v51-systems.js';
-import {raidTickV276} from './villages-v276.js';import {peaceV276} from './diplomacy-v87.js';import {buildDrainage,openStartingPassages,addLakeOutletsV275} from './world-geography.js?v=65c';
+import {raidTickV276,villageTypeV276,tradeWithVillageV276,TRADE_RANGE_V276} from './villages-v276.js';import {peaceV276} from './diplomacy-v87.js';import {buildDrainage,openStartingPassages,addLakeOutletsV275} from './world-geography.js?v=65c';
 import {createLandmarks,collectLandmark,findExplorationPath} from './world-discoveries.js';
 import {buildRailNetworks} from './infrastructure.js';
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js';
@@ -84,6 +84,8 @@ Object.assign(BUILDINGS.farm,{cost:{wood:25,stone:12},requires:['hall']});
 Object.assign(BUILDINGS.barracks,{name:'Sõdalaste laager',cost:{wood:35,stone:15},requires:['lumber','quarry']});
 BUILDINGS.hunter={name:'Jahimehe onn',icon:'♧',cost:{wood:18},requires:['hall'],workers:2,time:16,out:'bread',rate:6,cycle:8};
 BUILDINGS.fisher={name:'Kalamehe onn',icon:'≈',cost:{wood:20},requires:['hall'],workers:2,time:16,out:'bread',rate:6,cycle:7};
+// V280: Stone Age food: hunters and fishers bring 50 % more; a farm needs only a lumber camp and wood
+BUILDINGS.hunter.rate=9;BUILDINGS.fisher.rate=9;BUILDINGS.farm.requires=['lumber'];BUILDINGS.farm.cost={wood:30};
 BUILDINGS.warehouse={name:'Materjaliladu',icon:'▦',cost:{wood:35,stone:12},requires:['hall'],workers:1,time:42};
 BUILDINGS.cellar={name:'Toidukelder',icon:'▤',cost:{wood:45,stone:25},requires:['house'],workers:0,time:58};
 BUILDINGS.market={name:'Turg',icon:'⚖',cost:{wood:50,stone:24},requires:['house'],workers:2,time:65};
@@ -250,6 +252,13 @@ export function shoreWarpV278(x,z){
  const wz=(valueV278(x/31+19.4,z/31+5.2)-.5)*15+(valueV278(x/11+4.6,z/11+17.1)-.5)*7;
  return {x:wx,z:wz};
 }
+// V280: each computer nation has a character that brings its favourite discoveries forward
+export const PERSONALITIES_V280=['sõjakas','ehitaja','kaupleja'];
+export const personalityV280=(s,team)=>PERSONALITIES_V280[((s.seed|0)+team*7)%3];
+export function personalityResearchV280(s,team){
+ const p=personalityV280(s,team);
+ return p==='sõjakas'?['hunting','warfare','woodworking','archery','fortifications']:p==='ehitaja'?['stone_tools','agriculture','woodworking','pottery','stone_crafts']:['fishing','settlement','pottery','storage','animal_husbandry'];
+}
 export function createGame(seed,type='continents'){return {version:4,unitBalanceVersion:UNIT_BALANCE_VERSION,roadKeyCols:COLS,hydrologyVersion:2,tempo:'normal',researchBalanceVersion:2,mapExpansionVersion:2,worldScaleVersion:2,geographyVersion:type==='tectonic'?7:type==='continents'?4:0,coastalStartsVersion:1,seed,type,difficulty:'normal',time:0,research:STARTS.map(()=>newResearch()),ages:[0,0,0,0],cities:[],settlers:(type==='tectonic'?tectonicLayout(seed).starts:type==='continents'?continentLayout(seed,true).starts:STARTS).map((p,team)=>({id:team,team,...p,x:0,z:0,path:[],landed:false,localTarget:null})),nextSettler:4,units:STARTS.map((p,team)=>({kind:'scout',team,hp:TROOPS.scout.hp,morale:100})),explorerVersion:1,armies:(type==='tectonic'?tectonicLayout(seed).starts:type==='continents'?continentLayout(seed,true).starts:STARTS).map((p,team)=>({team,...p,path:[]})),deployments:{},explored:Array.from({length:4},()=>({})),visionClock:0,clock:0,battle:null,winner:null,lakeOutletsV275:true,naturalShoreV278:true}};
 export function migrateGame(old){if(old?.version===4)return old;if(!old?.world)return null;const s=createGame(old.world.seed,old.world.type);delete s.research;s.time=old.time||0;s.ages=old.realms?.map(r=>r.tech?3:old.buildings.some(b=>b.type==='smith')?2:0)||[0,0];s.settlers=[];for(const team of [0,1]){const hall=old.buildings.find(b=>b.team===team&&b.type==='hall');if(!hall){s.settlers.push({id:s.nextSettler++,team,c:team?17:10,r:team?9:11,x:old.settlers?.[team]?.x||0,z:old.settlers?.[team]?.z||0,path:[],landed:false,localTarget:null});continue}const indices=old.buildings.map((b,i)=>b.team===team?i:-1).filter(i=>i>=0),econ=initialState(s.seed);econ.settlers=[];econ.buildings=indices.map(i=>{const b=copy(old.buildings[i]);if(b.parent!=null)b.parent=indices.indexOf(b.parent);return b});econ.realms[team]=copy(old.realms[team]);econ.cargo=[];econ.units=[];migrateEconomy(econ);s.cities.push({id:s.cities.length,team,c:team?17:10,r:team?9:11,name:team?'Idakindlus':'Kadakalinn',economy:econ,world:old.cityWorlds?.[team]||old.cityWorld?copy(old.cityWorlds?.[team]||old.cityWorld):null,hp:600});if(s.cities.at(-1).world)s.cities.at(-1).world.workers={}}
 s.units=copy(old.units||[]).map(u=>({...u,cityId:s.cities.find(c=>c.team===u.team)?.id}));if(old.campaign){s.armies=copy(old.campaign.armies);s.deployments=copy(old.campaign.deployments||{})}s.armies=s.armies.slice(0,2);delete s.mapExpansionVersion;delete s.geographyVersion;return s;}
@@ -346,7 +355,7 @@ export class Civilization{
  cell(p){return this.cells[p.r*COLS+p.c]}
  atlasHeight(x,z){if(!Number.isFinite(x)||!Number.isFinite(z))return -15;if(this.s?.naturalShoreV278){const w=shoreWarpV278(x,z);x+=w.x;z+=w.z;}const fx=(x-ORIGIN_X)/50-.5,fz=(z-ORIGIN_Z)/50-.5,c=Math.floor(fx),r=Math.floor(fz);let u=fx-c,v=fz-r;u=u*u*(3-2*u);v=v*v*(3-2*v);const sample=(c,r)=>{const a=this.cells[r*COLS+c];return !a||c<0||c>=COLS||r<0||r>=ROWS?-15:a.land?(a.river&&!a.bridge?Math.max(4,a.h-3.5):Math.max(5,a.h)):Math.min(-6,a.h)};return (sample(c,r)*(1-u)+sample(c+1,r)*u)*(1-v)+(sample(c,r+1)*(1-u)+sample(c+1,r+1)*u)*v}
  ensureBerries(world,cell){if(world.berriesVersion)return;world.berriesVersion=1;for(let i=0;i<9;i++){const x=-24+(i%3)*22,z=-22+Math.floor(i/3)*21;if(detailHeight(cell,x,z)>.4)world.resources.push({id:world.resources.length,kind:'berry',x,z,amount:60,capacity:60,removed:false})}world.revision++}
- makeWorld(cell){const dryV278=(kind,x,z)=>kind>=3||this.atlasHeight(cell.x+x/4.5,cell.z+z/3.9)>5.6;return consolidateMinerals({resources:cell.detail.resources.map(([kind,x,z],id)=>({id,kind:['tree','stone','ore','game','fish'][kind],x,z,amount:kind>=3?96:kind?420:32,removed:!dryV278(kind,x,z),cleared:!dryV278(kind,x,z)})),heat:{},revision:0,foodResourcesVersion:1},cell)}
+ makeWorld(cell){const dryV278=(kind,x,z)=>kind>=3||this.atlasHeight(cell.x+x/4.5,cell.z+z/3.9)>5.6,firmV280=this.s?.naturalShoreV278?(x,z)=>this.atlasHeight(cell.x+x/4.5,cell.z+z/3.9)>6.2:null;return consolidateMinerals({resources:cell.detail.resources.map(([kind,x,z],id)=>({id,kind:['tree','stone','ore','game','fish'][kind],x,z,amount:kind>=3?96:kind?420:32,removed:!dryV278(kind,x,z),cleared:!dryV278(kind,x,z)})),heat:{},revision:0,foodResourcesVersion:1},cell,[],firmV280)}
  cityAt(p){const lookup=cityLookup(this);return lookup?lookup.positions.get(p.c+':'+p.r):this.s.cities.find(c=>c.c===p.c&&c.r===p.r)}
 
  // Fractional travel clocks let units move smoothly from cell to cell.
@@ -369,14 +378,63 @@ export class Civilization{
     this.uiMessagesV276.push(m);(this.s.events??=[]).push({time:this.s.time,text:m.text});}
   }
  }
+ // V280: computer nations use their gold (speed up research) and trade surplus with trader villages for food
+ aiTreasuryV280(dt){
+  this.treasuryClockV280=(this.treasuryClockV280||0)+dt;if(this.treasuryClockV280<30)return;this.treasuryClockV280=0;
+  for(const team of [1,2,3]){
+   const towns=this.s.cities.filter(c=>c.team===team&&c.districtOf==null);if(!towns.length)continue;
+   const gold=towns.reduce((a,c)=>a+(c.economy.realms[team].resources.gold||0),0);
+   if(gold>=150&&this.s.research[team]?.active)this.buyResearchV280(team);
+   const trader=personalityV280(this.s,team)==='kaupleja';
+   for(const town of towns){
+    const r=town.economy.realms[team],res=r.resources,food=foodTotal(res),hungry=food<(r.pop||3)*(trader?3:2);
+    if(!hungry)continue;
+    const village=(this.s.landmarks||[]).filter(l=>villageTypeV276(l)==='traders'&&Math.abs(l.c-town.c)+Math.abs(l.r-town.r)<=TRADE_RANGE_V276).sort((a,b)=>Math.abs(a.c-town.c)+Math.abs(a.r-town.r)-Math.abs(b.c-town.c)-Math.abs(b.r-town.r))[0];
+    if(!village)continue;
+    (this.s.explored[team]??={})[village.c+':'+village.r]=true;
+    if((res.gold||0)<12){if((res.wood||0)>=80)tradeWithVillageV276(this,village.id,'sell_wood',team);else if((res.stone||0)>=80)tradeWithVillageV276(this,village.id,'sell_stone',team);}
+    if((res.gold||0)>=12)tradeWithVillageV276(this,village.id,'buy_food',team);
+   }
+  }
+ }
+ // V280: research never sits idle: if no goal fits, take the cheapest open discovery of the current age
+ fallbackResearchV280(team,postponeBronze){
+  const science=this.s.research[team],age=this.s.ages[team]||0,known=new Set(science.known);
+  const open=Object.entries(TECHS).filter(([id,t])=>!known.has(id)&&t.age<=age&&!(postponeBronze&&id==='bronze')).sort((a,b)=>(a[1].turns||9)-(b[1].turns||9));
+  for(const [id] of open){const r=this.research(team,id);if(r&&!r.error&&science.active)return id;}
+  return null;
+ }
+ // V280: the kingdom's treasury: 40 gold speeds up the current discovery by 12 research points
+ buyResearchV280(team){
+  const science=this.s.research[team],id=science.active;if(!id)return {error:'Ühtegi uuringut pole käimas.'};
+  const city=this.s.cities.filter(c=>c.team===team&&c.districtOf==null).sort((a,b)=>(b.economy.realms[team].resources.gold||0)-(a.economy.realms[team].resources.gold||0))[0];
+  const res=city?.economy.realms[team].resources;if(!res||(res.gold||0)<40)return {error:'Kassas pole 40 kulda.'};
+  res.gold-=40;science.progress[id]=(science.progress[id]||0)+12;return {ok:true,id,town:city.name};
+ }
  migrationActiveV274(){const m=this.s.migrationV274;return !!m&&!m.done&&this.s.time<m.until;}
  // during the migration the scout walks hidden inside its people's band
  followBandV274(){for(const army of this.s.armies){const band=this.s.settlers.find(a=>a.team===army.team);if(!band)continue;army.c=band.c;army.r=band.r;army.path=[];army.travelClock=0;army.hiddenInBandV274=true;}}
+ // V280: three suggested town sites near the migrating band (water, wood, stone, food, little walking)
+ siteSuggestionsV280(team){
+  const a=this.s.settlers.find(x=>x.team===team&&x.embarked==null);if(!a)return [];
+  const out=[];
+  for(let dr=-7;dr<=7;dr++)for(let dc=-7;dc<=7;dc++){
+   const cell=this.cell({c:a.c+dc,r:a.r+dr});if(!cell?.land||cell.mountain||cell.river)continue;
+   if(this.s.cities.some(c=>Math.abs(c.c-cell.c)+Math.abs(c.r-cell.r)<6))continue;
+   let water=0;for(let y=-2;y<=2;y++)for(let x=-2;x<=2;x++){const n=this.cell({c:cell.c+x,r:cell.r+y});if(n?.river||n?.lake||n?.lakeOutletV275)water=Math.max(water,3-Math.max(Math.abs(x),Math.abs(y)));}
+   const d=cell.deposits||{},score=water*9+(d.wood?8:0)+(d.stone?6:0)+(d.game?5:0)+(d.grain?6:0)+(cell.coast?5:0)-(Math.abs(dc)+Math.abs(dr))*1.2;
+   out.push({c:cell.c,r:cell.r,score,water:water>0});
+  }
+  out.sort((x,y)=>y.score-x.score);const pick=[];for(const p of out){if(pick.every(q=>Math.abs(q.c-p.c)+Math.abs(q.r-p.r)>=4))pick.push(p);if(pick.length===3)break;}
+  return pick;
+ }
  endMigrationV274(){
   const m=this.s.migrationV274;if(!m||m.done||this.s.time<m.until)return;m.done=true;
   for(const team of [...new Set(this.s.settlers.map(a=>a.team))]){
    if(this.s.cities.some(c=>c.team===team))continue;
    const a=this.s.settlers.find(a=>a.team===team&&a.embarked==null);if(!a)continue;
+   const best=!a.chosenSiteV274?this.siteSuggestionsV280(team)[0]:null; // V280: no choice made -> the best suggested site
+   if(best&&!a.chosenSiteV274){a.c=best.c;a.r=best.r;a.path=[];a.travelClock=0;a.landed=false;}
    const site=a.chosenSiteV274;if(site){a.c=site.c;a.r=site.r;a.path=[];a.travelClock=0;a.landed=false;}
    if(!a.landed)this.land(a.id);a.localTarget=null;
    const prefer=site?[{x:site.x,z:site.z}]:[{x:Math.round(a.x||0),z:Math.round(a.z||0)}];
@@ -508,10 +566,12 @@ export class Civilization{
    const parent=this.parentCity(ctx),houses=this.allBuildings(parent).filter(b=>b.type==='house'&&b.ready&&b.hp>0);
    // V267: without a well, people carry water from a river within two tiles. It covers the need but
    // costs working time (cityNeeds: -10% productivity) and satisfaction (one need step, -5%).
-   parent.waterFetchV267=false;
+   parent.waterFetchV267=false;parent.waterFetchFarV280=false;
    if(!this.cityReady(parent,'well')){
-    let river=false;for(let dr=-2;dr<=2&&!river;dr++)for(let dc=-2;dc<=2&&!river;dc++){const c=parent.c+dc,rr=parent.r+dr;if(c<0||rr<0||c>=COLS)continue;const cell=this.cells[rr*COLS+c];if(cell?.river||cell?.lake)river=true;}
+    let river=false;for(let dr=-4;dr<=4&&!river;dr++)for(let dc=-4;dc<=4&&!river;dc++){const c=parent.c+dc,rr=parent.r+dr;if(c<0||rr<0||c>=COLS)continue;const cell=this.cells[rr*COLS+c];if(cell?.river||cell?.lake||cell?.lakeOutletV275)river=true;} // V280: radius 4
     if(river){const lack=Math.max(0,waterNeed-(r.resources.water||0));if(lack>0){r.resources.water=(r.resources.water||0)+lack;parent.waterFetchV267=true;}}
+    // V280: no river or lake near: water is carried from a far spring - enough to live, but it costs more work
+    else{const lack=Math.max(0,waterNeed-(r.resources.water||0));if(lack>0){r.resources.water=(r.resources.water||0)+lack;parent.waterFetchV267=true;parent.waterFetchFarV280=true;}}
    }
    const market=this.cityReady(parent,'market');
    const consume=(key,amount,house=null)=>{
@@ -813,7 +873,7 @@ if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plan
  research(team,id){return startResearch(this.s,team,id)}
  advance(city){const id=['bronze','iron','civics','renaissance','industrialization','modernity'][this.s.ages[city.team]];return id?this.research(city.team,id):{error:'Kõrgeim ajastu on saavutatud.'}}
  tick(dt){if(dt<=0||this.s.winner!==null)return;this.s.time+=dt;tickDiplomacy(this.s,dt);this.s.visionClock=(this.s.visionClock||0)+dt;if(this.s.visionClock>=3){this.s.visionClock=0;this.refreshVision();}tickShips(this,dt);decayWorldRoads(this.s,dt);this.s.localTrailDecayClock=(this.s.localTrailDecayClock||0)+dt;if(this.s.localTrailDecayClock>=60){this.s.localTrailDecayClock%=60;for(const nav of [...this.navs.values(),...this.localNavs.values()]){nav.world.trailTime=this.s.time;nav.pruneTrails()}}for(const u of this.s.units){const army=this.s.armies.find(a=>a.team===u.team&&(a.id||0)===(u.armyId||0))||this.s.armies[u.team],city=this.cityAt(army);if(!this.s.battle&&u.hp>0&&u.hp<(u.maxHp||TROOPS[u.kind]?.hp||u.hp)&&city?.team===u.team&&foodTotal(city.economy.realms[u.team].resources)>0){const healed=Math.min(((u.maxHp||TROOPS[u.kind].hp)-u.hp),dt*.12);u.hp+=healed;u.healSupply=(u.healSupply||0)+healed;if(u.healSupply>=12){takeFood(city.economy.realms[u.team].resources,1);u.healSupply-=12}}}this.s.clock+=dt;this.s.railClock=(this.s.railClock||0)+dt;if(this.s.railClock>=25){this.s.railClock%=25;buildRailNetworks(this)}this.s.tradeClock+=dt;if(this.s.tradeClock>=15){this.s.tradeClock%=15;this.trade()}for(const a of this.s.settlers){if(a.embarked==null&&a.landed&&a.localTarget){if(this.nav(a).move(a,a.localTarget,dt,a.team>0?2.2:3))a.localTarget=null}}for(const parent of this.s.cities){consumeLuxuries(parent,this.s.ages[parent.team],dt);for(const ctx of this.contexts(parent))if(ctx.world)naturalRegrowthV274(this.s,ctx.world,null,dt,ctx.economy?.buildings||[]);this.applyUpgrades(parent);const realm=parent.economy.realms[parent.team],critical=foodTotal(realm.resources)<Math.ceil(realm.pop/4)*2;for(const ctx of this.contexts(parent))for(const w of Object.values(ctx.world.workers||{})){w.moving=false;w.working=false}allocateCity(this,parent);/* Update shoppers every tick, avoiding 3m jumps from the old 1-second batching. */
- tickMarketHouseholds(this,parent,dt);parent.marketClock=0;tickTownStreets(this,parent,dt);if(parent.team===0)planRoadGatesV177(this,parent);tickBuilders(this,parent,dt*(parent.team>0?(this.s.difficulty==='easy'?.6:this.s.difficulty==='hard'?.95:.8):1));const totalEmployed=realm.employed;let used=0;const contexts=this.contexts(parent).slice().sort((a,b)=>critical?Number(!a.economy.buildings.some(t=>['hunter','fisher','bakery'].includes(t.type)&&t.ready&&!t.disabled))-Number(!b.economy.buildings.some(t=>['hunter','fisher','bakery'].includes(t.type)&&t.ready&&!t.disabled)):0);for(const city of contexts){const mobilized=this.s.battle?.civilianCityId===parent.id?this.s.battle.squads.filter(u=>u.civilian).length:0;city.laborBudget=Math.max(0,availableLabor(realm.pop,realm.housingShortage,mobilized)-used);for(const r of city.world.resources)if(r.respawnAt!=null&&r.respawnAt<=city.economy.time){r.removed=false;r.amount=r.capacity||96;delete r.respawnAt;city.world.revision++}if(tickEconomy(city.economy,dt*(city.team>0?(this.s.difficulty==='easy'?.6:this.s.difficulty==='hard'?.95:.8):1),this.env(city)))this.uiRevision++;city.employed=realm.employed||0;used+=city.employed}this.tickBasic(parent,dt*(parent.team>0?(this.s.difficulty==='easy'?.6:.75):1));this.tickTraining(parent,dt*(parent.team>0?(this.s.difficulty==='easy'?.6:.75):1));for(const ctx of this.contexts(parent))healMedievalArmies(this,ctx,dt);for(const ctx of this.contexts(parent))if(ctx.economy.buildings.some(b=>b.type==='bridge'&&b.ready)&&!this.cell(ctx).bridge){this.cell(ctx).bridge=true;this.s.crossingRevision=(this.s.crossingRevision||0)+1};realm.employed=totalEmployed;this.radius(parent)}for(const research of this.s.research){if(research.active&&research.discoveryInsight>0){research.progress[research.active]=(research.progress[research.active]||0)+research.discoveryInsight;research.discoveryInsight=0}}this.researchEvents.push(...tickResearch(this.s,dt));if(this.migrationActiveV274())this.followBandV274();else this.endMigrationV274();this.tickThreatsV276(dt);this.autoExplore(dt);autoExploreNavy(this);this.advanceWorldMovers(dt);if(this.migrationActiveV274())this.followBandV274();captureEnemySettlers(this);if(this.s.clock>=3){this.s.clock-=3;for(const cargo of [...this.s.shipments]){if(cargo.merchantV87){receiveMerchant(this,cargo);continue;}if(cargo.mode==='air'&&cargo.flightLeft>0)continue;if(cargo.mode!=='air'&&(cargo.blocked||(cargo.path.length&&!this.canTraverse(cargo.team,cargo.path[0])))){ const destination=this.s.cities.find(c=>c.id===cargo.to);const route=destination?this.landPath(cargo,destination,cargo.team):null;cargo.blocked=!route;if(!route)continue;cargo.path=route;cargo.mode='road'}if(!cargo.path.length){const city=this.s.cities.find(c=>c.id===cargo.to&&c.team===cargo.team);if(!city){this.s.shipments.splice(this.s.shipments.indexOf(cargo),1);continue}const stock=city.economy.realms[cargo.team].resources;for(const[k,n]of Object.entries(cargo.goods)){const free=Math.max(0,this.storageCap(city,k)-this.storageUsed(city,k,stock)),taken=Math.min(n,free);stock[k]=(stock[k]||0)+taken;cargo.goods[k]-=taken;if(cargo.goods[k]<=0.00001)delete cargo.goods[k]}if(!Object.keys(cargo.goods).length)this.s.shipments.splice(this.s.shipments.indexOf(cargo),1);else cargo.status='Ootab vaba laoruumi'}}if(this.s.time-(this.s.lastAIPlan||0)>=12){this.s.lastAIPlan=this.s.time;this.ai()}}}
+ tickMarketHouseholds(this,parent,dt);parent.marketClock=0;tickTownStreets(this,parent,dt);if(parent.team===0)planRoadGatesV177(this,parent);tickBuilders(this,parent,dt*(parent.team>0?(this.s.difficulty==='easy'?.6:this.s.difficulty==='hard'?.95:.8):1));const totalEmployed=realm.employed;let used=0;const contexts=this.contexts(parent).slice().sort((a,b)=>critical?Number(!a.economy.buildings.some(t=>['hunter','fisher','bakery'].includes(t.type)&&t.ready&&!t.disabled))-Number(!b.economy.buildings.some(t=>['hunter','fisher','bakery'].includes(t.type)&&t.ready&&!t.disabled)):0);for(const city of contexts){const mobilized=this.s.battle?.civilianCityId===parent.id?this.s.battle.squads.filter(u=>u.civilian).length:0;city.laborBudget=Math.max(0,availableLabor(realm.pop,realm.housingShortage,mobilized)-used);for(const r of city.world.resources)if(r.respawnAt!=null&&r.respawnAt<=city.economy.time){r.removed=false;r.amount=r.capacity||96;delete r.respawnAt;city.world.revision++}if(tickEconomy(city.economy,dt*(city.team>0?(this.s.difficulty==='easy'?.6:this.s.difficulty==='hard'?.95:.8):1),this.env(city)))this.uiRevision++;city.employed=realm.employed||0;used+=city.employed}this.tickBasic(parent,dt*(parent.team>0?(this.s.difficulty==='easy'?.6:.75):1));this.tickTraining(parent,dt*(parent.team>0?(this.s.difficulty==='easy'?.6:.75):1));for(const ctx of this.contexts(parent))healMedievalArmies(this,ctx,dt);for(const ctx of this.contexts(parent))if(ctx.economy.buildings.some(b=>b.type==='bridge'&&b.ready)&&!this.cell(ctx).bridge){this.cell(ctx).bridge=true;this.s.crossingRevision=(this.s.crossingRevision||0)+1};realm.employed=totalEmployed;this.radius(parent)}for(const research of this.s.research){if(research.active&&research.discoveryInsight>0){research.progress[research.active]=(research.progress[research.active]||0)+research.discoveryInsight;research.discoveryInsight=0}}this.researchEvents.push(...tickResearch(this.s,dt));if(this.migrationActiveV274())this.followBandV274();else this.endMigrationV274();this.tickThreatsV276(dt);this.aiTreasuryV280(dt);this.autoExplore(dt);autoExploreNavy(this);this.advanceWorldMovers(dt);if(this.migrationActiveV274())this.followBandV274();captureEnemySettlers(this);if(this.s.clock>=3){this.s.clock-=3;for(const cargo of [...this.s.shipments]){if(cargo.merchantV87){receiveMerchant(this,cargo);continue;}if(cargo.mode==='air'&&cargo.flightLeft>0)continue;if(cargo.mode!=='air'&&(cargo.blocked||(cargo.path.length&&!this.canTraverse(cargo.team,cargo.path[0])))){ const destination=this.s.cities.find(c=>c.id===cargo.to);const route=destination?this.landPath(cargo,destination,cargo.team):null;cargo.blocked=!route;if(!route)continue;cargo.path=route;cargo.mode='road'}if(!cargo.path.length){const city=this.s.cities.find(c=>c.id===cargo.to&&c.team===cargo.team);if(!city){this.s.shipments.splice(this.s.shipments.indexOf(cargo),1);continue}const stock=city.economy.realms[cargo.team].resources;for(const[k,n]of Object.entries(cargo.goods)){const free=Math.max(0,this.storageCap(city,k)-this.storageUsed(city,k,stock)),taken=Math.min(n,free);stock[k]=(stock[k]||0)+taken;cargo.goods[k]-=taken;if(cargo.goods[k]<=0.00001)delete cargo.goods[k]}if(!Object.keys(cargo.goods).length)this.s.shipments.splice(this.s.shipments.indexOf(cargo),1);else cargo.status='Ootab vaba laoruumi'}}if(this.s.time-(this.s.lastAIPlan||0)>=12){this.s.lastAIPlan=this.s.time;this.ai()}}}
  trade(){const count=planMerchants(this),modern=Object.create(this);modern.landPath=()=>null;return count+planTrade(modern)}
 
  // V137: Every owned detail tile is a potential urban quarter or rural plot.
@@ -919,7 +979,7 @@ if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plan
   for(const parent of this.s.cities.filter(c=>c.team===team))for(const ctx of this.contexts(parent)){
    if(!this.cell(ctx)?.land||!ctx.economy.buildings.some(b=>b.type==='farm'&&b.ready&&b.hp>0))continue;
    if(ctx.economy.buildings.some(b=>b.type==='field'&&b.hp>0))continue;
-   if(this.constructionArea(parent).pending.length>=2||!this.canBuildNow(ctx,'field')||this.s.time<(ctx.nextFieldSearchV127||0))continue;
+   if(this.constructionArea(parent).pending.length>=4||!this.canBuildNow(ctx,'field')||this.s.time<(ctx.nextFieldSearchV127||0))continue;
    ctx.nextFieldSearchV127=this.s.time+60;
    const field=findAIFieldSite(this,ctx);if(field)this.build(ctx,'field',field);
   }
@@ -934,10 +994,10 @@ if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plan
  }
 const science=this.s.research[team];
  const stoneCapital=this.s.cities.find(c=>c.team===team);
- const postponeBronze=stoneFortificationAgeGate(stoneCapital,this.s.ages[team],this.s.time);
+ const postponeBronze=stoneFortificationAgeGate(stoneCapital,this.s.ages[team],this.s.time)&&Object.entries(TECHS).some(([id,t])=>t.age===0&&!science.known.includes(id)); // V280: never idle once the Stone Age is fully researched
  if(postponeBronze&&science.active==='bronze')science.active=null;
- if(science.active&&!allowAIResearch(this.s,team,science.active,TROOPS,TECHS))science.active=null;if(!science.active&&this.s.cities.some(c=>c.team===team)){const order=[...productivityResearchOrder(this.s.ages[team]),'stone_tools','learning','hunting','water','agriculture','warfare','fortifications','bronze','woodworking','pottery','animal_husbandry','masonry','archery','settlement','stone_crafts','woodworking','wheel','copper_tin','stone_fortifications','road_construction','forestry','storage','cellaring','commerce','writing','literacy','bronze_crafts','milling','bridges','fishing','shipbuilding','iron','smelting','smithing','horsemanship','early_siege_engineering','ancient_artillery','philosophy','iron_crafts','navigation','civics','armor_craft','crossbows','guilds','watermills','windmills','medieval_healing','city_trade','monasticism','knighthood','castle_building','siege_engineering','city_fortifications','scholasticism','medieval_crafts','ocean_sailing','renaissance','printing','astronomy','gunpowder','industrialization','steelmaking','steam_engine','industrial_education','public_education','secondary_education','rifles','railways','modernity','oil_drilling','petroleum','electricity','combustion','modern_science','aviation'];const coastalCity=this.s.cities.some(c=>c.team===team&&this.constructionArea(c).tiles.some(t=>isShore(this,this.cell(t))));const urgent=[...(coastalCity?['fishing']:[]),...(this.s.ages[team]>=1?['stone_fortifications','commerce','shipbuilding']:[])];const goals=bronzeResearchGoals(this.s,team,TECHS,[...urgent,...expandResearchOrderV125(order)].filter(id=>allowAIResearch(this.s,team,id,TROOPS,TECHS)));
- const id=nextResearchForGoals(science,goals);if(id&&!(postponeBronze&&id==='bronze'))this.research(team,id)}for(const a of this.s.settlers.filter(a=>a.team===team)){if(a.embarked!=null)continue;if(a.landed&&!citySpacingAllowed(a,this.s.cities)){a.landed=false;a.localTarget=null}if(a.path.length)continue;if(!a.landed){const missing=nationalResourceNeeds(this,team);const ownCities=this.s.cities.filter(c=>c.team===team),hasCity=ownCities.length>0;const score=c=>settlementResourceScore(this,team,c,missing)*3+(c.deposits.wood?8:0)-(Math.abs(c.c-a.c)+Math.abs(c.r-a.r))*1.5-(hasCity?Math.min(...ownCities.map(h=>Math.max(Math.abs(c.c-h.c),Math.abs(c.r-h.r))))*6:0);const span=hasCity?26:9;const options=[];
+ if(science.active&&!allowAIResearch(this.s,team,science.active,TROOPS,TECHS))science.active=null;if(!science.active&&this.s.cities.some(c=>c.team===team)){const order=['fire_use',...personalityResearchV280(this.s,team),...productivityResearchOrder(this.s.ages[team]),'stone_tools','learning','hunting','water','agriculture','warfare','fortifications','bronze','woodworking','pottery','animal_husbandry','masonry','archery','settlement','stone_crafts','woodworking','wheel','copper_tin','stone_fortifications','road_construction','forestry','storage','cellaring','commerce','writing','literacy','bronze_crafts','milling','bridges','fishing','shipbuilding','iron','smelting','smithing','horsemanship','early_siege_engineering','ancient_artillery','philosophy','iron_crafts','navigation','civics','armor_craft','crossbows','guilds','watermills','windmills','medieval_healing','city_trade','monasticism','knighthood','castle_building','siege_engineering','city_fortifications','scholasticism','medieval_crafts','ocean_sailing','renaissance','printing','astronomy','gunpowder','industrialization','steelmaking','steam_engine','industrial_education','public_education','secondary_education','rifles','railways','modernity','oil_drilling','petroleum','electricity','combustion','modern_science','aviation'];const coastalCity=this.s.cities.some(c=>c.team===team&&this.constructionArea(c).tiles.some(t=>isShore(this,this.cell(t))));const urgent=[...(coastalCity?['fishing']:[]),...(this.s.ages[team]>=1?['stone_fortifications','commerce','shipbuilding']:[])];const goals=bronzeResearchGoals(this.s,team,TECHS,[...urgent,...expandResearchOrderV125(order)].filter(id=>allowAIResearch(this.s,team,id,TROOPS,TECHS)));
+ const id=nextResearchForGoals(science,goals);if(id&&!(postponeBronze&&id==='bronze'))this.research(team,id);if(!science.active)this.fallbackResearchV280(team,postponeBronze);}for(const a of this.s.settlers.filter(a=>a.team===team)){if(a.embarked!=null)continue;if(a.landed&&!citySpacingAllowed(a,this.s.cities)){a.landed=false;a.localTarget=null}if(a.path.length)continue;if(!a.landed){const missing=nationalResourceNeeds(this,team);const ownCities=this.s.cities.filter(c=>c.team===team),hasCity=ownCities.length>0;const score=c=>settlementResourceScore(this,team,c,missing)*3+(c.deposits.wood?8:0)-(Math.abs(c.c-a.c)+Math.abs(c.r-a.r))*1.5-(hasCity?Math.min(...ownCities.map(h=>Math.max(Math.abs(c.c-h.c),Math.abs(c.r-h.r))))*6:0);const span=hasCity?26:9;const options=[];
  for(let rr=Math.max(0,a.r-span);rr<=Math.min(ROWS-1,a.r+span);rr++)for(let cc=Math.max(0,a.c-span);cc<=Math.min(COLS-1,a.c+span);cc++){
   const c=this.cell({c:cc,r:rr});
   if(!c?.land||this.territoryOwner(c)||(hasCity===false&&(!c.deposits.wood||!c.deposits.stone))||
@@ -1044,14 +1104,15 @@ const science=this.s.research[team];
   this.s.cities.some(c=>c.team!==team&&atWar(this.s,team,c.team)));
  const schedule=this.s.aiRecruitAt??={};
  const nextRecruitAt=schedule[team]??=210;
- if(this.s.time>=nextRecruitAt&&city.economy.realms[team].pop>=(age===1?28:10)&&
+ const warlikeV280=personalityV280(this.s,team)==='sõjakas'; // V280: a warlike nation keeps a war band from a smaller town
+ if(this.s.time>=nextRecruitAt&&city.economy.realms[team].pop>=(age===1?28:warlikeV280?7:10)&&
    foodTotal(stock)>=Math.max(24,city.economy.realms[team].pop*2)&&(city.training?.length||0)<2){
   const choices=militaryChoices(this,team,city,TROOPS,UNIT_TECH);
   const kind=choices.find(k=>{const d=TROOPS[k],tech=UNIT_TECH[k];
    return k!=='bronze_cavalry'&&!this.obsoleteUnit(team,k)&&age>=d.age&&
     (!tech||science.known.includes(tech))&&d.requires.every(type=>this.cityReady(city,type))&&canAfford(stock,d.cost)});
   if(kind){const source=this.s.units.findIndex((u,i)=>u.team===team&&combatUnit(u)&&!u.garrison&&(TROOPS[u.kind]?.age??0)<TROOPS[kind].age&&!this.s.cities.some(c=>(c.training||[]).some(j=>j.upgradeSource===i))&&this.s.armies.some(a=>a.team===team&&(a.id||0)===(u.armyId||0)&&a.c===city.c&&a.r===city.r&&!a.path.length));const queued=this.s.cities.filter(c=>c.team===team).reduce((n,c)=>n+(c.training||[]).filter(j=>!j.ship&&j.upgradeSource==null).length,0);const result=source>=0?this.retrain(city,source,kind):living.length+queued<desired?this.recruit(city,kind):{};if(result.unit)
-     this.s.aiRecruitAt[team]=this.s.time+(age<=1?100:age<=3?90:75);}
+     this.s.aiRecruitAt[team]=this.s.time+(age<=1?(warlikeV280?70:100):age<=3?90:75);}
  }
  // Cap expansion by elapsed game turns, not by an arbitrary resource-deficit
  // exception; settlers still need food, people, a valid route and a real build site.

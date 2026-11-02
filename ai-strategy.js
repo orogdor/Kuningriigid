@@ -56,10 +56,9 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
  const possibilities=[],visiting=new Set();
  const add=(type,priority,reason)=>{
   if(excluded.has(type)||DEFENSE_TYPES.has(type))return;
-  if(type==='farm'&&!game.cell(city)?.deposits.grain)return;
   if(type==='house'){if(buildings.some(b=>b.type==='house'&&!b.ready&&b.hp>0))return;}
   else if(hasWorkingSource(buildings,type)){
-   const foodExpansion=['hunter','fisher','farm'].includes(type)&&r.pop>=5&&edibleSupply(stock)<r.pop*(age===1?4:3)&&
+   const foodExpansion=['hunter','fisher','farm'].includes(type)&&r.pop>=(age===0?3:5)&&edibleSupply(stock)<r.pop*(age===1?4:3)&& // V280: a hungry small village may add food sources
      !buildings.some(b=>b.type===type&&!b.ready&&b.hp>0&&!b.disabled);
    const woodExpansion=type==='lumber'&&age>=1&&r.pop>=16&&(stock.wood||0)<r.pop*2&&
      !buildings.some(b=>b.type==='lumber'&&!b.ready&&b.hp>0&&!b.disabled);
@@ -166,7 +165,7 @@ export function selectAIBuild(game,team,city,excluded=new Set()){
    (gaps.plank>35&&(stock.plank||0)>=BUILDINGS.house.cost.plank+12)||
    (gaps.bread>0)||
    (gaps.wood>0&&(stock.wood||0)>=BUILDINGS.house.cost.wood+20);
-  if(enoughToInvest||capacity<=r.pop+1.5)add('house',r.pop>=capacity-(age===1?6:2)?(age===1?274:238):missing?104:112,'Eluruumid ja järgmise rahvastikukasvu varu');
+  if(age===0&&capacity>r.pop+2){/* V280: no empty Stone Age houses */}else if(enoughToInvest||capacity<=r.pop+1.5)add('house',r.pop>=capacity-(age===1?6:2)?(age===1?274:238):missing?104:112,'Eluruumid ja järgmise rahvastikukasvu varu');
  }
  const foodCap=game.storageCap(city,'bread'),materialCap=game.storageCap(city,'plank');
  const eraCost=ERA_MATERIALS[science.ageWait?.id]||{};

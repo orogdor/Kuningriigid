@@ -8,7 +8,7 @@
 //    and it also buys your surplus. It can still be visited once for its welcome gift.
 // The kind and layout follow the village's id, so they are the same in every save without new state.
 const hash=s=>{let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619);return (h>>>0)/4294967296;};
-export const TRADE_RANGE_V276=22,RAID_EVERY_V276=420,RAID_RANGE_V276=14;
+export const TRADE_RANGE_V276=22,RAID_EVERY_V276=420,RAID_RANGE_V276=28;
 export const villageTypeV276=l=>l?.kind!=='village'?null:hash(l.id+':kind')<.42?'raiders':'traders';
 export const VILLAGE_NAMES_V276={raiders:'Röövlite küla',traders:'Kaupmeeste küla'};
 // layout in detail-map units around the tile centre (same frame as a city's buildings)

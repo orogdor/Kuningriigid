@@ -95,3 +95,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V278: loomulik kaldajoon (uued maailmad), puud mitte vette/liivale, barbarimüür kinnine (tornid müüris, värav müüris), külad lähima riigi ajastus (hooned, kaubad, röövsalgad).
 
 - V279: vanu protseduurseid hooneid/inimesi ei näidata kunagi GLB ootel (ainult laadimisvea korral), hoonete GLB-d järjekorras ees, 5 allalaadimist korraga.
+
+- V280: kiviaja testmängu parandused (toit +50%, talu ilma saeveskita, vesi 4 ruudu raadiusest + kauge allikas, ladu 240, kassa uuringu kiirendus, AI ei jää uuringuta, tuli esimesena, palisaad ainult ohu korral, röövlid 28 ruutu, AI kaupleb, AI iseloomud, tühje maju pole, asunik varem, rände soovitatud linnakohad, maagid kõvale maale, 45 min AI test).

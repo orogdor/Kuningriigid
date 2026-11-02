@@ -90,5 +90,6 @@ jobs:
           node tests/river-bank-v276.mjs
           node tests/villages-v276.mjs
           node tests/natural-shore-v278.mjs
+          node tests/stone-age-playthrough-v280.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

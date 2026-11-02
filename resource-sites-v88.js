@@ -10,7 +10,7 @@ export function mineralSite(world,type){const kind=MINERAL_BUILDINGS[type];retur
 
 // Keep resource IDs stable in V4 saves: workers use array indices as IDs.
 // Legacy scattered deposits are merged without replenishing extracted stock.
-export function consolidateMinerals(world,cell,buildings=[]){
+export function consolidateMinerals(world,cell,buildings=[],isDry=null){
  if(world.mineralSitesVersion===1)return world;
  for(const kind of mineralKinds){
   const existing=world.resources.filter(r=>r.kind===kind),extractor=buildings.find(b=>MINERAL_BUILDINGS[b.type]===kind&&b.hp>0);
@@ -20,6 +20,7 @@ export function consolidateMinerals(world,cell,buildings=[]){
    const candidates=[];
    for(let x=-54;x<=54;x+=9)for(let z=-45;z<=45;z+=9){
     if(Math.hypot(x,z)<25||[-4,0,4].some(dx=>[-4,0,4].some(dz=>detailHeight(cell,x+dx,z+dz)<=.4)))continue;
+    if(isDry&&[-6,0,6].some(dx=>[-6,0,6].some(dz=>!isDry(x+dx,z+dz))))continue; // V280: quarries and pits stand on firm ground, not beach sand
     if(world.resources.some(r=>r.depositSite&&distance(r,{x,z})<16)||buildings.some(b=>distance(b,{x,z})<12))continue;
     const levels=[[-3,-3],[-3,3],[3,-3],[3,3]].map(([dx,dz])=>detailHeight(cell,x+dx,z+dz));
     candidates.push({x,z,score:Math.max(...levels)-Math.min(...levels)+Math.abs(x)*.0001});

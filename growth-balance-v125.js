@@ -11,7 +11,7 @@ export function settlerPolicy({time,age,cities,pending,pop,food,lastAt,hasSettle
  // Grow a capital and its resource village before financing more settlers.
  const concentrate=(age===0&&cities>=2)||(age===1&&cities>=2&&pop<30);
  return {capacity,allow:hasSettlement&&cities+pending<capacity&&pending<2&&!concentrate&&
-  time>=10*60&&time-(lastAt||0)>=interval&&pop>=(age===1?12:7)&&food>=Math.max(25,pop*2.2),
+  time>=10*60&&time-(lastAt||0)>=interval&&pop>=(age===1?12:6)&&food>=Math.max(age===0?20:25,pop*(age===0?1.6:2.2)), // V280: earlier Stone Age expansion
   interval};
 }
 export function armyCapacity(ownCities,age,atWar=false){

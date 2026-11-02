@@ -32,7 +32,7 @@ export function foodProductionAllowed(stock,cargo,key,rate,cap,input={}){
  return used-reclaim+rate<=cap+1e-7;
 }
 
-export function storageLimit(buildings,key){const ready=buildings.filter(b=>b.ready&&b.hp>0&&!b.virtual);const count=type=>ready.filter(b=>b.type===type).length;const halls=Math.max(1,count("hall"));if(key==="gold")return Infinity;if(key==="power")return 100;if(key==="water")return 100*halls;if(FOOD_KEYS.has(key))return 100*halls+200*count("cellar")+60*count("pottery_kiln");if(MATERIAL_KEYS.has(key))return 120*halls+300*count("warehouse");return Infinity}
+export function storageLimit(buildings,key){const ready=buildings.filter(b=>b.ready&&b.hp>0&&!b.virtual);const count=type=>ready.filter(b=>b.type===type).length;const halls=Math.max(1,count("hall"));if(key==="gold")return Infinity;if(key==="power")return 100;if(key==="water")return 100*halls;if(FOOD_KEYS.has(key))return 100*halls+200*count("cellar")+60*count("pottery_kiln");if(MATERIAL_KEYS.has(key))return 240*halls+300*count("warehouse");return Infinity}
 export const START={wood:68,plank:10,stone:18,grain:0,flour:0,water:28,bread:26,ore:0,coal:0,iron:0,weapons:0,paper:0,saltpeter:0,gunpowder:0,steel:0,machines:0,oil:0,fuel:0,power:0,vehicles:0,gold:90,clay:0,pottery:0,cutstone:0,copper:0,tin:0,bronze:0,carts:0};
 // Rolling minute buckets record goods actually received, not theoretical output.
 export function recordDelivery(realm,seconds,key,amount){

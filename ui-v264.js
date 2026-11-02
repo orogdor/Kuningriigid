@@ -99,9 +99,14 @@ function fill(){
   }
  }else if(mode==='trade'){
   panel.querySelector('.v264-head strong').textContent='Kaubandus';
+  // V280: the treasury: gold speeds up the current discovery
+  {const box=document.createElement('div');box.className='v276-trader';const act=a.research?.().active;
+   box.innerHTML=`<div class="v276-title"><img src="ui-art-v263/cmd_research.webp" alt=""><span><b>Kuningriigi kassa</b><small>${act?'Käimas: '+esc(act):'Ühtegi uuringut pole käimas'}</small></span></div>`;
+   const offers=document.createElement('div');offers.className='v276-offers';const b=document.createElement('button');b.type='button';b.disabled=!act;
+   b.textContent='Kiirenda uuringut (40 kulda → +12 punkti)';b.onclick=e=>{e.stopPropagation();a.boostResearch();fill();};offers.append(b);box.append(offers);rows.append(box);}
   // V276: trade with the trader villages you have discovered (from your nearest town in range)
   const traders=(a.traders?.()||[]).filter(t=>!q||(t.name+' '+(t.town||'')).toLowerCase().includes(q)).sort((x,y)=>(y.town?1:0)-(x.town?1:0));
-  if(!traders.length)rows.innerHTML='<p class="v264-empty">Ühtegi kaupmeeste küla pole veel avastatud. Saada skaut maailma avastama.</p>';
+  if(!traders.length)rows.insertAdjacentHTML('beforeend','<p class="v264-empty">Ühtegi kaupmeeste küla pole veel avastatud. Saada skaut maailma avastama.</p>');
   for(const t of traders){
    const card=document.createElement('div');card.className='v276-trader';
    card.innerHTML=`<div class="v276-title"><img src="ui-art-v263/res_gold.webp" alt=""><span><b>${esc(t.name)}${t.age?' · '+['Kiviaeg','Pronksiaeg','Rauaaeg','Keskaeg','Renessanss','Tööstusajastu','Moodne ajastu'][t.age]:''}</b><small>${t.town?'kaupleb linn '+esc(t.town):'ükski linn pole piisavalt lähedal'} · ruut ${t.c+1}:${t.r+1}</small></span></div>`;

@@ -162,9 +162,14 @@ export function stoneFortificationAgeGate(city,age,time,limit=110*60){
    !b.disabled&&Math.hypot(b.x-slot.x,b.z-slot.z)<(slot.drawnWallV175?1:4.5))).length;
  return ready<plan.slots.length;
 }
+import {villageTypeV276} from './villages-v276.js';
+const raiderVillageV280=l=>villageTypeV276(l)==='raiders';
 export function planStoneVillageDefenses(game,team,city){
  const age=game.s.ages[team],local=(game.defenseBuildingsV177?.(city)||city.economy.buildings).filter(b=>!b.virtual&&b.hp>0);
  if(age!==0)return false; // let the existing Bronze fortification strategy proceed
+ // V280: a Stone Age village only fences itself when there is a real threat: a raiders' village within 26
+ // tiles, a foreign army within 10 tiles, or (after the peace) a town of 12+ people. Labour goes to food first.
+ if(!city.stoneDefensePlanV166?.slots?.length&&!stoneThreatV280(game,team,city))return true;
  if(game.s.time<(city.nextStoneDefenseCheckV166||0))return true;
  city.nextStoneDefenseCheckV166=game.s.time+9;
  const realm=city.economy.realms[team],stock=realm.resources,
@@ -242,4 +247,12 @@ export function planStoneVillageDefenses(game,team,city){
  city.aiStoneDefenseStatusV166={reason:Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0]||'no-site',
   ready,placed,total:plan.slots.length,details:counts,at:game.s.time};
  return true;
+}
+
+export function stoneThreatV280(game,team,city){
+ const s=game.s,d=(a,b)=>Math.abs(a.c-b.c)+Math.abs(a.r-b.r);
+ if((s.landmarks||[]).some(l=>l.kind==='village'&&!l.destroyedV276&&l.raiderV280!==false&&raiderVillageV280(l)&&d(l,city)<=26))return true;
+ if((s.armies||[]).some(a=>a.team!==team&&!a.hiddenInBandV274&&d(a,city)<=10&&(s.units||[]).some(u=>u.team===a.team&&u.hp>0&&u.kind!=='scout')))return true;
+ const peace=(s.peaceUntilV276||0)>(s.time||0),pop=city.economy.realms[team]?.pop||0;
+ return !peace&&pop>=12;
 }
