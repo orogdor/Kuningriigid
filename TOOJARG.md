@@ -97,3 +97,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V279: vanu protseduurseid hooneid/inimesi ei näidata kunagi GLB ootel (ainult laadimisvea korral), hoonete GLB-d järjekorras ees, 5 allalaadimist korraga.
 
 - V280: kiviaja testmängu parandused (toit +50%, talu ilma saeveskita, vesi 4 ruudu raadiusest + kauge allikas, ladu 240, kassa uuringu kiirendus, AI ei jää uuringuta, tuli esimesena, palisaad ainult ohu korral, röövlid 28 ruutu, AI kaupleb, AI iseloomud, tühje maju pole, asunik varem, rände soovitatud linnakohad, maagid kõvale maale, 45 min AI test).
+
+- V281: teise kiviaja testmängu parandused (metsalaager metsarikkale naaberruudule, puidu/kivi ost külast, kassa plaan + piir 80, madala rannikumetsa puude kadumise viga, sõjakas kaupleb ja alustab sõda lihtsamalt, aga värbab vähem, asunik kuni 16 ruutu, ehitajal 2 ehitajat, talu tasuvaks, üks röövsalk linna kohta + vangid, vee näit „jõest“, erinevad algusuuringud, test kaardil 7741).

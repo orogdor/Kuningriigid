@@ -257,7 +257,13 @@ export const PERSONALITIES_V280=['sõjakas','ehitaja','kaupleja'];
 export const personalityV280=(s,team)=>PERSONALITIES_V280[((s.seed|0)+team*7)%3];
 export function personalityResearchV280(s,team){
  const p=personalityV280(s,team);
- return p==='sõjakas'?['hunting','warfare','woodworking','archery','fortifications']:p==='ehitaja'?['stone_tools','agriculture','woodworking','pottery','stone_crafts']:['fishing','settlement','pottery','storage','animal_husbandry'];
+ return p==='sõjakas'?['hunting','warfare','agriculture','woodworking','archery']:p==='ehitaja'?['stone_tools','agriculture','woodworking','pottery','stone_crafts']:['fishing','settlement','pottery','storage','animal_husbandry'];
+}
+// V281: the beach line is measured from the tile's own ground level. Low land (atlas floor 5) used to fall
+// completely under the fixed 5.6 line of V278, so every tree and quarry of a low coastal forest vanished.
+export function shoreLinesV281(cell){
+ const floor=cell?.land?(cell.river&&!cell.bridge?Math.max(4,cell.h-3.5):Math.max(5,cell.h)):-6;
+ return {tree:Math.min(5.6,floor-.6),firm:Math.min(6.2,floor-.3)};
 }
 export function createGame(seed,type='continents'){return {version:4,unitBalanceVersion:UNIT_BALANCE_VERSION,roadKeyCols:COLS,hydrologyVersion:2,tempo:'normal',researchBalanceVersion:2,mapExpansionVersion:2,worldScaleVersion:2,geographyVersion:type==='tectonic'?7:type==='continents'?4:0,coastalStartsVersion:1,seed,type,difficulty:'normal',time:0,research:STARTS.map(()=>newResearch()),ages:[0,0,0,0],cities:[],settlers:(type==='tectonic'?tectonicLayout(seed).starts:type==='continents'?continentLayout(seed,true).starts:STARTS).map((p,team)=>({id:team,team,...p,x:0,z:0,path:[],landed:false,localTarget:null})),nextSettler:4,units:STARTS.map((p,team)=>({kind:'scout',team,hp:TROOPS.scout.hp,morale:100})),explorerVersion:1,armies:(type==='tectonic'?tectonicLayout(seed).starts:type==='continents'?continentLayout(seed,true).starts:STARTS).map((p,team)=>({team,...p,path:[]})),deployments:{},explored:Array.from({length:4},()=>({})),visionClock:0,clock:0,battle:null,winner:null,lakeOutletsV275:true,naturalShoreV278:true}};
 export function migrateGame(old){if(old?.version===4)return old;if(!old?.world)return null;const s=createGame(old.world.seed,old.world.type);delete s.research;s.time=old.time||0;s.ages=old.realms?.map(r=>r.tech?3:old.buildings.some(b=>b.type==='smith')?2:0)||[0,0];s.settlers=[];for(const team of [0,1]){const hall=old.buildings.find(b=>b.team===team&&b.type==='hall');if(!hall){s.settlers.push({id:s.nextSettler++,team,c:team?17:10,r:team?9:11,x:old.settlers?.[team]?.x||0,z:old.settlers?.[team]?.z||0,path:[],landed:false,localTarget:null});continue}const indices=old.buildings.map((b,i)=>b.team===team?i:-1).filter(i=>i>=0),econ=initialState(s.seed);econ.settlers=[];econ.buildings=indices.map(i=>{const b=copy(old.buildings[i]);if(b.parent!=null)b.parent=indices.indexOf(b.parent);return b});econ.realms[team]=copy(old.realms[team]);econ.cargo=[];econ.units=[];migrateEconomy(econ);s.cities.push({id:s.cities.length,team,c:team?17:10,r:team?9:11,name:team?'Idakindlus':'Kadakalinn',economy:econ,world:old.cityWorlds?.[team]||old.cityWorld?copy(old.cityWorlds?.[team]||old.cityWorld):null,hp:600});if(s.cities.at(-1).world)s.cities.at(-1).world.workers={}}
@@ -355,7 +361,7 @@ export class Civilization{
  cell(p){return this.cells[p.r*COLS+p.c]}
  atlasHeight(x,z){if(!Number.isFinite(x)||!Number.isFinite(z))return -15;if(this.s?.naturalShoreV278){const w=shoreWarpV278(x,z);x+=w.x;z+=w.z;}const fx=(x-ORIGIN_X)/50-.5,fz=(z-ORIGIN_Z)/50-.5,c=Math.floor(fx),r=Math.floor(fz);let u=fx-c,v=fz-r;u=u*u*(3-2*u);v=v*v*(3-2*v);const sample=(c,r)=>{const a=this.cells[r*COLS+c];return !a||c<0||c>=COLS||r<0||r>=ROWS?-15:a.land?(a.river&&!a.bridge?Math.max(4,a.h-3.5):Math.max(5,a.h)):Math.min(-6,a.h)};return (sample(c,r)*(1-u)+sample(c+1,r)*u)*(1-v)+(sample(c,r+1)*(1-u)+sample(c+1,r+1)*u)*v}
  ensureBerries(world,cell){if(world.berriesVersion)return;world.berriesVersion=1;for(let i=0;i<9;i++){const x=-24+(i%3)*22,z=-22+Math.floor(i/3)*21;if(detailHeight(cell,x,z)>.4)world.resources.push({id:world.resources.length,kind:'berry',x,z,amount:60,capacity:60,removed:false})}world.revision++}
- makeWorld(cell){const dryV278=(kind,x,z)=>kind>=3||this.atlasHeight(cell.x+x/4.5,cell.z+z/3.9)>5.6,firmV280=this.s?.naturalShoreV278?(x,z)=>this.atlasHeight(cell.x+x/4.5,cell.z+z/3.9)>6.2:null;return consolidateMinerals({resources:cell.detail.resources.map(([kind,x,z],id)=>({id,kind:['tree','stone','ore','game','fish'][kind],x,z,amount:kind>=3?96:kind?420:32,removed:!dryV278(kind,x,z),cleared:!dryV278(kind,x,z)})),heat:{},revision:0,foodResourcesVersion:1},cell,[],firmV280)}
+ makeWorld(cell){const lineV281=shoreLinesV281(cell),dryV278=(kind,x,z)=>kind>=3||this.atlasHeight(cell.x+x/4.5,cell.z+z/3.9)>lineV281.tree,firmV280=this.s?.naturalShoreV278?(x,z)=>this.atlasHeight(cell.x+x/4.5,cell.z+z/3.9)>lineV281.firm:null;return consolidateMinerals({resources:cell.detail.resources.map(([kind,x,z],id)=>({id,kind:['tree','stone','ore','game','fish'][kind],x,z,amount:kind>=3?96:kind?420:32,removed:!dryV278(kind,x,z),cleared:!dryV278(kind,x,z)})),heat:{},revision:0,foodResourcesVersion:1},cell,[],firmV280)}
  cityAt(p){const lookup=cityLookup(this);return lookup?lookup.positions.get(p.c+':'+p.r):this.s.cities.find(c=>c.c===p.c&&c.r===p.r)}
 
  // Fractional travel clocks let units move smoothly from cell to cell.
@@ -379,22 +385,32 @@ export class Civilization{
   }
  }
  // V280: computer nations use their gold (speed up research) and trade surplus with trader villages for food
+ // V281: the treasury is part of the economic plan of every nation (warlike ones too): first what is missing
+ // (food, the wood/stone the town cannot gather or the next age needs), then surplus at the storage limit is
+ // sold, and only then spare gold (80+) speeds up research.
  aiTreasuryV280(dt){
   this.treasuryClockV280=(this.treasuryClockV280||0)+dt;if(this.treasuryClockV280<30)return;this.treasuryClockV280=0;
   for(const team of [1,2,3]){
    const towns=this.s.cities.filter(c=>c.team===team&&c.districtOf==null);if(!towns.length)continue;
-   const gold=towns.reduce((a,c)=>a+(c.economy.realms[team].resources.gold||0),0);
-   if(gold>=150&&this.s.research[team]?.active)this.buyResearchV280(team);
-   const trader=personalityV280(this.s,team)==='kaupleja';
+   const trader=personalityV280(this.s,team)==='kaupleja',wait=this.s.research[team]?.ageWait,missing=wait?ageDeficit(this.s,team,wait.id):{};
    for(const town of towns){
-    const r=town.economy.realms[team],res=r.resources,food=foodTotal(res),hungry=food<(r.pop||3)*(trader?3:2);
-    if(!hungry)continue;
     const village=(this.s.landmarks||[]).filter(l=>villageTypeV276(l)==='traders'&&Math.abs(l.c-town.c)+Math.abs(l.r-town.r)<=TRADE_RANGE_V276).sort((a,b)=>Math.abs(a.c-town.c)+Math.abs(a.r-town.r)-Math.abs(b.c-town.c)-Math.abs(b.r-town.r))[0];
     if(!village)continue;
     (this.s.explored[team]??={})[village.c+':'+village.r]=true;
-    if((res.gold||0)<12){if((res.wood||0)>=80)tradeWithVillageV276(this,village.id,'sell_wood',team);else if((res.stone||0)>=80)tradeWithVillageV276(this,village.id,'sell_stone',team);}
-    if((res.gold||0)>=12)tradeWithVillageV276(this,village.id,'buy_food',team);
+    const r=town.economy.realms[team],res=r.resources,deal=id=>tradeWithVillageV276(this,village.id,id,team).ok;
+    const all=this.allBuildings(town),starved=type=>!all.some(b=>b.type===type&&b.ready&&b.hp>0&&!/pole ligipääsetavat|maardla puudub/.test(b.status||''));
+    const hungry=foodTotal(res)<(r.pop||3)*(trader?3:2);
+    const wantWood=(missing.wood>0)||((res.wood||0)<40&&starved('lumber')),wantStone=(missing.stone>0)||((res.stone||0)<25&&starved('quarry'));
+    // raise gold from surplus first if something is needed
+    const full=k=>(res[k]||0)>=this.storageCap(town,k)*.9;
+    if((hungry||wantWood||wantStone)&&(res.gold||0)<12){if((res.wood||0)>=80&&!wantWood)deal('sell_wood');else if((res.stone||0)>=80&&!wantStone)deal('sell_stone');}
+    if((hungry||missing.bread>0)&&(res.gold||0)>=12)deal('buy_food');
+    if(wantWood&&(res.gold||0)>=12)deal('buy_wood');
+    if(wantStone&&(res.gold||0)>=12)deal('buy_stone');
+    if(full('wood'))deal('sell_wood');if(full('stone'))deal('sell_stone');
    }
+   const gold=towns.reduce((a,c)=>a+(c.economy.realms[team].resources.gold||0),0);
+   if(gold>=80&&this.s.research[team]?.active&&!wait)this.buyResearchV280(team);
   }
  }
  // V280: research never sits idle: if no goal fits, take the cheapest open discovery of the current age
@@ -653,7 +669,7 @@ export class Civilization{
  prepareCity(city){if(this.cell(city)?.land)city.world.resources=city.world.resources.filter(r=>r.kind!=='fish');if(city.districtOf==null){city.builderCount??=1;city.builderAgents??=[]}for(const id of Object.keys(city.world.workers||{}))if(id.startsWith('build:'))delete city.world.workers[id];this.ensureBerries(city.world,this.cell(city));if(!city.world.foodResourcesVersion){for(const r of this.makeWorld(this.cell(city)).resources.filter(r=>['game','fish'].includes(r.kind)))city.world.resources.push({...r,id:city.world.resources.length});city.world.foodResourcesVersion=1}city.foundedAt??=0;city.world.heat??={};city.world.workers??={};city.economy.settlers??=[];city.economy.units=[];city.economy.cargo??=[];migrateEconomy(city.economy);consolidateMinerals(city.world,this.cell(city),city.economy.buildings);for(const b of city.economy.buildings)if(!b.virtual){configureWallFootprint(b);clearFootprint(city.world,b)}migrateLegacyFarms(city,(x,z)=>detailHeight(this.cell(city),x,z)>.4,city.districtOf!=null&&this.isCountyTile(city,this.parentCity(city)));}
  env(city){const nav=this.nav(city),s=city.economy;return {unlimitedBuildingRange:true,nearBuildings:(p,type)=>buildingsNear(city.economy,p.x,p.z,type==='market'?27:20),buildTime:(type,time)=>time*tempoMultiplier(this.s),marketFoodGrowth:()=>marketFoodGrowth(this.allBuildings(city),city.economy.realms[city.team].resources,city.economy.realms[city.team].pop,this.s.ages[city.team]),
  bronzeGrowthMultiplier:()=>{const parent=this.parentCity(city),r=parent.economy.realms[parent.team],market=marketFoodGrowth(this.allBuildings(parent),r.resources,r.pop,this.s.ages[parent.team]);return prosperousTownGrowth({age:this.s.ages[parent.team],pop:r.pop,stock:r.resources,marketVarieties:market.varieties.length,housingFree:this.housing(parent)-r.pop})},
- growthFactor:tempoMultiplier(this.s)*(this.allBuildings(city).some(b=>b.type==='inn'&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>=.5)?.86:1),storageCap:(team,key)=>this.storageCap(city,key),storageUsed:(team,key,stock)=>this.storageUsed(city,key,stock),sameStorageGroup:(a,b)=>a===b||(FOOD_KEYS.has(a)&&FOOD_KEYS.has(b)),consumeHouseholds:(team,r,foodNeed,waterNeed)=>this.consumeHouseholds(city,r,foodNeed,waterNeed),assigned:b=>b.assigned||0,productionBonus:b=>cityNeeds(this.parentCity(city),this.s.ages[city.team]).productivity*this.bonus(city.team)*this.terrainBonus(city,b.type)*medievalBonus(this,city,b)*productivityBonus(this.s,city.team,b.type)*productionReformV125(this.s,city.team,b.type,BUILDINGS)*(b.type==='lumber'&&this.s.ages[city.team]===0&&this.s.research[city.team]?.known?.includes('fortifications')?1.75:1),buildWork:b=>b.workThisTick||0,operateWork:(b,dt)=>b.type==='farm'?farmWork(this,city,b,dt):operateWorker(this,city,b,dt),skipDemographics:city.districtOf!=null,workerBudget:team=>team===city.team?(city.laborBudget??s.realms[team].pop):0,capacity:()=>this.housing(city),requirement:type=>{const missing=BUILDINGS[type].requires.filter(k=>!this.cityReady(city,k)&&!(['oilwell','refinery'].includes(type)&&((type==='oilwell'&&k==='engineworks')||(type==='refinery'&&k==='oilwell'))&&this.s.cities.some(c=>c.team===city.team&&this.cityReady(c,k))));return missing.length?'Vaja: '+missing.map(k=>BUILDINGS[k].name).join(', '):''},priority:b=>{const food=['hunter','fisher','well','bakery'].includes(b.type);return food?0:b.type==='forester'?1:['lumber','quarry'].includes(b.type)?2:3},passable:(x,z)=>nav.passable(x,z),segmentDry:(a,b)=>{const n=Math.ceil(distance(a,b)*2);for(let i=0;i<=n;i++)if(!nav.passable(a.x+(b.x-a.x)*i/n,a.z+(b.z-a.z)*i/n))return false;return true},canOperate:b=>(BUILD_AGE[b.type]??0)<=this.s.ages[city.team],spawnPoint:b=>({...door(b)}),moveCargo:(a,p,dt)=>nav.moveCitizen(a,p,dt,4),isDepositBuilding:type=>!!MINERAL_BUILDINGS[type],harvest:(b,d,dt,multiplier)=>MINERAL_BUILDINGS[b.type]?harvestMineral(city.world,b,d,operateWorker(this,city,b,dt),multiplier):b.type==='fisher'?fishingHarvest(this,city,b,d,dt,nav,multiplier):gather(s,b,d,dt,nav,multiplier),plant:(b,d,dt)=>plantTrees(s,b,d,dt,nav),canBuild:p=>!resourcesNear(city.world,p.x,p.z,10,10).some(r=>!['tree','berry'].includes(r.kind)&&!['game','fish','berry'].includes(r.kind)&&!r.removed&&Math.abs(r.x-p.x)<(r.depositSite?10:4.5)&&Math.abs(r.z-p.z)<(r.depositSite?10:4)),onPlaced:b=>{configureWallFootprint(b);clearFootprint(city.world,b);for(const r of city.world.resources.filter(r=>r.kind==='game'&&Math.abs(r.x-b.x)<5&&Math.abs(r.z-b.z)<5)){for(const[dx,dz]of [[9,9],[-9,9],[9,-9],[-9,-9],[15,0],[-15,0]]){const x=b.x+dx,z=b.z+dz;if(nav.passable(x,z)&&!s.buildings.some(h=>Math.abs(h.x-x)<5&&Math.abs(h.z-z)<5)){r.x=x;r.z=z;break}}}nav.rebuild()}}}
+ growthFactor:tempoMultiplier(this.s)*(this.allBuildings(city).some(b=>b.type==='inn'&&b.ready&&b.hp>0&&!b.disabled&&(b.assigned||0)>=.5)?.86:1),storageCap:(team,key)=>this.storageCap(city,key),storageUsed:(team,key,stock)=>this.storageUsed(city,key,stock),sameStorageGroup:(a,b)=>a===b||(FOOD_KEYS.has(a)&&FOOD_KEYS.has(b)),consumeHouseholds:(team,r,foodNeed,waterNeed)=>this.consumeHouseholds(city,r,foodNeed,waterNeed),assigned:b=>b.assigned||0,productionBonus:b=>cityNeeds(this.parentCity(city),this.s.ages[city.team]).productivity*this.bonus(city.team)*this.terrainBonus(city,b.type)*medievalBonus(this,city,b)*productivityBonus(this.s,city.team,b.type)*productionReformV125(this.s,city.team,b.type,BUILDINGS)*(b.type==='lumber'&&this.s.ages[city.team]===0&&this.s.research[city.team]?.known?.includes('fortifications')?1.75:1),buildWork:b=>b.workThisTick||0,operateWork:(b,dt)=>b.type==='farm'?farmWork(this,city,b,dt):operateWorker(this,city,b,dt),skipDemographics:city.districtOf!=null,workerBudget:team=>team===city.team?(city.laborBudget??s.realms[team].pop):0,capacity:()=>this.housing(city),requirement:type=>{const missing=BUILDINGS[type].requires.filter(k=>!this.cityReady(city,k)&&!(['oilwell','refinery'].includes(type)&&((type==='oilwell'&&k==='engineworks')||(type==='refinery'&&k==='oilwell'))&&this.s.cities.some(c=>c.team===city.team&&this.cityReady(c,k))));return missing.length?'Vaja: '+missing.map(k=>BUILDINGS[k].name).join(', '):''},priority:b=>{const food=['hunter','fisher','well','bakery','farm'].includes(b.type);return food?0:b.type==='forester'?1:['lumber','quarry'].includes(b.type)?2:3},passable:(x,z)=>nav.passable(x,z),segmentDry:(a,b)=>{const n=Math.ceil(distance(a,b)*2);for(let i=0;i<=n;i++)if(!nav.passable(a.x+(b.x-a.x)*i/n,a.z+(b.z-a.z)*i/n))return false;return true},canOperate:b=>(BUILD_AGE[b.type]??0)<=this.s.ages[city.team],spawnPoint:b=>({...door(b)}),moveCargo:(a,p,dt)=>nav.moveCitizen(a,p,dt,4),isDepositBuilding:type=>!!MINERAL_BUILDINGS[type],harvest:(b,d,dt,multiplier)=>MINERAL_BUILDINGS[b.type]?harvestMineral(city.world,b,d,operateWorker(this,city,b,dt),multiplier):b.type==='fisher'?fishingHarvest(this,city,b,d,dt,nav,multiplier):gather(s,b,d,dt,nav,multiplier),plant:(b,d,dt)=>plantTrees(s,b,d,dt,nav),canBuild:p=>!resourcesNear(city.world,p.x,p.z,10,10).some(r=>!['tree','berry'].includes(r.kind)&&!['game','fish','berry'].includes(r.kind)&&!r.removed&&Math.abs(r.x-p.x)<(r.depositSite?10:4.5)&&Math.abs(r.z-p.z)<(r.depositSite?10:4)),onPlaced:b=>{configureWallFootprint(b);clearFootprint(city.world,b);for(const r of city.world.resources.filter(r=>r.kind==='game'&&Math.abs(r.x-b.x)<5&&Math.abs(r.z-b.z)<5)){for(const[dx,dz]of [[9,9],[-9,9],[9,-9],[-9,-9],[15,0],[-15,0]]){const x=b.x+dx,z=b.z+dz;if(nav.passable(x,z)&&!s.buildings.some(h=>Math.abs(h.x-x)<5&&Math.abs(h.z-z)<5)){r.x=x;r.z=z;break}}}nav.rebuild()}}}
  moveSettler(id,cell){const a=this.s.settlers.find(a=>a.id===id);if(!a)return 'Asunik puudub.';if(a.embarked!=null)return 'Maabu esmalt transpordilaevalt.';const path=this.landPath(a,cell,a.team);if(!path)return 'Sihtkohta ei pääse mööda maad. Otsi koolmekoht, sild või meretee.';a.path=path;a.landed=false;a.localTarget=null;return ''}
  land(id){const a=this.s.settlers.find(a=>a.id===id);if(!a||a.path.length)return 'Oota asuniku saabumist.';if(a.embarked!=null)return 'Maabu esmalt laevalt.';if(this.territoryOwner(a))return 'See ruut kuulub olemasolevale linnale. Vali uus vaba ruut.';a.landed=true;const nav=this.nav(a),p=nav.nearest({x:a.x||0,z:a.z||0},80);if(!p)return 'Siin pole sobivat maad.';a.x=p.x;a.z=p.z;return ''}
  siteRule(a,p){if(!a.landed||a.path.length)return 'Ava esmalt asuniku detailkaart.';if(this.cityAt(a))return 'Sellel ruudul on juba linn.';if(this.territoryOwner(a))return 'See ruut kuulub olemasoleva linna alasse.';if(!citySpacingAllowed(a,this.s.cities,a.team>0?AI_CITY_SPACING:MIN_CITY_SPACING))return 'Linnakeskuste vahele peab jääma vähemalt '+(a.team>0?AI_CITY_SPACING:MIN_CITY_SPACING)+' ruutu.';if(Math.abs(p.x)>42||Math.abs(p.z)>32)return 'Vali linnakoht detailkaardi keskosas.';const nav=this.nav(a);for(const dx of [-4,0,4])for(const dz of [-4,0,4])if(!nav.passable(p.x+dx,p.z+dz))return 'Linn vajab kuiva maad.';if(nav.world.resources.some(r=>!['tree','berry'].includes(r.kind)&&!['game','fish','berry'].includes(r.kind)&&!r.removed&&Math.abs(r.x-p.x)<5&&Math.abs(r.z-p.z)<4))return 'Kivimaardlale ei saa linna rajada.';return ''}
@@ -978,8 +994,8 @@ if(p.plannedDefense){result.building.wallAxis=p.wallAxis||0;result.building.plan
  ensureFarmFields(team){
   for(const parent of this.s.cities.filter(c=>c.team===team))for(const ctx of this.contexts(parent)){
    if(!this.cell(ctx)?.land||!ctx.economy.buildings.some(b=>b.type==='farm'&&b.ready&&b.hp>0))continue;
-   if(ctx.economy.buildings.some(b=>b.type==='field'&&b.hp>0))continue;
-   if(this.constructionArea(parent).pending.length>=4||!this.canBuildNow(ctx,'field')||this.s.time<(ctx.nextFieldSearchV127||0))continue;
+   if(ctx.economy.buildings.filter(b=>b.type==='field'&&b.hp>0).length>=ctx.economy.buildings.filter(b=>b.type==='farm'&&b.ready&&b.hp>0).length)continue; // V281: one field for every farm
+   if(this.constructionArea(parent).pending.length>=6||!this.canBuildNow(ctx,'field')||this.s.time<(ctx.nextFieldSearchV127||0))continue;
    ctx.nextFieldSearchV127=this.s.time+60;
    const field=findAIFieldSite(this,ctx);if(field)this.build(ctx,'field',field);
   }
@@ -996,7 +1012,7 @@ const science=this.s.research[team];
  const stoneCapital=this.s.cities.find(c=>c.team===team);
  const postponeBronze=stoneFortificationAgeGate(stoneCapital,this.s.ages[team],this.s.time)&&Object.entries(TECHS).some(([id,t])=>t.age===0&&!science.known.includes(id)); // V280: never idle once the Stone Age is fully researched
  if(postponeBronze&&science.active==='bronze')science.active=null;
- if(science.active&&!allowAIResearch(this.s,team,science.active,TROOPS,TECHS))science.active=null;if(!science.active&&this.s.cities.some(c=>c.team===team)){const order=['fire_use',...personalityResearchV280(this.s,team),...productivityResearchOrder(this.s.ages[team]),'stone_tools','learning','hunting','water','agriculture','warfare','fortifications','bronze','woodworking','pottery','animal_husbandry','masonry','archery','settlement','stone_crafts','woodworking','wheel','copper_tin','stone_fortifications','road_construction','forestry','storage','cellaring','commerce','writing','literacy','bronze_crafts','milling','bridges','fishing','shipbuilding','iron','smelting','smithing','horsemanship','early_siege_engineering','ancient_artillery','philosophy','iron_crafts','navigation','civics','armor_craft','crossbows','guilds','watermills','windmills','medieval_healing','city_trade','monasticism','knighthood','castle_building','siege_engineering','city_fortifications','scholasticism','medieval_crafts','ocean_sailing','renaissance','printing','astronomy','gunpowder','industrialization','steelmaking','steam_engine','industrial_education','public_education','secondary_education','rifles','railways','modernity','oil_drilling','petroleum','electricity','combustion','modern_science','aviation'];const coastalCity=this.s.cities.some(c=>c.team===team&&this.constructionArea(c).tiles.some(t=>isShore(this,this.cell(t))));const urgent=[...(coastalCity?['fishing']:[]),...(this.s.ages[team]>=1?['stone_fortifications','commerce','shipbuilding']:[])];const goals=bronzeResearchGoals(this.s,team,TECHS,[...urgent,...expandResearchOrderV125(order)].filter(id=>allowAIResearch(this.s,team,id,TROOPS,TECHS)));
+ if(science.active&&!allowAIResearch(this.s,team,science.active,TROOPS,TECHS))science.active=null;if(!science.active&&this.s.cities.some(c=>c.team===team)){const order=['fire_use',...personalityResearchV280(this.s,team),...productivityResearchOrder(this.s.ages[team]),'stone_tools','learning','hunting','water','agriculture','warfare','fortifications','bronze','woodworking','pottery','animal_husbandry','masonry','archery','settlement','stone_crafts','woodworking','wheel','copper_tin','stone_fortifications','road_construction','forestry','storage','cellaring','commerce','writing','literacy','bronze_crafts','milling','bridges','fishing','shipbuilding','iron','smelting','smithing','horsemanship','early_siege_engineering','ancient_artillery','philosophy','iron_crafts','navigation','civics','armor_craft','crossbows','guilds','watermills','windmills','medieval_healing','city_trade','monasticism','knighthood','castle_building','siege_engineering','city_fortifications','scholasticism','medieval_crafts','ocean_sailing','renaissance','printing','astronomy','gunpowder','industrialization','steelmaking','steam_engine','industrial_education','public_education','secondary_education','rifles','railways','modernity','oil_drilling','petroleum','electricity','combustion','modern_science','aviation'];const coastalCity=this.s.cities.some(c=>c.team===team&&this.constructionArea(c).tiles.some(t=>isShore(this,this.cell(t))));const urgent=[...(coastalCity&&(personalityV280(this.s,team)==='kaupleja'||science.known.includes(personalityResearchV280(this.s,team)[0]))?['fishing']:[]),...(this.s.ages[team]>=1?['stone_fortifications','commerce','shipbuilding']:[])];const goals=bronzeResearchGoals(this.s,team,TECHS,[...urgent,...expandResearchOrderV125(order)].filter(id=>allowAIResearch(this.s,team,id,TROOPS,TECHS)));
  const id=nextResearchForGoals(science,goals);if(id&&!(postponeBronze&&id==='bronze'))this.research(team,id);if(!science.active)this.fallbackResearchV280(team,postponeBronze);}for(const a of this.s.settlers.filter(a=>a.team===team)){if(a.embarked!=null)continue;if(a.landed&&!citySpacingAllowed(a,this.s.cities)){a.landed=false;a.localTarget=null}if(a.path.length)continue;if(!a.landed){const missing=nationalResourceNeeds(this,team);const ownCities=this.s.cities.filter(c=>c.team===team),hasCity=ownCities.length>0;const score=c=>settlementResourceScore(this,team,c,missing)*3+(c.deposits.wood?8:0)-(Math.abs(c.c-a.c)+Math.abs(c.r-a.r))*1.5-(hasCity?Math.min(...ownCities.map(h=>Math.max(Math.abs(c.c-h.c),Math.abs(c.r-h.r))))*6:0);const span=hasCity?26:9;const options=[];
  for(let rr=Math.max(0,a.r-span);rr<=Math.min(ROWS-1,a.r+span);rr++)for(let cc=Math.max(0,a.c-span);cc<=Math.min(COLS-1,a.c+span);cc++){
   const c=this.cell({c:cc,r:rr});
@@ -1004,7 +1020,9 @@ const science=this.s.research[team];
    !citySpacingAllowed(c,this.s.cities,AI_CITY_SPACING)||Math.abs(c.c-a.c)+Math.abs(c.r-a.r)>span)continue;
   options.push(c);
  }
- options.sort((p,q)=>score(q)-score(p));let target=options.find(c=>{const path=this.landPath(a,c,team);return path!==null&&(!hasCity||path.length<=64)&&[-18,-6,6,18].some(x=>[-18,-6,6,18].some(z=>!this.siteRule({...a,c:c.c,r:c.r,landed:true,path:[]},{x,z})));});
+ options.sort((p,q)=>score(q)-score(p));const siteOk=c=>[-18,-6,6,18].some(x=>[-18,-6,6,18].some(z=>!this.siteRule({...a,c:c.c,r:c.r,landed:true,path:[]},{x,z})));let target=null;
+ if(!hasCity)target=options.find(c=>this.landPath(a,c,team)!==null&&siteOk(c));
+ else{/* V281: a settler walks ~100 s per world tile: weigh the real walk and stay within 16 tiles in the Stone and Bronze Ages (was 64 = two hours) */const maxPath=this.s.ages[team]<=1?16:64;let best=-Infinity,tried=0,calls=0;for(const c of options){if(tried>=12||calls>=200)break;if(Math.max(Math.abs(c.c-a.c),Math.abs(c.r-a.r))>maxPath)continue;calls++;const path=this.landPath(a,c,team);if(path===null||path.length>maxPath||!siteOk(c))continue;tried++;const v=score(c)-path.length*2.5;if(v>best){best=v;target=c;}}}
  if(target&&!hasCity)target=stoneVillageFoundingTileV169(this,a,target);if(!target){a.aiSeaNeeded=hasCity;continue;}a.aiSeaNeeded=false;if(a.c!==target.c||a.r!==target.r){this.moveSettler(a.id,target);continue}this.land(a.id)}if(a.localTarget)continue;let founded=false;for(let x=-18;x<=18&&!founded;x+=6)for(let z=-18;z<=18&&!founded;z+=6){if(!this.siteRule(a,{x,z})&&this.nav(a).route(a,{x,z})){if(distance(a,{x,z})<1){this.found(a.id);founded=true}else{a.localTarget={x,z};founded=true}}}}
  for(const city of this.s.cities.filter(c=>c.team===team)){const army=this.s.armies[team];if(city===this.s.cities.find(c=>c.team===team)&&!army.path.length&&this.s.units.filter(u=>u.team===team&&u.hp>0).every(u=>u.kind==='scout')&&(army.c!==city.c||army.r!==city.r))army.path=this.landPath(army,city,team)||[];const age=this.s.ages[team];
  for(const b of this.allBuildings(city))if(b.ready&&b.hp>0&&b.disabled&&['well','hunter','fisher','lumber','quarry','saw','mine','coal','smelter'].includes(b.type)){b.disabled=false;b.workerLimit=Math.max(1,b.workerLimit||1);}
@@ -1015,6 +1033,7 @@ const science=this.s.research[team];
  // avoids 12-town empires recomputing thousands of building-site paths per frame.
  // Two paid builders for the mature Bronze core; never conjure completed walls.
   if((age===0&&city.economy.realms[team].pop>=7&&this.s.research[team].known.includes('fortifications'))||(age>=1&&city.economy.realms[team].pop>=18))city.builderCount=Math.max(2,city.builderCount||1);
+  if(personalityV280(this.s,team)==='ehitaja'&&city.economy.realms[team].pop>=6)city.builderCount=Math.max(2,city.builderCount||1); // V281: the builder nation keeps two builders
  planAIDefenses(this,team,city);
  this.planAIHouseUpgradesV218(team,city);
  if(this.s.time>=(city.aiNextBuildCheck||0)){
@@ -1045,6 +1064,10 @@ const science=this.s.research[team];
    contexts.push({...tile,lazy:true,expandV138:true});
   }
   const orderedContexts=historicalDistrictOrder(city,contexts);
+  // V281: economic plan for timber: when the town's own tile has little forest (or its lumber camp has run out of
+  // trees), the next lumber camp goes to the neighbouring tile with the most standing trees.
+  if(next==='lumber'){const live=ctx=>ctx.world?ctx.world.resources.filter(r=>r.kind==='tree'&&!r.removed).length:(this.cell(ctx)?.detail?.resources||[]).filter(r=>r[0]===0).length;
+   if(live(city)<40||this.allBuildings(city).some(b=>b.type==='lumber'&&/pole ligipääsetavat/.test(b.status||'')))orderedContexts.sort((a,b)=>live(b)-live(a));}
   if(isHousing)orderedContexts.sort((a,b)=>{
    const rank=ctx=>orderedHousingContextScoreV220(city,ctx,growth.phase,
     ctx.expandV138?85:cityInfillRank(city,ctx,next,this));
@@ -1105,14 +1128,15 @@ const science=this.s.research[team];
  const schedule=this.s.aiRecruitAt??={};
  const nextRecruitAt=schedule[team]??=210;
  const warlikeV280=personalityV280(this.s,team)==='sõjakas'; // V280: a warlike nation keeps a war band from a smaller town
- if(this.s.time>=nextRecruitAt&&city.economy.realms[team].pop>=(age===1?28:warlikeV280?7:10)&&
+ // V281: ...but not at the cost of its economy: at least 9 people at home and a Stone Age band of at most 4
+ if(this.s.time>=nextRecruitAt&&city.economy.realms[team].pop>=(age===1?28:warlikeV280?9:10)&&!(warlikeV280&&age===0&&living.length>=4)&&
    foodTotal(stock)>=Math.max(24,city.economy.realms[team].pop*2)&&(city.training?.length||0)<2){
   const choices=militaryChoices(this,team,city,TROOPS,UNIT_TECH);
   const kind=choices.find(k=>{const d=TROOPS[k],tech=UNIT_TECH[k];
    return k!=='bronze_cavalry'&&!this.obsoleteUnit(team,k)&&age>=d.age&&
     (!tech||science.known.includes(tech))&&d.requires.every(type=>this.cityReady(city,type))&&canAfford(stock,d.cost)});
   if(kind){const source=this.s.units.findIndex((u,i)=>u.team===team&&combatUnit(u)&&!u.garrison&&(TROOPS[u.kind]?.age??0)<TROOPS[kind].age&&!this.s.cities.some(c=>(c.training||[]).some(j=>j.upgradeSource===i))&&this.s.armies.some(a=>a.team===team&&(a.id||0)===(u.armyId||0)&&a.c===city.c&&a.r===city.r&&!a.path.length));const queued=this.s.cities.filter(c=>c.team===team).reduce((n,c)=>n+(c.training||[]).filter(j=>!j.ship&&j.upgradeSource==null).length,0);const result=source>=0?this.retrain(city,source,kind):living.length+queued<desired?this.recruit(city,kind):{};if(result.unit)
-     this.s.aiRecruitAt[team]=this.s.time+(age<=1?(warlikeV280?70:100):age<=3?90:75);}
+     this.s.aiRecruitAt[team]=this.s.time+(age<=1?(warlikeV280?85:100):age<=3?90:75);}
  }
  // Cap expansion by elapsed game turns, not by an arbitrary resource-deficit
  // exception; settlers still need food, people, a valid route and a real build site.
@@ -1127,10 +1151,13 @@ const science=this.s.research[team];
 }
  // Territorial competition: AI may declare a limited war only after scouting
  // the opponent, fielding a real army, and approaching contested settlements.
- if(this.s.strategyPacingV125&&this.s.time>180*60){
+ // V281: a warlike nation starts a war sooner and with a smaller army (after the peace, from 60 min; 5 men)
+ const warlikeWarV281=personalityV280(this.s,team)==='sõjakas';
+ if(this.s.strategyPacingV125&&this.s.time>(warlikeWarV281?Math.max(60*60,this.s.peaceUntilV276||0):180*60)){
   const mobile=this.s.units.filter(u=>u.team===team&&combatUnit(u)&&!u.garrison);
   const last=(this.s.aiLastWarAt??={})[team]||0;
-  if(mobile.length>=8&&this.s.time-last>150*60){
+  const minArmyV281=warlikeWarV281?5:8;
+  if(mobile.length>=minArmyV281&&((warlikeWarV281&&!last)||this.s.time-last>(warlikeWarV281?90:150)*60)){
    const ourCities=this.s.cities.filter(c=>c.team===team);
    const knownRivals=this.s.cities.filter(c=>c.team!==team&&
      this.seen(team,c)&&!atWar(this.s,team,c.team));
@@ -1141,7 +1168,7 @@ const science=this.s.research[team];
    const enemy=candidates[0];
    if(enemy){
     const enemyStrength=this.s.units.filter(u=>u.team===enemy.team&&combatUnit(u)&&!u.garrison).length;
-    if(mobile.length>=Math.max(8,Math.ceil(enemyStrength*.75))){
+    if(mobile.length>=Math.max(minArmyV281,Math.ceil(enemyStrength*(warlikeWarV281?.6:.75)))){
      setRelation(this.s,team,enemy.team,'war');
      this.s.aiLastWarAt[team]=this.s.time;
     }

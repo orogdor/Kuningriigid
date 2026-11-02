@@ -13,7 +13,7 @@ export function farmingProfile(age,known=[],powered=false){
  if(age>=3&&has('heavy_plough'))return {id:'heavy_plough',name:'Hoburakend ja hõlmader',speed:2.7,areaPerWorker:224,output:1.5};
  if(age>=2&&has('iron_ploughshare')&&has('animal_husbandry'))return {id:'iron_plough',name:'Härjarakend ja raudader',speed:2.3,areaPerWorker:160,output:1.25};
  if(age>=1&&has('animal_husbandry'))return {id:'ox_plough',name:'Härjarakend ja puuader',speed:2,areaPerWorker:112,output:1};
- return {id:'hand',name:'Kõblas ja käsikülv',speed:1.6,areaPerWorker:64,output:.8};
+ return {id:'hand',name:'Kõblas ja käsikülv',speed:1.6,areaPerWorker:64,output:1.25}; // V281: was .8
 }
 export function fieldsForFarm(ctx,farm){
  const farms=ctx.economy.buildings.filter(b=>b.type==='farm'&&b.ready&&b.hp>0&&!b.disabled);

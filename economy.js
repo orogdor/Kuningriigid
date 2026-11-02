@@ -25,7 +25,7 @@ export function foodProductionAllowed(stock,cargo,key,rate,cap,input={}){
  const pending=cargo.filter(c=>FOOD_KEYS.has(c.key)).reduce((v,c)=>v+c.amount,0);
  const used=[...FOOD_KEYS].reduce((v,k)=>v+(stock[k]||0),0)+pending;
  const outputStock=(stock[key]||0)+cargo.filter(c=>c.key===key).reduce((v,c)=>v+c.amount,0);
- const rawShare=key==='grain'?.55:key==='flour'?.42:1;
+ const rawShare=key==='grain'?.75:key==='flour'?.42:1; // V281: grain may fill 3/4 of the food store (was .55)
  if(outputStock+rate>cap*rawShare+1e-7)return false;
  // Conversion can operate in a full cellar when its inputs make room.
  const reclaim=Object.entries(input).filter(([k])=>FOOD_KEYS.has(k)).reduce((n,[,amount])=>n+amount,0);

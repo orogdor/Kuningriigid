@@ -47,14 +47,17 @@ const ERA_OFFERS_V278=[
  [{id:'buy_steel',label:'Osta 6 terast',give:{gold:30},get:{steel:6}},{id:'sell_machines',label:'Müü 3 masinat',give:{machines:3},get:{gold:40}}],
  [{id:'buy_fuel',label:'Osta 8 kütust',give:{gold:28},get:{fuel:8}}]
 ];
-export function tradeOffersV278(age=0){let out=[...TRADE_OFFERS_V276];for(let a=1;a<=age;a++)out=[...ERA_OFFERS_V278[a],...out];return out.slice(0,10);}
+export function tradeOffersV278(age=0){let out=[...TRADE_OFFERS_V276];for(let a=1;a<=age;a++)out=[...ERA_OFFERS_V278[a],...out];return out.slice(0,12);}
 export const TRADE_OFFERS_V276=[
  {id:'sell_wood',label:'Müü 20 puitu',give:{wood:20},get:{gold:9}},
  {id:'sell_stone',label:'Müü 20 kivi',give:{stone:20},get:{gold:11}},
  {id:'sell_pottery',label:'Müü 5 savinõud',give:{pottery:5},get:{gold:14}},
  {id:'buy_food',label:'Osta 25 toitu',give:{gold:12},get:{bread:25}},
  {id:'buy_clay',label:'Osta 15 savi',give:{gold:8},get:{clay:15}},
- {id:'buy_plank',label:'Osta 10 lauda',give:{gold:10},get:{plank:10}}
+ {id:'buy_plank',label:'Osta 10 lauda',give:{gold:10},get:{plank:10}},
+ // V281: a town without forest or quarry can buy its building materials
+ {id:'buy_wood',label:'Osta 20 puitu',give:{gold:12},get:{wood:20}},
+ {id:'buy_stone',label:'Osta 15 kivi',give:{gold:12},get:{stone:15}}
 ];
 const dist=(a,b)=>Math.abs(a.c-b.c)+Math.abs(a.r-b.r);
 export function tradeTownV276(game,l,team=0){
@@ -74,9 +77,10 @@ export function tradeWithVillageV276(game,landmarkId,offerId,team=0){
  return {ok:true,town:town.name,text:offer.label+' — '+town.name};
 }
 // ---- raids
-const defended=(game,town,age=0)=>{const all=game.allBuildings?game.allBuildings(town):town.economy.buildings;
- return all.some(b=>['palisade','watchtower','stonewall','stonetower','woodgate'].includes(b.type)&&b.ready&&b.hp>0)||
-  (game.s.units||[]).filter(u=>u.team===town.team&&u.hp>0&&u.kind!=='scout'&&(u.cityId===town.id||u.cityId==null)).length>=2+age;};
+const defence=(game,town,age=0)=>{const all=game.allBuildings?game.allBuildings(town):town.economy.buildings;
+ const walls=all.some(b=>['palisade','watchtower','stonewall','stonetower','woodgate'].includes(b.type)&&b.ready&&b.hp>0);
+ const men=(game.s.units||[]).filter(u=>u.team===town.team&&u.hp>0&&u.kind!=='scout'&&(u.cityId===town.id||u.cityId==null)).length;
+ return {full:walls||men>=2+age,some:men>0};};
 // advance raids; returns messages for the player
 export function raidTickV276(game,dt,peace){
  const s=game.s,msgs=[];s.raidsV276??=[];
@@ -84,7 +88,8 @@ export function raidTickV276(game,dt,peace){
  for(const l of (s.landmarks||[]).filter(l=>villageTypeV276(l)==='raiders'&&!l.destroyedV276)){
   l.raidClockV276=(l.raidClockV276??hash(l.id+'r')*RAID_EVERY_V276)+dt;
   if(l.raidClockV276<RAID_EVERY_V276||s.raidsV276.some(r=>r.from===l.id))continue;
-  const target=s.cities.filter(c=>c.districtOf==null&&dist(c,l)<=RAID_RANGE_V276).sort((a,b)=>dist(a,l)-dist(b,l))[0];
+  // V281: only one raiding party at a time heads for the same town
+  const target=s.cities.filter(c=>c.districtOf==null&&dist(c,l)<=RAID_RANGE_V276&&!s.raidsV276.some(r=>r.to===c.id)).sort((a,b)=>dist(a,l)-dist(b,l))[0];
   if(!target)continue;
   l.raidClockV276=0;const eta=40+dist(target,l)*6;
   const age=villageAgeV278(game,l);s.raidsV276.push({id:l.id+'@'+Math.round(s.time),from:l.id,to:target.id,start:s.time,eta,fc:l.c,fr:l.r,age,men:3+age*2});
@@ -94,10 +99,13 @@ export function raidTickV276(game,dt,peace){
   if(s.time-r.start<r.eta)continue;
   s.raidsV276.splice(s.raidsV276.indexOf(r),1);
   const town=s.cities.find(c=>c.id===r.to);if(!town)continue;
-  if(defended(game,town,r.age||0)){if(town.team===0)msgs.push({text:'Röövsalk löödi '+town.name+' juures tagasi.'});continue;}
-  const res=town.economy.realms[town.team].resources,taken=[];
-  for(const k of ['bread','wood','stone','gold',...(r.age>=1?['bronze','copper']:[]),...(r.age>=2?['iron','weapons']:[])]){const v=Math.min(60+(r.age||0)*30,Math.floor((res[k]||0)*.25));if(v>0){res[k]-=v;taken.push(v+' '+k);}}
-  if(town.team===0)msgs.push({warn:true,text:'Röövlid rüüstasid '+town.name+': '+(taken.join(', ')||'midagi polnud võtta')+'. Ehita palisaad/vahitorn või hoia linnas sõdalasi.'});
+  const guard=defence(game,town,r.age||0);
+  if(guard.full){if(town.team===0)msgs.push({text:'Röövsalk löödi '+town.name+' juures tagasi.'});const l=s.landmarks?.find(x=>x.id===r.from);if(l)l.raidClockV276=-RAID_EVERY_V276*.5;continue;} // V281: a beaten band waits longer
+  // V281: a few warriors (less than enough) halve the loot; an unguarded town also loses a captive
+  const share=guard.some?.12:.25,realm=town.economy.realms[town.team],res=realm.resources,taken=[];
+  for(const k of ['bread','wood','stone','gold',...(r.age>=1?['bronze','copper']:[]),...(r.age>=2?['iron','weapons']:[])]){const v=Math.min(60+(r.age||0)*30,Math.floor((res[k]||0)*share));if(v>0){res[k]-=v;taken.push(v+' '+k);}}
+  const captive=!guard.some&&(realm.pop||0)>=5;if(captive)realm.pop-=1;
+  if(town.team===0)msgs.push({warn:true,text:'Röövlid rüüstasid '+town.name+': '+(taken.join(', ')||'midagi polnud võtta')+(captive?' ja viisid ühe elaniku vangi':'')+'. Ehita palisaad/vahitorn või hoia linnas sõdalasi.'});
  }
  return msgs;
 }

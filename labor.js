@@ -61,8 +61,8 @@ function jobPriority(b,foodCritical,waterCritical,eraNeed={},scarceWood=false,st
   if(b.type==='saw')return scarceWood?25:154;
   if(b.type==='lumber')return scarceWood?160:108;
  }
- if(need('bread')>0&&['hunter','fisher','bakery'].includes(b.type))return 157;
- if(need('bread')>0&&['farm','mill'].includes(b.type))return 139;
+ if(need('bread')>0&&['hunter','fisher','bakery','farm'].includes(b.type))return 157; // V281: a farm feeds as well as a hunter
+ if(need('bread')>0&&['mill'].includes(b.type))return 139;
  // Do not starve the town while shifting workers to industry.
  if(foodCritical&&['hunter','fisher','bakery','farm','pasture'].includes(b.type))return 171;
  if(waterCritical&&b.type==='well')return 169;

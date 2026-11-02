@@ -91,5 +91,6 @@ jobs:
           node tests/villages-v276.mjs
           node tests/natural-shore-v278.mjs
           node tests/stone-age-playthrough-v280.mjs
+          node tests/stone-age-economy-v281.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic
