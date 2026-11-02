@@ -35,8 +35,10 @@ export function createSoldier(parent,x,z,color,kind,grade='standard'){
  if(rigged||trellis||human||(!hasV148Soldier(kind)&&V148_KINDS.includes(kind))){
   const fallbackChildren=root.children.slice();
   root.userData.assetPendingV241=true;
+  // V279: the old procedural figure is not shown while the GLB person/warrior loads; it only returns if loading fails
+  for(const c of fallbackChildren)c.visible=false;const showOldV279=()=>{for(const c of fallbackChildren)c.visible=true;root.userData.assetPendingV241=false;};
   (rigged?loadRiggedStoneWarriorV261(kind):trellis?loadTrellisStoneV259(kind):(human?loadStoneHumanV241():loadSoldierV241(kind))).then(ready=>{
-   if(!ready)return;
+   if(!ready){showOldV279();return;}
    const holder=new T.Group(),fresh=rigged?createRiggedStoneWarriorV261(holder,x,z,color,kind,grade):trellis?createTrellisStoneV259(holder,x,z,color,kind,grade,ready):human?createStoneHuman(holder,x,z,color,kind):createV148Soldier(holder,x,z,color,kind,grade);
    // Keep the live root, position, selection, formations and caller metadata.
    // Only its visual children and animation rig are replaced.
@@ -48,13 +50,14 @@ export function createSoldier(parent,x,z,color,kind,grade='standard'){
    if(parent?.userData)parent.userData.assetRevisionV241=(parent.userData.assetRevisionV241||0)+1;
   }).catch(error=>{
    root.userData.assetPendingV241=false;console.warn('Keeping soldier fallback',kind,error);
+   if(!trellis)showOldV279();
    if(trellis)loadSoldierV241(kind).then(ok=>{
-    if(!ok)return;
+    if(!ok){showOldV279();return;}
     const holder=new T.Group(),fresh=createV148Soldier(holder,x,z,color,kind,grade);
     root.clear();root.add(...fresh.children.slice());
     Object.assign(root.userData,fresh.userData,{assetRevisionV241:(root.userData.assetRevisionV241||0)+1});
     if(parent?.userData)parent.userData.assetRevisionV241=(parent.userData.assetRevisionV241||0)+1;
-   }).catch(e=>console.warn('Keeping procedural soldier',kind,e));
+   }).catch(e=>{console.warn('Keeping procedural soldier',kind,e);showOldV279();});
   });
  }
  // V274: worker model + dog + spear; added after the asset swap list so the dog is not removed

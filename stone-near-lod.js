@@ -22,7 +22,7 @@ export function stoneLodAsset(name,level){
   const material=new T.MeshStandardMaterial({map:texture(p.image,true),roughnessMap:mr,metalnessMap:mr,
    roughness:Math.min(1,p.roughness??1),metalness:Math.min(0,p.metalness??0),side:T.DoubleSide,color:new T.Color().fromArray(p.color)});
   return {data,geometry:p.geometry,material,box:new T.Box3(new T.Vector3().fromArray(box.min),new T.Vector3().fromArray(box.max))};
- });
+ },{priority:level==='far'});
 }
 let nearDistanceV226=STONE_NEAR_DISTANCE,nearHumanDistanceV226=STONE_NEAR_DISTANCE;
 export function setStoneNearDistanceV226(buildings=100,humans=100){nearDistanceV226=Math.max(25,Math.min(240,Number(buildings)||100));nearHumanDistanceV226=Math.max(25,Math.min(240,Number(humans)||100));}
@@ -73,17 +73,24 @@ class LazyStoneLOD extends T.LOD{
   this.high.visible=false;this.low.visible=true;this.userData.stoneNearLOD=true;
   this.userData.nearReady=false;this.userData.nearActive=false;
   this.userData.stoneFarReady=false;
-  // The old mesh is only a placeholder while the original GLB streams.
-  if(buildFar)Promise.resolve().then(buildFar).then(mesh=>{
-   if(!mesh)return;
+  // V279: the old procedural mesh is never shown while the GLB model streams (it only comes back if every
+  // load attempt fails, so a building can not vanish for good). Failed loads are retried a few times.
+  this.userData.oldPlaceholderV279=!!buildFar;
+  const tryFar=(attempt=0)=>Promise.resolve().then(buildFar).then(mesh=>{
+   if(!mesh)throw new Error('empty far model');
    if(this.userData.stonePreviewV237)setStonePreviewV237(mesh,this.userData.previewColorV237,this.userData.previewOpacityV237);
    const old=this.low;this.remove(old);this.low=mesh;
    this.addLevel(mesh,STONE_NEAR_DISTANCE,.05);
    mesh.visible=!this.userData.nearActive;
    this.userData.stoneFarReady=true;
    this.userData.stoneFarSource='detailed-glb';
-  }).catch(error=>{this.userData.farError=String(error);console.warn('Keeping temporary Stone Age far model',error);});
+  }).catch(error=>{this.userData.farError=String(error);
+   if(attempt<4)setTimeout(()=>tryFar(attempt+1),16000*(attempt+1)); // the asset queue keeps a failure for 15 s
+   else{this.userData.oldPlaceholderV279=false;console.warn('Stone Age GLB unavailable, showing the old model',error);}});
+  if(buildFar){low.visible=false;tryFar();}
  }
+ // V279: hide the old placeholder until the GLB far model is in place
+ hidePlaceholderV279(){if(this.userData.oldPlaceholderV279&&!this.userData.stoneFarReady)this.low.visible=false;}
  update(camera){
   // A unit in the detail scene is approximately a metre; world-space distance
   // also works if a caller puts the model under a transformed parent.
@@ -105,7 +112,7 @@ class LazyStoneLOD extends T.LOD{
    const showHigh=detail&&this.userData.nearReady,showMid=near&&!showHigh&&this.userData.midReady;
    this.high.visible=showHigh;this.mid.visible=showMid;this.low.visible=!showHigh&&!showMid;
    this.userData.detailActive=showHigh;this.userData.nearActive=showHigh||showMid;this.userData.stoneLevelV244=showHigh?'detail':showMid?'mid':'far';
-   return;
+   this.hidePlaceholderV279();return;
   }
   this.mid.visible=false;
   if(near&&!this.pending){
@@ -120,6 +127,7 @@ class LazyStoneLOD extends T.LOD{
   }
   const show=near&&this.userData.nearReady;
   this.high.visible=show;this.low.visible=!show;this.userData.nearActive=show;
+  this.hidePlaceholderV279();
  }
 }
 
