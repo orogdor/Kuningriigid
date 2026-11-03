@@ -20,7 +20,7 @@ html body.ui-reference-v288 header .brand{
  align-self:flex-start!important;flex:0 0 77px!important;width:77px!important;height:69px!important;
  margin:-3px 0 0 -3px!important;border:2px solid #dbb45e;border-radius:3px 3px 35% 35%!important;
  box-shadow:0 4px 0 #071726,0 6px 12px #000b,0 0 0 2px #304c6c inset!important;
- background:linear-gradient(#173c70cc,#072650eb),url('ui-art-v263/cmd_city.webp') center/68% no-repeat!important;
+ background:linear-gradient(#173c7066,#072650aa),url('ui-art-v288/crest.svg') center/contain no-repeat!important;
  filter:none!important;
 }
 html body.ui-reference-v288 .v287-wordmark{
@@ -327,7 +327,7 @@ html body.ui-reference-v288.atlas #maplabel{
  html body.ui-reference-v288.atlas #tools #hud-army::before{background-image:url('ui-art-v263/unit_spearman.webp')!important}
  html body.ui-reference-v288.atlas #tools #techtoggle::before{background-image:url('ui-art-v288/research.svg')!important}
  html body.ui-reference-v288.atlas #tools #v288-diplomacy::before{background-image:url('ui-art-v288/diplomacy.svg')!important}
- html body.ui-reference-v288.atlas #tools #hud-trade-v276::before{background-image:url('ui-art-v263/res_gold.webp')!important}
+ html body.ui-reference-v288.atlas #tools #hud-trade-v276::before{background-image:url('ui-art-v288/trade.svg')!important}
  html body.ui-reference-v288.atlas #tools #hud-city::before{background-image:url('ui-art-v288/empire.svg')!important}
  html body.ui-reference-v288.atlas #tools #hud-build::after{content:'Ehitused'!important}
  html body.ui-reference-v288.atlas #tools #hud-army::after{content:'Üksused'!important}
@@ -398,7 +398,7 @@ html body.ui-reference-v288.atlas #maplabel{
  }
  html body.ui-reference-v288.atlas header #pause::before{
   content:''!important;width:85px!important;height:92px!important;
-  background:url('ui-art-v263/cmd_pause.webp') center/contain no-repeat!important;
+  background:url('ui-art-v288/hourglass.svg') center/contain no-repeat!important;
   filter:drop-shadow(0 5px 4px #0007);
  }
  html body.ui-reference-v288.atlas header #pause::after{
