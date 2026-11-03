@@ -122,7 +122,7 @@
      const turn=root.querySelector('.v290-turn');if(turn)turn.textContent=T('Käik ','Turn ')+snap.turn;
      const age=root.querySelector('.v290-age');if(age)age.textContent=snap.age;
      if(snap.turn!==lastTurn||force){
-       const title=root.querySelector('.v290-research-name');title.textContent=snap.research||T('Vali avastus','Choose discovery');lastTurn=snap.turn;
+       const title=root.querySelector('.v290-research-name');title.textContent=T('Avastus:\n','Discovery:\n')+(snap.research||T('Vali avastus','Choose discovery'));lastTurn=snap.turn;
      }
    }
    const day=$('dayclock-v235')?.textContent||'';root.querySelector('.v290-live-date').title=day.trim();
