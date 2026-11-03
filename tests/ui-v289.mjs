@@ -41,4 +41,8 @@ const images=[...css.matchAll(/url\(['"]?(ui-art-v(?:263|288)\/[^'")\s]+)['"]?\)
 for(const asset of images){
  assert.ok(fs.existsSync(path.join(new URL('.',root).pathname,asset)),'Missing art '+asset);
 }
+assert.match(html,/<title>Kuningriigid · UI V289 · mäng V286<\/title>/);
+assert.match(html,/id="menu-version">KUNINGRIIGID · UI V289 · MÄNG V286</);
+assert.match(js,/<small>UI V289 · MÄNG V286<\/small>/);
+assert.doesNotMatch(html,/id="menu-version">KUNINGRIIGID · V286</);
 console.log('V289 independent responsive HUD references, real actions and image assets: OK');
