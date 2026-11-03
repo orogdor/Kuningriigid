@@ -5,7 +5,7 @@
 (()=>{
  'use strict';
  const $=id=>document.getElementById(id);
- const A='/Kuningriigid/ui-art-v290/';
+ const A='ui-art-v290/';
  const image=n=>A+n+'.webp';
  const T=(et,en)=>(document.documentElement.lang||'').startsWith('et')?et:en;
  const game=()=>window.kingdomsUiV288?.snapshot?.()||null;
