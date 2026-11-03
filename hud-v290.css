@@ -250,3 +250,18 @@ body.v290-active.atlas:has(#help:not([hidden])) #v290-hud{display:none!important
  #v290-hud .v290-footer-texture{height:90px}
  #v290-hud .v290-mini,#v290-hud .v290-selection{bottom:85px}
 }
+/* The 3x2 phone dock uses cropped artwork rather than distorting vertical card images. */
+@media(max-width:940px), (max-height:590px){
+ #v290-hud .v290-card{overflow:hidden;background-image:url('ui-art-v263/panel_stone.webp')!important;background-size:cover!important;border:2px ridge #c69a58!important}
+ #v290-hud .v290-card-image{object-fit:cover;object-position:center 27%}
+ #v290-hud .v290-card::after{
+  content:attr(aria-label);display:block;position:absolute;left:0;right:0;bottom:0;
+  min-height:19px;max-height:27px;overflow:hidden;
+  padding:2px 3px;text-align:center;color:#f7db98;
+  background-image:url('ui-art-v263/panel_stone.webp');background-size:cover;
+  font:700 10px/1.1 Georgia,serif;text-shadow:0 1px 1px #000;
+ }
+}
+@media(max-height:425px) and (orientation:landscape){
+ #v290-hud .v290-discovery{top:60px;width:170px;height:245px}
+}
