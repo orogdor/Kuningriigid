@@ -101,7 +101,7 @@
    root.style.setProperty('--art-scale',String(Math.min(1.9,Math.max(.51,sc))));
    root.dataset.mode=(w<940||h<590)?'compact':'desktop';
  }
- function shouldShow(){return document.body.classList.contains('atlas')&&document.body.classList.contains('ui-paint-v287');}
+ function shouldShow(){return document.body.classList.contains('atlas')&&new URLSearchParams(location.search).get('ui')==='picture';}
  function activate(){
    if(!root)return;
    const yes=shouldShow();if(active===yes)return;active=yes;
