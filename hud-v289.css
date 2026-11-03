@@ -428,3 +428,13 @@ body.v289-active.atlas #atlaspanel{
   width:min(320px,calc(100vw - 16px))!important;
  }
 }
+
+
+/* The reference picture uses a large gold pause symbol, not an hourglass. */
+#v289-hud .v289-pause-glyph{
+ display:block;font:700 clamp(23px,3vw,49px)/1 Georgia,serif;
+ color:#f8d588;text-shadow:0 2px 4px #081723;
+}
+@media(max-width:900px){
+ #v289-hud .v289-pause-glyph{font-size:27px}
+}
