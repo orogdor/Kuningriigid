@@ -1534,6 +1534,8 @@ window.kingdomsUiV288={
   return {view,age:AGES[s.ages?.[0]||0]?.name||'Stone Age',
    turn:1+Math.floor(s.time/TURN_SECONDS),paused:!!paused,
    research:current?(TECHS[current]?.name||current):null,
+   researchPercent:current?Math.max(0,Math.min(100,Math.round(100*(s.research?.[0]?.progress?.[current]||0)/Math.max(1,researchCost(s,TECHS[current]))))):0,
+   researchRate:Math.round(game.scienceRate(0)*10)/10,
    leaders};
  },
  diplomacy(team,status){
