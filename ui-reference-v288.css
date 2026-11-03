@@ -510,3 +510,65 @@ html body.ui-reference-v288:has(#help:not([hidden])) :is(#v288-research,#v288-ri
   filter:none!important;
  }
 }
+
+
+/* Six live top counters in the same order as the illustrated reference.
+   Source spans stay in the DOM for the V264 grouping/stock popups. */
+@media (min-width:1101px) and (min-height:650px){
+ html body.ui-reference-v288.atlas header #resources{display:none!important}
+ html body.ui-reference-v288.atlas header #v288-resources{
+  display:flex!important;flex:1 1 auto!important;align-items:center!important;
+  justify-content:space-evenly!important;min-width:0!important;max-width:none!important;
+  overflow:hidden!important;gap:2px!important;height:54px!important;
+ }
+ html body.ui-reference-v288.atlas header #v288-resources .v288-resource{
+  display:flex;align-items:center;justify-content:center;
+  flex:1 1 auto;min-width:0;gap:4px;height:51px;
+  padding:2px 5px;background:transparent;border:0;
+  border-right:1px solid #b995574a;border-radius:0;cursor:pointer;
+  color:#f7e8c6;text-align:left;
+ }
+ html body.ui-reference-v288.atlas header #v288-resources .v288-resource:hover{
+  background:linear-gradient(#e7ce9a22,#7694b41a)
+ }
+ html body.ui-reference-v288.atlas #v288-resources .v288-resource img{
+  width:38px;height:38px;max-width:38px;flex:0 1 38px;object-fit:contain;
+  filter:drop-shadow(0 2px 2px #000b);
+ }
+ html body.ui-reference-v288.atlas #v288-resources .v288-resource>span{
+  display:flex;flex-direction:column;align-items:flex-start;min-width:0;
+ }
+ html body.ui-reference-v288.atlas #v288-resources .v288-resource-label{
+  color:#e5d3a6;font:600 11px/1.1 Georgia,serif;overflow:hidden;
+  white-space:nowrap;text-overflow:ellipsis;max-width:100%;
+ }
+ html body.ui-reference-v288.atlas #v288-resources .v288-resource-value{
+  color:#fff4d3;font:700 17px/1.05 Georgia,serif;
+ }
+ html body.ui-reference-v288.atlas #v288-resources .v288-resource-growth{
+  color:#75d47f;font:700 10px/1 Georgia,serif;min-height:9px;
+ }
+}
+/* The reference cards are intentionally image-based even when the game's
+   language remains English. Native aria-label/title still reflect the locale. */
+@media (min-width:1101px) and (min-height:650px){
+ html:not([lang^="et"]) body.ui-reference-v288.atlas #tools{
+  background:url('ui-art-v288/toolbar.svg') center/100% 100% no-repeat!important;
+ }
+ html:not([lang^="et"]) body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city){
+  background:none!important;border:0!important;box-shadow:none!important;
+  color:transparent!important;text-shadow:none!important;
+ }
+ html:not([lang^="et"]) body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city)::before,
+ html:not([lang^="et"]) body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city)::after{
+  content:none!important;display:none!important;
+ }
+ html:not([lang^="et"]) body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city):hover,
+ html:not([lang^="et"]) body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city):focus-visible{
+  background:linear-gradient(#f3d88336,#f3d88324)!important;
+  outline:2px solid #ffe9a0!important;outline-offset:-4px!important;filter:none!important;
+ }
+}
+@media (max-width:1100px), (max-height:649px){
+ html body.ui-reference-v288 header #v288-resources{display:none!important}
+}
