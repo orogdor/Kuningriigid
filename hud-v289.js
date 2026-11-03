@@ -52,6 +52,9 @@ function build(){
  root.querySelector('.v289-mini-collapse').onclick=()=>root.querySelector('.v289-mini').classList.toggle('v289-mini-folded');
  root.querySelector('.v289-pause').onclick=()=>legacy('pause');
  root.querySelector('.v289-dip-close').onclick=closeDiplomacy;
+ // The V264 document-level click-away listener must not instantly close a panel
+ // opened through our mirrored Army/City/Trade button on the same click.
+ root.addEventListener('click',event=>{if(event.target.closest('button'))event.stopPropagation();});
  root.addEventListener('keydown',e=>{if(e.key==='Escape')closeDiplomacy();});
  for(const [panel,e,n] of [['goals','Ülesanded','Goals'],['factions','Riigid','Factions'],['mini','Kaart','Map']]){
   const b=root.querySelector('.v289-mobile [data-panel="'+panel+'"]');b.textContent=tr(e,n);
