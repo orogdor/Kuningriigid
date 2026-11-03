@@ -435,15 +435,21 @@ export function groundBaseColor(cell,out=new T.Color()){
  return out.set(GROUND[vb]||GROUND.grassland);
 }
 const detailBase=(cell,out)=>groundBaseColor(cell,out);
-const D_WATER=new T.Color('#799489'),D_SAND=new T.Color('#b2a17c'),D_HIGH=new T.Color('#697964'),D_ROCK=new T.Color('#7c847b'),D_EARTH=new T.Color('#48553a');
+const D_WET=new T.Color('#8f8266'),D_WATER=new T.Color('#799489'),D_SAND=new T.Color('#b2a17c'),D_HIGH=new T.Color('#697964'),D_ROCK=new T.Color('#7c847b'),D_EARTH=new T.Color('#48553a');
+const sstepV286=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
 export function detailGroundColor(game,wx,wz,h,mountainHere){
  const color=smoothBiomeColor(game,wx,wz,'ground',detailBase);
- if(h<-.15)return color.copy(D_WATER);
- if(h<.65)return color.copy(D_SAND);
  if(mountainHere&&h>12)color.lerp(D_ROCK,Math.min(1,(h-12)/10)*.6);
  else if(h>8)color.lerp(D_HIGH,Math.min(1,(h-8)/4)*.7);
  // Mute the bright green lowlands while retaining each biome's own colour.
  if(!mountainHere&&h<8)color.lerp(D_EARTH,.24).multiplyScalar(.87);
+ if(h>1.6)return color;
+ // V286: grass -> dry sand -> wet sand -> shallows blend over a height band instead of switching at one
+ // height (a hard switch drew the coarse mesh's triangles as a saw-tooth beach edge). The sand line wanders.
+ const wob=(game.smooth(wx/9+41.3,wz/9+7.9)-.5)*.45;
+ color.lerp(D_SAND,1-sstepV286((h-(.4+wob))/.75));
+ color.lerp(D_WET,(1-sstepV286((h+.05)/.4))*.55);
+ color.lerp(D_WATER,1-sstepV286((h+.5)/.4));
  return color;
 }
 

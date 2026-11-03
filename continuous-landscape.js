@@ -347,5 +347,8 @@ export function overviewSurface(game,x,z,spacing){
  const h=surface(game,x,z),near=riverNear(game,x,z);
  if(!Number.isFinite(near.distance))return h;
  const t=Math.max(0,Math.min(1,(near.distance-near.width-spacing)/(spacing*.75)));
- return Math.min(h,near.waterHeight-2.3+(h-near.waterHeight+2.3)*t*t);
+ // V286: the coarse world mesh only dips just under the river surface (was 2.3 m): the deep trough was wider than
+ // the river, filled with the sea plane and drew stepped blue terraces with trees standing in them
+ const bed=Math.max(near.waterHeight-.55,.78);
+ return Math.min(h,bed+(h-bed)*t*t);
 }

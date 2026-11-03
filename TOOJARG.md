@@ -107,3 +107,5 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V284: kivimurru töötaja ronib kivihunniku astmele ja raiub kaljuseina, kiviraidur töötab koja tööpingi taga; kivikillud lendavad löögi hetkel (stone-work-spots-v284.js).
 
 - V285: töökohad hoone mudelil ka savikaevandusele (kaevab lohus), pottsepale (ahju ees), õpetajale (kivilaua juures) ja kaevule (veekandja ringi ääres).
+
+- V286: sujuvad kaldad (liiva/muru/vee üleminek kõrgusvahemikus, tihedam kauge maastik, piirid mitte üle mere, maailmakaardi jõesäng madal + meri mitte sisemaal, puud mitte jõkke).

@@ -18,6 +18,7 @@ export function createDetailBorders(game,tile){
    for(let i=0;i<50;i++){
     const t0=i/50,t1=(i+1)/50,half=boundary>=8?1.15:boundary>=4?.18:.30;
     const pt=(t,side)=>{const X=x+vx*t+(dc?half*side:0),Z=z+vz*t+(dr?half*side:0),p=worldToLocal(tile,X,Z);return [p.x,visualProject(game,Math.max(.95,surface(game,X,Z))+.55,X,Z),p.z]};
+    if(game.atlasHeight(x+vx*(t0+t1)/2,z+vz*(t0+t1)/2)<.6)continue; // V286: no border strips over the sea
     const a=pt(t0,-1),b=pt(t0,1),c=pt(t1,-1),d=pt(t1,1);vertices.push(...a,...c,...b,...b,...c,...d);if(boundary>=8){const outline=byTeam.get(boundary+4)||[];byTeam.set(boundary+4,outline);const A=pt(t0,-1.7),B=pt(t0,1.7),C=pt(t1,-1.7),D=pt(t1,1.7);outline.push(...A,...C,...B,...B,...C,...D);}
    }
   }
