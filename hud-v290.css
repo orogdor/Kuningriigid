@@ -1,0 +1,267 @@
+/* Kuningriigid V290 — every visible chrome panel is a bitmap taken directly
+   from the approved 1672x941 artwork. CSS positions images and transparent
+   click targets only; the Three.js world remains live. */
+#v290-hud{display:none}
+body.v290-active.atlas #v290-hud{display:block}
+body.v290-active.atlas #v289-hud,
+body.v290-active.atlas > header,
+body.v290-active.atlas > #tools,
+body.v290-active.atlas #v51insights,
+body.v290-active.atlas #v51cities,
+body.v290-active.atlas #atlasoverview,
+body.v290-active.atlas #commandhud,
+body.v290-active.atlas #hud-zoom-controls,
+body.v290-active.atlas #hud-minimap-toggle,
+body.v290-active.atlas #hud-resource-toggle,
+body.v290-active.atlas #researchstatus,
+body.v290-active.atlas #v288-research,
+body.v290-active.atlas #v288-rivals,
+body.v290-active.atlas #v288-map-tools,
+body.v290-active.atlas #v288-diplomacy-panel,
+body.v290-active.atlas #maplabel{display:none!important}
+#v290-hud{
+ --a:var(--art-scale,1);
+ position:fixed;inset:0;z-index:35;pointer-events:none;
+ font-family:Georgia,serif;overflow:hidden;
+ color:#f9e2af;user-select:none;
+}
+#v290-hud *{box-sizing:border-box}
+#v290-hud .v290-background{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none}
+#v290-hud button{pointer-events:auto;touch-action:manipulation;cursor:pointer}
+#v290-hud button:focus-visible{outline:2px solid #ffefaa;outline-offset:2px}
+#v290-hud .v290-hit,
+#v290-hud .v290-queue-hit,
+#v290-hud .v290-research-hit,
+#v290-hud .v290-map-world,
+#v290-hud .v290-map-plus,
+#v290-hud .v290-map-minus,
+#v290-hud .v290-map-camera,
+#v290-hud .v290-map-visibility,
+#v290-hud .v290-sel-hit{
+ position:absolute;display:block;background:transparent!important;border:0!important;
+ color:transparent!important;padding:0!important;min-width:0!important;min-height:0!important;
+}
+#v290-hud .v290-hit:hover,
+#v290-hud .v290-queue-hit:hover,
+#v290-hud .v290-research-hit:hover,
+#v290-hud .v290-map-world:hover,
+#v290-hud .v290-map-plus:hover,
+#v290-hud .v290-map-minus:hover,
+#v290-hud .v290-map-camera:hover,
+#v290-hud .v290-map-visibility:hover,
+#v290-hud .v290-sel-hit:hover{outline:2px solid rgba(253,228,153,.8);outline-offset:-2px;border-radius:50%}
+/* Main bar is a single cropped picture. Actual counters float on its painted plates. */
+#v290-hud .v290-top{
+ position:absolute;left:0;right:0;top:0;height:calc(56px * var(--a));
+ pointer-events:auto;overflow:visible;
+}
+#v290-hud .v290-live-ledger{
+ position:absolute;inset:0;display:flex;gap:calc(6px * var(--a));
+ align-items:center;justify-content:center;pointer-events:none;
+}
+#v290-hud .v290-counter{
+ text-align:center;position:absolute;top:calc(14px * var(--a));
+ min-width:calc(61px * var(--a));height:calc(25px * var(--a));
+ display:flex;align-items:center;justify-content:center;
+ font:bold calc(15px * var(--a)) Georgia,serif;
+ color:#feecc9;text-shadow:0 1px 3px #000;
+ background-image:url('ui-art-v263/panel_stone.webp');
+ background-size:cover;border-radius:8px;opacity:.98;
+}
+#v290-hud .v290-counter[data-key="gold"]{left:calc(18.2vw)}
+#v290-hud .v290-counter[data-key="bread"]{left:calc(26.4vw)}
+#v290-hud .v290-counter[data-key="stone"]{left:calc(35.2vw)}
+#v290-hud .v290-counter[data-key="population"]{right:calc(29.8vw)}
+#v290-hud .v290-counter[data-key="science"]{right:calc(21.9vw)}
+#v290-hud .v290-live-date{
+ position:absolute;right:calc(12vw);top:calc(16px * var(--a));
+ display:flex;gap:calc(6px * var(--a));align-items:center;
+ color:#ffecb6;font:bold calc(11px * var(--a)) Georgia,serif;
+ text-shadow:0 2px 3px #020912;pointer-events:none;
+ background-image:url('ui-art-v263/panel_stone.webp');background-size:cover;
+ padding:2px 6px;border-radius:3px;
+}
+#v290-hud .v290-top-pause{right:calc(6.5vw);top:12%;width:3%;height:70%}
+#v290-hud .v290-top-menu{right:0;top:8%;width:6%;height:82%}
+/* Hanging discovery decoration from original picture. */
+#v290-hud .v290-discovery{
+ position:absolute;left:0;top:calc(46px * var(--a));
+ width:calc(252px * var(--a));height:calc(362px * var(--a));
+ pointer-events:none;
+}
+#v290-hud .v290-discovery>.v290-background{pointer-events:none}
+#v290-hud .v290-research-hit{left:10%;top:0;width:79%;height:53%;border-radius:50%}
+#v290-hud .v290-research-name{
+ position:absolute;left:20%;top:36%;width:63%;height:15%;
+ display:flex;align-items:center;justify-content:center;
+ font:bold calc(12px * var(--a))/1.2 Georgia,serif;text-align:center;
+ background:transparent;color:#342012;pointer-events:none;
+ overflow:hidden;white-space:pre-line;border-radius:4px;
+}
+#v290-hud .v290-queue-hit{width:16%;height:15%;top:49%;border-radius:50%}
+#v290-hud .v290-queue-0{left:1%}
+#v290-hud .v290-queue-1{left:17%}
+#v290-hud .v290-queue-2{left:35%}
+#v290-hud .v290-queue-3{left:53%}
+#v290-hud .v290-queue-4{left:72%}
+/* The only bottom background is the real wood image from the reference. */
+#v290-hud .v290-footer-texture{
+ position:absolute;bottom:0;left:19%;width:62%;height:calc(55px * var(--a));
+ pointer-events:none;overflow:hidden;
+}
+/* Left: the authentic ornate minimap frame with LIVE game minimap in its centre. */
+#v290-hud .v290-minimap{
+ position:absolute;left:0;bottom:0;
+ width:calc(347px * var(--a));height:calc(422px * var(--a));
+ pointer-events:none;
+}
+#v290-hud .v290-real-map-host{
+ position:absolute;left:6.3%;top:24.2%;width:66%;height:54%;
+ border-radius:50%;clip-path:circle(48% at 50% 50%);
+ overflow:hidden;pointer-events:auto;
+ box-shadow:0 0 8px 2px #000c;
+}
+#v290-hud .v290-real-map-host #atlasminimap{
+ display:block!important;position:static!important;width:100%!important;height:100%!important;
+ min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;
+ border:0!important;border-radius:0!important;margin:0!important;padding:0!important;
+ background:#213f4d!important;cursor:crosshair;pointer-events:auto;
+}
+#v290-hud .v290-map-world{left:3%;top:4%;width:28%;height:23%;border-radius:50%}
+#v290-hud .v290-map-plus{left:32%;top:6%;width:20%;height:19%;border-radius:50%}
+#v290-hud .v290-map-minus{left:49%;top:7%;width:20%;height:19%;border-radius:50%}
+#v290-hud .v290-map-camera{left:70%;top:13%;width:23%;height:18%;border-radius:50%}
+#v290-hud .v290-map-visibility{left:75%;top:52%;width:20%;height:20%;border-radius:50%}
+/* Six UI cards are separately cropped source pictures, not CSS illustrations. */
+#v290-hud .v290-cards{
+ position:absolute;left:calc(347px * var(--a));right:calc(402px * var(--a));
+ bottom:calc(67px * var(--a));height:calc(234px * var(--a));
+ display:flex;align-items:stretch;justify-content:center;
+ gap:calc(4px * var(--a));pointer-events:none;
+}
+#v290-hud .v290-card{
+ display:block;position:relative;flex:1 1 0;min-width:0;max-width:calc(154px * var(--a));
+ height:100%;padding:0!important;margin:0!important;
+ background:none!important;border:0!important;border-radius:0!important;
+ box-shadow:none!important;cursor:pointer;pointer-events:auto;
+ transition:filter .12s ease,transform .12s ease;
+}
+#v290-hud .v290-card-image{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none}
+#v290-hud .v290-card:hover{filter:brightness(1.18);transform:translateY(calc(-3px * var(--a)))}
+#v290-hud .v290-card:active{transform:translateY(2px)}
+/* Right: all decoration from the reference, with live selected entity overlay. */
+#v290-hud .v290-selection{
+ position:absolute;right:0;bottom:0;width:calc(402px * var(--a));height:calc(420px * var(--a));
+ pointer-events:none;
+}
+#v290-hud .v290-live-portrait{
+ position:absolute;left:25%;top:20%;width:67%;height:52%;overflow:hidden;
+ clip-path:circle(47% at 50% 50%);border-radius:50%;pointer-events:none;
+}
+#v290-hud .v290-live-portrait[hidden],#v290-hud .v290-sel-name[hidden]{display:none!important}
+#v290-hud .v290-live-portrait img{width:100%;height:100%;object-fit:cover}
+#v290-hud .v290-sel-name{
+ position:absolute;left:34%;top:69%;width:58%;height:9%;text-align:center;
+ display:flex;justify-content:center;align-items:center;
+ background:#ebd0a9;color:#35220f;font:bold calc(13px * var(--a)) Georgia,serif;
+ border-radius:9px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none;
+}
+#v290-hud .v290-sel-move{left:12%;top:11%;width:21%;height:19%;border-radius:50%}
+#v290-hud .v290-sel-attack{left:4%;top:29%;width:21%;height:19%;border-radius:50%}
+#v290-hud .v290-sel-defense{left:4%;top:51%;width:21%;height:19%;border-radius:50%}
+#v290-hud .v290-sel-options{right:8%;top:2%;width:21%;height:17%;border-radius:50%}
+#v290-hud .v290-sel-city{left:5%;top:4%;width:20%;height:18%;border-radius:50%}
+/* Functional diplomacy screen; its fill is an existing painted stone texture. */
+#v290-hud .v290-popup{
+ position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+ width:min(440px,calc(100vw - 20px));max-height:min(570px,80vh);overflow:auto;
+ z-index:6;pointer-events:auto;padding:13px 15px;
+ background-image:url('ui-art-v263/panel_stone.webp');background-size:cover;
+ border:8px ridge #c9a363;box-shadow:0 14px 35px #000f;
+}
+#v290-hud .v290-popup[hidden]{display:none!important}
+#v290-hud .v290-dialog-head{display:flex;justify-content:space-between;align-items:center}
+#v290-hud .v290-dialog-head h2{color:#f6d598;font:700 22px Georgia,serif;margin:0}
+#v290-hud .v290-dialog-close,
+#v290-hud .v290-dialog-btn{background-image:url('ui-art-v263/panel_stone.webp');background-size:cover;border:2px solid #c89d57;color:#f6dfa7;padding:6px;cursor:pointer}
+#v290-hud .v290-dialog-row{padding:9px 0;border-bottom:1px solid #c89d57}
+#v290-hud .v290-dialog-actions{display:flex;gap:6px;margin-top:7px}
+#v290-hud .v290-dialog-btn{flex:1}
+#v290-hud .v290-mobile-buttons{display:none}
+/* Modal windows already present in the game can remain interactive above the painted world. */
+body.v290-active.atlas #v264-listpanel,
+body.v290-active.atlas #atlaspanel{z-index:75!important}
+body.v290-active.atlas #v264-listpanel{background-image:url('ui-art-v263/panel_stone.webp')!important;background-size:cover!important;border:4px ridge #c9a363!important}
+body.v290-active.atlas #atlaspanel{background-image:url('ui-art-v263/panel_stone.webp')!important;background-size:cover!important;border:4px ridge #c9a363!important}
+#v290-hud.v290-modal-behind,
+body.v290-active.atlas:has(#startmenu:not([hidden])) #v290-hud,
+body.v290-active.atlas:has(#journalpanel:not([hidden])) #v290-hud,
+body.v290-active.atlas:has(#researchpanel:not([hidden])) #v290-hud,
+body.v290-active.atlas:has(#help:not([hidden])) #v290-hud{display:none!important}
+/* 1100px width and below: reduce UI scale while maintaining reference order. */
+@media(max-width:1190px){
+ #v290-hud .v290-footer-texture{left:14%;width:72%}
+ #v290-hud .v290-cards{gap:1px}
+ #v290-hud .v290-counter{min-width:35px;font-size:10px}
+ #v290-hud .v290-live-date{display:none}
+}
+/* Portrait tablet or mobile: compact, openable bitmap panels and 3x2 cards. */
+@media(max-width:940px), (max-height:590px){
+ #v290-hud .v290-top{height:50px}
+ #v290-hud .v290-top .v290-background{object-fit:cover;object-position:left top}
+ #v290-hud .v290-live-ledger{display:none}
+ #v290-hud .v290-live-date{display:none}
+ #v290-hud .v290-discovery,
+ #v290-hud .v290-minimap,
+ #v290-hud .v290-selection{display:none;z-index:4}
+ #v290-hud.v290-show-discovery .v290-discovery,
+ #v290-hud.v290-show-minimap .v290-minimap,
+ #v290-hud.v290-show-selection .v290-selection{display:block}
+ #v290-hud .v290-discovery{top:85px;left:0;width:220px;height:316px;--a:.87}
+ #v290-hud .v290-minimap{left:0;bottom:120px;width:230px;height:280px;--a:.66}
+ #v290-hud .v290-selection{right:0;bottom:120px;width:250px;height:261px;--a:.62}
+ #v290-hud .v290-mobile-buttons{position:absolute;top:51px;right:6px;display:flex;gap:5px;pointer-events:auto;z-index:8}
+ #v290-hud .v290-mobile-button{
+  color:#f8dfac;background-image:url('ui-art-v263/panel_stone.webp');background-size:cover;
+  border:2px ridge #caa361;border-radius:5px;padding:4px 8px;min-height:31px;
+  font:700 12px Georgia,serif;
+ }
+ #v290-hud .v290-cards{
+  left:7px;right:7px;bottom:9px;height:114px;gap:3px;
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));
+ }
+ #v290-hud .v290-card{max-width:none;width:100%;height:114px}
+ #v290-hud .v290-footer-texture{bottom:0;left:0;width:100%;height:127px}
+ #v290-hud .v290-top-pause{left:auto;right:4%;width:8%}
+ #v290-hud .v290-top-menu{left:auto;right:0;width:7%}
+ #v290-hud .v290-popup{top:48%}
+}
+@media(max-width:550px){
+ #v290-hud .v290-cards{height:164px;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,1fr)}
+ #v290-hud .v290-card{height:81px}
+ #v290-hud .v290-footer-texture{height:179px}
+ #v290-hud .v290-minimap,#v290-hud .v290-selection{bottom:176px}
+ #v290-hud .v290-mobile-button{padding:4px 6px;font-size:10px}
+ #v290-hud .v290-top-pause{right:7%}
+}
+@media(max-height:425px) and (orientation:landscape){
+ #v290-hud .v290-cards{height:80px;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:1fr}
+ #v290-hud .v290-card{height:80px}
+ #v290-hud .v290-footer-texture{height:90px}
+ #v290-hud .v290-mini,#v290-hud .v290-selection{bottom:85px}
+}
+/* The 3x2 phone dock uses cropped artwork rather than distorting vertical card images. */
+@media(max-width:940px), (max-height:590px){
+ #v290-hud .v290-card{overflow:hidden;background-image:url('ui-art-v263/panel_stone.webp')!important;background-size:cover!important;border:2px ridge #c69a58!important}
+ #v290-hud .v290-card-image{object-fit:cover;object-position:center 27%}
+ #v290-hud .v290-card::after{
+  content:attr(aria-label);display:block;position:absolute;left:0;right:0;bottom:0;
+  min-height:19px;max-height:27px;overflow:hidden;
+  padding:2px 3px;text-align:center;color:#f7db98;
+  background-image:url('ui-art-v263/panel_stone.webp');background-size:cover;
+  font:700 10px/1.1 Georgia,serif;text-shadow:0 1px 1px #000;
+ }
+}
+@media(max-height:425px) and (orientation:landscape){
+ #v290-hud .v290-discovery{top:60px;width:170px;height:245px}
+}

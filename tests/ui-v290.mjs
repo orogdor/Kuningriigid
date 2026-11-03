@@ -1,0 +1,29 @@
+// V290: image-based world HUD must use the approved screenshot's real image assets.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const html=read('index.html'),js=read('hud-v290.js'),css=read('hud-v290.css');
+assert.match(html,/<title>Kuningriigid · V290<\/title>/);
+assert.match(html,/id="menu-version">KUNINGRIIGID · V290</);
+assert.ok(html.includes('hud-v290.css?v=290a')&&html.includes('hud-v290.js?v=290a'));
+assert.ok(html.indexOf('hud-v289.css')<html.indexOf('hud-v290.css'));
+assert.ok(html.indexOf('hud-v289.js')<html.indexOf('hud-v290.js'));
+assert.match(js,/get\('ui'\)==='picture'/);
+assert.match(js,/function activate/);
+assert.match(js,/function update/);
+assert.match(js,/function resize/);
+assert.match(js,/const commands=\[/);
+for(const id of ['hud-city','hud-build','hud-army','hud-trade-v276','journal','techtoggle','maptoggle','hud-zoom-in','hud-zoom-out','commandmove','commandattack','commandstop','hud-command-toggle','pause'])assert.ok(js.includes("'"+id+"'"),'No game action '+id);
+assert.match(js,/kingdomsUiV288\?\.diplomacy/);
+assert.match(js,/insertBefore\(home,canvas\)/);
+assert.match(js,/querySelector\('\.v290-real-map-host'\)\.append\(canvas\)/);
+assert.match(js,/new URLSearchParams\(location.search\)/);
+for(const cls of ['.v290-top','.v290-discovery','.v290-minimap','.v290-cards','.v290-selection','.v290-popup','.v290-real-map-host'])assert.ok(css.includes(cls),'Missing illustrated frame '+cls);
+for(const bp of ['1190px','940px','550px','425px'])assert.ok(css.includes(bp),'Missing responsive breakpoint '+bp);
+assert.match(css,/body\.v290-active\.atlas #v289-hud/);
+assert.match(css,/v290-hud \.v290-card-image/);
+assert.match(css,/ui-art-v263\/panel_stone\.webp/);
+const names=['topbar','discovery','minimap','selection','wood_footer','card_cities','card_build','card_armies','card_trade','card_diplomacy','card_journal','map_world','map_zoom_in','map_zoom_out','map_camera','selected_move','selected_sword','selected_shield','selected_gear'];
+for(const name of names){const f=new URL('../ui-art-v290/'+name+'.webp',import.meta.url);const b=fs.readFileSync(f);assert.equal(b.toString('ascii',0,4),'RIFF',name+' not RIFF');assert.equal(b.toString('ascii',8,12),'WEBP',name+' not WEBP');}
+console.log('V290 picture HUD: '+names.length+' actual WebP artwork files and active game actions PASS');
