@@ -6,7 +6,7 @@ const root=new URL('../',import.meta.url);
 const read=p=>fs.readFileSync(new URL(p,root),'utf8');
 const html=read('index.html'),js=read('hud-v289.js'),css=read('hud-v289.css');
 const game=read('civilization.js');
-for(const file of ['hud-v289.css?v=289a','hud-v289.js?v=289a']){
+for(const file of ['hud-v289.css?v=289a','hud-v289.js?v=289b']){
  assert.ok(html.includes(file),'Missing final UI asset: '+file);
 }
 assert.ok(html.indexOf('ui-reference-v288.css')<html.indexOf('hud-v289.css'),'New CSS must be loaded last');
