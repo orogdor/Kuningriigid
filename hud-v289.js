@@ -22,7 +22,7 @@ function build(){
  '<div class="v289-foot"><section class="v289-mini v289-plate"><div class="v289-mini-head"><b>✥ <span></span></b><button type="button" class="v289-mini-collapse" aria-label="Minimap visibility">▤</button></div><div class="v289-mini-body"><div class="v289-mini-host"></div><div class="v289-mini-controls"></div></div></section>',
  '<nav class="v289-cards" aria-label="Game actions"></nav>',
  '<section class="v289-selected v289-plate"><div class="v289-selected-main"><img class="v289-selected-photo" src="ui-art-v263/bld_hall.webp" alt=""><div><h2></h2><p class="v289-selected-sub"></p><p class="v289-selected-status"></p></div></div><div class="v289-selected-actions"></div></section>',
- '<button class="v289-pause" type="button"><img src="ui-art-v288/hourglass.svg" alt=""><b></b></button></div>',
+ '<button class="v289-pause" type="button"><span class="v289-pause-glyph">Ⅱ</span><b></b></button></div>',
  '<div class="v289-mobile"><button type="button" data-panel="goals"></button><button type="button" data-panel="factions"></button><button type="button" data-panel="mini"></button></div>',
  '<section class="v289-diplomacy v289-plate" role="dialog" aria-label="Diplomacy" hidden><div class="v289-dialog-head"><h2></h2><button type="button" class="v289-dip-close" aria-label="Close">✕</button></div><div class="v289-dialog-list"></div><p class="v289-dialog-message" role="status"></p></section>'
  ].join('');
