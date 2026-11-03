@@ -1,0 +1,124 @@
+/* Kuningriigid V291 — Every visible HUD border, control, header section, card,
+   backdrop, and decoration is a separate image from the accepted reference.
+   CSS is used only to position artwork and live, accessible text/click targets. */
+#v291-hud{display:none}
+body.v291-active.atlas #v291-hud{display:block}
+body.v291-active.atlas > header,
+body.v291-active.atlas > #tools,
+body.v291-active.atlas #v51insights,
+body.v291-active.atlas #v51cities,
+body.v291-active.atlas #atlasoverview,
+body.v291-active.atlas #commandhud,
+body.v291-active.atlas #v288-research,
+body.v291-active.atlas #v288-rivals,
+body.v291-active.atlas #v288-map-tools,
+body.v291-active.atlas #v288-diplomacy-panel,
+body.v291-active.atlas #v289-hud,
+body.v291-active.atlas #v290-hud,
+body.v291-active.atlas #researchstatus,
+body.v291-active.atlas #camerahelp,
+body.v291-active.atlas #hud-zoom-controls,
+body.v291-active.atlas #hud-resource-toggle,
+body.v291-active.atlas #hud-minimap-toggle,
+body.v291-active.atlas #maplabel{display:none!important}
+#v291-hud{position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden;color:#ffe8bd;font-family:Georgia,serif;user-select:none;--v291-scale:1}
+#v291-hud *,#v291-hud *::before,#v291-hud *::after{box-sizing:border-box}
+#v291-hud button{pointer-events:auto;cursor:pointer;font-family:Georgia,serif;touch-action:manipulation}
+#v291-hud button:focus-visible{outline:2px solid #fff2b2!important;outline-offset:2px!important}
+#v291-hud img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none;mix-blend-mode:normal}
+#v291-hud .v291-element{position:absolute;pointer-events:none;min-width:0;min-height:0;margin:0;padding:0}
+#v291-hud .v291-art-button{pointer-events:auto;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:transparent!important;transition:filter .12s ease}
+#v291-hud .v291-art-button:hover:not(:disabled){filter:brightness(1.18)}
+#v291-hud .v291-art-button:active:not(:disabled){filter:brightness(.88)}
+#v291-hud .v291-art-button:disabled{filter:grayscale(.45);opacity:.67;cursor:not-allowed}
+#v291-hud .v291-command-dock{position:absolute;inset:0;pointer-events:none}
+#v291-hud .v291-card{pointer-events:auto}
+#v291-hud .v291-card:hover{transform:translateY(calc(-3px * var(--v291-scale)))}
+#v291-hud .v291-real-number{position:absolute;top:24%;left:38%;width:59%;height:56%;display:flex;align-items:center;justify-content:center;font:700 calc(17px * var(--v291-scale))/1 Georgia,serif;color:#fff0cc;text-shadow:0 1px 3px #000;white-space:nowrap;pointer-events:none}
+#v291-hud .v291-ledger[data-resource='population'] .v291-real-number{left:41%;width:58%}
+#v291-hud .v291-ledger[data-resource='science'] .v291-real-number{left:39%;width:60%}
+#v291-hud .v291-frame-click{position:absolute;inset:0;border:0;background:transparent!important;opacity:0;color:transparent!important}
+#v291-hud .v291-date-text{position:absolute;top:23%;left:8%;width:86%;display:flex;justify-content:center;align-items:center;height:54%;font:700 calc(13px * var(--v291-scale))/1 Georgia,serif;color:#fff0c7;text-shadow:0 2px 2px #000;white-space:nowrap;overflow:hidden;pointer-events:none}
+#v291-hud .v291-research-main{position:absolute;pointer-events:auto;background:transparent!important;border:0!important;padding:0!important;margin:0}
+#v291-hud .v291-research-title{position:absolute;top:66%;left:7%;width:86%;height:26%;display:flex;justify-content:center;align-items:center;color:#39220c;text-align:center;font:700 calc(13px * var(--v291-scale))/1.05 Georgia,serif;text-shadow:0 1px #efd6a6;overflow:hidden;white-space:normal}
+#v291-hud .v291-research-queue{pointer-events:auto}
+#v291-hud .v291-minimap-frame{z-index:4}
+#v291-hud .v291-minimap-frame>.v291-sprite{position:absolute;inset:0;z-index:3}
+#v291-hud .v291-real-map{position:absolute;left:11.6%;top:12.8%;width:58.1%;height:75.8%;border-radius:50%;clip-path:ellipse(50% 50% at 50% 50%);overflow:hidden;z-index:2;pointer-events:auto}
+#v291-hud .v291-real-map #atlasminimap{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;min-width:0!important;min-height:0!important;position:static!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;cursor:crosshair;display:block!important;pointer-events:auto}
+#v291-hud .v291-minimap-button{z-index:5}
+#v291-hud .v291-selection-frame{z-index:4}
+#v291-hud .v291-selection-frame>.v291-sprite{position:absolute;inset:0;z-index:4}
+#v291-hud .v291-portrait{position:absolute;z-index:2;left:37%;top:8%;width:51%;height:64%;overflow:hidden;clip-path:ellipse(50% 50% at 50% 50%);border-radius:50%}
+#v291-hud .v291-portrait img{width:100%;height:100%;object-fit:cover}
+#v291-hud .v291-selected-text{position:absolute;z-index:6;top:72%;left:45%;width:43%;height:12%;color:#2d1c0e;font:700 calc(14px * var(--v291-scale))/1.04 Georgia,serif;display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;overflow:hidden;text-shadow:0 1px #f6ddac}
+#v291-hud .v291-unit-button{z-index:6}
+#v291-hud .v291-unit-info{z-index:6;position:absolute;pointer-events:auto;background:transparent!important;border:0!important;font-size:0!important}
+#v291-hud .v291-footer-navy{z-index:1}
+#v291-hud .v291-wood{z-index:1}
+#v291-hud .v291-card{z-index:6}
+#v291-hud .v291-dock-background{z-index:1}
+#v291-hud .v291-brand,#v291-hud .v291-ledger,#v291-hud .v291-date,#v291-hud .v291-world,#v291-hud .v291-pause,#v291-hud .v291-play,#v291-hud .v291-speed{z-index:8}
+#v291-hud .v291-research-background,#v291-hud .v291-research-main,#v291-hud .v291-research-queue{z-index:6}
+#v291-hud .v291-dialog{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(490px,94vw);max-height:75vh;overflow-y:auto;z-index:20;pointer-events:auto;border:12px solid transparent;border-image:url('ui-art-v291/popup_top.webp') 3 stretch;background:url('ui-art-v291/footer_navy.webp') center / cover;color:#f5dfa9;box-shadow:0 10px 30px #000d;padding:12px}
+#v291-hud .v291-dialog[hidden]{display:none!important}
+#v291-hud .v291-dialog-header{display:flex;align-items:center;justify-content:space-between;border:0;background:none!important;padding:0;margin-bottom:9px}
+#v291-hud .v291-dialog-header h2{font:700 23px Georgia,serif;color:#f8daa1;margin:0}
+#v291-hud .v291-dialog-close{background:url('ui-art-v291/header_pause.webp') center/contain no-repeat!important;border:0!important;color:#f7d8a3;font:700 19px Georgia,serif;width:35px;height:35px}
+#v291-hud .v291-faction-row{padding:10px 0;border-bottom:1px solid #bc9457}
+#v291-hud .v291-faction-buttons{display:flex;gap:7px;margin-top:8px}
+#v291-hud .v291-faction-action{flex:1;padding:9px 5px;background:url('ui-art-v291/header_date.webp') center/100% 100% no-repeat!important;border:0!important;color:#f9e3ba}
+#v291-hud .v291-dialog-feedback{min-height:20px;color:#f8dfaa;font-size:13px}
+#v291-hud .v291-mobile-toolbar,#v291-hud .v291-mobile-counters{display:none}
+body.v291-active.atlas:has(#startmenu:not([hidden])) #v291-hud,
+body.v291-active.atlas:has(#researchpanel:not([hidden])) #v291-hud,
+body.v291-active.atlas:has(#journalpanel:not([hidden])) #v291-hud,
+body.v291-active.atlas:has(#help:not([hidden])) #v291-hud,#v291-hud.v291-behind-modal{display:none!important}
+/* Existing army/city/tech windows must remain functional ABOVE the image HUD. */
+body.v291-active.atlas #v264-listpanel,body.v291-active.atlas #atlaspanel{z-index:90!important;max-height:65vh!important;overflow:auto!important;background:url('ui-art-v291/footer_navy.webp') center/cover!important;border:4px ridge #bd9454!important;box-shadow:0 14px 24px #000c!important;color:#f6e5c6!important}
+body.v291-active.atlas #v264-listpanel{left:50%!important;bottom:clamp(155px,22vh,260px)!important;transform:translateX(-50%)!important;width:min(410px,94vw)!important}
+body.v291-active.atlas #atlaspanel{left:clamp(8px,20vw,350px)!important;bottom:clamp(155px,22vh,260px)!important;top:auto!important}
+/* Narrow screens use genuine picture sprites in a 3×2 dock instead of scaling the 1671-px master into unreadable buttons. */
+@media (max-width:780px), (max-height:530px){
+ #v291-hud .v291-dock-background{left:0!important;top:auto!important;bottom:0!important;width:100%!important;height:225px!important}
+ #v291-hud .v291-wood{top:auto!important;bottom:0!important;width:100%!important;height:15px!important;left:0!important}
+ #v291-hud .v291-brand{left:0!important;top:0!important;width:135px!important;height:42px!important}
+ #v291-hud .v291-world{left:35%!important;top:0!important;width:40%!important;height:42px!important}
+ #v291-hud .v291-date{display:none!important}
+ #v291-hud .v291-pause{left:auto!important;right:8px!important;top:0!important;width:42px!important;height:42px!important}
+ #v291-hud .v291-play,#v291-hud .v291-speed,#v291-hud .v291-ledger{display:none!important}
+ #v291-hud .v291-mobile-counters{position:absolute;left:0;top:45px;height:47px;right:0;display:flex;overflow-x:auto;gap:3px;pointer-events:auto;scrollbar-width:thin;z-index:10;background:url('ui-art-v291/footer_navy.webp') center/cover}
+ #v291-hud .v291-mobile-counter{position:relative;flex:0 0 105px;height:43px}
+ #v291-hud .v291-mobile-counter .v291-mobile-value{position:absolute;right:7px;top:13px;width:59px;text-align:center;font:700 13px Georgia,serif;text-shadow:0 1px 2px #000;color:#ffe7b5}
+ #v291-hud .v291-command-dock{position:absolute;left:7px;right:7px;top:auto;bottom:22px;height:196px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,1fr);gap:5px;z-index:12}
+ #v291-hud .v291-card{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:100%!important;pointer-events:auto}
+ #v291-hud .v291-research-background,#v291-hud .v291-research-main,#v291-hud .v291-research-queue,#v291-hud .v291-minimap-frame,#v291-hud .v291-minimap-button,#v291-hud .v291-selection-frame,#v291-hud .v291-unit-button,#v291-hud .v291-unit-info{display:none!important}
+ #v291-hud.v291-show-research .v291-research-background,#v291-hud.v291-show-research .v291-research-main,#v291-hud.v291-show-research .v291-research-queue{display:block!important}
+ #v291-hud.v291-show-map .v291-minimap-frame,#v291-hud.v291-show-map .v291-minimap-button{display:block!important}
+ #v291-hud.v291-show-units .v291-selection-frame,#v291-hud.v291-show-units .v291-unit-button,#v291-hud.v291-show-units .v291-unit-info{display:block!important}
+ #v291-hud .v291-research-background{left:5px!important;top:111px!important;width:185px!important;height:254px!important}
+ #v291-hud .v291-research-main{left:29px!important;top:118px!important;width:156px!important;height:141px!important}
+ #v291-hud .v291-research-title{font-size:11px!important}
+ #v291-hud .v291-research-queue{top:252px!important;width:44px!important;height:47px!important}
+ #v291-hud [data-art='research_compass']{left:4px!important}#v291-hud [data-art='research_tools']{left:47px!important}
+ #v291-hud [data-art='research_gate']{left:90px!important}#v291-hud [data-art='research_ship']{left:133px!important}
+ #v291-hud [data-art='research_city']{left:175px!important;width:39px!important;height:43px!important}
+ #v291-hud .v291-minimap-frame{left:2px!important;top:111px!important;width:283px!important;height:217px!important}
+ #v291-hud .v291-minimap-button{top:135px!important;width:50px!important;height:52px!important}
+ #v291-hud [data-art='map_zoom_in']{left:187px!important}#v291-hud [data-art='map_camera']{left:218px!important;top:177px!important}#v291-hud [data-art='map_show']{left:211px!important;top:230px!important}
+ #v291-hud .v291-selection-frame{left:auto!important;right:2px!important;top:111px!important;width:320px!important;height:198px!important}
+ #v291-hud .v291-unit-button{top:170px!important;width:58px!important;height:58px!important}
+ #v291-hud [data-art='cmd_attack']{left:auto!important;right:254px!important}
+ #v291-hud [data-art='cmd_move']{left:auto!important;right:194px!important;top:130px!important}
+ #v291-hud [data-art='cmd_defend']{left:auto!important;right:256px!important;top:225px!important}
+ #v291-hud [data-art='cmd_city']{left:auto!important;right:194px!important;top:231px!important}
+ #v291-hud .v291-unit-info{display:none!important}
+ #v291-hud .v291-selected-text{font-size:12px!important}
+ #v291-hud .v291-mobile-toolbar{display:flex;gap:5px;position:absolute;right:6px;top:101px;z-index:16;pointer-events:auto}
+ #v291-hud .v291-mobile-toggle{width:36px;height:36px;background:transparent!important;border:0!important;padding:0!important}
+ #v291-hud .v291-mobile-toggle img{object-fit:contain}
+ #v291-hud .v291-dialog{max-height:45vh;top:37%}
+ body.v291-active.atlas #v264-listpanel{bottom:225px!important;max-height:42vh!important}
+ body.v291-active.atlas #atlaspanel{bottom:225px!important;max-height:42vh!important;left:5px!important}
+}
+@media (max-width:400px){#v291-hud .v291-command-dock{height:184px;bottom:18px}#v291-hud .v291-card{max-height:90px}}
