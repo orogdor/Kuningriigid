@@ -8,7 +8,7 @@
   const tr = (et,en) => isEt() ? et : en;
   const make=(tag,cls,parent)=>{const el=document.createElement(tag);if(cls)el.className=cls;parent?.append(el);return el;};
   const art = name => 'ui-art-v263/'+name+'.webp';
-  const safe=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const safe=(v)=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const API=()=>window.kingdomsUiV288;
   let lastRivals='',activeDiplomat=null;
 
@@ -143,6 +143,8 @@
       const study=$('v288-study-name'),sub=$('v288-study-sub');
       if(study)study.textContent=data.research||tr('Vali uurimus','Choose research');
       if(sub)sub.textContent=data.research?tr('Ava tehnoloogiapuu','Open technology tree'):tr('Uurimus ootab','Research idle');
+      const progress=$('v288-research')?.querySelector('.v288-progress>i');if(progress)progress.style.width=String(data.researchPercent||0)+'%';
+      if(sub&&data.research)sub.textContent=(data.researchPercent||0)+'% · '+(data.researchRate||0)+' '+tr('teadust/min','research/min');
       const p=$('pause');if(p)p.dataset.v288Paused=String(data.paused);
     }
     paintRivals();
