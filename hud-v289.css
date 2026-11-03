@@ -402,3 +402,29 @@ body.v289-active.atlas:has(#help:not([hidden])) #v289-hud{display:none!important
  #v289-hud .v289-art{height:34px}
 }
 @media(prefers-reduced-motion:reduce){#v289-hud .v289-action{transition:none;transform:none!important}}
+
+
+/* Legacy game lists are functional adapters, but need an explicit stacking and
+   placement rule because their original anchor buttons are hidden by V289. */
+body.v289-active.atlas #v264-listpanel{
+ z-index:100!important;left:50%!important;transform:translateX(-50%)!important;
+ bottom:clamp(165px,21vh,250px)!important;max-height:min(56vh,510px)!important;
+ width:min(340px,calc(100vw - 18px))!important;
+ background:linear-gradient(135deg,#173247fa,#0c1e30fa)!important;
+ border:2px solid #caa15c!important;
+ box-shadow:0 10px 30px #000b!important;
+}
+body.v289-active.atlas #atlaspanel{
+ z-index:95!important;top:auto!important;
+ bottom:clamp(165px,21vh,250px)!important;left:clamp(10px,17vw,295px)!important;
+ max-height:55vh!important;overflow:auto!important;
+ background:linear-gradient(135deg,#173247fa,#0c1e30fa)!important;
+ border:2px solid #caa15c!important;
+}
+@media(max-width:900px){
+ body.v289-active.atlas #v264-listpanel{bottom:clamp(166px,27vh,230px)!important}
+ body.v289-active.atlas #atlaspanel{
+  bottom:clamp(166px,27vh,230px)!important;left:8px!important;
+  width:min(320px,calc(100vw - 16px))!important;
+ }
+}
