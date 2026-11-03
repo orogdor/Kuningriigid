@@ -16,7 +16,7 @@ let root,home,mini,sigTips='',sigFactions='',sigSelection='',dipTeam=null;
 function build(){
  root=create('div','',document.body);root.id='v289-hud';root.setAttribute('aria-label','Kingdoms illustrated HUD');
  root.innerHTML=[
- '<div class="v289-bar" role="banner"><div class="v289-brand"><img class="v289-crest" src="ui-art-v288/crest.svg" alt=""><div class="v289-name"><strong>KUNINGRIIGID</strong><small>UI V289 · MÄNG V286</small></div><img class="v289-hero" src="ui-art-v263/unit_spearman.webp" alt=""></div><div class="v289-ledger"></div><div class="v289-turn"><b></b><small></small></div><div class="v289-head-actions"></div></div>',
+ '<div class="v289-bar" role="banner"><div class="v289-brand"><img class="v289-crest" src="ui-art-v288/crest.svg" alt=""><div class="v289-name"><strong>KUNINGRIIGID</strong><small>UI V289 · SEVEN ERAS</small></div><img class="v289-hero" src="ui-art-v263/unit_spearman.webp" alt=""></div><div class="v289-ledger"></div><div class="v289-turn"><b></b><small></small></div><div class="v289-head-actions"></div></div>',
  '<section class="v289-goals v289-plate"><h2>✧ <span></span></h2><div class="v289-goal-rows"></div></section>',
  '<section class="v289-factions v289-plate"><h2>⚜ <span></span></h2><div class="v289-faction-rows"></div></section>',
  '<div class="v289-foot"><section class="v289-mini v289-plate"><div class="v289-mini-head"><b>✥ <span></span></b><button type="button" class="v289-mini-collapse" aria-label="Minimap visibility">▤</button></div><div class="v289-mini-body"><div class="v289-mini-host"></div><div class="v289-mini-controls"></div></div></section>',
