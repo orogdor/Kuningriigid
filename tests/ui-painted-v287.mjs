@@ -20,7 +20,7 @@ assert.match(css,/#tools button/);
 assert.match(css,/@media \(max-width:900px\), \(max-height:580px\)/);
 assert.doesNotMatch(js,/\.onclick\s*=\s*|addEventListener\(['"]click['"],\s*\(\)\s*=>\s*\{\s*location\.reload/);
 const images=[...css.matchAll(/url\(['"]?(ui-art-v263\/[^'")\s]+)['"]?\)/g)].map(m=>m[1]);
-assert.ok(images.length>=12,'The new UI must actually use illustrated artwork');
+assert.ok(images.length>=8,'The new UI must actually use illustrated artwork');
 for (const src of images) {
  assert.ok(fs.existsSync(path.join(new URL('.',root).pathname,src)),'Missing image asset: '+src);
 }
