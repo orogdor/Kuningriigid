@@ -1,0 +1,267 @@
+/* Kuningriigid V287 — illustrated grand-strategy world-map interface.
+   Opt-in with ?ui=painted; no gameplay handlers or state are replaced.
+   Image assets are the existing painterly WebP files from V263. */
+body.ui-paint-v287 {
+  --p287-gold:#d8ad64;
+  --p287-light:#f8e8bc;
+  --p287-ink:#e9ddc0;
+  --p287-frame:#a67c42;
+  --p287-plate:linear-gradient(180deg,rgba(31,39,42,.91),rgba(11,21,28,.97)),url('ui-art-v263/panel_stone.webp');
+  --p287-tile:linear-gradient(180deg,rgba(46,57,62,.77),rgba(15,25,34,.91)),url('ui-art-v263/panel_stone.webp');
+  color:var(--p287-ink);
+}
+/* The actual decorative panels and button symbols use game-provided images.
+   Text, counts and controls remain HTML so they stay accessible and live. */
+body.ui-paint-v287 header {
+  padding:6px 15px!important;gap:12px!important;min-height:62px!important;
+  background:linear-gradient(180deg,rgba(13,21,30,.97),rgba(19,28,34,.93)),url('ui-art-v263/panel_stone.webp') 0 0 / 400px!important;
+  border:0!important;border-bottom:2px solid var(--p287-frame)!important;
+  box-shadow:0 6px 18px #04090dbb,0 1px 0 #f4cf8b5a inset!important;
+  z-index:22!important;
+}
+body.ui-paint-v287 header .brand {
+  flex:0 0 46px!important;width:46px!important;height:51px!important;
+  background:url('ui-art-v263/bld_hall.webp') center/contain no-repeat!important;
+  border-radius:5px;
+}
+body.ui-paint-v287 .v287-wordmark {
+  display:flex;flex-direction:column;justify-content:center;min-width:135px;
+  white-space:nowrap;pointer-events:none;margin-left:-5px;
+}
+body.ui-paint-v287 .v287-wordmark b{
+  font:700 clamp(17px,1.55vw,27px)/1.07 Georgia,'Cormorant Garamond',serif;
+  letter-spacing:.09em;color:#f0dba9;text-shadow:0 2px 3px #000;
+}
+body.ui-paint-v287 .v287-wordmark small{
+  color:#bf985d;letter-spacing:.18em;font:700 8px/1.3 Georgia,serif;text-transform:uppercase;
+}
+body.ui-paint-v287 header .game-language{flex:0 0 auto;order:7;opacity:.82}
+body.ui-paint-v287 header .time {
+  order:6!important;width:auto!important;flex:0 0 auto!important;gap:8px!important;
+  display:flex!important;flex-wrap:nowrap!important;white-space:nowrap;
+}
+body.ui-paint-v287 header #turn {
+  display:block!important;width:auto!important;max-width:240px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font:600 12px/1.3 Georgia,serif;color:#ecd39d!important;
+  border-left:1px solid #b9945966;padding-left:10px;
+}
+body.ui-paint-v287 #dayclock-v235,
+body.ui-paint-v287 #pause {
+  background:var(--p287-tile)!important;border:1px solid var(--p287-frame)!important;
+  color:var(--p287-light)!important;border-radius:5px!important;
+}
+body.ui-paint-v287 header #clock{accent-color:var(--p287-gold)}
+body.ui-paint-v287 #resources.v264-grouped{
+  gap:7px!important;flex:1 1 auto;align-items:center!important;
+  min-width:0!important;justify-content:center!important;
+}
+body.ui-paint-v287 #resources .v264-chip {
+  min-height:46px!important;padding:4px 9px 10px 5px!important;
+  background:var(--p287-tile)!important;
+  border:1px solid #ab8b5377!important;border-radius:4px!important;
+  box-shadow:0 1px 0 #ebcb8648 inset,0 3px 8px #0007;
+}
+body.ui-paint-v287 #resources .v264-chip:hover,
+body.ui-paint-v287 #resources .v264-chip.open{
+  box-shadow:0 0 0 1px #eacb8a inset,0 0 14px #a67c4266!important;
+  border-color:#eacb8a!important;
+}
+body.ui-paint-v287 #resources .v264-val i{color:#f9eace;font-family:Georgia,serif}
+body.ui-paint-v287 #resources .v264-gname{color:#b9ab8a}
+body.ui-paint-v287 #resources span[data-resource="population"]{
+  background:var(--p287-tile)!important;border:1px solid #ab8b5377!important;
+  border-radius:4px!important;
+}
+/* Desktop world-map composition: objectives at upper left, map bottom left,
+   unit-card lower right, illustrated command dock centered at bottom. */
+@media (min-width:901px) and (min-height:581px){
+ body.ui-paint-v287.atlas #v51insights{
+   top:102px!important;left:14px!important;bottom:auto!important;
+   width:276px!important;max-width:276px!important;max-height:258px!important;
+   padding:12px 14px!important;overflow-y:auto!important;
+ }
+ body.ui-paint-v287.atlas #researchstatus {
+   top:82px!important;right:20px!important;left:auto!important;
+   max-width:260px;z-index:17!important;
+ }
+ body.ui-paint-v287.atlas #atlasoverview {
+   left:14px!important;right:auto!important;top:auto!important;bottom:16px!important;
+   width:218px!important;max-width:218px!important;min-height:0!important;
+   padding:10px!important;z-index:16!important;
+   transform:none!important;
+ }
+ body.ui-paint-v287.atlas #atlasoverview canvas {
+   display:block!important;width:100%!important;height:143px!important;
+   max-height:143px!important;min-height:0!important;
+ }
+ body.ui-paint-v287.atlas #atlasoverview>small{display:none!important}
+ body.ui-paint-v287.atlas #commandhud {
+   right:14px!important;left:auto!important;top:auto!important;bottom:16px!important;
+   width:318px!important;max-width:min(318px,24vw)!important;transform:none!important;
+   z-index:17!important;padding:12px 12px 12px 100px!important;
+   min-height:112px!important;
+ }
+ body.ui-paint-v287.atlas #commandhud:not(.v263-has-portrait){padding-left:15px!important}
+ body.ui-paint-v287.atlas #commandhud .command-buttons{max-height:104px;overflow-y:auto}
+ body.ui-paint-v287.atlas #tools{
+   left:50%!important;right:auto!important;bottom:14px!important;
+   transform:translateX(-50%)!important;max-width:calc(100vw - 600px)!important;
+   overflow-x:auto!important;overflow-y:visible!important;scrollbar-width:none;
+ }
+ body.ui-paint-v287.atlas #tools::-webkit-scrollbar{display:none}
+}
+/* Painted artwork replaces generic web-app cards, not the underlying buttons. */
+body.ui-paint-v287 #v51insights,
+body.ui-paint-v287 #v51cities,
+body.ui-paint-v287 #atlasoverview,
+body.ui-paint-v287 #commandhud,
+body.ui-paint-v287 #atlaspanel,
+body.ui-paint-v287 #v264-listpanel,
+body.ui-paint-v287 #citypanel,
+body.ui-paint-v287 #building-inspector,
+body.ui-paint-v287 #hud-tile-resources,
+body.ui-paint-v287 #hud-explore-panel,
+body.ui-paint-v287 #researchpanel .research-window,
+body.ui-paint-v287 #journalpanel .journal-window {
+  background:var(--p287-plate)!important;color:var(--p287-ink)!important;
+  border:1px solid var(--p287-frame)!important;border-radius:7px!important;
+  box-shadow:0 0 0 1px #f0d39a35 inset,0 1px 0 #fbe1a363 inset,0 13px 25px #040708af!important;
+}
+body.ui-paint-v287 #v51insights>strong,
+body.ui-paint-v287 #v264-listpanel .v264-head strong,
+body.ui-paint-v287 #atlasoverview>span,
+body.ui-paint-v287 #commandhud #commandname,
+body.ui-paint-v287 #citypanel h2{
+  font-family:Georgia,'Cormorant Garamond',serif!important;
+  color:#f7db9b!important;text-shadow:0 2px 3px #0009;
+}
+body.ui-paint-v287 #v51insights{border-left:3px solid #ba985f!important}
+body.ui-paint-v287 #v51insights button,
+body.ui-paint-v287 #commandhud button,
+body.ui-paint-v287 #atlaspanel button,
+body.ui-paint-v287 #v264-listpanel button{
+  background:var(--p287-tile)!important;
+  border:1px solid #a88a586b!important;border-radius:4px!important;
+  color:#f0e0bf!important;
+}
+body.ui-paint-v287 #v51insights button:hover,
+body.ui-paint-v287 #commandhud button:hover,
+body.ui-paint-v287 #atlaspanel button:hover,
+body.ui-paint-v287 #v264-listpanel button:hover{border-color:#e9c881!important}
+body.ui-paint-v287 #atlasminimap{border:1px solid #bd995b!important;box-shadow:0 0 0 2px #0009}
+body.ui-paint-v287 #maplabel{
+  background:var(--p287-plate)!important;border:1px solid #b99658!important;
+  color:#ecd6a4!important;box-shadow:0 3px 10px #0009!important;
+}
+body.ui-paint-v287 #tools {
+  border:0!important;background:transparent!important;box-shadow:none!important;
+  padding:0!important;gap:4px!important;z-index:19!important;
+}
+body.ui-paint-v287 #tools button:not([hidden]) {
+  position:relative;isolation:isolate;
+  border:1px solid #a98249!important;
+  border-radius:6px!important;
+  background:var(--p287-tile)!important;
+  color:var(--p287-light)!important;
+  box-shadow:0 0 0 1px #f0cf8847 inset,0 3px 9px #000b!important;
+  text-shadow:0 1px 2px #000!important;
+  transition:filter .12s,border-color .12s,box-shadow .12s;
+}
+body.ui-paint-v287 #tools button:hover:not(:disabled){
+  background:var(--p287-tile)!important;filter:brightness(1.16);
+  border-color:#f0d69a!important;
+}
+body.ui-paint-v287 #tools button:focus-visible{
+  outline:2px solid #fff2c4!important;outline-offset:2px!important;
+}
+body.ui-paint-v287 #tools button.active,
+body.ui-paint-v287 #tools button[aria-pressed="true"],
+body.ui-paint-v287.atlas #tools #maptoggle,
+body.ui-paint-v287.hud-city-open #tools #hud-city,
+body.ui-paint-v287.hud-city-open.hud-building-tab #tools #hud-build,
+body.ui-paint-v287.hud-city-open.hud-army-tab #tools #hud-army{
+  background:linear-gradient(180deg,rgba(64,100,127,.94),rgba(18,44,70,.98)),url('ui-art-v263/panel_stone.webp')!important;
+  border-color:#f7d590!important;
+  box-shadow:0 0 0 2px #eed18c7a inset,0 3px 14px #000a!important;
+}
+body.ui-paint-v287 #tools #journal::before{
+  content:''!important;display:block!important;
+  background:url('ui-art-v263/res_pottery.webp') center/contain no-repeat!important;
+}
+body.ui-paint-v287 #tools #menubtn::before{
+  content:''!important;display:block!important;
+  background:url('ui-art-v263/cmd_city.webp') center/contain no-repeat!important;
+}
+body.ui-paint-v287 #tools #home::before{
+  content:''!important;display:block!important;
+  background:url('ui-art-v263/cmd_explore.webp') center/contain no-repeat!important;
+}
+body.ui-paint-v287 #tools #zin::before,
+body.ui-paint-v287 #tools #zout::before{
+  content:''!important;display:block!important;
+  background:url('ui-art-v263/cmd_map.webp') center/contain no-repeat!important;
+}
+body.ui-paint-v287 #tools #hud-trade-v276::before{background:url('ui-art-v263/res_gold.webp') center/contain no-repeat!important}
+@media (min-width:901px) and (min-height:581px){
+ body.ui-paint-v287 #tools button:not([hidden]){
+   width:clamp(61px,5.4vw,84px)!important;min-width:clamp(61px,5.4vw,84px)!important;
+   min-height:81px!important;padding:6px 3px 4px!important;
+   gap:2px!important;font-size:0!important;white-space:normal!important;
+   display:flex!important;flex-direction:column!important;
+   align-items:center!important;justify-content:center!important;
+ }
+ body.ui-paint-v287 #tools button:not([hidden])::before{
+   height:42px!important;width:45px!important;margin:0!important;
+   font-size:24px!important;line-height:42px!important;
+   background-size:contain!important;background-repeat:no-repeat!important;
+ }
+ body.ui-paint-v287 #tools button:not([hidden])::after{
+   font:700 10.5px/1.15 Georgia,serif!important;
+   color:#f6e7c4!important;letter-spacing:0!important;
+   white-space:normal!important;text-align:center;
+ }
+ body.ui-paint-v287 #tools #hud-build{margin-left:0!important;box-shadow:0 3px 9px #000b!important}
+ body.ui-paint-v287 #tools [data-tab="help"],body.ui-paint-v287 #tools #home{margin-left:0!important}
+}
+/* Small screens: keep the existing game's tested touch controls, but use image art.
+   Never overlay a large fixed 'desktop' card on the play area. */
+@media (max-width:900px), (max-height:580px){
+ body.ui-paint-v287 header{padding:5px 7px!important;gap:5px!important;min-height:40px!important}
+ body.ui-paint-v287 .v287-wordmark{display:none!important}
+ body.ui-paint-v287 header .brand{
+   flex:0 0 27px!important;width:27px!important;height:29px!important;
+ }
+ body.ui-paint-v287 header .game-language{display:none!important}
+ body.ui-paint-v287 header .time{order:3!important;gap:3px!important}
+ body.ui-paint-v287 header #turn{display:none!important}
+ body.ui-paint-v287 #resources.v264-grouped{justify-content:flex-start!important;gap:2px!important}
+ body.ui-paint-v287 #resources .v264-chip{
+   min-height:30px!important;padding:2px 3px!important;gap:2px!important;
+ }
+ body.ui-paint-v287 #tools{gap:3px!important}
+ body.ui-paint-v287 #tools button:not([hidden]){
+   min-height:50px!important;padding:4px 1px!important;
+ }
+ body.ui-paint-v287 #tools button.v263-btn::before{
+   width:29px!important;height:29px!important;background-size:contain!important;
+ }
+ body.ui-paint-v287 #tools #hud-trade-v276::before,
+ body.ui-paint-v287 #tools #journal::before,
+ body.ui-paint-v287 #tools #menubtn::before{
+   width:26px!important;height:27px!important;background-size:contain!important;
+ }
+ body.ui-paint-v287 #tools button::after{font:700 9px/12px Georgia,serif!important}
+ body.ui-paint-v287 #commandhud,
+ body.ui-paint-v287 #hud-explore-panel,
+ body.ui-paint-v287 #atlaspanel{max-width:calc(100vw - 12px)!important}
+ body.ui-paint-v287 #v51insights{border-left:2px solid #ba985f!important}
+}
+@media (max-width:480px) and (orientation:portrait){
+ body.ui-paint-v287 #tools button::after{font-size:8px!important}
+ body.ui-paint-v287 #tools button.v263-btn::before{width:23px!important;height:23px!important}
+}
+/* Lightweight accessibility: never bake numbers into images; images are decoration. */
+@media (prefers-reduced-motion:reduce){
+ body.ui-paint-v287 #tools button{transition:none!important}
+}
