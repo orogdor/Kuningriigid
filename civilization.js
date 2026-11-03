@@ -1522,6 +1522,28 @@ window.kingdomsUiV264={
  research:()=>({active:s.research[0]?.active||null,name:s.research[0]?.active?(TECHS[s.research[0].active]?.name||s.research[0].active):null}),
  focusVillage(id){const l=(s.landmarks||[]).find(x=>x.id===id);if(!l)return;chosen=game.cell(l);if(view!=='world')openWorld();const p=center(l.c,l.r);focus.set(p.x,0,p.z);renderUI();}
 };
+// V288: read-only presentation data for the illustrated HUD. No invented turn-end action.
+window.kingdomsUiV288={
+ snapshot(){
+  const leaders=Array.from({length:4},(_,team)=>{
+   const cities=s.cities.filter(c=>c.team===team&&c.districtOf==null);
+   const population=cities.reduce((n,c)=>n+Math.max(0,Number(c.economy?.realms?.[team]?.pop||0)),0);
+   return {team,name:FACTION_NAMES[team]||('Riik '+(team+1)),population:Math.floor(population),towns:cities.length,relation:team===0?'own':relation(s,0,team)};
+  });
+  const current=s.research?.[0]?.active||null;
+  return {view,age:AGES[s.ages?.[0]||0]?.name||'Stone Age',
+   turn:1+Math.floor(s.time/TURN_SECONDS),paused:!!paused,
+   research:current?(TECHS[current]?.name||current):null,
+   researchPercent:current?Math.max(0,Math.min(100,Math.round(100*(s.research?.[0]?.progress?.[current]||0)/Math.max(1,researchCost(s,TECHS[current]))))):0,
+   researchRate:Math.round(game.scienceRate(0)*10)/10,
+   leaders};
+ },
+ diplomacy(team,status){
+  if(!Number.isInteger(team)||team<1||team>3||!['neutral','friendly','war'].includes(status))return {error:'Vigane diplomaatiline käsk'};
+  if(status==='war'&&(s.peaceUntilV276||0)>s.time)return {error:'Algne rahuperiood pole veel lõppenud'};
+  setRelation(s,0,team,status);renderUI();save();return {ok:true};
+ }
+};
 $('hud-army').onclick=()=>{if(window.uiListsV264&&!s.battle){window.uiListsV264.toggle('army');return}if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){selectedUnit=null;setCityTab('build');tab='army';renderUI();document.body.classList.add('hud-city-open')}else say('Sõjaväe värbamiseks raja esmalt linn.')};
 $('hud-walk').onclick=()=>{if(view!=='local')return say('Open a detail map first, then press Walk.');if(s.battle)return say('Walking is not available during a battle.');if(walker.active)return walker.exit();if(walker.placed)walker.enter();else walker.startPlacing();};$('hud-build').onclick=()=>{if(view==='world')$('opencity').click();if(view==='local'&&activeCity()){selectedUnit=null;setCityTab('build');tab='build';renderUI();document.body.classList.add('hud-city-open')}else say('Ehitamiseks raja esmalt linn.')};$('opencity').onclick=()=>{const city=ownCity(),a=s.settlers.find(a=>a.team===0);if(city)openTile(game.cell(city));else if(a){chosen=game.cell(a);openTile(chosen)}};$('viewenemy').onclick=()=>{const c=s.cities.find(c=>c.team!==0&&game.visibleNow(0,c))||s.settlers.find(a=>a.team!==0&&game.visibleNow(0,a));if(c)openTile(game.cell(c));else say('Vastast pole veel avastatud. Saada avastaja.');};$('attackcity').onclick=()=>{
  const target=game.cityAt(chosen)?.team!==0?game.cityAt(chosen):null;
