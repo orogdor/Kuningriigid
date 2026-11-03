@@ -92,11 +92,11 @@ body.v290-active.atlas #maplabel{display:none!important}
 #v290-hud .v290-discovery>.v290-background{pointer-events:none}
 #v290-hud .v290-research-hit{left:10%;top:0;width:79%;height:53%;border-radius:50%}
 #v290-hud .v290-research-name{
- position:absolute;left:20%;top:38%;width:62%;height:7%;
+ position:absolute;left:20%;top:36%;width:63%;height:15%;
  display:flex;align-items:center;justify-content:center;
- font:bold calc(12px * var(--a)) Georgia,serif;text-align:center;
- background:#dec38cdd;color:#342012;pointer-events:none;
- overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-radius:4px;
+ font:bold calc(12px * var(--a))/1.2 Georgia,serif;text-align:center;
+ background:transparent;color:#342012;pointer-events:none;
+ overflow:hidden;white-space:pre-line;border-radius:4px;
 }
 #v290-hud .v290-queue-hit{width:16%;height:15%;top:49%;border-radius:50%}
 #v290-hud .v290-queue-0{left:1%}
