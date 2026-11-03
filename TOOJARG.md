@@ -109,3 +109,6 @@ Käivita muudatusele vastavad testid. Näiteks V243 ehitusmuudatuste puhul `node
 - V285: töökohad hoone mudelil ka savikaevandusele (kaevab lohus), pottsepale (ahju ees), õpetajale (kivilaua juures) ja kaevule (veekandja ringi ääres).
 
 - V286: sujuvad kaldad (liiva/muru/vee üleminek kõrgusvahemikus, tihedam kauge maastik, piirid mitte üle mere, maailmakaardi jõesäng madal + meri mitte sisemaal, puud mitte jõkke).
+
+
+- V287: valikuline maalitud maailmakaardi UI (haru feature/world-map-painted-ui-v287). Kasutab V263 pildilisi WebP elemente; säilitab olemasolevad nupud, salvestused ja reaalajas käigud. Käivitamine ?ui=painted; taastamine ?ui=classic või peamenüü nupuga. Failid: ui-painted-v287.css, ui-painted-v287.js, tests/ui-painted-v287.mjs, MUUDATUSED_UI_V287.md. Enne haru ühendamist kontrolliti JS süntaksit ja pildifailide olemasolu. Brauseri visuaalkontroll ja CI täiskontroll on veel vajalikud.
