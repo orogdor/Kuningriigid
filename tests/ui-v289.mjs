@@ -6,7 +6,7 @@ const root=new URL('../',import.meta.url);
 const read=p=>fs.readFileSync(new URL(p,root),'utf8');
 const html=read('index.html'),js=read('hud-v289.js'),css=read('hud-v289.css');
 const game=read('civilization.js');
-for(const file of ['hud-v289.css?v=289a','hud-v289.js?v=289a']){
+for(const file of ['hud-v289.css?v=289a','hud-v289.js?v=289b']){
  assert.ok(html.includes(file),'Missing final UI asset: '+file);
 }
 assert.ok(html.indexOf('ui-reference-v288.css')<html.indexOf('hud-v289.css'),'New CSS must be loaded last');
@@ -41,8 +41,8 @@ const images=[...css.matchAll(/url\(['"]?(ui-art-v(?:263|288)\/[^'")\s]+)['"]?\)
 for(const asset of images){
  assert.ok(fs.existsSync(path.join(new URL('.',root).pathname,asset)),'Missing art '+asset);
 }
-assert.match(html,/<title>Kuningriigid · UI V289 · mäng V286<\/title>/);
-assert.match(html,/id="menu-version">KUNINGRIIGID · UI V289 · MÄNG V286</);
-assert.match(js,/<small>UI V289 · MÄNG V286<\/small>/);
+assert.match(html,/<title>Kuningriigid · V289<\/title>/);
+assert.match(html,/id="menu-version">KUNINGRIIGID · V289</);
+assert.match(js,/<small>UI V289 · SEVEN ERAS<\/small>/);
 assert.doesNotMatch(html,/id="menu-version">KUNINGRIIGID · V286</);
 console.log('V289 independent responsive HUD references, real actions and image assets: OK');
