@@ -31,6 +31,7 @@ jobs:
           node --check boot-v83.js
           node --check ui-painted-v287.js
           node --check ui-reference-v288.js
+          node --check hud-v289.js
           node --check atmosphere-v158.js
           node --check landscape-v149.js
           node --check sea-v158.js
@@ -97,6 +98,7 @@ jobs:
           node tests/ui-v282.mjs
           node tests/ui-painted-v287.mjs
           node tests/ui-reference-v288.mjs
+          node tests/ui-v289.mjs
           node tests/stone-animation-v283.mjs
           node tests/work-spots-v284.mjs
           node tests/coast-v286.mjs
