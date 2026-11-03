@@ -1,0 +1,487 @@
+/* V288 illustrated reference HUD — this layer supersedes the loose V287 theme.
+   Desktop 1648x928 reference geometry: top 54, objectives left 98–382,
+   rivals right, minimap at bottom-left, six painted cards in bottom center,
+   selection card lower-right and one *real pause* control lower-right.
+   Rendered stats/buttons stay live DOM; artwork never replaces controls. */
+html body.ui-reference-v288 {
+ --v288-panel:linear-gradient(100deg,rgba(13,27,41,.95),rgba(15,27,37,.91)),url('ui-art-v263/panel_stone.webp');
+ --v288-gold:#d8ac5e;--v288-bright:#f8e4b4;--v288-frame:url('ui-art-v288/card-frame.svg');
+ color:#f7e4b4;
+}
+/* Top imperial bar */
+html body.ui-reference-v288 header {
+ height:56px!important;min-height:56px!important;max-height:56px!important;
+ padding:2px 8px 2px 4px!important;gap:8px!important;align-items:center!important;
+ background:linear-gradient(180deg,#0d1a26f8,#0a1825f3),url('ui-art-v263/panel_stone.webp') 0 0 / 340px!important;
+ border-bottom:2px solid #bb914b!important;box-shadow:0 3px 16px #000b!important;
+ z-index:27!important;
+}
+html body.ui-reference-v288 header .brand{
+ align-self:flex-start!important;flex:0 0 77px!important;width:77px!important;height:69px!important;
+ margin:-3px 0 0 -3px!important;border:2px solid #dbb45e;border-radius:3px 3px 35% 35%!important;
+ box-shadow:0 4px 0 #071726,0 6px 12px #000b,0 0 0 2px #304c6c inset!important;
+ background:linear-gradient(#173c70cc,#072650eb),url('ui-art-v263/cmd_city.webp') center/68% no-repeat!important;
+ filter:none!important;
+}
+html body.ui-reference-v288 .v287-wordmark{
+ flex:0 0 205px!important;min-width:0!important;
+ padding:0 10px 0 3px!important;margin-left:0!important;
+ border-right:1px solid #a47b4570!important;
+}
+html body.ui-reference-v288 .v287-wordmark b{
+ font:700 24px/1.1 Georgia,serif!important;letter-spacing:.045em!important;
+ color:#f7de9a!important;
+}
+html body.ui-reference-v288 .v287-wordmark small{
+ color:#d0a35f!important;letter-spacing:.24em!important;
+ font:700 8px/1.3 Georgia,serif!important;
+}
+/* Era is derived from real world state, not from an image caption. */
+html body.ui-reference-v288 #v288-era{
+ flex:0 0 270px;display:flex;align-items:center;gap:9px;min-width:0;height:56px;
+ background:linear-gradient(90deg,rgba(53,34,22,.98),rgba(31,26,23,.86)),url('ui-art-v263/panel_stone.webp') center/cover;
+ border-left:2px solid #d8b36d;border-right:2px solid #b68846;
+ box-shadow:0 0 0 1px #251507 inset,0 0 15px #0009 inset;
+ position:relative;padding:3px 9px 3px 2px;
+}
+html body.ui-reference-v288 #v288-era:before,
+html body.ui-reference-v288 #v288-era:after{
+ content:'';position:absolute;top:0;height:54px;width:2px;
+ background:linear-gradient(transparent,#f7d88b,transparent);
+}
+html body.ui-reference-v288 #v288-era:before{left:0}html body.ui-reference-v288 #v288-era:after{right:0}
+html body.ui-reference-v288 #v288-era img{
+ width:58px;height:55px;object-fit:contain;filter:drop-shadow(0 3px 3px #000e);
+}
+html body.ui-reference-v288 #v288-era span{display:flex;flex-direction:column;min-width:0}
+html body.ui-reference-v288 #v288-age{font:700 23px/1.12 Georgia,serif;color:#fff0c0}
+html body.ui-reference-v288 #v288-turn{font:600 11px/1.3 Georgia,serif;color:#d5c4a3}
+html body.ui-reference-v288 #resources.v264-grouped{
+ flex:1 1 auto!important;min-width:100px!important;justify-content:space-evenly!important;
+ padding:0!important;gap:1px!important;overflow-x:auto!important;
+}
+html body.ui-reference-v288 #resources .v264-chip{
+ min-height:49px!important;border:0!important;border-right:1px solid #aa85504d!important;
+ padding:1px 5px 5px 2px!important;border-radius:0!important;
+ background:transparent!important;box-shadow:none!important;gap:4px!important;
+}
+html body.ui-reference-v288 #resources .v264-chip:hover,
+html body.ui-reference-v288 #resources .v264-chip.open{
+ background:linear-gradient(#b7933e22,#1a2b4a55)!important;box-shadow:none!important;
+}
+html body.ui-reference-v288 #resources .v264-gicon{width:34px!important;height:37px!important}
+html body.ui-reference-v288 #resources .v264-val{font:700 15px/1.05 Georgia,serif!important;color:#f2e4ce!important}
+html body.ui-reference-v288 #resources .v264-gname{
+ position:static!important;display:block!important;white-space:nowrap!important;
+ text-transform:none!important;letter-spacing:0!important;
+ font:600 9px/1.1 Georgia,serif!important;color:#c8a97b!important;
+}
+html body.ui-reference-v288 #resources .v264-vals{display:flex;flex-wrap:wrap;gap:6px}
+html body.ui-reference-v288 #resources span[data-resource="population"]{
+ padding:4px!important;border:0!important;background:transparent!important;
+}
+html body.ui-reference-v288 header .time {
+ flex:0 0 auto!important;order:8!important;width:auto!important;margin-left:0!important;
+}
+html body.ui-reference-v288 header .time #turn{display:none!important}
+html body.ui-reference-v288 header .time #clock{display:none!important}
+html body.ui-reference-v288 header .time #dayclock-v235{
+ min-width:50px!important;padding:3px!important;border:0!important;background:transparent!important;
+ font:700 11px Georgia,serif!important;
+}
+html body.ui-reference-v288 header .game-language{display:none!important}
+html body.ui-reference-v288 #v288-header-actions{
+ display:flex;gap:5px;align-items:center;flex:0 0 auto;margin-left:auto;
+}
+html body.ui-reference-v288 #v288-header-actions .v288-icon{
+ width:38px;height:38px;min-width:38px;min-height:38px;padding:5px;
+ border-radius:50%;border:2px solid #b58a49;
+ background:linear-gradient(160deg,#23436a,#081d33);
+ box-shadow:0 0 0 1px #271c13 inset,0 3px 9px #000b;
+ cursor:pointer;font-size:0;
+}
+html body.ui-reference-v288 #v288-header-actions .v288-icon::before{
+ content:'';display:block;width:24px;height:24px;margin:auto;
+ background:var(--v288-icon) center/contain no-repeat;
+ filter:drop-shadow(0 1px 2px #000a);
+}
+html body.ui-reference-v288 #v288-header-actions .v288-icon:hover{filter:brightness(1.23)}
+/* Art-backed stat, city, selected unit and diplomacy panels */
+html body.ui-reference-v288 #v288-research,
+html body.ui-reference-v288 #v51insights,
+html body.ui-reference-v288 #atlasoverview,
+html body.ui-reference-v288 #commandhud,
+html body.ui-reference-v288 #v288-diplomacy-panel,
+html body.ui-reference-v288 #v288-rivals,
+html body.ui-reference-v288 #atlaspanel,
+html body.ui-reference-v288 #citypanel {
+ background:var(--v288-panel)!important;
+ border:1px solid #b08b4b!important;
+ box-shadow:0 1px 0 #f5d28a70 inset,0 0 0 2px #07121cc9,0 12px 24px #0009!important;
+ border-radius:5px!important;color:#f5e6c2!important;
+}
+html body.ui-reference-v288 #v288-research{
+ position:fixed;left:6px;top:98px;z-index:19;
+ width:328px;height:122px;text-align:left;cursor:pointer;
+ padding:0 12px 10px;background:var(--v288-panel);
+}
+html body.ui-reference-v288 .v288-section-title{
+ display:block;margin:0 -9px 7px;padding:6px 10px;
+ font:700 21px Georgia,serif;color:#fae4b0;
+ border-bottom:1px solid #b88d4d;text-shadow:0 2px 4px #000a;
+}
+html body.ui-reference-v288 .v288-section-title::before{
+ content:'✦';display:inline-grid;place-items:center;margin-right:11px;
+ width:31px;height:31px;border:2px solid #be954b;border-radius:50%;
+ background:linear-gradient(#142b46,#071522);font-size:17px;
+}
+html body.ui-reference-v288 .v288-study{display:flex;gap:11px;align-items:center}
+html body.ui-reference-v288 .v288-study img{
+ width:64px;height:62px;padding:5px;object-fit:contain;
+ border:2px solid #ab8444;border-radius:50%;
+ background:linear-gradient(145deg,#334c61,#071724);
+}
+html body.ui-reference-v288 .v288-study>span{
+ flex:1;display:flex;flex-direction:column;min-width:0;
+}
+html body.ui-reference-v288 #v288-study-name{
+ color:#f9edd5;font:700 15px/1.2 Georgia,serif;
+ overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+html body.ui-reference-v288 #v288-study-sub{
+ font:11px/1.6 Georgia,serif;color:#d4c2a0;
+}
+html body.ui-reference-v288 .v288-progress{
+ height:11px;border:1px solid #b49157;border-radius:3px;
+ background:#081b2c;overflow:hidden;box-shadow:0 1px 2px #000 inset;
+}
+html body.ui-reference-v288 .v288-progress>i{
+ display:block;width:0%;height:100%;
+ background:linear-gradient(#38c3ee,#08608e);
+}
+html body.ui-reference-v288 #v51insights {
+ position:fixed!important;left:6px!important;top:238px!important;right:auto!important;
+ bottom:auto!important;width:328px!important;max-width:328px!important;
+ height:auto!important;max-height:175px!important;
+ z-index:18!important;padding:13px 11px!important;
+ overflow:auto!important;
+}
+html body.ui-reference-v288 #v51insights>strong{
+ font:700 21px/1.15 Georgia,serif!important;color:#fbe3b2!important;
+ border-bottom:1px solid #b88d4d;display:block!important;padding-bottom:7px;
+}
+html body.ui-reference-v288 #v51insights>strong::before{content:'❧';color:#d5b36a;margin-right:8px}
+html body.ui-reference-v288 #v51insights #v51tips{
+ overflow:visible!important;max-height:none!important;
+}
+html body.ui-reference-v288 #v51insights #v51tips button{
+ background:transparent!important;box-shadow:none!important;border:0!important;
+ text-align:left!important;color:#ebdfc8!important;
+ font:12px/1.25 Georgia,serif!important;
+}
+html body.ui-reference-v288 #v51insights #v51tips button:hover{
+ color:#fce5ac!important;background:#6688ae1e!important;
+}
+html body.ui-reference-v288 #v51insights #hud-objective-toggle{
+ right:7px;top:6px;font-size:13px!important;min-width:25px;min-height:25px;padding:0!important;
+}
+/* Right-hand real faction overview. Every number is actual population, not a mock score. */
+html body.ui-reference-v288 #v288-rivals{
+ position:fixed;top:77px;right:0;width:171px;
+ z-index:18;border:0!important;box-shadow:none!important;
+ background:transparent!important;display:flex;flex-direction:column;gap:4px;
+ pointer-events:none;
+}
+html body.ui-reference-v288 .v288-rival{
+ height:71px;position:relative;display:flex;align-items:center;justify-content:flex-end;
+ background:linear-gradient(90deg,transparent,#172434eb 28%,#142332 98%)!important;
+ padding:4px 7px 4px 30px!important;
+ border:0!important;border-bottom:1px solid #ba975f!important;
+ border-radius:0!important;color:#f6dfa9!important;cursor:pointer;pointer-events:auto;
+}
+html body.ui-reference-v288 .v288-rival:hover{filter:brightness(1.2)}
+html body.ui-reference-v288 .v288-rival-portrait{
+ width:66px;height:66px;position:absolute;top:2px;left:-19px;
+ border:3px solid #d6a75b;border-radius:50%;overflow:hidden;
+ background:linear-gradient(#33415b,#0c1f31);
+ box-shadow:0 2px 7px #000f,0 0 0 1px #141b27 inset;
+}
+html body.ui-reference-v288 .v288-rival-portrait img{
+ width:100%;height:100%;object-fit:cover;
+}
+html body.ui-reference-v288 .v288-rival-info{
+ display:flex;flex:1;flex-direction:column;min-width:0;padding-left:22px;
+}
+html body.ui-reference-v288 .v288-rival-name{
+ display:block;font:700 12px/1.1 Georgia,serif;overflow:hidden;
+ text-overflow:ellipsis;white-space:nowrap;color:#f6ddaa;
+}
+html body.ui-reference-v288 .v288-rival-stat{
+ font:10px/1.4 Georgia,serif;color:#c7b28c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+html body.ui-reference-v288 .v288-rival-power{
+ flex:0 0 auto;font:700 13px Georgia,serif;color:#f9e5b8;
+}
+/* Minimap and live layer buttons. */
+html body.ui-reference-v288.atlas #atlasoverview{
+ position:fixed!important;top:auto!important;left:7px!important;
+ right:auto!important;bottom:11px!important;
+ width:245px!important;max-width:245px!important;height:213px!important;
+ padding:9px 9px 8px!important;z-index:19!important;overflow:visible!important;
+}
+html body.ui-reference-v288.atlas #atlasoverview>span{
+ font:700 14px Georgia,serif!important;color:#ead2a0!important;
+ letter-spacing:.04em!important;white-space:nowrap;
+}
+html body.ui-reference-v288.atlas #atlasoverview>small{display:none!important}
+html body.ui-reference-v288.atlas #atlasoverview #atlasminimap{
+ display:block!important;width:100%!important;height:162px!important;max-height:162px!important;
+ border:1px solid #d5aa61!important;border-radius:3px!important;
+}
+html body.ui-reference-v288 #v288-map-caption{
+ font:700 11px Georgia,serif;color:#eed1a2;text-align:center;
+}
+html body.ui-reference-v288 #v288-map-tools{
+ position:fixed;left:258px;bottom:12px;z-index:20;
+ display:flex;flex-direction:column;gap:4px;
+}
+html body.ui-reference-v288 #v288-map-tools button{
+ width:38px;height:38px;padding:5px;min-width:38px;min-height:38px;
+ border-radius:50%;border:2px solid #c09b5e;
+ background:linear-gradient(#173958,#081925);box-shadow:0 3px 8px #000d;
+ cursor:pointer;
+}
+html body.ui-reference-v288 #v288-map-tools button::before{
+ content:'';width:24px;height:24px;display:block;
+ background:var(--v288-icon) center/contain no-repeat;
+}
+html body.ui-reference-v288 #v288-map-tools button.active,
+html body.ui-reference-v288 #v288-map-tools button:hover{background:linear-gradient(#2d6289,#0d304c)}
+html body.ui-reference-v288.atlas #hud-resource-toggle,
+html body.ui-reference-v288.atlas #hud-map-details,
+html body.ui-reference-v288.atlas #hud-zoom-controls,
+html body.ui-reference-v288.atlas #researchstatus,
+html body.ui-reference-v288.atlas #maplabel{
+ display:none!important;
+}
+/* Centre illustrated command dock: genuine HTML button per illustrated card. */
+@media (min-width:1101px) and (min-height:650px) {
+ html body.ui-reference-v288.atlas #tools{
+  position:fixed!important;
+  left:calc(50% - min(8vw,132px))!important;right:auto!important;
+  bottom:22px!important;top:auto!important;
+  width:733px!important;max-width:calc(100vw - 660px)!important;
+  display:flex!important;flex-wrap:nowrap!important;align-items:stretch!important;
+  justify-content:center!important;
+  height:129px!important;gap:2px!important;
+  transform:translateX(-50%)!important;overflow:visible!important;
+  background:transparent!important;border:0!important;z-index:21!important;
+ }
+ html body.ui-reference-v288.atlas #tools button{
+  order:100;
+ }
+ html body.ui-reference-v288.atlas #tools #hud-build{order:1!important}
+ html body.ui-reference-v288.atlas #tools #hud-army{order:2!important}
+ html body.ui-reference-v288.atlas #tools #techtoggle{order:3!important}
+ html body.ui-reference-v288.atlas #tools #v288-diplomacy{order:4!important}
+ html body.ui-reference-v288.atlas #tools #hud-trade-v276{order:5!important}
+ html body.ui-reference-v288.atlas #tools #hud-city{order:6!important}
+ html body.ui-reference-v288.atlas #tools button:not(#hud-build):not(#hud-army):not(#techtoggle):not(#v288-diplomacy):not(#hud-trade-v276):not(#hud-city){
+  display:none!important;
+ }
+ html body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city){
+  display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+  position:relative!important;align-items:center!important;justify-content:flex-end!important;
+  width:121px!important;min-width:0!important;max-width:none!important;
+  height:129px!important;min-height:129px!important;
+  margin:0!important;padding:7px 5px 9px!important;
+  background-image:url('ui-art-v288/card-frame.svg'),linear-gradient(180deg,#263e4de8,#0c1c2a 75%),url('ui-art-v263/panel_stone.webp')!important;
+  background-size:100% 100%,100% 100%,220px!important;
+  background-position:center!important;
+  border:0!important;border-radius:5px!important;
+  box-shadow:0 5px 8px #000a!important;
+  white-space:normal!important;
+  font-size:0!important;text-align:center;
+  color:#f6e4bf!important;text-shadow:0 2px 3px #000!important;
+ }
+ html body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city):hover{
+  filter:brightness(1.25)!important;
+ }
+ html body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city)::before{
+  content:''!important;display:block!important;position:absolute!important;
+  top:9px!important;left:12px!important;
+  width:calc(100% - 24px)!important;height:82px!important;
+  margin:0!important;
+  background-position:center!important;
+  background-size:contain!important;background-repeat:no-repeat!important;
+  font-size:0!important;line-height:0!important;
+  filter:drop-shadow(0 5px 2px #000b)!important;
+ }
+ html body.ui-reference-v288.atlas #tools button:is(#hud-build,#hud-army,#techtoggle,#v288-diplomacy,#hud-trade-v276,#hud-city)::after{
+  content:attr(title)!important;
+  display:block!important;position:relative!important;
+  z-index:2;font:700 15px/1.1 Georgia,serif!important;
+  color:#faeac9!important;white-space:nowrap!important;
+ }
+ html body.ui-reference-v288.atlas #tools #hud-build::before{background-image:url('ui-art-v263/bld_house.webp')!important}
+ html body.ui-reference-v288.atlas #tools #hud-army::before{background-image:url('ui-art-v263/unit_spearman.webp')!important}
+ html body.ui-reference-v288.atlas #tools #techtoggle::before{background-image:url('ui-art-v288/research.svg')!important}
+ html body.ui-reference-v288.atlas #tools #v288-diplomacy::before{background-image:url('ui-art-v288/diplomacy.svg')!important}
+ html body.ui-reference-v288.atlas #tools #hud-trade-v276::before{background-image:url('ui-art-v263/res_gold.webp')!important}
+ html body.ui-reference-v288.atlas #tools #hud-city::before{background-image:url('ui-art-v288/empire.svg')!important}
+ html body.ui-reference-v288.atlas #tools #hud-build::after{content:'Ehitused'!important}
+ html body.ui-reference-v288.atlas #tools #hud-army::after{content:'Üksused'!important}
+ html body.ui-reference-v288.atlas #tools #techtoggle::after{content:'Uurimus'!important}
+ html body.ui-reference-v288.atlas #tools #v288-diplomacy::after{content:'Diplomaatia'!important}
+ html body.ui-reference-v288.atlas #tools #hud-trade-v276::after{content:'Kaubandus'!important}
+ html body.ui-reference-v288.atlas #tools #hud-city::after{content:'Riigi juhtimine'!important;font-size:13px!important}
+ html[lang^="en"] body.ui-reference-v288.atlas #tools #hud-build::after{content:'Buildings'!important}
+ html[lang^="en"] body.ui-reference-v288.atlas #tools #hud-army::after{content:'Units'!important}
+ html[lang^="en"] body.ui-reference-v288.atlas #tools #techtoggle::after{content:'Research'!important}
+ html[lang^="en"] body.ui-reference-v288.atlas #tools #v288-diplomacy::after{content:'Diplomacy'!important}
+ html[lang^="en"] body.ui-reference-v288.atlas #tools #hud-trade-v276::after{content:'Trade'!important}
+ html[lang^="en"] body.ui-reference-v288.atlas #tools #hud-city::after{content:'Empire'!important}
+ html body.ui-reference-v288.atlas #tools button.active,
+ html body.ui-reference-v288.atlas #tools button[aria-pressed="true"]{
+  filter:brightness(1.18)!important;
+ }
+ /* Right lower real unit card */
+ html body.ui-reference-v288.atlas #commandhud{
+  position:fixed!important;
+  right:190px!important;left:auto!important;top:auto!important;bottom:13px!important;
+  transform:none!important;z-index:20!important;
+  width:384px!important;max-width:384px!important;height:198px!important;
+  min-height:0!important;padding:12px 13px 10px 156px!important;
+  background:var(--v288-panel)!important;
+ }
+ html body.ui-reference-v288.atlas #commandhud .v263-portrait{
+  left:8px!important;top:8px!important;width:141px!important;height:179px!important;
+  border:2px solid #d2a65d;border-radius:6px;object-fit:cover!important;
+  background:linear-gradient(#6e7e86,#1a2932);
+ }
+ html body.ui-reference-v288.atlas #commandhud:not(.v263-has-portrait){padding-left:15px!important}
+ html body.ui-reference-v288.atlas #commandhud .command-heading{
+  border-bottom:1px solid #ae8751;padding-bottom:5px!important;
+ }
+ html body.ui-reference-v288.atlas #commandhud #commandname{
+  font:700 21px/1.1 Georgia,serif!important;color:#f5e2b6!important;
+ }
+ html body.ui-reference-v288.atlas #commandhud #commandmode{
+  font:700 10px Georgia,serif;color:#d3b784!important;
+ }
+ html body.ui-reference-v288.atlas #commandhud #commandstate{
+  font:12px/1.4 Georgia,serif!important;color:#efe1c1!important;
+  display:block!important;
+ }
+ html body.ui-reference-v288.atlas #commandhud .command-buttons{
+  display:flex!important;gap:4px!important;flex-wrap:wrap!important;
+ }
+ html body.ui-reference-v288.atlas #commandhud .command-buttons button{
+  min-width:37px!important;min-height:39px!important;padding:5px!important;
+  border:1px solid #c09b57!important;border-radius:4px!important;
+  background:linear-gradient(#193a57,#0d2134)!important;
+ }
+ html body.ui-reference-v288.atlas #commandhud .command-buttons button::before{
+  width:23px!important;height:22px!important;
+ }
+ /* The big reference circle is the actual pause/resume, not fake End Turn. */
+ html body.ui-reference-v288.atlas header #pause{
+  position:fixed!important;top:auto!important;bottom:13px!important;right:10px!important;
+  margin:0!important;width:174px!important;height:196px!important;
+  min-height:0!important;min-width:0!important;padding:12px!important;
+  z-index:21!important;display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;gap:9px;
+  background:radial-gradient(ellipse at 50% 42%,#1f6591 0%,#0a345e 48%,#041425 75%)!important;
+  border:7px double #e8bd66!important;border-radius:50%!important;
+  box-shadow:0 0 0 3px #5e3a18,0 0 0 5px #e1b759,0 9px 22px #000c,0 0 18px #c99f4c8c inset!important;
+  color:transparent!important;font-size:0!important;
+ }
+ html body.ui-reference-v288.atlas header #pause::before{
+  content:''!important;width:85px!important;height:92px!important;
+  background:url('ui-art-v263/cmd_pause.webp') center/contain no-repeat!important;
+  filter:drop-shadow(0 5px 4px #0007);
+ }
+ html body.ui-reference-v288.atlas header #pause::after{
+  content:'Paus'!important;font:700 25px/1 Georgia,serif!important;
+  color:#f7db99!important;text-shadow:1px 2px #060d1d!important;
+ }
+ html[lang^="en"] body.ui-reference-v288.atlas header #pause::after{content:'Pause'!important}
+ html body.ui-reference-v288.atlas header #pause[data-v288-paused="true"]::after{content:'Jätka'!important}
+ html[lang^="en"] body.ui-reference-v288.atlas header #pause[data-v288-paused="true"]::after{content:'Resume'!important}
+ /* Atlas extra windows remain available, above art dock. */
+ html body.ui-reference-v288.atlas #atlaspanel{
+  top:auto!important;bottom:230px!important;left:260px!important;
+  width:280px!important;max-height:55vh!important;overflow:auto!important;
+ }
+ html body.ui-reference-v288.atlas #v264-listpanel{
+  bottom:170px!important;max-width:340px!important;z-index:31!important;
+ }
+}
+/* Functional diplomatic actions, not a static decorative tab. */
+html body.ui-reference-v288 #v288-diplomacy-panel{
+ position:fixed;left:50%;bottom:160px;z-index:40;
+ width:400px;max-width:92vw;max-height:55vh;overflow:auto;
+ transform:translateX(-50%);padding:10px 13px;
+}
+html body.ui-reference-v288 #v288-diplomacy-panel[hidden]{display:none!important}
+html body.ui-reference-v288 .v288-diplomacy-head{
+ display:flex;align-items:center;justify-content:space-between;
+ border-bottom:1px solid #b99755;padding-bottom:6px;margin-bottom:10px;
+ font:700 19px Georgia,serif;
+}
+html body.ui-reference-v288 .v288-diplomacy-head button{
+ padding:4px 9px;background:#152d43;border:1px solid #b99755;color:#f6dfb3;
+}
+html body.ui-reference-v288 .v288-diplomacy-row{
+ display:flex;flex-direction:column;gap:8px;padding:9px 0;
+ border-bottom:1px solid #d3af4b48;
+}
+html body.ui-reference-v288 .v288-diplomacy-name{display:flex;justify-content:space-between;gap:8px}
+html body.ui-reference-v288 .v288-diplomacy-name b{font:700 16px Georgia,serif}
+html body.ui-reference-v288 .v288-diplomacy-name small{font:12px Georgia,serif;color:#e2cda3}
+html body.ui-reference-v288 .v288-diplomacy-actions{display:flex;gap:5px}
+html body.ui-reference-v288 .v288-diplomacy-actions button{
+ flex:1;padding:7px 4px;background:linear-gradient(#29435b,#142333);
+ color:#f2dca7;border:1px solid #a9824d;border-radius:4px;
+}
+html body.ui-reference-v288 #v288-diplomacy-message{margin:4px 0;color:#e4c27f}
+html body.ui-reference-v288 :is(#v288-research,#v288-rivals button,#v288-map-tools button,#tools button,#pause):focus-visible{
+ outline:3px solid #fff1b5!important;outline-offset:3px!important;
+}
+/* Non-world modes retain original V287/legacy menus with a consistent dark palette. */
+html body.ui-reference-v288:not(.atlas) :is(#v288-research,#v288-rivals,#v288-map-tools){display:none!important}
+/* At constrained aspect ratios, leave original touch layout fully usable. */
+@media (max-width:1100px), (max-height:649px){
+ html body.ui-reference-v288 :is(#v288-research,#v288-rivals,#v288-map-tools,#v288-era,#v288-header-actions){
+  display:none!important;
+ }
+ html body.ui-reference-v288 header{
+  height:auto!important;max-height:none!important;min-height:36px!important;
+  padding:4px!important;gap:4px!important;
+ }
+ html body.ui-reference-v288 header .brand{
+  width:27px!important;height:32px!important;flex:0 0 27px!important;
+  margin:0!important;border-width:1px!important;
+ }
+ html body.ui-reference-v288 #resources .v264-chip{min-height:30px!important}
+ html body.ui-reference-v288 #resources .v264-gname{display:none!important}
+ html body.ui-reference-v288 #v51insights{max-width:min(270px,60vw)!important}
+ html body.ui-reference-v288 #tools button{
+  background-image:linear-gradient(#17354bd9,#0b1e2bf2),url('ui-art-v263/panel_stone.webp')!important;
+  background-size:100% 100%,contain!important;
+  border:1px solid #b99759!important;
+  color:#f1daaf!important;
+ }
+ html body.ui-reference-v288 #tools button.v263-btn::before{
+  width:29px!important;height:29px!important;
+  background-size:contain!important;
+ }
+ html body.ui-reference-v288 #v288-diplomacy-panel{bottom:74px;max-height:70vh}
+}
+/* Hide decorative chrome over modal menus and prevent game-map clicks.
+   The underlying dialogs already own modal focus. */
+html body.ui-reference-v288:has(#startmenu:not([hidden])) :is(#v288-research,#v288-rivals,#v288-map-tools,#v288-era,#v288-header-actions,#v288-diplomacy-panel),
+html body.ui-reference-v288:has(#researchpanel:not([hidden])) :is(#v288-research,#v288-rivals,#v288-map-tools),
+html body.ui-reference-v288:has(#help:not([hidden])) :is(#v288-research,#v288-rivals,#v288-map-tools){
+ display:none!important;
+}
