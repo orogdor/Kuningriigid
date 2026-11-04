@@ -1,0 +1,128 @@
+/* V298 unified picture-based HUD. The former V291/V292 mobile media rules
+   and V297 incremental overrides have been retired from the page.
+   One image = one surface. No blue rectangles or duplicate painted controls.
+ */
+#v291-hud .v291-minimap-button > img,
+#v291-hud .v291-unit-button > img{visibility:hidden!important}
+#v291-hud .v291-minimap-button,
+#v291-hud .v291-unit-button{
+ pointer-events:auto!important;background:none!important;box-shadow:none!important;
+ border:0!important;border-radius:50%!important;z-index:29!important;
+}
+#v291-hud .v291-research-background>.v291-sprite,
+#v291-hud .v291-minimap-frame>.v291-sprite,
+#v291-hud .v291-selection-frame>.v291-sprite{object-fit:fill!important}
+#v291-hud .v291-dock-background{
+ background:url('ui-art-v297/footer_trim.svg') center bottom / 100% 100% no-repeat!important;
+ pointer-events:none!important;z-index:1!important;
+}
+#v291-hud .v291-dock-background>img{display:none!important}
+#v291-hud .v291-portrait>img{object-fit:cover!important}
+#v291-hud .v291-selected-text{
+ left:43%!important;top:74%!important;width:47%!important;height:14%!important;
+ color:#2d2112!important;text-shadow:0 1px #fff0bc!important;
+ white-space:normal!important;line-height:1.08!important;
+ overflow:hidden!important;overflow-wrap:anywhere!important;
+}
+#v291-hud .v291-research-background{filter:drop-shadow(0 2px 3px #0008)}
+#v291-hud.v298-managed{--v298-top:40px}
+#v291-hud.v298-managed .v291-mobile-counters{
+ display:flex!important;align-items:stretch!important;justify-content:space-between!important;
+ overflow:hidden!important;pointer-events:auto!important;
+ background:transparent!important;z-index:14!important;gap:0!important;
+}
+#v291-hud.v298-managed .v291-mobile-counter{
+ position:relative!important;display:block!important;
+ flex:1 1 0!important;width:auto!important;min-width:0!important;
+ height:100%!important;cursor:pointer;pointer-events:auto!important;
+}
+#v291-hud.v298-managed .v291-mobile-counter>img{
+ width:100%!important;height:100%!important;object-fit:fill!important;
+}
+#v291-hud.v298-managed .v291-mobile-value{
+ position:absolute!important;left:34%!important;right:3%!important;
+ top:15%!important;height:72%!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ font:700 clamp(10px,1.2vw,15px)/1 Georgia,serif!important;
+ color:#ffebbf!important;text-align:center!important;text-shadow:0 1px 3px #000b!important;
+ white-space:nowrap!important;
+}
+#v291-hud.v298-managed .v291-command-dock{
+ pointer-events:none!important;align-items:stretch!important;
+ min-width:0!important;margin:0!important;padding:0!important;
+ background:none!important;
+}
+#v291-hud.v298-managed .v291-card{
+ pointer-events:auto!important;flex-shrink:0!important;
+ border:0!important;background:none!important;box-shadow:none!important;
+ overflow:hidden!important;
+}
+#v291-hud.v298-managed .v291-card>img{
+ width:100%!important;height:100%!important;
+ object-fit:contain!important;object-position:center bottom!important;
+}
+#v291-hud.v298-managed .v291-minimap-frame{z-index:10!important}
+#v291-hud.v298-managed .v291-real-map{pointer-events:auto!important;touch-action:manipulation!important}
+#v291-hud.v298-managed .v291-selection-frame{z-index:10!important}
+#v291-hud.v298-managed .v291-research-background{z-index:12!important}
+#v291-hud.v298-managed .v291-research-main{
+ pointer-events:auto!important;z-index:24!important;
+ background:none!important;border:0!important;padding:0!important;
+}
+#v291-hud.v298-managed .v291-research-queue{z-index:25!important;pointer-events:auto!important}
+#v291-hud.v298-managed .v291-research-title{
+ font:700 clamp(8px,1.05vw,12px)/1.08 Georgia,serif!important;
+ color:#3a2714!important;text-shadow:0 1px #f3dab2!important;
+}
+#v291-hud.v298-managed .v291-minimap-button,
+#v291-hud.v298-managed .v291-unit-button,
+#v291-hud.v298-managed .v291-unit-info,
+#v291-hud.v298-managed .v292-zoom-out{z-index:31!important}
+#v291-hud.v298-managed .v292-zoom-out{
+ pointer-events:auto!important;z-index:32!important;
+ background:transparent!important;border:0!important;padding:0!important;
+}
+#v291-hud.v298-managed .v292-zoom-out>img{object-fit:contain!important}
+#v291-hud.v298-managed .v291-mobile-toolbar{
+ pointer-events:auto!important;z-index:35!important;
+ align-items:center!important;justify-content:center!important;
+ gap:4px!important;background:none!important;
+}
+#v291-hud.v298-managed .v291-mobile-toggle{
+ flex:0 0 auto!important;pointer-events:auto!important;
+ width:33%!important;height:100%!important;min-width:0!important;
+ border:0!important;background:transparent!important;padding:0!important;
+}
+#v291-hud.v298-managed .v291-mobile-toggle>img{object-fit:contain!important}
+#v291-hud.v298-managed .v291-dialog{
+ width:min(430px,calc(100vw - 20px))!important;max-height:65dvh!important;
+ z-index:50!important;top:50%!important;
+}
+#v291-hud.v298-managed .v291-brand,
+#v291-hud.v298-managed .v291-world,
+#v291-hud.v298-managed .v291-pause,
+#v291-hud.v298-managed .v291-play{z-index:28!important}
+#v291-hud.v298-managed .v291-pause:disabled,
+#v291-hud.v298-managed .v291-play:disabled{display:none!important}
+#v291-hud.v298-managed .v291-wood{pointer-events:none!important;z-index:20!important}
+#v291-hud.v298-landscape:not(.v298-compact-landscape) .v291-mobile-toolbar{display:none!important}
+#v291-hud.v298-compact-landscape .v291-mobile-toolbar{display:flex!important}
+#v291-hud.v298-portrait .v291-mobile-counters .v291-mobile-value{
+ font-size:clamp(9px,2.45vw,13px)!important;
+}
+#v291-hud.v298-portrait .v291-research-title{font-size:11px!important}
+#v291-hud.v298-portrait .v291-selected-text{font-size:12px!important}
+#v291-hud.v298-portrait .v291-queue-center{pointer-events:none!important}
+body.v291-active.atlas #v264-listpanel{
+ left:50%!important;right:auto!important;top:auto!important;
+ bottom:clamp(94px,20dvh,205px)!important;transform:translateX(-50%)!important;
+ width:min(390px,calc(100vw - 12px))!important;max-height:56dvh!important;
+}
+body.v291-active.atlas #atlaspanel{
+ left:50%!important;right:auto!important;top:auto!important;
+ bottom:clamp(94px,20dvh,205px)!important;transform:translateX(-50%)!important;
+ width:min(390px,calc(100vw - 12px))!important;max-height:56dvh!important;
+}
+@media(prefers-reduced-motion:reduce){
+ #v291-hud .v291-card{transition:none!important;transform:none!important}
+}
