@@ -1,5 +1,6 @@
 // V119: downward, progressive research tree. Only researched and currently researchable nodes exist in the DOM.
 import {TECHS,techBlock,ERA_NAMES} from './research.js?v=125a';
+import {techArtSrc} from './research-art-v293.js?v=293a';
 import {V118_ERA_IDS} from './tech-tree-data-v118.js?v=118a';
 import {VERTICAL_TREE,verticalResearchLayout} from './tech-tree-layout-v119.js?v=123a';
 import {progressiveResearchIds} from './research-preview-v123.js?v=123a';
@@ -101,6 +102,7 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
   card.style.width=VERTICAL_TREE.nodeWidth+'px';card.style.height=VERTICAL_TREE.nodeHeight+'px';
   card.setAttribute('aria-pressed','false');
   card.setAttribute('aria-label',tech.name+'; '+(done?'Researched':active?'Researching':preview?'Preview of next unlock':'Available'));
+  const portrait=element('img','v293-tech-picture');portrait.alt='';portrait.src=techArtSrc(id,tech);portrait.loading='lazy';portrait.decoding='async';card.append(portrait);
   card.append(element('strong','tech-node-name',(done?'✓ ':active?'▶ ':preview?'◇ ':'')+tech.name));
   card.append(element('span','tech-time',done?'Researched':preview?'Upcoming discovery':fmt(cost)+' RP · '+(rate>0?Math.ceil((cost-progress)/rate)+' min':'Waiting for research')));
   card.append(element('small','tech-parents',done?'✓ Known':active?'▶ Researching':preview?'○ Locked — next step':'● Available'));
@@ -164,6 +166,7 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
   }
   inspector.replaceChildren();
   const intro=element('div','tech-info-intro');
+  const portrait=element('img','v293-tech-detail-image');portrait.src=techArtSrc(id,tech);portrait.alt='';portrait.decoding='async';intro.append(portrait);
   intro.append(element('strong','tech-info-name',tech.name),
                element('small','',ERA_NAMES[tech.age]+' · '+fmt(researchCost(state,tech))+' research points'));
   const missing=techBlock(research,id);
