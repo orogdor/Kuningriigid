@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=f=>fs.readFileSync(new URL('../'+f,import.meta.url),'utf8');
 const html=read('index.html'),js=read('hud-v291.js'),css=read('hud-v291.css');
-const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\\/title>/)||[])[1]);
+const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
 assert.ok(publishedVersion>=292,'Published version is older than this UI test');
 assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+publishedVersion+'<'),'Menu label differs from page title');
 for(const f of ['hud-v291.css?v=291a','hud-v291.js?v=291a'])assert.ok(html.includes(f),'Missing '+f);
