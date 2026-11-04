@@ -159,7 +159,11 @@
     const mobile=root.querySelector('.v291-mobile-counter[data-resource="'+key+'"] .v291-mobile-value');if(mobile)mobile.textContent=n;
   }
   const d=$('dayclock-v235')?.textContent?.trim()||'';
-  root.querySelector('.v291-date-text').textContent=(s?.turn?tr('Käik ','Turn ')+s.turn+' · ':'')+d;
+  // Header illustration leaves ~163px for live text. Show compact, legible
+  // turn/time instead of clipping the full "Turn - Day ..." message under Pause.
+  const clock=(d.match(/([0-2]?\d:[0-5]\d)(?!.*\d:[0-5]\d)/)||[])[1]||'';
+  const turn=s?.turn?tr('K','T')+s.turn:'';
+  root.querySelector('.v291-date-text').textContent=[turn,clock].filter(Boolean).join(' · ')||d.slice(0,17);
   root.querySelector('.v291-research-title').textContent=(s?.research||tr('Vali avastus','Choose research'));
   const command=$('commandhud');
   const chosen=$('commandname')?.textContent?.trim()||'';
