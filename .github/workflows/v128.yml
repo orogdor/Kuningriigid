@@ -91,6 +91,10 @@ jobs:
         run: node tests/torch-hand-v257.mjs
       - name: V258 world and detail movement
         run: node tests/world-movement-v258.mjs
+      - name: V293-V294 illustrated research menu regression
+        run: |
+          node tests/ui-research-v293.mjs
+          node tests/ui-research-v294.mjs
       - name: V268 water carriers and river water
         run: |
           node tests/water-carriers-v268.mjs
@@ -110,8 +114,6 @@ jobs:
           node tests/ui-v290.mjs
           node tests/ui-v291.mjs
           node tests/ui-v292-mobile.mjs
-          node tests/ui-research-v293.mjs
-          node tests/ui-research-v294.mjs
           node tests/stone-animation-v283.mjs
           node tests/work-spots-v284.mjs
           node tests/coast-v286.mjs
