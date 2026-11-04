@@ -1,0 +1,78 @@
+/* V297: eliminate blue rectangular screen crops and duplicate pictured buttons.
+   Only the real gold/navy source pictures form visible HUD surfaces. */
+#v291-hud .v291-research-background >img,
+#v291-hud .v291-minimap-frame >.v291-sprite,
+#v291-hud .v291-selection-frame >.v291-sprite{object-fit:fill!important}
+/* Frames themselves already contain the painted map and unit command buttons;
+   these elements are accessible invisible hotspots positioned by JS. */
+#v291-hud .v291-minimap-button >img,
+#v291-hud .v291-unit-button >img{visibility:hidden!important}
+#v291-hud .v291-minimap-button,
+#v291-hud .v291-unit-button{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ pointer-events:auto!important;border-radius:50%!important;z-index:29!important;
+}
+#v291-hud .v291-selected-text{
+ left:43%!important;top:74%!important;width:47%!important;height:14%!important;
+ padding:0 2px!important;line-height:1.05!important;
+ white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+ color:#322311!important;text-shadow:0 1px #f6d7a7!important;
+}
+#v291-hud .v291-portrait>img{object-fit:cover!important}
+#v291-hud .v291-research-background{filter:drop-shadow(0 3px 4px #0008)}
+#v291-hud .v291-dock-background>img{display:none!important}
+/* A thin image of the carved original wooden footer takes the place of the
+   old tall opaque blue rectangle. World map remains visible behind the cards. */
+@media (max-width:950px), (max-height:590px) and (pointer:coarse){
+ #v291-hud .v291-dock-background{
+  display:block!important;position:absolute!important;left:0!important;right:0!important;
+  top:auto!important;bottom:0!important;width:100%!important;height:21px!important;
+  border:0!important;
+  background:url('ui-art-v297/footer_trim.svg') center bottom / 100% 21px no-repeat!important;
+  z-index:1!important;pointer-events:none!important;
+ }
+ #v291-hud .v291-wood{height:7px!important}
+ #v291-hud .v291-mobile-counters{background:none!important}
+ #v291-hud .v291-mobile-toolbar{gap:2px!important}
+ #v291-hud .v291-mobile-toggle{
+  width:33px!important;min-width:33px!important;height:33px!important;min-height:33px!important;
+ }
+ #v291-hud .v291-selected-text{font-size:clamp(9px,1.2vw,12px)!important}
+}
+@media (max-width:950px) and (orientation:landscape) and (max-height:590px),
+       (max-height:440px) and (orientation:landscape){
+ #v291-hud{--mobile-dock:clamp(64px,16.5vh,83px)!important}
+ #v291-hud .v291-research-background{
+   left:3px!important;top:47px!important;width:100px!important;height:138px!important;
+ }
+ #v291-hud .v291-research-main{z-index:24!important}
+ #v291-hud .v291-research-queue{z-index:25!important}
+ #v291-hud .v291-mobile-toolbar{top:43px!important;right:5px!important}
+ #v291-hud .v291-minimap-frame{
+   width:clamp(116px,17.5vw,160px)!important;
+   height:clamp(89px,13.4vw,123px)!important;
+   left:2px!important;bottom:5px!important;
+ }
+ #v291-hud .v291-selection-frame{
+   width:clamp(116px,17.5vw,160px)!important;
+   height:clamp(72px,10.8vw,100px)!important;
+   right:2px!important;bottom:5px!important;
+ }
+ #v291-hud .v291-command-dock{
+   left:clamp(119px,18.2vw,171px)!important;
+   right:clamp(119px,18.2vw,171px)!important;
+ }
+ #v291-hud .v291-selected-text{font-size:clamp(9px,1.1vw,11px)!important}
+ #v291-hud .v291-research-title{font-size:9px!important}
+ #v291-hud .v292-zoom-out{
+   display:block!important;
+   left:calc(clamp(116px,17.5vw,160px) - 37px)!important;
+   top:auto!important;
+   bottom:calc(clamp(89px,13.4vw,123px) - 28px)!important;
+   width:27px!important;height:27px!important;
+ }
+}
+@media (max-width:950px) and (orientation:portrait){
+ #v291-hud .v291-research-background{width:160px!important;height:220px!important}
+ #v291-hud .v291-selected-text{font-size:11px!important}
+}
