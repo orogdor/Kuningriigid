@@ -1,0 +1,112 @@
+/* V293: research ONLY. Keep the five original golden circles as frames.
+   Their centers show the true research state: one active + four queued.
+   Empty slots never display the old misleading compass/ship/castle icons. */
+#v291-hud .v293-research-slot{isolation:isolate}
+#v291-hud .v293-queue-center{
+ position:absolute;inset:15%;z-index:3;pointer-events:none;
+ display:grid;place-items:center;
+ border-radius:50%;overflow:hidden;
+ background:radial-gradient(circle at 42% 35%,#284b67 0%,#0b243b 65%,#061426 100%);
+ box-shadow:0 0 0 1px #ddba72,0 2px 5px #041321 inset;
+}
+#v291-hud .v293-queue-picture{
+ position:absolute;inset:0;width:100%!important;height:100%!important;
+ display:block;object-fit:cover!important;border-radius:50%;z-index:1;
+}
+#v291-hud .v293-queue-picture[hidden]{display:none!important}
+#v291-hud .v293-queue-mark{
+ font:700 calc(22px * var(--v291-scale,1))/1 Georgia,serif;
+ color:#d6b579;text-shadow:0 1px #041322;
+}
+#v291-hud .v293-queue-mark[hidden]{display:none!important}
+#v291-hud .v293-queue-progress{
+ position:absolute;bottom:0;right:0;min-width:38%;padding:1px;
+ text-align:center;z-index:2;
+ background:#0a233bcc;color:#f8dfa3;border:1px solid #e8c57a;
+ font:700 calc(9px * var(--v291-scale,1))/1.1 Georgia,serif;
+ border-radius:8px;pointer-events:none;
+}
+#v291-hud .v293-queue-progress[hidden]{display:none!important}
+#v291-hud .v293-research-slot.v293-current .v293-queue-center{box-shadow:0 0 0 2px #f9df85,0 0 10px #f0d16a99}
+#v291-hud .v293-research-slot.v293-pending .v293-queue-center{box-shadow:0 0 0 1px #d8b77b}
+#v291-hud .v293-active-picture{
+ position:absolute!important;top:3%!important;left:24%!important;
+ width:52%!important;height:56%!important;z-index:2;
+ object-fit:contain!important;border-radius:50%;pointer-events:none;
+ filter:drop-shadow(0 2px 5px #10151ebb);
+}
+#v291-hud .v293-active-picture[hidden]{display:none!important}
+/* Technology menu: each node has its own illustrated medallion, not an emoji. */
+#researchpanel .research-window{
+ background-image:linear-gradient(125deg,rgba(10,24,42,.93),rgba(13,33,54,.94)),url('ui-art-v291/footer_navy.webp')!important;
+ background-size:cover!important;border-color:#be934c!important;
+ box-shadow:0 10px 35px #000b,inset 0 0 0 1px #e0b77566!important;
+}
+#researchpanel .tech-card.tech-tree-node{
+ position:absolute!important;padding-left:76px!important;
+ background-image:linear-gradient(125deg,rgba(38,57,68,.94),rgba(12,29,45,.95)),url('ui-art-v291/footer_navy.webp')!important;
+ background-size:cover!important;
+ border:1px solid #b4945c!important;border-left:4px solid #c5a46c!important;
+ box-shadow:0 2px 8px #0009,inset 0 0 0 1px #d3ad6255!important;
+ color:#eadbc0!important;
+}
+#researchpanel .tech-card.tech-tree-node.researching{border-color:#f5d778!important;box-shadow:0 0 11px #e7bb5a77!important}
+#researchpanel .tech-card.tech-tree-node.known{border-color:#82bd92!important}
+#researchpanel .tech-card.tech-tree-node.locked{filter:saturate(.65)}
+#researchpanel .tech-card .v293-tech-picture{
+ position:absolute;left:8px;top:10px;
+ width:59px;height:59px;object-fit:contain;
+ border-radius:50%;background:#091a2b;filter:drop-shadow(0 3px 4px #0007);
+}
+#researchpanel .tech-card.tech-tree-node .tech-node-name{
+ color:#fff0c8;font:700 12px/1.17 Georgia,serif;
+ display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+ overflow:hidden;
+}
+#researchpanel .tech-card.tech-tree-node .tech-time{
+ white-space:normal;overflow:hidden;max-height:2.4em;
+ font:11px/1.15 Georgia,serif;color:#dfc48d;
+}
+#researchpanel .tech-card.tech-tree-node .tech-parents,
+#researchpanel .tech-card.tech-tree-node .v123-preview-unlocks{font:10px/1.15 Georgia,serif}
+#researchpanel .tech-info-intro{
+ display:grid!important;grid-template-columns:62px minmax(0,1fr);
+ grid-template-rows:auto auto 1fr;gap:1px 9px;
+}
+#researchpanel .v293-tech-detail-image{
+ grid-column:1;grid-row:1 / span 3;width:59px;height:59px;object-fit:contain;
+ border-radius:50%;background:#092136;
+}
+#researchpanel .tech-info-intro .tech-info-name{grid-column:2;grid-row:1;font:700 17px/1.14 Georgia,serif;color:#f8e4bd}
+#researchpanel .tech-info-intro>small{grid-column:2;grid-row:2}
+#researchpanel .tech-info-intro>p{grid-column:2;grid-row:3}
+#researchpanel #researchqueue{max-height:62px;gap:6px}
+#researchpanel #researchqueue .v293-research-queue-item{
+ display:flex;align-items:center;gap:5px;min-width:0;max-width:245px;
+ background:linear-gradient(135deg,#193853,#0c2235)!important;
+ border:1px solid #c4a060!important;border-radius:5px!important;
+ color:#f6dfb6!important;padding:4px 8px 4px 4px!important;
+}
+#researchpanel .v293-research-queue-item img{
+ width:29px;height:29px;object-fit:contain;border-radius:50%;flex-shrink:0;
+}
+#researchpanel .v293-research-queue-item span{
+ flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+ font:700 11px/1.2 Georgia,serif;
+}
+#researchpanel .v293-research-queue-item strong{font-size:18px;line-height:1;color:#f5bca4}
+@media(max-width:700px){
+ #researchpanel .tech-info-intro{grid-template-columns:46px minmax(0,1fr)}
+ #researchpanel .v293-tech-detail-image{width:43px;height:43px}
+ #researchpanel .tech-info-intro .tech-info-name{font-size:14px}
+ #researchpanel .tech-card .v293-tech-picture{width:56px;height:56px;left:8px}
+ #researchpanel #researchqueue{max-height:43px;flex-wrap:nowrap;overflow-x:auto}
+ #researchpanel .v293-research-queue-item{flex:0 0 auto;max-width:160px!important}
+ #researchpanel .v293-research-queue-item img{width:23px;height:23px}
+ #v291-hud .v293-queue-progress{font-size:7px}
+}
+@media(max-height:470px){
+ #researchpanel .tech-inspector{max-height:24dvh!important}
+ #researchpanel .v293-tech-detail-image{width:36px;height:36px}
+ #researchpanel .tech-info-intro{grid-template-columns:39px minmax(0,1fr)}
+}
