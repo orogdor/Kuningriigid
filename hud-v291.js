@@ -8,16 +8,52 @@
  const $=id=>document.getElementById(id), A='ui-art-v291/';
  // V297: separate alpha-cleaned picture sources, not CSS boxes. Keep all other art untouched.
  const cleaned=new Set(['research_panel','selection_frame','minimap_frame','portrait_castle']);
- const art=name=>cleaned.has(name)?'ui-art-v297/'+name+'.svg':A+name+'.webp';
+ const art=name=>name==='selection_frame'?'ui-art-v300/selection_frame.svg':cleaned.has(name)?'ui-art-v297/'+name+'.svg':A+name+'.webp';
  const et=()=> (document.documentElement.lang||'en').startsWith('et');
  const tr=(ee,en)=>et()?ee:en;
  const snap=()=>window.kingdomsUiV288?.snapshot?.();
  const original=(...ids)=>{for(const id of ids){const el=$(id);if(el&&!el.disabled){el.click();return true;}}return false;};
  const openResearch=()=>{const real=window.openKuningriigidResearchV296;if(typeof real==='function'){real();return true;}return original('techtoggle','researchstatus');};
+ const selectionActions=()=>window.KuningriigidSelectionV300?.actions?.(snap()?.selection,snap()?.view)||[];
+ function dispatchSelection(slot){
+  const action=selectionActions()[slot];
+  if(!action||action.disabled)return false;
+  if(action.target==='research')return openResearch();
+  if(action.target==='diplomacy'){openDiplomacy();return true;}
+  const targets=Array.isArray(action.target)?action.target:[action.target];
+  // The "found city" action is only valid when the settling panel is visible.
+  const filtered=targets.filter(id=>id!=='foundcity'||($('foundcity')&&!$('foundcity').hidden));
+  return original(...filtered);
+ }
+ function showSelectionActions(state){
+  const actions=window.KuningriigidSelectionV300?.actions?.(state?.selection,state?.view)||[];
+  const signature=JSON.stringify([state?.selection,actions.map(a=>[a.icon,a.disabled])]);
+  if(signature===lastSelectionSignature)return;
+  lastSelectionSignature=signature;
+  root.dataset.selectionKind=state?.selection?.kind||'none';
+  const buttons=[...root.querySelectorAll('.v291-unit-button')];
+  buttons.forEach((button,i)=>{
+   const a=actions[i];if(!a)return;
+   const label=tr(a.ee,a.en);
+   button.title=label;button.setAttribute('aria-label',label);
+   button.disabled=!!a.disabled;
+   button.setAttribute('aria-disabled',String(!!a.disabled));
+   button.setAttribute('aria-pressed',String(!!state?.selection?.order&&(
+    (a.icon==='move'&&state.selection.order==='move')||
+    (a.icon==='attack'&&state.selection.order==='attack'))));
+   const img=button.querySelector('img'),src='ui-art-v300/action_'+a.icon+'.svg';
+   if(img&&img.getAttribute('src')!==src)img.src=src;
+  });
+  const details=root.querySelector('.v291-unit-info');
+  if(details){const sel=state?.selection;const label=sel?.kind==='none'?tr('Sündmuste logi','Journal'):
+   sel?.kind==='city'||sel?.kind==='building'?tr('Linna või hoone teave','City or building info'):
+   tr('Valitud objekti üksikasjad','Selected object details');
+   details.title=label;details.setAttribute('aria-label',label);}
+ }
  const make=(tag,cl,parent)=>{const e=document.createElement(tag);if(cl)e.className=cl;parent?.append(e);return e;};
  const image=(parent,name,cl='v291-sprite')=>{const e=make('img',cl,parent);e.src=art(name);e.alt='';e.draggable=false;return e;};
  const click=(parent,cl,label,fn)=>{const e=make('button',cl,parent);e.type='button';e.setAttribute('aria-label',label);e.title=label;e.addEventListener('click',fn);return e;};
- let root,active=false,liveMap,oldMapHome,lastSource='',factionTeam=null;
+ let root,active=false,liveMap,oldMapHome,lastSource='',factionTeam=null,lastSelectionSignature='';
  const slots=[
   ['gold','header_gold',262,0,175,64,'Kuld','Gold'],
   ['bread','header_food',433,0,143,64,'Toit','Food'],
@@ -85,15 +121,22 @@
   const selection=sprite(root,'selection_frame',1292,698,379,234,'v291-selection-frame');
   const portrait=make('div','v291-portrait',selection);image(portrait,'portrait_castle','v291-portrait-image');
   const selectedText=make('div','v291-selected-text',selection);selectedText.textContent=tr('Vali üksus','Select unit');
-  for(const [n,x,y,w,h,ee,en,fn] of [
-    ['cmd_attack',1283,744,86,84,'Ründa','Attack',()=>original('commandattack')],
-    ['cmd_move',1354,708,74,81,'Liigu','Move',()=>original('commandmove')],
-    ['cmd_defend',1283,809,80,83,'Peata üksus','Stop unit',()=>original('commandstop')],
-    ['cmd_city',1363,816,67,67,'Linna juhtimine','City management',()=>original('hud-city')]
-  ])buttonSprite(root,n,x,y,w,h,tr(ee,en),fn,'v291-unit-button');
+  for(const [i,[n,x,y,w,h]] of [
+    ['cmd_attack',1283,744,86,84],
+    ['cmd_move',1354,708,74,81],
+    ['cmd_defend',1283,809,80,83],
+    ['cmd_city',1363,816,67,67]
+  ].entries())buttonSprite(root,n,x,y,w,h,tr('Tegevus','Action'),()=>dispatchSelection(i),'v291-unit-button');
   // A fifth genuine command gets its own image: selected entity details.
-  const details=click(root,'v291-unit-info',tr('Kõik üksuse käsud','All unit commands'),()=>original('hud-command-toggle'));
+  const details=click(root,'v291-unit-info',tr('Valitud objekti info','Selected details'),()=>{
+    const sel=snap()?.selection;
+    if(sel?.kind==='none')return original('journal');
+    if(sel?.kind==='city'||sel?.kind==='building')return original('citytab-info','hud-city');
+    return original('hud-command-toggle','commandfocus');
+  });
   pos(details,1430,704,40,48);details.textContent='';
+  const detailsArt=make('img','v300-detail-icon',details);
+  detailsArt.src='ui-art-v300/action_info.svg';detailsArt.alt='';detailsArt.draggable=false;
   const modal=make('section','v291-dialog',root);modal.id='v291-dialog';modal.hidden=true;modal.setAttribute('role','dialog');
   const mh=make('header','v291-dialog-header',modal);make('h2','',mh).textContent=tr('Diplomaatia','Diplomacy');
   click(mh,'v291-dialog-close',tr('Sulge','Close'),closeDiplomacy).textContent='×';
@@ -170,10 +213,16 @@
   const portrait=command?.querySelector('.v263-portrait:not([hidden])');
   const src=portrait?.getAttribute('src');
   const valid=!!src&&!!chosen&&!/Vali üksus|Select unit/i.test(chosen);
-  const p=root.querySelector('.v291-portrait-image');
-  if(valid){p.src=src;p.onerror=()=>{p.onerror=null;p.src=art('portrait_castle')};root.querySelector('.v291-selected-text').textContent=chosen;}
-  else if(force||lastSource){p.src=art('portrait_castle');root.querySelector('.v291-selected-text').textContent=tr('Vali üksus','Select unit')}
+  const p=root.querySelector('.v291-portrait-image'),selection=s?.selection||{};
+  const fallback=selection.kind==='none'?'ui-art-v300/action_world.svg':art('portrait_castle');
+  if(valid&&selection.kind!=='none'){
+   if(p.getAttribute('src')!==src)p.src=src;
+   p.onerror=()=>{p.onerror=null;p.src=art('portrait_castle')};
+  }else if(p.getAttribute('src')!==fallback){p.src=fallback;}
+  root.querySelector('.v291-selected-text').textContent=
+    selection.name|| (selection.kind==='none'?tr('Maailm','World'):chosen)||tr('Vali üksus','Select unit');
   lastSource=valid?src:'';
+  showSelectionActions(s);
   const modal=['startmenu','researchpanel','journalpanel','help'].some(id=>$(id)&&!$(id).hidden);
   root.classList.toggle('v291-behind-modal',modal);
   const pause=root.querySelector('.v291-pause');const play=root.querySelector('.v291-play');
