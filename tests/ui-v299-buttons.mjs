@@ -41,7 +41,7 @@ const sourceButtons=[
  ['cmd_city',1363,816,67,67,1292,698]
 ];
 for(const [name,x,y,w,h,fx,fy] of sourceButtons){
- const pattern=new RegExp("'+name+"+'\\s*,\\s*'+x+'\\s*,\\s*'+y+'\\s*,\\s*'+w+'\\s*,\\s*'+h);
+ const pattern=new RegExp("'"+name+"'\\s*,\\s*"+x+"\\s*,\\s*"+y+"\\s*,\\s*"+w+"\\s*,\\s*"+h);
  assert.match(base,pattern,'Original picture crop is no longer mapped for '+name);
  assert.deepEqual((name.startsWith('map_')?map:units)[name],[x-fx,y-fy,w,h],name+' hitbox not over crop');
 }
