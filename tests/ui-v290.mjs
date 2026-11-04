@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const html=read('index.html'),js=read('hud-v290.js'),css=read('hud-v290.css');
-const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\\/title>/)||[])[1]);
+const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
 assert.ok(publishedVersion>=292,'Published version is older than this UI test');
 assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+publishedVersion+'<'),'Menu label differs from page title');
 assert.ok(html.includes('hud-v290.css?v=290a')&&html.includes('hud-v290.js?v=290a'));
