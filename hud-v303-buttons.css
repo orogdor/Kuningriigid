@@ -1,0 +1,38 @@
+/* V303 illustrated assets are desktop-only; preserve the V298 mobile artwork. */
+#v291-hud .v303-card-art,#v291-hud .v303-round-art,#v291-hud .v303-action-art{display:none!important;pointer-events:none!important}
+#v291-hud.v302-pieces .v291-card.v303-ready{
+ opacity:1!important;z-index:20!important;background:transparent!important;
+ transition:filter .15s ease,transform .15s ease
+}
+#v291-hud.v302-pieces .v291-card.v303-ready>img.v303-card-art{
+ display:block!important;width:100%!important;height:100%!important;
+ object-fit:fill!important;opacity:1!important;filter:drop-shadow(0 1px 2px #080f22ae)
+}
+#v291-hud.v302-pieces .v291-card.v303-ready:hover{filter:brightness(1.12)}
+#v291-hud.v302-pieces .v291-card.v303-ready:active{filter:brightness(.89)}
+#v291-hud.v302-pieces .v291-card.v303-ready:focus-visible{outline:2px solid #f9d77d!important;opacity:1!important}
+#v291-hud.v302-pieces .v291-card>.v301-card-icon,
+#v291-hud.v302-pieces.v301-picture .v291-card>.v301-card-icon,
+#v291-hud.v302-pieces .v291-card>.v301-card-caption,
+#v291-hud.v302-pieces.v301-picture .v291-card>.v301-card-caption{display:none!important}
+#v291-hud.v302-pieces .v291-minimap-button>img.v303-round-art,
+#v291-hud.v302-pieces .v292-zoom-out>img.v303-round-art,
+#v291-hud.v302-pieces .v291-unit-info>img.v303-round-art,
+#v291-hud.v302-pieces .v291-unit-button[data-v303-art]>img.v303-action-art:not([hidden]){
+ display:block!important;width:100%!important;height:100%!important;
+ object-fit:contain!important;opacity:1!important;visibility:visible!important
+}
+#v291-hud.v302-pieces .v291-unit-button:not([data-v303-art])>img.v291-sprite{
+ display:block!important;width:100%!important;height:100%!important;
+ object-fit:contain!important;opacity:1!important;visibility:visible!important
+}
+#v291-hud.v302-pieces .v291-unit-button[data-v303-art]>img.v291-sprite{display:none!important}
+#v291-hud.v302-pieces .v292-zoom-out{
+ z-index:32!important;pointer-events:auto!important;display:block!important;
+ background:transparent!important;border:0!important;padding:0!important
+}
+#v291-hud.v302-pieces .v292-zoom-out>img:not(.v303-round-art){display:none!important}
+#v291-hud.v302-pieces .v291-minimap-button:hover,
+#v291-hud.v302-pieces .v292-zoom-out:hover,
+#v291-hud.v302-pieces .v291-unit-button:hover{filter:brightness(1.13)}
+#v291-hud.v302-pieces .v291-unit-button:disabled{filter:grayscale(.5)!important;opacity:.55!important}

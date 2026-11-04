@@ -32,6 +32,8 @@ jobs:
           node --check hud-v302-pieces.js
           node tests/ui-v301-background.mjs
           node tests/ui-v302-pieces.mjs
+          node --check hud-v303-buttons.js
+          node tests/ui-v303-buttons.mjs
       - name: Prepare site
         run: |
           mkdir -p /tmp/game-pages

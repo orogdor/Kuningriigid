@@ -55,6 +55,8 @@
   const commandButtons=[...root.querySelectorAll('.v291-unit-button')];
   [[1311,695,68,62],[1412,634,66,61],[1311,770,68,62],[1510,631,66,61]].forEach((p,i)=>place(commandButtons[i],p,s,dx,dy));
   place($('.v291-unit-info'),[1319,635,50,50],s,dx,dy);
+  // Keep the real zoom-out control in a spare minimap circle, not floating above.
+  place($('.v292-zoom-out'),[125,631,62,59],s,dx,dy);
  }
  function update(){
   if(!root)return;
