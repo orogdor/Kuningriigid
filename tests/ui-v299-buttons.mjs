@@ -7,9 +7,9 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const html=read('index.html'),base=read('hud-v291.js');
 const js=read('hud-v298-layout.js'),css=read('hud-v298-layout.css');
-assert.match(html,/<title>Kuningriigid · V299<\/title>/);
+assert.match(html,/<title>Kuningriigid · V300<\/title>/);
 for(const name of ['hud-v291.js','hud-v298-layout.js','hud-v298-layout.css']){
- assert.ok(html.includes(name+'?v=299a'),name+' not cache-busted');
+ assert.ok(html.includes(name+'?v=300a'),name+' not cache-busted');
 }
 const objectFrom=(name)=>{
  const match=js.match(new RegExp('const '+name+'=\\{([^\\n]+)\\};'));
