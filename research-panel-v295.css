@@ -1,0 +1,364 @@
+/* V295: one artwork image is the entire menu backing. Technology images, text,
+   DAG lines and buttons are the ONLY elements above it.
+   Desktop uses the original 1600x920 artwork; portrait uses ONE 720x1280 artwork.
+   No nested CSS-drawn panels or second image overlays. */
+#researchpanel[hidden]{display:none!important}
+#researchpanel:not([hidden]){
+ position:fixed!important;inset:0!important;z-index:600!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ overflow:hidden!important;overscroll-behavior:contain;
+ padding:0!important;background:#020915e8!important;
+}
+#researchpanel .research-window.v294-research-screen{
+ position:relative!important;display:block!important;flex:0 0 auto!important;
+ box-sizing:border-box!important;
+ width:min(1600px,calc(100vw - 12px),calc(100dvh * 1.73913 - 12px))!important;
+ height:auto!important;aspect-ratio:40 / 23!important;
+ min-width:0!important;min-height:0!important;
+ max-width:100vw!important;max-height:100dvh!important;
+ padding:0!important;margin:0!important;overflow:hidden!important;
+ border:0!important;box-shadow:none!important;border-radius:0!important;
+ color:#f6e6c2!important;
+ background:#081c2f url('ui-art-v294/research_menu_bg.svg') center / 100% 100% no-repeat!important;
+}
+#researchpanel .research-window.v294-research-screen *{box-sizing:border-box!important}
+#researchpanel .research-window.v294-research-screen .research-heading{
+ position:absolute!important;top:3.5%!important;left:19%!important;
+ width:62%!important;height:10%!important;
+ z-index:4!important;display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:0!important;margin:0!important;pointer-events:none!important;
+ background:none!important;border:0!important;
+}
+#researchpanel .research-window.v294-research-screen .research-heading .eyebrow{display:none!important}
+#researchpanel .research-window.v294-research-screen #researchtitle{
+ font:700 clamp(16px,2.2vw,34px)/1.1 Georgia,serif!important;
+ color:#fff0bb!important;text-shadow:0 2px 3px #000b!important;
+ letter-spacing:.09em!important;white-space:nowrap!important;
+ margin:0!important;padding:0!important;
+}
+#researchpanel .research-window.v294-research-screen #closeresearch{
+ position:absolute!important;top:5.5%!important;right:2.5%!important;
+ left:auto!important;bottom:auto!important;z-index:12!important;
+ width:clamp(34px,3.7vw,52px)!important;height:clamp(34px,3.7vw,52px)!important;
+ min-width:34px!important;min-height:34px!important;
+ display:grid!important;place-items:center!important;pointer-events:auto!important;
+ padding:0!important;margin:0!important;
+ border:1px solid #dfc18a!important;border-radius:50%!important;
+ background:#092238d9!important;color:#ffe6b4!important;
+ font:700 21px Georgia,serif!important;box-shadow:0 2px 7px #000b!important;
+ cursor:pointer!important;
+}
+#researchpanel .research-window.v294-research-screen #researchsummary{
+ position:absolute!important;top:15.2%!important;left:5.7%!important;
+ width:63%!important;max-width:63%!important;max-height:2em!important;
+ z-index:4!important;margin:0!important;padding:0!important;
+ overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;
+ background:transparent!important;border:0!important;
+ font:700 clamp(10px,.95vw,15px)/1.25 Georgia,serif!important;
+ color:#ead3a7!important;
+}
+#researchpanel .research-window.v294-research-screen .research-guide{display:none!important}
+#researchpanel .research-window.v294-research-screen #pauseresearch{
+ position:absolute!important;top:15%!important;right:4.7%!important;left:auto!important;
+ z-index:9!important;min-height:30px!important;max-width:20%!important;
+ margin:0!important;padding:3px 6px!important;
+ border:1px solid #d5b77c!important;border-radius:5px!important;
+ background:#102e43e8!important;color:#fff0c3!important;
+ font:700 clamp(10px,.85vw,13px)/1.15 Georgia,serif!important;
+ cursor:pointer!important;
+}
+#researchpanel .research-window.v294-research-screen #pauseresearch:disabled{opacity:.5!important}
+#researchpanel .research-window.v294-research-screen #researchtree{
+ position:absolute!important;left:4.2%!important;top:20%!important;
+ width:91.6%!important;height:61.5%!important;
+ display:grid!important;grid-template-columns:minmax(0,72.4%) minmax(0,26.6%)!important;
+ grid-template-rows:35px 37px minmax(0,1fr)!important;
+ gap:1px 1%!important;padding:0!important;margin:0!important;
+ min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ overflow:hidden!important;z-index:3!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-tree-controls{
+ grid-column:1!important;grid-row:1!important;display:flex!important;
+ align-items:center!important;gap:6px!important;min-width:0!important;
+ border:0!important;background:transparent!important;box-shadow:none!important;
+ margin:0!important;padding:0 5px!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-tree-subtitle{
+ flex:1!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+ color:#f3dda8!important;font:700 clamp(9px,.85vw,13px)/1.15 Georgia,serif!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-control{
+ width:32px!important;height:31px!important;min-width:32px!important;min-height:31px!important;
+ padding:0!important;margin:0!important;
+ background:transparent!important;color:#ffe4a7!important;
+ border:1px solid #bea06d!important;border-radius:50%!important;
+ font:700 18px Georgia,serif!important;box-shadow:none!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-scale{min-width:30px!important;font-size:10px!important}
+#researchpanel .research-window.v294-research-screen .tech-ages{
+ grid-column:1!important;grid-row:2!important;display:flex!important;
+ flex-wrap:nowrap!important;align-items:center!important;
+ gap:4px!important;min-width:0!important;overflow-x:auto!important;
+ background:transparent!important;border:0!important;
+ margin:0!important;padding:0 2px!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-age-jump{
+ flex:0 0 auto!important;white-space:nowrap!important;min-height:28px!important;
+ padding:5px 8px!important;margin:0!important;
+ background:transparent!important;box-shadow:none!important;
+ border:0!important;border-bottom:1px solid #bc985a!important;
+ color:#e8d0a6!important;font:700 11px Georgia,serif!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-legend{display:none!important}
+#researchpanel .research-window.v294-research-screen .tech-map-viewport{
+ grid-column:1!important;grid-row:3!important;display:block!important;
+ position:relative!important;min-width:0!important;min-height:0!important;
+ width:100%!important;height:100%!important;max-height:none!important;max-width:none!important;
+ padding:3px!important;margin:0!important;
+ border:0!important;box-shadow:none!important;border-radius:0!important;
+ background:transparent!important;overflow:auto!important;
+ touch-action:pan-x pan-y!important;overscroll-behavior:contain!important;
+ scrollbar-color:#b58d54 transparent!important;
+}
+#researchpanel .research-window.v294-research-screen :is(.tech-map-space,.tech-map-canvas,.tech-era-band,.tech-era-heading,.tech-links){
+ background:transparent!important;border:0!important;box-shadow:none!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-links path.tech-link-path{stroke:#d2b77e;opacity:.75}
+#researchpanel .research-window.v294-research-screen .tech-era-heading{
+ color:#f5dda7!important;text-shadow:0 2px 3px #0009!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node{
+ /* No CSS-drawn tiles: the tech picture is the real visible object and the
+    whole 218x124 card remains one accessible clickable hotspot. */
+ position:absolute!important;display:flex!important;flex-direction:column!important;
+ align-items:flex-start!important;justify-content:center!important;
+ gap:3px!important;min-height:0!important;
+ padding:8px 7px 8px 80px!important;margin:0!important;
+ border:0!important;border-radius:5px!important;
+ background:transparent!important;background-image:none!important;
+ box-shadow:none!important;color:#f5e2c3!important;
+ text-shadow:0 2px 2px #000a!important;
+ opacity:1!important;cursor:pointer!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node:is(:hover,:focus-visible,.is-selected){
+ background:#dfbb7730!important;outline:2px solid #f8dfa1!important;outline-offset:-3px!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node.locked{filter:grayscale(.70)!important;opacity:.75!important}
+#researchpanel .research-window.v294-research-screen .tech-card .v293-tech-picture{
+ position:absolute!important;top:15px!important;left:7px!important;
+ width:63px!important;height:63px!important;max-width:63px!important;
+ display:block!important;object-fit:contain!important;
+ background:transparent!important;border:0!important;border-radius:50%!important;
+ filter:drop-shadow(0 3px 3px #0009)!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node .tech-node-name{
+ color:#ffebc0!important;font:700 13px/1.12 Georgia,serif!important;
+ white-space:normal!important;max-height:2.4em!important;overflow:hidden!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node .tech-time,
+#researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node .tech-parents{
+ color:#e7d4b2!important;font:11px/1.2 Georgia,serif!important;
+ max-height:2.4em!important;overflow:hidden!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node :is(.v123-preview-unlocks,.eureka-available,.eureka-earned,.tech-progress-detail){display:none!important}
+#researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node progress{
+ width:95%!important;height:5px!important;max-height:5px!important;margin:1px 0 0!important;
+ accent-color:#ebc679!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-inspector{
+ grid-column:2!important;grid-row:1/4!important;display:flex!important;flex-direction:column!important;
+ align-items:stretch!important;gap:8px!important;
+ width:100%!important;height:100%!important;max-height:none!important;min-height:0!important;
+ min-width:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+ padding:12px 9px!important;margin:0!important;
+ background:transparent!important;background-image:none!important;
+ border:0!important;box-shadow:none!important;border-radius:0!important;
+ color:#eedcb9!important;scrollbar-width:thin!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-info-intro,
+#researchpanel .research-window.v294-research-screen .tech-info-relations,
+#researchpanel .research-window.v294-research-screen .tech-info-actions{
+ display:flex!important;flex-direction:column!important;gap:6px!important;
+ min-width:0!important;width:100%!important;max-width:100%!important;
+ flex:0 0 auto!important;margin:0!important;padding:0!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ overflow:visible!important;
+}
+#researchpanel .research-window.v294-research-screen .v293-tech-detail-image{
+ flex:0 0 auto!important;position:static!important;
+ width:clamp(56px,5.5vw,90px)!important;height:clamp(56px,5.5vw,90px)!important;
+ border:0!important;border-radius:50%!important;
+ background:transparent!important;object-fit:contain!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-info-name{
+ font:700 clamp(14px,1.25vw,21px)/1.17 Georgia,serif!important;color:#ffe8bb!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-info-intro p,
+#researchpanel .research-window.v294-research-screen .tech-info-relations p{
+ font:12px/1.42 Georgia,serif!important;color:#e9d3ae!important;
+ margin:2px 0!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-info-actions{
+ margin-top:auto!important;padding-top:7px!important;
+}
+#researchpanel .research-window.v294-research-screen .tech-info-actions button{
+ width:100%!important;min-width:0!important;min-height:37px!important;
+ padding:6px 7px!important;background:#112d42a6!important;color:#f9e2b4!important;
+ border:1px solid #bf985e!important;border-radius:5px!important;
+ font:700 12px/1.2 Georgia,serif!important;
+}
+#researchpanel .research-window.v294-research-screen #researchqueue{
+ position:absolute!important;left:3.8%!important;bottom:4.0%!important;
+ width:92.4%!important;height:8.7%!important;max-height:none!important;
+ display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ gap:0!important;align-items:stretch!important;
+ margin:0!important;padding:0!important;z-index:4!important;
+ border:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden!important;
+}
+#researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-slot{
+ position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;
+ flex-direction:row!important;gap:5px!important;
+ min-width:0!important;min-height:0!important;margin:0!important;padding:0 5px!important;
+ background:transparent!important;background-image:none!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ color:#f9e6c0!important;cursor:pointer!important;overflow:hidden!important;
+}
+#researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-slot:hover,
+#researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-slot:focus-visible{
+ background:#ddbd7930!important;outline:1px solid #f5dca0!important;outline-offset:-2px!important;
+}
+#researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-slot img{
+ flex:0 0 auto!important;object-fit:contain!important;display:block!important;
+ width:clamp(26px,3.5vw,52px)!important;height:clamp(26px,3.5vw,52px)!important;
+ max-width:52px!important;min-width:0!important;
+ border:0!important;border-radius:50%!important;background:transparent!important;
+}
+#researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-slot .v294-queue-caption{
+ min-width:0!important;max-width:60%!important;
+ overflow:hidden!important;text-overflow:ellipsis!important;
+ display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;
+ font:700 clamp(9px,.83vw,13px)/1.12 Georgia,serif!important;color:#f8e0b2!important;
+}
+#researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-empty-mark{
+ display:block!important;width:auto!important;flex:0 0 auto!important;
+ font:700 clamp(19px,2.8vw,36px) Georgia,serif!important;color:#f4d18d!important;
+ text-shadow:0 2px 4px #000b!important;
+}
+#researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-remove{font-size:15px!important}
+@media(max-width:900px){
+ #researchpanel .research-window.v294-research-screen .tech-inspector{padding:5px!important;gap:4px!important}
+ #researchpanel .research-window.v294-research-screen .tech-info-intro,
+ #researchpanel .research-window.v294-research-screen .tech-info-relations,
+ #researchpanel .research-window.v294-research-screen .tech-info-actions{
+  width:100%!important;flex:0 0 auto!important;
+  flex-direction:column!important;gap:4px!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-info-actions{
+  flex-direction:row!important;gap:4px!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-info-actions button{
+  flex:1 1 0!important;min-width:0!important;font-size:10px!important;
+ }
+ #researchpanel .research-window.v294-research-screen .v293-tech-detail-image{width:50px!important;height:50px!important}
+ #researchpanel .research-window.v294-research-screen .tech-info-intro p,
+ #researchpanel .research-window.v294-research-screen .tech-info-relations p{font-size:11px!important}
+}
+@media(max-width:700px) and (orientation:portrait){
+ /* This is a DIFFERENT SINGLE IMAGE, not extra CSS frames; layout follows its
+    etched map region, right-sized inspector and five bottom circles. */
+ #researchpanel .research-window.v294-research-screen{
+  width:calc(100vw - 10px)!important;height:calc(100dvh - 10px)!important;
+  aspect-ratio:auto!important;
+  background:#081c2f url('ui-art-v295/research_menu_mobile.svg') center/100% 100% no-repeat!important;
+ }
+ #researchpanel .research-window.v294-research-screen .research-heading{
+  top:2.3%!important;left:20%!important;width:60%!important;height:8.5%!important;
+ }
+ #researchpanel .research-window.v294-research-screen #researchtitle{
+  font-size:clamp(16px,4.5vw,26px)!important;
+ }
+ #researchpanel .research-window.v294-research-screen #closeresearch{
+  top:3.7%!important;right:3.6%!important;
+  width:35px!important;height:35px!important;min-width:35px!important;min-height:35px!important;
+ }
+ #researchpanel .research-window.v294-research-screen #researchsummary{
+  top:12.1%!important;left:6.5%!important;width:64%!important;max-width:64%!important;
+  font-size:10px!important;
+ }
+ #researchpanel .research-window.v294-research-screen #pauseresearch{
+  top:12.0%!important;right:4%!important;max-width:25%!important;
+  min-height:25px!important;padding:2px 3px!important;font-size:9px!important;
+ }
+ #researchpanel .research-window.v294-research-screen #researchtree{
+  top:15.2%!important;left:5.1%!important;width:89.8%!important;height:70.3%!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:35px 31px minmax(0,1fr) 36%!important;
+  gap:1px!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-tree-controls{
+  grid-column:1!important;grid-row:1!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-ages{
+  grid-column:1!important;grid-row:2!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-map-viewport{
+  grid-column:1!important;grid-row:3!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-inspector{
+  grid-column:1!important;grid-row:4!important;
+  display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;
+  height:100%!important;max-height:none!important;min-height:0!important;
+  overflow:auto!important;padding:6px 7px!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-inspector :is(.tech-info-intro,.tech-info-relations,.tech-info-actions){
+  width:100%!important;flex:0 0 auto!important;min-width:0!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-info-intro{
+  display:grid!important;grid-template-columns:43px minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto!important;column-gap:8px!important;
+ }
+ #researchpanel .research-window.v294-research-screen .v293-tech-detail-image{
+  grid-row:1 / 4!important;grid-column:1!important;width:42px!important;height:42px!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-info-name{font-size:13px!important}
+ #researchpanel .research-window.v294-research-screen .tech-inspector p{font-size:10px!important;line-height:1.26!important}
+ #researchpanel .research-window.v294-research-screen .tech-tree-subtitle{font-size:10px!important}
+ #researchpanel .research-window.v294-research-screen .tech-control{
+  width:29px!important;height:29px!important;min-width:29px!important;min-height:29px!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-card.tech-tree-node{padding-left:76px!important}
+ #researchpanel .research-window.v294-research-screen #researchqueue{
+  left:3%!important;bottom:1.3%!important;width:94%!important;height:12.2%!important;
+ }
+ #researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-slot{
+  flex-direction:column!important;padding:0!important;gap:0!important;
+ }
+ #researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-slot img{
+  width:min(9.3vw,5.8dvh)!important;height:min(9.3vw,5.8dvh)!important;
+  max-width:none!important;min-width:0!important;
+ }
+ #researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-caption{
+  display:none!important;
+ }
+ #researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-remove{
+  position:absolute!important;bottom:4%!important;right:15%!important;font-size:12px!important;
+ }
+ #researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-empty-mark{font-size:24px!important}
+}
+@media(max-height:500px) and (orientation:landscape){
+ #researchpanel .research-window.v294-research-screen #researchtree{
+  top:20%!important;height:61%!important;
+  grid-template-columns:minmax(0,66%) minmax(0,33%)!important;
+  grid-template-rows:26px 27px minmax(0,1fr)!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-inspector{
+  grid-column:2!important;grid-row:1 / 4!important;
+  display:flex!important;flex-direction:column!important;
+  flex-wrap:nowrap!important;
+ }
+ #researchpanel .research-window.v294-research-screen .tech-map-viewport{grid-column:1!important;grid-row:3!important}
+ #researchpanel .research-window.v294-research-screen #researchqueue{bottom:3.5%!important;height:9.0%!important}
+ #researchpanel .research-window.v294-research-screen #pauseresearch{top:16%!important}
+ #researchpanel .research-window.v294-research-screen .tech-info-intro p{display:none!important}
+}
