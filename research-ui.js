@@ -1,6 +1,7 @@
 import {ERA_MATERIALS,ageDeficit} from './era-economy.js';
 import {RESOURCE_NAMES} from './economy.js';
 import {TECHS,techBlock,ERA_NAMES} from './research.js?v=125a';
+import {techArtSrc} from './research-art-v293.js?v=293a';
 import {researchCost,EUREKAS,scienceRate} from './science.js';
 import {tempoName} from './tempo.js';
 import {renderTechTreeV119} from './research-tree-v119.js?v=125a';
@@ -33,7 +34,7 @@ export function renderResearchUI(game,{choose,queue,remove,details=true}){
  }
  tree.dataset.renderKey=stamp;
  const queued=document.getElementById('researchqueue');queued.innerHTML='';
- for(const id of r.queue||[]){const item=document.createElement('button');item.textContent=TECHS[id].name+' ✕';item.onclick=()=>remove(id);queued.append(item)}
+ for(const id of r.queue||[]){if(!TECHS[id])continue;const item=document.createElement('button');item.type='button';item.className='v293-research-queue-item';item.title='Eemalda uurimisjärjekorrast: '+TECHS[id].name;item.setAttribute('aria-label',item.title);const icon=document.createElement('img');icon.src=techArtSrc(id,TECHS[id]);icon.alt='';item.append(icon);const label=document.createElement('span');label.textContent=TECHS[id].name;item.append(label);const close=document.createElement('strong');close.textContent='×';item.append(close);item.onclick=()=>remove(id);queued.append(item)}
  tree.innerHTML='';
  renderTechTreeV119(tree,game,{choose,queue,remove,rate});
 }
