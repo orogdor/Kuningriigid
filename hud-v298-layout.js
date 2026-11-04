@@ -28,7 +28,7 @@
  function hide(node){if(node)set(node,'display','none');}
  function release(){
   if(!managed)return;
-  managed=false;root?.classList.remove('v298-managed','v298-landscape','v298-portrait');
+  managed=false;root?.classList.remove('v298-managed','v298-landscape','v298-portrait','v298-compact-landscape');
   for(const node of N(root,'[data-x],.v291-command-dock,.v291-card,.v291-mobile-counters,.v291-mobile-toolbar,.v292-zoom-out')){
    for(const property of [...geometry,'position','grid-template-columns','grid-template-rows','gap','justify-content','align-items'])node.style.removeProperty(property);
   }
@@ -63,6 +63,8 @@
   managed=true;root.classList.add('v298-managed');
   root.classList.toggle('v298-landscape',land);
   root.classList.toggle('v298-portrait',portrait);
+  const compactLandscape=land&&w<710;
+  root.classList.toggle('v298-compact-landscape',compactLandscape);
   const top=land?Math.max(30,Math.min(44,h*.072)):Math.max(35,Math.min(47,w*.115));
   const second=portrait?Math.max(26,Math.min(35,w*.085)):0;
   const pauseW=top;
@@ -87,15 +89,17 @@
   const research=A(root,'.v291-research-background'),mini=A(root,'.v291-minimap-frame'),selected=A(root,'.v291-selection-frame');
   const toolbar=A(root,'.v291-mobile-toolbar');
   if(land){
-   const researchW=Math.max(91,Math.min(127,h*.235));
+   const researchW=Math.max(96,Math.min(137,h*.255));
    area(research,3,top+8,researchW,researchW*286/208);
-   const mapW=Math.max(107,Math.min(166,h*.30));
-   const selectedW=Math.max(129,Math.min(189,h*.345));
-   area(mini,3,h-mapW*238/311-4,mapW,mapW*238/311);
-   area(selected,w-selectedW-3,h-selectedW*234/379-4,selectedW,selectedW*234/379);
-   hide(toolbar);
+   const mapW=Math.max(155,Math.min(183,h*.355));
+   const selectedW=Math.max(173,Math.min(202,h*.365));
+   const miniShown=!compactLandscape||root.classList.contains('v291-show-map');
+   const selectionShown=!compactLandscape||root.classList.contains('v291-show-units');
+   area(mini,3,h-mapW*238/311-4,mapW,mapW*238/311,miniShown?'block':'none');
+   area(selected,w-selectedW-3,h-selectedW*234/379-4,selectedW,selectedW*234/379,selectionShown?'block':'none');
+   if(compactLandscape)area(toolbar,w-114,top+6,108,34,'flex');else hide(toolbar);
    const gap=Math.max(2,Math.min(6,w*.004));
-   const available=w-mapW-selectedW-23;
+   const available=compactLandscape?w-20:w-mapW-selectedW-23;
    const cardH=Math.max(36,Math.min(h*.157,Math.max(35,(available-5*gap)/6)*155/162));
    const cardW=cardH*162/155;
    const groupW=6*cardW+5*gap;
@@ -131,8 +135,8 @@
   // The minimap/selection/research artwork already CONTAINS round controls.
   // Their real buttons are transparent hitboxes over those exact painted icons.
   const rVisible=land||root.classList.contains('v291-show-research');
-  const mVisible=land||root.classList.contains('v291-show-map');
-  const sVisible=land||root.classList.contains('v291-show-units');
+  const mVisible=(land&&!compactLandscape)||root.classList.contains('v291-show-map');
+  const sVisible=(land&&!compactLandscape)||root.classList.contains('v291-show-units');
   if(!rVisible){hide(A(root,'.v291-research-main'));N(root,'.v291-research-queue').forEach(hide);}
   if(!mVisible)N(root,'.v291-minimap-button').forEach(hide);
   if(!sVisible){N(root,'.v291-unit-button').forEach(hide);hide(A(root,'.v291-unit-info'));}
