@@ -84,7 +84,7 @@
  text-shadow:0 1px #f8e5c7;white-space:normal;pointer-events:none;
 }
 #v291-hud.v301-picture .v291-card:hover>.v301-card-icon{filter:drop-shadow(0 0 6px #c7953c)}
-#v291-hud.v301-picture .v291-portrait{background:#122d45!important;z-index:6!important}
+#v291-hud.v301-picture .v291-portrait{left:28%!important;top:8%!important;width:60%!important;height:63%!important;background:#122d45!important;z-index:6!important}
 #v291-hud.v301-picture .v291-selected-text{
  left:29%!important;top:72%!important;width:60%!important;height:14%!important;
  color:#342318!important;z-index:7!important;
