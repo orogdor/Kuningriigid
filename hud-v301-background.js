@@ -25,7 +25,7 @@
  const tr=(ee,en)=>(document.documentElement.lang||'en').startsWith('et')?ee:en;
  const responsive=()=>{
   const w=innerWidth,h=innerHeight;
-  return w<1000||h<640||h>w||!!matchMedia?.('(pointer: coarse)').matches;
+  return w<1000||h<640||h>w||(typeof window.matchMedia==='function'&&window.matchMedia('(pointer: coarse)').matches);
  };
  function plate(id){const d=document.createElement('div');d.id=id;d.setAttribute('aria-hidden','true');root.prepend(d);return d;}
  function set(node,prop,value){node?.style.setProperty(prop,value,'important');}
