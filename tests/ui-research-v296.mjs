@@ -4,10 +4,11 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const html=read('index.html'),boot=read('boot-v83.js'),core=read('civilization.js');
 const hud=read('hud-v291.js'),mobile=read('hud-v292-mobile.js'),queue=read('hud-v293-research.js');
-assert.match(html,/<title>Kuningriigid · V296<\/title>/);
-assert.match(html,/id="menu-version">KUNINGRIIGID · V296</);
+const liveVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
+assert.ok(liveVersion>=296,'Page version must include research opening fix');
+assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+liveVersion+'<'));
 for(const p of ['boot-v83.js','hud-v291.js','hud-v292-mobile.js','hud-v293-research.js']){
- assert.match(html,new RegExp(p.replace('.','\\.')+'\\?v=296a'));
+ assert.match(html,new RegExp(p.replace('.','\\.')+'\\?v=(?:296a|297a)'));
 }
 assert.match(boot,/await import\('\.\/civilization\.js\?v=296a'\)/);
 assert.match(core,/window\.openKuningriigidResearchV296=openResearch/);
