@@ -1,0 +1,38 @@
+// V295: a single background artwork per orientation, with real discovery elements.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {TECHS,newResearch,queueResearch} from '../research.js';
+import {techArtSrc} from '../research-art-v293.js';
+const read=name=>fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
+const html=read('index.html');
+const css=read('research-panel-v295.css');
+const js=read('research-panel-v295.js');
+const mobile=read('ui-art-v295/research_menu_mobile.svg');
+const desktop=read('ui-art-v294/research_menu_bg.svg');
+const ui=read('research-ui.js');
+assert.match(html,/<title>Kuningriigid · V295<\/title>/);
+assert.match(html,/id="menu-version">KUNINGRIIGID · V295</);
+assert.ok(html.indexOf('research-panel-v294.css')<html.indexOf('research-panel-v295.css'));
+assert.ok(html.indexOf('research-panel-v294.js')<html.indexOf('research-panel-v295.js'));
+assert.match(desktop,/viewBox="0 0 1600 920"/);
+assert.match(mobile,/viewBox="0 0 720 1280"/);
+assert.match(mobile,/<\/svg>/);
+assert.equal((mobile.match(/<circle cx="(?:88|224|360|496|632)" cy="1182" r="47"/g)||[]).length,5);
+assert.match(css,/background:#081c2f url\('ui-art-v294\/research_menu_bg\.svg'\)/);
+assert.match(css,/background:#081c2f url\('ui-art-v295\/research_menu_mobile\.svg'\)/);
+assert.match(css,/@media\(max-width:700px\) and \(orientation:portrait\)/);
+assert.match(css,/@media\(max-height:500px\) and \(orientation:landscape\)/);
+assert.match(css,/aspect-ratio:40 \/ 23/);
+assert.match(css,/background:transparent!important;background-image:none!important/);
+assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+assert.match(css,/\.tech-card\.tech-tree-node/);
+assert.match(css,/\.tech-inspector/);
+assert.match(css,/\.tech-map-viewport/);
+assert.match(js,/screen\.append\(close\)/); // close hotspot is no longer inside pointer-events:none title row
+assert.match(js,/screen\.classList\.add\('v294-research-screen','v295-research-screen'\)/);
+assert.match(ui,/const queueIds=\[active,\.\.\.Array\.from\(\{length:4\}/);
+assert.match(ui,/for\(let index=0;index<5;index\+\+\)/);
+assert.equal(newResearch().queue.length,0);
+assert.ok(Object.keys(TECHS).length>=130);
+for(const [id,tech] of Object.entries(TECHS))assert.ok(techArtSrc(id,tech).startsWith('data:image/svg+xml'),'Missing pictured tech '+id);
+console.log('V295 single-image research desktop + portrait: live queue, close control, art and responsive layout OK');
