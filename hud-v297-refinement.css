@@ -20,7 +20,6 @@
 }
 #v291-hud .v291-portrait>img{object-fit:cover!important}
 #v291-hud .v291-research-background{filter:drop-shadow(0 3px 4px #0008)}
-#v291-hud .v291-dock-background>img{display:none!important}
 /* A thin image of the carved original wooden footer takes the place of the
    old tall opaque blue rectangle. World map remains visible behind the cards. */
 @media (max-width:950px), (max-height:590px) and (pointer:coarse){
@@ -31,6 +30,7 @@
   background:url('ui-art-v297/footer_trim.svg') center bottom / 100% 21px no-repeat!important;
   z-index:1!important;pointer-events:none!important;
  }
+ #v291-hud .v291-dock-background>img{display:none!important}
  #v291-hud .v291-wood{height:7px!important}
  #v291-hud .v291-mobile-counters{background:none!important}
  #v291-hud .v291-mobile-toolbar{gap:2px!important}
