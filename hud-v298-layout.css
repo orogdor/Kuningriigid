@@ -105,7 +105,8 @@
 #v291-hud.v298-managed .v291-pause:disabled,
 #v291-hud.v298-managed .v291-play:disabled{display:none!important}
 #v291-hud.v298-managed .v291-wood{pointer-events:none!important;z-index:20!important}
-#v291-hud.v298-landscape .v291-mobile-toolbar{display:none!important}
+#v291-hud.v298-landscape:not(.v298-compact-landscape) .v291-mobile-toolbar{display:none!important}
+#v291-hud.v298-compact-landscape .v291-mobile-toolbar{display:flex!important}
 #v291-hud.v298-portrait .v291-mobile-counters .v291-mobile-value{
  font-size:clamp(9px,2.45vw,13px)!important;
 }
