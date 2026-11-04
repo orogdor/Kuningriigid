@@ -36,7 +36,7 @@ assert.match(ui,/techArtSrc\(id,TECHS\[id\]\)/);
 assert.ok(index.includes('research-art-v293.css?v=293a'));
 assert.ok(index.includes('hud-v293-research.js?v=293a'));
 assert.ok(index.includes('research-art-v293.js?v=293a'));
-const publishedVersion=Number((index.match(/<title>Kuningriigid · V([0-9]+)<\\/title>/)||[])[1]);
+const publishedVersion=Number((index.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
 assert.ok(publishedVersion>=293,'Published version is older than this UI test');
 assert.ok(index.includes('id="menu-version">KUNINGRIIGID · V'+publishedVersion+'<'),'Menu label differs from page title');
 assert.match(css,/\.v293-queue-center/);
