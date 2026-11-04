@@ -29,7 +29,9 @@ jobs:
           node --check civilization-core.js
           node --check stone-near-lod.js
           node --check hud-v301-background.js
+          node --check hud-v302-pieces.js
           node tests/ui-v301-background.mjs
+          node tests/ui-v302-pieces.mjs
       - name: Prepare site
         run: |
           mkdir -p /tmp/game-pages
