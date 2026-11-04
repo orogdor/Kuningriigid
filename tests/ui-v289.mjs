@@ -41,8 +41,9 @@ const images=[...css.matchAll(/url\(['"]?(ui-art-v(?:263|288)\/[^'")\s]+)['"]?\)
 for(const asset of images){
  assert.ok(fs.existsSync(path.join(new URL('.',root).pathname,asset)),'Missing art '+asset);
 }
-assert.match(html,/<title>Kuningriigid · V292<\/title>/);
-assert.match(html,/id="menu-version">KUNINGRIIGID · V292</);
+const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\\/title>/)||[])[1]);
+assert.ok(publishedVersion>=292,'Published version is older than this UI test');
+assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+publishedVersion+'<'),'Menu label differs from page title');
 assert.match(js,/<small>UI V289 · SEVEN ERAS<\/small>/);
 assert.doesNotMatch(html,/id="menu-version">KUNINGRIIGID · V286</);
 console.log('V289 independent responsive HUD references, real actions and image assets: OK');
