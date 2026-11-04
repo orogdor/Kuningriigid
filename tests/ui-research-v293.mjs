@@ -32,7 +32,7 @@ assert.match(tree,/techArtSrc\(id,tech\)/);
 assert.match(tree,/v293-tech-picture/);
 assert.match(tree,/v293-tech-detail-image/);
 assert.match(ui,/(v293-research-queue-item|v294-queue-slot)/); // V294 replaced the legacy list with five drawn slots
-assert.match(ui,/techArtSrc\(id,TECHS\[id\]\)/);
+assert.match(ui,/techArtSrc\(id,(TECHS\[id\]|tech)\)/); // V294 queue uses the local tech object
 assert.ok(index.includes('research-art-v293.css?v=293a'));
 assert.ok(index.includes('hud-v293-research.js?v=293a'));
 assert.ok(index.includes('research-art-v293.js?v=293a'));
