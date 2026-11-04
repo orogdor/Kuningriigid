@@ -1,7 +1,7 @@
 /* V298 — one authoritative responsive layout for the illustrated world HUD.
  * Existing V291 painted assets and real game actions are preserved. No extra
  * icon pictures are stacked over controls already painted inside the art.
- * All geometry, including transparent hit targets, comes from this file.
+ * All geometry, including the visible circular control images and hit targets, comes from this file.
  */
 (()=>{
  'use strict';
@@ -10,8 +10,10 @@
  const N=(root,selector)=>[...(root?.querySelectorAll(selector)||[])];
  const names=['research_compass','research_tools','research_gate','research_ship','research_city'];
  const researchRects=[[2,152,53,56],[42,160,58,61],[84,159,55,63],[123,152,55,59],[163,149,47,54]];
- const mapRects={map_zoom_in:[211,39,61,62],map_camera:[234,88,67,59],map_show:[232,144,70,67]};
- const unitRects={cmd_attack:[20,64,68,68],cmd_move:[83,24,69,69],cmd_defend:[20,129,68,68],cmd_city:[82,128,71,69]};
+ // Original image cutouts are measured from the 311x238 minimap illustration, not guessed circle centers.
+ const mapRects={map_zoom_in:[203,22,68,71],map_camera:[237,64,69,74],map_show:[230,125,78,80]};
+ // Command cutouts are relative to the 379x234 selection frame; some legitimately extend 9px left.
+ const unitRects={cmd_attack:[-9,46,86,84],cmd_move:[62,10,74,81],cmd_defend:[-9,111,80,83],cmd_city:[71,118,67,67]};
  const geometry=['left','top','right','bottom','width','height','display'];
  let root,frame=0,managed=false,lastMode='',lastW=0,lastH=0;
  const set=(node,k,v)=>node?.style.setProperty(k,v,'important');
@@ -52,7 +54,14 @@
   const select=A(root,'.v291-selection-frame');
   for(const [id,r] of Object.entries(unitRects))frameHit(A(root,'[data-art="'+id+'"]'),select,379,234,r);
   const more=A(root,'.v291-unit-info');
-  frameHit(more,select,379,234,[142,12,44,43]);
+  frameHit(more,select,379,234,[138,6,40,48]);
+  // Zoom-out is an EXTRA standalone button. Never cover the painted zoom-in circle.
+  const zoomOut=A(root,'.v292-zoom-out');
+  if(zoomOut&&mini&&getComputedStyle(mini).display!=='none'){
+   const b=mini.getBoundingClientRect();
+   const size=Math.max(27,Math.min(43,b.width*.15));
+   area(zoomOut,b.left+b.width*.57,b.top-size-3,size,size);
+  }
  }
  function mobileLayout(){
   const w=window.innerWidth,h=window.innerHeight;
@@ -141,12 +150,7 @@
   if(!mVisible)N(root,'.v291-minimap-button').forEach(hide);
   if(!sVisible){N(root,'.v291-unit-button').forEach(hide);hide(A(root,'.v291-unit-info'));}
   const zoom=A(root,'.v292-zoom-out');
-  if(zoom){
-   if(mVisible){
-    const b=mini.getBoundingClientRect();
-    area(zoom,b.left+b.width*.72,b.top+b.height*.06,Math.max(23,b.width*.18),Math.max(23,b.width*.18));
-   }else hide(zoom);
-  }
+  if(zoom&&!mVisible)hide(zoom); // setHotspots places it outside the frame when visible.
   lastMode=portrait?'portrait':'landscape';lastW=w;lastH=h;
  }
  function update(){
@@ -154,6 +158,18 @@
   if(!root)return;
   mobileLayout();
   setHotspots();
+  if(!managed&&document.body.classList.contains('v291-active')){
+   // V291 rendered Pause + Resume + a disabled speed icon simultaneously.
+   // Use ONE live control in the same golden slot, with no overlapping art.
+   const pause=A(root,'.v291-pause'),play=A(root,'.v291-play'),speed=A(root,'.v291-speed');
+   const b=pause?.getBoundingClientRect();
+   const paused=!!window.kingdomsUiV288?.snapshot?.()?.paused;
+   if(b?.width){
+    area(pause,b.left,b.top,b.width,b.height,paused?'none':'block');
+    area(play,b.left,b.top,b.width,b.height,paused?'block':'none');
+   }
+   hide(speed);
+  }
   const chosen=A(root,'.v291-selected-text');
   if(chosen&&root.classList.contains('v298-managed')){
    set(chosen,'font-size',Math.max(10,Math.min(14,(A(root,'.v291-selection-frame')?.getBoundingClientRect().width||155)*.07))+'px');
