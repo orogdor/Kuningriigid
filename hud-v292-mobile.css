@@ -1,0 +1,78 @@
+/* V292: V291 painted assets resized for mobile, not replaced by generic widgets. */
+#v291-hud .v292-zoom-out{display:none!important;position:absolute;pointer-events:auto;z-index:27}
+@media(max-width:950px), (max-height:590px) and (pointer:coarse){
+#v291-hud{--mobile-top:42px;--mobile-dock:clamp(124px,19vh,153px);--drawer-top:115px}
+#v291-hud .v291-brand{left:0!important;top:0!important;width:min(35vw,140px)!important;height:42px!important}
+#v291-hud .v291-world{left:35%!important;top:0!important;width:40%!important;height:42px!important}
+#v291-hud .v291-pause,#v291-hud .v291-play{right:3px!important;left:auto!important;top:0!important;width:36px!important;height:42px!important}
+#v291-hud .v291-pause:disabled,#v291-hud .v291-play:disabled{display:none!important}
+#v291-hud .v291-play:not(:disabled){display:block!important}
+#v291-hud .v291-speed,#v291-hud .v291-ledger,#v291-hud .v291-date{display:none!important}
+#v291-hud .v291-mobile-counters{display:flex!important;position:absolute!important;left:0!important;top:42px!important;right:0!important;width:100%!important;height:34px!important;gap:0!important;overflow:hidden!important;background:url('ui-art-v291/footer_navy.webp') center top/100% 300% no-repeat!important;pointer-events:none!important;z-index:12}
+#v291-hud .v291-mobile-counter{position:relative!important;flex:1 1 0!important;min-width:0!important;width:20%!important;height:100%!important;pointer-events:auto!important;cursor:pointer}
+#v291-hud .v291-mobile-counter img{height:100%!important;width:100%!important;object-fit:fill!important}
+#v291-hud .v291-mobile-value{left:37%!important;right:0!important;top:19%!important;width:63%!important;height:66%!important;display:flex!important;align-items:center;justify-content:center;font:700 clamp(9px,2.4vw,14px) Georgia,serif!important;color:#ffe7b5!important;text-align:center!important}
+#v291-hud .v291-dock-background{left:0!important;right:0!important;top:auto!important;bottom:0!important;width:100%!important;height:calc(var(--mobile-dock) + 18px)!important;background:url('ui-art-v291/footer_navy.webp') center top/100% 300% no-repeat!important;z-index:1!important}
+#v291-hud .v291-dock-background>img{display:none!important}
+#v291-hud .v291-wood{left:0!important;top:auto!important;bottom:0!important;width:100%!important;height:9px!important;z-index:21!important}
+#v291-hud .v291-command-dock{left:5px!important;right:5px!important;top:auto!important;bottom:calc(7px + env(safe-area-inset-bottom,0px))!important;width:auto!important;height:var(--mobile-dock)!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:3px!important;z-index:20!important;pointer-events:none!important}
+#v291-hud .v291-card{display:block!important;position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;overflow:hidden!important;pointer-events:auto!important}
+#v291-hud .v291-card img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center bottom!important}
+#v291-hud .v291-mobile-toolbar{display:flex!important;position:absolute!important;top:81px!important;left:auto!important;right:6px!important;height:36px!important;z-index:30!important;gap:5px!important;pointer-events:none!important}
+#v291-hud .v291-mobile-toggle{width:40px!important;height:36px!important;min-width:40px!important;min-height:36px!important;padding:0!important;background:transparent!important;border:0!important;pointer-events:auto!important}
+#v291-hud .v291-research-background,#v291-hud .v291-research-main,#v291-hud .v291-research-queue,#v291-hud .v291-minimap-frame,#v291-hud .v291-minimap-button,#v291-hud .v291-selection-frame,#v291-hud .v291-unit-button,#v291-hud .v291-unit-info{display:none!important}
+#v291-hud.v291-show-research .v291-research-background,#v291-hud.v291-show-research .v291-research-main,#v291-hud.v291-show-research .v291-research-queue,#v291-hud.v291-show-map .v291-minimap-frame,#v291-hud.v291-show-map .v291-minimap-button,#v291-hud.v291-show-map .v292-zoom-out,#v291-hud.v291-show-units .v291-selection-frame,#v291-hud.v291-show-units .v291-unit-button{display:block!important}
+#v291-hud .v291-research-background{left:5px!important;top:var(--drawer-top)!important;width:171px!important;height:235px!important}
+#v291-hud .v291-research-main{left:26px!important;top:calc(var(--drawer-top) + 5px)!important;width:144px!important;height:118px!important}
+#v291-hud .v291-research-queue{top:calc(var(--drawer-top) + 121px)!important;width:37px!important;height:42px!important}
+#v291-hud [data-art='research_compass']{left:5px!important}
+#v291-hud [data-art='research_tools']{left:39px!important}
+#v291-hud [data-art='research_gate']{left:76px!important}
+#v291-hud [data-art='research_ship']{left:111px!important}
+#v291-hud [data-art='research_city']{left:148px!important}
+#v291-hud .v291-minimap-frame{left:5px!important;top:var(--drawer-top)!important;width:225px!important;height:172px!important}
+#v291-hud .v291-minimap-button,#v291-hud .v292-zoom-out{position:absolute!important;top:calc(var(--drawer-top) + 8px)!important;width:40px!important;height:42px!important;z-index:27!important}
+#v291-hud [data-art='map_zoom_in']{left:144px!important}
+#v291-hud [data-art='map_camera']{left:182px!important;top:calc(var(--drawer-top) + 44px)!important}
+#v291-hud [data-art='map_show']{left:178px!important;top:calc(var(--drawer-top) + 94px)!important}
+#v291-hud .v292-zoom-out{left:182px!important}
+#v291-hud .v291-selection-frame{left:auto!important;right:5px!important;top:var(--drawer-top)!important;width:267px!important;height:165px!important}
+#v291-hud .v291-unit-button{left:auto!important;width:44px!important;height:44px!important;z-index:27!important}
+#v291-hud [data-art='cmd_attack']{right:205px!important;top:calc(var(--drawer-top) + 37px)!important}
+#v291-hud [data-art='cmd_move']{right:155px!important;top:calc(var(--drawer-top) + 7px)!important}
+#v291-hud [data-art='cmd_defend']{right:205px!important;top:calc(var(--drawer-top) + 97px)!important}
+#v291-hud [data-art='cmd_city']{right:155px!important;top:calc(var(--drawer-top) + 95px)!important}
+#v291-hud .v291-dialog{width:min(380px,calc(100vw - 24px))!important;max-height:55vh!important;top:47%!important}
+body.v291-active.atlas #v264-listpanel,body.v291-active.atlas #atlaspanel{left:50%!important;right:auto!important;top:auto!important;bottom:calc(var(--mobile-dock) + 16px)!important;transform:translateX(-50%)!important;max-height:45vh!important;width:min(380px,calc(100vw - 16px))!important}
+}
+@media(max-width:950px) and (orientation:landscape) and (max-height:590px), (max-height:440px) and (orientation:landscape){
+#v291-hud{--mobile-dock:clamp(70px,20vh,91px);--drawer-top:75px}
+#v291-hud .v291-brand{width:min(17vw,140px)!important;height:39px!important}
+#v291-hud .v291-world{left:76%!important;width:18%!important;height:39px!important}
+#v291-hud .v291-pause,#v291-hud .v291-play{width:38px!important;height:39px!important}
+#v291-hud .v291-mobile-counters{left:16%!important;right:24%!important;top:0!important;width:auto!important;height:39px!important;background:none!important}
+#v291-hud .v291-mobile-value{font-size:clamp(9px,1.32vw,13px)!important}
+#v291-hud .v291-mobile-toolbar{top:42px!important}
+#v291-hud .v291-command-dock{grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-template-rows:minmax(0,1fr)!important;left:clamp(130px,19vw,202px)!important;right:clamp(130px,19vw,202px)!important;bottom:5px!important;gap:2px!important}
+#v291-hud .v291-minimap-frame{display:block!important;left:3px!important;right:auto!important;top:auto!important;bottom:5px!important;width:clamp(124px,19vw,176px)!important;height:clamp(94px,14.5vw,135px)!important}
+#v291-hud .v291-selection-frame{display:block!important;left:auto!important;right:3px!important;top:auto!important;bottom:5px!important;width:clamp(124px,19vw,176px)!important;height:clamp(78px,11.8vw,109px)!important}
+#v291-hud .v291-minimap-button,#v291-hud .v291-unit-button,#v291-hud .v292-zoom-out{display:block!important;width:32px!important;height:32px!important;top:auto!important}
+#v291-hud [data-art='cmd_attack']{right:104px!important;bottom:48px!important}
+#v291-hud [data-art='cmd_move']{right:89px!important;bottom:75px!important}
+#v291-hud [data-art='cmd_defend']{right:104px!important;bottom:11px!important}
+#v291-hud [data-art='cmd_city']{right:89px!important;bottom:8px!important}
+#v291-hud [data-art='map_zoom_in']{left:calc(clamp(124px,19vw,176px) - 45px)!important;bottom:95px!important}
+#v291-hud [data-art='map_camera']{left:calc(clamp(124px,19vw,176px) - 29px)!important;bottom:56px!important}
+#v291-hud [data-art='map_show']{left:calc(clamp(124px,19vw,176px) - 29px)!important;bottom:17px!important}
+#v291-hud .v292-zoom-out{left:calc(clamp(124px,19vw,176px) - 45px)!important;bottom:121px!important}
+#v291-hud .v291-research-background{display:block!important;left:2px!important;top:58px!important;width:112px!important;height:154px!important}
+#v291-hud .v291-research-main{display:block!important;left:15px!important;top:60px!important;width:96px!important;height:78px!important}
+#v291-hud .v291-research-queue{display:block!important;top:135px!important;width:24px!important;height:28px!important}
+#v291-hud [data-art='research_compass']{left:0!important}
+#v291-hud [data-art='research_tools']{left:23px!important}
+#v291-hud [data-art='research_gate']{left:46px!important}
+#v291-hud [data-art='research_ship']{left:69px!important}
+#v291-hud [data-art='research_city']{left:92px!important}
+#v291-hud .v291-research-title{font-size:8px!important}
+}
+@media(max-width:950px) and (orientation:portrait){#v291-hud{--mobile-dock:clamp(124px,19vh,153px)}}
