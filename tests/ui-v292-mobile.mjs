@@ -7,7 +7,7 @@ const original=read('hud-v291.js');
 const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
 assert.ok(publishedVersion>=292,'Published version is older than this UI test');
 assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+publishedVersion+'<'),'Menu label differs from page title');
-assert.ok(html.includes('hud-v298-layout.css?v=298a'),'Missing active responsive artwork CSS');
+assert.ok(html.includes('hud-v298-layout.css?v=299a'),'Missing active responsive artwork CSS');
 assert.ok(!html.includes('hud-v292-mobile.css'),'Old V292 mobile layout must be retired');
 assert.match(html,/hud-v292-mobile\.js\?v=(?:292a|296a)/,'Missing V292/V296 mobile controls');
 assert.ok(html.indexOf('hud-v291.css')<html.indexOf('hud-v298-layout.css'));
