@@ -360,3 +360,19 @@ body:has(#researchpanel:not([hidden])) #v288-map-tools {display:none!important}
   flex-direction:row!important;
  }
 }
+
+
+/* The five empty queue circles are already drawn in the single image.
+   Only a small + is rendered over a vacant slot. */
+#researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-empty-mark{
+ display:block!important;width:45px!important;flex:0 0 45px!important;
+ text-align:center!important;
+ font:700 clamp(21px,3vw,39px)/1 Georgia,serif!important;
+ color:#e9ca89!important;text-shadow:0 2px 4px #061522!important;
+ pointer-events:none!important;
+}
+@media(max-width:600px){
+ #researchpanel .research-window.v294-research-screen #researchqueue .v294-queue-empty-mark{
+  width:28px!important;flex-basis:28px!important;font-size:26px!important;
+ }
+}
