@@ -59,6 +59,7 @@
   }
  }
  function update(){
+  if(window.KuningriigidV302?.active)return;
   if(!root)return;
   const active=!responsive();
   root.classList.toggle('v301-picture',active);

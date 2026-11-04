@@ -1,0 +1,56 @@
+/* V302: independent art layers, 20% shorter bottom dock, blank six cards. */
+#v291-hud .v302-picture-part{display:none;position:absolute;pointer-events:none;object-fit:fill;max-width:none;z-index:3}
+#v291-hud.v302-pieces .v302-picture-part{display:block!important}
+#v291-hud.v302-pieces #v302-header{z-index:3}
+#v291-hud.v302-pieces #v302-research{z-index:5}
+#v291-hud.v302-pieces #v302-minimap,
+#v291-hud.v302-pieces #v302-dock,
+#v291-hud.v302-pieces #v302-selection{z-index:5}
+#v291-hud.v302-pieces #v301-backdrop-top,
+#v291-hud.v302-pieces #v301-backdrop-bottom{display:none!important}
+/* Hide old image fragments, keeping live text, minimap canvas and commands. */
+#v291-hud.v302-pieces .v291-brand>.v291-sprite,
+#v291-hud.v302-pieces .v291-ledger>.v291-sprite,
+#v291-hud.v302-pieces .v291-world>.v291-sprite,
+#v291-hud.v302-pieces .v291-date>.v291-sprite,
+#v291-hud.v302-pieces .v291-pause>.v291-sprite,
+#v291-hud.v302-pieces .v291-play>.v291-sprite,
+#v291-hud.v302-pieces .v291-research-background>.v291-sprite,
+#v291-hud.v302-pieces .v291-research-queue>.v291-sprite,
+#v291-hud.v302-pieces .v291-minimap-frame>.v291-sprite,
+#v291-hud.v302-pieces .v291-minimap-button>.v291-sprite,
+#v291-hud.v302-pieces .v291-selection-frame>.v291-sprite,
+#v291-hud.v302-pieces .v291-unit-button>.v291-sprite,
+#v291-hud.v302-pieces .v291-unit-info>img,
+#v291-hud.v302-pieces .v291-card>img,
+#v291-hud.v302-pieces .v301-card-caption,
+#v291-hud.v302-pieces .v291-footer-navy,
+#v291-hud.v302-pieces .v291-wood,
+#v291-hud.v302-pieces .v291-dock-background{display:none!important}
+/* Keep the center command dock EMPTY until button art is designed later. */
+#v291-hud.v302-pieces .v291-card{background:none!important;border:0!important;box-shadow:none!important;z-index:20!important;opacity:0!important;cursor:pointer}
+#v291-hud.v302-pieces .v291-card:focus-visible{opacity:1!important;outline:2px solid #f5d28a!important}
+#v291-hud.v302-pieces .v291-minimap-frame,
+#v291-hud.v302-pieces .v291-selection-frame{z-index:10!important;filter:none!important}
+#v291-hud.v302-pieces .v291-real-map{
+ left:10.5%!important;top:24%!important;width:61%!important;height:62%!important;
+ z-index:12!important;border-radius:50%!important;clip-path:circle(50% at 50% 50%)!important;
+}
+#v291-hud.v302-pieces .v291-portrait{
+ left:35%!important;top:24%!important;width:57%!important;height:61%!important;
+ z-index:13!important;clip-path:circle(50% at 50% 50%)!important;
+}
+#v291-hud.v302-pieces .v291-selected-text{
+ left:38%!important;top:78%!important;width:54%!important;height:13%!important;
+ z-index:14!important;color:#3b2918!important;
+}
+#v291-hud.v302-pieces .v291-minimap-button,
+#v291-hud.v302-pieces .v291-unit-button,
+#v291-hud.v302-pieces .v291-unit-info{z-index:32!important;opacity:1!important;pointer-events:auto!important}
+#v291-hud.v302-pieces .v291-minimap-button:after{content:none!important}
+#v291-hud.v302-pieces .v291-unit-button:disabled{opacity:.6!important}
+#v291-hud.v302-pieces .v291-research-background,
+#v291-hud.v302-pieces .v291-research-main,
+#v291-hud.v302-pieces .v291-research-queue{z-index:26!important}
+#v291-hud.v302-pieces .v291-research-main{background:transparent!important}
+#v291-hud.v302-pieces .v291-research-queue{background:transparent!important}
