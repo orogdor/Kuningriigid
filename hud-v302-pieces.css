@@ -3,9 +3,11 @@
 #v291-hud.v302-pieces .v302-picture-part{display:block!important}
 #v291-hud.v302-pieces #v302-header{z-index:3}
 #v291-hud.v302-pieces #v302-research{z-index:5}
+/* The dock runs 28 reference pixels BEHIND each side panel. Side gold
+   borders sit on top, concealing the horizontal join at every aspect ratio. */
+#v291-hud.v302-pieces #v302-dock{z-index:5}
 #v291-hud.v302-pieces #v302-minimap,
-#v291-hud.v302-pieces #v302-dock,
-#v291-hud.v302-pieces #v302-selection{z-index:5}
+#v291-hud.v302-pieces #v302-selection{z-index:7}
 #v291-hud.v302-pieces #v301-backdrop-top,
 #v291-hud.v302-pieces #v301-backdrop-bottom{display:none!important}
 /* Hide old image fragments, keeping live text, minimap canvas and commands. */

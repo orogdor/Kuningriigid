@@ -3,12 +3,25 @@
 (()=>{
  'use strict';
  const BASE_W=1672,BASE_H=941;
+ // Fixed anchor panels; the six-card dock is JOINED to their inner edges.
+ // Overlap is measured in reference pixels, then scaled together with both panels.
+ const MINIMAP=[0,611,343,318], SELECTION=[1290,611,382,318];
+ const DOCK_TOP=752,DOCK_HEIGHT=143,DOCK_OVERLAP=28;
+ function joinedDockRect(left,right,overlap,top,height){
+  const x=left[0]+left[2]-overlap;
+  const rightEdge=right[0]+overlap;
+  if(rightEdge<=x)throw new Error('Bottom UI panels have no space for the dock');
+  return [x,top,rightEdge-x,height];
+ }
+ const dockRect=joinedDockRect(MINIMAP,SELECTION,DOCK_OVERLAP,DOCK_TOP,DOCK_HEIGHT);
+ // Pure geometry hook for regression tests, not a gameplay API.
+ window.KuningriigidDockGeometryV302={joinedDockRect};
  const parts=[
   ['header',[0,0,1672,78],false],
   ['research',[8,65,240,342],false],
-  ['minimap',[0,611,343,318],true],
-  ['dock',[346,752,944,143],true],
-  ['selection',[1290,611,382,318],true]
+  ['minimap',MINIMAP,true],
+  ['dock',dockRect,true],
+  ['selection',SELECTION,true]
  ];
  const $=s=>root?.querySelector(s);
  let root, elements=[],wasActive=false;
@@ -26,9 +39,15 @@
    ['.v291-minimap-frame',[0,611,343,318],true],
    ['.v291-selection-frame',[1290,611,382,318],true]
   ];
-  const cardX=[357,513,668,824,980,1136];
+  // Align the six real command hitboxes to the six parchment slots of the
+  // stretched dock; no screen-center constants or invisible gaps at the joins.
+  const dockInset=26,slot=(dockRect[2]-2*dockInset)/6;
   const card=[...root.querySelectorAll('.v291-card')];
-  card.forEach((el,i)=>{if(i<6)adjusted.push([el,[cardX[i],766,137,115],true]);});
+  card.forEach((el,i)=>{
+   if(i>=6)return;
+   const rect=[dockRect[0]+dockInset+i*slot+5,dockRect[1]+14,slot-10,dockRect[3]-28];
+   adjusted.push([el,rect,true]);
+  });
   for(const [selector,rect,bottom] of adjusted){const node=typeof selector==='string'?$(selector):selector;place(node,rect,s,dx,bottom?dy:0);}
   // Invisible genuine controls are aligned with the newly painted empty sockets.
   const mapButtons=[...root.querySelectorAll('.v291-minimap-button')];
@@ -58,7 +77,7 @@
   root=document.getElementById('v291-hud');if(!root)return;
   for(const [name,rect,bottom] of parts){
    const img=document.createElement('img');img.id='v302-'+name;img.className='v302-picture-part';
-   img.src='ui-art-v302/'+name+'.webp?v=302a';img.alt='';img.draggable=false;
+   img.src='ui-art-v302/'+name+'.webp?v=302b';img.alt='';img.draggable=false;
    img.setAttribute('aria-hidden','true');root.prepend(img);elements.push([img,rect,bottom]);
   }
   update();addEventListener('resize',update,{passive:true});
