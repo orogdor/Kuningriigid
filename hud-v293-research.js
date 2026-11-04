@@ -17,7 +17,7 @@
    tree.dataset.renderKey=''; // force a new inspector selection even when research state is unchanged
   }
   const panel=$('researchpanel');
-  if(panel?.hidden)$('techtoggle')?.click();
+  if(panel?.hidden){const real=window.openKuningriigidResearchV296;if(typeof real==='function')real();else $('techtoggle')?.click();}
   else if(id){tree?.querySelector('.tech-map-viewport')?.focus?.()}
  }
  function enhanceSlot(button,i){

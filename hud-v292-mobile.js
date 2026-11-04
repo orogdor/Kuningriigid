@@ -25,7 +25,7 @@
    node.setAttribute('aria-label',kind==='science'?'Uurimus / Research':kind==='population'?'Linnad / Cities':kind);
    const open=e=>{
     e.stopPropagation();
-    if(kind==='science')$('techtoggle')?.click();
+    if(kind==='science'){const real=window.openKuningriigidResearchV296;if(typeof real==='function')real();else $('techtoggle')?.click();}
     else if(kind==='population')$('hud-city')?.click();
     else if(groups[kind])document.querySelector('#resources .v264-chip[data-group="'+groups[kind]+'"]')?.click();
    };
