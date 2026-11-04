@@ -99,7 +99,7 @@ import {createSiegeWorkModel} from './siege-work-visual-v108.js?v=117a';
 import {TECHS,BUILD_TECH,UNIT_TECH,TURN_SECONDS,techBlock,ERA_NAMES} from './research.js?v=125a';
 import {researchCost} from './science.js';
 import {tempoMultiplier,tempoName} from './tempo.js';
-import {renderResearchUI} from './research-ui.js?v=125a';
+import {renderResearchUI} from './research-ui.js?v=294a';
 import {BUILD_CATEGORIES,buildingCategory,matchesBuilding,appendBuildingCard,renderBuildingCategories} from './build-catalog-v121.js?v=127a';
 import {TileDoubleTap,detailWheelTransition} from './map-gestures-v121.js?v=123a';
 import {createWildlife,createWorldUnit,updateWorldUnit,worldTravelSample} from './map-units.js?v=59';
