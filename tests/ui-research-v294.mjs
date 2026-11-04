@@ -1,0 +1,45 @@
+// V294: one illustrated menu image with live discoveries above it.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {TECHS,newResearch,queueResearch} from '../research.js';
+import {techArtSrc} from '../research-art-v293.js';
+const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const html=read('index.html'),css=read('research-panel-v294.css'),js=read('research-panel-v294.js');
+const ui=read('research-ui.js'),core=read('civilization.js');
+const background=read('ui-art-v294/research_menu_bg.svg');
+assert.ok(background.startsWith('<?xml')&&background.includes('viewBox="0 0 1600 920"'));
+assert.match(background,/<\/svg>/);
+assert.equal((css.match(/url\(/g)||[]).length,1,'Exactly one background image for the whole research UI');
+assert.match(css,/research_menu_bg\.svg/);
+assert.match(css,/#researchpanel:not\(\[hidden\]\)/);
+assert.match(css,/z-index:300!important/);
+assert.match(css,/body:has\(#researchpanel:not\(\[hidden\]\)\) #v291-hud/);
+assert.match(css,/#researchpanel .research-window\.v294-research-screen #researchtree/);
+assert.match(css,/\.tech-card\.tech-tree-node/);
+assert.match(css,/background-image:none!important/);
+assert.match(css,/#researchqueue \.v294-queue-slot/);
+assert.match(css,/@media\(max-width:900px\)/);
+assert.match(css,/@media\(max-width:520px\)/);
+assert.match(css,/@media\(max-height:500px\) and \(orientation:landscape\)/);
+assert.match(js,/v294-research-screen/);
+assert.match(js,/researchtitle/);
+assert.match(js,/researchtree/);
+assert.match(html,/<title>Kuningriigid · V294<\/title>/);
+assert.match(html,/id="menu-version">KUNINGRIIGID · V294</);
+assert.match(html,/research-panel-v294\.css\?v=294a/);
+assert.match(html,/research-panel-v294\.js\?v=294a/);
+assert.match(core,/research-ui\.js\?v=294a/);
+assert.match(ui,/const queueIds=\[active,\.\.\.Array\.from\(\{length:4\}/);
+assert.match(ui,/for\(let index=0;index<5;index\+\+\)/);
+assert.match(ui,/if\(index>0\)\{remove\(id\);return;\}/);
+assert.match(ui,/techArtSrc\(id,tech\)/);
+assert.match(ui,/tree\.dataset\.selectedTech=id/);
+assert.match(ui,/renderTechTreeV119\(tree,game/);
+assert.equal(newResearch().queue.length,0);
+const ids=Object.keys(TECHS);
+assert.ok(ids.length>=130,'Research catalog unexpectedly reduced');
+for(const id of ids){
+ const tech=TECHS[id];const uri=techArtSrc(id,tech);
+ assert.ok(uri.startsWith('data:image/svg+xml;charset=utf-8,'),'Picture missing: '+id);
+}
+console.log('V294: single painted research image, live 5-slot queue, '+ids.length+' pictured technologies and responsive menus OK');

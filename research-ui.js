@@ -33,8 +33,38 @@ export function renderResearchUI(game,{choose,queue,remove,details=true}){
   return;
  }
  tree.dataset.renderKey=stamp;
- const queued=document.getElementById('researchqueue');queued.innerHTML='';
- for(const id of r.queue||[]){if(!TECHS[id])continue;const item=document.createElement('button');item.type='button';item.className='v293-research-queue-item';item.title='Eemalda uurimisjärjekorrast: '+TECHS[id].name;item.setAttribute('aria-label',item.title);const icon=document.createElement('img');icon.src=techArtSrc(id,TECHS[id]);icon.alt='';item.append(icon);const label=document.createElement('span');label.textContent=TECHS[id].name;item.append(label);const close=document.createElement('strong');close.textContent='×';item.append(close);item.onclick=()=>remove(id);queued.append(item)}
+ const queued=document.getElementById('researchqueue');queued.replaceChildren();
+ queued.setAttribute('role','group');
+ queued.setAttribute('aria-label','Uurimisjärjekord: aktiivne avastus ja neli järgmist');
+ const queueIds=[active,...Array.from({length:4},(_,i)=>r.queue?.[i]||null)];
+ for(let index=0;index<5;index++){
+  const id=queueIds[index],tech=id?TECHS[id]:null;
+  const slot=document.createElement('button');slot.type='button';
+  slot.className='v294-queue-slot '+(tech?(index===0?'v294-active':'v294-pending'):'v294-empty');
+  slot.dataset.slot=String(index);slot.dataset.tech=id||'';
+  slot.title=tech?(index===0?'Uurimisel: ':'Uurimisjärjekorras: ')+tech.name:(index===0?'Vali avastus':'Järjekorras vaba koht');
+  slot.setAttribute('aria-label',slot.title);
+  if(tech){
+   const picture=document.createElement('img');picture.src=techArtSrc(id,tech);picture.alt='';picture.draggable=false;slot.append(picture);
+   const caption=document.createElement('span');caption.className='v294-queue-caption';caption.textContent=tech.name;slot.append(caption);
+   if(index>0){const removeMark=document.createElement('span');removeMark.className='v294-queue-remove';removeMark.textContent='×';removeMark.setAttribute('aria-hidden','true');slot.append(removeMark)}
+   slot.onclick=()=>{
+    if(index>0){remove(id);return;}
+    tree.dataset.selectedTech=id;tree.dataset.renderKey='';
+    renderResearchUI(game,{choose,queue,remove,details:true});
+    requestAnimationFrame(()=>{
+     const card=tree.querySelector('.tech-card[data-tech="'+id+'"]');
+     const frame=tree.querySelector('.tech-map-viewport');
+     if(card&&frame){const top=card.getBoundingClientRect().top-frame.getBoundingClientRect().top;
+      frame.scrollTop+=top-frame.clientHeight/3;}
+    });
+   };
+  }else{
+   const mark=document.createElement('span');mark.className='v294-queue-empty-mark';mark.textContent='+';mark.setAttribute('aria-hidden','true');slot.append(mark);
+   slot.onclick=()=>tree.querySelector('.tech-map-viewport')?.focus?.();
+  }
+  queued.append(slot);
+ }
  tree.innerHTML='';
  renderTechTreeV119(tree,game,{choose,queue,remove,rate});
 }
