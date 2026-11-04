@@ -2,12 +2,12 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=f=>fs.readFileSync(new URL('../'+f,import.meta.url),'utf8');
-const html=read('index.html'),js=read('hud-v291.js'),css=read('hud-v291.css');
+const html=read('index.html'),js=read('hud-v291.js'),css=read('hud-v291.css'),ctx=read('selection-context-v300.js');
 const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
 assert.ok(publishedVersion>=292,'Published version is older than this UI test');
 assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+publishedVersion+'<'),'Menu label differs from page title');
 assert.ok(html.includes('hud-v291.css?v=298a'),'Missing updated V291 artwork CSS');
-assert.match(html,/hud-v291\.js\?v=(?:291a|296a|297a|298a|299a)/,'Missing current illustrated HUD');
+assert.match(html,/hud-v291\.js\?v=(?:291a|296a|297a|298a|299a|300a)/,'Missing current illustrated HUD');
 assert.ok(html.indexOf('hud-v290.css')<html.indexOf('hud-v291.css'));
 assert.ok(html.indexOf('hud-v290.js')<html.indexOf('hud-v291.js'));
 assert.match(js,/get\('ui'\)==='art'/);
@@ -19,7 +19,7 @@ assert.match(js,/new MutationObserver\(activate\)/);
 assert.match(js,/oldMapHome\.parentNode\.insertBefore\(liveMap,oldMapHome\)/);
 assert.match(js,/root\.querySelector\('\.v291-real-map'\)\.append\(canvas\)/);
 for(const cmd of ['hud-city','hud-build','hud-army','hud-trade-v276','journal','techtoggle','maptoggle','zin','commandmove','commandattack','commandstop','pause']){
- assert.ok(js.includes("'"+cmd+"'"),'Missing original game action '+cmd);
+ assert.ok((js+ctx).includes("'"+cmd+"'"),'Missing original game action '+cmd);
 }
 assert.doesNotMatch(js,/endTurn\s*\(/);
 assert.match(css,/body\.v291-active\.atlas #v290-hud/);

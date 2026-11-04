@@ -1531,7 +1531,23 @@ window.kingdomsUiV288={
    return {team,name:FACTION_NAMES[team]||('Riik '+(team+1)),population:Math.floor(population),towns:cities.length,relation:team===0?'own':relation(s,0,team)};
   });
   const current=s.research?.[0]?.active||null;
-  return {view,age:AGES[s.ages?.[0]||0]?.name||'Stone Age',
+  const q=currentSelection();
+  const city=!q&&view==='local'&&activeCity()?.team===0?activeCity():null;
+  const unitType=String(q?.entity?.kind||'');
+  const workerLike=q?.kind==='settler'||(q?.kind==='unit'&&/worker|builder|labor|peasant|settler/i.test(unitType));
+  const category=workerLike?'worker':q?.kind==='unit'||q?.kind==='army'||q?.kind==='ship'?'unit':
+    q?.kind==='building'?'building':q?.kind==='trade'?'trade':city?'city':'none';
+  // Read-only selection summary: no game objects exposed or mutated.
+  const selection={
+   kind:category,name:q?.name||(city?.name||''),
+   own:q?Number(q.entity?.team)===0:!!city,
+   movable:!!q?.movable&&Number(q?.entity?.team)===0,
+   attackable:!!s.battle&&!s.battle.result&&q?.kind==='unit'&&Number(q.entity?.team)===0&&!q.entity?.reserve&&!q.entity?.routing,
+   scout:!!q&&(q.kind==='army'||q.kind==='unit')&&!!explorerArmy(),
+   order:commandMode,
+   team:q?.entity?.team??city?.team??null
+  };
+  return {view,age:AGES[s.ages?.[0]||0]?.name||'Stone Age',selection,
    turn:1+Math.floor(s.time/TURN_SECONDS),paused:!!paused,
    research:current?(TECHS[current]?.name||current):null,
    researchPercent:current?Math.max(0,Math.min(100,Math.round(100*(s.research?.[0]?.progress?.[current]||0)/Math.max(1,researchCost(s,TECHS[current]))))):0,
