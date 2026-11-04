@@ -162,7 +162,8 @@
    // V291 rendered Pause + Resume + a disabled speed icon simultaneously.
    // Use ONE live control in the same golden slot, with no overlapping art.
    const pause=A(root,'.v291-pause'),play=A(root,'.v291-play'),speed=A(root,'.v291-speed');
-   const b=pause?.getBoundingClientRect();
+   const pb=pause?.getBoundingClientRect(),rb=play?.getBoundingClientRect();
+   const b=pb?.width?pb:rb;
    const paused=!!window.kingdomsUiV288?.snapshot?.()?.paused;
    if(b?.width){
     area(pause,b.left,b.top,b.width,b.height,paused?'none':'block');
