@@ -1536,6 +1536,10 @@ window.kingdomsUiV288={
    research:current?(TECHS[current]?.name||current):null,
    researchPercent:current?Math.max(0,Math.min(100,Math.round(100*(s.research?.[0]?.progress?.[current]||0)/Math.max(1,researchCost(s,TECHS[current]))))):0,
    researchRate:Math.round(game.scienceRate(0)*10)/10,
+   researchActiveId:current,
+   researchActiveAge:current?(TECHS[current]?.age??0):null,
+   researchPaused:!!s.research?.[0]?.paused,
+   researchQueue:(s.research?.[0]?.queue||[]).slice(0,4).filter(id=>TECHS[id]).map(id=>({id,name:TECHS[id].name,age:TECHS[id].age})),
    leaders};
  },
  diplomacy(team,status){
