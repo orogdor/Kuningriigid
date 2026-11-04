@@ -6,7 +6,9 @@
 (()=>{
  'use strict';
  const $=id=>document.getElementById(id), A='ui-art-v291/';
- const art=name=>A+name+'.webp';
+ // V297: separate alpha-cleaned picture sources, not CSS boxes. Keep all other art untouched.
+ const cleaned=new Set(['research_panel','selection_frame','minimap_frame','portrait_castle']);
+ const art=name=>cleaned.has(name)?'ui-art-v297/'+name+'.svg':A+name+'.webp';
  const et=()=> (document.documentElement.lang||'en').startsWith('et');
  const tr=(ee,en)=>et()?ee:en;
  const snap=()=>window.kingdomsUiV288?.snapshot?.();

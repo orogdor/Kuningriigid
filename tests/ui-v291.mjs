@@ -7,7 +7,7 @@ const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/ti
 assert.ok(publishedVersion>=292,'Published version is older than this UI test');
 assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+publishedVersion+'<'),'Menu label differs from page title');
 assert.ok(html.includes('hud-v291.css?v=291a'),'Missing V291 artwork CSS');
-assert.match(html,/hud-v291\.js\?v=(?:291a|296a)/,'Missing V291/V296 functional HUD');
+assert.match(html,/hud-v291\.js\?v=(?:291a|296a|297a)/,'Missing current illustrated HUD');
 assert.ok(html.indexOf('hud-v290.css')<html.indexOf('hud-v291.css'));
 assert.ok(html.indexOf('hud-v290.js')<html.indexOf('hud-v291.js'));
 assert.match(js,/get\('ui'\)==='art'/);
