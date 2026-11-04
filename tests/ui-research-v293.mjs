@@ -1,0 +1,44 @@
+/* V293: every existing research technology gets an image and queue slots map 1+4. */
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {techArtSrc,techArtMotif} from '../research-art-v293.js';
+import {TECHS,newResearch,queueResearch,startResearch} from '../research.js';
+const read=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
+const index=read('index.html'),ui=read('research-ui.js'),tree=read('research-tree-v119.js');
+const hud=read('hud-v293-research.js'),css=read('research-art-v293.css'),core=read('civilization.js');
+assert.ok(Object.keys(TECHS).length>=130,'Research count unexpectedly reduced');
+const urls=new Set();
+for(const [id,tech] of Object.entries(TECHS)){
+ const uri=techArtSrc(id,tech);
+ assert.ok(uri.startsWith('data:image/svg+xml;charset=utf-8,'),'No real image for '+id);
+ const raw=decodeURIComponent(uri.split(',').slice(1).join(','));
+ assert.match(raw,/<svg xmlns="http:\/\/www.w3.org\/2000\/svg"/);
+ assert.match(raw,/<\/svg>/);
+ assert.match(raw,/<circle/);
+ assert.match(raw,/<path/);
+ assert.ok(techArtMotif(id,tech),'No artwork motif for '+id);
+ assert.ok(!urls.has(uri),'Duplicate technology portrait '+id);
+ urls.add(uri);
+}
+assert.equal(newResearch().queue.length,0);
+assert.match(hud,/const positions=5;/);
+assert.match(hud,/const values=\[active,\.\.\.Array\.from\(\{length:4\}/);
+assert.match(hud,/const queue=\(state\.researchQueue\|\|\[\]\)\.slice\(0,4\)/);
+assert.match(hud,/stopImmediatePropagation\(\)/);
+assert.match(hud,/tree\.dataset\.selectedTech=id/);
+assert.match(core,/researchActiveId:current/);
+assert.match(core,/researchQueue:\(s\.research\?\.\[0\]\?\.queue\|\|\[\]\)\.slice\(0,4\)/);
+assert.match(tree,/techArtSrc\(id,tech\)/);
+assert.match(tree,/v293-tech-picture/);
+assert.match(tree,/v293-tech-detail-image/);
+assert.match(ui,/v293-research-queue-item/);
+assert.match(ui,/techArtSrc\(id,TECHS\[id\]\)/);
+assert.ok(index.includes('research-art-v293.css?v=293a'));
+assert.ok(index.includes('hud-v293-research.js?v=293a'));
+assert.ok(index.includes('research-art-v293.js?v=293a'));
+assert.match(index,/<title>Kuningriigid · V293<\/title>/);
+assert.match(index,/id="menu-version">KUNINGRIIGID · V293</);
+assert.match(css,/\.v293-queue-center/);
+assert.match(css,/\.v293-active-picture/);
+assert.match(css,/@media\(max-width:700px\)/);
+console.log('V293: '+urls.size+' distinct research portraits, 1 active + 4 queued circles, original queue preserved');
