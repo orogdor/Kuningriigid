@@ -20,3 +20,6 @@
 - Päris Androidi kasutajakogemus vajab telefonis kinnitust; automaattest ei asenda ekraanil vajutamise testi.
 
 Link: https://orogdor.github.io/Kuningriigid/?ui=art&v=296
+## Mobiili klõpsukatse
+- Chromiumi eraldiseisva HUD-i brauseritest mõõtudel 1536×691, 844×390, 390×844: avastusbadge vajutus avas menüü kõigil 3 juhul, isegi kui vana `techtoggle` oli `disabled`.
+- Testis kasutati tegelikku V291 HUD-i klõpsukoodi koos mängu avamisfunktsiooni simuleeritud vastega. See kontrollib klõpsuahelat, kuid mitte tervet Three.js-maailmakaarti.
