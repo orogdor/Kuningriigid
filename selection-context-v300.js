@@ -20,9 +20,9 @@
   ];
   if(k==='unit')return [
    command('move','Liigu','Move',['commandmove'],!movable),
-   sel.attackable&&own
+   sel.attackable&&movable
     ?command('attack','Ründa','Attack',['commandattack'])
-    :sel.scout&&own
+    :sel.scout&&movable
      ?command('explore','Avasta','Explore',['commandexplore'])
      :command('recruit','Armeed','Armies',['hud-army']),
    command('stop','Peata','Stop',['commandstop'],!movable),
