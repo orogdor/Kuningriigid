@@ -11,6 +11,7 @@
  const tr=(ee,en)=>et()?ee:en;
  const snap=()=>window.kingdomsUiV288?.snapshot?.();
  const original=(...ids)=>{for(const id of ids){const el=$(id);if(el&&!el.disabled){el.click();return true;}}return false;};
+ const openResearch=()=>{const real=window.openKuningriigidResearchV296;if(typeof real==='function'){real();return true;}return original('techtoggle','researchstatus');};
  const make=(tag,cl,parent)=>{const e=document.createElement(tag);if(cl)e.className=cl;parent?.append(e);return e;};
  const image=(parent,name,cl='v291-sprite')=>{const e=make('img',cl,parent);e.src=art(name);e.alt='';e.draggable=false;return e;};
  const click=(parent,cl,label,fn)=>{const e=make('button',cl,parent);e.type='button';e.setAttribute('aria-label',label);e.title=label;e.addEventListener('click',fn);return e;};
@@ -45,7 +46,7 @@
   for(const [key,name,x,y,w,h,ee,en] of slots){
     const holder=sprite(root,name,x,y,w,h,'v291-ledger');holder.dataset.resource=key;
     const value=make('span','v291-real-number',holder);value.textContent='—';
-    if(key==='science')click(holder,'v291-frame-click',tr(ee,en),()=>original('techtoggle'));
+    if(key==='science')click(holder,'v291-frame-click',tr(ee,en),()=>openResearch());
     else if(key==='population')click(holder,'v291-frame-click',tr(ee,en),()=>original('hud-city'));
     else click(holder,'v291-frame-click',tr(ee,en),()=>{
       const group={gold:'lux',bread:'food',stone:'build'}[key];
@@ -61,10 +62,10 @@
   const ff=buttonSprite(root,'header_speed',1592,1,59,59,tr('Mängu kiirus on fikseeritud','Game speed is fixed'),()=>{},'v291-speed');
   ff.disabled=true;
   sprite(root,'research_panel',10,72,208,286,'v291-research-background');
-  const research=click(root,'v291-research-main',tr('Ava avastuste puu','Open research tree'),()=>original('techtoggle'));
+  const research=click(root,'v291-research-main',tr('Ava avastuste puu','Open research tree'),()=>openResearch());
   pos(research,34,76,173,153);make('span','v291-research-title',research);
   for(const [n,x,y,w,h] of [['research_compass',12,224,53,56],['research_tools',52,232,58,61],['research_gate',94,231,55,63],['research_ship',133,224,55,59],['research_city',173,221,47,54]]){
-    buttonSprite(root,n,x,y,w,h,tr('Avastuste järjekord','Research queue'),()=>original('techtoggle'),'v291-research-queue');
+    buttonSprite(root,n,x,y,w,h,tr('Avastuste järjekord','Research queue'),()=>openResearch(),'v291-research-queue');
   }
   // Actual minimap canvas is placed UNDER the photographed ring; the artwork
   // itself has a transparent aperture and cannot swallow minimap map clicks.
