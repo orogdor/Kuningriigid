@@ -28,7 +28,7 @@ assert.equal(elements.researchpanel.hidden,false);
 assert.equal(rendered,1,'Opening research must render real technology tree');
 assert.equal(focused,1,'Close control must receive focus');
 // Exercise V291's button adapter: it prefers the live game API over a hidden/disabled button.
-const adapter=hud.match(/const openResearch=\(\)=>\{[^}]+\};/)?.[0];
+const adapter=hud.match(/^ const openResearch=.*;$/m)?.[0];
 assert.ok(adapter,'HUD research adapter missing');
 let calls=0;
 const bridge=new Function('window','original',adapter+';return openResearch;')(
