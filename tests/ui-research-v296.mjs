@@ -12,7 +12,7 @@ for(const p of ['boot-v83.js','hud-v291.js','hud-v292-mobile.js','hud-v293-resea
 assert.match(boot,/await import\('\.\/civilization\.js\?v=296a'\)/);
 assert.match(core,/window\.openKuningriigidResearchV296=openResearch/);
 assert.match(hud,/const openResearch=\(\)=>\{const real=window\.openKuningriigidResearchV296/);
-assert.match(hud,/\.v291-research-main[^]{0,200}openResearch\(\)/);
+assert.match(hud,/['"]v291-research-main['"][^]{0,200}openResearch\(\)/);
 assert.match(mobile,/if\(kind==='science'\)\{const real=window\.openKuningriigidResearchV296/);
 assert.match(queue,/if\(panel\?\.hidden\)\{const real=window\.openKuningriigidResearchV296/);
 // Exercise the real game's unmodified opener with a simulated panel and render callback.
