@@ -78,47 +78,4 @@ body.v291-active.atlas:has(#help:not([hidden])) #v291-hud,#v291-hud.v291-behind-
 body.v291-active.atlas #v264-listpanel,body.v291-active.atlas #atlaspanel{z-index:90!important;max-height:65vh!important;overflow:auto!important;background:url('ui-art-v291/footer_navy.webp') center/cover!important;border:4px ridge #bd9454!important;box-shadow:0 14px 24px #000c!important;color:#f6e5c6!important}
 body.v291-active.atlas #v264-listpanel{left:50%!important;bottom:clamp(155px,22vh,260px)!important;transform:translateX(-50%)!important;width:min(410px,94vw)!important}
 body.v291-active.atlas #atlaspanel{left:clamp(8px,20vw,350px)!important;bottom:clamp(155px,22vh,260px)!important;top:auto!important}
-/* Narrow screens use genuine picture sprites in a 3×2 dock instead of scaling the 1671-px master into unreadable buttons. */
-@media (max-width:780px), (max-height:530px){
- #v291-hud .v291-dock-background{left:0!important;top:auto!important;bottom:0!important;width:100%!important;height:225px!important}
- #v291-hud .v291-wood{top:auto!important;bottom:0!important;width:100%!important;height:15px!important;left:0!important}
- #v291-hud .v291-brand{left:0!important;top:0!important;width:135px!important;height:42px!important}
- #v291-hud .v291-world{left:35%!important;top:0!important;width:40%!important;height:42px!important}
- #v291-hud .v291-date{display:none!important}
- #v291-hud .v291-pause{left:auto!important;right:8px!important;top:0!important;width:42px!important;height:42px!important}
- #v291-hud .v291-play,#v291-hud .v291-speed,#v291-hud .v291-ledger{display:none!important}
- #v291-hud .v291-mobile-counters{position:absolute;left:0;top:45px;height:47px;right:0;display:flex;overflow-x:auto;gap:3px;pointer-events:auto;scrollbar-width:thin;z-index:10;background:url('ui-art-v291/footer_navy.webp') center/cover}
- #v291-hud .v291-mobile-counter{position:relative;flex:0 0 105px;height:43px}
- #v291-hud .v291-mobile-counter .v291-mobile-value{position:absolute;right:7px;top:13px;width:59px;text-align:center;font:700 13px Georgia,serif;text-shadow:0 1px 2px #000;color:#ffe7b5}
- #v291-hud .v291-command-dock{position:absolute;left:7px;right:7px;top:auto;bottom:22px;height:196px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,1fr);gap:5px;z-index:12}
- #v291-hud .v291-card{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:100%!important;pointer-events:auto}
- #v291-hud .v291-research-background,#v291-hud .v291-research-main,#v291-hud .v291-research-queue,#v291-hud .v291-minimap-frame,#v291-hud .v291-minimap-button,#v291-hud .v291-selection-frame,#v291-hud .v291-unit-button,#v291-hud .v291-unit-info{display:none!important}
- #v291-hud.v291-show-research .v291-research-background,#v291-hud.v291-show-research .v291-research-main,#v291-hud.v291-show-research .v291-research-queue{display:block!important}
- #v291-hud.v291-show-map .v291-minimap-frame,#v291-hud.v291-show-map .v291-minimap-button{display:block!important}
- #v291-hud.v291-show-units .v291-selection-frame,#v291-hud.v291-show-units .v291-unit-button,#v291-hud.v291-show-units .v291-unit-info{display:block!important}
- #v291-hud .v291-research-background{left:5px!important;top:111px!important;width:185px!important;height:254px!important}
- #v291-hud .v291-research-main{left:29px!important;top:118px!important;width:156px!important;height:141px!important}
- #v291-hud .v291-research-title{font-size:11px!important}
- #v291-hud .v291-research-queue{top:252px!important;width:44px!important;height:47px!important}
- #v291-hud [data-art='research_compass']{left:4px!important}#v291-hud [data-art='research_tools']{left:47px!important}
- #v291-hud [data-art='research_gate']{left:90px!important}#v291-hud [data-art='research_ship']{left:133px!important}
- #v291-hud [data-art='research_city']{left:175px!important;width:39px!important;height:43px!important}
- #v291-hud .v291-minimap-frame{left:2px!important;top:111px!important;width:283px!important;height:217px!important}
- #v291-hud .v291-minimap-button{top:135px!important;width:50px!important;height:52px!important}
- #v291-hud [data-art='map_zoom_in']{left:187px!important}#v291-hud [data-art='map_camera']{left:218px!important;top:177px!important}#v291-hud [data-art='map_show']{left:211px!important;top:230px!important}
- #v291-hud .v291-selection-frame{left:auto!important;right:2px!important;top:111px!important;width:320px!important;height:198px!important}
- #v291-hud .v291-unit-button{top:170px!important;width:58px!important;height:58px!important}
- #v291-hud [data-art='cmd_attack']{left:auto!important;right:254px!important}
- #v291-hud [data-art='cmd_move']{left:auto!important;right:194px!important;top:130px!important}
- #v291-hud [data-art='cmd_defend']{left:auto!important;right:256px!important;top:225px!important}
- #v291-hud [data-art='cmd_city']{left:auto!important;right:194px!important;top:231px!important}
- #v291-hud .v291-unit-info{display:none!important}
- #v291-hud .v291-selected-text{font-size:12px!important}
- #v291-hud .v291-mobile-toolbar{display:flex;gap:5px;position:absolute;right:6px;top:101px;z-index:16;pointer-events:auto}
- #v291-hud .v291-mobile-toggle{width:36px;height:36px;background:transparent!important;border:0!important;padding:0!important}
- #v291-hud .v291-mobile-toggle img{object-fit:contain}
- #v291-hud .v291-dialog{max-height:45vh;top:37%}
- body.v291-active.atlas #v264-listpanel{bottom:225px!important;max-height:42vh!important}
- body.v291-active.atlas #atlaspanel{bottom:225px!important;max-height:42vh!important;left:5px!important}
-}
-@media (max-width:400px){#v291-hud .v291-command-dock{height:184px;bottom:18px}#v291-hud .v291-card{max-height:90px}}
+/* Mobile artwork geometry is now owned solely by hud-v298-layout.js/css. */
