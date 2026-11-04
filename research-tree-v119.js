@@ -64,6 +64,8 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  const legend=element('p','tech-legend','Research progresses downward ↓. Solid arrows = all prerequisites required (AND); dashed arrows = one alternative (OR). Grey cards preview the discoveries unlocked by your next research. Later technologies remain hidden.');
  const frame=element('div','tech-map-viewport tech-vertical-viewport'),
        space=element('div','tech-map-space'),canvas=element('div','tech-map-canvas');
+ frame.tabIndex=0;
+ frame.setAttribute('aria-label','Avastuste kaart; libista kerimiseks, näpista suumimiseks');
  canvas.style.width=layout.width+'px';
  canvas.style.height=layout.height+'px';
  const svg=document.createElementNS(NS,'svg');
