@@ -9,9 +9,9 @@ const js=read('hud-v298-layout.js'),css=read('hud-v298-layout.css');
 const published=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
 assert.ok(published>=298,'Old/overlapping HUD still published');
 assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+published+'<'));
-assert.match(html,/hud-v291\.js\?v=298a/);
-assert.match(html,/hud-v298-layout\.css\?v=298a/);
-assert.match(html,/hud-v298-layout\.js\?v=298a/);
+assert.match(html,/hud-v291\.js\?v=299a/);
+assert.match(html,/hud-v298-layout\.css\?v=299a/);
+assert.match(html,/hud-v298-layout\.js\?v=299a/);
 assert.ok(!html.includes('hud-v297-refinement.js?v=297a'),'Old V297 placement script must not run');
 assert.ok(!html.includes('hud-v297-refinement.css?v=297a'),'Old V297 override stylesheet must not run');
 assert.ok(!html.includes('hud-v292-mobile.css?v=292a'),'Old V292 stylesheet must not run');
@@ -28,7 +28,7 @@ for(const id of images){
 assert.match(v291,/cleaned\.has\(name\)\?'ui-art-v297\/'/);
 assert.match(css,/\.v291-minimap-button > img/);
 assert.match(css,/\.v291-unit-button > img/);
-assert.match(css,/visibility:hidden!important/);
+assert.match(css,/visibility:visible!important/);
 assert.match(css,/ui-art-v297\/footer_trim\.svg/);
 assert.match(js,/function mobileLayout\(\)/);
 assert.match(js,/function frameHit\(button,frameNode,baseW,baseH,rect\)/);
@@ -41,8 +41,8 @@ let result;
 const align=new Function('getComputedStyle','area',src+';return frameHit;')(
  ()=>({display:'block'}),(button,x,y,w,h)=>{result={x,y,w,h};}
 );
-align({}, {getBoundingClientRect(){return {left:9,top:400,width:160,height:122}}},311,238,[211,39,61,62]);
-assert.ok(Math.abs(result.x-(9+211*160/311))<.001);
-assert.ok(Math.abs(result.y-(400+39*122/238))<.001);
+align({}, {getBoundingClientRect(){return {left:9,top:400,width:160,height:122}}},311,238,[203,22,68,71]);
+assert.ok(Math.abs(result.x-(9+203*160/311))<.001);
+assert.ok(Math.abs(result.y-(400+22*122/238))<.001);
 assert.ok(result.w>30&&result.h>30);
 console.log('V298: V297 picture assets, zero duplicate controls and unified frame-relative hitboxes PASS');
