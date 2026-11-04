@@ -39,6 +39,7 @@ jobs:
           node --check research-panel-v294.js
           node --check research-panel-v295.js
           node --check hud-v297-refinement.js
+          node --check hud-v298-layout.js
           node --check research-art-v293.js
           node --check research-tree-v119.js
           node --check research-ui.js
@@ -100,6 +101,7 @@ jobs:
           node tests/ui-research-v295.mjs
           node tests/ui-research-v296.mjs
           node tests/ui-v297.mjs
+          node tests/ui-v298.mjs
       - name: V268 water carriers and river water
         run: |
           node tests/water-carriers-v268.mjs
