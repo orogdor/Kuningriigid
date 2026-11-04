@@ -148,3 +148,47 @@ body.v291-active.atlas #atlaspanel{
 #v291-hud .v291-art-button.v291-unit-button:focus-visible{
  outline:2px solid #f9d57c!important;outline-offset:-2px!important;
 }
+
+/* V300: compact contextual command portrait; every action is a separate SVG.
+   The new frame has an empty portrait aperture and NO prepainted action icons. */
+#v291-hud .v291-selection-frame{filter:drop-shadow(0 4px 6px #0008)!important}
+#v291-hud .v291-selection-frame>.v291-sprite{pointer-events:none!important}
+#v291-hud .v291-portrait{
+ left:38%!important;top:11%!important;width:49%!important;height:68%!important;
+ overflow:hidden!important;clip-path:ellipse(50% 50% at 50% 50%)!important;
+ border-radius:50%!important;background:#122d45!important;
+}
+#v291-hud .v291-portrait-image{object-fit:cover!important}
+#v291-hud[data-selection-kind="none"] .v291-portrait-image{
+ object-fit:contain!important;padding:21%!important;box-sizing:border-box!important;
+}
+#v291-hud .v291-selected-text{
+ left:42.5%!important;top:79%!important;width:48%!important;height:12%!important;
+ font:700 calc(13px * var(--v291-scale,1))/1.08 Georgia,serif!important;
+ color:#3b2918!important;text-shadow:0 1px #fff0c7!important;
+}
+#v291-hud .v291-unit-button{
+ overflow:visible!important;border-radius:50%!important;
+ background:none!important;border:0!important;box-shadow:none!important;
+}
+#v291-hud .v291-unit-button > img{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ width:100%!important;height:100%!important;object-fit:contain!important;
+ pointer-events:none!important;filter:drop-shadow(0 2px 2px #0009)!important;
+}
+#v291-hud .v291-unit-button:disabled{opacity:.50!important;filter:grayscale(.5)!important}
+#v291-hud .v291-unit-button[aria-pressed="true"] > img{filter:drop-shadow(0 0 6px #f0cf8e)!important}
+#v291-hud .v291-unit-info{
+ display:grid!important;place-items:center!important;
+ overflow:visible!important;border:0!important;background:none!important;
+ pointer-events:auto!important;
+}
+#v291-hud .v291-unit-info .v300-detail-icon{
+ width:100%!important;height:100%!important;object-fit:contain!important;
+ display:block!important;pointer-events:none!important;
+}
+#v291-hud .v291-unit-button:focus-visible,
+#v291-hud .v291-unit-info:focus-visible{
+ outline:2px solid #fbe19d!important;outline-offset:1px!important;
+}
+#v291-hud .v291-card:hover{transform:none!important}
