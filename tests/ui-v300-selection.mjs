@@ -7,8 +7,8 @@ const html=read('index.html'),hud=read('hud-v291.js'),core=read('civilization.js
 const catalogue=read('selection-context-v300.js'),css=read('hud-v298-layout.css');
 const window={};new Function('window',catalogue)(window);
 const get=window.KuningriigidSelectionV300.actions;
-assert.match(html,/<title>Kuningriigid · V300<\/title>/);
-assert.match(html,/id="menu-version">KUNINGRIIGID · V300</);
+assert.match(html,/<title>Kuningriigid · V301<\/title>/);
+assert.match(html,/id="menu-version">KUNINGRIIGID · V301</);
 assert.ok(html.indexOf('selection-context-v300.js')<html.indexOf('hud-v291.js?v=300a'),'Selector must load before HUD');
 assert.ok(html.includes('hud-v298-layout.css?v=300a'));
 assert.ok(html.includes('boot-v83.js?v=300a'));

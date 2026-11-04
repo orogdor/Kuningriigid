@@ -1,0 +1,97 @@
+/* Kuningriigid V301: the user's blank picture UI is the ONLY desktop frame.
+ * The image is split top/bottom for anchoring, not laid over the live world.
+ * The bottom frame was compressed vertically to 80% in backdrop.webp.
+ * Touch/narrow layouts continue to use the proven V298 responsive interface.
+ */
+#v301-backdrop-top,#v301-backdrop-bottom{display:none}
+#v291-hud .v301-card-icon,#v291-hud .v301-card-caption{display:none!important}
+#v291-hud.v301-picture #v301-backdrop-top,
+#v291-hud.v301-picture #v301-backdrop-bottom{
+ display:block;position:absolute;z-index:0;pointer-events:none;
+ background-image:url('ui-art-v301/backdrop.webp?v=301a');
+ background-repeat:no-repeat;overflow:hidden;
+}
+/* All artwork already painted into backdrop.webp must not appear a second time. */
+#v291-hud.v301-picture .v291-brand>.v291-sprite,
+#v291-hud.v301-picture .v291-ledger>.v291-sprite,
+#v291-hud.v301-picture .v291-world>.v291-sprite,
+#v291-hud.v301-picture .v291-date>.v291-sprite,
+#v291-hud.v301-picture .v291-pause>.v291-sprite,
+#v291-hud.v301-picture .v291-play>.v291-sprite,
+#v291-hud.v301-picture .v291-research-background>.v291-sprite,
+#v291-hud.v301-picture .v291-research-queue>.v291-sprite,
+#v291-hud.v301-picture .v291-minimap-frame>.v291-sprite,
+#v291-hud.v301-picture .v291-minimap-button>.v291-sprite,
+#v291-hud.v301-picture .v291-selection-frame>.v291-sprite,
+#v291-hud.v301-picture .v291-dock-background>.v291-sprite,
+#v291-hud.v301-picture .v291-wood>.v291-sprite,
+#v291-hud.v301-picture .v291-card>.v291-sprite{display:none!important}
+#v291-hud.v301-picture .v291-dock-background{background:none!important;filter:none!important}
+#v291-hud.v301-picture .v291-research-background,
+#v291-hud.v301-picture .v291-selection-frame{filter:none!important}
+/* Render live content over the empty paper and leather, without new faux frames. */
+#v291-hud.v301-picture .v291-brand:after{
+ content:'Kuningriigid';position:absolute;left:33%;top:15%;width:66%;height:68%;
+ color:#f6d68f;font:700 calc(24px * var(--v291-scale,1))/1 Georgia,serif;
+ text-shadow:0 2px 3px #000b;display:flex;align-items:center;justify-content:center;
+ pointer-events:none;
+}
+#v291-hud.v301-picture .v291-world:after{
+ content:attr(data-v301-title);position:absolute;inset:12% 7%;
+ color:#ffe6af;font:700 calc(24px * var(--v291-scale,1))/1.1 Georgia,serif;
+ text-shadow:0 2px 4px #000;display:flex;align-items:center;justify-content:center;
+ pointer-events:none;
+}
+#v291-hud.v301-picture .v291-pause:after,
+#v291-hud.v301-picture .v291-play:after{
+ position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+ color:#f6da9a;font:700 calc(29px * var(--v291-scale,1))/1 Georgia,serif;
+ text-shadow:0 2px 3px #000;pointer-events:none;
+}
+#v291-hud.v301-picture .v291-pause:after{content:'Ⅱ'}
+#v291-hud.v301-picture .v291-play:after{content:'▶'}
+#v291-hud.v301-picture .v291-date-text{z-index:2;color:#f7d59c!important}
+#v291-hud.v301-picture .v291-real-number{
+ top:20%!important;left:29%!important;width:69%!important;
+ font-size:calc(17px * var(--v291-scale,1))!important;
+}
+#v291-hud.v301-picture .v291-research-title{
+ color:#352316!important;text-shadow:0 1px #fce4b6!important;
+}
+/* The live canvas is the minimap; the old fake map image is not displayed. */
+#v291-hud.v301-picture .v291-real-map{
+ left:8.3%!important;top:13.2%!important;width:66.8%!important;height:73%!important;
+ border-radius:50%!important;clip-path:ellipse(50% 50% at 50% 50%)!important;
+}
+#v291-hud.v301-picture .v291-minimap-button:after{
+ content:attr(data-v301-icon);display:flex;position:absolute;inset:0;
+ justify-content:center;align-items:center;color:#f5d38d;
+ font:700 calc(34px * var(--v291-scale,1))/1 Georgia,serif;
+ text-shadow:0 2px 3px #000c;pointer-events:none;
+}
+#v291-hud.v301-picture .v291-minimap-button:hover:after{color:#fff4c7}
+/* Buttons keep their original actions, with independent content ON TOP of blank cards. */
+#v291-hud.v301-picture .v291-card{z-index:18!important;overflow:hidden!important}
+#v291-hud.v301-picture .v291-card>.v301-card-icon{
+ display:block!important;position:absolute!important;
+ left:25%!important;top:12%!important;width:50%!important;height:49%!important;
+ object-fit:contain!important;opacity:.96;filter:drop-shadow(0 2px 3px #39200b88);
+}
+#v291-hud.v301-picture .v301-card-caption{
+ display:flex!important;position:absolute;left:7%;right:7%;bottom:10%;height:26%;
+ display:flex;align-items:center;justify-content:center;text-align:center;
+ color:#39240e;font:700 calc(18px * var(--v291-scale,1))/1.05 Georgia,serif;
+ text-shadow:0 1px #f8e5c7;white-space:normal;pointer-events:none;
+}
+#v291-hud.v301-picture .v291-card:hover>.v301-card-icon{filter:drop-shadow(0 0 6px #c7953c)}
+#v291-hud.v301-picture .v291-portrait{background:#122d45!important;z-index:6!important}
+#v291-hud.v301-picture .v291-selected-text{
+ left:29%!important;top:72%!important;width:60%!important;height:14%!important;
+ color:#342318!important;z-index:7!important;
+}
+#v291-hud.v301-picture .v291-unit-button{z-index:31!important}
+#v291-hud.v301-picture .v291-unit-info{z-index:31!important}
+#v291-hud.v301-picture .v291-minimap-button{z-index:31!important}
+/* Preserve the V298 phone layout and its existing artwork when not in desktop picture mode. */
+#v291-hud:not(.v301-picture) #v301-backdrop-top,
+#v291-hud:not(.v301-picture) #v301-backdrop-bottom{display:none!important}
