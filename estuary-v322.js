@@ -7,12 +7,17 @@ const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const smooth=x=>{x=clamp(x);return x*x*(3-2*x)};
 export const SEA_LEVEL_V322=.72;
 
-export function naturalSeaDepthV322(game,x,z){
- return SEA_LEVEL_V322-baseHeight(game,x,z);
+// The smooth visual height can contain a river-cell depression. The raw
+// atlas still knows which terrain is naturally above water. Use BOTH so
+// excavated riverbeds never get mistaken for ocean.
+export function naturalBedHeightV322(game,x,z){
+ return Math.max(baseHeight(game,x,z),game.atlasHeight(x,z));
 }
-// A river excavation below sea level must not create a new inland ocean.
+export function naturalSeaDepthV322(game,x,z){
+ return SEA_LEVEL_V322-naturalBedHeightV322(game,x,z);
+}
 export function localNaturalSeaGroundV322(game,tile,x,z,sx,sz){
- return (baseHeight(game,tile.x+x/sx,tile.z+z/sz)-.7)*.30;
+ return (naturalBedHeightV322(game,tile.x+x/sx,tile.z+z/sz)-.7)*.30;
 }
 export function mouthZonesV322(edges){
  const zones=[];
@@ -47,6 +52,6 @@ export function riverSurfaceOpacityV322(game,x,z,zones){
  if(influence<=0)return 1;
  // Wet shore is owned by the sea plane. At mean sea level river surface
  // becomes fully transparent; farther inland the ordinary river resumes.
- const land=smooth((baseHeight(game,x,z)-SEA_LEVEL_V322)/3.0);
+ const land=smooth((naturalBedHeightV322(game,x,z)-SEA_LEVEL_V322)/3.0);
  return 1-influence*(1-land);
 }
