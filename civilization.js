@@ -150,7 +150,7 @@ const wildlifeV255=createWildlifeV255();let siteSuggestV280=null,waterCarriersV2
 const peopleLifeV252=createPeopleLifeV252();
 // V252: idle townsfolk chat or go home, keep personal space and carry torches at night (Stone Age)
 function peopleLifeCtxV252(city,age){if(!city)return {time:s.time,enabled:false,night:false,open:()=>true,homes:[]};const nav=game.nav(city);return {time:s.time,enabled:age===0,night:dayClockV235(s.time).torch>.3,open:(x,z)=>nav.open(x,z),homes:(city.economy?.buildings||[]).filter(b=>b.type==='house'&&b.ready&&b.hp>0).map(b=>door(b))};}
-import {detailSeaStepsV242,createDetailSea} from './sea-v158.js?v=226';
+import {detailSeaStepsV242,createDetailSea} from './sea-v158.js?v=321';
 import {buildingClearance} from './navigation.js?v=2273';
 import {door} from './navigation.js?v=2273';
 import {loadProtectedGame,writeAutosave,replaceProtectedGame} from './save-safety-v73.js?v=256';
