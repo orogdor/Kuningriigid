@@ -8,7 +8,7 @@ import * as T from './vendor/three.module.js';
 import {releaseMaterial} from './program-keep-v161.js';
 import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=2231';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=2232';
-import {riverNear,visibleRiverHeight,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal} from './continuous-landscape.js?v=2232';
+import {riverNear,visibleRiverHeight,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal,smoothAtlasHeight} from './continuous-landscape.js?v=316';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
@@ -105,7 +105,8 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   const key=gx+','+gz;if(nodes.has(key))return nodes.get(key);
   const x=gx*step,z=gz*step,near=riverNear(game,x,z),w=near.width||1;
   const distance=Math.min(100,near.distance);
-  const atlas=game.atlasHeight(x,z);
+  // Match the height field used by the water depth/estuary transition.
+  const atlas=smoothAtlasHeight(game,x,z);
   // V249: banks stop at the shore (shore), but the water itself runs on into the sea (sea) and fades there
   const p={x,z,d:distance-w,outer:distance-w*1.40,outerDry:distance-w*2.18,shore:.30-atlas,sea:-2.5-atlas,width:w};nodes.set(key,p);return p;
  };
@@ -130,8 +131,11 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  let batchV242=0;for(const key of cells){if(batchV242++%96===0)yield;
   const [x,z]=key.split(',').map(Number),a=node(x,z),b=node(x+1,z),c=node(x,z+1),d=node(x+1,z+1);
   for(const triangle of [[a,c,b],[b,c,d]]){
-   const land=clip(triangle,'shore'),wet=clip(triangle,'sea');
-   if(wet.length>=3)emit(clip(wet,'d'),water,true);
+   const land=clip(triangle,'shore');
+   // Do not slice the mouth against an independent -2.5m sea polygon.
+   // Vertex alpha already fades it out by -2.2m: hard clipping made
+   // visible straight/triangular seams where river meets the sea.
+   emit(clip(triangle,'d'),water,true);
    if(land.length<3)continue;
    emit(clip(clip(land,'outer'),'d',true),banks,false);
    // V223: second, much softer bank band between wet mud and untouched meadow.
@@ -151,7 +155,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  const toWorld=(x,z)=>scope==='world'?{x,z}:localToWorld(tile,x,z);
  const mud=new T.Color('#5a523f'),damp=new T.Color('#6e6a4c');
  // V249: mud and gravel banks fade out on the beach instead of ending in a hard edge at the shore
- const shoreFadeV249=p=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(p.x,p.z)-.3)/2.2));return t*t*(3-2*t);};
+ const shoreFadeV249=p=>{const t=Math.max(0,Math.min(1,(smoothAtlasHeight(game,p.x,p.z)-.3)/2.2));return t*t*(3-2*t);};
  const bankMesh=yield* buffersStepsV242(banks,'#6e6a4c',{standard:true,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
   return mud.clone().lerp(damp,t).multiplyScalar(.92+.16*Math.sin(p.x*.37+Math.sin(p.z*.29)*2));
@@ -179,7 +183,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,1-mouthBlend(game,p.x,p.z)).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
  },alpha:(x,y,z)=>{
   // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
-  const p=toWorld(x,z),a=game.atlasHeight(p.x,p.z),t=Math.max(0,Math.min(1,(a+2.2)/2.6));
+  const p=toWorld(x,z),a=smoothAtlasHeight(game,p.x,p.z),t=Math.max(0,Math.min(1,(a+2.2)/2.6));
   // V250: clear water at the banks (the bed shows through), denser mid-stream
   const near=riverNear(game,p.x,p.z),edge=Math.min(1,near.distance/Math.max(1,near.width));
   return (.94-.36*Math.pow(edge,2.5))*t*t*(3-2*t);
