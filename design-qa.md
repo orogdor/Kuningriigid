@@ -1,3 +1,13 @@
+## V310 · maailmakaardi mõõdus ja kujundusega alamkaardid
+
+V309 väikesed sinised alamvalikud asendati põhikaartidega samas mõõdus kullatud raami ja pärgamendialaga kaartidega. Algse nupu DOM-sõlm ja callback säilivad; visuaalse kujunduse jaoks liigutatakse selle päris pilt ja tekst raami sisse. Sama lahendus katab ehitised, üksuste nupud, linnad, armeed, kaubanduspakkumised, diplomaatia valikud ja päevikukirjed. Tagasi ja filtrid on samuti sama suured. Otsing/filtrid ei vähenda enam ülejäänud kaartide kõrgust. Põhikaartide mõõte võetakse ka menüü avamisel ja pärast akna suuruse muutmist; ResizeObserver kontrollib pööramise järgset lõplikku paigutust.
+
+Brauseris kõik 6 menüüd 915×364: iga kaardi laius 58.28125 px, kõrgus 87.421875 px ja top 254.921875 px, täpselt põhikaartidega samad. Ehitusvalikuid võrreldi põhikaartidega lisaks 844×390, 740×320, 390×844 ja 1200×675 mõõtudes: 0 mõõtude/joondumise erinevust, Tagasi puuteala vaba, pildid laetud. Kontrolliti avatud menüü pööramist püstvaatesse (100×150, top 674), viimase ehitise valimist pärast külgkerimist, kaubanduse callback'i, diplomaatia muutmist ja päeviku kordusavamist/Escape'i.
+
+Tõendid `reports/ui-v310-menus.json`, `reports/ui-v310-sizes.json`, `reports/ui-v310-actions.json`, `previews/ui-v310-matching-cards.png`. Test kasutab päris HUD-, nimekirja- ja ehituskaardifaile koos näidisandmetega; 3D-renderdust ega tegelikku ehitise maastikule paigutamist see vaade ei testi. Kõik 23 nõutud kohalikku CI gruppi läbisid (`reports/ui-v310-ci.json`); lõpliku V310 skripti süntaks ja V304/V306 regressioonid kontrolliti ka pärast visuaalseid parandusi.
+
+Uus raam `ui-art-v310/card_frame.webp` on genereeritud V306 ehituskaardi stiili järgi, päris alfakanaliga, seejärel vähendatud 448×672 WebP-ks. Päris mängupildid ja tekst jäävad eraldi. Genereerimise juhis: `ui-art-v310/prompt.txt`.
+
 ## V309 · vahetuv alumine valikuriba
 
 Kasutaja soovi järgi jääb V308 täislaiuses raam alles. Kuue põhikaardi asemele ilmub valitud menüü ja püsiv Tagasi. Päris paneelide DOM-elemendid koos algsete käsitlejatega liiguvad ajutiselt ribasse; sulgemisel taastatakse nende algne asukoht, roll ja aria-modal. Avastuspuu ja põhimenüü säilitavad senise eraldi vaate.

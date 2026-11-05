@@ -46,6 +46,7 @@ jobs:
           node --check selection-context-v300.js
           node --check ui-v304.js
           node --check ui-v309.js
+          node --check ui-v310.js
           node --check ui-catalog-v304.js
           node --check research-art-v304.js
           node --check research-art-v293.js

@@ -1,0 +1,1 @@
+Reusable transparent card frame generated with the built-in image tool from ui-art-v306/card_build.webp. Gold frame, blue diamonds, blank parchment caption, transparent illustration window and exterior. Optimized to 448×672 WebP. Artwork is used as a reusable overlay; labels and real game pictures remain DOM elements.

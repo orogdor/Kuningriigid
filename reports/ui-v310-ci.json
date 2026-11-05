@@ -1,0 +1,117 @@
+[
+  {
+    "name": "Main game and wall syntax",
+    "exit": 0,
+    "seconds": 3.9
+  },
+  {
+    "name": "Historic suburb geometry (V191)",
+    "exit": 0,
+    "seconds": 0.8
+  },
+  {
+    "name": "Continuous natural barriers and gaps (V194)",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "name": "Sea and cliff suburb demos (V194)",
+    "exit": 0,
+    "seconds": 25.0
+  },
+  {
+    "name": "Defense construction priority (V188)",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "name": "Graphics settings V226 unit test",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "name": "Three.js r187 engine and game material compatibility",
+    "exit": 0,
+    "seconds": 0.9
+  },
+  {
+    "name": "V233 farm and Stone Age far LOD regression",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "name": "V234 equipment and V261 rigged warrior regressions",
+    "exit": 0,
+    "seconds": 0.3
+  },
+  {
+    "name": "V235 day cycle and city torch regression",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "name": "V236 scouts and door torch regressions",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "name": "V237 farm, field and green-preview regression",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "name": "V238 scout visibility and marker regression",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "name": "V239 visible scout meshes and names toggle",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "name": "V240 scout continuous world/detail movement",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "name": "V241 demand loading and V242 detail streaming",
+    "exit": 0,
+    "seconds": 14.0
+  },
+  {
+    "name": "V243 wall connections and building rotation",
+    "exit": 0,
+    "seconds": 2.9
+  },
+  {
+    "name": "V256 save compression and wildlife",
+    "exit": 0,
+    "seconds": 6.7
+  },
+  {
+    "name": "V257 handheld torch and animal facing",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "name": "V258 world and detail movement",
+    "exit": 0,
+    "seconds": 4.6
+  },
+  {
+    "name": "V293-V294 illustrated research menu regression",
+    "exit": 0,
+    "seconds": 2.1
+  },
+  {
+    "name": "V268 water carriers and river water",
+    "exit": 0,
+    "seconds": 130.0
+  },
+  {
+    "name": "Gameplay smoke test",
+    "exit": 0,
+    "seconds": 40.5
+  }
+]

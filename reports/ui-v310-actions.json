@@ -1,0 +1,11 @@
+{
+  "build": "Kivimurd: ehituskoht valitud",
+  "trade": "Kauplemine tehtud",
+  "diplomacy": "friendly",
+  "journalReopenEscape": 2,
+  "portraitRotation": {
+    "width": 100,
+    "height": 150,
+    "top": 674
+  }
+}

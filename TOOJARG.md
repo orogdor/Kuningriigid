@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V310: kõik alumise riba valikukaardid kasutavad maailmakaardi põhikaartidelt mõõdetud laiust, kõrgust ja ülaserva. Sama mõõduga Tagasi, ehitus-/armee-/linna-/kaubandus-/diplomaatia-/päevikukaardid, uus genereeritud läbipaistev kullatud raam ja pärgamendiala. Otsing ja ehitusfiltrid asuvad eraldi sama suures kaardis; pikad read kerivad küljele. Kontrollitud 6 menüüd ja 5 ekraanimõõtu, 0 mõõtude või joondumise erinevust. Kõik 23 CI gruppi läbisid; tõendid `reports/ui-v310-*.json`, `design-qa.md`.
+
 - V309: kuus alumist kaarti avavad oma sisu samas alumises ribas, püsiva Tagasi-nupuga. Päris ehitus-, linna-, armee-, kaubandus-, diplomaatia- ja päevikuelemendid liigutatakse ajutiselt ribasse ning taastatakse sulgemisel; andmeid ja mängukäske ei kloonita. Ehitiste pildid ja hinnad, horisontaalne kerimine, värbamise järgmine tase, Escape ning diplomaatia modaalikatete eemaldamine. Brauseris kontrollitud 5 ekraanimõõtu ja 6 menüüd; kõik 23 kohalikku CI gruppi läbisid. Tõendid ja kontrolli piirid `design-qa.md`, `reports/ui-v309-matrix.json`.
 
 - V308: rõhtvaate ribad ulatuvad äärest ääreni, kuue kaardi suurus säilib ning lisaruum jääb nende järele. Parempoolsed ressursid järgivad paremat serva. Brauseris kontrollitud 4 rõhtvaadet ja senine püstvaade; mõõdud `reports/ui-v308-matrix.json`. Kohalike nõutud kontrollide tulemused: `reports/ui-v308-ci.json`.
