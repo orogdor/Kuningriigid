@@ -85,7 +85,7 @@ export function createAtlasDecor(game,scene,quality='medium',{terrainGeometry=nu
  plots.count=0;
  rocks.forEach((a,i)=>{dummy.position.set(a.x-10,height(a.x-10,a.z)-.2,a.z);dummy.rotation.set(0,i*1.4,0);dummy.scale.set(3.2,3.4,3.2);dummy.updateMatrix();stones.setMatrixAt(i,dummy.matrix)});
  group.add(spatialInstances(plots),spatialInstances(stones));
- const nature=createAtlasBiomeDetail(game,group,quality);
+ const nature=createAtlasBiomeDetail(game,group,quality,worldGroundV326);
  // All tributaries and banks are one connected world-space 3D network.
  let rivers=createRiverNetwork(game,'world',null,quality,worldGroundV326),crossingRevision=game.s.crossingRevision||0;group.add(rivers);group.add(createMountainOutcrops(game,'world'));
  // Real-world traffic generates the atlas road network (no roads appear just because a route was planned).
@@ -176,7 +176,7 @@ export function createAtlasDecor(game,scene,quality='medium',{terrainGeometry=nu
  }
  function route(state,mover){const path=mover?.path||[],stamp=(mover?.c??'')+':'+(mover?.r??'')+JSON.stringify(path);if(stamp===lastRoute)return;lastRoute=stamp;disposeGroup(routes);if(!path.length)return;const tiles=[mover,...path],points=[];for(let i=1;i<tiles.length;i++){const a=center(tiles[i-1].c,tiles[i-1].r),b=center(tiles[i].c,tiles[i].r);for(let j=0;j<10;j++){const x=a.x+(b.x-a.x)*j/10,z=a.z+(b.z-a.z)*j/10;points.push(new T.Vector3(x,height(x,z)+2,z))}}const end=center(path.at(-1).c,path.at(-1).r);points.push(new T.Vector3(end.x,height(end.x,end.z)+2,end.z));const line=new T.Line(new T.BufferGeometry().setFromPoints(points),new T.LineDashedMaterial({color:'#f4d48b',dashSize:5,gapSize:3,transparent:true,opacity:1,depthTest:false}));line.computeLineDistances();routes.add(line);const dots=new T.InstancedMesh(new T.RingGeometry(2,3,12),new T.MeshBasicMaterial({color:'#fae4a4',side:T.DoubleSide,depthTest:false,depthWrite:false}),path.length);path.forEach((p,i)=>{const q=center(p.c,p.r);dummy.position.set(q.x,height(q.x,q.z)+2,q.z);dummy.rotation.set(-Math.PI/2,0,0);dummy.scale.set(1,1,1);dummy.updateMatrix();dots.setMatrixAt(i,dummy.matrix)});routes.add(dots)}
 
- return {group,territory,route,roads,routes,waveLines,peaks:peaks.length,shoreSegments:shore.length/6,nature};
+ return {group,ground:worldGroundV326,territory,route,roads,routes,waveLines,peaks:peaks.length,shoreSegments:shore.length/6,nature};
 }
 // V46: readable settlement silhouettes from prehistoric huts to modern urban skylines.
 const cityMaterials=new Map(),cityGeometries=new Map();

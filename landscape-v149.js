@@ -364,6 +364,7 @@ export function trailMaterial(radial=false){
 // catch a little light. One pass over the existing vertices at build time; no runtime cost.
 // ring: neighbour distance in grid steps; hScale/vScale convert the mesh to world metres.
 export function bakeRelief(geo,{ring=1,hScale=1,vScale=1,strength=1.15,minY=.9}={}){
+ if(geo.userData.adaptiveAtlasV327)return;
  const P=geo.attributes.position,C=geo.attributes.color,w=geo.parameters.widthSegments+1,h=geo.parameters.heightSegments+1;
  if(!C||P.count!==w*h)return;
  const at=(c,r)=>(Math.max(0,Math.min(h-1,r)))*w+Math.max(0,Math.min(w-1,c));

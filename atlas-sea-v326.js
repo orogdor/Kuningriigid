@@ -1,7 +1,9 @@
+import {adaptiveAtlasSamplerV327} from './atlas-terrain-v327.js';
 import * as T from './vendor/three.module.js';
 // Sample the actual overview triangles, rather than the detailed river-bed
 // function that can be metres below or above this coarser mesh.
 export function atlasGroundSamplerV326(geometry){
+ const adaptive=adaptiveAtlasSamplerV327(geometry);if(adaptive)return adaptive;
  const p=geometry.attributes.position,nx=geometry.parameters.widthSegments,nz=geometry.parameters.heightSegments;
  const x0=p.getX(0),z0=p.getZ(0),sx=(p.getX(nx)-x0)/nx,sz=(p.getZ(nz*(nx+1))-z0)/nz;
  return (x,z)=>{

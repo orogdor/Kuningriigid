@@ -33,7 +33,8 @@ import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 // V271: world-map trees closer to the detail map: smaller and denser (detail density for the whole world
 // would be millions of trees, so 3x denser and ~2.2x smaller)
 const TREE_SCALE_V271=.45,TREE_DENSITY_V271=3;
-export function createAtlasBiomeDetail(game,group,quality='medium'){
+export function createAtlasBiomeDetail(game,group,quality='medium',ground=null){
+ const terrain=(x,z)=>ground?ground(x,z):surface(game,x,z,'world');
  // V152: new procedural tree, shrub, cactus and rock models (world-models-v152.js) with mixed
  // species per biome and gentle per-tree colour variation. Placement rules are unchanged.
  const factor=quality==='high'?.60:quality==='low'?.15:.29;
@@ -68,7 +69,7 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
   const effective=density*factor,count=Math.floor(effective+(j(cell.c+17,cell.r+201)<effective%1?1:0));
   for(let i=0;i<count;i++){
    const nx=j(cell.c*29+i*1.7,cell.r*7+i*13.2),nz=j(cell.c*11+i*17.8,cell.r*23+i*4.9);
-   const x=cell.x+(nx-.5)*39,z=cell.z+(nz-.5)*39,y=surface(game,x,z,'world'),stream=riverNear(game,x,z);
+   const x=cell.x+(nx-.5)*39,z=cell.z+(nz-.5)*39,y=terrain(x,z),stream=riverNear(game,x,z);
    if(y<3||y>45||stream.distance<stream.width+3.2)continue;
    if(j(cell.c*31+i*2.3,cell.r*41+i*5.7)>treeKeepV270(x,z,forestV270))continue;
    const k=j(cell.c*13+i*4.1,cell.r*19+i*2.9),kind=pick(list,j(cell.c*5+i*7.3,cell.r*3+i*1.1)),size=(3.8+k*4.2)*TREE_SCALE_V271,rot=k*6.28;
@@ -77,7 +78,7 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
   }
   const shrubs=Math.floor(bush*factor*1.5+(j(cell.c+71,cell.r+9)<(bush*factor*1.5)%1?1:0));
   for(let i=0;i<shrubs;i++){
-   const x=cell.x+(j(cell.c*7+i*5.1,cell.r*13+i)-.5)*42,z=cell.z+(j(cell.c*3+i,cell.r*17+i*2.3)-.5)*42,y=surface(game,x,z,'world'),stream=riverNear(game,x,z);
+   const x=cell.x+(j(cell.c*7+i*5.1,cell.r*13+i)-.5)*42,z=cell.z+(j(cell.c*3+i,cell.r*17+i*2.3)-.5)*42,y=terrain(x,z),stream=riverNear(game,x,z);
    if(y<2.5||y>45||stream.distance<stream.width+2.5)continue;
    const k=j(cell.c+i*9.1,cell.r+i*4.4);
    const dryTint=b==='desert'||b==='mesa'?'#d9c48e':b==='steppe'?'#e8dfb4':b==='tundra'?'#c9cdb0':null;
@@ -85,7 +86,7 @@ export function createAtlasBiomeDetail(game,group,quality='medium'){
   }
   const rockChance={desert:.15,mesa:.15,tundra:.4,steppe:.62,coastal_steppe:.62}[biome];
   if(rockChance!==undefined&&j(cell.c+126,cell.r+113)>rockChance){
-   const x=cell.x+(j(cell.c+31,cell.r+72)-.5)*33,z=cell.z+(j(cell.c+13,cell.r+61)-.5)*33,y=surface(game,x,z,'world'),size=2.2+j(cell.c+7,cell.r+99)*4;
+   const x=cell.x+(j(cell.c+31,cell.r+72)-.5)*33,z=cell.z+(j(cell.c+13,cell.r+61)-.5)*33,y=terrain(x,z),size=2.2+j(cell.c+7,cell.r+99)*4;
    sets.rock.push({x,y:y-.15,z,scale:size/1.5,rot:j(cell.c,cell.r)*6.28});
   }
  }

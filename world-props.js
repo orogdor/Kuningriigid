@@ -6,7 +6,8 @@ import {loadWorldGLB} from './scripts/glb_lite.js';
 import {createWorldObjectCatalog} from './world-object-catalog.js';
 const ROOT='./assets/world1000/';
 const FILES={village:'world_village_1000',ruins:'ancient_ruin_1000',rock:'rock_outcrop_1000',bridge:'river_bridge_1000',forest:'forest_cluster_1000'};
-export function createWorldAtlasProps(game,scene,quality='medium'){
+export function createWorldAtlasProps(game,scene,quality='medium',{ground=null}={}){
+ const terrain=(x,z)=>ground?ground(x,z):game.atlasHeight(x,z);
  const group=new T.Group();scene.add(group);
  const templates=new Map(),instanced=[],dummy=new T.Object3D(),obj=new T.Object3D();
  let ready=false,lastRevision=null;
@@ -17,7 +18,7 @@ export function createWorldAtlasProps(game,scene,quality='medium'){
  const multipliers={rock:1.65,forest:1.55,bridge:1.35};
  function materialize(){
   for(const item of instanced)group.remove(item.mesh);instanced.length=0;
-  for(const kind of ['rock','forest','bridge']){
+  for(const kind of ['rock','bridge']){
    const variants=kind==='bridge'?[false,true]:[null];
    for(const ford of variants){
     const template=kind==='bridge'?crossingTemplate(ford):templates.get(kind),sites=candidates[kind].filter(c=>kind!=='bridge'||!c.bridge===ford);if(!template||!sites.length)continue;
@@ -37,13 +38,17 @@ export function createWorldAtlasProps(game,scene,quality='medium'){
     applyCrossingTransform(obj,crossingFrame(game,cell));
     if(!visible)obj.matrix.makeScale(0,0,0);mesh.setMatrixAt(i,obj.matrix);obj.matrixAutoUpdate=true;return;
    }
-   obj.position.set(cell.x,game.atlasHeight(cell.x,cell.z)+.45,cell.z);obj.scale.setScalar(visible?multipliers[kind]:0);
+   obj.position.set(cell.x,terrain(cell.x,cell.z)+.02,cell.z);obj.scale.setScalar(visible?multipliers[kind]:0);
    obj.rotation.set(0,game.noise(cell.c,cell.r+16)*Math.PI*2,0);obj.updateMatrix();mesh.setMatrixAt(i,obj.matrix);
   });if(changed)mesh.instanceMatrix.needsUpdate=true;}
  }
  function landmark(kind){const src=templates.get(kind);if(!src)return null;const copy=src.clone(true);copy.scale.setScalar(kind==='village'?2.15:2.05);copy.name='World Atlas 1000 '+kind;return copy}
  const initialized=Promise.allSettled(Object.entries(FILES).map(async ([kind,name])=>{
-  const m=await loadWorldGLB(ROOT+name+'.glb');templates.set(kind,m);return kind;
+  const m=await loadWorldGLB(ROOT+name+'.glb');
+  // Authored ground slabs visibly float across the continuous landscape.
+  if(kind==='ruins')for(const o of [...m.children])if(o.name==='earth')m.remove(o);
+  if(kind==='forest')for(const o of [...m.children])if(o.name==='moss')m.remove(o);
+  templates.set(kind,m);return kind;
  })).then(results=>{const errors=results.filter(r=>r.status==='rejected');if(errors.length)console.warn('World Atlas 1000 GLB load incomplete:',errors.map(r=>r.reason));materialize();ready=true;update(true);return errors.length===0;});
  return {group,get ready(){return ready},initialized,landmark,update,
   // The detail renderer uses exactly the same selected atlas props.

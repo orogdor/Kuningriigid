@@ -103,6 +103,8 @@ jobs:
           node tests/estuary-v323.mjs
           node tests/river-estuary-v325.mjs
           node tests/shared-water-v326.mjs
+          node tests/adaptive-atlas-v327.mjs
+          node tests/world-assets-v327.mjs
       - name: V243 wall connections and building rotation
         run: node scripts/test-build-v243.mjs
       - name: V256 save compression and wildlife

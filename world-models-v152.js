@@ -1,6 +1,8 @@
+import {installWorldAssetsV327} from './world-assets-v327.js';
 // V152: procedural world-map models (trees, shrubs, cacti, rocks, settlements).
 // Built once in code as small vertex-coloured meshes and shared by all instances,
-// so they cost no downloads and few triangles. Presentation only: no gameplay data changes.
+// V327 replaces oak/pine/palm/rock with small local TRELLIS-derived GLBs after load.
+// Presentation only: no gameplay data changes.
 import * as T from './vendor/three.module.js';
 import {addWind} from './atmosphere-v158.js?v=161a';
 
@@ -302,3 +304,6 @@ export function miningSiteGeometry(type,kind,age){const key='site:'+type+':'+kin
  // tool shed (all sites)
  siteBox(b,3.1,0,2.9,1.4,1.1,1.1,modern?'#7c898a':'#97754c');b.part(new T.BoxGeometry(1,1,1),{at:[3.1,1.2,2.9],rot:[0,0,0],scale:[1.6,.12,1.3],color:()=>C('#5b4a3a')});
  const g=b.build(key);SITE_CACHE.set(key,g);return g;}
+
+// Keep authored placeholders only while the small generated assets load.
+if(typeof document!=='undefined')installWorldAssetsV327(getWorldModel).then(results=>{const failed=results.filter(r=>r.status==='rejected');if(failed.length)console.warn('V327 nature assets incomplete',failed.map(r=>String(r.reason)));});

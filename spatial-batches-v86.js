@@ -1,5 +1,6 @@
 import * as T from './vendor/three.module.js';
 const batches=new Set();
+function refreshGeneratedBoundsV327(mesh){const key=mesh.geometry.uuid+':'+!!mesh.geometry.userData.trellisV327;if(mesh.userData.boundsKeyV327===key)return;mesh.userData.boundsKeyV327=key;mesh.boundingSphere=null;mesh.computeBoundingSphere?.();}
 // Keep authored meshes, transforms and colors; only the draw groups change.
 export function spatialInstances(source,size=600){
  if(!source.isInstancedMesh||source.count<32)return source;
@@ -25,11 +26,11 @@ export function spatialInstances(source,size=600){
 // (and everything when zoomed out) the light one. Only a geometry reference changes per chunk.
 export function updateSpatialBatches(zoom,focus=null){
  const far=zoom>3000;
- for(const {source,near,size,lod} of batches){source.visible=far;near.visible=!far;
+ for(const {source,near,size,lod} of batches){source.visible=far;near.visible=!far;refreshGeneratedBoundsV327(source);
   if(!lod||far)continue;
   const radius=Math.max(420,zoom*1.1);
   for(const mesh of near.children){const [cx,cz]=mesh.userData.spatialCell.split(':').map(Number);
    const x=(cx+.5)*size,z=(cz+.5)*size,d=focus?Math.hypot(x-focus.x,z-focus.z):Infinity;
-   const geo=zoom<640&&d<radius+size*.7?lod.high:lod.low;if(mesh.geometry!==geo)mesh.geometry=geo;}
+   const geo=zoom<640&&d<radius+size*.7?lod.high:lod.low;if(mesh.geometry!==geo)mesh.geometry=geo;refreshGeneratedBoundsV327(mesh);}
  }
 }
