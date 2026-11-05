@@ -667,9 +667,13 @@ function* buildDetailTileV242(entry){
  entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
  let water=0;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const neighbour=game.cell({c:tile.c+dc,r:tile.r+dr});if(!neighbour||!neighbour.land)water++;}
  entry.water=water;
+ // V321: one non-overlapping sea tile per terrain tile, each sampling its
+ // own detailed terrain. The former giant 5x5 centre sea plane sampled
+ // beyond the rendered-ground window and created visible circular/diagonal
+ // depth boundaries at river mouths when the camera moved.
  entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>ground(tile,x,z),{origin:tile,
-   halfX:DETAIL_TILE_X*(detailStreamV242.radius+.55),halfZ:DETAIL_TILE_Z*(detailStreamV242.radius+.55),
-   seg:detailStreamV242.radius===2?216:166});if(entry.sea)entry.decor.add(entry.sea);}yield;
+   halfX:DETAIL_HALF_X,halfZ:DETAIL_HALF_Z,seg:quality==='high'?75:quality==='low'?38:55});
+   if(entry.sea)entry.root.add(entry.sea);}yield;
  entry.stage='rivers';
  entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
  entry.stage='outcrops';
