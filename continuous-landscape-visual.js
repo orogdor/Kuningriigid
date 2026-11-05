@@ -108,13 +108,17 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   // Match the height field used by the water depth/estuary transition.
   const atlas=smoothAtlasHeight(game,x,z);
   // V249: banks stop at the shore (shore), but the water itself runs on into the sea (sea) and fades there
-  const p={x,z,d:distance-w,outer:distance-w*1.40,outerDry:distance-w*2.18,shore:.30-atlas,sea:-2.5-atlas,width:w};nodes.set(key,p);return p;
+  // V317: the river mouth is transparent at sea level. Do not generate a
+  // coloured river-water polygon far out on the sea: its raster boundary
+  // used to appear as a pale rectangular sheet and diagonal triangles.
+  const p={x,z,d:distance-w,outer:distance-w*1.40,outerDry:distance-w*2.18,
+   shore:.30-atlas,sea:-2.5-atlas,mouth:-.65-atlas,width:w};nodes.set(key,p);return p;
  };
  const clip=(polygon,key,invert=false)=>{
   const result=[];for(let i=0;i<polygon.length;i++){
    const a=polygon[i],b=polygon[(i+1)%polygon.length],va=(invert?-1:1)*a[key],vb=(invert?-1:1)*b[key];
    if(va<=0)result.push(a);
-   if((va<=0)!==(vb<=0)){const t=va/(va-vb),p={};for(const k of ['x','z','d','outer','outerDry','shore','sea','width'])p[k]=a[k]+(b[k]-a[k])*t;result.push(p)}
+   if((va<=0)!==(vb<=0)){const t=va/(va-vb),p={};for(const k of ['x','z','d','outer','outerDry','shore','sea','mouth','width'])p[k]=a[k]+(b[k]-a[k])*t;result.push(p)}
   }return result;
  };
  const emit=(polygon,array,isWater)=>{
@@ -132,10 +136,10 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   const [x,z]=key.split(',').map(Number),a=node(x,z),b=node(x+1,z),c=node(x,z+1),d=node(x+1,z+1);
   for(const triangle of [[a,c,b],[b,c,d]]){
    const land=clip(triangle,'shore');
-   // Do not slice the mouth against an independent -2.5m sea polygon.
-   // Vertex alpha already fades it out by -2.2m: hard clipping made
-   // visible straight/triangular seams where river meets the sea.
-   emit(clip(triangle,'d'),water,true);
+   // Stop the river surface within the near-shore blending zone, never
+   // across deep sea cells. Alpha fades to zero BEFORE this clipping edge.
+   // No visible square boundary or fan of translucent triangles offshore.
+   emit(clip(clip(triangle,'mouth'),'d'),water,true);
    if(land.length<3)continue;
    emit(clip(clip(land,'outer'),'d',true),banks,false);
    // V223: second, much softer bank band between wet mud and untouched meadow.
@@ -183,7 +187,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,1-mouthBlend(game,p.x,p.z)).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
  },alpha:(x,y,z)=>{
   // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
-  const p=toWorld(x,z),a=smoothAtlasHeight(game,p.x,p.z),t=Math.max(0,Math.min(1,(a+2.2)/2.6));
+  const p=toWorld(x,z),a=smoothAtlasHeight(game,p.x,p.z),t=Math.max(0,Math.min(1,(a+.20)/1.8));
   // V250: clear water at the banks (the bed shows through), denser mid-stream
   const near=riverNear(game,p.x,p.z),edge=Math.min(1,near.distance/Math.max(1,near.width));
   return (.94-.36*Math.pow(edge,2.5))*t*t*(3-2*t);
