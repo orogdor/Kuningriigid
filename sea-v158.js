@@ -3,9 +3,9 @@
 import * as T from './vendor/three.module.js';
 import {CLOUD_TIME,SEA_EFFECT_V226} from './atmosphere-v158.js?v=161a';
 
-export function seaMaterial({scale=1,scaleZ=scale,origin={x:0,z:0}}={}){
+export function seaMaterial({scale=1,scaleZ=scale,origin={x:0,z:0},unified=false}={}){
  // Tile-local model units per world metre (4.5 x, 3.9 z in detail mode).
- if(T.GPU_MODE_V225)return seaNodeMaterialV246({scale,scaleZ,origin});
+ if(T.GPU_MODE_V225)return seaNodeMaterialV246({scale,scaleZ,origin,unified});
  const m=new T.MeshStandardMaterial({color:'#ffffff',roughness:.22,metalness:.12,transparent:true,depthWrite:false});
  m.onBeforeCompile=shader=>{
   shader.uniforms.uSeaT=CLOUD_TIME;shader.uniforms.uSeaFXV226=SEA_EFFECT_V226;
@@ -36,12 +36,22 @@ float sn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(sh(
    .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
  normal=normalize(normal+vec3(seaRipple-.5,0.0,.5-sn(vSeaP*.31+uSeaT*.2))*.22*uSeaFXV226);`);
  };
- m.customProgramCacheKey=()=>`sea-v242-${scale.toFixed(2)}-${scaleZ.toFixed(2)}`;
+ if(unified){
+  const compile=m.onBeforeCompile;
+  m.onBeforeCompile=shader=>{
+   compile(shader);
+   shader.vertexShader=shader.vertexShader.replace('attribute float aDepth;', 'attribute float aDepth;attribute float aRiver;varying float vRiver324;')
+    .replace('vSeaD=aDepth;', 'vSeaD=aDepth;vRiver324=aRiver;');
+   shader.fragmentShader=shader.fragmentShader.replace('varying float vSeaD;', 'varying float vSeaD;varying float vRiver324;')
+    .replace('diffuseColor.rgb=sea;', 'sea=mix(sea,mix(vec3(.18,.32,.28),vec3(.065,.20,.25),smoothstep(0.0,3.5,d)),vRiver324*.72);diffuseColor.rgb=sea;');
+  };
+ }
+ m.customProgramCacheKey=()=>`sea-v324-${unified}-${scale.toFixed(2)}-${scaleZ.toFixed(2)}`;
  return m;
 }
 // V246: WebGPU ignores onBeforeCompile, so the sea was drawn as an opaque white sheet (also over
 // beaches). The same depth colour, ripples, surf, wet-edge cut-out and normal wobble as TSL nodes.
-function seaNodeMaterialV246({scale,scaleZ,origin}){
+function seaNodeMaterialV246({scale,scaleZ,origin,unified=false}){
  const {Fn,vec2,vec3,float,floor,fract,sin,dot,mix,max,clamp,smoothstep,normalize,positionLocal,attribute,uniform,normalView}=T;
  const uT=uniform(CLOUD_TIME.value).onRenderUpdate(()=>CLOUD_TIME.value),uFX=uniform(SEA_EFFECT_V226.value).onRenderUpdate(()=>SEA_EFFECT_V226.value);
  const sh=p=>{const a=fract(p.mul(vec2(123.34,456.21))),b=a.add(dot(a,a.add(45.32)));return fract(b.x.mul(b.y));};
@@ -59,6 +69,7 @@ function seaNodeMaterialV246({scale,scaleZ,origin}){
  sea=mix(sea,vec3(.93,.96,.94),clamp(surf,0,1).mul(.75).mul(uFX));
  const wet=smoothstep(-.12,.20,depthRaw);
  const m=new T.MeshStandardNodeMaterial({roughness:.22,metalness:.12,transparent:true,depthWrite:false});
+ if(unified)sea=mix(sea,mix(vec3(.18,.32,.28),vec3(.065,.20,.25),smoothstep(0,3.5,d)),attribute('aRiver','float').mul(.72));
  m.colorNode=sea;
  m.opacityNode=mix(float(.36),float(.91),smoothstep(0,1.6,d)).mul(wet);
  m.alphaTest=.0025; // wet<.008 is discarded in the GLSL version (alpha stays ≥ .36·wet)

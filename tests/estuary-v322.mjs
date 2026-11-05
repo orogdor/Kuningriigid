@@ -29,8 +29,8 @@ for(const [x,z] of [[0,0],[54,-49],[-112,93]]){
  assert.ok(Math.abs(sample/0.30+0.7-original)<1e-7,'sea samples undisturbed world-coordinate terrain');
 }
 const main=readFileSync(new URL('../civilization.js',import.meta.url),'utf8');
-assert.ok(main.includes('localNaturalSeaGroundV322(game,tile,x,z,DETAIL_X,DETAIL_Z)'),'sea mesh must NOT sample excavated riverbed');
+assert.ok(main.includes('unifiedWaterStepsV324(game,'),'V324 replaces separate sea and river surfaces');
 const rivers=readFileSync(new URL('../continuous-landscape-visual.js',import.meta.url),'utf8');
-assert.ok(rivers.includes('riverSurfaceOpacityV322(game,p.x,p.z,estuaries)'),'new mouth fade is wired to water surface');
+assert.ok(!rivers.includes('riverSurfaceOpacityV322(game,p.x,p.z,estuaries)'),'V322 opacity patch is no longer used');
 assert.ok(!rivers.includes('estuaryOpacityV318(p.x,p.z,estuaries)'),'old mouth fade is disabled');
 console.log('V322 independent river-mouth/sea ownership PASS',zones.length);
