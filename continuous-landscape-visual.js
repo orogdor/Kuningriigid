@@ -1,4 +1,5 @@
 import {detailWorldRoadWidth,roadWidthScaleV250} from './road-width-v89.js';
+import {estuaryOpacityV318,estuaryMouthsV318} from './estuary-transition-v318.js';
 import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216,roadSurfaceV251} from './road-appearance-v216.js';
 import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 // V67: one topology for each river system and each road network. The atlas
@@ -94,6 +95,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  // A single clipped scalar-field mesh unions ALL tributaries. Every shared
  // grid coordinate has one height; overlapping ribbons and junction fans vanish.
  const step=scope==='detail'?1.75:2.5,cells=new Set(),nodes=new Map();
+ const estuaries=estuaryMouthsV318(getRivers(game));
  for(const edge of getRivers(game)){
   if(!visible(tile,edge.points))continue;riverCount++;
   for(const p of edge.points){yield;
@@ -136,10 +138,9 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   const [x,z]=key.split(',').map(Number),a=node(x,z),b=node(x+1,z),c=node(x,z+1),d=node(x+1,z+1);
   for(const triangle of [[a,c,b],[b,c,d]]){
    const land=clip(triangle,'shore');
-   // Stop the river surface within the near-shore blending zone, never
-   // across deep sea cells. Alpha fades to zero BEFORE this clipping edge.
-   // No visible square boundary or fan of translucent triangles offshore.
-   emit(clip(clip(triangle,'mouth'),'d'),water,true);
+   // The final river reach fades before its endpoint; do not cut the
+   // water polygon against an unrelated terrain-height contour.
+   emit(clip(triangle,'d'),water,true);
    if(land.length<3)continue;
    emit(clip(clip(land,'outer'),'d',true),banks,false);
    // V223: second, much softer bank band between wet mud and untouched meadow.
@@ -187,10 +188,11 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,1-mouthBlend(game,p.x,p.z)).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
  },alpha:(x,y,z)=>{
   // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
-  const p=toWorld(x,z),a=smoothAtlasHeight(game,p.x,p.z),t=Math.max(0,Math.min(1,(a+.20)/1.8));
-  // V250: clear water at the banks (the bed shows through), denser mid-stream
+  const p=toWorld(x,z);
+  // Dedicated estuary transition: fade longitudinally into the sea.
+  const outlet=estuaryOpacityV318(p.x,p.z,estuaries);
   const near=riverNear(game,p.x,p.z),edge=Math.min(1,near.distance/Math.max(1,near.width));
-  return (.94-.36*Math.pow(edge,2.5))*t*t*(3-2*t);
+  return (.94-.36*Math.pow(edge,2.5))*outlet;
  }});
  if(waterMesh){
   waterMesh.material.dispose();waterMesh.material=waterMaterial(scope,tile);animate(waterMesh);
