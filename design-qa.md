@@ -1,3 +1,11 @@
+## V311 · ehitistest oli nähtaval ainult esimene
+
+Viga taasesitati päris vana ui-v121.css stiiliga: #tray flex-direction oli column; kaevu, puuraiduri ja ülejäänud ehitiste top oli järgmistes vertikaalsetes ridades ning riba overflow lõikas need ära. Varasem kontrollvaade ei laadinud seda vana stiili ja jättis vea leidmata.
+
+Parandus määrab ainult illustreeritud alumise riba #tray suunaks row ja keelab reamurdmise piisava selektori tugevusega. Mõõdud, pildid ja mängureeglid säilivad. Kontrollvaade laadib nüüd kõik index.html stiilid samas järjekorras ning kasutab ehituse avamisel ka hud-city-open kehaklassi. Uus CI test kontrollib, et ükski mängu stiil pole kontrollvaatest puudu.
+
+Brauseris 915×364 on kõik 7 näidisehitist samal kõrgusel (top 254.921875), x kasvab 259.671875 → 627.921875. Valiti kaev ja viimane kivimurd, mõlema algne callback vastas õige nimega. Püstvaates 390×844 keriti viimase kaardini: scrollLeft 566, kõik top 674; kivimurru callback toimis. Tõendid reports/ui-v311-check.json ja previews/ui-v311-building-row.png. Kasutatakse päris HUD- ja ehituskaardifaile koos näidisandmetega; 3D-paigutust selles vaates ei testita.
+
 ## V310 · maailmakaardi mõõdus ja kujundusega alamkaardid
 
 V309 väikesed sinised alamvalikud asendati põhikaartidega samas mõõdus kullatud raami ja pärgamendialaga kaartidega. Algse nupu DOM-sõlm ja callback säilivad; visuaalse kujunduse jaoks liigutatakse selle päris pilt ja tekst raami sisse. Sama lahendus katab ehitised, üksuste nupud, linnad, armeed, kaubanduspakkumised, diplomaatia valikud ja päevikukirjed. Tagasi ja filtrid on samuti sama suured. Otsing/filtrid ei vähenda enam ülejäänud kaartide kõrgust. Põhikaartide mõõte võetakse ka menüü avamisel ja pärast akna suuruse muutmist; ResizeObserver kontrollib pööramise järgset lõplikku paigutust.

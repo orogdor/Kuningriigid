@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V311: parandatud ainult esimest ehitist näidanud riba. Vana ui-v121.css sundis päris #tray püstisesse tulpa; alumises ribas kirjutatakse nüüd suund ja reamurdmine selgelt üle. Brauserikontroll laadib kõik mängu stiilid, et sama viga kontrollvaatest enam välja ei jääks. Kinnitatud samas reas 7 kaarti, kaevu ja kivimurru valik ning püstvaates viimase kaardini külgkerimine. Üldkontrollid `reports/ui-v311-ci.json`; tõend `reports/ui-v311-check.json`.
+
 - V310: kõik alumise riba valikukaardid kasutavad maailmakaardi põhikaartidelt mõõdetud laiust, kõrgust ja ülaserva. Sama mõõduga Tagasi, ehitus-/armee-/linna-/kaubandus-/diplomaatia-/päevikukaardid, uus genereeritud läbipaistev kullatud raam ja pärgamendiala. Otsing ja ehitusfiltrid asuvad eraldi sama suures kaardis; pikad read kerivad küljele. Kontrollitud 6 menüüd ja 5 ekraanimõõtu, 0 mõõtude või joondumise erinevust. Kõik 23 CI gruppi läbisid; tõendid `reports/ui-v310-*.json`, `design-qa.md`.
 
 - V309: kuus alumist kaarti avavad oma sisu samas alumises ribas, püsiva Tagasi-nupuga. Päris ehitus-, linna-, armee-, kaubandus-, diplomaatia- ja päevikuelemendid liigutatakse ajutiselt ribasse ning taastatakse sulgemisel; andmeid ja mängukäske ei kloonita. Ehitiste pildid ja hinnad, horisontaalne kerimine, värbamise järgmine tase, Escape ning diplomaatia modaalikatete eemaldamine. Brauseris kontrollitud 5 ekraanimõõtu ja 6 menüüd; kõik 23 kohalikku CI gruppi läbisid. Tõendid ja kontrolli piirid `design-qa.md`, `reports/ui-v309-matrix.json`.

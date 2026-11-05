@@ -49,3 +49,6 @@ body.v306-active #v304-hud #v309-menu #v304-diplomacy,body.v306-active #v309-men
 body.v306-active #v309-menu .journal-window>:is(h2,button){display:none!important}
 
 body.v306-active #v309-menu #tray>label.v310-card select{box-sizing:border-box;width:100%!important;max-width:100%!important;height:auto!important;padding:0!important;font-size:inherit!important;color:#24170d;background:#edce8e;border:0}
+
+/* V311: reset the vertical construction flow inherited from ui-v121.css. */
+body.v306-active #v304-hud #v309-menu #citypanel #tray{flex-direction:row!important;flex-wrap:nowrap!important}

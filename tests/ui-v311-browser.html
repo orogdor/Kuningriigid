@@ -1,0 +1,43 @@
+<!doctype html><meta charset="utf-8"><title>V311 landscape viewport checks</title>
+<style>body{margin:0;background:#17252a;color:#f1d491;font:13px system-ui}nav{min-height:44px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:4px 12px}button{padding:7px 10px;background:#102235;border:1px solid #b39251;color:#f1d491;cursor:pointer}iframe{display:block;border:0;margin:0 auto;background:#344d54}output{display:block;padding:6px 12px;font:12px monospace}</style>
+<nav><button data-size="915,364">Telefon külili 915 × 364</button><button data-size="844,390">Telefon külili 844 × 390</button><button data-size="740,320">Lühike rõhtvaade 740 × 320</button><button data-size="390,844">Telefon püsti 390 × 844</button><button data-size="1200,675">Arvuti 1200 × 675</button></nav>
+<output id="result">Laeb päris HUD-i…</output>
+<iframe id="surface" title="V311 HUD" width="915" height="364" src="ui-v309-preview.html?capture=1&amp;release=311"></iframe>
+<script>
+const frame=document.getElementById('surface'),result=document.getElementById('result');
+function check(){
+ const w=frame.contentWindow,d=frame.contentDocument,root=d?.querySelector('#v304-hud');if(!root)return;
+ if(root.hidden){result.textContent='Menüü avatud · HUD on õigesti peidetud';result.dataset.passed='menu';return;}
+ const visible=e=>e&&w.getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;
+ const landscape=w.innerWidth>w.innerHeight,errors=[];
+ const selectors=['.v304-discoveries','.v304-map','.v304-selection','.v304-world'];
+ if(landscape)for(const s of selectors)if(!visible(d.querySelector(s)))errors.push('hidden '+s);
+ if(root.classList.contains('v309-submenu')){
+  const menu=d.querySelector('#v309-menu'),style=w.getComputedStyle(menu),cw=parseFloat(style.getPropertyValue('--choice-w')),ch=parseFloat(style.getPropertyValue('--choice-h')),top=menu.getBoundingClientRect().top;
+  const cards=[...menu.querySelectorAll('.v310-card')],bad=cards.filter(c=>{const r=c.getBoundingClientRect();return Math.abs(r.width-cw)>.1||Math.abs(r.height-ch)>.1||Math.abs(r.top-top)>.1});
+  result.textContent=(bad.length?'FAIL':'PASS')+' · '+cards.length+' sama mõõduga kaarti · '+cw.toFixed(1)+' × '+ch.toFixed(1)+' px';result.dataset.passed=String(!bad.length);return;
+ }
+ const cards=[...d.querySelectorAll('.v304-command')],rects=cards.map(e=>e.getBoundingClientRect());
+ if(landscape){
+  for(const r of rects)if(r.left<-.5||r.right>w.innerWidth+.5||r.top<-.5||r.bottom>w.innerHeight+.5)errors.push('card outside viewport');
+  if(rects.some(r=>r.height>w.innerHeight*.3))errors.push('dock too tall');
+  const research=d.querySelector('.v304-discoveries').getBoundingClientRect(),map=d.querySelector('.v304-map').getBoundingClientRect();
+  if(research.bottom>map.top+1)errors.push('research overlaps atlas');
+  const header=d.querySelector('.v304-top').getBoundingClientRect();
+  const rail=d.querySelector('.v306-bottom-rail').getBoundingClientRect(),hud=root.getBoundingClientRect(),dock=d.querySelector('.v304-dock').getBoundingClientRect(),selection=d.querySelector('.v304-selection').getBoundingClientRect();
+  if(Math.abs(hud.left)>1||Math.abs(hud.right-w.innerWidth)>1||Math.abs(header.width-w.innerWidth)>1||Math.abs(rail.width-w.innerWidth)>1)errors.push('bars not edge to edge');
+  if(dock.right>selection.left+12)errors.push('cards overlap right panel');
+  for(const e of d.querySelectorAll('.v304-resource,.v304-world'))if(visible(e)&&e.getBoundingClientRect().bottom>header.bottom+2)errors.push('header content below frame');
+  for(const e of d.querySelectorAll('#citypanel,#atlaspanel'))if(visible(e)){const r=e.getBoundingClientRect();if(r.left<0||r.top<0||r.right>w.innerWidth+1||r.bottom>w.innerHeight+1)errors.push('menu outside viewport');}
+  const overlay=[...d.querySelectorAll('#citypanel,#atlaspanel,#v304-resource-panel,#v304-diplomacy')].some(visible);
+  if(!overlay)for(const b of root.querySelectorAll('button'))if(!b.disabled&&visible(b)){
+   const r=b.getBoundingClientRect(),hit=d.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
+   if(hit!==b&&!b.contains(hit))errors.push('blocked '+b.getAttribute('aria-label'));
+  }
+ }
+ result.textContent=(errors.length?'FAIL: '+errors.join('; '):'PASS')+' · '+w.innerWidth+' × '+w.innerHeight+' · '+(landscape?'kõik 3 paneeli ja 6 kaarti':'püstvaate sahtlid')+' · kaart '+(rects[0]?.height||0).toFixed(1)+' px';
+ result.dataset.passed=String(!errors.length);
+}
+for(const b of document.querySelectorAll('button[data-size]'))b.onclick=()=>{const [w,h]=b.dataset.size.split(',');frame.width=w;frame.height=h;requestAnimationFrame(()=>requestAnimationFrame(check));};
+frame.onload=()=>{frame.contentWindow.addEventListener('resize',check);check()};setInterval(check,500);
+</script>

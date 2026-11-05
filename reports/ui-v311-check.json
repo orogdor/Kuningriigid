@@ -1,0 +1,63 @@
+{
+  "beforeDirection": "column",
+  "after": {
+    "cards": [
+      {
+        "left": 259.671875,
+        "top": 254.921875,
+        "type": "house"
+      },
+      {
+        "left": 321.046875,
+        "top": 254.921875,
+        "type": "well"
+      },
+      {
+        "left": 382.421875,
+        "top": 254.921875,
+        "type": "lumber"
+      },
+      {
+        "left": 443.796875,
+        "top": 254.921875,
+        "type": "farm"
+      },
+      {
+        "left": 505.171875,
+        "top": 254.921875,
+        "type": "barracks"
+      },
+      {
+        "left": 566.546875,
+        "top": 254.921875,
+        "type": "watchtower"
+      },
+      {
+        "left": 627.921875,
+        "top": 254.921875,
+        "type": "quarry"
+      }
+    ],
+    "direction": "row"
+  },
+  "portrait": {
+    "direction": "row",
+    "scrollLeft": 566,
+    "scrollWidth": 730,
+    "tops": [
+      674,
+      674,
+      674,
+      674,
+      674,
+      674,
+      674
+    ],
+    "width": 164
+  },
+  "selected": [
+    "Kaev: ehituskoht valitud",
+    "Kivimurd: ehituskoht valitud"
+  ],
+  "styles": "All production stylesheet links from index.html"
+}
