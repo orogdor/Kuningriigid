@@ -55,15 +55,29 @@ export class DetailStreamV242{
   this.position();
  }
  tick(){
-  if(!this.enabled||!this.center)return;const start=this.clock();
-  const pending=[...this.entries.values()].filter(e=>!e.ready).sort((a,b)=>{
-   const distance=e=>e.key===this.targetKey?-1:Math.max(Math.abs(e.tile.c-this.center.c),Math.abs(e.tile.r-this.center.r));
-   return distance(a)-distance(b);
-  });
-  // One bounded construction step at a time, rather than one whole scene.
-  while(pending.length&&this.clock()-start<this.budget){
-   this.step(pending[0],true);if(pending[0].ready)pending.shift();
+  if(!this.enabled||!this.center)return;
+  const start=this.clock();
+  const pending=[...this.entries.values()].filter(e=>!e.ready);
+  const distance=(a,b)=>Math.max(Math.abs(a.tile.c-b.c),Math.abs(a.tile.r-b.r));
+  const target=this.targetKey&&this.entries.get(this.targetKey)?.tile;
+  // The camera can enter any adjacent tile next. Complete its vegetation
+  // before constructing the much more expensive horizon/sea/road meshes.
+  const near=pending.filter(e=>distance(e,this.center)<=1||(target&&distance(e,target)<=1));
+  const pool=near.length?near:pending;
+  const treeStage=e=>!e.stage||['terrain','local world','resources','ground cover'].includes(e.stage);
+  pool.sort((a,b)=>Number(treeStage(b))-Number(treeStage(a))
+    ||distance(a,target||this.center)-distance(b,target||this.center)
+    ||a.tile.r-b.tile.r||a.tile.c-b.tile.c);
+  // V320: round-robin the stage generators instead of finishing a whole
+  // tile (including invisible decoration) before starting the next tile.
+  let cursor=(this.jobCursor||0)%Math.max(1,pool.length);
+  while(pool.length&&this.clock()-start<this.budget){
+   const i=cursor%pool.length,entry=pool[i];
+   this.step(entry,true);
+   if(entry.ready)pool.splice(i,1);
+   else cursor=i+1;
   }
+  this.jobCursor=cursor;
  }
  remove(entry){this.dispose(entry);entry.root.removeFromParent();this.entries.delete(entry.key);this.stats.evicted++;}
  clear(){for(const entry of [...this.entries.values()])this.remove(entry);this.center=null;}
