@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {Civilization,createGame} from '../civilization-core.js';
-import {baseHeight,getRivers} from '../continuous-landscape.js';
+import {baseHeight,getRivers,estuaryShoreHeightV323} from '../continuous-landscape.js';
 import {DETAIL_X,DETAIL_Z} from '../detail-scale-v123.js';
 import {SEA_LEVEL_V322,naturalBedHeightV322,naturalSeaDepthV322,localNaturalSeaGroundV322,
  mouthZonesV322,riverSurfaceOpacityV322} from '../estuary-v322.js';
@@ -25,7 +25,7 @@ assert.ok(depth<0,'natural inland terrain must not flood even if river trench is
 assert.ok(Math.abs(depth-(SEA_LEVEL_V322-Math.max(baseHeight(game,tile.x,tile.z),game.atlasHeight(tile.x,tile.z))))<1e-8);
 for(const [x,z] of [[0,0],[54,-49],[-112,93]]){
  const sample=localNaturalSeaGroundV322(game,tile,x,z,DETAIL_X,DETAIL_Z);
- const original=naturalBedHeightV322(game,tile.x+x/DETAIL_X,tile.z+z/DETAIL_Z);
+ const original=estuaryShoreHeightV323(game,tile.x+x/DETAIL_X,tile.z+z/DETAIL_Z);
  assert.ok(Math.abs(sample/0.30+0.7-original)<1e-7,'sea samples undisturbed world-coordinate terrain');
 }
 const main=readFileSync(new URL('../civilization.js',import.meta.url),'utf8');
