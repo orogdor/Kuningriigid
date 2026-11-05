@@ -4,14 +4,14 @@ import * as T from './vendor/three.module.js';
 import {CLOUD_TIME,SEA_EFFECT_V226} from './atmosphere-v158.js?v=161a';
 
 export function seaMaterial({scale=1,scaleZ=scale,origin={x:0,z:0}}={}){
- // scale: model units per world metre on the horizontal plane (1 on the world map, ~4.5 on detail maps)
+ // Tile-local model units per world metre (4.5 x, 3.9 z in detail mode).
  if(T.GPU_MODE_V225)return seaNodeMaterialV246({scale,scaleZ,origin});
  const m=new T.MeshStandardMaterial({color:'#ffffff',roughness:.22,metalness:.12,transparent:true,depthWrite:false});
  m.onBeforeCompile=shader=>{
   shader.uniforms.uSeaT=CLOUD_TIME;shader.uniforms.uSeaFXV226=SEA_EFFECT_V226;
   shader.uniforms.uSeaOriginV242={value:new T.Vector2(origin.x,origin.z)};
   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform vec2 uSeaOriginV242;attribute float aDepth;varying float vSeaD;varying vec2 vSeaP;')
-   .replace('#include <begin_vertex>','#include <begin_vertex>\nvSeaD=aDepth;vSeaP=(modelMatrix*vec4(position,1.0)).xz/vec2('+scale.toFixed(3)+','+scaleZ.toFixed(3)+')+uSeaOriginV242;');
+   .replace('#include <begin_vertex>','#include <begin_vertex>\nvSeaD=aDepth;vSeaP=position.xz/vec2('+scale.toFixed(3)+','+scaleZ.toFixed(3)+')+uSeaOriginV242;');
   shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
 uniform float uSeaT;uniform float uSeaFXV226;varying float vSeaD;varying vec2 vSeaP;float seaRipple=0.0;
 float sh(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
@@ -42,13 +42,14 @@ float sn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(sh(
 // V246: WebGPU ignores onBeforeCompile, so the sea was drawn as an opaque white sheet (also over
 // beaches). The same depth colour, ripples, surf, wet-edge cut-out and normal wobble as TSL nodes.
 function seaNodeMaterialV246({scale,scaleZ,origin}){
- const {Fn,vec2,vec3,float,floor,fract,sin,dot,mix,max,clamp,smoothstep,normalize,positionWorld,attribute,uniform,normalView}=T;
+ const {Fn,vec2,vec3,float,floor,fract,sin,dot,mix,max,clamp,smoothstep,normalize,positionLocal,attribute,uniform,normalView}=T;
  const uT=uniform(CLOUD_TIME.value).onRenderUpdate(()=>CLOUD_TIME.value),uFX=uniform(SEA_EFFECT_V226.value).onRenderUpdate(()=>SEA_EFFECT_V226.value);
  const sh=p=>{const a=fract(p.mul(vec2(123.34,456.21))),b=a.add(dot(a,a.add(45.32)));return fract(b.x.mul(b.y));};
  const sn=Fn(([p])=>{const i=floor(p),f0=fract(p),f=f0.mul(f0).mul(float(3).sub(f0.mul(2)));
   return mix(mix(sh(i),sh(i.add(vec2(1,0))),f.x),mix(sh(i.add(vec2(0,1))),sh(i.add(vec2(1,1))),f.x),f.y);});
  const depthRaw=attribute('aDepth','float'),d=max(depthRaw,0);
- const p=positionWorld.xz.div(vec2(scale,scaleZ)).add(vec2(origin.x,origin.z));
+ // Tile-local shader coordinates keep waves continuous as streaming roots move.
+ const p=positionLocal.xz.div(vec2(scale,scaleZ)).add(vec2(origin.x,origin.z));
  let sea=mix(vec3(.42,.70,.66),vec3(.16,.45,.52),smoothstep(.3,4.0,d));sea=mix(sea,vec3(.05,.20,.32),smoothstep(4.0,22.0,d));
  const r1=sn(p.mul(.18).add(vec2(uT.mul(.22),uT.mul(.10)))),r2=sn(p.mul(.47).sub(vec2(uT.mul(.15),uT.mul(-.27))).add(3));
  const ripple=r1.mul(.6).add(r2.mul(.4));
