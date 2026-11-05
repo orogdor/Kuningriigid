@@ -29,7 +29,13 @@ function prep(game){
   for(const {c} of edges){
    const k=idx(c),up=incoming.get(k)?.[0],down=game.cell(c.riverTo);
    if(!c.ford&&!c.bridge&&up&&down?.land&&incoming.get(k)?.length===1){
-    graph.anchors.set(k,{x:c.x+clamp((up.x+down.x-2*c.x)*.18,-12,12),z:c.z+clamp((up.z+down.z-2*c.z)*.18,-12,12)});
+    // Coherent landscape-scale bends, not a separate zigzag inside each tile.
+    const dx=down.x-up.x,dz=down.z-up.z,len=hypot(dx,dz);
+    const low=1-smooth(((up.h+c.h+down.h)/3-18)/14);
+    const bend=(game.smooth(c.x/145+13.7,c.z/145+5.1)-.5)*2;
+    const shift=7.5*low*bend;
+    graph.anchors.set(k,{x:c.x+clamp((up.x+down.x-2*c.x)*.18-dz/len*shift,-13,13),
+      z:c.z+clamp((up.z+down.z-2*c.z)*.18+dx/len*shift,-13,13)});
    }
    const branches=incoming.get(k)||[];
    if(branches.length<2||!c.land||!down?.land||c.ford||c.bridge||c.h<4)continue;
@@ -39,6 +45,20 @@ function prep(game){
    const flow=c.riverFlow||branches.reduce((n,p)=>n+(p.riverFlow||0),0);
    graph.confluenceLakes.set(k,clamp(12+Math.sqrt(flow)*(.48+chance*.7),14,32));
   }
+ }
+ // Smooth movable visual anchors; fixed crossings, confluences and mouths
+ // retain their exact drainage positions. Three passes remove cell zigzags.
+ for(let pass=0;pass<3;pass++){
+  const next=new Map(graph.anchors);
+  for(const {c} of edges){
+   const k=idx(c),p=graph.anchors.get(k);if(!p)continue;
+   const up=incoming.get(k)?.[0],down=game.cell(c.riverTo);
+   if(!up||!down?.land)continue;
+   const a=riverPoint(game,graph,up),b=riverPoint(game,graph,down);
+   next.set(k,{x:c.x+clamp((a.x+2*p.x+b.x)/4-c.x,-13,13),
+     z:c.z+clamp((a.z+2*p.z+b.z)/4-c.z,-13,13)});
+  }
+  graph.anchors=next;
  }
  caches.set(game,graph);
  // The river position field is spatially indexed. Detail and atlas queries
@@ -114,15 +134,7 @@ export function sampleRiver(game,cell,count=12,graph=null){
  for(let i=0;i<=count;i++){
   const t=i/count,p=hermite(start,end,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t);
   let width=source+(target-source)*smooth(t);
-  // V250 (new worlds): rivers meander between drainage anchors instead of running like canals along the
-  // grid. Ford, bridge and confluence anchors stay fixed; the bend side and size drift smoothly
-  // over the map, lowland rivers swing more than mountain streams.
-  if(game.s?.geographyVersion>=7&&i>0&&i<count){
-   const d=hermiteTangent(start,end,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t),dl=Math.hypot(d.x,d.z)||1;
-   const mx=(start.x+end.x)/2,mz=(start.z+end.z)/2,side=(game.smooth(mx/110+13.7,mz/110+5.1)-.5)*2;
-   const low=1-smooth(((cell.h+to.h)/2-18)/14),amp=Math.min(13,3.5+width*.7)*low*side*Math.sin(PI*t);
-   p.x+=-d.z/dl*amp;p.z+=d.x/dl*amp;
-  }
+  // Hermite follows smoothed anchors; no per-cell oscillation on the banks.
   // A seeded minority of confluences broadens into small or larger lakes.
   // The same radius is used by every incoming and outgoing reach.
   const lakeAtStart=graph.confluenceLakes.get(idx(cell))||0;
@@ -137,10 +149,10 @@ export function sampleRiver(game,cell,count=12,graph=null){
 }
 export const getRivers=game=>prep(game).edges;
 // V249: 0 inland, rising to 1 where the river meets sea level (coast and open sea).
-export function estuaryV249(game,x,z){return 1-smooth((game.atlasHeight(x,z)-.30)/6);}
+export function estuaryV249(game,x,z){return 1-smooth((smoothAtlasHeight(game,x,z)-.30)/6);}
 // V249: 1 on dry land, 0 on the beach and in the sea. River banks, levees and raised meadows
 // only exist on land; at the mouth the riverbed runs down into the sea floor instead.
-export function landnessV249(game,x,z){return smooth((game.atlasHeight(x,z)-1.2)/4);}
+export function landnessV249(game,x,z){return smooth((smoothAtlasHeight(game,x,z)-1.2)/4);}
 export function riverNear(game,x,z){
  const pos=cellAt(x,z);if(!pos)return {distance:Infinity,width:0};
  const bucket=prep(game).bucket.get(idx(pos));if(!bucket)return {distance:Infinity,width:0};
