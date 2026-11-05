@@ -1,0 +1,352 @@
+{
+  "menus": [
+    {
+      "backHit": true,
+      "bounds": {
+        "height": 87.421875,
+        "width": 633.421875,
+        "x": 136.921875,
+        "y": 254.921875
+      },
+      "dockHidden": true,
+      "hudHidden": false,
+      "kind": "cities",
+      "modalBlocked": false,
+      "panel": "v264-listpanel",
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "bounds": {
+        "height": 87.421875,
+        "width": 633.421875,
+        "x": 136.921875,
+        "y": 254.921875
+      },
+      "dockHidden": true,
+      "hudHidden": false,
+      "kind": "build",
+      "modalBlocked": false,
+      "panel": "citypanel",
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "bounds": {
+        "height": 87.421875,
+        "width": 633.421875,
+        "x": 136.921875,
+        "y": 254.921875
+      },
+      "dockHidden": true,
+      "hudHidden": false,
+      "kind": "armies",
+      "modalBlocked": false,
+      "panel": "v264-listpanel",
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "bounds": {
+        "height": 87.421875,
+        "width": 633.421875,
+        "x": 136.921875,
+        "y": 254.921875
+      },
+      "dockHidden": true,
+      "hudHidden": false,
+      "kind": "trade",
+      "modalBlocked": false,
+      "panel": "v264-listpanel",
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "bounds": {
+        "height": 87.421875,
+        "width": 633.421875,
+        "x": 136.921875,
+        "y": 254.921875
+      },
+      "dockHidden": true,
+      "hudHidden": false,
+      "kind": "diplomacy",
+      "modalBlocked": false,
+      "panel": "v304-diplomacy",
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "bounds": {
+        "height": 87.421875,
+        "width": 633.421875,
+        "x": 136.921875,
+        "y": 254.921875
+      },
+      "dockHidden": true,
+      "hudHidden": false,
+      "kind": "journal",
+      "modalBlocked": false,
+      "panel": "journal-window",
+      "visible": true
+    }
+  ],
+  "responsive": [
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 342.34375,
+        "height": 87.421875,
+        "left": 136.921875,
+        "right": 770.34375,
+        "top": 254.921875,
+        "width": 633.421875,
+        "x": 136.921875,
+        "y": 254.921875
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "build",
+      "viewport": [
+        915,
+        364
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 342.34375,
+        "height": 87.421875,
+        "left": 136.921875,
+        "right": 770.34375,
+        "top": 254.921875,
+        "width": 633.421875,
+        "x": 136.921875,
+        "y": 254.921875
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "diplomacy",
+      "viewport": [
+        915,
+        364
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 366.796875,
+        "height": 93.65625,
+        "left": 146.703125,
+        "right": 689,
+        "top": 273.140625,
+        "width": 542.296875,
+        "x": 146.703125,
+        "y": 273.140625
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "build",
+      "viewport": [
+        844,
+        390
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 366.796875,
+        "height": 93.65625,
+        "left": 146.703125,
+        "right": 689,
+        "top": 273.140625,
+        "width": 542.296875,
+        "x": 146.703125,
+        "y": 273.140625
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "diplomacy",
+      "viewport": [
+        844,
+        390
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 300.96875,
+        "height": 76.84375,
+        "left": 120.375,
+        "right": 612.828125,
+        "top": 224.125,
+        "width": 492.453125,
+        "x": 120.375,
+        "y": 224.125
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "build",
+      "viewport": [
+        740,
+        320
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 300.96875,
+        "height": 76.84375,
+        "left": 120.375,
+        "right": 612.828125,
+        "top": 224.125,
+        "width": 492.453125,
+        "x": 120.375,
+        "y": 224.125
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "diplomacy",
+      "viewport": [
+        740,
+        320
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 834,
+        "height": 150,
+        "left": 8,
+        "right": 382,
+        "top": 684,
+        "width": 374,
+        "x": 8,
+        "y": 684
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "build",
+      "viewport": [
+        390,
+        844
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 834,
+        "height": 150,
+        "left": 8,
+        "right": 382,
+        "top": 684,
+        "width": 374,
+        "x": 8,
+        "y": 684
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "diplomacy",
+      "viewport": [
+        390,
+        844
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 634.84375,
+        "height": 162.109375,
+        "left": 253.921875,
+        "right": 931.734375,
+        "top": 472.734375,
+        "width": 677.8125,
+        "x": 253.921875,
+        "y": 472.734375
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "build",
+      "viewport": [
+        1200,
+        675
+      ],
+      "visible": true
+    },
+    {
+      "backHit": true,
+      "badImages": [],
+      "blocked": false,
+      "bounds": {
+        "bottom": 634.84375,
+        "height": 162.109375,
+        "left": 253.921875,
+        "right": 931.734375,
+        "top": 472.734375,
+        "width": 677.8125,
+        "x": 253.921875,
+        "y": 472.734375
+      },
+      "cards": true,
+      "hudVisible": true,
+      "kind": "diplomacy",
+      "viewport": [
+        1200,
+        675
+      ],
+      "visible": true
+    }
+  ],
+  "journalReopen": [
+    {
+      "journal": true,
+      "sourceHidden": true,
+      "visible": true
+    },
+    {
+      "journal": true,
+      "sourceHidden": true,
+      "visible": true
+    }
+  ],
+  "commands": [
+    "building callback",
+    "army callback and return",
+    "trade callback",
+    "diplomacy relation update",
+    "journal Escape twice"
+  ],
+  "contextRoute": {
+    "selection": "own city",
+    "action": "Build",
+    "submenu": "build",
+    "buildingButtons": 7,
+    "backRestoresDock": true
+  }
+}

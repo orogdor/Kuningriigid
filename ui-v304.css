@@ -111,7 +111,7 @@ body.v304-active #v304-hud .v304-selection-actions button[aria-pressed=true]{fil
 .v304-store-row img{width:28px;height:28px;object-fit:contain}
 .v304-store-row>small{grid-column:2/4;color:var(--ui-muted);font-size:10px}
 .v304-diplomacy{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(600px,calc(100vw - 24px));max-height:calc(100dvh - 30px);overflow:auto;z-index:700;padding:14px!important}
-body.v304-active:has(#v304-diplomacy:not([hidden]))::after{content:'';position:fixed;inset:0;background:#020811b8;z-index:650;backdrop-filter:blur(3px)}
+body.v304-active:has(#v304-diplomacy:not([hidden]):not(.v309-embedded))::after{content:'';position:fixed;inset:0;background:#020811b8;z-index:650;backdrop-filter:blur(3px)}
 .v304-menu-banner{height:105px;overflow:hidden;margin:0 -2px 14px}
 .v304-menu-banner img{width:100%;height:100%;object-fit:cover;object-position:center 28%}
 .v304-faction{padding:13px 0;border-top:1px solid var(--ui-line);display:grid;gap:7px}

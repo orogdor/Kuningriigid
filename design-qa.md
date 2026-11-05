@@ -1,3 +1,11 @@
+## V309 · vahetuv alumine valikuriba
+
+Kasutaja soovi järgi jääb V308 täislaiuses raam alles. Kuue põhikaardi asemele ilmub valitud menüü ja püsiv Tagasi. Päris paneelide DOM-elemendid koos algsete käsitlejatega liiguvad ajutiselt ribasse; sulgemisel taastatakse nende algne asukoht, roll ja aria-modal. Avastuspuu ja põhimenüü säilitavad senise eraldi vaate.
+
+Brauseris kontrollitud kõik kuus valikut 915×364 mõõdus ning ehitus ja diplomaatia mõõtudes 915×364, 844×390, 740×320, 390×844 ja 1200×675: riba püsib all, põhikaardid on peidetud, HUD jääb nähtavale, Tagasi puuteala on vaba, katkisi menüüpiltide allikaid pole ning modaalne kaardiblokeering ei jää külge. Kontrollitud ka valitud linna parempoolse portree Ehita-käsu suunamist samasse ribasse ja tagasiteed, armee valimise järel põhivalikusse naasmist, värbamise alamastmesse minekut, ehitusvaliku callback'i, viimase hooneni kerimist, kauplemise callback'i, diplomaatia muutmist ning päeviku kahekordset avamist ja Escape'iga sulgemist. Leitud ja parandatud vana diplomaatia ekraanikate ning päeviku kordusavamise peidetud lapse viga.
+
+Tõendid: `reports/ui-v309-matrix.json`, `previews/ui-v309-bottom-build.png`. Kontrollvaade kasutab päris HUD-, nimekirja- ja ehituskaardifaile, mänguandmed ja simulatsioonikäskude API on näidisandmetega. Selles vaates 3D-mootorit ei käivitata; tegelikku kaardile paigutamist ja GPU-pilti siin ei kinnitata. Kohalikud kõik 23 nõutud CI gruppi läbisid (`reports/ui-v309-ci.json`), seejärel kontrolliti lõpliku V309 skripti süntaks ning V304/V306 regressioonid uuesti.
+
 ## V308 · täislaiuses ribad
 
 Kasutaja heakskiidetud V307 paneelide ja kaartide skaala säilib. Rõhtvaates ulatuvad üla- ja alariba kogu ohutu ekraanilaiuseni; lisalaius jääb kuue kaardi järele, enne paremat paneeli. Parempoolne ressursirühm on ankurdatud parema serva külge.

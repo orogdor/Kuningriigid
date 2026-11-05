@@ -104,6 +104,7 @@
   if(a.target==='diplomacy')return openDiplomacy();
   const targets=Array.isArray(a.target)?a.target:[a.target];
   original(...targets.filter(id=>id!=='foundcity'||($('settlerpanel')&&!$('settlerpanel').hidden)));
+  window.KuningriigidUIV309?.route?.(targets);
  }
  function showResources(key,anchor){
   if(!resourcePanel.hidden&&resourceKey===key){resourcePanel.hidden=true;return;}
@@ -140,7 +141,7 @@
   const feedbackEl=el('p','v304-feedback',diplomacy,feedback);feedbackEl.setAttribute('role','status');
  }
  function syncBlocking(){
-  document.body.classList.toggle('v304-blocking',!!(diplomacy&&!diplomacy.hidden)||!!($('v264-listpanel')&&!$('v264-listpanel').hidden));
+  document.body.classList.toggle('v304-blocking',!!(diplomacy&&!diplomacy.hidden&&!diplomacy.classList.contains('v309-embedded'))||!!($('v264-listpanel')&&!$('v264-listpanel').hidden&&!$('v264-listpanel').classList.contains('v309-embedded')));
  }
  function update(){
   const bigMenu=['startmenu','researchpanel','journalpanel','help'].some(id=>$(id)&&!$(id).hidden);
@@ -219,7 +220,7 @@
   });listObserver.observe(document.body,{childList:true});
   document.addEventListener('keydown',e=>{
    if(e.key==='Escape'){if(!diplomacy.hidden){e.stopImmediatePropagation();closeTransient();previousFocus?.focus?.();}else closeTransient();}
-   if(e.key==='Tab'&&!diplomacy.hidden){const focusable=[...diplomacy.querySelectorAll('button:not(:disabled)')],first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}
+   if(e.key==='Tab'&&!diplomacy.hidden&&!diplomacy.classList.contains('v309-embedded')){const focusable=[...diplomacy.querySelectorAll('button:not(:disabled)')],first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}
   },true);
   document.addEventListener('pointerdown',e=>{if(!e.target.closest('#v304-resource-panel,.v304-resource'))resourcePanel.hidden=true;});
   addEventListener('pagehide',()=>{if(mapCanvas&&mapHome)mapHome.append(mapCanvas);},{once:true});

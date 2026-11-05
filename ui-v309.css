@@ -1,0 +1,52 @@
+/* The submenu takes exactly the old choice strip, including V308 spare width. */
+body.v306-active #v304-hud .v304-dock[hidden],body.v306-active #v309-menu[hidden]{display:none!important}
+body.v306-active #v309-menu{position:absolute;left:calc(354 * var(--hud-u));right:calc(374 * var(--hud-u));bottom:calc(56 * var(--hud-u));height:calc(226 * var(--hud-u));display:flex;gap:calc(8 * var(--hud-u));z-index:8;pointer-events:auto;min-width:0;color:var(--ui-ink)}
+body.v306-active #v309-menu .v309-back{flex:0 0 max(46px,calc(105 * var(--hud-u)));height:100%;padding:5px;border:1px solid #b98d47;background:#0b1c2f url('ui-art-v304/panel.webp') center/100% 100%;color:#f1d491;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font:700 max(10px,calc(16 * var(--hud-u)))/1.2 Georgia,serif;cursor:pointer}
+body.v306-active #v309-menu .v309-back img{width:75%;max-height:60%;object-fit:contain}
+body.v306-active #v309-menu .v309-content{flex:1;min-width:0;height:100%;overflow:hidden}
+body.v306-active #v304-hud #v309-menu .v309-embedded{position:static!important;inset:auto!important;transform:none!important;display:block!important;width:100%!important;min-width:0!important;max-width:none!important;height:100%!important;min-height:0!important;max-height:100%!important;padding:0!important;margin:0!important;overflow:auto!important;background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;z-index:auto!important}
+body.v306-active #v304-hud #v309-menu .v309-embedded[hidden]{display:none!important}
+body.v306-active #v309-menu :is(.v304-list-banner,.v304-menu-banner,.v304-dialog-heading,.v264-head,.v264-close,.city-panel-heading,.city-tabs,#cityqueue,#buildqueuefolder,#hud-build-guidance,#citypane-build>p,.v121-build-search-label,.city-build-tabs,#closejournal,#journalpanel h2){display:none!important}
+body.v306-active #v309-menu #citypane-build:not([hidden]){height:100%;display:flex!important;flex-direction:column;min-height:0}
+body.v306-active #v304-hud #v309-menu #citypanel #buildcatalogtools{display:flex!important;align-items:center;flex:0 0 auto;gap:5px!important;height:24px!important;min-height:0!important;margin:0!important;overflow:hidden!important}
+body.v306-active #v309-menu #buildsearch{width:90px!important;min-width:0!important;height:22px!important;padding:2px 5px!important;font-size:10px!important}
+body.v306-active #v304-hud #v309-menu #citypanel #buildcategories{flex:1;min-width:0;padding:0!important;overflow-x:auto!important}
+body.v306-active #v304-hud #v309-menu #citypanel .v121-category{padding:3px 6px!important;font-size:10px!important;white-space:nowrap}
+body.v306-active #v304-hud #v309-menu #citypanel #tray{display:flex!important;flex:1;min-height:0!important;height:auto!important;max-height:none!important;width:100%!important;gap:5px!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity;overscroll-behavior:contain;padding:0 0 3px!important}
+body.v306-active #v304-hud #v309-menu #citypanel #tray>button{flex:0 0 max(110px,calc(156 * var(--hud-u)))!important;width:auto!important;min-width:0!important;max-width:none!important;min-height:0!important;height:100%!important;max-height:none!important;padding:5px!important;overflow-y:auto!important;overflow-x:hidden!important;scroll-snap-align:start;white-space:normal!important;text-align:left!important;font-size:10px!important;line-height:1.2!important;border:1px solid #a37a3d!important;background:#102337!important}
+body.v306-active #v304-hud #v309-menu #citypanel #tray>button .v304-catalog-picture{position:static!important;float:left;width:34%!important;height:calc(100% - 6px)!important;max-height:90px;object-fit:cover;margin:0 5px 2px 0!important;border-radius:2px}
+body.v306-active #v304-hud #v309-menu #citypanel :is(.v121-card-name,.v121-card-cost,.v121-card-warning,.v121-card-action,.v121-card-meta){font-size:10px!important;line-height:1.2!important}
+body.v306-active #v309-menu :is(.v121-card-state,.v121-card-extra){display:none!important}
+body.v306-active #v309-menu #tray>label{flex:0 0 110px!important;width:110px!important;font-size:10px}
+body.v306-active #v309-menu #v264-listpanel{display:flex!important;flex-direction:column}
+body.v306-active #v309-menu #v264-listpanel>input{flex:0 0 22px!important;width:120px!important;margin:0!important;padding:2px 5px!important;font-size:10px!important;box-sizing:border-box}
+body.v306-active #v309-menu .v264-rows{display:flex!important;flex:1;min-height:0;gap:6px;overflow:auto!important;align-items:stretch}
+body.v306-active #v309-menu .v264-rows>:is(button,div,p){flex:0 0 max(135px,calc(210 * var(--hud-u)));width:auto!important;min-width:0;max-height:100%;margin:0!important;overflow:auto!important;font-size:11px!important}
+body.v306-active #v309-menu .v264-row{display:flex!important;align-items:center;padding:5px!important;min-height:0!important}
+body.v306-active #v309-menu .v264-row img{width:36px!important;height:48px!important;object-fit:contain}
+body.v306-active #v309-menu .v264-row :is(b,small){font-size:11px!important;line-height:1.2!important}
+body.v306-active #v309-menu :is(.v276-offers,.v304-faction-controls){display:flex;gap:4px;flex-wrap:wrap}
+body.v306-active #v309-menu :is(.v276-offers,.v304-faction-controls) button{padding:4px!important;font-size:10px!important;min-height:24px!important}
+body.v306-active #v309-menu .v276-title img{width:30px!important;height:30px!important;object-fit:contain}
+body.v306-active #v309-menu #v304-diplomacy{display:flex!important;gap:6px}
+body.v306-active #v309-menu .v304-faction{flex:0 0 170px;padding:6px!important;overflow:auto;border:1px solid #a37a3d;background:#102337}
+body.v306-active #v309-menu .v304-faction :is(strong,small){font-size:11px!important;line-height:1.2!important}
+body.v306-active #v309-menu #v304-diplomacy>.v304-muted{display:none}
+body.v306-active #v309-menu .v304-feedback{font-size:10px}
+body.v306-active #v309-menu #journalpanel .journal-window{position:static!important;display:block!important;width:100%!important;height:100%!important;max-height:none!important;padding:0!important;background:none!important;border:0!important;overflow:auto!important}
+body.v306-active #v309-menu #journalentries{display:flex;gap:6px;height:100%;overflow:auto}
+body.v306-active #v309-menu #journalentries p{flex:0 0 180px;padding:6px;margin:0;border:1px solid #a37a3d;font-size:11px;overflow:auto}
+body.v306-active #v309-menu :focus-visible{outline:2px solid #f4dc9c;outline-offset:-2px}
+@media(orientation:portrait) and (max-width:800px){body.v306-active #v309-menu{left:8px;right:8px;bottom:10px;height:150px}}
+
+body.v306-active #v309-menu[data-kind=city] .city-tabs{display:flex!important;height:24px;margin:0!important;gap:4px}
+body.v306-active #v309-menu[data-kind=city] .city-tabs button{font-size:10px!important;padding:3px!important}
+body.v306-active #v309-menu :is(#citypane-info,#citypane-workers):not([hidden]){height:calc(100% - 26px);overflow:auto}
+body.v306-active #v309-menu .journal-window{position:static!important;display:block!important;width:100%!important;height:100%!important;max-height:none!important;padding:0!important;background:none!important;border:0!important;overflow:auto!important}
+
+/* The simulation may mark the local city panel visible on every render. Its
+   controls now live in the bottom menu, so it must not reappear over the map. */
+body.v306-active.v309-active #citypanel:not(.v309-embedded){display:none!important}
+@media(orientation:landscape) and (max-height:560px){
+ body.v306-active #v309-menu #tray :is(.v121-card-meta,.v121-card-action){display:none!important}
+}

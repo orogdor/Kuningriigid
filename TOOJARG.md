@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V309: kuus alumist kaarti avavad oma sisu samas alumises ribas, püsiva Tagasi-nupuga. Päris ehitus-, linna-, armee-, kaubandus-, diplomaatia- ja päevikuelemendid liigutatakse ajutiselt ribasse ning taastatakse sulgemisel; andmeid ja mängukäske ei kloonita. Ehitiste pildid ja hinnad, horisontaalne kerimine, värbamise järgmine tase, Escape ning diplomaatia modaalikatete eemaldamine. Brauseris kontrollitud 5 ekraanimõõtu ja 6 menüüd; kõik 23 kohalikku CI gruppi läbisid. Tõendid ja kontrolli piirid `design-qa.md`, `reports/ui-v309-matrix.json`.
+
 - V308: rõhtvaate ribad ulatuvad äärest ääreni, kuue kaardi suurus säilib ning lisaruum jääb nende järele. Parempoolsed ressursid järgivad paremat serva. Brauseris kontrollitud 4 rõhtvaadet ja senine püstvaade; mõõdud `reports/ui-v308-matrix.json`. Kohalike nõutud kontrollide tulemused: `reports/ui-v308-ci.json`.
 
 - V307: lühikeses telefoni rõhtvaates on nüüd korraga nähtaval kolm pildipaneeli ja kuus kaarti. Skaala sobitub ka nähtava kõrgusega; ülariba ja menüüd mahuvad ekraanile. Parandatud kaardivahetust katnud keelatud jalutamisnupu puuteala. Brauseris kontrollitud kolm rõhtvaadet, püstvaade ja arvutivaade; 0 kaetud lubatud nuppu, 23 CI gruppi läbisid. Tõendid ja GPU piirang: `design-qa.md`, `reports/ui-v307-matrix.json`.
