@@ -22,7 +22,24 @@ function prep(game){
   const k=idx(to),list=incoming.get(k)||[];list.push(c);incoming.set(k,list);
  }
  for(const arr of incoming.values())arr.sort((a,b)=>(b.riverFlow||0)-(a.riverFlow||0));
- const graph={incoming,edges,bucket,paths:new Map()};
+ const graph={incoming,edges,bucket,paths:new Map(),anchors:new Map(),confluenceLakes:new Map()};
+ // River centre points drift toward the neighbouring reach. A ford or bridge
+ // stays at its original crossing, and all tributaries share one junction.
+ if(game.s?.geographyVersion>=7){
+  for(const {c} of edges){
+   const k=idx(c),up=incoming.get(k)?.[0],down=game.cell(c.riverTo);
+   if(!c.ford&&!c.bridge&&up&&down?.land&&incoming.get(k)?.length===1){
+    graph.anchors.set(k,{x:c.x+clamp((up.x+down.x-2*c.x)*.18,-12,12),z:c.z+clamp((up.z+down.z-2*c.z)*.18,-12,12)});
+   }
+   const branches=incoming.get(k)||[];
+   if(branches.length<2||!c.land||!down?.land||c.ford||c.bridge||c.h<4)continue;
+   const h=Math.sin((c.c+game.s.seed*.013)*127.1+(c.r-game.s.seed*.017)*311.7)*43758.5453;
+   const chance=h-Math.floor(h);
+   if(chance>=.28)continue;
+   const flow=c.riverFlow||branches.reduce((n,p)=>n+(p.riverFlow||0),0);
+   graph.confluenceLakes.set(k,clamp(12+Math.sqrt(flow)*(.48+chance*.7),14,32));
+  }
+ }
  caches.set(game,graph);
  // The river position field is spatially indexed. Detail and atlas queries
  // use the same samples, instead of checking every river globally.
@@ -64,33 +81,54 @@ function hermiteTangent(a,b,m0,m1,t){
  const t2=t*t,d00=6*t2-6*t,d10=3*t2-4*t+1,d01=-6*t2+6*t,d11=3*t2-2*t;
  return {x:d00*a.x+d10*m0.x+d01*b.x+d11*m1.x,z:d00*a.z+d10*m0.z+d01*b.z+d11*m1.z};
 }
+function riverPoint(game,graph,cell){return graph.anchors.get(idx(cell))||cell;}
+function mouthPoint(game,cell,to){
+ if(to.land||game.s?.geographyVersion<6)return to;
+ // Stop shortly beyond the coast instead of drawing a long, squared-off
+ // tongue across the sea cell. The water colour still fades into the sea.
+ let lo=0,hi=1;for(let i=0;i<12;i++){
+  const t=(lo+hi)/2,x=cell.x+(to.x-cell.x)*t,z=cell.z+(to.z-cell.z)*t;
+  if(game.atlasHeight(x,z)>.3)lo=t;else hi=t;
+ }
+ const t=Math.min(1,(lo+hi)/2+12/hypot(to.x-cell.x,to.z-cell.z));
+ return {x:cell.x+(to.x-cell.x)*t,z:cell.z+(to.z-cell.z)*t};
+}
 function tangent(game,graph,cell,previous=null){
  const up=previous||graph.incoming.get(idx(cell))?.[0]||null;
  const downstream=cell.riverTo?game.cell(cell.riverTo):null;
- if(up&&downstream)return unit(downstream.x-up.x,downstream.z-up.z);
- if(downstream)return unit(downstream.x-cell.x,downstream.z-cell.z);
- if(up)return unit(cell.x-up.x,cell.z-up.z);
+ const here=riverPoint(game,graph,cell),prior=up&&riverPoint(game,graph,up);
+ const next=downstream&&(downstream.land?riverPoint(game,graph,downstream):mouthPoint(game,cell,downstream));
+ if(prior&&next)return unit(next.x-prior.x,next.z-prior.z);
+ if(next)return unit(next.x-here.x,next.z-here.z);
+ if(prior)return unit(here.x-prior.x,here.z-prior.z);
  return {x:1,z:0};
 }
 export function sampleRiver(game,cell,count=12,graph=null){
  if(!cell?.riverTo)return [];
  graph??=prep(game);
  const to=game.cell(cell.riverTo);if(!to)return [];
- const len=hypot(to.x-cell.x,to.z-cell.z),t0=tangent(game,graph,cell),t1=tangent(game,graph,to);
+ const start=riverPoint(game,graph,cell),end=to.land?riverPoint(game,graph,to):mouthPoint(game,cell,to);
+ const len=hypot(end.x-start.x,end.z-start.z),t0=tangent(game,graph,cell),t1=tangent(game,graph,to,cell);
  const source=Math.max(1.5,cell.riverWidth||3),target=Math.max(source,to.riverWidth||source*1.18);
  const pts=[];
  for(let i=0;i<=count;i++){
-  const t=i/count,p=hermite(cell,to,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t);
+  const t=i/count,p=hermite(start,end,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t);
   let width=source+(target-source)*smooth(t);
-  // V250 (new worlds): rivers meander between cell centres instead of running like canals along the
-  // grid. Cell centres (fords, bridges, confluences) stay fixed; the bend side and size drift smoothly
+  // V250 (new worlds): rivers meander between drainage anchors instead of running like canals along the
+  // grid. Ford, bridge and confluence anchors stay fixed; the bend side and size drift smoothly
   // over the map, lowland rivers swing more than mountain streams.
   if(game.s?.geographyVersion>=7&&i>0&&i<count){
-   const d=hermiteTangent(cell,to,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t),dl=Math.hypot(d.x,d.z)||1;
-   const mx=(cell.x+to.x)/2,mz=(cell.z+to.z)/2,side=(game.smooth(mx/110+13.7,mz/110+5.1)-.5)*2;
+   const d=hermiteTangent(start,end,{x:t0.x*len,z:t0.z*len},{x:t1.x*len,z:t1.z*len},t),dl=Math.hypot(d.x,d.z)||1;
+   const mx=(start.x+end.x)/2,mz=(start.z+end.z)/2,side=(game.smooth(mx/110+13.7,mz/110+5.1)-.5)*2;
    const low=1-smooth(((cell.h+to.h)/2-18)/14),amp=Math.min(13,3.5+width*.7)*low*side*Math.sin(PI*t);
    p.x+=-d.z/dl*amp;p.z+=d.x/dl*amp;
   }
+  // A seeded minority of confluences broadens into small or larger lakes.
+  // The same radius is used by every incoming and outgoing reach.
+  const lakeAtStart=graph.confluenceLakes.get(idx(cell))||0;
+  const lakeAtEnd=to.land?(graph.confluenceLakes.get(idx(to))||0):0;
+  if(lakeAtStart)width=Math.max(width,source+(lakeAtStart-source)*(1-smooth(t/.53)));
+  if(lakeAtEnd)width=Math.max(width,target+(lakeAtEnd-target)*(1-smooth((1-t)/.53)));
   // V249 (new worlds): the last stretch opens into a funnel-shaped estuary towards the sea.
   if(game.s?.geographyVersion>=6)width*=1+1.5*estuaryV249(game,p.x,p.z);
   pts.push({...p,width,flow:cell.riverFlow||0});
