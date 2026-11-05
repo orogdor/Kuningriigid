@@ -85,7 +85,7 @@ import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=2232';
-import {riverNetworkStepsV242,createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=319';
+import {riverNetworkStepsV242,createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=322';
 import {surface,localSurface,localVisualSurface,worldElevation,visualElevation,visualProject,mountainMask,projectHeight as projectHeightV161,riverNear,overviewSurface,roadNetwork,worldToLocal} from './continuous-landscape.js?v=319';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=125b';
 import {createShipModel} from './naval-visual.js';
@@ -151,6 +151,7 @@ const peopleLifeV252=createPeopleLifeV252();
 // V252: idle townsfolk chat or go home, keep personal space and carry torches at night (Stone Age)
 function peopleLifeCtxV252(city,age){if(!city)return {time:s.time,enabled:false,night:false,open:()=>true,homes:[]};const nav=game.nav(city);return {time:s.time,enabled:age===0,night:dayClockV235(s.time).torch>.3,open:(x,z)=>nav.open(x,z),homes:(city.economy?.buildings||[]).filter(b=>b.type==='house'&&b.ready&&b.hp>0).map(b=>door(b))};}
 import {detailSeaStepsV242,createDetailSea} from './sea-v158.js?v=321';
+import {localNaturalSeaGroundV322} from './estuary-v322.js';
 import {buildingClearance} from './navigation.js?v=2273';
 import {door} from './navigation.js?v=2273';
 import {loadProtectedGame,writeAutosave,replaceProtectedGame} from './save-safety-v73.js?v=256';
@@ -671,7 +672,7 @@ function* buildDetailTileV242(entry){
  // own detailed terrain. The former giant 5x5 centre sea plane sampled
  // beyond the rendered-ground window and created visible circular/diagonal
  // depth boundaries at river mouths when the camera moved.
- entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>ground(tile,x,z),{origin:tile,
+ entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>localNaturalSeaGroundV322(game,tile,x,z,DETAIL_X,DETAIL_Z),{origin:tile,
    halfX:DETAIL_HALF_X,halfZ:DETAIL_HALF_Z,seg:quality==='high'?75:quality==='low'?38:55});
    if(entry.sea)entry.root.add(entry.sea);}yield;
  entry.stage='rivers';
