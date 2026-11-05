@@ -3,7 +3,10 @@ import * as T from './vendor/three.module.js';
 import {DETAIL_TILE_X,DETAIL_TILE_Z} from './detail-scale-v123.js';
 export class DetailStreamV242{
  constructor({scene,cell,build,dispose,clock=()=>performance.now(),budget=3}){
-  Object.assign(this,{cell,build,dispose,clock,budget});this.entries=new Map();
+  Object.assign(this,{cell,build,dispose,clock,budget});
+  // Desktop: display one extra tile ring at the same mesh resolution as the centre.
+  this.radius=typeof matchMedia==='function'&&matchMedia('(min-width:900px) and (pointer:fine)').matches?2:1;
+  this.entries=new Map();
   this.root=new T.Group();this.root.name='V242 persistent detail tiles';scene.add(this.root);
   this.center=null;this.enabled=false;this.stats={created:0,reused:0,evicted:0,maxJobMs:0,crossings:0};
  }
@@ -25,10 +28,10 @@ export class DetailStreamV242{
  }
  finish(tile){const entry=this.ensure(tile);while(!entry.ready)this.step(entry);return entry;}
  activate(tile){
-  this.stats.reused+=[...this.entries.values()].filter(e=>e.ready&&e.root.visible&&Math.max(Math.abs(e.tile.c-tile.c),Math.abs(e.tile.r-tile.r))<=1).length;
+  this.stats.reused+=[...this.entries.values()].filter(e=>e.ready&&e.root.visible&&Math.max(Math.abs(e.tile.c-tile.c),Math.abs(e.tile.r-tile.r))<=this.radius).length;
   if(this.center&&this.key(this.center)!==this.key(tile))this.stats.crossings++;
   this.center=tile;this.enabled=true;this.root.visible=true;
-  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)this.ensure(this.cell(tile.c+dc,tile.r+dr));
+  for(let dr=-this.radius;dr<=this.radius;dr++)for(let dc=-this.radius;dc<=this.radius;dc++)this.ensure(this.cell(tile.c+dc,tile.r+dr));
   this.position();return this.entries.get(this.key(tile));
  }
  position(){
@@ -36,9 +39,9 @@ export class DetailStreamV242{
   for(const entry of this.entries.values()){
    const dc=entry.tile.c-this.center.c,dr=entry.tile.r-this.center.r;
    entry.root.position.set(dc*DETAIL_TILE_X,0,dr*DETAIL_TILE_Z);
-   entry.root.visible=this.enabled&&Math.max(Math.abs(dc),Math.abs(dr))<=1;
+   entry.root.visible=this.enabled&&Math.max(Math.abs(dc),Math.abs(dr))<=this.radius;
    entry.decor.visible=dc===0&&dr===0;
-   if(Math.max(Math.abs(dc),Math.abs(dr))>2)this.remove(entry);
+   if(Math.max(Math.abs(dc),Math.abs(dr))>this.radius+1)this.remove(entry);
   }
  }
  prefetch(x,z){
@@ -48,7 +51,7 @@ export class DetailStreamV242{
   const target=this.cell(this.center.c+dc,this.center.r+dr);if(!target)return;
   this.targetKey=this.key(target);
   this.ensure(target);
-  for(let r=-1;r<=1;r++)for(let c=-1;c<=1;c++)this.ensure(this.cell(target.c+c,target.r+r));
+  for(let r=-this.radius;r<=this.radius;r++)for(let c=-this.radius;c<=this.radius;c++)this.ensure(this.cell(target.c+c,target.r+r));
   this.position();
  }
  tick(){
