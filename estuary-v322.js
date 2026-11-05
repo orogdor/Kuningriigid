@@ -46,12 +46,19 @@ function nearOutlet(x,z,zone){
  return (1-smooth(d/zone.radius))*smooth((along+zone.radius*.6)/(zone.radius*.6));
 }
 export function riverSurfaceOpacityV322(game,x,z,zones){
- // Away from mouths, the historical river surface stays untouched.
- let influence=0;
- for(const zone of zones)influence=Math.max(influence,nearOutlet(x,z,zone));
- if(influence<=0)return 1;
- // Wet shore is owned by the sea plane. At mean sea level river surface
- // becomes fully transparent; farther inland the ordinary river resumes.
- const land=smooth((naturalBedHeightV322(game,x,z)-SEA_LEVEL_V322)/3.0);
- return 1-influence*(1-land);
+ // V323: longitudinal fade removes tinted triangles at the outlet,
+ // while shoreline ownership resolves the remaining tidal transition.
+ let influence=0,downstreamFade=1;
+ for(const zone of zones){
+  influence=Math.max(influence,nearOutlet(x,z,zone));
+  const dx=x-zone.a.x,dz=z-zone.a.z;
+  const along=dx*zone.ux+dz*zone.uz;
+  const lateral=Math.abs(-dx*zone.uz+dz*zone.ux);
+  const progress=smooth((along-zone.length*.08)/Math.max(.01,zone.length*.92));
+  const cross=1-smooth((lateral-zone.radius*.68)/Math.max(.1,zone.radius*.32));
+  downstreamFade=Math.min(downstreamFade,1-progress*cross);
+ }
+ if(influence<=0)return downstreamFade;
+ const land=smooth((estuaryShoreHeightV323(game,x,z)-SEA_LEVEL_V322)/3.0);
+ return clamp(Math.min(1-influence*(1-land),downstreamFade));
 }
