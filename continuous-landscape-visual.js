@@ -1,5 +1,5 @@
 import {detailWorldRoadWidth,roadWidthScaleV250} from './road-width-v89.js';
-import {mouthZonesV322,riverSurfaceOpacityV322} from './estuary-v322.js';
+import {mouthZonesV322,riverSurfaceOpacityV322} from './estuary-v322.js?v=323';
 import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216,roadSurfaceV251} from './road-appearance-v216.js';
 import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 // V67: one topology for each river system and each road network. The atlas
