@@ -1,55 +1,51 @@
-# V306 – valitud UI võrdlus
+# V307 – telefoni rõhtvaate parandus
 
-Scope: HUD, selle andmeside ja menüüde avamise nupud. Mängu 3D-maailma välimust see muudatus ei asenda.
+## Allikas ja kontrolli ulatus
 
-## Tõendid
+Kasutaja uus pilt `6784.png` näitas päris Androidi rõhtvaadet: avastuspaneel, minikaart ja valikupaneel olid peidetud, kaardirida oli liiga kõrge ning ülariba arvud liikusid piltide alla. Soovitud välimus on endiselt teine pilt `6777.png` (1672 × 941).
 
-- Visuaalne allikas: kasutaja teine pilt `/workspace/scratch/82c72cf7fc2c/upload/02-6777.png`, 1672 × 941 px.
-- Brauseri renderdus: `previews/ui-v306-desktop.png`, 1200 × 675 px/CSS px, ja `previews/ui-v306-mobile.png`, 390 × 844 px/CSS px.
-- Täpne sisemine viewport loodi tavalise iframe'iga failis `tests/ui-v306-browser.html`; brauseri screenshot lõigati iframe'i nähtavate DOM-piiride järgi. Seadme pikslitihedus on 1. Allikas normaliseeriti 1200 × 675 peale, sama 16:9 küljesuhe (ümardus alla 1 px).
-- Täisvaate võrdlus: `previews/ui-v306-comparison.jpg`. Allikas ja teostus on ühes võrdluspildis.
-- Fookusvõrdlused: `previews/ui-v306-footer-comparison.jpg`, `previews/ui-v306-research-comparison.jpg`.
-- Teostus kasutab päris `ui-v304.js`, `ui-v306.js` ja nende CSS-i. Kontrollvaate andmed on selgelt märgitud näidisandmetena; seal ei käivitata 3D-mootorit. Minikaardi katseandmestik ja hall keskosa ei ole mängumaailma uus graafika.
+Eelmine V306 telefonikontroll hõlmas püstvaadet, kuid jättis selle lühikese rõhtvaate kontrollimata. V307 tõendid kasutavad eraldi kolme rõhtvaate mõõtu.
 
-## Võrdluse ajalugu
+## Leitud vead ja parandused
 
-1. Kasutaja esimene pilt/V304: P1 — raamid olid väikesed ristkülikud; kuus kaarti olid madalad ja väga väikesed. Parandus: pildiraamidele vastavad proportsionaalsed piirkonnad, 248 × 356 avastuspaneel, 344 × 376 atlas, 384 × 386 valikupaneel ja kuus püstkaarti 1672 × 941 lähtekoordinaatides. Lõplik tõend on ülaltoodud täis- ja jalusevõrdlus.
-2. Esimene brauserivaade: P1 — avastuse pilt/tekst sattus raami taha või kattis pärgamendi. Parandus: eraldatud pildi, raami ja teksti kihid ning pildisisu piiramine ringi sisemusse. Lõplik avastuse lähivõrdlus näitab loetavat nime ja tervet kuldset äärist.
-3. Telefoni esimene vaade: P2 — kuus kõrvuti surutud kaarti andsid liiga väikese teksti. Parandus: 100 × 150 px kaardid horisontaalselt keritavas reas; viimase päevikukaardini ja esimese linnakaardini liikumine on brauseris kontrollitud.
-4. P2 — valiku harvemad käsud kasutasid vanu lamedaid SVG-ikoone ning paus ei näidanud selgelt jätkamist. Parandus: kõik 17 käsuvarianti kasutavad olemasolevaid maalitud pilte; eraldi genereeritud pausi-, jätkamis- ja seadete nupud. Kontrollitud päris HUD-i pausi- ja käsupildid.
-5. Kontrollvaate enda mobiilne sulgemisnupp oli algul iframe'ist väljas (P0 katserakisele, mitte mängule). Parandus katsele: kogu uurimispaneel mahub iframe'i ning sulgemisnupp asub nähtavas nurgas. Avamine ja sulgemine läbisid korduskontrolli.
+- **P1, rõhtvaate paneelid:** `(max-height:560px)` lülitas ka laia telefoni sahtlivaatesse. Kompaktne V306 paigutus rakendub nüüd ainult püstisele kitsale ekraanile. Rõhtvaates on kõik kolm pildipaneeli ja kuus kaarti korraga nähtavad.
+- **P1, skaala:** fikseeritud 150 px kaardikõrgus võttis madalast aknast liiga palju ruumi. Pildiliides sobitatakse nüüd nii nähtava laiuse kui ka `100dvh` kõrguse järgi. Väga laias aknas jäävad HUD-i külgedele vabad mänguala ribad; ringe ega pilte ei venitata.
+- **P2, ülariba:** vanast kujundusest pärinesid 42 px nupukõrgus ja püstine ressursipaigutus. Rõhtvaate ressursid on taas ühel real ning mahuvad oma pildiraami sisse.
+- **P1, kaardivahetus:** liiga nõrk CSS-selektor jättis keelatud jalutamisnupu kaardivahetuse nupu peale. Teine nupp paikneb nüüd oma kohal ning on maailmavaates peidetud. Kaardivahetus ja detailvaate jalutamiskäsk jõudsid brauseris õigete olemasolevate nuppudeni.
+- **P2, menüüde piirid:** linna-, ehitus- ja kaardimenüüde laius/asukoht arvestavad päris telefoniakent. Sulgemisnupud jäävad nähtavasse alasse.
 
-## Viis nõutud visuaalset pinda
+## Brauseritõendid
 
-- **Kirjatüüp ja tekst:** elavad arvud/nimed kasutavad Georgia/Times serif-kirja; pildikaartide must tekst on heledal pärgamendil. Pealkirja, arvude ja kaartide hierarhia on kontrollitud. Mobiilikaartide teksti ei vähendata enam kuue kaardi mahutamiseks ühe ekraani laiusesse.
-- **Vahed ja rütm:** allika vasak/parem kaar, keskmine kuue kaardi rida, suur ümmargune avastus ning ülariba on samas jaotuses. Keskne mänguväli on vaba. Pildid ja klõpsualad skaleeruvad ühe ühikuga; telefonis avanevad raamid nõudmisel.
-- **Värvid:** tumesinine email/nahk, vana kuld, hele pärgament ja tume puit vastavad allika materjalidele. Tavalised ristkülikud on HUD-i kandvatelt piirkondadelt eemaldatud.
-- **Pildid:** kümme uut üksikpilti, kuus püstist 448 px laiust kaarti, 512 px lossiportree ning kolm ümmargust juhtnuppu. Kasutatud on olemasolevaid genereeritud raame ja ressursipilte. Teema käsud ei kasuta uusi käsitsi joonistatud SVG/CSS-asenduspilte. Puuduvaid pilte ei olnud lõplikus brauserivaates.
-- **Sisu:** kuue kaardi nähtavad eestikeelsed pealkirjad järgivad allikat. Arvud, avastus, järjekord, valiku nimi ja käsud tulevad mängu olemasolevast liidesest. Allika väljamõeldud aastaarvu, kasvunumbreid ja valitud lossi nime ei esitata mängu tegelike andmetena. Tühja valiku korral näidatakse kuningriigi illustratsiooni ja sellele sobivaid käske; päris valik säilitab oma portree.
+Päris HUD-i failid töötasid rakises `tests/ui-v307-browser.html`, mille iframe annab täpse CSS-viewport'i. Andmed ja minikaart on selgelt märgistatud näidisandmetena; hall keskosa ei ole uus mängugraafika.
 
-## Brauseris kontrollitud tegevused
+| CSS-viewport | Olek | Kaardi kõrgus | Pildid / kaetud nähtavad nupud |
+| --- | --- | --- | --- |
+| 915 × 364 | 3 paneeli + 6 kaarti | 87,4 px | 0 puuduvat / 0 kaetud |
+| 844 × 390 | 3 paneeli + 6 kaarti | 93,7 px | 0 / 0 |
+| 740 × 320 | 3 paneeli + 6 kaarti | 76,8 px | 0 / 0 |
+| 390 × 844 | püstvaate sahtlid | 150 px, keritav rida | 0 / 0 nähtavas alas |
+| 1200 × 675 | 3 paneeli + 6 kaarti | 162,1 px | 0 / 0 |
 
-- Kõik kuus põhikaarti: linnaloend, ehitus, armee, kaubandus, diplomaatia, päevik.
-- Uurimise avamine ja sulgemine; telefoni avastuste/kaardi sahtlid.
-- Minikaardi suurendusnupu ühendus olemasoleva `zin` käsuga.
-- Ressursimenüüs on kivi kõrval alles ka puit.
-- Paus lülitab ikooni jätkamise pildiks ja tagasi.
-- Oma sõduri liikumiskäsk jõuab `commandmove` nupuni; vastase liikumise ja peatamise nupud on keelatud.
-- Telefonis pääseb ka horisontaalse rea viimasele kaardile ja saab tagasi esimesele.
-- Lõplikus kontrollvaates ei olnud rakenduse konsoolivigu ega puuduvaid pildifaile. Brauserilaiendi enda metaandmete vead jäid sellest hinnangust välja.
+- Mõõtmised: `reports/ui-v307-matrix.json`.
+- Täielik telefonivaade: `previews/ui-v307-phone-landscape.png` (915 × 364, density 1).
+- Lühike rõhtvaade: `previews/ui-v307-phone-short.png` (740 × 320).
+- Püstvaade: `previews/ui-v307-phone-portrait.png` (390 × 844).
+- Ühine pildiline võrdlus: `previews/ui-v307-phone-comparison.jpg`. Allikas on sobitatud samasse 915 × 364 alasse, et erinev küljesuhe ei moonutaks kujusid. Võrreldud on HUD-i kompositsiooni ja suurust; näidiskaardi geograafia ja 3D taust jäävad võrdlusest välja.
 
-## Lubatud erinevused ja piirangud
+Brauseris kontrolliti pausi/jätkamise ikooni, ehitusmenüü avamist ja sulgemist, avastuspaneeli avamist ja sulgemist, minikaardi kaardivahetust, jalutamiskäsu ühendust detailvaates ning kaarditoimingute menüü avamist ja sulgemist. HTML-elementide tegelikud keskpunktid läbisid `elementFromPoint` kontrolli: ükski nähtav ja lubatud HUD-i nupp ei olnud teise elemendi all. Mobiiliridade väljaspool keritavat nähtavat ala paiknevaid kaarte ei loetud kaetud nuppudeks.
 
-- Eraldi genereeritud maalide üksikdetailid ja kuldornamendid võivad allikast veidi erineda (P3). Kompositsioon, proportsioonid, materjalid ja pealkirjad järgivad valitud UI-d.
-- Allika täpne geograafia ning lahingu/linnaandmed ei kuulu HUD-i võrdlusse. Siinses brauseris on GPU kontekst keelatud, seega täismängu 3D-käivitust ei kinnitatud; see on allesolev seadmel tehtav kontroll.
-- 140 avastuspildi seosed ja mängu reeglid läbisid olemasolevad testid. Kõik CI 23 kiirkontrolli gruppi ning uus `node tests/ui-v306.mjs` läbisid.
+## Viis visuaalset pinda
 
-## Teostuse kontrollnimekiri
+- **Kirjatüüp:** senine serif/pärgamendi kujundus säilib; lühikese rõhtvaate arvudel, pealkirjal ja valiku nimel on loetavuse alampiir.
+- **Paigutus:** pildiraamid ja klõpsualad skaleeruvad koos, avastus ei kattu atlasega ning kuus kaarti mahuvad ekraanile. Rõhtvaates ei ole enam kolme mobiilisahtli nupurida.
+- **Värvid:** V306 tumesinine, kuld ja pärgament säilivad.
+- **Pildid:** kasutatakse olemasolevaid genereeritud raame ja pilte; uut asendusgraafikat ei lisatud. Puuduvaid pilte ei leitud.
+- **Sisu:** kõik ressursid, avastused ja käsud kasutavad senist V304/V306 andmesidet. Mängureegleid ei muudeta.
 
-- [x] Suured kaarjad paneelid ja püstised pildikaardid.
-- [x] Elavad andmed ja olemasolevad käsud, oma/vastase valiku piirangud.
-- [x] Arvuti- ja telefonivaate pildiline kontroll.
-- [x] Ühine täisvaate ja lähivõtete võrdlus, P0/P1/P2 parandused uuesti kontrollitud.
-- [x] Päris GPU-ga mängupildi kontrolli piirang ausalt eristatud HUD-i kontrollist.
+## Kontrollid ja piirangud
+
+Kõik 23 CI kiirkontrolli gruppi ja V306 kunstivarade/käskude kontroll läbisid. Päris mängu käivitus jõudis uuesti Three.js renderdaja loomiseni, kuid selle pilvebrauseri GPU kontekst on keelatud (`GL_RENDERER = Disabled`). Seetõttu ei väideta, et täismängu 3D-pilti või päris Androidi riistvara oleks siin proovitud. Vastuvõtukontroll hõlmab brauseris renderdatud HUD-i, viewport'i mõõte ja klõpsuühendusi.
+
+Eraldi maalitud kujunduse peened ornamentide/pildisisu erinevused jäävad P3-na; lahendamata P0/P1/P2 HUD-i paigutus- või klõpsuala vigu selles maatriksis ei jäänud.
 
 final result: passed

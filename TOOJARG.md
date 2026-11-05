@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V307: lühikeses telefoni rõhtvaates on nüüd korraga nähtaval kolm pildipaneeli ja kuus kaarti. Skaala sobitub ka nähtava kõrgusega; ülariba ja menüüd mahuvad ekraanile. Parandatud kaardivahetust katnud keelatud jalutamisnupu puuteala. Brauseris kontrollitud kolm rõhtvaadet, püstvaade ja arvutivaade; 0 kaetud lubatud nuppu, 23 CI gruppi läbisid. Tõendid ja GPU piirang: `design-qa.md`, `reports/ui-v307-matrix.json`.
+
 - V306: kasutaja teise pildi järgi taastatud suured kaarjad pildiraamid ja kuus kõrget kaarti. Kümme uut üksikpilti, 17 maalitud kontekstikäsu ühendust, eraldi pausi/jätkamise ikoonid ning loetav telefoni kaardirida. Brauseris kontrollitud HUD-i päris failid ja käsud; 23 CI gruppi ning V306 test läbisid. Visuaalse kontrolli tõendid ja GPU piirang: `design-qa.md`; üksikasjad `MUUDATUSED_V306.md`.
 
 - V305: Three.js r170 → r187 (`0.187.0`), ametlikud muutmata core/WebGL/WebGPU/TSL failid, ühised vahemäluvõtmed, praegune WebGPU renderdusliides, PCF-varjud ja staatilise silla maatriksi uuendamine. Kõik CI kiirkontrolli grupid ning uued varjutajakoodi/GLB/instantside kontrollid läbisid. Siinne brauser ei saa graafikakonteksti luua, nii et tegelik GPU-pilt ja jõudlus vajavad seadmel kontrolli. Üksikasjad: `MUUDATUSED_V305.md`.

@@ -1,0 +1,42 @@
+[
+  {
+    "badImages": [],
+    "height": 364,
+    "occluded": [],
+    "root": "{\"bottom\":364,\"height\":364,\"left\":134.109375,\"right\":780.875,\"top\":0,\"width\":646.765625,\"x\":134.109375,\"y\":0}",
+    "width": 915,
+    "result": "PASS · 915 × 364 · kõik 3 paneeli ja 6 kaarti · kaart 87.4 px"
+  },
+  {
+    "badImages": [],
+    "height": 390,
+    "occluded": [],
+    "root": "{\"bottom\":390,\"height\":390,\"left\":75.515625,\"right\":768.46875,\"top\":0,\"width\":692.953125,\"x\":75.515625,\"y\":0}",
+    "width": 844,
+    "result": "PASS · 844 × 390 · kõik 3 paneeli ja 6 kaarti · kaart 93.7 px"
+  },
+  {
+    "badImages": [],
+    "height": 320,
+    "occluded": [],
+    "root": "{\"bottom\":320,\"height\":320,\"left\":85.703125,\"right\":654.28125,\"top\":0,\"width\":568.578125,\"x\":85.703125,\"y\":0}",
+    "width": 740,
+    "result": "PASS · 740 × 320 · kõik 3 paneeli ja 6 kaarti · kaart 76.8 px"
+  },
+  {
+    "badImages": [],
+    "height": 844,
+    "occluded": [],
+    "root": "{\"bottom\":844,\"height\":844,\"left\":0,\"right\":390,\"top\":0,\"width\":390,\"x\":0,\"y\":0}",
+    "width": 390,
+    "result": "PASS · 390 × 844 · püstvaate sahtlid · kaart 150.0 px"
+  },
+  {
+    "badImages": [],
+    "height": 675,
+    "occluded": [],
+    "root": "{\"bottom\":675,\"height\":675,\"left\":0.3125,\"right\":1199.671875,\"top\":0,\"width\":1199.359375,\"x\":0.3125,\"y\":0}",
+    "width": 1200,
+    "result": "PASS · 1200 × 675 · kõik 3 paneeli ja 6 kaarti · kaart 162.1 px"
+  }
+]

@@ -1,0 +1,50 @@
+/* Landscape is the complete selected reference, including on short phones.
+   Fit by width AND the live viewport height; never enlarge a 150px mobile dock
+   independently of the side frames. The original image proportions stay intact. */
+/* The old selector placed the disabled Walk button over Switch map. */
+body.v306-active #v304-hud .v304-map-shortcuts button:nth-child(2){left:34%;top:84%;width:17%;height:11%}
+.v306-active #v304-hud[data-view=world] .v304-map-shortcuts button:nth-child(2){display:none!important}
+@media (orientation:landscape){
+ body.v306-active{
+  --hud-safe-w:calc(100vw - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));
+  --hud-safe-h:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  --hud-u:min(calc(var(--hud-safe-w) / 1672),calc(var(--hud-safe-h) / 941));
+  --hud-span:calc(1672 * var(--hud-u));
+ }
+ .v306-active #v304-hud{
+  inset:auto;top:env(safe-area-inset-top,0px);
+  left:calc(env(safe-area-inset-left,0px) + (var(--hud-safe-w) - var(--hud-span)) / 2);
+  width:var(--hud-span);height:var(--hud-safe-h);
+ }
+ /* Override the older V304 short-screen drawer rules as well. */
+ .v306-active .v304-discoveries{display:block;right:auto;bottom:auto;max-height:none;overflow:visible}
+ .v306-active .v304-map{display:block;top:auto;right:auto;max-height:none;overflow:visible}
+ .v306-active .v304-selection{display:block;top:auto;left:auto;max-height:none;overflow:visible}
+ .v306-active .v304-clock{display:block}
+ body.v306-active #v304-hud .v304-top button{min-height:0!important}
+ body.v306-active #v304-hud .v304-resource{flex-direction:row;align-items:center}
+ .v306-active .v304-mobile-tools{display:none!important}
+ .v306-active .v304-dock{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));overflow:visible;pointer-events:none}
+ body.v306-active #v304-hud .v304-command{height:auto;max-height:none;min-height:0;flex:none}
+}
+@media (orientation:landscape) and (max-height:560px){
+ .v306-active .v304-resource b{font-size:max(9px,calc(18 * var(--hud-u)))}
+ .v306-active .v304-clock{font-size:max(8px,calc(16 * var(--hud-u)));max-width:calc(17.6% - 58px)}
+ body.v306-active #v304-hud .v304-world{font-size:max(12px,calc(28 * var(--hud-u)))}
+ body.v306-active #v304-hud .v304-pause{left:auto;right:calc(6 * var(--hud-u) + 28px);width:26px;height:26px;top:0}
+ body.v306-active #v304-hud .v304-menu{left:auto;right:calc(6 * var(--hud-u));width:26px;height:26px;top:0}
+ .v306-active .v304-research-copy strong{font-size:max(8px,calc(16 * var(--hud-u)))}
+ .v306-active .v304-research-copy>small:first-child{font-size:max(7px,calc(14 * var(--hud-u)))}
+ .v306-active .v304-selection-head strong{font-size:max(9px,calc(19 * var(--hud-u)))}
+ /* Menus are body-level overlays, so size them to the actual phone viewport,
+    independently of the fitted reference HUD. Keep the close controls inside. */
+ body.v306-active :is(#citypanel,#building-inspector){
+  top:40px!important;left:auto!important;right:max(8px,env(safe-area-inset-right,0px))!important;
+  width:min(440px,calc(var(--hud-safe-w) - 16px))!important;max-height:calc(var(--hud-safe-h) - 56px)!important;
+ }
+ body.v306-active :is(#atlaspanel,#hud-explore-panel,#hud-tile-resources,#settlerpanel,#battlepanel){
+  top:40px!important;left:max(8px,env(safe-area-inset-left,0px))!important;right:auto!important;
+  width:min(380px,calc(var(--hud-safe-w) - 16px))!important;max-height:calc(var(--hud-safe-h) - 56px)!important;
+ }
+ body.v306-active #v264-listpanel{top:40px!important;width:min(760px,calc(var(--hud-safe-w) - 16px))!important;max-height:calc(var(--hud-safe-h) - 56px)!important}
+}

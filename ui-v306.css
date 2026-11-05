@@ -95,7 +95,7 @@ body.v306-active .v304-resource-panel{top:calc(64 * var(--hud-u))}
 
 /* Small screens retain the same tall illustrated cards and open side frames
    on demand. The map center stays available for touch interaction. */
-@media(max-width:800px),(max-height:560px){
+@media(max-width:800px) and (orientation:portrait){
  body.v306-active{--hud-u:calc(100vw / 1000)}
  body.v306-active #v304-hud .v304-top{height:52px;background:#102235!important;border-bottom:1px solid #b39251!important}
  .v306-active .v304-top::before{height:55px;top:0;background-size:auto 55px}
@@ -124,7 +124,7 @@ body.v306-active .v304-resource-panel{top:calc(64 * var(--hud-u))}
  body.v306-active :is(#citypanel,#building-inspector,#atlaspanel,#hud-explore-panel,#hud-tile-resources,#settlerpanel,#battlepanel){left:7px!important;right:7px!important;top:105px!important;width:calc(100vw - 14px)!important;max-height:calc(100dvh - 265px)!important}
  body.v306-active #toast{bottom:160px!important}
 }
-@media(max-width:440px){
+@media(max-width:440px) and (orientation:portrait){
  body.v306-active #v304-hud .v304-brand{width:95px;object-fit:cover}
  .v306-active .v304-resource[data-hud-resource=gold]{left:94px}.v306-active .v304-resource[data-hud-resource=bread]{left:135px}.v306-active .v304-resource[data-hud-resource=stone]{left:176px}.v306-active .v304-resource[data-hud-resource=population]{left:217px}.v306-active .v304-resource[data-hud-resource=science]{display:none!important}
  .v306-active .v304-resource{width:40px!important}
