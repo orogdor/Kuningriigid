@@ -1,5 +1,8 @@
 # Kuningriigid – ühine tööjärg
 
+- V326: kasutaja soovis merevee samasuguseks nagu jões. Meri ja jõgi kasutavad ühist vee materjali/paletti ning sama lainetuse, läike ja taevapeegelduse teostust. Jõesuudme hele merevärvi lisavärving eemaldatud. WebGPU-s on nüüd mõlemale sama TSL-i veematerjal. Maailmakaardi merevõrk võtab x/z tipud ja kolmnurgad tegelikust maastikuvõrgust; 30 m alla surutud meretipud eemaldatud ning kuiv maa peidetakse ainult sügavusmaskiga. Jõekallaste pealisribad järgivad päriselt renderdatud maailmamaastiku kõrgust. V320 laadimisjärjekord, 5×5 detailala ja mänguandmed säilivad. Kontrollid ja piirid: reports/shared-water-v326-ci.json; uus test kontrollib jagatud varjutaja käitumist, tasast merepinda, kuiva maa maski, ühiseid rannakolmnurki ja mõlema WebGPU materjali WGSL-i koostamist. Päris mängu GPU-pilt kasutaja samast salvestusest on veel kinnitamata.
+
+
 - V325: kasutaja V324 kuvatõmmis kinnitas jõe ja suudme visuaalset regressiooni. V324 kogu vee renderduse asendus ja lai suudmemaastiku väljalõige eemaldatud; V323 voolava jõe materjal, kaldad, veekõrgused ja eraldi ruudupõhine meri taastatud. Ranniku väikeses ribas kasutatakse 3×3 kaalutud loodusliku maapinna filtrit ning nii maastik kui merepiir võtavad sellelt täpselt sama kõrguse. V320 taimestiku laadimine, 5×5 detailala ja V324 käivitaja parandused säilivad. Uus kontroll: 3705 ranniku proovipunkti, jõe päris materjal koos voolusuuna ja kaldavarjutuse atribuutidega, varasemad sisemaa veekõrgused ja puutumata salvestus. Täieliku kiirkontrolli tulemus failis reports/river-estuary-v325-ci.json. Brauseri GPU-pilti ei ole kinnitatud; V324 pildi ebaõnnestumist ei käsitleta parandatuks ainuüksi automaattestide alusel. Järgmine kontroll: sama suudme pilt kasutaja seadmel.
 
 

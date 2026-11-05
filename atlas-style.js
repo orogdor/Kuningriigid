@@ -1,3 +1,5 @@
+import {WATER_STYLE_V326} from './water-style-v326.js';
+import {atlasSeaGeometryV326,atlasGroundSamplerV326} from './atlas-sea-v326.js';
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 import * as T from './vendor/three.module.js';
 import {smoothBiomeColor,groundBaseColor,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=162a';
@@ -60,13 +62,17 @@ export function atlasColor(game,x,z,h){
  color.multiplyScalar(.92+game.smooth(x/17+20,z/17+30)*.14);
  return color;
 }
-export function createAtlasDecor(game,scene,quality='medium'){const group=new T.Group();scene.add(group);const height=(x,z)=>Math.max(.7,surface(game,x,z,'world'));const material=c=>new T.MeshStandardMaterial({color:c,roughness:1});
+export function createAtlasDecor(game,scene,quality='medium',{terrainGeometry=null}={}){const group=new T.Group();scene.add(group);const height=(x,z)=>Math.max(.7,surface(game,x,z,'world'));const material=c=>new T.MeshStandardMaterial({color:c,roughness:1});
  // One ocean mesh uses depth-dependent color, showing shelves and deep water.
- const geo=new T.PlaneGeometry(WORLD_WIDTH+200,WORLD_DEPTH+200,COLS*2,ROWS*2);geo.rotateX(-Math.PI/2);geo.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);const p=geo.attributes.position,colors=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=game.atlasHeight(x,z),t=Math.max(0,Math.min(1,(-h+.8)/26)),shore=Math.pow(1-t,3),c=new T.Color('#5fa8aa').lerp(new T.Color('#102d4e'),Math.pow(t,.7));c.lerp(new T.Color('#9ac6b5'),shore*.33);c.multiplyScalar(.94+game.smooth(x/130+80,z/130+56)*.10);colors.push(c.r,c.g,c.b)}geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));{const d=new Float32Array(p.count);for(let i=0;i<p.count;i++)d[i]=.72-game.atlasHeight(p.getX(i),p.getZ(i));geo.setAttribute('aDepth',new T.BufferAttribute(d,1));}
- /* V286: well inland the sea plane dives under the land, so it can not show through river beds */for(let i=0;i<p.count;i++)if(game.atlasHeight(p.getX(i),p.getZ(i))>3.5)p.setY(i,-30);const water=new T.Mesh(geo,seaMaterial({scale:1}));water.position.y=.72;water.userData.water=true;group.add(water);group.userData.water=water;
- const shore=[];for(let z=ORIGIN_Z;z<ORIGIN_Z+WORLD_DEPTH;z+=10)for(let x=ORIGIN_X;x<ORIGIN_X+WORLD_WIDTH;x+=10){const points=[[x,z],[x+10,z],[x+10,z+10],[x,z+10]],hits=[];for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],ha=game.atlasHeight(...a)-.8,hb=game.atlasHeight(...b)-.8;if((ha>0)!==(hb>0)){const t=ha/(ha-hb);hits.push([a[0]+(b[0]-a[0])*t,1.04,a[1]+(b[1]-a[1])*t])}}if(hits.length===2){const near=riverNear(game,x+5,z+5);/* V249: no coast line drawn across a river mouth */if(near.distance>near.width*1.6+4)shore.push(...hits[0],...hits[1])}}group.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(shore,3)),new T.LineBasicMaterial({color:'#dbeddf',transparent:true,opacity:.12})));
- // Sparse ocean strokes give water scale without animated shader cost.
- const waves=[];for(const cell of game.cells)if(!cell.land&&!cell.coast&&game.noise(cell.c,cell.r+77)>.88){const x=cell.x,z=cell.z;for(let i=0;i<5;i++){const a=x-14+i*6,b=a+6;waves.push(a,.84,z+Math.sin(i*.9)*2,b,.84,z+Math.sin((i+1)*.9)*2)}}const waveLines=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(waves,3)),new T.LineBasicMaterial({color:'#91c1bd',transparent:true,opacity:.11}));group.add(waveLines);group.userData.waveLines=waveLines;
+ const seaSource=terrainGeometry||new T.PlaneGeometry(WORLD_WIDTH+200,WORLD_DEPTH+200,COLS*3,ROWS*3);
+ if(!terrainGeometry){seaSource.rotateX(-Math.PI/2);seaSource.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);
+  const p=seaSource.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,game.atlasHeight(p.getX(i),p.getZ(i)));}
+ const worldGroundV326=atlasGroundSamplerV326(seaSource);
+ const geo=atlasSeaGeometryV326(game,seaSource);if(!terrainGeometry)seaSource.dispose();
+ const water=new T.Mesh(geo,seaMaterial({scale:1}));water.position.y=.72;water.userData.water=true;group.add(water);group.userData.water=water;
+ const shore=[];for(let z=ORIGIN_Z;z<ORIGIN_Z+WORLD_DEPTH;z+=10)for(let x=ORIGIN_X;x<ORIGIN_X+WORLD_WIDTH;x+=10){const points=[[x,z],[x+10,z],[x+10,z+10],[x,z+10]],hits=[];for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],ha=game.atlasHeight(...a)-.8,hb=game.atlasHeight(...b)-.8;if((ha>0)!==(hb>0)){const t=ha/(ha-hb);hits.push([a[0]+(b[0]-a[0])*t,1.04,a[1]+(b[1]-a[1])*t])}}if(hits.length===2){const near=riverNear(game,x+5,z+5);/* V249: no coast line drawn across a river mouth */if(near.distance>near.width*1.6+4)shore.push(...hits[0],...hits[1])}}group.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(shore,3)),new T.LineBasicMaterial({color:WATER_STYLE_V326.shallow,transparent:true,opacity:.06})));
+ // The shared flowing-water shader supplies ocean motion; no extra pale strokes.
+ const waveLines=new T.Group();group.add(waveLines);group.userData.waveLines=waveLines;
  // Continuous terrain relief replaces separate rock instances.
  const peaks=game.cells.filter(c=>c.mountain);
  const dummy=new T.Object3D();
@@ -81,11 +87,11 @@ export function createAtlasDecor(game,scene,quality='medium'){const group=new T.
  group.add(spatialInstances(plots),spatialInstances(stones));
  const nature=createAtlasBiomeDetail(game,group,quality);
  // All tributaries and banks are one connected world-space 3D network.
- let rivers=createRiverNetwork(game,'world',null,quality),crossingRevision=game.s.crossingRevision||0;group.add(rivers);group.add(createMountainOutcrops(game,'world'));
+ let rivers=createRiverNetwork(game,'world',null,quality,worldGroundV326),crossingRevision=game.s.crossingRevision||0;group.add(rivers);group.add(createMountainOutcrops(game,'world'));
  // Real-world traffic generates the atlas road network (no roads appear just because a route was planned).
  const roadGroup=new T.Group();roadGroup.name='V67 continuous road graph';roadGroup.userData.roadNetwork=true;group.add(roadGroup);let roadStamp='';
  function roads(state){
-  if(crossingRevision!==(state.crossingRevision||0)){crossingRevision=state.crossingRevision||0;group.remove(rivers);disposeNetwork(rivers);rivers=createRiverNetwork(game,'world',null,quality);group.add(rivers)}
+  if(crossingRevision!==(state.crossingRevision||0)){crossingRevision=state.crossingRevision||0;group.remove(rivers);disposeNetwork(rivers);rivers=createRiverNetwork(game,'world',null,quality,worldGroundV326);group.add(rivers)}
   const stamp=(state.roadRevision||0)+':'+(state.railRevision||0)+':'+(state.visionRevision||0);
   if(stamp===roadStamp)return;roadStamp=stamp;
   for(const o of [...roadGroup.children]){roadGroup.remove(o);disposeNetwork(o)}

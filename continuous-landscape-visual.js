@@ -1,3 +1,4 @@
+import {WATER_STYLE_V326} from './water-style-v326.js';
 import {detailWorldRoadWidth,roadWidthScaleV250} from './road-width-v89.js';
 import {mouthZonesV322,riverSurfaceOpacityV322} from './estuary-v322.js?v=323';
 import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216,roadSurfaceV251} from './road-appearance-v216.js';
@@ -131,6 +132,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
    // V223.2: use exactly the same visible water level used by the
    // riverbed deformation (including the transition into the sea).
    let y=isWater?visibleRiverHeight(game,p.x,p.z):(scope==='world'?surface:visualElevation)(game,p.x,p.z)+.10;
+   if(scope==='world'&&ground&&!isWater)y=ground(p.x,p.z)+.06;
    const q=scope==='detail'&&ground&&!isWater?worldToLocal(tile,p.x,p.z):null;
    return {...field(game,p.x,p.z,scope,tile),y:q?ground(q.x,q.z)+.012:vp(game,y,scope,p.x,p.z)};
   });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
@@ -161,7 +163,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  const toWorld=(x,z)=>scope==='world'?{x,z}:localToWorld(tile,x,z);
  const mud=new T.Color('#5a523f'),damp=new T.Color('#6e6a4c');
  // V249: mud and gravel banks fade out on the beach instead of ending in a hard edge at the shore
- const shoreFadeV249=p=>{const t=Math.max(0,Math.min(1,(smoothAtlasHeight(game,p.x,p.z)-.3)/2.2));return t*t*(3-2*t);};
+ const shoreFadeV249=p=>{const h=scope==='world'&&ground?ground(p.x,p.z):smoothAtlasHeight(game,p.x,p.z);const t=Math.max(0,Math.min(1,(h-.3)/2.2));return t*t*(3-2*t);};
  const bankMesh=yield* buffersStepsV242(banks,'#6e6a4c',{standard:true,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
   return mud.clone().lerp(damp,t).multiplyScalar(.92+.16*Math.sin(p.x*.37+Math.sin(p.z*.29)*2));
@@ -182,11 +184,11 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   return .54*Math.pow(1-t,1.3)*shoreFadeV249(p);
  }});
  // V250: deep, slightly green-blue middle; olive-green shallows where the bed shows through; sea tone at the mouth
- const deep=new T.Color('#1f4b55'),shallowCol=new T.Color('#5e8466'),seaCol=new T.Color('#62a6a3');
+ const deep=new T.Color(WATER_STYLE_V326.deep),shallowCol=new T.Color(WATER_STYLE_V326.shallow);
  const waterMesh=yield* buffersStepsV242(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
   const edge=Math.min(1,near.distance/Math.max(1,near.width));
-  return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,Math.max(1-mouthBlend(game,p.x,p.z),1-riverSurfaceOpacityV322(game,p.x,p.z,estuaries))).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
+  return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
  },alpha:(x,y,z)=>{
   // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
   const p=toWorld(x,z);

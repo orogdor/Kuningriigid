@@ -27,7 +27,7 @@ const shader={vertexShader:GL.ShaderLib.standard.vertexShader,fragmentShader:GL.
 const {seaMaterial}=await import('../sea-v158.js');seaMaterial().onBeforeCompile(shader);
 assert.ok(shader.vertexShader.includes('vSeaD=aDepth'));
 assert.ok(shader.fragmentShader.includes('diffuseColor.rgb=sea'));
-assert.ok(shader.fragmentShader.includes('normal=normalize(normal+'));
+assert.ok(shader.fragmentShader.includes('normal=normalize('));
 const html=read('index.html'),map=JSON.parse(html.match(/<script type="importmap">([\s\S]*?)<\/script>/)[1]).imports;
 for(const file of ['three.core.js','three.webgpu.js','three.tsl.js'])assert.equal(map['./vendor/'+file],'./vendor/'+file+'?v=305r187');
 console.log('PASS Three.js r187: official checksums, shared core, game exports, 4096-instance capacity, bridge relocation, sea shader hooks and cache aliases');
