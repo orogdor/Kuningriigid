@@ -1,3 +1,9 @@
+## V308 · täislaiuses ribad
+
+Kasutaja heakskiidetud V307 paneelide ja kaartide skaala säilib. Rõhtvaates ulatuvad üla- ja alariba kogu ohutu ekraanilaiuseni; lisalaius jääb kuue kaardi järele, enne paremat paneeli. Parempoolne ressursirühm on ankurdatud parema serva külge.
+
+Brauseri päris HUD-failidega kontrollvaade: 915×364, 844×390, 740×320 ja 1200×675. Kõigis neljas ulatuvad mõlemad ribad servadeni; puuduvad katvad lubatud nupud ja katkised pildid. 390×844 püstvaate senised sahtlid ja keritav kaardirida säilivad; kaks kerimisalast väljas nuppu pole selles mõõtmises nähtaval. Mõõdud: `reports/ui-v308-matrix.json`. Kontrollvaade kasutab näidisandmeid ja ei käivita 3D-renderdajat.
+
 # V307 – telefoni rõhtvaate parandus
 
 ## Allikas ja kontrolli ulatus

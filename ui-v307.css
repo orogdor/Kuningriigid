@@ -9,12 +9,11 @@ body.v306-active #v304-hud .v304-map-shortcuts button:nth-child(2){left:34%;top:
   --hud-safe-w:calc(100vw - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));
   --hud-safe-h:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
   --hud-u:min(calc(var(--hud-safe-w) / 1672),calc(var(--hud-safe-h) / 941));
-  --hud-span:calc(1672 * var(--hud-u));
  }
  .v306-active #v304-hud{
   inset:auto;top:env(safe-area-inset-top,0px);
-  left:calc(env(safe-area-inset-left,0px) + (var(--hud-safe-w) - var(--hud-span)) / 2);
-  width:var(--hud-span);height:var(--hud-safe-h);
+  left:env(safe-area-inset-left,0px);
+  width:var(--hud-safe-w);height:var(--hud-safe-h);
  }
  /* Override the older V304 short-screen drawer rules as well. */
  .v306-active .v304-discoveries{display:block;right:auto;bottom:auto;max-height:none;overflow:visible}
@@ -24,12 +23,16 @@ body.v306-active #v304-hud .v304-map-shortcuts button:nth-child(2){left:34%;top:
  body.v306-active #v304-hud .v304-top button{min-height:0!important}
  body.v306-active #v304-hud .v304-resource{flex-direction:row;align-items:center}
  .v306-active .v304-mobile-tools{display:none!important}
- .v306-active .v304-dock{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));overflow:visible;pointer-events:none}
+ /* Keep the six cards at the approved size. Extra width stays after them. */
+ .v306-active .v304-resource[data-hud-resource=population]{left:auto;right:calc(476 * var(--hud-u))}
+ .v306-active .v304-resource[data-hud-resource=science]{left:auto;right:calc(334 * var(--hud-u))}
+ .v306-active .v304-clock{left:auto;right:calc(128 * var(--hud-u));max-width:calc(190 * var(--hud-u))}
+ .v306-active .v304-dock{right:auto;width:calc(944 * var(--hud-u));display:grid;grid-template-columns:repeat(6,minmax(0,1fr));overflow:visible;pointer-events:none}
  body.v306-active #v304-hud .v304-command{height:auto;max-height:none;min-height:0;flex:none}
 }
 @media (orientation:landscape) and (max-height:560px){
  .v306-active .v304-resource b{font-size:max(9px,calc(18 * var(--hud-u)))}
- .v306-active .v304-clock{font-size:max(8px,calc(16 * var(--hud-u)));max-width:calc(17.6% - 58px)}
+ .v306-active .v304-clock{font-size:max(8px,calc(16 * var(--hud-u)));right:calc(6 * var(--hud-u) + 58px);max-width:calc(328 * var(--hud-u) - 64px)}
  body.v306-active #v304-hud .v304-world{font-size:max(12px,calc(28 * var(--hud-u)))}
  body.v306-active #v304-hud .v304-pause{left:auto;right:calc(6 * var(--hud-u) + 28px);width:26px;height:26px;top:0}
  body.v306-active #v304-hud .v304-menu{left:auto;right:calc(6 * var(--hud-u));width:26px;height:26px;top:0}

@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V308: rõhtvaate ribad ulatuvad äärest ääreni, kuue kaardi suurus säilib ning lisaruum jääb nende järele. Parempoolsed ressursid järgivad paremat serva. Brauseris kontrollitud 4 rõhtvaadet ja senine püstvaade; mõõdud `reports/ui-v308-matrix.json`. Kohalike nõutud kontrollide tulemused: `reports/ui-v308-ci.json`.
+
 - V307: lühikeses telefoni rõhtvaates on nüüd korraga nähtaval kolm pildipaneeli ja kuus kaarti. Skaala sobitub ka nähtava kõrgusega; ülariba ja menüüd mahuvad ekraanile. Parandatud kaardivahetust katnud keelatud jalutamisnupu puuteala. Brauseris kontrollitud kolm rõhtvaadet, püstvaade ja arvutivaade; 0 kaetud lubatud nuppu, 23 CI gruppi läbisid. Tõendid ja GPU piirang: `design-qa.md`, `reports/ui-v307-matrix.json`.
 
 - V306: kasutaja teise pildi järgi taastatud suured kaarjad pildiraamid ja kuus kõrget kaarti. Kümme uut üksikpilti, 17 maalitud kontekstikäsu ühendust, eraldi pausi/jätkamise ikoonid ning loetav telefoni kaardirida. Brauseris kontrollitud HUD-i päris failid ja käsud; 23 CI gruppi ning V306 test läbisid. Visuaalse kontrolli tõendid ja GPU piirang: `design-qa.md`; üksikasjad `MUUDATUSED_V306.md`.

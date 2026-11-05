@@ -1,0 +1,185 @@
+[
+  {
+    "badImages": [],
+    "blocked": [],
+    "dock": {
+      "height": 87.421875,
+      "right": 502.078125,
+      "width": 365.15625,
+      "x": 136.921875,
+      "y": 254.921875
+    },
+    "hud": {
+      "height": 364,
+      "right": 915,
+      "width": 915,
+      "x": 0,
+      "y": 0
+    },
+    "rail": {
+      "height": 116.421875,
+      "right": 915,
+      "width": 915,
+      "x": 0,
+      "y": 247.578125
+    },
+    "selection": {
+      "height": 149.3125,
+      "right": 915,
+      "width": 148.53125,
+      "x": 766.46875,
+      "y": 206.1875
+    },
+    "viewport": [
+      915,
+      364
+    ]
+  },
+  {
+    "badImages": [],
+    "blocked": [],
+    "dock": {
+      "height": 93.671875,
+      "right": 537.9375,
+      "width": 391.234375,
+      "x": 146.703125,
+      "y": 273.125
+    },
+    "hud": {
+      "height": 390,
+      "right": 844,
+      "width": 844,
+      "x": 0,
+      "y": 0
+    },
+    "rail": {
+      "height": 124.75,
+      "right": 844,
+      "width": 844,
+      "x": 0,
+      "y": 265.25
+    },
+    "selection": {
+      "height": 159.96875,
+      "right": 844,
+      "width": 159.140625,
+      "x": 684.859375,
+      "y": 220.921875
+    },
+    "viewport": [
+      844,
+      390
+    ]
+  },
+  {
+    "badImages": [],
+    "blocked": [],
+    "dock": {
+      "height": 76.875,
+      "right": 441.390625,
+      "width": 321.015625,
+      "x": 120.375,
+      "y": 224.09375
+    },
+    "hud": {
+      "height": 320,
+      "right": 740,
+      "width": 740,
+      "x": 0,
+      "y": 0
+    },
+    "rail": {
+      "height": 102.34375,
+      "right": 740,
+      "width": 740,
+      "x": 0,
+      "y": 217.65625
+    },
+    "selection": {
+      "height": 131.25,
+      "right": 740,
+      "width": 130.578125,
+      "x": 609.421875,
+      "y": 181.28125
+    },
+    "viewport": [
+      740,
+      320
+    ]
+  },
+  {
+    "badImages": [],
+    "blocked": [
+      "Diplomaatia",
+      "Sündmuste logi"
+    ],
+    "dock": {
+      "height": 160,
+      "right": 382,
+      "width": 374,
+      "x": 8,
+      "y": 674
+    },
+    "hud": {
+      "height": 844,
+      "right": 390,
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    "rail": {
+      "height": 170,
+      "right": 390,
+      "width": 390,
+      "x": 0,
+      "y": 674
+    },
+    "selection": {
+      "height": 0,
+      "right": 0,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    "viewport": [
+      390,
+      844
+    ]
+  },
+  {
+    "badImages": [],
+    "blocked": [],
+    "dock": {
+      "height": 162.109375,
+      "right": 931.0625,
+      "width": 677.140625,
+      "x": 253.921875,
+      "y": 472.734375
+    },
+    "hud": {
+      "height": 675,
+      "right": 1200,
+      "width": 1200,
+      "x": 0,
+      "y": 0
+    },
+    "rail": {
+      "height": 215.90625,
+      "right": 1200,
+      "width": 1200,
+      "x": 0,
+      "y": 459.09375
+    },
+    "selection": {
+      "height": 276.875,
+      "right": 1200,
+      "width": 275.4375,
+      "x": 924.5625,
+      "y": 382.359375
+    },
+    "viewport": [
+      1200,
+      675
+    ]
+  }
+]

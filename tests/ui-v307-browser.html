@@ -1,8 +1,8 @@
-<!doctype html><meta charset="utf-8"><title>V307 landscape viewport checks</title>
+<!doctype html><meta charset="utf-8"><title>V308 landscape viewport checks</title>
 <style>body{margin:0;background:#17252a;color:#f1d491;font:13px system-ui}nav{min-height:44px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:4px 12px}button{padding:7px 10px;background:#102235;border:1px solid #b39251;color:#f1d491;cursor:pointer}iframe{display:block;border:0;margin:0 auto;background:#344d54}output{display:block;padding:6px 12px;font:12px monospace}</style>
 <nav><button data-size="915,364">Telefon külili 915 × 364</button><button data-size="844,390">Telefon külili 844 × 390</button><button data-size="740,320">Lühike rõhtvaade 740 × 320</button><button data-size="390,844">Telefon püsti 390 × 844</button><button data-size="1200,675">Arvuti 1200 × 675</button></nav>
 <output id="result">Laeb päris HUD-i…</output>
-<iframe id="surface" title="V307 HUD" width="915" height="364" src="ui-v306-preview.html?capture=1&amp;release=307"></iframe>
+<iframe id="surface" title="V308 HUD" width="915" height="364" src="ui-v306-preview.html?capture=1&amp;release=308"></iframe>
 <script>
 const frame=document.getElementById('surface'),result=document.getElementById('result');
 function check(){
@@ -19,6 +19,9 @@ function check(){
   const research=d.querySelector('.v304-discoveries').getBoundingClientRect(),map=d.querySelector('.v304-map').getBoundingClientRect();
   if(research.bottom>map.top+1)errors.push('research overlaps atlas');
   const header=d.querySelector('.v304-top').getBoundingClientRect();
+  const rail=d.querySelector('.v306-bottom-rail').getBoundingClientRect(),hud=root.getBoundingClientRect(),dock=d.querySelector('.v304-dock').getBoundingClientRect(),selection=d.querySelector('.v304-selection').getBoundingClientRect();
+  if(Math.abs(hud.left)>1||Math.abs(hud.right-w.innerWidth)>1||Math.abs(header.width-w.innerWidth)>1||Math.abs(rail.width-w.innerWidth)>1)errors.push('bars not edge to edge');
+  if(dock.right>selection.left+12)errors.push('cards overlap right panel');
   for(const e of d.querySelectorAll('.v304-resource,.v304-world'))if(visible(e)&&e.getBoundingClientRect().bottom>header.bottom+2)errors.push('header content below frame');
   for(const e of d.querySelectorAll('#citypanel,#atlaspanel'))if(visible(e)){const r=e.getBoundingClientRect();if(r.left<0||r.top<0||r.right>w.innerWidth+1||r.bottom>w.innerHeight+1)errors.push('menu outside viewport');}
   const overlay=[...d.querySelectorAll('#citypanel,#atlaspanel,#v304-resource-panel,#v304-diplomacy')].some(visible);
