@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V313: ehitusmenüüs on nähtavad edasi- ja tagasi-kerimise nupud; kaubanduse ja diplomaatia tagasi-nupp tõuseb koos kogu paneeliga ning kasutab sama tumesinist ja kuldset kujundust. Kontrollitud Chromiumis 1200 px ja 390 px laiusel: ehitiste nupp kerib rida, paneel ja tagasi-nupp on sama kõrgusega. V311 ja V312 vastavad lähtekoodikontrollid läbisid. Järgmine töö: kasutaja tavapärase salvestuse pikk mängutest.
+
 - V312: ehituspilt lisatakse sünkroonselt kaardi loomisel; veniv ehitusvaliku teade piiratud väikseks; kaubandus/diplomaatia kuni 3× kõrgemad, iga riik ja kaupleja oma plokis. Päris Chromiumi 3D-mäng ja telefonimõõdud kontrollitud, 101 automaatkäsku läbisid. Tõendid `reports/ui-v312-browser.json`, `reports/ui-v312-ci.json`; üksikasjad `MUUDATUSED_V312.md`. Järgmine töö: kasutaja tavapärase salvestuse pikaajaline mängutest; selle paranduse kontroll kasutas näidisküla ja eraldi kaubanduse näidisandmeid.
 
 - V311: parandatud ainult esimest ehitist näidanud riba. Vana ui-v121.css sundis päris #tray püstisesse tulpa; alumises ribas kirjutatakse nüüd suund ja reamurdmine selgelt üle. Brauserikontroll laadib kõik mängu stiilid, et sama viga kontrollvaatest enam välja ei jääks. Kinnitatud samas reas 7 kaarti, kaevu ja kivimurru valik ning püstvaates viimase kaardini külgkerimine. Üldkontrollid `reports/ui-v311-ci.json`; tõend `reports/ui-v311-check.json`.

@@ -1,0 +1,13 @@
+/* The entire trade / diplomacy surface rises together, including Back. */
+body.v306-active #v304-hud #v309-menu:is([data-kind=trade],[data-kind=diplomacy]){align-items:stretch;gap:calc(8 * var(--hud-u))}
+body.v306-active #v304-hud #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) .v309-back{box-sizing:border-box!important;flex:0 0 clamp(64px,calc(112 * var(--hud-u)),112px)!important;width:clamp(64px,calc(112 * var(--hud-u)),112px)!important;min-width:0!important;height:100%!important;min-height:0!important;max-height:100%!important;aspect-ratio:auto!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px!important;color:var(--ui-gold-light)!important;background:linear-gradient(155deg,#20394a,#0b1c2c)!important;border:1px solid var(--ui-gold)!important;border-radius:10px!important;box-shadow:0 8px 24px #0008!important;overflow:hidden!important}
+body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) .v309-back :is(img,.v310-visual){display:none!important}
+body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) .v309-back::after{display:none!important}
+body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) .v309-back :is(span,.v310-caption){position:static!important;color:var(--ui-gold-light)!important;font:700 clamp(11px,calc(17 * var(--hud-u)),17px)/1.2 Georgia,serif!important;text-align:center!important}
+body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) .v309-content{box-sizing:border-box;min-height:0}
+/* The cards keep their native horizontal scroll, with clear paging buttons. */
+body.v306-active #v309-menu .v313-build-scroll{position:absolute;inset:0;z-index:15;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding-left:calc(var(--choice-w) + 10px);box-sizing:border-box}
+body.v306-active #v309-menu .v313-build-scroll[hidden]{display:none!important}
+body.v306-active #v309-menu .v313-build-scroll button{pointer-events:auto;display:grid;place-items:center;width:clamp(32px,calc(42 * var(--hud-u)),46px);height:clamp(44px,calc(72 * var(--hud-u)),76px);padding:0;color:#f3d997;background:linear-gradient(#263d4a,#0b1c2c);border:2px solid #be9854;border-radius:8px;box-shadow:0 4px 12px #000a;font:700 36px/1 Georgia,serif;cursor:pointer}
+body.v306-active #v309-menu .v313-build-scroll button:disabled{opacity:.3;cursor:default;pointer-events:none}
+body.v306-active #v309-menu .v313-build-scroll button:focus-visible{outline:2px solid #fff;outline-offset:2px}
