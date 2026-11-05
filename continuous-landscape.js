@@ -1,4 +1,3 @@
-import {buildEstuariesV324,sampleEstuaryV324,estuaryBedV324,SEA_LEVEL_V324} from './estuary-v324.js';
 import {memoHeight} from './perf-render-v131.js';
 // V67. One procedural elevation/drainage/transport coordinate space.
 // Everything is generated in WORLD metres and merely projected at different
@@ -85,7 +84,6 @@ function prep(game){
    }
   }
  }
- graph.estuaries=buildEstuariesV324(edges,(x,z)=>baseHeight(game,x,z));
  return graph;
 }
 function drainageTangent(graph,cell,up=null){
@@ -150,8 +148,6 @@ export function sampleRiver(game,cell,count=12,graph=null){
  return pts;
 }
 export const getRivers=game=>prep(game).edges;
-export const getEstuariesV324=game=>prep(game).estuaries;
-export const estuaryAtV324=(game,x,z)=>sampleEstuaryV324(prep(game).estuaries||[],x,z);
 // V249: 0 inland, rising to 1 where the river meets sea level (coast and open sea).
 export function estuaryV249(game,x,z){return 1-smooth((smoothAtlasHeight(game,x,z)-.30)/6);}
 // V249: 1 on dry land, 0 on the beach and in the sea. River banks, levees and raised meadows
@@ -223,17 +219,19 @@ export function baseHeight(game,x,z){
 // drainage cells. Sample the same undisturbed heights for terrain and sea.
 // This removes cell-corner sand spits and avoids distinct shoreline masks.
 export function estuaryShoreHeightV323(game,x,z,near=null){
- const natural=(a,b)=>Math.max(baseHeight(game,a,b),game.atlasHeight(a,b));
- const h=natural(x,z),waterline=.72;
- if(Math.abs(h-waterline)>5)return h;
+ const h=baseHeight(game,x,z),waterline=.72;
+ const coastal=1-smooth(Math.abs(h-waterline)/4);
+ if(coastal<=0)return h;
  near??=riverNear(game,x,z);
  if(!Number.isFinite(near.distance))return h;
- const reach=Math.max(12,near.width+24);
- const weight=(1-smooth(Math.abs(h-waterline)/5))*(1-smooth((near.distance-reach+10)/18));
- if(weight<=0)return h;
- const radius=4.5;
- const avg=(natural(x-radius,z)+natural(x+radius,z)+natural(x,z-radius)+natural(x,z+radius))/4;
- return h+(avg-h)*Math.min(.52,weight*.52);
+ const corridor=1-smooth((near.distance-near.width-6)/18);
+ if(corridor<=0)return h;
+ // Weighted 3x3 footprint, in WORLD metres. No repeated 50 m cell shape
+ // and no max(rawAtlas, smoothedTerrain) ridge along the coast.
+ const radius=5,weights=[1,2,1];let average=0;
+ for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)
+  average+=baseHeight(game,x+i*radius,z+j*radius)*weights[i+1]*weights[j+1]/16;
+ return h+(average-h)*coastal*corridor*.65;
 }
 // visual=true (drawing only): where the rolling ground dips below a river's water level, the banks
 // rise gently to just above the water (natural levees), so the river sits in its bed instead of
@@ -244,29 +242,17 @@ export function estuaryShoreHeightV323(game,x,z,near=null){
 export function visibleRiverHeight(game,x,z,rawHeight=null){
  const h=rawHeight??riverNear(game,x,z).waterHeight??.86;
  const t=smooth((game.atlasHeight(x,z)-.30)/3.7);
- const old=.78+(h-.78)*t,estuary=estuaryAtV324(game,x,z);
- return estuary?old+(SEA_LEVEL_V324-old)*estuary.settle:old;
+ return .78+(h-.78)*t;
 }
 export function worldElevation(game,x,z,visual=false){
- const estuary=visual?estuaryAtV324(game,x,z):null;
- if(estuary){
-  const base=baseHeight(game,x,z),near=riverNear(game,x,z);
-  const level=visibleRiverHeight(game,x,z,near.waterHeight);
-  const shaped=estuaryBedV324(base,level,{...estuary,depth:estuary.depth*(1-(near.fordStrength||0))+.42*(near.fordStrength||0)});
-  // At the inland boundary blend into the existing bank; the seaward
-  // boundary is already submerged and meets the undisturbed sea floor.
-  if(estuary.terrainInfluence>.999)return shaped;
-  const old=worldElevationLegacyV324(game,x,z,true);
-  return old+(shaped-old)*estuary.terrainInfluence;
- }
- return worldElevationLegacyV324(game,x,z,visual);
-}
-function worldElevationLegacyV324(game,x,z,visual=false){
  let base=baseHeight(game,x,z);
  const {distance:d,width:w,waterHeight,fordStrength=0}=riverNear(game,x,z);
  if(!Number.isFinite(d))return base;
  const inner=w*1.04,outer=Math.max(inner+3.5,w*1.8+3);
  if(visual&&w>.05){
+  // Shore terrain and the new sea mask share the same local smoothing.
+  if(d<w+30&&Math.abs(base-.72)<5)
+   base=estuaryShoreHeightV323(game,x,z,{distance:d,width:w});
   const level=visibleRiverHeight(game,x,z,waterHeight);
   const rim=level+.60,reach=outer+18,land=landnessV249(game,x,z);
   if(base<rim&&d<reach)
@@ -435,7 +421,6 @@ export function roadNetwork(game,{includeUnseen=false}={}){
 // the water, preventing a coarse terrain triangle from roofing over a river.
 export function overviewSurface(game,x,z,spacing){
  const h=surface(game,x,z),near=riverNear(game,x,z);
- if(estuaryAtV324(game,x,z))return Math.max(visualElevation(game,x,z),Math.min(h,near.waterHeight-.55));
  if(!Number.isFinite(near.distance))return h;
  const t=Math.max(0,Math.min(1,(near.distance-near.width-spacing)/(spacing*.75)));
  // V286: the coarse world mesh only dips just under the river surface (was 2.3 m): the deep trough was wider than

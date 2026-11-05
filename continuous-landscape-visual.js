@@ -1,5 +1,5 @@
 import {detailWorldRoadWidth,roadWidthScaleV250} from './road-width-v89.js';
-import {estuaryAtV324} from './continuous-landscape.js';
+import {mouthZonesV322,riverSurfaceOpacityV322} from './estuary-v322.js?v=323';
 import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216,roadSurfaceV251} from './road-appearance-v216.js';
 import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 // V67: one topology for each river system and each road network. The atlas
@@ -96,7 +96,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  // A single clipped scalar-field mesh unions ALL tributaries. Every shared
  // grid coordinate has one height; overlapping ribbons and junction fans vanish.
  const step=scope==='detail'?1.75:2.5,cells=new Set(),nodes=new Map();
-
+ const estuaries=mouthZonesV322(getRivers(game));
  for(const edge of getRivers(game)){
   if(!visible(tile,edge.points))continue;riverCount++;
   for(const p of edge.points){yield;
@@ -141,7 +141,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
    const land=clip(triangle,'shore');
    // The final river reach fades before its endpoint; do not cut the
    // water polygon against an unrelated terrain-height contour.
-   // V324: water belongs exclusively to the unified ocean/channel mesh.
+   emit(clip(triangle,'d'),water,true);
    if(land.length<3)continue;
    emit(clip(clip(land,'outer'),'d',true),banks,false);
    // V223: second, much softer bank band between wet mud and untouched meadow.
@@ -161,7 +161,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  const toWorld=(x,z)=>scope==='world'?{x,z}:localToWorld(tile,x,z);
  const mud=new T.Color('#5a523f'),damp=new T.Color('#6e6a4c');
  // V249: mud and gravel banks fade out on the beach instead of ending in a hard edge at the shore
- const shoreFadeV249=p=>{const estuary=estuaryAtV324(game,p.x,p.z);if(estuary)return 1-estuary.influence;const t=Math.max(0,Math.min(1,(smoothAtlasHeight(game,p.x,p.z)-.3)/2.2));return t*t*(3-2*t);};
+ const shoreFadeV249=p=>{const t=Math.max(0,Math.min(1,(smoothAtlasHeight(game,p.x,p.z)-.3)/2.2));return t*t*(3-2*t);};
  const bankMesh=yield* buffersStepsV242(banks,'#6e6a4c',{standard:true,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
   return mud.clone().lerp(damp,t).multiplyScalar(.92+.16*Math.sin(p.x*.37+Math.sin(p.z*.29)*2));
@@ -181,9 +181,33 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   const t=Math.max(0,Math.min(1,(near.distance-near.width*1.4)/Math.max(.8,near.width*.78)));
   return .54*Math.pow(1-t,1.3)*shoreFadeV249(p);
  }});
+ // V250: deep, slightly green-blue middle; olive-green shallows where the bed shows through; sea tone at the mouth
+ const deep=new T.Color('#1f4b55'),shallowCol=new T.Color('#5e8466'),seaCol=new T.Color('#62a6a3');
+ const waterMesh=yield* buffersStepsV242(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
+  const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
+  const edge=Math.min(1,near.distance/Math.max(1,near.width));
+  return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,Math.max(1-mouthBlend(game,p.x,p.z),1-riverSurfaceOpacityV322(game,p.x,p.z,estuaries))).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
+ },alpha:(x,y,z)=>{
+  // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
+  const p=toWorld(x,z);
+  // V322: only natural dry terrain owns river-water colour; sea owns the shore.
+  const outlet=riverSurfaceOpacityV322(game,p.x,p.z,estuaries);
+  const near=riverNear(game,p.x,p.z),edge=Math.min(1,near.distance/Math.max(1,near.width));
+  return (.94-.36*Math.pow(edge,2.5))*outlet;
+ }});
+ if(waterMesh){
+  waterMesh.material.dispose();waterMesh.material=waterMaterial(scope,tile);animate(waterMesh);
+  const pos=waterMesh.geometry.attributes.position,flow=new Float32Array(pos.count*2),shore=new Float32Array(pos.count);
+  for(let i=0;i<pos.count;i++){if(i&&i%192===0)yield;
+   const p=toWorld(pos.getX(i),pos.getZ(i)),f=riverFlow(game,p.x,p.z);
+   const near=riverNear(game,p.x,p.z),speed=Math.max(.45,Math.min(1.35,1.5-(near.width||3)*.09));
+   flow[i*2]=f.x*speed;flow[i*2+1]=f.z*speed;shore[i]=Math.max(0,Math.min(1,near.distance/Math.max(.5,near.width)));
+  }
+  waterMesh.geometry.setAttribute('aFlow',new T.BufferAttribute(flow,2));waterMesh.geometry.setAttribute('aShore',new T.BufferAttribute(shore,1));
+ }
  if(dryMesh){dryMesh.name='V223 gravel and meadow river shoulders';dryMesh.renderOrder=7;group.add(dryMesh)}
  if(bankMesh){bankMesh.name='continuous river banks';bankMesh.renderOrder=8;group.add(bankMesh)}
-
+ if(waterMesh){waterMesh.name='continuous water surface';waterMesh.renderOrder=9;group.add(waterMesh)}
  group.userData.riverEdges=riverCount;
  group.userData.shallowFordCount=shallowCrossings;
  group.userData.riverVertexCount=water.length/3;
