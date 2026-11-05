@@ -2,6 +2,7 @@
  * Uses data:image/svg+xml URLs so Android and desktop display them consistently.
  * Every picture is a separate image element; shapes are cached by technology ID.
  */
+import {paintedTechSrc} from './research-art-v304.js';
 const cache=new Map();
 const themes=[['#231f1b','#906436'],['#2d2420','#a46b40'],['#222e34','#829198'],
  ['#1c2a43','#b49b59'],['#352a43','#a98cba'],['#202f37','#c19569'],['#132f46','#52a7bb']];
@@ -72,6 +73,7 @@ function svgFor(id,tech){
  '<path d="M15 64l8-11 8 11-8 11Z M97 64l8-11 8 11-8 11Z" fill="#d9ab58" stroke="#422c1b"/></svg>';
 }
 export function techArtSrc(id,tech={}){
+ const painting=paintedTechSrc(id);if(painting)return painting;
  const safe=/^[a-z][a-z0-9_]*$/.test(String(id||''))?id:'unknown';
  const key=safe+'|'+(tech.name||'')+'|'+(tech.age||0);
  if(!cache.has(key))cache.set(key,'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgFor(safe,tech)));

@@ -5,6 +5,8 @@
  */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  const $=id=>document.getElementById(id);
  const A=(root,selector)=>root?.querySelector(selector);
  const N=(root,selector)=>[...(root?.querySelectorAll(selector)||[])];

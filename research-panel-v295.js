@@ -4,6 +4,8 @@
  */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  function init(){
   const panel=document.getElementById('researchpanel');
   const screen=panel?.querySelector('.research-window');

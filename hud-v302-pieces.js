@@ -2,6 +2,8 @@
    V301 remains an opt-out fallback; map, saves and gameplay are untouched. */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  const BASE_W=1672,BASE_H=941;
  // Fixed anchor panels; the six-card dock is JOINED to their inner edges.
  // Overlap is measured in reference pixels, then scaled together with both panels.

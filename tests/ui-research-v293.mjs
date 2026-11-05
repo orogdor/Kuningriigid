@@ -10,12 +10,11 @@ assert.ok(Object.keys(TECHS).length>=130,'Research count unexpectedly reduced');
 const urls=new Set();
 for(const [id,tech] of Object.entries(TECHS)){
  const uri=techArtSrc(id,tech);
- assert.ok(uri.startsWith('data:image/svg+xml;charset=utf-8,'),'No real image for '+id);
- const raw=decodeURIComponent(uri.split(',').slice(1).join(','));
- assert.match(raw,/<svg xmlns="http:\/\/www.w3.org\/2000\/svg"/);
- assert.match(raw,/<\/svg>/);
- assert.match(raw,/<circle/);
- assert.match(raw,/<path/);
+ assert.match(uri,/^ui-art-v304\/tech\/[a-z0-9_]+\.webp$/,'No generated painting for '+id);
+ const bytes=fs.readFileSync(new URL('../'+uri,import.meta.url));
+ assert.equal(bytes.toString('ascii',0,4),'RIFF');
+ assert.equal(bytes.toString('ascii',8,12),'WEBP');
+ assert.ok(bytes.length>3000,'Empty illustration '+id);
  assert.ok(techArtMotif(id,tech),'No artwork motif for '+id);
  assert.ok(!urls.has(uri),'Duplicate technology portrait '+id);
  urls.add(uri);
@@ -35,7 +34,7 @@ assert.match(ui,/(v293-research-queue-item|v294-queue-slot)/); // V294 replaced 
 assert.match(ui,/techArtSrc\(id,(TECHS\[id\]|tech)\)/); // V294 queue uses the local tech object
 assert.ok(index.includes('research-art-v293.css?v=293a'));
 assert.match(index,/hud-v293-research\.js\?v=(?:293a|296a)/); // Script revision may advance without changing the V293 artwork contract
-assert.ok(index.includes('research-art-v293.js?v=293a'));
+assert.match(index,/research-art-v293\.js\?v=304a/);
 const publishedVersion=Number((index.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
 assert.ok(publishedVersion>=293,'Published version is older than this UI test');
 assert.ok(index.includes('id="menu-version">KUNINGRIIGID · V'+publishedVersion+'<'),'Menu label differs from page title');

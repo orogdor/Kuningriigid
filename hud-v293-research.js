@@ -4,6 +4,8 @@
  */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  const $=id=>document.getElementById(id);
  const query=root=>[...root.querySelectorAll('.v291-research-queue')];
  const art=(id,meta)=>window.KuningriigidTechArtV293?.src?.(id,meta)||'';

@@ -2,6 +2,8 @@
    Original game controls remain hidden but dispatch real actions; the existing minimap
    canvas is moved rather than copied so its click handlers keep working. */
 (()=>{
+ 'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
 const $=id=>document.getElementById(id);
 const img=n=>'ui-art-v263/'+n+'.webp';
 const tr=(e,n)=>(document.documentElement.lang||'').startsWith('et')?e:n;

@@ -4,6 +4,8 @@
  */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  const $=id=>document.getElementById(id);
  const A='ui-art-v290/';
  const image=n=>A+n+'.webp';

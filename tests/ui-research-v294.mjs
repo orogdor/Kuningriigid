@@ -41,6 +41,6 @@ const ids=Object.keys(TECHS);
 assert.ok(ids.length>=130,'Research catalog unexpectedly reduced');
 for(const id of ids){
  const tech=TECHS[id];const uri=techArtSrc(id,tech);
- assert.ok(uri.startsWith('data:image/svg+xml;charset=utf-8,'),'Picture missing: '+id);
+ assert.ok(fs.existsSync(new URL('../'+uri,import.meta.url)),'Picture missing: '+id);
 }
 console.log('V294: single painted research image, live 5-slot queue, '+ids.length+' pictured technologies and responsive menus OK');

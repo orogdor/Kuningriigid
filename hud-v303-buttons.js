@@ -1,6 +1,8 @@
 /* V303: illustrated controls retain existing click handlers and selection rules. */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  const BASE='ui-art-v303/', VERSION='?v=303a';
  const CARDS={card_cities:'card_cities',card_build:'card_build',card_armies:'card_armies',
  card_trade:'card_trade',card_diplomacy:'card_diplomacy',card_journal:'card_journal'};

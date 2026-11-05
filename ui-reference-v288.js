@@ -3,6 +3,8 @@
  * No dummy "end turn": the large round control is the real-time pause/resume.
  */
 (() => {
+ 'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
   const $ = id => document.getElementById(id);
   const isEt = () => (document.documentElement.lang || '').startsWith('et');
   const tr = (et,en) => isEt() ? et : en;

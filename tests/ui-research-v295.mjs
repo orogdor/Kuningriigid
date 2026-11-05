@@ -35,5 +35,5 @@ assert.match(ui,/const queueIds=\[active,\.\.\.Array\.from\(\{length:4\}/);
 assert.match(ui,/for\(let index=0;index<5;index\+\+\)/);
 assert.equal(newResearch().queue.length,0);
 assert.ok(Object.keys(TECHS).length>=130);
-for(const [id,tech] of Object.entries(TECHS))assert.ok(techArtSrc(id,tech).startsWith('data:image/svg+xml'),'Missing pictured tech '+id);
+for(const [id,tech] of Object.entries(TECHS))assert.ok(fs.existsSync(new URL('../'+techArtSrc(id,tech),import.meta.url)),'Missing pictured tech '+id);
 console.log('V295 single-image research desktop + portrait: live queue, close control, art and responsive layout OK');

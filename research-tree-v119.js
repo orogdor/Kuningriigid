@@ -35,7 +35,12 @@ export function renderTechTreeV119(tree,game,{choose,queue,remove,rate}){
  const progression=progressiveResearchIds(TECHS,research,(id,r)=>techBlock(r||research,id)===''),{ids,present,previews}=progression,visible=new Set(ids),entries=ids.map(id=>[id,TECHS[id]]);
  const narrow=matchMedia('(max-width:480px)').matches;
  const compact=matchMedia('(max-width:700px)').matches;
- const layout=verticalResearchLayout(TECHS,ids,ERA_NAMES.length,V118_ERA_IDS,narrow?1:compact?2:4);
+ // Use the tree's actual grid track after the inspector takes its share. The
+ // old viewport-based four-column choice clipped nodes beneath the inspector.
+ const painted=typeof window!=='undefined'&&window.KINGDOMS_UI304;
+ const track=painted&&typeof getComputedStyle==='function'?parseFloat(getComputedStyle(tree).gridTemplateColumns):NaN;
+ const fit=Number.isFinite(track)?Math.max(1,Math.min(4,Math.floor((track-2*VERTICAL_TREE.marginX+VERTICAL_TREE.colGap)/(VERTICAL_TREE.nodeWidth+VERTICAL_TREE.colGap)))):null;
+ const layout=verticalResearchLayout(TECHS,ids,ERA_NAMES.length,V118_ERA_IDS,fit||(narrow?1:compact?2:4));
  const initialZoom=narrow?1:compact?.77:1;
  let zoom=clamp(Number(tree.dataset.zoom||initialZoom),.62,1.3);
  let selected=tree.dataset.selectedTech;

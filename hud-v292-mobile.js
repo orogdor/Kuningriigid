@@ -1,6 +1,8 @@
 /* V292 mobile artwork adapters: keep all original game handlers unchanged. */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  const $=id=>document.getElementById(id);
  function addZoomOut(){
   const root=$('v291-hud');

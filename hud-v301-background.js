@@ -5,6 +5,8 @@
  */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  const W=1672,H=941,SPLIT=510;
  const $=(root,selector)=>root?.querySelector(selector);
  const $$=(root,selector)=>[...(root?.querySelectorAll(selector)||[])];

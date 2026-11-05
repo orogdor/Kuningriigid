@@ -5,6 +5,8 @@
  */
 (()=>{
  'use strict';
+ if(typeof window!=='undefined'&&window.KINGDOMS_UI304)return;
+ 'use strict';
  const $=id=>document.getElementById(id), A='ui-art-v291/';
  // V297: separate alpha-cleaned picture sources, not CSS boxes. Keep all other art untouched.
  const cleaned=new Set(['research_panel','selection_frame','minimap_frame','portrait_castle']);
@@ -167,7 +169,7 @@
     el.style.width=(w*s)+'px';el.style.height=(h*s)+'px';
   }
  }
- function visible(){return document.body.classList.contains('atlas')&&new URLSearchParams(location.search).get('ui')==='art'}
+ function visible(){return !window.KINGDOMS_UI304&&document.body.classList.contains('atlas')&&new URLSearchParams(location.search).get('ui')==='art'}
  function activate(){
   if(!root)return;
   const yes=visible();if(yes===active)return;
