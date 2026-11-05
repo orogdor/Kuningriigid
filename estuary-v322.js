@@ -1,7 +1,7 @@
 // V322: new estuary system. Inland rivers and sea do not share geometry.
 // Sea depth is computed from undisturbed terrain, never the excavated river bed.
 // River tint is suppressed at the physical coastline so the sea shader owns the outlet.
-import {baseHeight} from './continuous-landscape.js?v=319';
+import {baseHeight,estuaryShoreHeightV323} from './continuous-landscape.js?v=323';
 
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const smooth=x=>{x=clamp(x);return x*x*(3-2*x)};
@@ -17,7 +17,7 @@ export function naturalSeaDepthV322(game,x,z){
  return SEA_LEVEL_V322-naturalBedHeightV322(game,x,z);
 }
 export function localNaturalSeaGroundV322(game,tile,x,z,sx,sz){
- return (naturalBedHeightV322(game,tile.x+x/sx,tile.z+z/sz)-.7)*.30;
+ return (estuaryShoreHeightV323(game,tile.x+x/sx,tile.z+z/sz)-.7)*.30;
 }
 export function mouthZonesV322(edges){
  const zones=[];
