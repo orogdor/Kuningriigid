@@ -18,8 +18,7 @@ for(const seed of [77,20261103,12345]){
   if(e.c.ford||e.c.bridge)
    assert.ok(Math.hypot(a.x-e.c.x,a.z-e.c.z)<1e-6,'ford/bridge anchor stays fixed');
   // The rendering and terrain samplers use the same, deterministic reach.
-  const resampled=getRivers(game).find(candidate=>candidate.c===e.c);
-  assert.deepEqual(resampled.points,e.points,'river geometry remains stable between views');
+  assert.strictEqual(getRivers(game),edges,'river geometry remains cached between views');
   for(let i=1;i<e.points.length-1;i++){
    const p=e.points[i-1],q=e.points[i],n=e.points[i+1];
    assert.ok(Math.hypot(n.x-2*q.x+p.x,n.z-2*q.z+p.z)<18,'no severe intra-cell sawtooth');
