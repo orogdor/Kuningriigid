@@ -245,7 +245,10 @@ export function worldElevation(game,x,z,visual=false){
    const fordDepth=depth*(1-fordStrength)+.42*fordStrength;
    const shallowing=smooth((d-w*.30)/Math.max(.01,w*.70));
    const visibleDepth=fordDepth*(1-shallowing)+.06*shallowing;
-   return Math.min(base,level-visibleDepth);
+   // V319: stop sculpting a separate river trench underneath open seawater.
+   // Fade the visual river bed into the original sea floor over the beach.
+   const coastal=smooth((smoothAtlasHeight(game,x,z)+.4)/2.4);
+   return base+(Math.min(base,level-visibleDepth)-base)*coastal;
   }
   // The outside bank rises continuously from that SAME shoreline
   // towards the raised river meadow. No hollow land below the water
@@ -254,7 +257,9 @@ export function worldElevation(game,x,z,visual=false){
    const t=smooth((d-w)/(outer-w));
    const bank=(level-.06)*(1-t)+Math.max(base,level+.10)*t;
    // V249: towards the sea the bank follows the beach/sea floor down instead of a sand bar
-   return Math.min(base,bank)*(1-land)+bank*land;
+   const coastal=smooth((smoothAtlasHeight(game,x,z)+.4)/2.4);
+   const shaped=Math.min(base,bank)*(1-land)+bank*land;
+   return base+(shaped-base)*coastal;
   }
   return base;
  }
@@ -400,5 +405,8 @@ export function overviewSurface(game,x,z,spacing){
  // V286: the coarse world mesh only dips just under the river surface (was 2.3 m): the deep trough was wider than
  // the river, filled with the sea plane and drew stepped blue terraces with trees standing in them
  const bed=Math.max(near.waterHeight-.55,.78);
- return Math.min(h,bed+(h-bed)*t*t);
+ const shaped=Math.min(h,bed+(h-bed)*t*t);
+ // The overview grid must meet the sea's own bathymetry, not a river trench.
+ const coastal=smooth((smoothAtlasHeight(game,x,z)+.4)/2.4);
+ return coastal>=1?shaped:baseHeight(game,x,z)*(1-coastal)+shaped*coastal;
 }
