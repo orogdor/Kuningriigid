@@ -1,0 +1,85 @@
+{
+  "generator": "TRELLIS.2 on Hugging Face + Blender decimation",
+  "assets": [
+    {
+      "kind": "oak",
+      "lod": "low",
+      "triangles": 260,
+      "vertices": 172,
+      "bytes": 6792,
+      "height": 2.6,
+      "sourceTriangles": 49652,
+      "texturesSampled": 1
+    },
+    {
+      "kind": "oak",
+      "lod": "high",
+      "triangles": 1400,
+      "vertices": 786,
+      "bytes": 29692,
+      "height": 2.6,
+      "sourceTriangles": 49652,
+      "texturesSampled": 1
+    },
+    {
+      "kind": "pine",
+      "lod": "low",
+      "triangles": 240,
+      "vertices": 172,
+      "bytes": 6556,
+      "height": 2.8,
+      "sourceTriangles": 48753,
+      "texturesSampled": 1
+    },
+    {
+      "kind": "pine",
+      "lod": "high",
+      "triangles": 1300,
+      "vertices": 762,
+      "bytes": 28136,
+      "height": 2.8,
+      "sourceTriangles": 48753,
+      "texturesSampled": 1
+    },
+    {
+      "kind": "rock",
+      "lod": "low",
+      "triangles": 54,
+      "vertices": 29,
+      "bytes": 2156,
+      "height": 1.5,
+      "sourceTriangles": 47450,
+      "texturesSampled": 1
+    },
+    {
+      "kind": "rock",
+      "lod": "high",
+      "triangles": 114,
+      "vertices": 59,
+      "bytes": 3332,
+      "height": 1.5,
+      "sourceTriangles": 47450,
+      "texturesSampled": 1
+    },
+    {
+      "kind": "palm",
+      "lod": "low",
+      "triangles": 240,
+      "vertices": 138,
+      "bytes": 6048,
+      "height": 2.8,
+      "sourceTriangles": 46413,
+      "texturesSampled": 1
+    },
+    {
+      "kind": "palm",
+      "lod": "high",
+      "triangles": 1200,
+      "vertices": 626,
+      "bytes": 24892,
+      "height": 2.8,
+      "sourceTriangles": 46413,
+      "texturesSampled": 1
+    }
+  ]
+}
