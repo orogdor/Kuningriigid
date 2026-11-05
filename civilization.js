@@ -1,5 +1,5 @@
 import {packSave,unpackSave} from './save-compression-v256.js';
-import {DetailStreamV242} from './detail-stream-v242.js?v=319';
+import {DetailStreamV242} from './detail-stream-v242.js?v=320';
 import {createAssetDemandV241} from './asset-demand-v241.js';
 import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
 import {rotateBuilding,pauseConstruction,removeBuilding} from './building-operations-v228.js';
