@@ -101,8 +101,7 @@ jobs:
           node tests/tiled-sea-v321.mjs
           node tests/estuary-v322.mjs
           node tests/estuary-v323.mjs
-          node tests/estuary-v324.mjs
-          node tests/water-material-v324.mjs
+          node tests/river-estuary-v325.mjs
       - name: V243 wall connections and building rotation
         run: node scripts/test-build-v243.mjs
       - name: V256 save compression and wildlife
