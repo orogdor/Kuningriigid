@@ -1,0 +1,9 @@
+<!doctype html><meta charset="utf-8"><title>V306 exact viewport checks</title>
+<style>body{margin:0;background:#17252a;color:#f1d491;font:14px system-ui}nav{height:48px;display:flex;align-items:center;gap:12px;padding:0 18px}button{padding:7px 12px;background:#102235;border:1px solid #b39251;color:#f1d491;cursor:pointer}iframe{display:block;border:0;margin:0 auto;background:#344d54}</style>
+<nav><button id="desktop">Töölaud 1200 × 675</button><button id="mobile">Telefon 390 × 844</button><span>Samad UI failid; näidisandmed, 3D mootorit ei käivitata.</span></nav>
+<iframe id="surface" title="V306 HUD" width="1200" height="675" src="ui-v306-preview.html?capture=1"></iframe>
+<script>
+const f=document.getElementById('surface');
+document.getElementById('desktop').onclick=()=>{f.width=1200;f.height=675};
+document.getElementById('mobile').onclick=()=>{f.width=390;f.height=844};
+</script>

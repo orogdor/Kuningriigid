@@ -155,7 +155,10 @@
   walk.disabled=s.view==='world';
   const t=$('dayclock-v235')?.textContent.match(/\d{1,2}:\d{2}/)?.[0]||'';
   clock.textContent=tr('Käik ','Turn ')+s.turn+(t?' · '+t:'');
-  pause.textContent=s.paused?'▶':'Ⅱ';pause.setAttribute('aria-pressed',String(s.paused));
+  const pauseArt=window.KuningriigidArtV306?.pauseSrc?.(s.paused);
+  if(pauseArt){let im=pause.querySelector('img');if(!im)im=picture(pause,pauseArt);if(im.getAttribute('src')!==pauseArt)im.src=pauseArt;}
+  else pause.textContent=s.paused?'▶':'Ⅱ';
+  pause.setAttribute('aria-pressed',String(s.paused));
   researchName.textContent=s.research||tr('Vali esimene avastus','Choose a discovery');
   researchValue.textContent=s.research?(s.researchPaused?tr('Pausil','Paused'):s.researchPercent+'%')+' · '+s.researchRate+tr(' teadust/min',' science/min'):tr('Uuri uusi teadmisi →','Explore new knowledge →');
   researchBar.value=s.researchPercent||0;researchBar.setAttribute('aria-label',researchName.textContent);
@@ -169,13 +172,14 @@
   const sel=s.selection||{};selectedName.textContent=sel.name||tr('Sinu kuningriik','Your kingdom');
   selectedInfo.disabled=sel.kind==='none';
   selectedState.textContent=sel.kind==='none'?s.age:$('commandstate')?.textContent||s.age;
-  const p=$('commandhud')?.querySelector('.v263-portrait:not([hidden])')?.getAttribute('src')||art(sel.kind==='none'?'cmd_map':sel.kind==='city'?'cmd_city':'unit_settler');
+  const originalPortrait=$('commandhud')?.querySelector('.v263-portrait:not([hidden])')?.getAttribute('src')||art(sel.kind==='none'?'cmd_map':sel.kind==='city'?'cmd_city':'unit_settler');
+  const p=window.KuningriigidArtV306?.portraitSrc?.(sel,originalPortrait)||originalPortrait;
   if(portrait.getAttribute('src')!==p)portrait.src=p;
   const choices=window.KuningriigidSelectionV300?.actions?.(sel,s.view)||[];
   [...actions.children].forEach((b,i)=>{
    const a=choices[i];b.hidden=!a;if(!a)return;b.disabled=!!a.disabled;
    const label=tr(a.ee,a.en);b.title=label;b.setAttribute('aria-label',label);b.querySelector('span').textContent=label;
-   const src=['move','attack','stop','focus'].includes(a.icon)?'ui-art-v303/action_'+a.icon+'.webp':'ui-art-v300/action_'+a.icon+'.svg';
+   const src=window.KuningriigidArtV306?.actionSrc?.(a.icon)||(['move','attack','stop','focus'].includes(a.icon)?'ui-art-v303/action_'+a.icon+'.webp':'ui-art-v300/action_'+a.icon+'.svg');
    const im=b.querySelector('img');if(im.getAttribute('src')!==src)im.src=src;
    b.setAttribute('aria-pressed',String((a.icon==='move'||a.icon==='attack')&&sel.order===a.icon));
   });

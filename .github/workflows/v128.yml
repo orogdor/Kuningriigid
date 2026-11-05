@@ -119,6 +119,7 @@ jobs:
           node tests/ui-v302-pieces.mjs
           node tests/ui-v303-buttons.mjs
           node tests/ui-v304.mjs
+          node tests/ui-v306.mjs
       - name: V268 water carriers and river water
         run: |
           node tests/water-carriers-v268.mjs

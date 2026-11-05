@@ -1,0 +1,132 @@
+/* The 1672 x 941 selected reference, using independent generated image assets.
+   A single proportional unit keeps each painted frame and its buttons aligned. */
+body.v306-active{--hud-u:calc(100vw / 1672);--hud-gold:#f1d491;--hud-paper:#24170c}
+#v304-hud .v306-frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:1;pointer-events:none}
+body.v306-active #v304-hud .v304-panel{border:0!important;border-image:none!important;box-shadow:none!important;background:none!important;border-radius:0!important;padding:0!important}
+body.v306-active #v304-hud :is(button,section){color:var(--hud-gold)}
+body.v306-active #v304-hud button{border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;padding:0!important;min-height:0;cursor:pointer}
+body.v306-active #v304-hud button:focus-visible{outline:2px solid #ffde85!important;outline-offset:2px!important}
+body.v306-active #v304-hud button:disabled{opacity:.5!important}
+body.v306-active #v304-hud .v304-top{height:calc(65 * var(--hud-u));min-height:0;display:block;z-index:10}
+.v306-active .v304-top::before{content:'';position:absolute;left:0;right:0;top:calc(-13 * var(--hud-u));height:calc(78 * var(--hud-u));background:url('ui-art-v302/header.webp') center/100% 100% no-repeat;pointer-events:none}
+body.v306-active #v304-hud .v304-brand{position:absolute;left:0;top:calc(-2 * var(--hud-u));width:calc(263 * var(--hud-u));height:calc(65 * var(--hud-u));display:block}
+.v306-active .v304-brand img{width:100%;height:100%;object-fit:fill}.v306-active .v304-brand span{display:none}
+.v306-active .v304-resources{display:contents}
+body.v306-active #v304-hud .v304-resource{position:absolute;top:calc(6 * var(--hud-u));height:calc(40 * var(--hud-u));display:flex;justify-content:flex-start;gap:calc(6 * var(--hud-u));width:calc(128 * var(--hud-u))}
+.v306-active .v304-resource img{width:calc(30 * var(--hud-u));height:calc(32 * var(--hud-u));object-fit:contain}
+.v306-active .v304-resource>span{display:flex;flex-direction:row;align-items:center;gap:4px}
+.v306-active .v304-resource small{display:none}.v306-active .v304-resource b{font:400 calc(18 * var(--hud-u))/1 Georgia,serif;white-space:nowrap}
+.v306-active .v304-resource[data-hud-resource=gold]{left:calc(278 * var(--hud-u))}
+.v306-active .v304-resource[data-hud-resource=bread]{left:calc(425 * var(--hud-u))}
+.v306-active .v304-resource[data-hud-resource=stone]{left:calc(558 * var(--hud-u))}
+.v306-active .v304-resource[data-hud-resource=wood]{display:none!important}
+.v306-active .v304-resource[data-hud-resource=population]{left:calc(1050 * var(--hud-u));width:calc(146 * var(--hud-u))}
+.v306-active .v304-resource[data-hud-resource=science]{left:calc(1203 * var(--hud-u));width:calc(135 * var(--hud-u))}
+body.v306-active #v304-hud .v304-world{position:absolute;left:39.6%;top:calc(2 * var(--hud-u));width:21.1%;height:calc(45 * var(--hud-u));margin:0;font:700 calc(28 * var(--hud-u))/1 Georgia,serif;display:flex!important;justify-content:center}
+.v306-active .v304-world img{display:none}.v306-active .v304-world span{display:block;white-space:nowrap}
+.v306-active .v304-clock{position:absolute;left:82.4%;top:calc(15 * var(--hud-u));font:400 calc(16 * var(--hud-u))/1 Georgia,serif;padding:0;max-width:10%;overflow:hidden;white-space:nowrap}
+body.v306-active #v304-hud .v304-pause{position:absolute;left:91%;top:calc(4 * var(--hud-u));width:calc(48 * var(--hud-u));height:calc(45 * var(--hud-u));font-size:0;min-width:0;overflow:hidden}
+.v306-active .v304-pause img{width:100%;height:100%;object-fit:contain;clip-path:circle(48% at 50% 50%)}
+.v306-active .v304-pause[data-paused=true] img{object-position:100% 50%;filter:brightness(1.2)}
+body.v306-active #v304-hud .v304-menu{position:absolute;left:95.2%;top:calc(4 * var(--hud-u));width:calc(42 * var(--hud-u));height:calc(43 * var(--hud-u));min-width:0;font-size:0}
+.v306-active .v304-menu img{width:100%;height:100%;object-fit:contain}
+
+/* Discovery medallion and four linked future discoveries. */
+.v306-active .v304-discoveries{left:calc(7 * var(--hud-u));top:calc(54 * var(--hud-u));width:calc(248 * var(--hud-u));height:calc(356 * var(--hud-u));z-index:4}
+.v306-active .v304-discoveries>.v304-eyebrow{display:none}
+body.v306-active #v304-hud .v304-research-main{position:absolute;inset:0 0 auto;width:100%;height:59%;display:block;z-index:auto;overflow:visible}
+.v306-active .v304-research-main>img{position:absolute;left:16%;top:8%;width:68%;height:78%;object-fit:cover;border:0;border-radius:50%;clip-path:inset(0 0 25% 0);z-index:2}
+.v306-active #v304-hud .v304-discoveries>.v306-frame{z-index:1}
+.v306-active .v304-research-copy{position:absolute;left:16%;top:60%;width:68%;height:28%;display:flex;flex-direction:column;justify-content:center;gap:1px;color:var(--hud-paper);z-index:4;text-align:center}
+.v306-active .v304-research-copy>small:first-child{font:700 calc(14 * var(--hud-u))/1 Georgia,serif;color:var(--hud-paper)}
+.v306-active .v304-research-copy strong{font:700 calc(16 * var(--hud-u))/1.07 Georgia,serif;max-height:2.2em;overflow:hidden;color:var(--hud-paper)}
+.v306-active .v304-research-copy>small:last-child{display:none}
+.v306-active .v304-discoveries>progress{position:absolute;left:25%;top:56.5%;width:50%;height:calc(3 * var(--hud-u));margin:0;z-index:4}
+.v306-active .v304-research-queue{position:absolute;inset:0;display:block;z-index:5;pointer-events:none}
+body.v306-active #v304-hud .v304-queue-slot{position:absolute;width:22%;height:15%;border:0!important;background:none!important;pointer-events:auto;min-height:0;overflow:hidden;clip-path:circle(40% at 50% 50%)}
+.v306-active .v304-queue-slot:nth-child(1){left:-.7%;top:48%}.v306-active .v304-queue-slot:nth-child(2){left:15.5%;top:57%}.v306-active .v304-queue-slot:nth-child(3){left:38%;top:60%}.v306-active .v304-queue-slot:nth-child(4){left:61.5%;top:57%}
+.v306-active .v304-queue-slot img{object-fit:cover}.v306-active .v304-queue-slot.empty span{font-size:calc(25 * var(--hud-u));color:#f5d790}
+.v306-active .v304-queue-slot.empty::before{content:'';position:absolute;inset:8%;background:url('ui-art-v263/cmd_research.webp') center/contain no-repeat;opacity:.65}
+.v306-active .v304-queue-slot.empty span{position:relative;text-shadow:0 1px 3px #000}
+body.v306-active #v304-hud .v306-all-research{position:absolute;left:80%;top:49%;width:19%;height:15%;z-index:5;clip-path:circle(43% at 50% 50%)}
+.v306-all-research img{width:100%;height:100%;object-fit:contain}
+
+/* Footer wood and navy backing sit behind the independently curved side frames. */
+.v306-bottom-rail{position:absolute;left:0;right:0;bottom:0;height:calc(301 * var(--hud-u));pointer-events:none;background:url('ui-art-v291/footer_wood.webp') bottom/100% calc(44 * var(--hud-u)) no-repeat}
+.v306-bottom-rail::before{content:'';position:absolute;left:calc(312 * var(--hud-u));right:calc(337 * var(--hud-u));top:0;bottom:calc(39 * var(--hud-u));border:9px solid transparent;border-image:url('ui-art-v304/panel.webp') 6% fill/12px/0 stretch}
+.v306-active .v304-dock{left:calc(354 * var(--hud-u));right:calc(374 * var(--hud-u));bottom:calc(56 * var(--hud-u));width:auto;max-width:none;transform:none;gap:calc(8 * var(--hud-u));z-index:4}
+body.v306-active #v304-hud .v304-command{display:block;padding:0!important;overflow:visible;aspect-ratio:2/3}
+.v306-active .v304-command-picture{width:100%;height:100%;aspect-ratio:auto;overflow:visible}
+.v306-active .v304-command-picture img{width:100%;height:100%;object-fit:fill;clip-path:polygon(3% 5%,43% 5%,50% 0,57% 5%,97% 5%,97% 95%,57% 95%,50% 100%,43% 95%,3% 95%)}
+.v306-active .v304-command-label{display:none!important}
+
+/* Real, clickable overview canvas inside a circular atlas. */
+.v306-active .v304-map{left:0;bottom:calc(25 * var(--hud-u));width:calc(344 * var(--hud-u));height:calc(376 * var(--hud-u));z-index:6;overflow:visible}
+.v306-active .v304-map>.v304-eyebrow{display:none}
+.v306-active .v304-map-host{position:absolute;left:8.2%;top:24.9%;width:67.4%;height:61.6%;margin:0;border-radius:50%;overflow:hidden;z-index:2;background:#122f40;clip-path:circle(50% at 50% 50%)}
+.v306-active #v304-map-host #atlasminimap{border-radius:50%!important;object-fit:fill}
+.v306-active .v304-map>.v306-frame{z-index:1;pointer-events:none}
+.v306-active .v304-map-tools,.v306-active .v304-map-shortcuts{position:absolute;inset:0;display:block;margin:0;z-index:4;pointer-events:none}
+body.v306-active #v304-hud .v304-map-tools button{position:absolute;width:18%;height:17%;min-height:0;pointer-events:auto}
+.v306-active .v304-map-tools button:nth-child(1){left:33.5%;top:6%}.v306-active .v304-map-tools button:nth-child(2){left:50%;top:9%}.v306-active .v304-map-tools button:nth-child(3){left:67%;top:16%}.v306-active .v304-map-tools button:nth-child(4){left:77.5%;top:31.8%}.v306-active .v304-map-tools button:nth-child(5){left:77.5%;top:51%}
+body.v306-active #v304-hud .v304-map-shortcuts button{position:absolute;left:7.5%;top:7%;width:24%;height:22%;min-height:0!important;pointer-events:auto}
+.v306-active .v304-map-shortcuts button:nth-child(2){left:34%;top:84%;width:17%;height:11%}
+.v306-active .v304-map-shortcuts img{width:100%;height:100%;object-fit:contain}.v306-active .v304-map-shortcuts span{display:none}
+
+/* Selected town/army portrait and context-dependent actions. */
+.v306-active .v304-selection{right:0;bottom:calc(22 * var(--hud-u));width:calc(384 * var(--hud-u));height:calc(386 * var(--hud-u));z-index:6;overflow:visible}
+.v306-active .v304-selection-head{position:absolute;inset:0;display:block;min-height:0;pointer-events:none}
+.v306-active .v304-selection-head>img{position:absolute;left:29%;top:25%;width:59%;height:56%;border:0;border-radius:50%;object-fit:cover;background:none;z-index:2;clip-path:inset(0 0 17% 0)}
+.v306-active .v304-selection>.v306-frame{z-index:1}
+.v306-active .v304-selection-head>div{position:absolute;left:29%;top:72.5%;width:59%;height:12%;display:flex;align-items:center;justify-content:center;text-align:center;z-index:4}
+.v306-active .v304-selection-head strong{font:700 calc(19 * var(--hud-u))/1.05 Georgia,serif;color:var(--hud-paper);max-height:2.1em;overflow:hidden}
+.v306-active .v304-selection-head small{display:none}
+body.v306-active #v304-hud .v304-selection-info{position:absolute;left:53%;top:6%;width:16.5%;height:16%;min-height:0!important;margin:0!important;z-index:5;pointer-events:auto;font:700 calc(25 * var(--hud-u))/1 Georgia,serif;color:#e4c477}
+.v306-active .v304-selection-actions{position:absolute;inset:0;display:block;margin:0;z-index:5;pointer-events:none}
+body.v306-active #v304-hud .v304-selection-actions button{position:absolute;width:20%;height:20%;display:block;pointer-events:auto}
+.v306-active .v304-selection-actions button:nth-child(1){left:5.5%;top:33%}.v306-active .v304-selection-actions button:nth-child(2){left:16%;top:17%}.v306-active .v304-selection-actions button:nth-child(3){left:32.5%;top:6.5%}.v306-active .v304-selection-actions button:nth-child(4){left:5.5%;top:54%}
+.v306-active .v304-selection-actions img{position:absolute;left:13%;top:13%;width:74%;height:74%;object-fit:cover;clip-path:circle(48% at 50% 50%)}.v306-active .v304-selection-actions span{display:none}
+body.v306-active #v304-hud .v306-selection-menu{position:absolute;left:71%;top:5%;width:17%;height:18%;z-index:5}
+.v306-selection-menu img{width:100%;height:100%;object-fit:contain}
+body.v306-active :is(#citypanel,#building-inspector){top:calc(76 * var(--hud-u))!important;max-height:calc(100dvh - 340 * var(--hud-u))!important}
+body.v306-active :is(#atlaspanel,#hud-explore-panel,#hud-tile-resources,#settlerpanel,#battlepanel){top:calc(77 * var(--hud-u))!important;left:calc(260 * var(--hud-u))!important;max-height:calc(100dvh - 360 * var(--hud-u))!important}
+body.v306-active #toast{bottom:calc(310 * var(--hud-u))!important}
+body.v306-active .v304-resource-panel{top:calc(64 * var(--hud-u))}
+
+/* Small screens retain the same tall illustrated cards and open side frames
+   on demand. The map center stays available for touch interaction. */
+@media(max-width:800px),(max-height:560px){
+ body.v306-active{--hud-u:calc(100vw / 1000)}
+ body.v306-active #v304-hud .v304-top{height:52px;background:#102235!important;border-bottom:1px solid #b39251!important}
+ .v306-active .v304-top::before{height:55px;top:0;background-size:auto 55px}
+ body.v306-active #v304-hud .v304-brand{width:135px;height:39px;top:5px}
+ body.v306-active #v304-hud .v304-resource{top:7px;height:37px;width:54px;flex-direction:column;gap:0}
+ .v306-active .v304-resource img{width:21px;height:21px}.v306-active .v304-resource b{font-size:11px}
+ .v306-active .v304-resource[data-hud-resource=gold]{left:calc(135px + (100vw - 235px) * 0)}
+ .v306-active .v304-resource[data-hud-resource=bread]{left:calc(135px + (100vw - 235px) * .22)}
+ .v306-active .v304-resource[data-hud-resource=stone]{left:calc(135px + (100vw - 235px) * .44)}
+ .v306-active .v304-resource[data-hud-resource=population]{left:calc(135px + (100vw - 235px) * .66);width:45px}
+ .v306-active .v304-resource[data-hud-resource=science]{left:calc(135px + (100vw - 235px) * .88);width:45px}
+ body.v306-active #v304-hud .v304-world,.v306-active .v304-clock{display:none!important}
+ body.v306-active #v304-hud .v304-pause{left:auto;right:43px;top:8px;width:34px;height:34px}
+ body.v306-active #v304-hud .v304-menu{left:auto;right:5px;top:8px;width:34px;height:34px}
+ .v306-active .v304-dock{left:8px;right:8px;bottom:10px;width:auto;gap:5px;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:thin;pointer-events:auto}
+ .v306-active .v304-command{flex:0 0 100px;height:150px;max-height:none;scroll-snap-align:start}.v306-active .v306-bottom-rail{height:170px;background-size:auto 28px}
+ .v306-active .v306-bottom-rail::before{left:0;right:0;bottom:0}
+ .v306-active .v304-discoveries,.v306-active .v304-map,.v306-active .v304-selection{display:none;top:103px;left:auto;right:7px;bottom:auto;max-height:none;overflow:visible}
+ #v304-hud.show-research .v304-discoveries{display:block;width:230px;height:330px}
+ #v304-hud.show-map .v304-map{display:block;width:290px;height:317px}
+ #v304-hud.show-selection .v304-selection{display:block;width:320px;height:322px}
+ .v306-active .v304-research-copy strong{font-size:15px}.v306-active .v304-research-copy>small:first-child{font-size:12px}.v306-active .v304-research-copy>small:last-child{font-size:10px}
+ .v306-active .v304-selection-head strong{font-size:16px}
+ .v306-active .v304-mobile-tools{top:59px;right:7px}
+ body.v306-active #v304-hud .v304-mobile-tools button{background:#112437!important;border:1px solid #b59659!important;padding:3px 7px!important}
+ body.v306-active :is(#citypanel,#building-inspector,#atlaspanel,#hud-explore-panel,#hud-tile-resources,#settlerpanel,#battlepanel){left:7px!important;right:7px!important;top:105px!important;width:calc(100vw - 14px)!important;max-height:calc(100dvh - 265px)!important}
+ body.v306-active #toast{bottom:160px!important}
+}
+@media(max-width:440px){
+ body.v306-active #v304-hud .v304-brand{width:95px;object-fit:cover}
+ .v306-active .v304-resource[data-hud-resource=gold]{left:94px}.v306-active .v304-resource[data-hud-resource=bread]{left:135px}.v306-active .v304-resource[data-hud-resource=stone]{left:176px}.v306-active .v304-resource[data-hud-resource=population]{left:217px}.v306-active .v304-resource[data-hud-resource=science]{display:none!important}
+ .v306-active .v304-resource{width:40px!important}
+ .v306-active .v304-command{max-height:none}.v306-active .v306-bottom-rail{height:170px}
+}

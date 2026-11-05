@@ -1,0 +1,3 @@
+Use case: game UI icon asset. Input is style reference: match this circular navy enamel and antique gold rim button exactly in materials, proportions, lighting, and decorative rim. Replace ONLY the gear symbol with a single large raised antique-gold RIGHT-POINTING PLAY TRIANGLE, clean readable resume icon, centered in the navy disc. No text, no extra symbols. Perfectly circular button isolated on actual transparent alpha outside its gold rim, tight crop, no extra backdrop. Front-facing flat game UI icon, realistic polished medieval gold, same navy enamel. Use this as one individual icon, not a sprite sheet.
+
+Generated with built-in image_gen, transparent_background=true, style reference settings.webp.
