@@ -642,27 +642,12 @@ function runCoverJobs(){const t0=performance.now();while(coverJobs.length&&perfo
 // V242: stable tile nodes survive a change of the local coordinate origin.
 const detailStreamV242=new DetailStreamV242({scene:localScene,
  cell:(c,r)=>c>=0&&r>=0&&c<COLS&&r<ROWS?game.cell({c,r}):null,
- build:buildDetailTileV242,dispose:disposeDetailTileV242,budget:typeof matchMedia==='function'&&matchMedia('(min-width:900px) and (pointer:fine)').matches?9:3});
+ build:buildDetailTileV242,dispose:disposeDetailTileV242,budget:typeof matchMedia==='function'&&matchMedia('(min-width:900px) and (pointer:fine)').matches?11:3});
 let streamRevisionV242='';
 function* buildDetailTileV242(entry){
  const tile=entry.tile;
  entry.stage='terrain';
  entry.terrain=yield* terrainStepsV242(entry.root,tile,true);yield;
- entry.stage='horizon';
- entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
- let water=0;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const neighbour=game.cell({c:tile.c+dc,r:tile.r+dr});if(!neighbour||!neighbour.land)water++;}
- entry.water=water;
- entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>ground(tile,x,z),{origin:tile,
-   halfX:DETAIL_TILE_X*(detailStreamV242.radius+.55),halfZ:DETAIL_TILE_Z*(detailStreamV242.radius+.55),
-   seg:detailStreamV242.radius===2?216:166});if(entry.sea)entry.decor.add(entry.sea);}yield;
- entry.stage='rivers';
- entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
- entry.stage='outcrops';
- entry.outcrops=createMountainOutcrops(game,'detail',tile);entry.decor.add(entry.outcrops);yield;
- entry.stage='ground cover';
- const cover=createGroundCoverV156(tile,coverHeight(tile),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(tile),{fraction:.55,deferred:true});
- entry.cover=cover.group;entry.root.add(cover.group);
- for(const step of cover.steps){step();yield;}
  entry.stage='local world';entry.world=game.localWorld(tile);entry.sourceIds=new Set(entry.world.resources.map(r=>r.id));
  const crossing=tile.river&&(tile.bridge||tile.ford)?crossingFrame(game,tile):null;
  let batch=0;
@@ -674,6 +659,21 @@ function* buildDetailTileV242(entry){
   }
   entry.resources.set(res.id,resourceView(res,tile,entry.scenery));if(++batch%4===0)yield;
  }
+ entry.stage='ground cover';
+ const cover=createGroundCoverV156(tile,coverHeight(tile),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(tile),{fraction:.55,deferred:true});
+ entry.cover=cover.group;entry.root.add(cover.group);
+ for(const step of cover.steps){step();yield;}
+ entry.stage='horizon';
+ entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
+ let water=0;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const neighbour=game.cell({c:tile.c+dc,r:tile.r+dr});if(!neighbour||!neighbour.land)water++;}
+ entry.water=water;
+ entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>ground(tile,x,z),{origin:tile,
+   halfX:DETAIL_TILE_X*(detailStreamV242.radius+.55),halfZ:DETAIL_TILE_Z*(detailStreamV242.radius+.55),
+   seg:detailStreamV242.radius===2?216:166});if(entry.sea)entry.decor.add(entry.sea);}yield;
+ entry.stage='rivers';
+ entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
+ entry.stage='outcrops';
+ entry.outcrops=createMountainOutcrops(game,'detail',tile);entry.decor.add(entry.outcrops);yield;
  const context=game.contextAt(tile,false);
  entry.stage='buildings';if(context)for(const b of context.economy.buildings){
   if(b.virtual)continue;
