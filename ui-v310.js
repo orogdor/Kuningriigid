@@ -21,6 +21,7 @@
   }
   const select='.v309-back,#tray>button,#tray>label,.v264-row,.v276-recruit,.v276-title,.v276-offers>button,.v304-faction-controls>button,#journalentries>p,.v264-empty';
   function paint(card){
+   if(menu.dataset.kind==='trade'||menu.dataset.kind==='diplomacy')return;
    let visual=card.querySelector(':scope > .v310-visual'),caption=card.querySelector(':scope > .v310-caption');
    // The catalogue decorator may attach the correct era image after us.
    const actual=card.querySelector('img.v304-catalog-picture')||card.querySelector(':scope > img');
@@ -40,7 +41,7 @@
    const tools=menu.querySelector('#buildcatalogtools');if(tools&&!tools.classList.contains('v310-card'))tools.classList.add('v310-card','v310-build-filter');
    const search=menu.querySelector('#buildsearch');if(search&&!search.placeholder)search.placeholder=(document.documentElement.lang||'en').startsWith('et')?'Otsi…':'Search…';
    const input=menu.querySelector('#v264-listpanel>input');
-   if(input){
+   if(input&&menu.dataset.kind!=='trade'){
     const filter=document.createElement('div');filter.className='v310-filter v310-card';
     const visual=document.createElement('span');visual.className='v310-visual';
     const im=document.createElement('img');im.className='v310-image';im.src='ui-art-v263/cmd_explore.webp';im.alt='';visual.append(im);

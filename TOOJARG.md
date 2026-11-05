@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V312: ehituspilt lisatakse sünkroonselt kaardi loomisel; veniv ehitusvaliku teade piiratud väikseks; kaubandus/diplomaatia kuni 3× kõrgemad, iga riik ja kaupleja oma plokis. Päris Chromiumi 3D-mäng ja telefonimõõdud kontrollitud, 101 automaatkäsku läbisid. Tõendid `reports/ui-v312-browser.json`, `reports/ui-v312-ci.json`; üksikasjad `MUUDATUSED_V312.md`. Järgmine töö: kasutaja tavapärase salvestuse pikaajaline mängutest; selle paranduse kontroll kasutas näidisküla ja eraldi kaubanduse näidisandmeid.
+
 - V311: parandatud ainult esimest ehitist näidanud riba. Vana ui-v121.css sundis päris #tray püstisesse tulpa; alumises ribas kirjutatakse nüüd suund ja reamurdmine selgelt üle. Brauserikontroll laadib kõik mängu stiilid, et sama viga kontrollvaatest enam välja ei jääks. Kinnitatud samas reas 7 kaarti, kaevu ja kivimurru valik ning püstvaates viimase kaardini külgkerimine. Üldkontrollid `reports/ui-v311-ci.json`; tõend `reports/ui-v311-check.json`.
 
 - V310: kõik alumise riba valikukaardid kasutavad maailmakaardi põhikaartidelt mõõdetud laiust, kõrgust ja ülaserva. Sama mõõduga Tagasi, ehitus-/armee-/linna-/kaubandus-/diplomaatia-/päevikukaardid, uus genereeritud läbipaistev kullatud raam ja pärgamendiala. Otsing ja ehitusfiltrid asuvad eraldi sama suures kaardis; pikad read kerivad küljele. Kontrollitud 6 menüüd ja 5 ekraanimõõtu, 0 mõõtude või joondumise erinevust. Kõik 23 CI gruppi läbisid; tõendid `reports/ui-v310-*.json`, `design-qa.md`.

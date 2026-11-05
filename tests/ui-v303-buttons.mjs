@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
@@ -32,5 +33,5 @@ assert.match(css,/v291-unit-button:not\(\[data-v303-art\]\)/);
 assert.match(css,/v303-action-art:not\(\[hidden\]\)/);
 assert.match(layout,/place\(\$\('\.v292-zoom-out'\),\[125,631,62,59\]/);
 assert.match(hud,/function dispatchSelection\(slot\)/);
-execFileSync(process.execPath,['--check',new URL('../hud-v303-buttons.js',import.meta.url).pathname]);
+execFileSync(process.execPath,['--check',fileURLToPath(new URL('../hud-v303-buttons.js',import.meta.url))]);
 console.log('V303 6 command cards, 4 map controls, 4 contextual actions: PASS');

@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -30,7 +31,7 @@ assert.ok(!js.includes('endTurn()'),'Do not invent an end turn in realtime game'
 assert.ok(css.includes('@media (max-width:1100px)'), 'Touch fallback required');
 assert.ok(css.includes("header #pause"),'Actual pause button must remain wired');
 const assets=[...css.matchAll(/url\(['"]?((?:ui-art-v263|ui-art-v288)\/[^'")\s]+)['"]?\)/g)].map(x=>x[1]);
-for(const p of assets) assert.ok(fs.existsSync(path.join(new URL('.',root).pathname,p)),'Missing asset: '+p);
+for(const p of assets) assert.ok(fs.existsSync(path.join(fileURLToPath(root),p)),'Missing asset: '+p);
 const toolbar=read('ui-art-v288/toolbar.svg');
 assert.match(toolbar,/data:image\/webp;base64,UklGR/);
 assert.ok(toolbar.length>5000,'Toolbar must contain real painted card image data');

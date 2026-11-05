@@ -1,3 +1,9 @@
+## V312 · kaardipildid, teade, kaubandus ja diplomaatia
+
+Päris 3D näidisküla käivitati kohalikus Chromiumis. Ehitise pilt on kaardi loomisel olemas ja iga saadaval hoone viitab olemasolevale sisupildile. Valiti ehituskaart ning mõõdeti teate kõrgus (alla 72 px). Kaubandus ja diplomaatia kontrolliti 1200×800, 915×364 ja 390×844: paneel ekraani piires, iga riik/kaupleja eraldi plokina, riiginimed ja suhted nähtavad, tegevusnuppe ei muudeta pikkadeks üldkaartideks. Diplomaatia muutis päris mängu suhet. Kaubanduse callback ja otsing läbisid eraldi deterministliku UI kontrollvaate. Tõend `reports/ui-v312-browser.json`; kuvatõmmised `previews/ui-v312-*.png` on kohalikus töökoopias. Pikaajalist olemasoleva salvestuse läbimängimist ei tehtud.
+
+Kõik CI quick-check käsud ning V312 lisakontrollid läbisid, kokku 101. Viies vanas testis parandati Windowsi failiteed; mootori kontrolliks taastati värskes töökoopias ametlikud LF reavahetused. Mootori lähtekood ei muutu.
+
 ## V311 · ehitistest oli nähtaval ainult esimene
 
 Viga taasesitati päris vana ui-v121.css stiiliga: #tray flex-direction oli column; kaevu, puuraiduri ja ülejäänud ehitiste top oli järgmistes vertikaalsetes ridades ning riba overflow lõikas need ära. Varasem kontrollvaade ei laadinud seda vana stiili ja jättis vea leidmata.

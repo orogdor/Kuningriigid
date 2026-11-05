@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 // V287 illustrated user interface static regression; requires only Node.js.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -22,7 +23,7 @@ assert.doesNotMatch(js,/\.onclick\s*=\s*|addEventListener\(['"]click['"],\s*\(\)
 const images=[...css.matchAll(/url\(['"]?(ui-art-v263\/[^'")\s]+)['"]?\)/g)].map(m=>m[1]);
 assert.ok(images.length>=8,'The new UI must actually use illustrated artwork');
 for (const src of images) {
- assert.ok(fs.existsSync(path.join(new URL('.',root).pathname,src)),'Missing image asset: '+src);
+ assert.ok(fs.existsSync(path.join(fileURLToPath(root),src)),'Missing image asset: '+src);
 }
 for(const id of ['hud-build','hud-army','techtoggle','maptoggle','hud-explore','commandhud','atlasoverview','v51insights']){
  assert.ok(html.includes('id="'+id+'"'),'Expected original action or panel #'+id+' is absent');

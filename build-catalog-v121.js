@@ -1,4 +1,5 @@
 // V121 building catalogue: readable cards, searchable categories and clear material status.
+import {addCatalogPicture} from './catalog-art-v312.js';
 export const BUILD_CATEGORIES=Object.freeze([
  ['all','All'],
  ['housing','Housing'],
@@ -45,7 +46,7 @@ export function appendBuildingCard(parent,{type,name,icon,cost,time,builder,miss
  else if(!blocked)button.append(make('span','v121-card-action',active?'Place on the map →':'Select a site →'));
  button.disabled=blocked;button.onclick=needs?onRequest:onChoose;
  button.setAttribute('aria-label',name+'. '+(blocked?error:needs?'Missing materials: '+missing+'. Request supplies':cost+'. Place on map'));
- parent.append(button);return button;
+ addCatalogPicture(button,type);parent.append(button);return button;
 }
 export function renderBuildingCategories(host,category,onSelect,counts){
  host.replaceChildren();

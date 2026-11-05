@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 // V289: independent picture-based responsive HUD regression.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -39,7 +40,7 @@ assert.doesNotMatch(js,/endTurn\(|location\.reload\(/);
 assert.ok(css.includes('#v289-hud'),'No independent root');
 const images=[...css.matchAll(/url\(['"]?(ui-art-v(?:263|288)\/[^'")\s]+)['"]?\)/g)].map(m=>m[1]);
 for(const asset of images){
- assert.ok(fs.existsSync(path.join(new URL('.',root).pathname,asset)),'Missing art '+asset);
+ assert.ok(fs.existsSync(path.join(fileURLToPath(root),asset)),'Missing art '+asset);
 }
 const publishedVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/title>/)||[])[1]);
 assert.ok(publishedVersion>=292,'Published version is older than this UI test');

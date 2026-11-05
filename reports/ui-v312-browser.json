@@ -1,0 +1,497 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "realGame": true,
+      "buildings": [
+        {
+          "type": "lumber",
+          "images": [
+            "ui-art-v263/bld_lumber.webp"
+          ]
+        },
+        {
+          "type": "quarry",
+          "images": [
+            "ui-art-v263/bld_quarry.webp"
+          ]
+        },
+        {
+          "type": "house",
+          "images": [
+            "ui-art-v263/bld_house.webp"
+          ]
+        },
+        {
+          "type": "well",
+          "images": [
+            "ui-art-v263/bld_well.webp"
+          ]
+        },
+        {
+          "type": "farm",
+          "images": [
+            "ui-art-v263/bld_farm.webp"
+          ]
+        },
+        {
+          "type": "barracks",
+          "images": [
+            "ui-art-v263/bld_barracks.webp"
+          ]
+        },
+        {
+          "type": "archery",
+          "images": [
+            "ui-art-v304/tech/archery.webp"
+          ]
+        },
+        {
+          "type": "hunter",
+          "images": [
+            "ui-art-v263/bld_hunter.webp"
+          ]
+        },
+        {
+          "type": "fisher",
+          "images": [
+            "ui-art-v304/tech/fishing.webp"
+          ]
+        },
+        {
+          "type": "study",
+          "images": [
+            "ui-art-v304/tech/learning.webp"
+          ]
+        },
+        {
+          "type": "claypit",
+          "images": [
+            "ui-art-v304/tech/pottery.webp"
+          ]
+        },
+        {
+          "type": "pottery_kiln",
+          "images": [
+            "ui-art-v304/tech/pottery.webp"
+          ]
+        },
+        {
+          "type": "pasture",
+          "images": [
+            "ui-art-v263/bld_pasture.webp"
+          ]
+        },
+        {
+          "type": "mason",
+          "images": [
+            "ui-art-v263/bld_mason.webp"
+          ]
+        },
+        {
+          "type": "palisade",
+          "images": [
+            "ui-art-v304/tech/fortifications.webp"
+          ]
+        },
+        {
+          "type": "palisade",
+          "images": [
+            "ui-art-v304/tech/fortifications.webp"
+          ]
+        },
+        {
+          "type": "woodgate",
+          "images": [
+            "ui-art-v304/tech/fortifications.webp"
+          ]
+        },
+        {
+          "type": "watchtower",
+          "images": [
+            "ui-art-v263/bld_watchtower.webp"
+          ]
+        },
+        {
+          "type": "field",
+          "images": [
+            "ui-art-v304/tech/agriculture.webp"
+          ]
+        }
+      ],
+      "toast": {
+        "x": 463.9296875,
+        "y": 543.328125,
+        "width": 272.140625,
+        "height": 34.1875
+      }
+    },
+    {
+      "width": 1200,
+      "height": 800,
+      "kind": "trade",
+      "rect": {
+        "x": 254.0625,
+        "y": 273.234375,
+        "width": 677.53125,
+        "height": 486.5625,
+        "bottom": 759.796875
+      },
+      "base": 162.1875,
+      "groups": [
+        {
+          "name": "Royal treasuryNo research in progressSpeed up research (40 gold → +12 points)",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 1
+        },
+        {
+          "name": "Merchant villagetrading town Kivikalda küla · tile 49:131Sell 20 wood (+9 gold)Sell 20 stone (+11 go",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 142:51Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 97:100Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 179:93Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 54:90Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell ",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 72:104Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 193:56Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 32:100Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 154:23Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 29:111Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 165:62Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 404.5625,
+          "actions": 8
+        }
+      ],
+      "cardActions": 0
+    },
+    {
+      "width": 1200,
+      "height": 800,
+      "kind": "diplomacy",
+      "rect": {
+        "x": 254.0625,
+        "y": 273.234375,
+        "width": 677.53125,
+        "height": 486.5625,
+        "bottom": 759.796875
+      },
+      "base": 162.1875,
+      "groups": [
+        {
+          "name": "Soome0 people · 0 cities · neutralFriendshipNeutralWar",
+          "display": "flex",
+          "height": 460.5625,
+          "actions": 3
+        },
+        {
+          "name": "Rootsi0 people · 0 cities · neutralFriendshipNeutralWar",
+          "display": "flex",
+          "height": 460.5625,
+          "actions": 3
+        },
+        {
+          "name": "Norra0 people · 0 cities · neutralFriendshipNeutralWar",
+          "display": "flex",
+          "height": 460.5625,
+          "actions": 3
+        }
+      ],
+      "cardActions": 0
+    },
+    {
+      "width": 915,
+      "height": 364,
+      "kind": "trade",
+      "rect": {
+        "x": 136.921875,
+        "y": 80.078125,
+        "width": 633.421875,
+        "height": 262.265625,
+        "bottom": 342.34375
+      },
+      "base": 87.421875,
+      "groups": [
+        {
+          "name": "Royal treasuryNo research in progressSpeed up research (40 gold → +12 points)",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 1
+        },
+        {
+          "name": "Merchant villagetrading town Kivikalda küla · tile 49:131Sell 20 wood (+9 gold)Sell 20 stone (+11 go",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 142:51Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 97:100Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 179:93Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 54:90Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell ",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 72:104Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 193:56Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 32:100Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 154:23Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 29:111Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 165:62Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 180.265625,
+          "actions": 8
+        }
+      ],
+      "cardActions": 0
+    },
+    {
+      "width": 915,
+      "height": 364,
+      "kind": "diplomacy",
+      "rect": {
+        "x": 136.921875,
+        "y": 80.078125,
+        "width": 633.421875,
+        "height": 262.265625,
+        "bottom": 342.34375
+      },
+      "base": 87.421875,
+      "groups": [
+        {
+          "name": "Soome0 people · 0 cities · friendlyFriendshipNeutralWar",
+          "display": "flex",
+          "height": 236.265625,
+          "actions": 3
+        },
+        {
+          "name": "Rootsi0 people · 0 cities · neutralFriendshipNeutralWar",
+          "display": "flex",
+          "height": 236.265625,
+          "actions": 3
+        },
+        {
+          "name": "Norra0 people · 0 cities · neutralFriendshipNeutralWar",
+          "display": "flex",
+          "height": 236.265625,
+          "actions": 3
+        }
+      ],
+      "cardActions": 0
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "trade",
+      "rect": {
+        "x": 8,
+        "y": 384,
+        "width": 374,
+        "height": 450,
+        "bottom": 834
+      },
+      "base": 150,
+      "groups": [
+        {
+          "name": "Royal treasuryNo research in progressSpeed up research (40 gold → +12 points)",
+          "display": "flex",
+          "height": 376,
+          "actions": 1
+        },
+        {
+          "name": "Merchant villagetrading town Kivikalda küla · tile 49:131Sell 20 wood (+9 gold)Sell 20 stone (+11 go",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 142:51Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 97:100Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 179:93Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 54:90Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell ",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 72:104Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 193:56Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 32:100Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 154:23Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 29:111Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        },
+        {
+          "name": "Merchant villageno town close enough · tile 165:62Sell 20 wood (+9 gold)Sell 20 stone (+11 gold)Sell",
+          "display": "flex",
+          "height": 376,
+          "actions": 8
+        }
+      ],
+      "cardActions": 0
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "diplomacy",
+      "rect": {
+        "x": 8,
+        "y": 384,
+        "width": 374,
+        "height": 450,
+        "bottom": 834
+      },
+      "base": 150,
+      "groups": [
+        {
+          "name": "Soome0 people · 0 cities · friendlyFriendshipNeutralWar",
+          "display": "flex",
+          "height": 432,
+          "actions": 3
+        },
+        {
+          "name": "Rootsi0 people · 0 cities · neutralFriendshipNeutralWar",
+          "display": "flex",
+          "height": 432,
+          "actions": 3
+        },
+        {
+          "name": "Norra0 people · 0 cities · neutralFriendshipNeutralWar",
+          "display": "flex",
+          "height": 432,
+          "actions": 3
+        }
+      ],
+      "cardActions": 0
+    }
+  ],
+  "errors": []
+}

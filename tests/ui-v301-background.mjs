@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 /* V301: the UI background is real, centered on live map, 20% shorter below. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -27,5 +28,5 @@ assert.match(css,/#v291-hud\.v301-picture \.v291-card>\.v291-sprite/);
 assert.match(css,/pointer-events:none/);
 assert.match(css,/#v291-hud:not\(\.v301-picture\)/);
 assert.match(css,/#v291-hud \.v301-card-icon,#v291-hud \.v301-card-caption\{display:none!important\}/);
-execFileSync(process.execPath,['--check',new URL('hud-v301-background.js',root).pathname]);
+execFileSync(process.execPath,['--check',fileURLToPath(new URL('hud-v301-background.js',root))]);
 console.log('V301: transparent painted backdrop, six real commands, bottom-20% responsive layout PASS');

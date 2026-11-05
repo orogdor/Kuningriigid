@@ -1,0 +1,28 @@
+/* A toast has one vertical anchor. Legacy top + footer bottom stretched it. */
+body.v304-active #toast{top:auto!important;height:auto!important;min-height:0!important;max-height:72px!important;overflow:auto;padding:8px 12px!important;font-size:12px!important;line-height:1.35!important;pointer-events:none}
+body.v304-active #hud-build-status{display:none!important}
+body.v304-active #buildhint:not([hidden]){top:calc(78 * var(--hud-u,1px))!important;bottom:auto!important;left:auto!important;right:12px!important;width:max-content!important;height:auto!important;max-width:min(360px,calc(100vw - 24px))!important;max-height:64px;overflow:hidden;padding:6px 10px;font-size:11px;line-height:1.35;pointer-events:none}
+/* Expanded contextual menus retain each nation / village as one group. */
+body.v306-active #v304-hud #v309-menu:is([data-kind=trade],[data-kind=diplomacy]){height:min(calc(3 * var(--choice-h)),calc(100dvh - 100 * var(--hud-u) - 56 * var(--hud-u)));align-items:flex-end}
+body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) .v309-content{height:100%;padding:12px;border:1px solid var(--ui-gold);border-radius:10px;background:#102235f5;box-shadow:0 8px 24px #0008}
+body.v306-active #v304-hud #v309-menu[data-kind=trade] #v264-listpanel{flex-direction:column!important;gap:10px!important}
+body.v306-active #v309-menu[data-kind=trade] #v264-listpanel>input{flex:0 0 36px;width:100%;min-height:36px;padding:6px 10px!important}
+body.v306-active #v309-menu[data-kind=trade] .v264-rows,body.v306-active #v304-hud #v309-menu[data-kind=diplomacy] #v304-diplomacy{height:100%!important;align-items:stretch;gap:12px!important;overflow-x:auto!important;scrollbar-width:thin}
+body.v306-active #v309-menu[data-kind=trade] .v264-rows{height:auto!important;flex:1}
+body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) :is(.v276-trader,.v304-faction){display:flex!important;flex-direction:column;flex:0 0 clamp(180px,calc(320 * var(--hud-u)),280px);min-width:0;max-height:100%;overflow-y:auto;gap:12px;padding:12px!important;margin:0!important;border:1px solid #b38e4c99!important;border-radius:7px!important;background:linear-gradient(155deg,#20394a,#0b1c2c)!important;scroll-snap-align:start}
+body.v306-active #v309-menu[data-kind=trade] .v276-title{display:flex!important;align-items:center;gap:10px;padding:0!important;min-height:54px;color:var(--ui-gold-light)}
+body.v306-active #v309-menu[data-kind=trade] .v276-title img{width:48px;height:48px;object-fit:cover;border-radius:50%;border:1px solid var(--ui-gold)}
+body.v306-active #v309-menu[data-kind=trade] .v276-title span{min-width:0}
+body.v306-active #v309-menu[data-kind=trade] .v276-title small{display:block;font-size:11px;line-height:1.4;color:var(--ui-muted);margin-top:5px}
+body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) :is(.v276-offers,.v304-faction-controls){display:flex!important;flex-direction:column;gap:8px;margin-top:auto}
+body.v306-active #v304-hud #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) :is(.v276-offers,.v304-faction-controls)>button{position:static;width:100%;min-height:40px;height:auto;padding:9px!important;white-space:normal;text-align:left;font-size:13px!important;line-height:1.35!important}
+body.v306-active #v304-hud #v309-menu[data-kind=diplomacy] #v304-diplomacy .v304-faction>strong{display:block!important;font-size:19px;color:var(--ui-gold-light);border-bottom:1px solid var(--ui-line);padding-bottom:10px}
+body.v306-active #v304-hud #v309-menu[data-kind=diplomacy] #v304-diplomacy .v304-faction>small{display:block!important;font-size:12px;line-height:1.6;color:var(--ui-muted)}
+body.v304-active:has(#v309-menu:is([data-kind=trade],[data-kind=diplomacy]):not([hidden])) #buildhint{display:none!important}
+body.v306-active #v309-menu[data-kind=diplomacy] .v304-feedback:not(:empty){flex:0 0 150px;align-self:flex-start;font-size:12px;line-height:1.5}
+@media(orientation:portrait) and (max-width:800px){
+ body.v304-active #buildhint:not([hidden]){top:112px!important}
+ body.v306-active #v304-hud #v309-menu:is([data-kind=trade],[data-kind=diplomacy]){height:min(calc(3 * var(--choice-h)),calc(100dvh - 110px))}
+ body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) .v309-back{flex-basis:64px!important;width:64px!important;min-width:64px!important}
+ body.v306-active #v309-menu:is([data-kind=trade],[data-kind=diplomacy]) .v309-content{padding:8px}
+}

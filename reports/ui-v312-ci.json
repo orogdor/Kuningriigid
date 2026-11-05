@@ -1,0 +1,603 @@
+[
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check civilization.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check graphics-settings-v226.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check graphics-runtime-v226.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check webgpu-safety-v227.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check vendor/three-gpu-shim.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check boot-v83.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check ui-painted-v287.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check ui-reference-v288.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v289.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v290.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v291.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v292-mobile.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v293-research.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check research-panel-v294.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check research-panel-v295.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v297-refinement.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v298-layout.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v301-background.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v303-buttons.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check hud-v302-pieces.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check selection-context-v300.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check ui-v304.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check ui-v309.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check ui-v310.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check ui-catalog-v304.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check research-art-v304.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check research-art-v293.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check research-tree-v119.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check research-ui.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check atmosphere-v158.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check landscape-v149.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check sea-v158.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check stone-near-lod.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check civilization-core.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check ai-defenses-v128.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check outer-ring-v184.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Main game and wall syntax",
+    "cmd": "node --check wall-demo-v184.js",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Historic suburb geometry (V191)",
+    "cmd": "node scripts/test-historic-suburb-v191.mjs",
+    "exit": 0,
+    "seconds": 0.6
+  },
+  {
+    "group": "Continuous natural barriers and gaps (V194)",
+    "cmd": "node scripts/test-natural-closure-v194.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Sea and cliff suburb demos (V194)",
+    "cmd": "node scripts/test-organic-demo-v190.mjs",
+    "exit": 0,
+    "seconds": 12.2
+  },
+  {
+    "group": "Defense construction priority (V188)",
+    "cmd": "node scripts/test-wall-priority-v188.mjs",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "group": "Graphics settings V226 unit test",
+    "cmd": "node scripts/test-graphics-v226.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "Three.js r187 engine and game material compatibility",
+    "cmd": "node tests/three-r187-v305.mjs",
+    "exit": 0,
+    "seconds": 0.3
+  },
+  {
+    "group": "Three.js r187 engine and game material compatibility",
+    "cmd": "node tests/three-r187-v305-tsl.mjs",
+    "exit": 0,
+    "seconds": 0.3
+  },
+  {
+    "group": "V233 farm and Stone Age far LOD regression",
+    "cmd": "node scripts/test-farming-lod-v233.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V234 equipment and V261 rigged warrior regressions",
+    "cmd": "node scripts/test-equipment-v234.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V234 equipment and V261 rigged warrior regressions",
+    "cmd": "node scripts/test-stone-warriors-v261.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V235 day cycle and city torch regression",
+    "cmd": "node scripts/test-daynight-v235.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V236 scouts and door torch regressions",
+    "cmd": "node scripts/test-scout-torch-v236.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V237 farm, field and green-preview regression",
+    "cmd": "node scripts/test-field-green-v237.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V238 scout visibility and marker regression",
+    "cmd": "node scripts/test-scout-marker-v238.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V239 visible scout meshes and names toggle",
+    "cmd": "node scripts/test-scout-model-v239.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V240 scout continuous world/detail movement",
+    "cmd": "node scripts/test-scout-motion-v240.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V241 demand loading and V242 detail streaming",
+    "cmd": "node scripts/test-demand-v241.mjs",
+    "exit": 0,
+    "seconds": 3.8
+  },
+  {
+    "group": "V241 demand loading and V242 detail streaming",
+    "cmd": "node scripts/test-stream-v242.mjs",
+    "exit": 0,
+    "seconds": 6.7
+  },
+  {
+    "group": "V243 wall connections and building rotation",
+    "cmd": "node scripts/test-build-v243.mjs",
+    "exit": 0,
+    "seconds": 2.2
+  },
+  {
+    "group": "V256 save compression and wildlife",
+    "cmd": "node TEST_V73.mjs",
+    "exit": 0,
+    "seconds": 3.3
+  },
+  {
+    "group": "V256 save compression and wildlife",
+    "cmd": "node tests/save-compression-v256.mjs",
+    "exit": 0,
+    "seconds": 1.2
+  },
+  {
+    "group": "V256 save compression and wildlife",
+    "cmd": "node tests/wildlife-v255/run.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V257 handheld torch and animal facing",
+    "cmd": "node tests/torch-hand-v257.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V258 world and detail movement",
+    "cmd": "node tests/world-movement-v258.mjs",
+    "exit": 0,
+    "seconds": 3.4
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-research-v293.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-research-v294.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-research-v295.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-research-v296.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v297.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v298.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v299-buttons.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v300-selection.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v301-background.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v302-pieces.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v303-buttons.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v304.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v306.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V293-V294 illustrated research menu regression",
+    "cmd": "node tests/ui-v311.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/water-carriers-v268.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/world-city-scale-v273.mjs",
+    "exit": 0,
+    "seconds": 3.2
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/tree-growth-v274.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/migration-v274.mjs",
+    "exit": 0,
+    "seconds": 4
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/lake-outlets-v275.mjs",
+    "exit": 0,
+    "seconds": 12.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/river-bank-v276.mjs",
+    "exit": 0,
+    "seconds": 6.3
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/villages-v276.mjs",
+    "exit": 0,
+    "seconds": 6.8
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/natural-shore-v278.mjs",
+    "exit": 0,
+    "seconds": 6.6
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/stone-age-playthrough-v280.mjs",
+    "exit": 0,
+    "seconds": 16.9
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/stone-age-economy-v281.mjs",
+    "exit": 0,
+    "seconds": 18.3
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/ui-v282.mjs",
+    "exit": 0,
+    "seconds": 0.4
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/ui-painted-v287.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/ui-reference-v288.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/ui-v289.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/ui-v290.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/ui-v291.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/ui-v292-mobile.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/stone-animation-v283.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/work-spots-v284.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "group": "V268 water carriers and river water",
+    "cmd": "node tests/coast-v286.mjs",
+    "exit": 0,
+    "seconds": 6.7
+  },
+  {
+    "group": "Gameplay smoke test",
+    "cmd": "node scripts/test.mjs traffic",
+    "exit": 0,
+    "seconds": 24.1
+  },
+  {
+    "group": "V312 fixes",
+    "cmd": "node tests/ui-v312.mjs",
+    "exit": 0
+  },
+  {
+    "group": "V312 fixes",
+    "cmd": "node --check catalog-art-v312.js",
+    "exit": 0
+  },
+  {
+    "group": "V312 fixes",
+    "cmd": "node --check ui-catalog-v304.js",
+    "exit": 0
+  },
+  {
+    "group": "V312 fixes",
+    "cmd": "node --check ui-v310.js",
+    "exit": 0
+  },
+  {
+    "group": "V312 fixes",
+    "cmd": "node --check build-catalog-v121.js",
+    "exit": 0
+  }
+]
