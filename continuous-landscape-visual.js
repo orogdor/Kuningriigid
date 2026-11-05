@@ -85,7 +85,8 @@ function riverFlow(game,x,z){
  return dir;
 }
 const mouthBlend=(game,x,z)=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(x,z)-.30)/3.7));return t*t*(3-2*t);};
-function visible(tile,path,radius=110){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
+const desktopRiverRadiusV319=typeof matchMedia==='function'&&matchMedia('(min-width:900px) and (pointer:fine)').matches?155:110;
+function visible(tile,path,radius=desktopRiverRadiusV319){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(...args){const steps=riverNetworkStepsV242(...args);let result;do{result=steps.next();}while(!result.done);return result.value;}
 export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='medium',ground=null){
  const group=new T.Group();group.name='V67 continuous watershed network';group.userData.landscape=true;
