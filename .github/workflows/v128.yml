@@ -68,6 +68,10 @@ jobs:
         run: node scripts/test-wall-priority-v188.mjs
       - name: Graphics settings V226 unit test
         run: node scripts/test-graphics-v226.mjs
+      - name: Three.js r187 engine and game material compatibility
+        run: |
+          node tests/three-r187-v305.mjs
+          node tests/three-r187-v305-tsl.mjs
       - name: V233 farm and Stone Age far LOD regression
         run: node scripts/test-farming-lod-v233.mjs
       - name: V234 equipment and V261 rigged warrior regressions

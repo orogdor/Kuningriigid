@@ -8,9 +8,9 @@ const liveVersion=Number((html.match(/<title>Kuningriigid · V([0-9]+)<\/title>/
 assert.ok(liveVersion>=296,'Page version must include research opening fix');
 assert.ok(html.includes('id="menu-version">KUNINGRIIGID · V'+liveVersion+'<'));
 for(const p of ['boot-v83.js','hud-v291.js','hud-v292-mobile.js','hud-v293-research.js']){
- assert.match(html,new RegExp(p.replace('.','\\.')+'\\?v=(?:296a|297a|298a|299a|300a|304a)'));
+ assert.match(html,new RegExp(p.replace('.','\\.')+'\\?v=\\d{3,}[a-z]?'));
 }
-assert.match(boot,/await import\('\.\/civilization\.js\?v=(?:300a|304a)'\)/);
+assert.match(boot,/await import\('\.\/civilization\.js\?v=\d{3,}[a-z]?'\)/);
 assert.match(core,/window\.openKuningriigidResearchV296=openResearch/);
 assert.match(hud,/const openResearch=\(\)=>\{const real=window\.openKuningriigidResearchV296/);
 assert.match(hud,/['"]v291-research-main['"][^]{0,200}openResearch\(\)/);

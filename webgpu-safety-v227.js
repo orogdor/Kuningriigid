@@ -24,7 +24,7 @@
  // V244: no global error/unhandledrejection triggers any more. Any unrelated game error (a missing
  // model file, an aborted download, a typo containing the word "material") used to switch the
  // player back to WebGL. Only real renderer failures call recover(): WebGPU init failure, device
- // loss and a rejected renderAsync (vendor/three-gpu-shim.js, graphics-runtime-v226.js).
+ // loss and a failed render (vendor/three-gpu-shim.js, graphics-runtime-v226.js).
  function banner(){
   if(params.get('gpuFallback')!=='1')return;
   const el=document.createElement('aside');el.id='webgpu-recovery-v227';

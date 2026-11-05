@@ -70,7 +70,7 @@ export function applyCrossingTransform(object,frame){
  const matrix=new T.Matrix4().makeRotationY(frame.yaw).multiply(shear);
  matrix.premultiply(new T.Matrix4().makeScale(frame.scale.x/frame.halfSpan,frame.scale.y,frame.scale.z/6.2));
  matrix.multiply(new T.Matrix4().makeScale(frame.halfSpan,1,6.2));
- matrix.setPosition(frame.x,frame.y,frame.z);object.matrixAutoUpdate=false;object.matrix.copy(matrix);
+ matrix.setPosition(frame.x,frame.y,frame.z);object.matrixAutoUpdate=false;object.matrix.copy(matrix);object.matrixWorldNeedsUpdate=true;
  return object;
 }
 export function createCrossingModel(game,cell,scope='world',tile=null,height=null){

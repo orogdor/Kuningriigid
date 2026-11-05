@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><title>Three.js r187 · Kuningriigid V305 compatibility</title>
+<style>body{margin:0;background:#101c29;color:#f1dbab;font:16px system-ui}pre{white-space:pre-wrap;padding:12px}canvas{display:block}</style>
+<pre id="status">Loading engine and game materials…</pre>
+<script>
+const gpu=new URLSearchParams(location.search).get('gpu')==='1';
+const imports={};for(const f of ['three.core.js','three.webgpu.js','three.tsl.js'])imports['../vendor/'+f]='../vendor/'+f+'?v=305r187';
+imports['../vendor/three.module.js']=gpu?'../vendor/three-gpu-shim.js?v=305r187':'../vendor/three.module.js?v=305r187';
+const m=document.createElement('script');m.type='importmap';m.textContent=JSON.stringify({imports});document.currentScript.after(m);
+window.addEventListener('error',e=>document.getElementById('status').textContent+='\nERROR '+e.message);
+window.addEventListener('unhandledrejection',e=>document.getElementById('status').textContent+='\nERROR '+e.reason);
+</script>
+<script type="module">
+import * as T from '../vendor/three.module.js';
+import {seaMaterial} from '../sea-v158.js';
+import {setupAtmosphere} from '../atmosphere-v158.js';
+import {createFireV252,tickFireV252} from '../daynight-v235.js';
+import {loadStoneHumanV241,createStoneHuman,animateStoneHuman} from '../stone-age-models-v221.js';
+const status=document.getElementById('status');
+try{
+ const r=new T.WebGLRenderer({antialias:true});r.setSize(960,540);r.shadowMap.enabled=true;document.body.append(r.domElement);
+ if(r.readyV225)await r.readyV225;
+ const scene=new T.Scene(),local=new T.Scene(),cam=new T.PerspectiveCamera(45,960/540,.1,30000);cam.position.set(16,13,20);cam.lookAt(0,1,0);
+ const atmosphere=setupAtmosphere({renderer:r,worldScene:scene,localScene:local,quality:'low'});
+ atmosphere.update(scene,new T.Vector3(),30,0,240);
+ const ground=new T.Mesh(new T.BoxGeometry(14,.3,12),new T.MeshStandardMaterial({color:'#6b7950'}));ground.position.set(-3,-.2,0);ground.receiveShadow=true;scene.add(ground);
+ const waterGeo=new T.PlaneGeometry(14,14,24,24);waterGeo.rotateX(-Math.PI/2);
+ waterGeo.setAttribute('aDepth',new T.Float32BufferAttribute(Array.from({length:waterGeo.attributes.position.count},(_,i)=>.1+(i%25)/4),1));
+ const water=new T.Mesh(waterGeo,seaMaterial());water.position.set(8,-.1,0);scene.add(water);
+ const instances=new T.InstancedMesh(new T.ConeGeometry(.35,2,6),new T.MeshStandardMaterial({color:'#3b5938'}),4096);instances.count=16;
+ for(let i=0;i<16;i++)instances.setMatrixAt(i,new T.Matrix4().makeTranslation(-8+(i%8)*1.3,1,-4+Math.floor(i/8)*2));instances.castShadow=true;scene.add(instances);
+ const fire=createFireV252(1);fire.position.set(-1,0,1);scene.add(fire);
+ await loadStoneHumanV241();const human=createStoneHuman(scene,-3,1,'#d4a65e','stone_worker');if(!human)throw Error('Skinned human model failed to load');
+ let frames=0,failed=false;const original=console.error;console.error=(...args)=>{failed=true;status.textContent+='\nRENDER ERROR '+args.map(String).join(' ');original(...args)};
+ function draw(t){try{tickFireV252(t/1000);animateStoneHuman(human,t/1000,true);r.render(scene,cam);frames++;
+  if(frames===60){const calls=r.info.render.drawCalls??r.info.render.calls;status.textContent=(failed?'FAIL':'PASS')+' · Three.js r'+T.REVISION+' · '+(window.KINGDOMS_GPU_V225?.backend||'webgl2')+' · '+frames+' frames · '+calls+' draw calls\nSea, sky, fire, shadows, 4096-capacity instances and animated skinned GLB';}
+  if(frames<180)requestAnimationFrame(draw);
+ }catch(e){status.textContent='FAIL '+e.stack;}}
+ requestAnimationFrame(draw);
+}catch(e){status.textContent='FAIL '+e.stack;}
+</script>

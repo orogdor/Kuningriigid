@@ -35,6 +35,6 @@ assert.match(js,/window\.KuningriigidV302=\{active\}/);
 assert.match(old,/if\(window\.KuningriigidV302\?\.active\)return;/);
 assert.match(html,/hud-v302-pieces\.css\?v=302b/);
 assert.match(html,/hud-v302-pieces\.js\?v=303a/);
-assert.match(html,/<title>Kuningriigid · V30[34]<\/title>/);
-assert.match(html,/KUNINGRIIGID · V30[34]/);
+assert.match(html,/<title>Kuningriigid · V\d{3,}<\/title>/);
+assert.match(html,/KUNINGRIIGID · V\d{3,}/);
 console.log('V302 side-to-side dock join, 28px overlaps, six command hitboxes PASS');

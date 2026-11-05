@@ -5,7 +5,7 @@ import {setStoneNearDistanceV226} from './stone-near-lod.js';
 export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,localScene,people,getQuality,getAdaptiveScale}){
  const originals=new WeakMap(),originalMaterials=new WeakMap(),convertedMaterials=new WeakMap();
  const gpuFallbackMaterials=new WeakMap();
- // WebGPU r170 cannot compile legacy ShaderMaterial/RawShaderMaterial GLSL.
+ // WebGPU cannot compile legacy ShaderMaterial/RawShaderMaterial GLSL.
  // Keep 3D geometries visible with conservative native material stand-ins.
  function prepareGPUScene(scene){
   scene.traverse(o=>{
@@ -121,12 +121,12 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
  function render(scene,camera,now){
   if(T.GPU_MODE_V225||renderer.isWebGPUShimV225){
    if(pendingGPU)return;
-   if(typeof renderer.renderAsync!=='function'){
-    window.KINGDOMS_WEBGPU_RECOVER_V227?.('WebGPU: async render puudub');return;
+   if(typeof renderer.render!=='function'){
+    window.KINGDOMS_WEBGPU_RECOVER_V227?.('WebGPU: render puudub');return;
    }
    pendingGPU=true;
    prepareGPUScene(scene);
-   Promise.resolve(renderer.readyV225).then(()=>renderer.renderAsync(scene,camera)).then(()=>{
+   Promise.resolve(renderer.readyV225).then(()=>renderer.render(scene,camera)).then(()=>{
     pendingGPU=false;gpuSuccessfulFrames++;afterRender(now);
     // A frame submission with no draw calls cannot display the 3D world.
     const calls=renderer.info?.render?.drawCalls; // V244: WebGPU counts draws in drawCalls (render.calls counts render() calls)

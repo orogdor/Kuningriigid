@@ -19,7 +19,7 @@ if(!s.world)s.world={seed:Math.floor(Math.random()*2147483647),type:'continents'
 let speed=1,paused=false,mode=null,selected=null,tab='build',toastTimer=0;
 const scene=new T.Scene();scene.background=new T.Color('#b6c6bd');scene.fog=new T.Fog('#b6c6bd',105,200);
 let renderer;try{renderer=new T.WebGLRenderer({canvas:$('world'),antialias:true});}catch{document.body.innerHTML='<p>3D mäng vajab WebGL-toega brauserit.</p>';throw Error('WebGL unavailable')}
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
 const camera=new T.PerspectiveCamera(43,1,.1,250),focus=new T.Vector3(-8,0,0);let zoom=57,angle=.65;
 scene.add(new T.HemisphereLight(0xd9eddf,0x526c3c,1.6));const sun=new T.DirectionalLight(0xffe0a5,2.4);sun.position.set(-25,60,25);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-75,right:75,top:75,bottom:-75});sun.shadow.bias=-.00025;sun.shadow.normalBias=.045;sun.shadow.radius=3;scene.add(sun);const fillLight=new T.DirectionalLight(0xb7d0df,.35);fillLight.position.set(35,25,-30);scene.add(fillLight);
 const mats={};function mat(c){return mats[c]||(mats[c]=new T.MeshStandardMaterial({color:c,roughness:.95}))}

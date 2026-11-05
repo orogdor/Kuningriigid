@@ -7,12 +7,12 @@ const html=read('index.html'),hud=read('hud-v291.js'),core=read('civilization.js
 const catalogue=read('selection-context-v300.js'),css=read('hud-v298-layout.css');
 const window={};new Function('window',catalogue)(window);
 const get=window.KuningriigidSelectionV300.actions;
-assert.match(html,/<title>Kuningriigid · V30[1234]<\/title>/);
-assert.match(html,/id="menu-version">KUNINGRIIGID · V30[1234]</);
+assert.match(html,/<title>Kuningriigid · V\d{3,}<\/title>/);
+assert.match(html,/id="menu-version">KUNINGRIIGID · V\d{3,}</);
 assert.ok(html.indexOf('selection-context-v300.js')<html.indexOf('hud-v291.js?v=300a'),'Selector must load before HUD');
 assert.ok(html.includes('hud-v298-layout.css?v=300a'));
-assert.ok(/boot-v83\.js\?v=(?:300a|304a)/.test(html));
-assert.match(boot,/civilization\.js\?v=(?:300a|304a)/);
+assert.ok(/boot-v83\.js\?v=\d{3,}[a-z]?/.test(html));
+assert.match(boot,/civilization\.js\?v=\d{3,}[a-z]?/);
 assert.match(core,/const q=currentSelection\(\);[\s\S]{0,1100}const selection=\{/);
 assert.match(core,/selection,\s*\n\s*turn:/);
 assert.match(hud,/selectionActions\(\)\[slot\]/);

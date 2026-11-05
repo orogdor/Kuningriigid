@@ -13,8 +13,8 @@ assert.ok(webp.includes(Buffer.from('ALPH')),'transparent scene center required'
 assert.ok(html.includes('hud-v301-background.css?v=301a'));
 assert.ok(html.includes('hud-v301-background.js?v=301b'));
 assert.ok(html.indexOf('hud-v298-layout.js?v=300a')<html.indexOf('hud-v301-background.js?v=301b'));
-assert.match(html,/<title>Kuningriigid · V30[1234]<\/title>/);
-assert.match(html,/id="menu-version">KUNINGRIIGID · V30[1234]</);
+assert.match(html,/<title>Kuningriigid · V\d{3,}<\/title>/);
+assert.match(html,/id="menu-version">KUNINGRIIGID · V\d{3,}</);
 assert.match(js,/W=1672,H=941,SPLIT=510/);
 assert.match(js,/ui-art-v300\/action_/);
 assert.match(js,/const responsive=/);

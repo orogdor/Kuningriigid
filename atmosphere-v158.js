@@ -30,7 +30,7 @@ function skyDome(top,horizon,ground){
 }
 export function setupAtmosphere({renderer,worldScene,localScene,quality}){
  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.02;
- renderer.shadowMap.type=T.PCFSoftShadowMap;
+ renderer.shadowMap.type=T.PCFShadowMap;
  const rigs=new Map(),rigsSkirt={mesh:null};
  const colorDayTop=new T.Color('#7fa9c8'),colorNightTop=new T.Color('#0d1c36');
  const colorDayHorizon=new T.Color('#d9e3dc'),colorNightHorizon=new T.Color('#33456a'),colorDuskHorizon=new T.Color('#d68d5c');
