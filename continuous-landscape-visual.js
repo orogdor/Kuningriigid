@@ -9,7 +9,7 @@ import * as T from './vendor/three.module.js';
 import {releaseMaterial} from './program-keep-v161.js';
 import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=2231';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=2232';
-import {riverNear,visibleRiverHeight,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal,smoothAtlasHeight} from './continuous-landscape.js?v=319';
+import {riverNear,visibleRiverHeight,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal,smoothAtlasHeight} from './continuous-landscape.js?v=323';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
@@ -186,7 +186,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  const waterMesh=yield* buffersStepsV242(water,'#2d7584',{standard:true,opacity:.94,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z);
   const edge=Math.min(1,near.distance/Math.max(1,near.width));
-  return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,1-mouthBlend(game,p.x,p.z)).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
+  return deep.clone().lerp(shallowCol,Math.pow(edge,2.2)*.85).lerp(seaCol,Math.max(1-mouthBlend(game,p.x,p.z),1-riverSurfaceOpacityV322(game,p.x,p.z,estuaries))).multiplyScalar(.97+.03*Math.sin(p.x*.11+p.z*.07));
  },alpha:(x,y,z)=>{
   // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
   const p=toWorld(x,z);
