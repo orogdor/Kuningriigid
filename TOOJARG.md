@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V324 käivitaja: avaliku lehe kontroll tuvastas, et boot-v83 laadis endiselt civilization.js V305 vahemäluvõtmega. Käivitaja ja selle skriptiviide on viidud V324-le ning vana V305 importkaardiga suunatud V324-le; kontroll lisatud tests/water-material-v324.mjs faili.
+
 - V324: jõesuudmete joonistus ehitatud uuesti. `estuary-v324.js` leiab ranniku tegeliku lõike ja loob voolusuunalise avatud kanali; `water-surface-v324.js` ühendab jõed ning mere üheks lõigatud veepinnaks nii maailma- kui detailkaardil. V322/V323 läbipaistvuskihid ei osale enam vee renderdamisel. Suudme maastik, vee kõrgus, kaldad ja sügavus jagavad sama välja; naaberruudud kasutavad samu maailmakoordinaate. 5×5 detailala ja taimestiku laadimisjärjekord säilivad. Kontroll: 102 CI kiirkäsku läbisid; uus test kolmel maailmaseemnel (160 suuet, 18 420 kontrollpunkti), ruudupiiri kõrgused, salvestuse puutumatus, WebGL shader-hook ja päris WGSL koostamine. Pärast maailma madala jõesängi regressiooni korrigeerimist läbis ka V286 rannikukontroll. Geomeetria eraldi Blenderi renderdus üle vaadatud; päris mängu GPU-pilt ja kasutaja salvestuse suue ei ole selles keskkonnas kinnitatud. Järgmine töö: kasutaja sama suudme seadmel kontrollimine.
 
 

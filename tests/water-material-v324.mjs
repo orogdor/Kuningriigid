@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {registerHooks} from 'node:module';
 import * as WebGL from '../vendor/three.module.js';
@@ -16,3 +17,7 @@ const geo=new T.PlaneGeometry();geo.setAttribute('aDepth',new T.Float32BufferAtt
 const mesh=new T.Mesh(geo,seaMaterial({unified:true})),builder=new T.WGSLNodeBuilder(mesh,renderer);builder.scene=new T.Scene();builder.camera=new T.PerspectiveCamera();builder.build();
 assert.match(builder.fragmentShader,/@fragment/);assert.ok(!/\b(?:NaN|undefined)\b/.test(builder.fragmentShader));
 assert.ok(mesh.material.isNodeMaterial);console.log('V324 unified WebGL shader hooks and generated WebGPU/WGSL PASS');
+
+const html=readFileSync(new URL('../index.html',import.meta.url),'utf8'),boot=readFileSync(new URL('../boot-v83.js',import.meta.url),'utf8');
+assert.ok(html.includes('src="boot-v83.js?v=324a"'));assert.ok(boot.includes("import('./civilization.js?v=324a')"));
+assert.ok(html.includes('"./civilization.js?v=305a": "./civilization.js?v=324a"'));
