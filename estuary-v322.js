@@ -1,7 +1,7 @@
 // V322: new estuary system. Inland rivers and sea do not share geometry.
 // Sea depth is computed from undisturbed terrain, never the excavated river bed.
 // River tint is suppressed at the physical coastline so the sea shader owns the outlet.
-import {baseHeight} from './continuous-landscape.js?v=322';
+import {baseHeight} from './continuous-landscape.js?v=319';
 
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const smooth=x=>{x=clamp(x);return x*x*(3-2*x)};
@@ -34,8 +34,10 @@ function nearOutlet(x,z,zone){
  const along=dx*zone.ux+dz*zone.uz;
  const lateral=Math.abs(-dx*zone.uz+dz*zone.ux);
  // A round, smooth influence around the last centreline; no abrupt cap.
- const beyond=Math.max(0,along-zone.length,-along);
- const d=Math.hypot(beyond,lateral);
+ // Keep ownership with the sea downstream of the mouth. Never allow
+ // the old river tint to reappear at the outer edge of the river cap.
+ const before=Math.max(0,-along);
+ const d=Math.hypot(before,lateral);
  return (1-smooth(d/zone.radius))*smooth((along+zone.radius*.6)/(zone.radius*.6));
 }
 export function riverSurfaceOpacityV322(game,x,z,zones){
