@@ -1,5 +1,5 @@
 import {packSave,unpackSave} from './save-compression-v256.js';
-import {DetailStreamV242} from './detail-stream-v242.js';
+import {DetailStreamV242} from './detail-stream-v242.js?v=319';
 import {createAssetDemandV241} from './asset-demand-v241.js';
 import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
 import {rotateBuilding,pauseConstruction,removeBuilding} from './building-operations-v228.js';
@@ -85,8 +85,8 @@ import {fishingRange,fishingEraText} from './fishery.js?v=64b';
 import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=2232';
-import {riverNetworkStepsV242,createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=318';
-import {surface,localSurface,localVisualSurface,worldElevation,visualElevation,visualProject,mountainMask,projectHeight as projectHeightV161,riverNear,overviewSurface,roadNetwork,worldToLocal} from './continuous-landscape.js?v=316';
+import {riverNetworkStepsV242,createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=319';
+import {surface,localSurface,localVisualSurface,worldElevation,visualElevation,visualProject,mountainMask,projectHeight as projectHeightV161,riverNear,overviewSurface,roadNetwork,worldToLocal} from './continuous-landscape.js?v=319';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=125b';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js?v=86a';
@@ -642,7 +642,7 @@ function runCoverJobs(){const t0=performance.now();while(coverJobs.length&&perfo
 // V242: stable tile nodes survive a change of the local coordinate origin.
 const detailStreamV242=new DetailStreamV242({scene:localScene,
  cell:(c,r)=>c>=0&&r>=0&&c<COLS&&r<ROWS?game.cell({c,r}):null,
- build:buildDetailTileV242,dispose:disposeDetailTileV242,budget:3});
+ build:buildDetailTileV242,dispose:disposeDetailTileV242,budget:typeof matchMedia==='function'&&matchMedia('(min-width:900px) and (pointer:fine)').matches?9:3});
 let streamRevisionV242='';
 function* buildDetailTileV242(entry){
  const tile=entry.tile;
@@ -652,7 +652,9 @@ function* buildDetailTileV242(entry){
  entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
  let water=0;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const neighbour=game.cell({c:tile.c+dc,r:tile.r+dr});if(!neighbour||!neighbour.land)water++;}
  entry.water=water;
- entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>ground(tile,x,z),{origin:tile});if(entry.sea)entry.decor.add(entry.sea);}yield;
+ entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>ground(tile,x,z),{origin:tile,
+   halfX:DETAIL_TILE_X*(detailStreamV242.radius+.55),halfZ:DETAIL_TILE_Z*(detailStreamV242.radius+.55),
+   seg:detailStreamV242.radius===2?216:166});if(entry.sea)entry.decor.add(entry.sea);}yield;
  entry.stage='rivers';
  entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
  entry.stage='outcrops';
@@ -753,7 +755,7 @@ function refreshStreamHoldersV242(){
    for(let i=0;i<coarse.all.length;i+=3){
     const a=coarse.all[i],b=coarse.all[i+1],c=coarse.all[i+2],x=(p.getX(a)+p.getX(b)+p.getX(c))/3,z=(p.getZ(a)+p.getZ(b)+p.getZ(c))/3;
     const dc=Math.floor((x+DETAIL_HALF_X)/DETAIL_TILE_X),dr=Math.floor((z+DETAIL_HALF_Z)/DETAIL_TILE_Z);
-    if(Math.abs(dc)<=1&&Math.abs(dr)<=1&&ready.has((activeTile.c+dc)+':'+(activeTile.r+dr)))continue;
+    if(Math.abs(dc)<=detailStreamV242.radius&&Math.abs(dr)<=detailStreamV242.radius&&ready.has((activeTile.c+dc)+':'+(activeTile.r+dr)))continue;
     kept.push(a,b,c);
    }
    horizon.geometry.index.array.set(kept);horizon.geometry.index.needsUpdate=true;horizon.geometry.setDrawRange(0,kept.length);
