@@ -1,5 +1,5 @@
 import {detailWorldRoadWidth,roadWidthScaleV250} from './road-width-v89.js';
-import {estuaryOpacityV318,estuaryMouthsV318} from './estuary-transition-v318.js';
+import {mouthZonesV322,riverSurfaceOpacityV322} from './estuary-v322.js';
 import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216,roadSurfaceV251} from './road-appearance-v216.js';
 import {DETAIL_X,DETAIL_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
 // V67: one topology for each river system and each road network. The atlas
@@ -84,7 +84,7 @@ function riverFlow(game,x,z){
  }
  return dir;
 }
-const mouthBlend=(game,x,z)=>{const t=Math.max(0,Math.min(1,(game.atlasHeight(x,z)-.30)/3.7));return t*t*(3-2*t);};
+const mouthBlend=(game,x,z)=>{const t=Math.max(0,Math.min(1,(smoothAtlasHeight(game,x,z)-.30)/3.7));return t*t*(3-2*t);};
 const desktopRiverRadiusV319=typeof matchMedia==='function'&&matchMedia('(min-width:900px) and (pointer:fine)').matches?155:110;
 function visible(tile,path,radius=desktopRiverRadiusV319){if(!tile)return true;radius=tile.tacticalRadius||radius;return path.some(p=>Math.abs(p.x-tile.x)<radius&&Math.abs(p.z-tile.z)<radius)}
 export function createRiverNetwork(...args){const steps=riverNetworkStepsV242(...args);let result;do{result=steps.next();}while(!result.done);return result.value;}
@@ -96,7 +96,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  // A single clipped scalar-field mesh unions ALL tributaries. Every shared
  // grid coordinate has one height; overlapping ribbons and junction fans vanish.
  const step=scope==='detail'?1.75:2.5,cells=new Set(),nodes=new Map();
- const estuaries=estuaryMouthsV318(getRivers(game));
+ const estuaries=mouthZonesV322(getRivers(game));
  for(const edge of getRivers(game)){
   if(!visible(tile,edge.points))continue;riverCount++;
   for(const p of edge.points){yield;
@@ -190,8 +190,8 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  },alpha:(x,y,z)=>{
   // V249: past the shoreline the river water thins out into the sea instead of ending in a wall
   const p=toWorld(x,z);
-  // Dedicated estuary transition: fade longitudinally into the sea.
-  const outlet=estuaryOpacityV318(p.x,p.z,estuaries);
+  // V322: only natural dry terrain owns river-water colour; sea owns the shore.
+  const outlet=riverSurfaceOpacityV322(game,p.x,p.z,estuaries);
   const near=riverNear(game,p.x,p.z),edge=Math.min(1,near.distance/Math.max(1,near.width));
   return (.94-.36*Math.pow(edge,2.5))*outlet;
  }});
