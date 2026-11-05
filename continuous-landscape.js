@@ -215,6 +215,22 @@ export function baseHeight(game,x,z){
  const oceanFloor=sub?(2.5*smooth(sub/7)+sub*.10):0;
  return h+roll+relief-oceanFloor;
 }
+// V323: smooth a narrow band around an estuary without touching the
+// drainage cells. Sample the same undisturbed heights for terrain and sea.
+// This removes cell-corner sand spits and avoids distinct shoreline masks.
+export function estuaryShoreHeightV323(game,x,z,near=null){
+ const natural=(a,b)=>Math.max(baseHeight(game,a,b),game.atlasHeight(a,b));
+ const h=natural(x,z),waterline=.72;
+ if(Math.abs(h-waterline)>5)return h;
+ near??=riverNear(game,x,z);
+ if(!Number.isFinite(near.distance))return h;
+ const reach=Math.max(12,near.width+24);
+ const weight=(1-smooth(Math.abs(h-waterline)/5))*(1-smooth((near.distance-reach+10)/18));
+ if(weight<=0)return h;
+ const radius=4.5;
+ const avg=(natural(x-radius,z)+natural(x+radius,z)+natural(x,z-radius)+natural(x,z+radius))/4;
+ return h+(avg-h)*Math.min(.52,weight*.52);
+}
 // visual=true (drawing only): where the rolling ground dips below a river's water level, the banks
 // rise gently to just above the water (natural levees), so the river sits in its bed instead of
 // floating above the land. Navigation keeps calling it without the flag (V161).
@@ -232,6 +248,9 @@ export function worldElevation(game,x,z,visual=false){
  if(!Number.isFinite(d))return base;
  const inner=w*1.04,outer=Math.max(inner+3.5,w*1.8+3);
  if(visual&&w>.05){
+  // Shore terrain and the new sea mask share the same local smoothing.
+  if(d<w+30&&Math.abs(base-.72)<5)
+   base+=(estuaryShoreHeightV323(game,x,z,{distance:d,width:w})-base)*.80;
   const level=visibleRiverHeight(game,x,z,waterHeight);
   const rim=level+.60,reach=outer+18,land=landnessV249(game,x,z);
   if(base<rim&&d<reach)
