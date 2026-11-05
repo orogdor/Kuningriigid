@@ -4,9 +4,10 @@
 // Visual only: river, road and terrain coordinates, navigation and saves are unchanged.
 // Everything is procedural in the shaders (no texture downloads); geometry counts stay the same.
 import * as T from './vendor/three.module.js';
+import {WATER_STYLE_V326,waterNodeMaterialV326} from './water-style-v326.js';
 import {groundUniforms232,GROUND_GLSL232} from './ground-materials-v232.js';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
-import {CLOUD_TIME,CLOUD_SHADE_V226,TERRAIN_BLEND_V226,WATER_SKY_V251} from './atmosphere-v158.js?v=161a';
+import {CLOUD_TIME,CLOUD_SHADE_V226,TERRAIN_BLEND_V226,WATER_SKY_V251,SEA_EFFECT_V226} from './atmosphere-v158.js?v=161a';
 
 export const LANDSCAPE_TIME={value:0};
 const tick=()=>{LANDSCAPE_TIME.value=performance.now()/1000;};
@@ -173,17 +174,22 @@ export function smoothedOverview(sample,x,z,spacing){
 
 // ---------------------------------------------------------------- water
 // attributes: aFlow (downstream direction * relative speed), aShore (0 mid-channel .. 1 at the bank)
-export function waterMaterial(scope='world',tile=null){
+export function waterMaterial(scope='world',tile=null,{sea=false,scale=1,scaleZ=scale}={}){
+ if(T.GPU_MODE_V225)return waterNodeMaterialV326({sea,scale:sea?scale:scope==='detail'?4.5:1,scaleZ:sea?scaleZ:scope==='detail'?3.9:1,origin:tile||{x:0,z:0}});
  // V249: transparent, so river water can thin out into the sea (alpha comes from the vertex colours)
- const material=new T.MeshStandardMaterial({vertexColors:true,roughness:.14,metalness:.02,side:T.DoubleSide,transparent:true,depthWrite:false});
+ const material=new T.MeshStandardMaterial({vertexColors:true,roughness:WATER_STYLE_V326.roughness,metalness:WATER_STYLE_V326.metalness,side:T.DoubleSide,transparent:true,depthWrite:false});
  const map=worldMapping(scope,tile);
+ if(sea){map.pos=`vec3(position.x/${scale.toFixed(3)}+uSeaOriginV326.x,position.y,position.z/${scaleZ.toFixed(3)}+uSeaOriginV326.y)`;map.head='uniform vec2 uSeaOriginV326;';map.uniforms={uSeaOriginV326:{value:new T.Vector2(tile?.x||0,tile?.z||0)}};}
  material.onBeforeCompile=shader=>{
-  shader.uniforms.uL149Time=LANDSCAPE_TIME;shader.uniforms.uWaterSky=WATER_SKY_V251;
+  shader.uniforms.uL149Time=CLOUD_TIME;shader.uniforms.uWaterSky=WATER_SKY_V251;shader.uniforms.uWaterFXV326=sea?SEA_EFFECT_V226:{value:1};
+  if(sea){shader.uniforms.uWaterDeepV326={value:new T.Color(WATER_STYLE_V326.deep)};shader.uniforms.uWaterShallowV326={value:new T.Color(WATER_STYLE_V326.shallow)};}
   inject(shader,{map,
-   vertexHead:'attribute vec2 aFlow;attribute float aShore;varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;',
-   vertexBody:`vL149P=${map.pos};vL149F=aFlow;vL149S=aShore;`,
-   fragHead:'uniform float uL149Time;varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;',
-   color:`
+   vertexHead:(sea?'attribute float aDepth;varying float vSeaD;':'attribute vec2 aFlow;attribute float aShore;')+'varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;',
+   vertexBody:`vL149P=${map.pos};`+(sea?'vSeaD=aDepth;vL149F=vec2(.65,.12);vL149S=1.0-smoothstep(0.0,3.6,aDepth);':'vL149F=aFlow;vL149S=aShore;'),
+   fragHead:'uniform float uL149Time;uniform float uWaterFXV326;varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;'+(sea?'varying float vSeaD;uniform vec3 uWaterDeepV326;uniform vec3 uWaterShallowV326;':''),
+   color:(sea?`vec3 sea=mix(uWaterDeepV326,uWaterShallowV326,pow(vL149S,2.2)*.85);
+ diffuseColor.rgb=sea*(.97+.03*sin(vL149P.x*.11+vL149P.z*.07));
+ diffuseColor.a=.94-.36*pow(vL149S,2.5);`:'')+`
  // V250: flow-map animation. The noise is sampled in plain world coordinates and only SHIFTED along
  // the flow (two phases cross-faded). The former rotated coordinates dot(wp,flow) jumped wherever the
  // flow direction changed between triangles, which drew dashed white lines across every river.
@@ -194,12 +200,12 @@ export function waterMaterial(scope='world',tile=null){
  float r1=mix(l149n((wp-o1)*.45),l149n((wp-o2)*.45+5.3),mixw);
  float r2=mix(l149n((wp-o1*1.6)*1.15+7.1),l149n((wp-o2*1.6)*1.15+2.9),mixw);
  float ripple=r1*.6+r2*.4;
- vec3 water=diffuseColor.rgb*(.93+ripple*.10);
+ vec3 water=diffuseColor.rgb*(.98+(ripple-.5)*.10*uWaterFXV326);
  // sky glints on the ripple crests, mostly mid-stream
- water+=vec3(.045,.055,.06)*smoothstep(.80,.96,r2)*(1.0-vL149S*.7);
+ water+=vec3(.045,.055,.06)*smoothstep(.80,.96,r2)*(1.0-vL149S*.7)*uWaterFXV326;
  // soft foam only right at the banks
  float foam=smoothstep(.90,1.0,vL149S)*smoothstep(.60,.88,r1);
- water=mix(water,vec3(.70,.74,.70),foam*.22);
+ water=mix(water,vec3(.70,.74,.70),foam*.22*uWaterFXV326);
  diffuseColor.rgb=water;
  vL149Ripple=ripple;`});
   shader.fragmentShader=shader.fragmentShader.replace('uniform float uL149Time;','uniform float uL149Time;uniform vec3 uWaterSky;float vL149Ripple=0.0;vec2 vL251Grad=vec2(0.0);')
@@ -211,14 +217,20 @@ export function waterMaterial(scope='world',tile=null){
   vL251Grad=vec2(rx-ripple,rz-ripple)/e;}`)
    .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
  // world-space wavelet normal (water is level) turned into view space
- normal=normalize((viewMatrix*vec4(normalize(vec3(-vL251Grad.x*.32,1.0,-vL251Grad.y*.32)),0.0)).xyz);`)
+ normal=normalize((viewMatrix*vec4(normalize(vec3(-vL251Grad.x*.32*uWaterFXV326,1.0,-vL251Grad.y*.32*uWaterFXV326)),0.0)).xyz);`)
    .replace('#include <opaque_fragment>',`// V251: Fresnel reflection of the sky: glassy at grazing angles, clear looking straight down
  {vec3 V=normalize(vViewPosition);float cosT=clamp(dot(V,normal),0.0,1.0);float fres=.03+.97*pow(1.0-cosT,5.0);
   outgoingLight=mix(outgoingLight,uWaterSky*(.78+.22*vL149Ripple),clamp(fres*.75,0.0,.75));
   diffuseColor.a=clamp(diffuseColor.a+fres*.35,0.0,1.0);}
 #include <opaque_fragment>`);
  };
- material.customProgramCacheKey=()=>'water-v251-'+scope;
+ if(sea){
+  const compile=material.onBeforeCompile;
+  material.onBeforeCompile=shader=>{compile(shader);shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',
+   'float wetV326=smoothstep(-.12,.20,vSeaD);if(wetV326<.008)discard;diffuseColor.a*=wetV326;\n#include <opaque_fragment>');};
+  material.vertexColors=false;
+ }
+ material.customProgramCacheKey=()=>'water-v326-'+scope+'-'+sea+'-'+(sea?scale+':'+scaleZ:'');
  material.userData.animated=true;
  return material;
 }

@@ -1,0 +1,626 @@
+[
+  {
+    "command": "node --check civilization.js",
+    "exit": 0,
+    "seconds": 0.86,
+    "output": ""
+  },
+  {
+    "command": "node --check graphics-settings-v226.js",
+    "exit": 0,
+    "seconds": 0.87,
+    "output": ""
+  },
+  {
+    "command": "node --check graphics-runtime-v226.js",
+    "exit": 0,
+    "seconds": 0.84,
+    "output": ""
+  },
+  {
+    "command": "node --check webgpu-safety-v227.js",
+    "exit": 0,
+    "seconds": 0.4,
+    "output": ""
+  },
+  {
+    "command": "node --check vendor/three-gpu-shim.js",
+    "exit": 0,
+    "seconds": 0.19,
+    "output": ""
+  },
+  {
+    "command": "node --check boot-v83.js",
+    "exit": 0,
+    "seconds": 0.31,
+    "output": ""
+  },
+  {
+    "command": "node --check ui-painted-v287.js",
+    "exit": 0,
+    "seconds": 0.24,
+    "output": ""
+  },
+  {
+    "command": "node --check ui-reference-v288.js",
+    "exit": 0,
+    "seconds": 0.46,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v289.js",
+    "exit": 0,
+    "seconds": 0.44,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v290.js",
+    "exit": 0,
+    "seconds": 1.06,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v291.js",
+    "exit": 0,
+    "seconds": 0.82,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v292-mobile.js",
+    "exit": 0,
+    "seconds": 1.78,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v293-research.js",
+    "exit": 0,
+    "seconds": 0.48,
+    "output": ""
+  },
+  {
+    "command": "node --check research-panel-v294.js",
+    "exit": 0,
+    "seconds": 0.27,
+    "output": ""
+  },
+  {
+    "command": "node --check research-panel-v295.js",
+    "exit": 0,
+    "seconds": 0.22,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v297-refinement.js",
+    "exit": 0,
+    "seconds": 0.31,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v298-layout.js",
+    "exit": 0,
+    "seconds": 0.34,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v301-background.js",
+    "exit": 0,
+    "seconds": 0.44,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v303-buttons.js",
+    "exit": 0,
+    "seconds": 0.18,
+    "output": ""
+  },
+  {
+    "command": "node --check hud-v302-pieces.js",
+    "exit": 0,
+    "seconds": 0.73,
+    "output": ""
+  },
+  {
+    "command": "node --check selection-context-v300.js",
+    "exit": 0,
+    "seconds": 0.85,
+    "output": ""
+  },
+  {
+    "command": "node --check ui-v304.js",
+    "exit": 0,
+    "seconds": 0.51,
+    "output": ""
+  },
+  {
+    "command": "node --check ui-v309.js",
+    "exit": 0,
+    "seconds": 0.41,
+    "output": ""
+  },
+  {
+    "command": "node --check ui-v310.js",
+    "exit": 0,
+    "seconds": 0.99,
+    "output": ""
+  },
+  {
+    "command": "node --check ui-catalog-v304.js",
+    "exit": 0,
+    "seconds": 1.01,
+    "output": ""
+  },
+  {
+    "command": "node --check research-art-v304.js",
+    "exit": 0,
+    "seconds": 0.36,
+    "output": ""
+  },
+  {
+    "command": "node --check research-art-v293.js",
+    "exit": 0,
+    "seconds": 0.65,
+    "output": ""
+  },
+  {
+    "command": "node --check research-tree-v119.js",
+    "exit": 0,
+    "seconds": 0.1,
+    "output": ""
+  },
+  {
+    "command": "node --check research-ui.js",
+    "exit": 0,
+    "seconds": 1.07,
+    "output": ""
+  },
+  {
+    "command": "node --check atmosphere-v158.js",
+    "exit": 0,
+    "seconds": 0.21,
+    "output": ""
+  },
+  {
+    "command": "node --check landscape-v149.js",
+    "exit": 0,
+    "seconds": 0.33,
+    "output": ""
+  },
+  {
+    "command": "node --check sea-v158.js",
+    "exit": 0,
+    "seconds": 0.27,
+    "output": ""
+  },
+  {
+    "command": "node --check stone-near-lod.js",
+    "exit": 0,
+    "seconds": 0.22,
+    "output": ""
+  },
+  {
+    "command": "node --check civilization-core.js",
+    "exit": 0,
+    "seconds": 0.31,
+    "output": ""
+  },
+  {
+    "command": "node --check ai-defenses-v128.js",
+    "exit": 0,
+    "seconds": 0.17,
+    "output": ""
+  },
+  {
+    "command": "node --check outer-ring-v184.js",
+    "exit": 0,
+    "seconds": 0.33,
+    "output": ""
+  },
+  {
+    "command": "node --check wall-demo-v184.js",
+    "exit": 0,
+    "seconds": 0.25,
+    "output": ""
+  },
+  {
+    "command": "node scripts/test-historic-suburb-v191.mjs",
+    "exit": 0,
+    "seconds": 2.5,
+    "output": "plain {\"segments\":43,\"plots\":25,\"area\":6664,\"angles\":6}\ncliff {\"segments\":33,\"plots\":22,\"area\":6281,\"angles\":1}\n"
+  },
+  {
+    "command": "node scripts/test-natural-closure-v194.mjs",
+    "exit": 0,
+    "seconds": 0.2,
+    "output": "V202 continuous coast, cliff and geometric wall-course joins PASS\n"
+  },
+  {
+    "command": "node scripts/test-organic-demo-v190.mjs",
+    "exit": 0,
+    "seconds": 36.05,
+    "output": "natural-plan-survey coast {\"partialFound\":1,\"naturalPreviewReject\":3,\"naturalAreaReject\":0,\"naturalPlotReject\":0,\"naturalSegmentsReject\":0,\"naturalFailures\":[{\"reason\":\"Teine hoone on liiga l\u00e4hedal.\",\"segment\":5,\"x\":36,\"z\":-53,\"nearest\":{\"type\":\"stonewall\",\"dist\":4.2,\"drawn\":false,\"span\":7,\"angle\":0,\"sideAngle\":-0.1920507847836808,\"joined\":false},\"joinedWalls\":[]},{\"reason\":\"Teine hoone on liiga l\u00e4hedal.\",\"segment\":2,\"x\":22,\"z\":-48,\"nearest\":{\"type\":\"stonewall\",\"dist\":1.5,\"drawn\":false,\"span\":7,\"angle\":0,\"sideAngle\":-0.2771183489054819,\"joined\":false},\"joinedWalls\":[]},{\"reason\":\"M\u00fc\u00fcr l\u00e4biks v\u00e4rava ava. \u00dchenda m\u00fc\u00fcr v\u00e4ravapostidega, j\u00e4ta keskkoh\",\"segment\":0,\"x\":-5,\"z\":-66,\"nearest\":{\"type\":\"woodgate\",\"dist\":1.8,\"drawn\":false,\"span\":7,\"angle\":-0.6103658730694412,\"sideAngle\":-0.09946358391206511,\"joined\":false},\"joinedWalls\":[]}],\"chosen\":\"water\"}\ncoast {\"kind\":\"coast\",\"targetCityId\":3,\"controlled\":true,\"organic\":true,\"outerSegments\":40,\"suburbArea\":8859.254982476486,\"naturalBoundary\":\"water\",\"naturalLength\":90.03182902136528,\"naturalPartial\":false,\"cliffUseVerified\":false}\nnatural-plan-survey mountain {\"partialFound\":8,\"naturalPreviewReject\":1,\"naturalAreaReject\":0,\"naturalPlotReject\":0,\"naturalSegmentsReject\":0,\"naturalFailures\":[{\"reason\":\"M\u00fc\u00fcr l\u00e4biks olemasolevat hoonet.\",\"segment\":1,\"x\":61,\"z\":10,\"nearest\":{\"type\":\"palisade\",\"dist\":5.9,\"drawn\":true,\"span\":7.476863973404111,\"angle\":-1.3105029917072264,\"sideAngle\":-0.643229424449443,\"joined\":false},\"joinedWalls\":[]}],\"chosen\":\"mountain\"}\nmountain survey radial hits [{\"direction\":45,\"distance\":197,\"kind\":\"mountain\"},{\"direction\":60,\"distance\":152,\"kind\":\"mountain\"},{\"direction\":75,\"distance\":110,\"kind\":\"mountain\"},{\"direction\":90,\"distance\":101,\"kind\":\"mountain\"},{\"direction\":105,\"distance\":104,\"kind\":\"mountain\"},{\"direction\":120,\"distance\":116,\"kind\":\"mountain\"},{\"direction\":135,\"distance\":140,\"kind\":\"mountain\"},{\"direction\":150,\"distance\":131,\"kind\":\"mountain\"},{\"direction\":165,\"distance\":119,\"kind\":\"mountain\"},{\"direction\":180,\"distance\":119,\"kind\":\"mountain\"},{\"direction\":195,\"distance\":140,\"kind\":\"mountain\"}]\nouter wall bounds {\"minX\":-131.77699951929284,\"maxX\":-31.56581052147928,\"minZ\":-37.032372106822834,\"maxZ\":53.674156141074164,\"sections\":[{\"x\":-46,\"z\":54},{\"x\":-78,\"z\":47},{\"x\":-111,\"z\":41},{\"x\":-58,\"z\":-22},{\"x\":-92,\"z\":-29},{\"x\":-125,\"z\":-36}],\"natural\":\"mountain\"}\ninner outline extents {\"minX\":-74.24621202458748,\"maxX\":56.198255498682016,\"minZ\":-19.18677210871126,\"maxZ\":110.0730374585271}\nmountain cliff usage is not yet confirmed; closed-wall fallback {\"natural\":\"mountain\",\"area\":5171.663824386335}\nmountain {\"kind\":\"mountain\",\"targetCityId\":0,\"controlled\":true,\"organic\":true,\"outerSegments\":27,\"suburbArea\":5171.663824386335,\"naturalBoundary\":\"mountain\",\"naturalLength\":83.50630026645445,\"naturalPartial\":false,\"cliffUseVerified\":true}\n"
+  },
+  {
+    "command": "node scripts/test-wall-priority-v188.mjs",
+    "exit": 0,
+    "seconds": 0.29,
+    "output": "V218: old curtain upgraded BEFORE any paid exterior wall\n"
+  },
+  {
+    "command": "node scripts/test-graphics-v226.mjs",
+    "exit": 0,
+    "seconds": 0.2,
+    "output": "PASS V226 graphics persistence, validation, presets and LOD distances\n"
+  },
+  {
+    "command": "node tests/three-r187-v305.mjs",
+    "exit": 0,
+    "seconds": 0.77,
+    "output": "PASS Three.js r187: official checksums, shared core, game exports, 4096-instance capacity, bridge relocation, sea shader hooks and cache aliases\n"
+  },
+  {
+    "command": "node tests/three-r187-v305-tsl.mjs",
+    "exit": 0,
+    "seconds": 1.18,
+    "output": "PASS r187 WGSL: 10 actual game material/geometry combinations; sea, sky, fire, large instancing and animated 17-bone GLB\nPASS r187 runtime: deferred initialization, synchronous frame submission and render error recovery\n"
+  },
+  {
+    "command": "node scripts/test-farming-lod-v233.mjs",
+    "exit": 0,
+    "seconds": 0.43,
+    "output": "V233 field + derived distant LOD PASS 38400 4785\n"
+  },
+  {
+    "command": "node scripts/test-equipment-v234.mjs",
+    "exit": 0,
+    "seconds": 0.6,
+    "output": "V234 equipment geometry OK: 18 types\n"
+  },
+  {
+    "command": "node scripts/test-stone-warriors-v261.mjs",
+    "exit": 0,
+    "seconds": 0.27,
+    "output": "V261 rigged Stone Age warriors: 17 bones, three equipped variants and integration PASS\n"
+  },
+  {
+    "command": "node scripts/test-daynight-v235.mjs",
+    "exit": 0,
+    "seconds": 0.5,
+    "output": "V235 24h cycle / lighting presets / city torches PASS\n"
+  },
+  {
+    "command": "node scripts/test-scout-torch-v236.mjs",
+    "exit": 0,
+    "seconds": 0.53,
+    "output": "V236 scouts and entrance torches PASS\n"
+  },
+  {
+    "command": "node scripts/test-field-green-v237.mjs",
+    "exit": 0,
+    "seconds": 1.78,
+    "output": "V237 GLB preview isolation + farm/field LOD regressions PASS\n"
+  },
+  {
+    "command": "node scripts/test-scout-marker-v238.mjs",
+    "exit": 0,
+    "seconds": 1.46,
+    "output": "V238/V239 scout finder compact label, names and sector PASS\n"
+  },
+  {
+    "command": "node scripts/test-scout-model-v239.mjs",
+    "exit": 0,
+    "seconds": 0.4,
+    "output": "V239: scout meshes and soldier name preferences PASS\n"
+  },
+  {
+    "command": "node scripts/test-scout-motion-v240.mjs",
+    "exit": 0,
+    "seconds": 0.18,
+    "output": "V240 scout world/detail coordinate + smooth motion PASS\n"
+  },
+  {
+    "command": "node scripts/test-demand-v241.mjs",
+    "exit": 0,
+    "seconds": 13.85,
+    "output": "V241 independent soldier bytes/clips, shared requests, offline fallback and all-team research policy PASS\n"
+  },
+  {
+    "command": "node scripts/test-stream-v242.mjs",
+    "exit": 0,
+    "seconds": 19.29,
+    "output": "V242 shared tile identity, bounded cache, camera offsets and incremental navigation parity PASS\n"
+  },
+  {
+    "command": "node tests/detail-stream-v319.mjs",
+    "exit": 0,
+    "seconds": 0.24,
+    "output": "V319 desktop 5x5 detail streaming PASS\n"
+  },
+  {
+    "command": "node tests/detail-vegetation-v320.mjs",
+    "exit": 0,
+    "seconds": 0.28,
+    "output": "V320 progressive nearby vegetation PASS\n"
+  },
+  {
+    "command": "node tests/tiled-sea-v321.mjs",
+    "exit": 0,
+    "seconds": 0.39,
+    "output": "V321 tiled sea extent and shader coordinates PASS\n"
+  },
+  {
+    "command": "node tests/estuary-v322.mjs",
+    "exit": 0,
+    "seconds": 16.11,
+    "output": "V322 independent river-mouth/sea ownership PASS 57\n"
+  },
+  {
+    "command": "node tests/estuary-v323.mjs",
+    "exit": 0,
+    "seconds": 20.71,
+    "output": "V323 estuary shoreline, fade and sea sampling PASS\n"
+  },
+  {
+    "command": "node tests/river-estuary-v325.mjs",
+    "exit": 0,
+    "seconds": 29.4,
+    "output": "V325 river appearance and coastal continuity PASS {\n  samples: 3705,\n  maxStep: 0.009645979409448557,\n  maxDelta: 0.46902909970139467,\n  riverVertices: 748,\n  inlandFlowRestored: true,\n  broadEstuaryExcavation: false\n}\n"
+  },
+  {
+    "command": "node tests/shared-water-v326.mjs",
+    "exit": 0,
+    "seconds": 0.78,
+    "output": "V326 shared river/sea style and planar shared coastline grid PASS\nWebGPU river AND sea compiled\n"
+  },
+  {
+    "command": "node scripts/test-build-v243.mjs",
+    "exit": 0,
+    "seconds": 9.49,
+    "output": "V243 wall joins, open gate, rotating fields and gate footprint PASS\n"
+  },
+  {
+    "command": "node TEST_V73.mjs",
+    "exit": 0,
+    "seconds": 16.77,
+    "output": "V73 SAVE PASS: V72 cargo, research, roads, legacy slots, backup fallback, invalid imports and low-quota recovery\n"
+  },
+  {
+    "command": "node tests/save-compression-v256.mjs",
+    "exit": 0,
+    "seconds": 8.76,
+    "output": "V256 save compression PASS: 4002337 -> 955473 characters\n"
+  },
+  {
+    "command": "node tests/wildlife-v255/run.mjs",
+    "exit": 0,
+    "seconds": 0.34,
+    "output": "V255 wildlife flees people, hunter stalks and drops game, herder takes the flock out and home PASS\n"
+  },
+  {
+    "command": "node tests/torch-hand-v257.mjs",
+    "exit": 0,
+    "seconds": 0.29,
+    "output": "V257 handheld torch: hand attachment, upright flame, rig replacement and fallback PASS\n"
+  },
+  {
+    "command": "node tests/world-movement-v258.mjs",
+    "exit": 0,
+    "seconds": 13.48,
+    "output": "V258 travel distance, speed, old-save continuity and neighbouring army PASS\n"
+  },
+  {
+    "command": "node tests/ui-research-v293.mjs",
+    "exit": 0,
+    "seconds": 0.31,
+    "output": "V293: 140 distinct research portraits, 1 active + 4 queued circles, original queue preserved\n"
+  },
+  {
+    "command": "node tests/ui-research-v294.mjs",
+    "exit": 0,
+    "seconds": 0.23,
+    "output": "V294: single painted research image, live 5-slot queue, 140 pictured technologies and responsive menus OK\n"
+  },
+  {
+    "command": "node tests/ui-research-v295.mjs",
+    "exit": 0,
+    "seconds": 0.22,
+    "output": "V295 single-image research desktop + portrait: live queue, close control, art and responsive layout OK\n"
+  },
+  {
+    "command": "node tests/ui-research-v296.mjs",
+    "exit": 0,
+    "seconds": 0.16,
+    "output": "V296: real game research dialog and illustrated HUD bridge both open correctly.\n"
+  },
+  {
+    "command": "node tests/ui-v297.mjs",
+    "exit": 0,
+    "seconds": 0.26,
+    "output": "V298: V297 picture assets, zero duplicate controls and unified frame-relative hitboxes PASS\n"
+  },
+  {
+    "command": "node tests/ui-v298.mjs",
+    "exit": 0,
+    "seconds": 0.18,
+    "output": "V298 unified picture-HUD geometry and painted hotspots PASS: 5 screens + 3 portrait drawers\n"
+  },
+  {
+    "command": "node tests/ui-v299-buttons.mjs",
+    "exit": 0,
+    "seconds": 0.31,
+    "output": "V299: 5 research rings, 3 minimap buttons, 4 selected-unit buttons, 6 bottom cards, zoom-out, pause/resume and header PASS\n"
+  },
+  {
+    "command": "node tests/ui-v300-selection.mjs",
+    "exit": 0,
+    "seconds": 0.13,
+    "output": "V300 contextual picture panel: 17 individual icons, 9 selection states, dispatch actions PASS\n"
+  },
+  {
+    "command": "node tests/ui-v301-background.mjs",
+    "exit": 0,
+    "seconds": 0.29,
+    "output": "V301: transparent painted backdrop, six real commands, bottom-20% responsive layout PASS\n"
+  },
+  {
+    "command": "node tests/ui-v302-pieces.mjs",
+    "exit": 0,
+    "seconds": 0.23,
+    "output": "V302 side-to-side dock join, 28px overlaps, six command hitboxes PASS\n"
+  },
+  {
+    "command": "node tests/ui-v303-buttons.mjs",
+    "exit": 0,
+    "seconds": 0.46,
+    "output": "V303 6 command cards, 4 map controls, 4 contextual actions: PASS\n"
+  },
+  {
+    "command": "node tests/ui-v304.mjs",
+    "exit": 0,
+    "seconds": 0.21,
+    "output": "V304: 140 generated paintings (2.72 MB), context dispatch, enemy guards, live research rules PASS\n"
+  },
+  {
+    "command": "node tests/ui-v306.mjs",
+    "exit": 0,
+    "seconds": 0.15,
+    "output": "PASS V306: 17 painted action paths, classic isolation, real selection portrait, distinct pause/resume art and six cards (821 KB)\n"
+  },
+  {
+    "command": "node tests/ui-v311.mjs",
+    "exit": 0,
+    "seconds": 0.18,
+    "output": "PASS V311: browser harness includes all 37 production styles, including legacy construction rules\n"
+  },
+  {
+    "command": "node tests/ui-v312.mjs",
+    "exit": 0,
+    "seconds": 0.37,
+    "output": "PASS V312: every building has shipped content art; house and well use distinct building pictures\n"
+  },
+  {
+    "command": "node tests/water-carriers-v268.mjs",
+    "exit": 0,
+    "seconds": 2.12,
+    "output": "water carriers V268 ok\n"
+  },
+  {
+    "command": "node tests/world-city-scale-v273.mjs",
+    "exit": 0,
+    "seconds": 14.43,
+    "output": "world city scale V273 ok, demo town x2.23\n"
+  },
+  {
+    "command": "node tests/tree-growth-v274.mjs",
+    "exit": 0,
+    "seconds": 1.07,
+    "output": "tree growth V274 ok, sprouted 1\nregrowth with global state ok\n"
+  },
+  {
+    "command": "node tests/migration-v274.mjs",
+    "exit": 0,
+    "seconds": 14.47,
+    "output": "migration V274 ok: Hiieoru ai towns 3\n"
+  },
+  {
+    "command": "node tests/lake-outlets-v275.mjs",
+    "exit": 0,
+    "seconds": 34.01,
+    "output": "lake outlets V275 ok: 2 outlets, 29 cells\n"
+  },
+  {
+    "command": "node tests/river-bank-v276.mjs",
+    "exit": 0,
+    "seconds": 15.68,
+    "output": "river bank V276 ok: 36 sites\n"
+  },
+  {
+    "command": "node tests/villages-v276.mjs",
+    "exit": 0,
+    "seconds": 18.14,
+    "output": "villages V276 ok: 8 raiders 11 traders, offers 8\n"
+  },
+  {
+    "command": "node tests/natural-shore-v278.mjs",
+    "exit": 0,
+    "seconds": 16.12,
+    "output": "natural shore V278 ok: 10839 resources checked\n"
+  },
+  {
+    "command": "node tests/stone-age-playthrough-v280.mjs",
+    "exit": 0,
+    "seconds": 47.67,
+    "output": "stone age playthrough V280 ok: pop 5/11/6 known 18/15/19\n"
+  },
+  {
+    "command": "node tests/stone-age-economy-v281.mjs",
+    "exit": 0,
+    "seconds": 44.38,
+    "output": "stone age economy V281 ok: grain/farm worker-min 2.09 longest settler trip 29 min, pop 4/7/5\n"
+  },
+  {
+    "command": "node tests/ui-v282.mjs",
+    "exit": 0,
+    "seconds": 0.94,
+    "output": "ui V282 ok\n"
+  },
+  {
+    "command": "node tests/ui-painted-v287.mjs",
+    "exit": 0,
+    "seconds": 0.16,
+    "output": "V287 painted UI: references, artwork, accessibility toggle, world layout and original controls OK\n"
+  },
+  {
+    "command": "node tests/ui-reference-v288.mjs",
+    "exit": 0,
+    "seconds": 0.18,
+    "output": "V288 picture-backed UI: live commands, actual state, painted assets, opt-in and responsive fallbacks OK\n"
+  },
+  {
+    "command": "node tests/ui-v289.mjs",
+    "exit": 0,
+    "seconds": 0.15,
+    "output": "V289 independent responsive HUD references, real actions and image assets: OK\n"
+  },
+  {
+    "command": "node tests/ui-v290.mjs",
+    "exit": 0,
+    "seconds": 0.11,
+    "output": "V290 picture HUD: 19 actual WebP artwork files and active game actions PASS\n"
+  },
+  {
+    "command": "node tests/ui-v291.mjs",
+    "exit": 0,
+    "seconds": 0.23,
+    "output": "V291: artwork (38), real controls, responsive layout, rollback and version PASS\n"
+  },
+  {
+    "command": "node tests/ui-v292-mobile.mjs",
+    "exit": 0,
+    "seconds": 0.18,
+    "output": "V292 mobile: original cards, responsive sizes, pause/resume, live minimap, touch actions PASS\n"
+  },
+  {
+    "command": "node tests/stone-animation-v283.mjs",
+    "exit": 0,
+    "seconds": 0.43,
+    "output": "stone animation V283 ok\n"
+  },
+  {
+    "command": "node tests/work-spots-v284.mjs",
+    "exit": 0,
+    "seconds": 0.41,
+    "output": "work spots V284 ok\n"
+  },
+  {
+    "command": "node tests/coast-v286.mjs",
+    "exit": 0,
+    "seconds": 18.23,
+    "output": "coast V286 ok\n"
+  },
+  {
+    "command": "node scripts/test.mjs traffic",
+    "exit": 0,
+    "seconds": 50.33,
+    "output": "PASS tests/traffic-v133/run.mjs --report artifacts-tests/traffic-cases.json (18.55s)\nPASS TEST_V133.mjs (29.38s)\nPASS TEST_V134.mjs (2.20s)\nPASS traffic: 3 checks in 50.13s\n"
+  }
+]

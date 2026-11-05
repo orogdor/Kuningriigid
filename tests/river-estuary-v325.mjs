@@ -45,7 +45,7 @@ assert.ok(samples>100);assert.equal(JSON.stringify(game.s),saved,'rendering does
 const main=readFileSync(new URL('../civilization.js',import.meta.url),'utf8'),atlas=readFileSync(new URL('../atlas-style.js',import.meta.url),'utf8');
 assert.ok(!main.includes('unifiedWaterStepsV324'));assert.ok(!atlas.includes('createUnifiedWaterV324'));
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8'),boot=readFileSync(new URL('../boot-v83.js',import.meta.url),'utf8');
-assert.ok(html.includes('src="boot-v83.js?v=325a"'));assert.ok(boot.includes("import('./civilization.js?v=325a')"));
+assert.match(html,/src="boot-v83\.js\?v=\d+a"/);assert.match(boot,/import\('\.\/civilization\.js\?v=\d+a'\)/);
 // Reproducible real geometry around the same wide seed-77 outlet as V324.
 const e=edges.find(e=>!e.to.land&&e.c.riverWidth>6)||edges.find(e=>!e.to.land),p=e.points.at(-5),x=p.x,z=p.z,n=136,radius=85,heights=[];
 for(let iz=0;iz<=n;iz++)for(let ix=0;ix<=n;ix++)heights.push(visualElevation(game,x-radius+ix*radius*2/n,z-radius+iz*radius*2/n));

@@ -19,7 +19,8 @@ assert.ok(Math.max(...d)-Math.min(...d)<1,'local sea depth has no cross-tile dis
 assert.equal(sea.position.y,.006);
 assert.equal(sea.material.transparent,true);
 const code=readFileSync(new URL('../sea-v158.js',import.meta.url),'utf8');
-assert.ok(code.includes('vSeaP=position.xz/vec2('),'WebGL uses tile local water coordinates');
-assert.ok(code.includes('positionLocal.xz.div(vec2(scale,scaleZ))'),'WebGPU uses tile local water coordinates');
+assert.ok(code.includes("waterMaterial(scale===1?'world':'detail',origin"),'WebGL uses shared river coordinate projection');
+const shared=readFileSync(new URL('../water-style-v326.js',import.meta.url),'utf8');
+assert.ok(shared.includes('positionLocal.xz.div(vec2(scale,scaleZ))'),'WebGPU uses tile local water coordinates');
 sea.geometry.dispose();sea.material.dispose();
 console.log('V321 tiled sea extent and shader coordinates PASS');
