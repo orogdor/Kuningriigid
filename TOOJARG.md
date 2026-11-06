@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V340 teine avaldamiskontroll: algusmenüü versioonikiri oli V339, kuigi lehe pealkiri V340. Kirjaviide parandatud; V293/V294 menüü- ja V338 salvestustestid läbisid. Järgmine töö: põhiharu CI ja Windowsi sisupaketi avaldumise kontroll.
+
 - V340 avaldamine: esimene põhiharu CI jäi V338 testi vananenud pealkirjakontrolli taha; test kontrollib nüüd jooksva versiooni ja käivitusskriptide kooskõla, säilitades automaatsalvestuse kontrollid. Järgmine töö: uuesti käivitunud CI, Windowsi sisupaketi ja seadme FPS-i kinnitamine.
 
 - V340 katse: kõigi moodulite alguses laadimine ja maailmakaardi maastiku vahemälu väljalülitamine. Tagasipööramise lipud ja katse piirid: MUUDATUSED_V340.md.
