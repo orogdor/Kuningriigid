@@ -225,7 +225,8 @@ let buildCategory='all',buildSearch='';const tileDoubleTap=new TileDoubleTap();
 let commandMode='select',hoverPoint=null;const cameraKeys=new CameraKeys();let lastMenuRevision=0,lastOverviewStamp='';let selectedShip=null;let cityTab='info';let restarting=false;let game=new Civilization(state),s=game.s,view='world',activeTile=null,chosen=game.cell(s.settlers.find(a=>a.team===0)||s.cities.find(c=>c.team===0)||{c:10,r:11}),selectedMover=s.settlers.find(a=>a.team===0)?.id??null,armySelected=false,selectedArmyId=0,selectedTrade=null,selectedUnit=null,mode=null,wallAxis=0,tab='build',menuOpen=true,paused=false,toastTime=0,zoom=950,drag=null,focus=new T.Vector3(),last=performance.now(),saveTimer=0,uiTimer=0,signature='',localTerrain=null,frameDelta=0,selectedBuilding=null,buildingInspector=null,ghost=null,ghostPoint=null,ghostKey='',lastTrailTime=-1,lastTrailChanges=-1,lastTrailNavVersion=-1;
 if(game.worldSourceV331==='generated')captureGeneratedWorldV331(game);
 await persistGeneratedWorldV331(state);
-if(game.worldSourceV331==='generated'&&!sampleDemo)replaceProtectedGame(localStorage,serializeSnapshot(state),validState);
+// Enrich the same active save without rotating away the pre-new-game backup.
+if(game.worldSourceV331==='generated'&&!sampleDemo)writeAutosave(localStorage,serializeSnapshot(state),s.time,s.time,validState);
 const assetDemandV241=createAssetDemandV241(game,{TROOPS,UNIT_TECH,BUILD_TECH,BUILD_AGE});assetDemandV241.update();let assetPollV241=0;
 const graphicsV226=loadGraphicsSettingsV226();
 const renderer=new T.WebGLRenderer({canvas:$('world'),antialias:graphicsV226.antiAlias!=='off'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
