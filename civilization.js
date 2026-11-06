@@ -1,3 +1,5 @@
+import {forestCandidatesV330,forestRandomV330} from './forest-placement-v330.js';
+import {treeKeepV270} from './forest-clumps-v270.js';
 import {pickTreeV329,forestV329,detailCompanionsV329} from './forest-ecology-v329.js';
 import {withSaplingInstancesV328,saplingStatsV328} from './sapling-trees-v328.js';
 import {createAtlasTerrainV327} from './atlas-terrain-v327.js';
@@ -556,7 +558,7 @@ function resourceIconV282(kind){const art=RES_ART_V282[kind];if(!art)return icon
   const tx=new T.CanvasTexture(canvas),img=new Image();img.onload=()=>{ctx.drawImage(img,16,16,64,64);tx.needsUpdate=true};img.src='ui-art-v263/'+art+'.webp';icons.set(key,new T.SpriteMaterial({map:tx,depthTest:false}))}
  const sprite=new T.Sprite(icons.get(key));sprite.scale.set(11,11,1);return sprite}
 const resourceSprites=[],forestSpots=[];/* V286: no forest stand in a river bed or on the beach */const forestSpotV286=p=>{const n=riverNear(game,p.x,p.z);if(n.distance<n.width+5||game.atlasHeight(p.x,p.z)<2.5)return;forestSpots.push(p);};let manualResourceOverlay=false;try{manualResourceOverlay=localStorage.getItem('kingdoms-resource-layer')==='1'}catch{}let showResourceOverlay=manualResourceOverlay,resourceDetailsOpen=false;const depositIcons={clay:'◈',copper:'◇',tin:'◆',wood:'♣',stone:'◆',ore:'⚒',grain:'♧',water:'≈',game:'🦌',fish:'🐟',oil:'🛢️'},depositNames={clay:'Savi',copper:'Vasemaak',tin:'Tinamaak',wood:'Mets',stone:'Kivi',ore:'Rauamaak',grain:'Viljakas maa',water:'Magevesi',game:'Ulukid',fish:'Kala',oil:'Naftamaardla',...Object.fromEntries(Object.entries(GOODS).map(([k,d])=>[k,d.name]))},depositColors={clay:'#c89b78',copper:'#d7a77d',tin:'#c1ced3',wood:'#a4cc8e',stone:'#d8dac9',ore:'#dfac83',grain:'#eed28b',water:'#8fd6ee',game:'#dcb993',fish:'#9cd8e0',oil:'#463b34'};
-for(const cell of game.cells.filter(c=>c.land)){if(forestV329(cell))for(let i=0;i<10;i++)forestSpotV286({cell,x:cell.x+(game.noise(cell.c*7+i,cell.r)-.5)*37,z:cell.z+(game.noise(cell.c+i,cell.r*7)-.5)*37,size:.75+game.noise(cell.c+i,cell.r+31)*.6})}
+for(const cell of game.cells){if(!cell.land||cell.mountain||!forestV329(cell))continue;for(const p of forestCandidatesV330(cell,14,s.seed,71)){if(forestRandomV330(p.gx,p.gz,s.seed,73)>treeKeepV270(p.x,p.z,true))continue;forestSpotV286({cell,x:p.x,z:p.z,size:.65+forestRandomV330(p.gx,p.gz,s.seed,74)*.5});}}
 // V152 mixed forest: the dense forest stands use the new procedural spruce/pine/oak/lime/birch models.
 {const kinds=['spruce','pine','oak','lime','birch','palm'],sets=new Map(kinds.map(k=>[k,[]])),forestDummy=new T.Object3D(),lod=quality==='high'?'high':quality==='low'?'low':'medium';
  forestSpots.forEach((p,i)=>{const r=game.noise(p.x*.13,p.z*.17),kind=pickTreeV329(p.cell,r);if(!kind)return;sets.get(kind).push({...p,i});});
