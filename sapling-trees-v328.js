@@ -1,3 +1,4 @@
+import {pickTreeV329} from './forest-ecology-v329.js';
 // Approved Sapling trees. Rendering only: callers retain their exact saved placements.
 import * as T from './vendor/three.module.js';
 import {loadGLB} from './glb-lite-v221.js';
@@ -9,10 +10,7 @@ function task(fn){return new Promise((resolve,reject)=>{queue.push(()=>fn().then
 function pump(){while(active<4&&queue.length){active++;queue.shift()().finally(()=>{active--;pump()});}}
 export function saplingVariantV328(x,z,seed=0){const n=Math.sin(x*12.9898+z*78.233+seed*.017)*43758.5453;return Math.min(4,Math.floor((n-Math.floor(n))*5));}
 export function saplingSpeciesV328(biome='',seed=0){
- const b=String(biome).replace('coastal_',''),n=Math.sin(seed*127.1+93.7)*43758.5453,r=n-Math.floor(n);
- if(b==='jungle'||b==='oasis')return 'palm';
- if(b==='taiga'||b==='tundra')return r<.45?'spruce':r<.85?'pine':'birch';
- return r<.5?'oak':r<.8?'lime':'birch';
+ const n=Math.sin(seed*127.1+93.7)*43758.5453;return pickTreeV329(biome,n-Math.floor(n));
 }
 export function loadSaplingV328(kind,variant,level){
  const key=kind+':'+variant+':'+level;if(loads.has(key))return loads.get(key);

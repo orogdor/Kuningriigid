@@ -1,0 +1,40 @@
+name: V329 forest habitats and real game
+on:
+  push:
+    branches: [feature/forest-ecology-v329]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  forest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Habitat, density and shared rendering checks
+        run: |
+          node tests/forest-ecology-v329.mjs
+          node tests/sapling-trees/live-integration.mjs
+          node tests/sapling-trees/existing-placement.mjs
+          node tests/world-assets-v327.mjs
+          node scripts/test-daynight-v235.mjs
+          node scripts/test-scout-torch-v236.mjs
+      - name: Install browser
+        run: |
+          npm install --prefix /tmp/forest-check playwright@1.56.1
+          /tmp/forest-check/node_modules/.bin/playwright install --with-deps chromium
+      - name: Real game world and detail forest
+        env:
+          TREE_NODE_MODULES: /tmp/forest-check/node_modules
+        run: |
+          export CHROMIUM_PATH=$(node -e "console.log(require('/tmp/forest-check/node_modules/playwright').chromium.executablePath())")
+          node tests/sapling-trees/game-browser-v329.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: forest-v329-evidence
+          path: |
+            reports/sapling-v329-browser.json
+            previews/sapling-trees/game-*-v329.png
