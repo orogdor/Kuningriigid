@@ -112,7 +112,7 @@ export function buildGraphicsMenuV226(settings,onChange){
  if(selected==='borderless'&&!capabilities.borderless||selected==='fullscreen'&&!capabilities.fullscreen)selected='windowed';
  modeSelect.value=selected;modeLabel.append(modeSelect);modeSection.append(modeLabel);
  const modeStatus=document.createElement('p');modeStatus.className='graphics-v226-note';modeStatus.setAttribute('role','status');
- modeStatus.textContent=androidApp?'Androidi rakendus kasutab täisekraani; aknarežiim sõltub telefonist.':capabilities.native?'Windowsis kasutab täisekraan ekraanisuurust akent.': 'Aknata täisekraan vajab seda toetavat Windowsi rakendust.';
+ modeStatus.textContent=androidApp?'Androidi rakendus kasutab täisekraani; aknarežiim sõltub telefonist.':capabilities.native?'Windowsi WebGL-is kasutavad mõlemad täisekraanivalikud ääristeta akent; eraldi eksklusiivset režiimi ei ole.': 'Aknata täisekraan vajab seda toetavat Windowsi rakendust.';
  if(androidApp)modeSelect.disabled=true;
  modeSelect.addEventListener('change',async()=>{const previous=selected;try{selected=await applyDisplayModeV334(modeSelect.value);modeStatus.textContent='Kuvarežiim rakendatud.';}catch(error){selected=previous;modeSelect.value=previous;modeStatus.textContent=error.message||'Kuvarežiimi ei saanud muuta.';}});
  if(!capabilities.native)document.addEventListener('fullscreenchange',()=>{selected=document.fullscreenElement?'fullscreen':'windowed';modeSelect.value=selected;});
