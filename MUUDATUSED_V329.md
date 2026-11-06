@@ -10,4 +10,4 @@ Kontrollid: tests/forest-ecology-v329.mjs kontrollib 8000 liigivalikut, külma/k
 
 Actionsi päris mängu WebGL test 42216717316 läbis: V329 käivitus, 12/12 maailma puuderühma valmis, detailis 218 puujuurt / 105 kaaspuud ja 15 liigi-variandi kombinatsiooni, 0 JavaScripti viga. Pildid vaadati üle artefaktis forest-v329-evidence. See on tarkvaraline 320×180 suitsutest; seadme FPS-i ei ole mõõdetud. Raport: reports/sapling-v329-browser.json.
 
-Kasutaja kinnitas GitHubi üleslaadimise ja avaldamise loa. Muudatused on harus feature/forest-ecology-v329, PR #51; päris mängu brauserikontroll läbis; põhiharusse ühendamine avaldab veebiuuenduse ning pärast main CI edu APK/EXE sisu.
+Kasutaja kinnitas GitHubi üleslaadimise ja avaldamise loa. PR #51 on main-is, runtime bf61aac8f9abdbe1bb0854daf04d45207e163b0b. Main CI 42217058570 ja Pages 42217058614 läbisid; avalik veebileht näitab V329 ja forest-ecology-v329.js vastab HTTP 200. Native-content avaldamine 42217545918 läbis. APK/EXE uuendab seitse faili, kokku 367451 baiti; paigaldajat ega puumudeleid ei pea uuesti alla laadima.

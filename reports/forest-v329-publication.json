@@ -1,0 +1,15 @@
+{
+  "version": "V329",
+  "runtime": "bf61aac8f9abdbe1bb0854daf04d45207e163b0b",
+  "pr": 51,
+  "mainCI": 42217058570,
+  "browserTest": 42216717316,
+  "pages": 42217058614,
+  "nativeContent": 42217545918,
+  "allActionsSuccessful": true,
+  "publicTitle": "Kuningriigid · V329",
+  "ecologyHTTP": 200,
+  "changedRuntimeFiles": 7,
+  "downloadBytes": 367451,
+  "realDeviceFPS": null
+}
