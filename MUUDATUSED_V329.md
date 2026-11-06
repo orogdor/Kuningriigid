@@ -8,6 +8,6 @@ Detaili kaaspuud väldivad vett, suuri kõrguserinevusi, maju ja põlde. Aktiivs
 
 Kontrollid: tests/forest-ecology-v329.mjs kontrollib 8000 liigivalikut, külma/kuiva metsa, oaasi, tegeliku detaili dekoraatori vee/nõlva/põllu välistusi ja salvestuse puutumatust. Testkaardi 81 ruudu maailmapuude arv 2617 → 4684; detailressursse endiselt 24853. Saplingu paigutus- ja elava instancing'u kontrollid läbisid. Kõik 106 CI kiirkäsku läbisid; tulemused reports/forest-v329-ci.json.
 
-Kohalik Chromium ei saanud selles keskkonnas socket-piirangu tõttu käivituda. Päris brauseri testi jaoks on valmis tests/sapling-trees/game-browser-v329.cjs ja eraldi Actionsi töövoog. GPU-pilti ja seadme FPS-i pole kinnitatud.
+Actionsi päris mängu WebGL test 42216717316 läbis: V329 käivitus, 12/12 maailma puuderühma valmis, detailis 218 puujuurt / 105 kaaspuud ja 15 liigi-variandi kombinatsiooni, 0 JavaScripti viga. Pildid vaadati üle artefaktis forest-v329-evidence. See on tarkvaraline 320×180 suitsutest; seadme FPS-i ei ole mõõdetud. Raport: reports/sapling-v329-browser.json.
 
-Muudatused on kohalikus harus feature/forest-ecology-v329. GitHubi push blokeeriti automaatse turvakontrolli poolt, kuna avaldamiseks nõutakse kasutaja kinnitust; avalikus veebis ja APK/EXE sisukanalis V329 veel ei ole.
+Kasutaja kinnitas GitHubi üleslaadimise ja avaldamise loa. Muudatused on harus feature/forest-ecology-v329, PR #51; päris mängu brauserikontroll läbis; põhiharusse ühendamine avaldab veebiuuenduse ning pärast main CI edu APK/EXE sisu.
