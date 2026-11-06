@@ -156,6 +156,8 @@ jobs:
           node tests/work-spots-v284.mjs
           node tests/coast-v286.mjs
       - name: Forest species and density V329
-        run: node tests/forest-ecology-v329.mjs
+        run: |
+          node tests/forest-ecology-v329.mjs
+          node tests/continuous-forest-v330.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

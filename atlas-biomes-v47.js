@@ -1,3 +1,4 @@
+import {forestCandidatesV330,forestRandomV330} from './forest-placement-v330.js';
 import {pickTreeV329} from './forest-ecology-v329.js';
 import {SAPLING_SPECIES_V328,withSaplingInstancesV328} from './sapling-trees-v328.js';
 // World-scale foliage and geological landmarks, light-weight instanced geometry.
@@ -41,7 +42,7 @@ export function createAtlasBiomeDetail(game,group,quality='medium',ground=null){
  // species per biome and gentle per-tree colour variation. Placement rules are unchanged.
  const factor=quality==='high'?.60:quality==='low'?.15:.29;
  const sets={oak:[],lime:[],birch:[],pine:[],spruce:[],palm:[],cactus:[],rock:[],shrub:[]};
- const startSet=new Set((game.startLocations||[]).map(p=>p.c+':'+p.r));
+ const starts=(game.startLocations||[]).map(p=>game.cell(p)).filter(Boolean),seed=game.s?.seed||0,spacing=quality==='high'?5:quality==='low'?10:7;
  const tints=['#ffffff','#f3f7e6','#e6efd6','#fff4de','#e2ead9','#f7f1d4'];
  const species={forest:[['oak',.5],['lime',.28],['birch',.22]],taiga:[['spruce',.48],['pine',.4],['birch',.12]],grass:[['oak',.45],['lime',.3],['birch',.25]],
   lush:[['birch',.35],['lime',.35],['oak',.3]],steppe:[['oak',.6],['lime',.4]],jungle:[['palm',.6],['lime',.4]],desert:[['cactus',1]],oasis:[['palm',.75],['cactus',.25]],tundra:[['spruce',.7],['birch',.3]]};
@@ -49,7 +50,7 @@ export function createAtlasBiomeDetail(game,group,quality='medium',ground=null){
  let biomes={};
  for(const cell of game.cells){
   const biome=cell.visualBiome||cell.biome;biomes[biome]=(biomes[biome]||0)+1;
-  if(!cell.land||cell.mountain||cell.river||startSet.has(cell.c+':'+cell.r))continue;
+  if(!cell.land||cell.mountain)continue;
   const j=game.noise;let density=0,list=species.grass,bush=0;
   // V250: vegetation that follows real-world logic. Grassland is a park-like savanna/meadow with
   // groves, steppe has scattered trees and many shrubs, desert has cacti, dry bushes and rocks (and
@@ -68,16 +69,17 @@ export function createAtlasBiomeDetail(game,group,quality='medium',ground=null){
   // V270: trees follow the shared clump field (same clearings/groves as the detail map)
   const forestV270=FOREST_BIOMES_V270.has(b);density/=forestV270?KEEP_MEAN_V270.forest:KEEP_MEAN_V270.open;
   density*=TREE_DENSITY_V271*(forestV270?1.8:1);
-  const effective=density*factor,count=Math.floor(effective+(j(cell.c+17,cell.r+201)<effective%1?1:0));
-  for(let i=0;i<count;i++){
-   const nx=j(cell.c*29+i*1.7,cell.r*7+i*13.2),nz=j(cell.c*11+i*17.8,cell.r*23+i*4.9);
-   const x=cell.x+(nx-.5)*39,z=cell.z+(nz-.5)*39,y=terrain(x,z),stream=riverNear(game,x,z);
-   if(y<3||y>45||stream.distance<stream.width+3.2)continue;
-   if(j(cell.c*31+i*2.3,cell.r*41+i*5.7)>treeKeepV270(x,z,forestV270))continue;
-   const k=j(cell.c*13+i*4.1,cell.r*19+i*2.9),kind=(b==='desert'||b==='mesa')?pick(list,j(cell.c*5+i*7.3,cell.r*3+i*1.1)):pickTreeV329(cell,j(cell.c*5+i*7.3,cell.r*3+i*1.1)),size=(3.8+k*4.2)*TREE_SCALE_V271,rot=k*6.28;
+  const probability=Math.min(1,density*factor*spacing*spacing/2500);
+  for(const p of forestCandidatesV330(cell,spacing,seed,31)){
+   const {x,z,gx,gz}=p;
+   if(forestRandomV330(gx,gz,seed,33)>probability)continue;
+   const y=terrain(x,z),stream=riverNear(game,x,z);
+   if(y<3||y>45||stream.distance<stream.width+3.2||starts.some(c=>Math.hypot(c.x-x,c.z-z)<8))continue;
+   if(forestRandomV330(gx,gz,seed,34)>treeKeepV270(x,z,forestV270))continue;
+   const k=forestRandomV330(gx,gz,seed,35),choice=forestRandomV330(gx,gz,seed,36),kind=(b==='desert'||b==='mesa')?pick(list,choice):pickTreeV329(cell,choice),size=(3.8+k*4.2)*TREE_SCALE_V271*(forestV270?1.2:1),rot=k*6.28;
    if(!kind)continue;
    const div=kind==='cactus'?1.25:kind==='pine'||kind==='spruce'?1.7:kind==='birch'?1.6:1.45;
-   sets[kind].push({x,y,z,scale:size/div,rot,tint:tints[Math.floor(j(cell.c+i*3.7,cell.r*2+i)*tints.length)%tints.length]});
+   sets[kind].push({x,y,z,scale:size/div,rot,tint:tints[Math.floor(forestRandomV330(gx,gz,seed,37)*tints.length)%tints.length]});
   }
   const shrubs=Math.floor(bush*factor*1.5+(j(cell.c+71,cell.r+9)<(bush*factor*1.5)%1?1:0));
   for(let i=0;i<shrubs;i++){
