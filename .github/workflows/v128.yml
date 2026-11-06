@@ -107,6 +107,8 @@ jobs:
           node tests/world-assets-v327.mjs
       - name: V243 wall connections and building rotation
         run: node scripts/test-build-v243.mjs
+      - name: V338 autosave cadence regression
+        run: node tests/autosave-v338.mjs
       - name: V256 save compression and wildlife
         run: |
           node TEST_V73.mjs
