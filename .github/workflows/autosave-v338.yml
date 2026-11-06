@@ -1,0 +1,26 @@
+name: V338 10-minute autosave safety
+on:
+  push:
+    branches: [feature/autosave-v338]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  autosave:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify 10-minute cadence, boot and syntax
+        run: |
+          node --check civilization.js
+          node --check boot-v83.js
+          node tests/autosave-v338.mjs
+      - name: Verify manual saves and compression unchanged
+        run: |
+          node TEST_V73.mjs
+          node tests/save-compression-v256.mjs
+          node tests/three-r187-v305-tsl.mjs
