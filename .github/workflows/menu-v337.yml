@@ -22,7 +22,7 @@ jobs:
           node --check native/windows/preload.cjs
           node tests/ui-v311.mjs
           node tests/ui-v312.mjs
-          node native/tests/display-modes.test.cjs
+          node --test native/tests/*.test.cjs
       - run: npm install --prefix /tmp/kuningriigid-ui337 playwright@1.56.1 --fetch-retries=1 --fetch-timeout=60000
       - name: Browser options, compact construction cards and exit fallback
         env: {UI_NODE_MODULES: /tmp/kuningriigid-ui337/node_modules}
