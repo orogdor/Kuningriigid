@@ -2,6 +2,19 @@
 // density elsewhere. Shared vertices and stitched 2:1 edges prevent cracks.
 import * as T from './vendor/three.module.js';
 const metadata=new WeakMap();
+function polygonForV336(nx,nz,unit,levels){
+ return (c,r,i,j)=>{
+  const level=levels[r*nx+c],n=2**level,u=unit/n,x=c*unit+i*u,z=r*unit+j*u;
+  const corners=[[x,z],[x,z+u],[x+u,z+u],[x+u,z]],splits=[
+   i===0&&c>0&&levels[r*nx+c-1]>level,
+   j===n-1&&r<nz-1&&levels[(r+1)*nx+c]>level,
+   i===n-1&&c<nx-1&&levels[r*nx+c+1]>level,
+   j===0&&r>0&&levels[(r-1)*nx+c]>level];
+  const points=[];for(let k=0;k<4;k++){const a=corners[k],b=corners[(k+1)%4];points.push(a);if(splits[k])points.push([(a[0]+b[0])/2,(a[1]+b[1])/2]);}
+  return {points,split:splits.some(Boolean),center:[x+u/2,z+u/2]};
+ };
+}
+
 export function createAtlasTerrainV327({width,depth,nx,nz,originX,originZ,rivers=[],coasts=[],height,maxLevel=3}){
  const sx=width/nx,sz=depth/nz,unit=2**maxLevel,row=nx*unit+1;
  const levels=new Uint8Array(nx*nz),queue=[];
@@ -28,16 +41,7 @@ export function createAtlasTerrainV327({width,depth,nx,nz,originX,originZ,rivers
   if(!Number.isFinite(y))throw new Error('Non-finite adaptive atlas height');
   i=vertices.length/3;vertices.push(x,y,z);lookup.set(key,i);return i;
  };
- const polygon=(c,r,i,j)=>{
-  const level=levels[r*nx+c],n=2**level,u=unit/n,x=c*unit+i*u,z=r*unit+j*u;
-  const corners=[[x,z],[x,z+u],[x+u,z+u],[x+u,z]],splits=[
-   i===0&&c>0&&levels[r*nx+c-1]>level,
-   j===n-1&&r<nz-1&&levels[(r+1)*nx+c]>level,
-   i===n-1&&c<nx-1&&levels[r*nx+c+1]>level,
-   j===0&&r>0&&levels[(r-1)*nx+c]>level];
-  const points=[];for(let k=0;k<4;k++){const a=corners[k],b=corners[(k+1)%4];points.push(a);if(splits[k])points.push([(a[0]+b[0])/2,(a[1]+b[1])/2]);}
-  return {points,split:splits.some(Boolean),center:[x+u/2,z+u/2]};
- };
+ const polygon=polygonForV336(nx,nz,unit,levels);
  for(let r=0;r<nz;r++)for(let c=0;c<nx;c++){
   const n=2**levels[r*nx+c];
   for(let j=0;j<n;j++)for(let i=0;i<n;i++){
@@ -68,4 +72,46 @@ export function adaptiveAtlasSamplerV327(geo){
   }
   return at(...points[0]);
  };
+}
+
+/** Typed-array snapshot after the original geometry has received its surface colours and relief. */
+export function snapshotAtlasTerrainV336(geo,originalColors=null){
+ const m=metadata.get(geo);
+ if(!m||!geo.index||!geo.attributes.position||!geo.attributes.normal||!geo.attributes.color)return null;
+ const attrs={};for(const [name,a] of Object.entries(geo.attributes)){
+  if(!(a.array instanceof Float32Array)||a.array.length>30000000)throw Error('Unexpected atlas attribute');
+  attrs[name]={itemSize:a.itemSize,values:(name==='color'&&originalColors?new Float32Array(originalColors):a.array.slice())};
+ }
+ const pairs=new Uint32Array(m.lookup.size*2);let k=0;
+ for(const [key,index]of m.lookup){pairs[k++]=key;pairs[k++]=index;}
+ return {schema:1,attributes:attrs,index:new Uint32Array(geo.index.array),parameters:{...geo.parameters},
+  meta:{width:m.width,depth:m.depth,nx:m.nx,nz:m.nz,originX:m.originX,originZ:m.originZ,
+   sx:m.sx,sz:m.sz,unit:m.unit,row:m.row,levels:m.levels.slice(),pairs}};
+}
+export function restoreAtlasTerrainV336(data){
+ const m=data?.meta,a=data?.attributes,positions=a?.position?.values;
+ if(data?.schema!==1||!(m?.levels instanceof Uint8Array)||!(m.pairs instanceof Uint32Array)
+  ||!(data.index instanceof Uint32Array)||!(positions instanceof Float32Array)
+  ||!Number.isInteger(m.nx)||!Number.isInteger(m.nz)||m.nx<1||m.nz<1
+  ||m.nx*m.nz>1000000||m.levels.length!==m.nx*m.nz||m.pairs.length%2
+  ||positions.length%3||positions.length>30000000||data.index.length>50000000
+  ||m.pairs.length>positions.length*2||!Number.isFinite(m.width)||!Number.isFinite(m.depth)
+  ||!Number.isFinite(m.originX)||!Number.isFinite(m.originZ)||!Number.isFinite(m.sx)||!Number.isFinite(m.sz)
+  ||!Number.isInteger(m.unit)||m.unit<1||m.unit>16||m.row!==m.nx*m.unit+1)throw Error('Invalid cached atlas');
+ const geo=new T.BufferGeometry();
+ for(const [name,attr]of Object.entries(a)){
+  if(!(attr.values instanceof Float32Array)||!Number.isInteger(attr.itemSize)||attr.itemSize<1||attr.itemSize>4
+   ||attr.values.length%attr.itemSize||attr.values.length/attr.itemSize!==positions.length/3)throw Error('Invalid cached atlas attribute');
+  geo.setAttribute(name,new T.BufferAttribute(attr.values,attr.itemSize));
+ }
+ if(!geo.attributes.normal||!geo.attributes.color||data.index.some(i=>i>=positions.length/3))throw Error('Invalid cached atlas indices');
+ const lookup=new Map();
+ for(let i=0;i<m.pairs.length;i+=2){
+  if(m.pairs[i+1]>=positions.length/3)throw Error('Invalid cached atlas lookup');
+  lookup.set(m.pairs[i],m.pairs[i+1]);
+ }
+ geo.setIndex(new T.BufferAttribute(data.index,1));geo.parameters=data.parameters||{};
+ geo.userData.adaptiveAtlasV327=true;geo.computeBoundingSphere();geo.computeBoundingBox();
+ metadata.set(geo,{...m,lookup,polygon:polygonForV336(m.nx,m.nz,m.unit,m.levels)});
+ return geo;
 }
