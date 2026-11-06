@@ -48,8 +48,9 @@ export async function createForest(scene,placements,manifest,{base='../../assets
   }
   assets.set(rec.id,levels);
  }
- // Spatially bounded groups; unlike the original far-source fallback, no whole-map mesh.
- const bins=new Map();for(const p of placements){const key=p.asset+':'+Math.floor(p.x/256)+':'+Math.floor(p.z/256);if(!bins.has(key))bins.set(key,[]);bins.get(key).push(p);}
+ // Batch visible records per asset/LOD. Explicit per-instance frustum selection below
+ // prevents the legacy whole-source far fallback from drawing off-screen trees.
+ const bins=new Map();for(const p of placements){const key=p.asset;if(!bins.has(key))bins.set(key,[]);bins.get(key).push(p);}
  const cells=[];let matrixBytes=0;const obj=new T.Object3D();
  for(const [key,records] of bins){
   const levels=assets.get(records[0].asset),cell={records,meshes:[],last:-1};
@@ -77,5 +78,5 @@ export async function createForest(scene,placements,manifest,{base='../../assets
   }
   return visible;
  }
- return {group,update,placements,get visible(){return visible},memory:{geometryBytes,textureBytesEstimate:Math.round(textureBytes),matrixBytes,totalEstimate:Math.round(geometryBytes+textureBytes+matrixBytes)},dispose(){group.removeFromParent();for(const cell of cells)for(const meshes of cell.meshes)for(const m of meshes)m.dispose();for(const r of resources)r.dispose();for(const t of textures.values())t.dispose();}};
+ return {group,update,placements,get visible(){return visible},memory:{geometryBytes,textureBytesEstimate:Math.round(textureBytes),matrixBytes,totalEstimate:Math.round(geometryBytes+textureBytes+matrixBytes)},dispose(){group.removeFromParent();for(const cell of cells)for(const meshes of cell.meshes)for(const m of meshes)m.dispose();for(const r of resources)r.dispose();for(const t of textures.values()){t.dispose();t.image?.close?.();}}};
 }
