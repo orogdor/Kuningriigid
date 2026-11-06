@@ -7,7 +7,7 @@ const server=http.createServer((req,res)=>{const p=path.resolve(root,'.'+decodeU
  try{fs.mkdirSync(path.join(root,'reports'),{recursive:true});
   for(const [name,width,height] of [['landscape',915,364],['portrait',390,844],['desktop',1200,675]]){
    const page=await browser.newPage({viewport:{width,height}}),errors=[];page.on('pageerror',e=>errors.push(String(e)));
-   await page.goto('http://127.0.0.1:8773/tests/ui-v309-preview.html');await page.addStyleTag({url:'/ui-v335.css'});
+   await page.goto('http://127.0.0.1:8773/tests/ui-v309-preview.html');
    await page.waitForSelector('.v304-command[data-action=build]');
    await page.locator('.v304-command[data-action=build]').click();await page.waitForSelector('#v309-menu[data-kind=build] #tray .v310-card');
    async function check(selector,kind){

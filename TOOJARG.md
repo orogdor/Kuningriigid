@@ -1,5 +1,8 @@
 # Kuningriigid – ühine tööjärg
 
+- V335 avaldamise CI tõrge: `tests/ui-v311.mjs` nõuab, et regressioonivaade sisaldaks kõiki põhiversiooni stiilifaile; V335 `ui-v335.css` puudus `tests/ui-v309-preview.html` vaates. Nüüd lisatud sama fail päris brauserivaatesse ja `tests/ui-v335-browser.cjs` ei laadi seda kunstlikult teist korda. See taastab põhikontrolli ning võimaldab eduka põhikontrolli järel avaldada uue APK/EXE sisumanifesti. Kontrolli Actionsi jooksude tulemusi ja seadme uuendust eraldi.
+
+
 - V335: ehitus-, värbamis- ja armeekaardid kahes kompaktses reas; ülejäänud menüüd ja filtrid säilivad. Kontrollitakse päris menüü klõpsamist ning telefoni püst- ja rõhtvaates ja arvutis.
 
 - V334 kuvarežiimid: graafikaseadetes aknas, täisekraan ja Windowsi rakenduse aknata täisekraan. Brauseri fullscreen käivitub kasutaja valikul; Androidi olemasolev rakendus on juba täisekraanil ega saa neid režiime vahetada. Aknata täisekraan Windowsis vajab uuendatud EXE kestaprogrammi; Windowsi WebGL ei taga eraldi eksklusiivset ekraanirežiimi. Mooduli, graafikaseadete ja brauseri testid läbisid. Windowsi test leidis, et V333 esimene maailmasalvestus võib ületada senist 15 s sulgemise ooteaega; Windowsi kest ootab nüüd kuni 120 s. Windowsi ja brauseri testid läbisid, V334 sisukanal 42267833739 avaldatud ning Windowsi paigaldaja webapp-v0.2.0 loodud. Pagesi avaldamine ebaõnnestus GitHubi deploy-etapis; veebiversiooni uuenemine vajab eraldi kontrolli.
