@@ -159,5 +159,7 @@ jobs:
         run: |
           node tests/forest-ecology-v329.mjs
           node tests/continuous-forest-v330.mjs
+      - name: Generated world save and restore V331
+        run: node tests/generated-world-v331.mjs
       - name: Gameplay smoke test
         run: node scripts/test.mjs traffic

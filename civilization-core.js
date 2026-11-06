@@ -1,3 +1,4 @@
+import {restoreGeneratedWorldV331} from './generated-world-v331.js';
 import {planRoadGatesV177} from './road-gates-v177.js';
 import {protectedHousingZoneV184,allowedSuburbJoinV191,allowedSuburbCornerV201} from './outer-ring-v184.js?v=218';
 import {mountainBlockedV178} from './mountain-foot-v178.js';
@@ -270,6 +271,7 @@ export function migrateGame(old){if(old?.version===4)return old;if(!old?.world)r
 s.units=copy(old.units||[]).map(u=>({...u,cityId:s.cities.find(c=>c.team===u.team)?.id}));if(old.campaign){s.armies=copy(old.campaign.armies);s.deployments=copy(old.campaign.deployments||{})}s.armies=s.armies.slice(0,2);delete s.mapExpansionVersion;delete s.geographyVersion;return s;}
 export class Civilization{
  constructor(state){
+ const worldStartedV331=performance.now();
  state.strategyPacingV125??=true;
  migrateUnitHealth(state);
  migrateBattleAmmunition(state.battle);
@@ -284,6 +286,12 @@ export class Civilization{
   state.constructionBalanceVersion=1;
  }
  if(state.mapExpansionVersion!==2){for(const team of [2,3]){const p=STARTS[team];state.settlers.push({id:state.nextSettler++,team,...p,x:0,z:0,path:[],landed:false,localTarget:null});state.armies.push({team,...p,path:[]});state.units.push({kind:"scout",team,hp:TROOPS.scout.hp,morale:100});state.ages[team]=0;if(state.research)state.research[team]=newResearch()}state.mapExpansionVersion=2;}if(!state.explorerVersion){for(const team of [0,1])state.units.push({kind:"scout",team,hp:TROOPS.scout.hp,morale:100});state.explorerVersion=1}state.tempo??='normal';initResearch(state);if(state.researchBalanceVersion!==2){for(const r of state.research){for(const [id,progress] of Object.entries(r.progress||{})){if(TECHS[id])r.progress[id]=Math.min(TECHS[id].turns*10*tempoMultiplier(state),Math.max(0,progress)*10/60*tempoMultiplier(state))}r.boosted??=[]}state.researchBalanceVersion=2}state.ships??=[];state.nextShip??=0;state.enemyIntel??={};state.nextArmyId??=Math.max(1,...(state.armies||[]).map(a=>(a.id||0)+1));this.s=state;if(state.battle)state.battle.field??={...BATTLEFIELD};this.battleNavs=new WeakMap();initArmyExperience(state,TROOPS);if(!state.relations){state.relations={};const teams=[...new Set((state.battle?.squads||[]).map(u=>u.team))];for(const a of teams)for(const b of teams)if(a<b)state.relations[a+':'+b]={status:'war',tension:0};}state.worldRoads??={};if(state.roadKeyCols!==COLS){const oldCols=state.roadKeyCols||160;const rekey=key=>{const [a,b]=key.split(':').map(Number);const points=[a,b].map(n=>({c:n%oldCols,r:Math.floor(n/oldCols)}));if(points.some(p=>p.c<0||p.c>=COLS||p.r<0||p.r>=ROWS))return null;return points.map(p=>p.r*COLS+p.c).sort((x,y)=>x-y).join(':')};const upgradeMap=old=>{const mapped={};for(const [k,v]of Object.entries(old||{})){const key=rekey(k);if(key)mapped[key]=v}return mapped};state.worldRoads=upgradeMap(state.worldRoads);state.railEdges=upgradeMap(state.railEdges);state.roadKeyCols=COLS;state.roadRevision=(state.roadRevision||0)+1;state.railRevision=(state.railRevision||0)+1}state.roadRevision??=0;state.roadDecayClock??=0;this.buildingDefinitions=BUILDINGS;this.troopDefinitions=TROOPS;this.researchEvents=[];this.discoveryEvents=[];this.uiRevision=0;this.cols=COLS;this.rows=ROWS;this.terrainBonusCache=new Map();state.events??=[];this.navs=new Map();this.localNavs=new Map();this.aiClock=0;state.difficulty??='normal';state.explored??=Array.from({length:4},()=>({}));state.visionClock??=0;if(state.aiBalanceVersion!==2){state.aiBalanceVersion=2;state.aiPeaceUntil=Math.max(540,state.time+150);state.nextAIRecruit=Math.max(210,state.time+45);if(!state.battle)state.armies[1].path=[]}state.shipments??=[];state.railEdges??={};state.railLinks??={};state.railRevision??=0;state.railClock??=0;state.tradeClock??=0;state.nextShipment??=0;const seed=state.seed;this.noise=(x,z)=>{const n=Math.sin(x*127.1+z*311.7+seed*.017)*43758.5453;return n-Math.floor(n)};this.smooth=(x,z)=>{const i=Math.floor(x),j=Math.floor(z);let u=x-i,v=z-j;u=u*u*(3-2*u);v=v*v*(3-2*v);return (this.noise(i,j)*(1-u)+this.noise(i+1,j)*u)*(1-v)+(this.noise(i,j+1)*(1-u)+this.noise(i+1,j+1)*u)*v};
+ const savedWorldV331=restoreGeneratedWorldV331(state,COLS,ROWS);
+ if(savedWorldV331){
+  this.cells=savedWorldV331.cells;this.continents=savedWorldV331.continents;
+  this.startLocations=savedWorldV331.startLocations;this.startPassages=savedWorldV331.startPassages;
+  this.lakeOutletsV275=savedWorldV331.lakeOutletsV275;this.fishDistance=savedWorldV331.fishDistance;this.worldSourceV331='saved';
+ }else{
  // V248: geographyVersion 5 = plate-tectonic world (world-tectonic-v248.js); older saves keep their generator.
  // V249: geographyVersion 6 = the same world with thin-to-wide rivers and estuaries (V248 games keep 5).
  // V250: geographyVersion 7 = rivers also meander between cell centres (V249 games keep 6).
@@ -356,7 +364,9 @@ export class Civilization{
  cell.deposits.game=cell.land&&(start||cell.deposits.wood&&this.noise(cell.c+731,cell.r+85)>.28);cell.deposits.fish=false;
  if(cell.river)cell.detail.feature='river';cell.detail.resources=cell.detail.resources.filter(([kind])=>kind?cell.deposits.stone:cell.deposits.wood);if(cell.deposits.ore)for(let i=0;i<6;i++){const x=(this.noise(cell.c*31+i,cell.r+911)-.5)*110,z=(this.noise(cell.c*21+i,cell.r+722)-.5)*90;if(detailHeight(cell,x,z)>.4)cell.detail.resources.push([2,x,z])}}
  for(const cell of this.cells){if(cell.deposits.game)for(let i=0;i<7;i++){const x=(this.noise(cell.c*13+i,cell.r+521)-.5)*100,z=(this.noise(cell.c*17+i,cell.r+611)-.5)*100;if(detailHeight(cell,x,z)>.4)cell.detail.resources.push([3,x,z])}}
- seedGoods(this.cells);initializeFisheries(this);for(const city of state.cities){city.districts??={};city.world??=this.makeWorld(this.cell(city));this.prepareCity(city);for(const region of Object.values(city.districts))this.attachDistrict(city,region)}installGameRevisions(this);this.refreshVision();
+ seedGoods(this.cells);initializeFisheries(this);this.worldSourceV331='generated';
+ }
+ for(const city of state.cities){city.districts??={};city.world??=this.makeWorld(this.cell(city));this.prepareCity(city);for(const region of Object.values(city.districts))this.attachDistrict(city,region)}if(savedWorldV331)for(const parent of state.cities)for(const ctx of [parent,...Object.values(parent.districts||{})])if(ctx.economy.buildings.some(b=>b.type==='bridge'&&b.ready&&b.hp>0))this.cell(ctx).bridge=true;installGameRevisions(this);this.refreshVision();this.worldLoadMsV331=performance.now()-worldStartedV331;
  }
  cell(p){return this.cells[p.r*COLS+p.c]}
  atlasHeight(x,z){if(!Number.isFinite(x)||!Number.isFinite(z))return -15;if(this.s?.naturalShoreV278){const w=shoreWarpV278(x,z);x+=w.x;z+=w.z;}const fx=(x-ORIGIN_X)/50-.5,fz=(z-ORIGIN_Z)/50-.5,c=Math.floor(fx),r=Math.floor(fz);let u=fx-c,v=fz-r;u=u*u*(3-2*u);v=v*v*(3-2*v);const sample=(c,r)=>{const a=this.cells[r*COLS+c];return !a||c<0||c>=COLS||r<0||r>=ROWS?-15:a.land?(a.river&&!a.bridge?Math.max(4,a.h-3.5):Math.max(5,a.h)):Math.min(-6,a.h)};return (sample(c,r)*(1-u)+sample(c+1,r)*u)*(1-v)+(sample(c,r+1)*(1-u)+sample(c+1,r+1)*u)*v}
