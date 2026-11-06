@@ -1,9 +1,10 @@
 name: V334 display modes
 on:
   push:
-    branches: [feature/display-mode-v334]
+    branches: [feature/display-mode-v334, main]
+    paths: ['native/windows/**', 'display-mode-v334.js', 'graphics-settings-v226.js', 'tests/display-mode-v334*', '.github/workflows/display-mode-v334.yml']
   workflow_dispatch:
-permissions: {contents: read}
+permissions: {contents: write}
 concurrency:
   group: display-mode-v334
   cancel-in-progress: true
@@ -54,3 +55,15 @@ jobs:
           path: |
             native/dist/windows/*.exe
             native/dist/windows-smoke*.log
+  release-windows:
+    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Release display mode V334')
+    needs: [browser, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: v334-windows, path: packages}
+      - name: Publish Windows installer
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          gh release create webapp-v0.2.0 packages/*.exe --target "$GITHUB_SHA" --prerelease --title 'Kuningriigid WebApp 0.2.0 Windows' --notes 'Windows installer with V334 display options. Installs over the previous Windows WebApp and keeps application data. This is a developer build without a code-signing certificate.'
