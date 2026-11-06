@@ -1,8 +1,9 @@
 name: Publish native game file updates
 on:
-  push:
+  workflow_run:
+    workflows: ['Kuningriigid Fast Game Check']
+    types: [completed]
     branches: [main]
-    paths-ignore: ['**.md', 'reports/**', 'previews/**', 'native/**']
   workflow_dispatch:
 permissions: {contents: write}
 concurrency:
@@ -10,10 +11,12 @@ concurrency:
   cancel-in-progress: true
 jobs:
   publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main}
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || 'main' }}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Verify updater

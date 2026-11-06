@@ -41,6 +41,7 @@ jobs:
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@v3
+        with: {packages: platform-tools}
       - uses: gradle/actions/setup-gradle@v4
         with: {gradle-version: '8.13'}
       - run: node native/scripts/stage-game.cjs native/android/app/src/main/assets/game
@@ -94,6 +95,7 @@ jobs:
         env: {CSC_IDENTITY_AUTO_DISCOVERY: 'false'}
       - name: Launch Windows app and verify saves across content revisions
         shell: pwsh
+        env: {NATIVE_SMOKE_OUT: native/dist/windows}
         run: |
           $p = Start-Process -FilePath 'native/dist/windows/win-unpacked/Kuningriigid WebApp.exe' -ArgumentList '--native-smoke' -Wait -PassThru -RedirectStandardOutput native/dist/windows-smoke.log -RedirectStandardError native/dist/windows-smoke-errors.log
           Get-Content native/dist/windows-smoke.log
