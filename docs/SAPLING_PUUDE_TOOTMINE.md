@@ -19,7 +19,7 @@ Staatus: visuaalset heakskiitu ootav katse, draft PR #49. Põhimängu puud ei ol
 
 `test-placement.mjs`: 12000 deterministlikku paigutust, ühise world/detail koordinaaditeisenduse pööratavus ning päris InstancedMeshi maatriksi adapter.
 
-`browser-benchmark.cjs`: 300/3000/12000 puud, kolm kaamerakaugust, soojendus ning 5-sekundiline mõõteaken; aeglasel tarkvaralisel GPU-l oodatakse kuni 10 sekundit juurde, et koguda vähemalt viis kaadrit. Raportis on tegelik kaadrite arv ja `lowSampleCount`; väikese valimi p95 on ebatäpne. Salvestab FPS, keskmine/p95 kaadriaeg, draw calls, triangles, heap (kui API on olemas), Three.js ressursiloendurid ning geomeetria/tekstuuride/instantsmaatriksite mäluhinnangu. VRAM-i täpset kulu WebGL avalik API ei anna.
+`experiments/sapling-trees/benchmark.cjs`: 300/3000/12000 puud, kolm kaamerakaugust, soojendus ning 5-sekundiline mõõteaken; aeglasel tarkvaralisel GPU-l oodatakse kuni 10 sekundit juurde, et koguda vähemalt viis kaadrit. Raportis on tegelik kaadrite arv ja `lowSampleCount`; väikese valimi p95 on ebatäpne. Salvestab FPS, keskmine/p95 kaadriaeg, draw calls, triangles, heap (kui API on olemas), Three.js ressursiloendurid ning geomeetria/tekstuuride/instantsmaatriksite mäluhinnangu. VRAM-i täpset kulu WebGL avalik API ei anna.
 
 Actions kasutab **SwiftShader tarkvaralist GPU-d**. Selle FPS pole telefoni ega kasutaja RTX 2080 Superi tulemus. Mõõda sama testvaadet päris seadmes ja salvesta JSON nupuga.
 
@@ -38,3 +38,11 @@ Saplingu lähtekood GPL-3.0-or-later; kaasasolevate tree-gen preset'ide päistes
 `sapling-benchmark.yml` taastab 30 päriselt genereeritud puu failid tootmiskäivituse 42189504137 Actionsi artefaktist, kontrollib need uuesti ning teeb ajaliselt piiratud mõõtmised. See ei asenda Blenderi tootmist teise generaatoriga. Aluseks olnud tootmiskood: bd06d602bcb09edefd0f15a088a29da8938bdc6b.
 
 Olemasolevate päris paigutusfunktsioonide eraldi test: `tests/sapling-trees/existing-placement.mjs`; kasutab kaardi tegelikke eri x/z skaalasid 4.5 ja 3.9. Kõik 23 nõutud CI kiirkontrolli läbisid; raport `reports/sapling-trees-regression.json`.
+
+## Lõppkontroll 2026-11-06
+
+30 puud / 90 GLB-d on arendusharus salvestatud. Khronose kontroll: 0 viga, 0 hoiatust. 23 CI kiirkontrolli gruppi läbisid. Lähimudelid 2293–2536, keskmised 294–312 ning kaugmudelid 6 kolmnurka.
+
+Mõõteraport: `reports/sapling-trees-browser.json`; 9 kaamerakatset, Chromium 141, 1280×800, SwiftShader. Tulemused 0.077–1.682 FPS ning ainult 2–9 kaadrit katse kohta: väike valim ja tarkvaraline GPU ei anna usaldusväärset päris seadme FPS-i ega p95 hinnangut. 12 000 puu kaugvaates 61 draw call'i ja 72 002 kolmnurka koos maapinnaga. Varade mäluhinnang 102.3–106.5 MiB; see pole mõõdetud VRAM. JS heap raporteeriti 33.1 MB.
+
+Mobiili/RTX riistvarakatse ja põhikaartide lõplik renderdusse ühendamine on tegemata. Visuaalne heakskiit ei tähenda automaatselt jõudluse heakskiitu. Põhiharu on puutumata.

@@ -7,7 +7,7 @@ on:
     inputs:
       species:
         description: 'First batch: pine,spruce,oak; second batch: lime,birch,palm'
-        default: pine,spruce,oak
+        default: pine,spruce,oak,lime,birch,palm
         required: true
 permissions:
   contents: write
@@ -37,6 +37,7 @@ jobs:
           git clone https://github.com/meet-brad-ch/add_curve_sapling.git /tmp/sapling-source
           git -C /tmp/sapling-source checkout 2fa50a8f6a5f1a9485bdc394c30c81d971dc751f
       - name: Generate real GLBs and reimported-model renders
+        id: assets
         env:
           SPECIES: ${{ inputs.species || 'pine,spruce,oak,lime,birch,palm' }}
         run: |
@@ -54,9 +55,11 @@ jobs:
           npm install --prefix /tmp/tree-qa playwright@1.56.1 gltf-validator@2.0.0-dev.3.10
           /tmp/tree-qa/node_modules/.bin/playwright install --with-deps chromium
           node tools/trees/test-placement.mjs
+          node tests/sapling-trees/existing-placement.mjs
           node tools/trees/validate-gltf.cjs
-          node tools/trees/browser-benchmark.cjs
+          node experiments/sapling-trees/benchmark.cjs
       - name: Save outputs on review branch
+        if: always() && steps.assets.outcome == 'success'
         run: |
           test "$(git branch --show-current)" = experimental/sapling-trees-30
           git config user.name 'github-actions[bot]'

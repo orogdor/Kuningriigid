@@ -1,5 +1,8 @@
 # Kuningriigid – ühine tööjärg
 
+- Sapling 30-puu komplekt salvestatud (2026-11-06), draft PR #49. 6 liiki × 5 varianti; 90 GLB-d, tekstuuriatlased, source.blend ja tegelike GLB-de renderdused. Khronos 0 viga / 0 hoiatust, 23 CI kiirkontrolli gruppi läbisid. 300/3000/12000 InstancedMesh metsad ja 9 vaatekauguse mõõtmist: reports/sapling-trees-browser.json. SwiftShader andis 0.077–1.682 FPS, ainult 2–9 kaadrit; päris seadme jõudlus pole selle põhjal kinnitatud. 12000 puu kaugvaade 61 draw call'i / 72002 kolmnurka. Olemasoleva paigutuse test 2617 maailma puuinstantsi ja 24853 detailressursiga säilitab maatriksid ning x/z 4.5/3.9 koordinaadid. Põhimängu puid ei asendatud; järgmine samm visuaalne heakskiit, riistvaraprofiil ning kaartide renderdusse integratsioon. CCORE jääb väikeobjektidele.
+
+
 - Sapling puude eraldatud arendus (2026-11-06): `experimental/sapling-trees-30`, draft PR #49. Blender 5.2.3 + Sapling 1.0.0 pin 2fa50a8. Esimene 15-puu Actions tootmine õnnestus; tegelikest GLB-dest renderdused. Visuaalse iteratsiooniga tihendatud lehestik, parandatud kuuse proportsioonid, unlit impostori materjal ja pealtvaate kaamera. Kuus liiki × viis varianti, near/mid/far GLB ja atlas; InstancedMesh testmetsad 300/3000/12000, ühise forest-clumps-v270 välja ja olemasolevate instantsmaatriksite adapter. Mõõtmised ja validaatorite tulemused: `reports/sapling-trees*.json`; need tuleb hinnata pärast viimase Actionsi lõpetamist. Põhimängu laadimis- ja paigutuskoodi ei ole muudetud. Järgmine töö: kasutaja visuaalne heakskiit ning seejärel mängu mõlema kaardi opt-in integratsioon ja päris seadme jõudluskatse. Automaatset merge ei lubata.
 
 
