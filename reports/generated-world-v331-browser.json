@@ -1,0 +1,73 @@
+{
+  "version": "V331",
+  "phases": [
+    {
+      "phase": "first-generation",
+      "source": "generated",
+      "loadMs": 4291,
+      "id": "5e9f9fcc-a6ef-4230-9494-060c604e8c48",
+      "cells": 36300,
+      "persisted": true,
+      "payloadBytes": 16130701,
+      "hasWorld": true
+    },
+    {
+      "phase": "reopen",
+      "source": "saved",
+      "loadMs": 22,
+      "id": "5e9f9fcc-a6ef-4230-9494-060c604e8c48",
+      "cells": 36300,
+      "persisted": true,
+      "payloadBytes": 16130701,
+      "hasWorld": true
+    },
+    {
+      "phase": "empty-second-device",
+      "source": "generated",
+      "loadMs": 3753,
+      "id": "f0720e52-0c66-4e60-bccf-e8fe65bbc91d",
+      "cells": 36300,
+      "persisted": true,
+      "payloadBytes": 14051281,
+      "hasWorld": true
+    },
+    {
+      "phase": "portable-import",
+      "source": "saved",
+      "loadMs": 14,
+      "id": "5e9f9fcc-a6ef-4230-9494-060c604e8c48",
+      "cells": 36300,
+      "persisted": true,
+      "payloadBytes": 16130701,
+      "hasWorld": true
+    },
+    {
+      "phase": "explicit-new-game",
+      "source": "generated",
+      "loadMs": 7496,
+      "id": "0d5d49de-f30f-43dc-b36f-8c484cbd870a",
+      "cells": 36300,
+      "persisted": true,
+      "payloadBytes": 21246845,
+      "hasWorld": true
+    },
+    {
+      "phase": "old-manual-slot",
+      "source": "saved",
+      "loadMs": 16,
+      "id": "5e9f9fcc-a6ef-4230-9494-060c604e8c48",
+      "cells": 36300,
+      "persisted": true,
+      "payloadBytes": 16130701,
+      "hasWorld": true
+    }
+  ],
+  "errors": [],
+  "portableBytes": 16138890,
+  "previousBackupRetained": true,
+  "passed": true,
+  "actions": "https://github.com/orogdor/Kuningriigid/actions/runs/42241753581",
+  "artifactId": 13516751389,
+  "screenshotReviewed": true,
+  "timingNote": "loadMs is the Civilization constructor only; IndexedDB read/decompression and renderer startup are excluded."
+}
