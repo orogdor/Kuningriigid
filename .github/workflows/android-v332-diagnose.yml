@@ -1,9 +1,11 @@
-name: Diagnose Android V332 startup
+name: Diagnose Android V330 upgrade
 on:
   push:
     branches: [investigate/android-v332-startup]
-  workflow_dispatch:
 permissions: {contents: read}
+concurrency:
+  group: android-upgrade-investigation
+  cancel-in-progress: true
 jobs:
   android:
     runs-on: ubuntu-latest
@@ -18,7 +20,16 @@ jobs:
         with: {packages: platform-tools}
       - uses: gradle/actions/setup-gradle@v4
         with: {gradle-version: '8.13'}
-      - run: node native/scripts/stage-game.cjs native/android/app/src/main/assets/game
+      - name: Stage V332 update
+        env:
+          NATIVE_REVISION: 844a317919d595c35f15aa9a61f24e1913741d1c
+        run: node native/scripts/stage-game.cjs
+      - name: Stage V330 bundle
+        run: |
+          git fetch origin 966841212bb96cfe3051bf19b3f9f48f8067bb85 --depth=1
+          git worktree add /tmp/kuningriigid-v330 966841212bb96cfe3051bf19b3f9f48f8067bb85
+          cd /tmp/kuningriigid-v330
+          node native/scripts/stage-game.cjs "$GITHUB_WORKSPACE/native/android/app/src/main/assets/game"
       - run: gradle :app:assembleDebug --stacktrace
         working-directory: native/android
       - name: Enable Android emulator acceleration
@@ -34,11 +45,11 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: bash native/scripts/android-smoke.sh
+          script: bash tests/android-v330-upgrade-diagnostic.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-v332-diagnostics
+          name: android-upgrade-diagnostics
           path: |
-            native/dist/android-game.png
-            native/dist/android-smoke.log
+            native/dist/android-upgrade.png
+            native/dist/android-upgrade.log
