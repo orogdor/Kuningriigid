@@ -8,12 +8,18 @@ function validate(m,shell=1){
  if(!paths.has('index.html')||total>2147483648)throw Error('Incomplete/oversize game');return m;
 }
 const digest=b=>crypto.createHash('sha256').update(b).digest('hex');
-async function atomic(file,data){await fs.mkdir(path.dirname(file),{recursive:true});const tmp=file+'.'+crypto.randomUUID()+'.tmp';const h=await fs.open(tmp,'wx');try{await h.writeFile(data);await h.sync();}finally{await h.close();}try{await fs.rename(tmp,file);}catch(e){await fs.rm(tmp,{force:true});throw e;}}
+async function atomic(file,data){
+ await fs.mkdir(path.dirname(file),{recursive:true});const tmp=file+'.'+crypto.randomUUID()+'.tmp';
+ try{const h=await fs.open(tmp,'wx');try{await h.writeFile(data);await h.sync();}finally{await h.close();}
+  // Windows scanners can briefly hold a destination open. Never unlink the active file.
+  for(let attempt=0;;attempt++){try{await fs.rename(tmp,file);break;}catch(e){if(attempt>=8||!['EPERM','EACCES','EBUSY'].includes(e.code))throw e;await new Promise(r=>setTimeout(r,Math.min(500,20*2**attempt)));}}
+ }finally{await fs.rm(tmp,{force:true}).catch(()=>{});}
+}
 class ContentStore{
- constructor(root,bundle,{shell=1}={}){this.root=root;this.bundle=bundle;this.shell=shell;this.cache=new Map();this.updating=false;this.stateQueue=Promise.resolve();}
+ constructor(root,bundle,{shell=1}={}){this.root=root;this.bundle=bundle;this.shell=shell;this.cache=new Map();this.updating=false;this.stateQueue=Promise.resolve();this.stateSnapshot=null;}
  async init(){this.base=validate(JSON.parse(await fs.readFile(path.join(this.bundle,'_bundle-manifest.json'),'utf8')),this.shell);this.baseHashes=new Map(this.base.files.map(f=>[f.sha256,f.path]));await fs.mkdir(path.join(this.root,'objects'),{recursive:true});return this;}
- async state(){try{return JSON.parse(await fs.readFile(path.join(this.root,'state.json'),'utf8'));}catch{return {active:this.base.version,previous:null,pending:null,booting:false,blocked:null};}}
- async setState(s){await atomic(path.join(this.root,'state.json'),JSON.stringify(s));}
+ async state(){if(this.stateSnapshot)return {...this.stateSnapshot};try{this.stateSnapshot=JSON.parse(await fs.readFile(path.join(this.root,'state.json'),'utf8'));}catch{this.stateSnapshot={active:this.base.version,previous:null,pending:null,booting:false,blocked:null};}return {...this.stateSnapshot};}
+ async setState(s){await atomic(path.join(this.root,'state.json'),JSON.stringify(s));this.stateSnapshot={...s};}
  async mutate(fn){const next=this.stateQueue.then(async()=>{const s=await this.state();const value=await fn(s);await this.setState(s);return value;});this.stateQueue=next.catch(()=>{});return next;}
  async getManifest(v){if(v===this.base.version)return this.base;if(this.cache.has(v))return this.cache.get(v);if(!REV.test(v))throw Error('Invalid revision');const m=validate(JSON.parse(await fs.readFile(path.join(this.root,'manifests',v+'.json'),'utf8')),this.shell);if(m.version!==v)throw Error('Revision mismatch');this.cache.set(v,m);return m;}
  async beginLaunch(){return this.mutate(async s=>{let rolledBack=false;if(s.booting){s.blocked=s.active;s.active=s.previous||this.base.version;s.pending=null;s.booting=false;rolledBack=true;}else if(s.pending&&s.pending!==s.active){s.previous=s.active;s.active=s.pending;s.pending=null;s.booting=true;}
@@ -21,11 +27,11 @@ class ContentStore{
  async healthy(){return this.mutate(s=>{s.booting=false;});}
  async rollback(){return this.mutate(async s=>{if(!s.previous||s.active===s.previous)return false;s.blocked=s.active;s.active=s.previous;s.pending=null;s.booting=false;this.current=await this.getManifest(s.active);return true;});}
  async stage(input,download,onProgress=()=>{}){
-  if(this.updating)return {status:'busy'};const m=validate(input,this.shell),s=await this.state(),active=await this.getManifest(s.active);
-  if(m.version===s.active||m.version===s.pending)return {status:'current',version:active.label};
-  if(m.sequence<active.sequence||m.version===s.blocked)return {status:'ignored'};
-  this.updating=true;let downloaded=0,changed=0,reused=0,done=0;
-  try{for(const f of m.files){
+  if(this.updating)return {status:'busy'};const m=validate(input,this.shell);this.updating=true;let downloaded=0,changed=0,reused=0,done=0;
+  try{const s=await this.state(),active=await this.getManifest(s.active);
+   if(m.version===s.active||m.version===s.pending)return {status:'current',version:active.label};
+   if(m.sequence<active.sequence||m.version===s.blocked)return {status:'ignored'};
+   for(const f of m.files){
    if(this.baseHashes.has(f.sha256)){reused++;done++;continue;}
    const dest=path.join(this.root,'objects',f.sha256);let valid=false;try{const b=await fs.readFile(dest);valid=b.length===f.size&&digest(b)===f.sha256;}catch{}
    if(valid){reused++;done++;continue;}
