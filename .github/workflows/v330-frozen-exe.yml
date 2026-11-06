@@ -1,0 +1,94 @@
+name: Build Kuningriigid V330 frozen Windows EXE
+on:
+  push:
+    branches: ['test/v330-frozen-exe']
+    paths:
+      - 'native/**'
+      - '.github/workflows/v330-frozen-exe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: native/windows/package-lock.json
+      - name: Verify frozen application and native content rules
+        run: node --test native/tests/frozen-v330.test.cjs native/tests/content-store.test.cjs native/tests/importmap.test.cjs
+      - name: Stage game content from the exact V330 source snapshot
+        run: node native/scripts/stage-game.cjs
+        env:
+          NATIVE_REVISION: '966841212bb96cfe3051bf19b3f9f48f8067bb85'
+      - name: Ensure staged revision and game title are V330
+        run: |
+          node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('native/dist/manifest.json'));if(m.version!=='966841212bb96cfe3051bf19b3f9f48f8067bb85'||m.label!=='V330')throw Error('Not the original V330 game: '+JSON.stringify({version:m.version,label:m.label}));console.log(m.label,m.version,m.files.length,'game files')"
+      - run: node native/scripts/prepare-windows.cjs
+      - run: npm ci --prefix native/windows --no-audit --no-fund
+      - name: Build independent V330 Windows installer
+        run: npm run dist --prefix native/windows
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Smoke-test actual Windows EXE with network access disabled
+        shell: pwsh
+        env:
+          NATIVE_SMOKE_OUT: native/dist/windows
+        run: |
+          $exe = 'native/dist/windows/win-unpacked/Kuningriigid V330 Frozen.exe'
+          if (!(Test-Path $exe)) { throw "Missing application EXE: $exe" }
+          $p = Start-Process -FilePath $exe -ArgumentList '--native-smoke' -Wait -PassThru -RedirectStandardOutput native/dist/windows-smoke.log -RedirectStandardError native/dist/windows-smoke-errors.log
+          Get-Content native/dist/windows-smoke.log
+          Get-Content native/dist/windows-smoke-errors.log
+          if ($p.ExitCode -ne 0) { throw "V330 Windows game smoke failed: $($p.ExitCode)" }
+          if (!(Test-Path 'native/dist/windows/native-game.png')) { throw 'No game screenshot after launch' }
+      - name: Create SHA256 checksum
+        shell: pwsh
+        run: |
+          $installer = Get-Item 'native/dist/windows/Kuningriigid-V330-FROZEN-win-x64.exe'
+          $hash = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash *$($installer.Name)" | Set-Content 'native/dist/windows/SHA256SUMS.txt'
+          Get-Content 'native/dist/windows/SHA256SUMS.txt'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v330-frozen-validation
+          path: |
+            native/dist/windows-smoke*.log
+            native/dist/windows/native-smoke.json
+            native/dist/windows/native-game.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v330-frozen-installer
+          path: |
+            native/dist/windows/Kuningriigid-V330-FROZEN-win-x64.exe
+            native/dist/windows/SHA256SUMS.txt
+          if-no-files-found: error
+  release:
+    needs: [windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: v330-frozen-installer
+          path: release
+      - name: Publish dedicated fixed-version comparison prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > release-notes.md <<'EOF'
+          **Fixed Kuningriigid V330 for Windows x64.** Uses the unchanged game from commit 966841212bb96cfe3051bf19b3f9f48f8067bb85. Automatic game content updates are disabled. All game assets are bundled locally; the app does not download newer versions. Separate installer identity and user-data folder keep it independent from the current WebApp and do not affect the production update channel. Installer is unsigned. This is a side-by-side FPS regression comparison build, not a performance fix.
+
+          Compare world-map FPS, detail-map FPS and loading time at the same seed/save, resolution, settings and camera zoom. Export/import JSON saves manually between applications.
+          EOF
+          if gh release view v330-frozen-test --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v330-frozen-test release/*.exe release/SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create v330-frozen-test release/*.exe release/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'Kuningriigid V330 FROZEN – Windows comparison EXE' --notes-file release-notes.md --prerelease
+          fi
