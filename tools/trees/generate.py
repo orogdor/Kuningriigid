@@ -35,13 +35,13 @@ def atlas(kind):
  for tile in range(4):
   ox=(tile%2)*256;oy=(tile//2)*256
   # side twigs spread along a diagonal main stem
-  for i in range(38 if kind in ('pine','spruce') else 19):
+  for i in range(220 if kind in ('pine','spruce') else 30):
    t=rng.uniform(.08,.92);side=(-1)**i
    cx=ox+55+145*t+side*rng.uniform(10,43);cy=oy+35+180*t-side*rng.uniform(0,20)
    ang=rng.uniform(-.8,.8)+(0 if side>0 else 1.3)
    dx=X-cx;dy=Y-cy;u=dx*math.cos(ang)+dy*math.sin(ang);v=-dx*math.sin(ang)+dy*math.cos(ang)
    if kind in ('pine','spruce'):
-    mask=(np.abs(u)<rng.uniform(13,27))&(np.abs(v)<1.7);vein=np.ones_like(X,dtype=float)*.8
+    mask=(np.abs(u)<rng.uniform(13,27))&(np.abs(v)<2.2);vein=np.ones_like(X,dtype=float)*.8
    else:
     length=rng.uniform(17,30);width=length*(.48 if kind=='birch' else .68)
     q=(u/length)**2+(v/width)**2
@@ -146,7 +146,7 @@ def make(kind,index,img):
  neartrunk=bark_from_curves(curves,bm)
  midtrunk=bark_from_curves(curves,bm,6,3,4)
  dg=bpy.context.evaluated_depsgraph_get();leafmesh=bpy.data.meshes.new_from_object(leaf.evaluated_get(dg),depsgraph=dg)
- foliage=cards(leafmesh,material('foliage_'+kind,COLORS[kind],img),min(1,450/max(1,len(leafmesh.polygons))),2.7,seed)
+ foliage=cards(leafmesh,material('foliage_'+kind,(1,1,1),img),min(1,800/max(1,len(leafmesh.polygons))),4.0,seed)
  for o in list(bpy.context.scene.objects):
   if o not in (neartrunk,midtrunk,foliage):bpy.data.objects.remove(o,do_unlink=True)
  trunk=neartrunk

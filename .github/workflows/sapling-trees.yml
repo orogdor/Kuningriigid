@@ -44,12 +44,24 @@ jobs:
           python tools/trees/validate.py
           pip install Pillow
           python tools/trees/contact_sheet.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser benchmark with explicit software GPU
+        env:
+          TREE_NODE_MODULES: /tmp/tree-qa/node_modules
+        run: |
+          npm install --prefix /tmp/tree-qa playwright@1.56.1 gltf-validator@2.0.0-dev.3.10
+          /tmp/tree-qa/node_modules/.bin/playwright install --with-deps chromium
+          node tools/trees/test-placement.mjs
+          node tools/trees/validate-gltf.cjs
+          node tools/trees/browser-benchmark.cjs
       - name: Save outputs on review branch
         run: |
           test "$(git branch --show-current)" = experimental/sapling-trees-30
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/sapling-trees previews/sapling-trees reports/sapling-trees-validation.json
+          git add assets/sapling-trees previews/sapling-trees reports/sapling-trees*.json
           git diff --cached --quiet || git commit -m 'Generate Sapling tree assets and actual GLB renders [skip ci]'
           git push origin HEAD:experimental/sapling-trees-30
       - uses: actions/upload-artifact@v4
