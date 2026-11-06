@@ -46,11 +46,17 @@ def atlas(kind):
     length=rng.uniform(17,30);width=length*(.48 if kind=='birch' else .68)
     q=(u/length)**2+(v/width)**2
     edge=1+(.07*np.sin(np.arctan2(v,u)*10) if kind=='oak' else 0)
-    mask=q<edge;vein=.85+.15*np.cos(v*.6);vein[np.abs(v)<1.1]=1.18
+    mask=q<edge
+    if kind=='lime':
+     uu=u/length;vv=v/width;mask=((uu*uu+vv*vv-1)**3-uu*uu*vv**3)<0
+    vein=.85+.15*np.cos(v*.6);vein[np.abs(v)<1.1]=1.18
    tint=rng.uniform(.75,1.35);ar[mask,:3]=np.clip(base*tint*vein[mask,None],0,1);ar[mask,3]=1
   # main woody twig, local tile only
   dx=X-(ox+128);dy=Y-(oy+128);mask=(abs(dx*.8-dy*.6)<1.3)&(abs(dx)<92)&(abs(dy)<105)
   ar[mask,:3]=(.25,.20,.09);ar[mask,3]=1
+ if kind=='palm':
+  for tile in range(4):
+   ox=(tile%2)*256;oy=(tile//2)*256;u=(X-ox-128)/88;v=(Y-oy-128)/116;mask=(np.abs(v)<1)&(np.abs(u)<(.14+.8*(1-v*v)))&(X>=ox)&(X<ox+256)&(Y>=oy)&(Y<oy+256);ar[mask,:3]=base*(.9+.15*np.cos(u[mask,None]*22));ar[mask,3]=1
  img=bpy.data.images.new(kind+'_foliage_atlas',width=n,height=n,alpha=True);img.pixels.foreach_set(ar.ravel());img.filepath_raw=str(OUT/(kind+'_foliage.png'));img.file_format='PNG';img.save();img.pack()
  return img
 
@@ -98,7 +104,8 @@ def cards(mesh,mat,keep=1.,size=1.,seed=0):
  for p in polys:
   if len(p.vertices)!=4:continue
   vs=[mesh.vertices[i].co.copy() for i in p.vertices];c=sum(vs,Vector())/4
-  k=len(verts);verts.extend([c+(v-c)*size for v in vs]);faces.append(tuple(range(k,k+4)));tiles.append(rng.randrange(4))
+  if c.z<=.04:continue
+  safe=min([size]+[(c.z-.03)/(c.z-v.z) for v in vs if v.z<c.z]);k=len(verts);verts.extend([c+(v-c)*safe for v in vs]);faces.append(tuple(range(k,k+4)));tiles.append(rng.randrange(4))
  me=bpy.data.meshes.new('foliage_cards');me.from_pydata(verts,[],faces);me.materials.append(mat);uv=me.uv_layers.new(name='UVMap')
  for p,t in zip(me.polygons,tiles):
   for li,(u,v) in zip(p.loop_indices,[(0,0),(1,0),(1,1),(0,1)]):uv.data[li].uv=((t%2+(u*.98+.01))/2,(t//2+(v*.98+.01))/2)
@@ -113,7 +120,16 @@ def export(path,objects):
  import struct
  raw=path.read_bytes();size,typ=struct.unpack_from('<II',raw,12);doc=json.loads(raw[20:20+size]);
  for m in doc.get('materials',[]):
-  if m.get('alphaMode')=='BLEND':m.update(alphaMode='MASK',alphaCutoff=.4,doubleSided=True)
+  if path.stem=='far':
+   # Canonical unlit RGBA material, also understood by the game's small GLB loader.
+   tex=m.pop('emissiveTexture',None)
+   if tex:
+    m['pbrMetallicRoughness']={'baseColorTexture':tex,'baseColorFactor':[1,1,1,1],'metallicFactor':0,'roughnessFactor':1}
+    m.pop('emissiveFactor',None);m.setdefault('extensions',{})['KHR_materials_unlit']={}
+    doc.setdefault('extensionsUsed',[])
+    if 'KHR_materials_unlit' not in doc['extensionsUsed']:doc['extensionsUsed'].append('KHR_materials_unlit')
+   m.update(alphaMode='MASK',alphaCutoff=.4,doubleSided=True)
+  elif m.get('alphaMode')=='BLEND':m.update(alphaMode='MASK',alphaCutoff=.4,doubleSided=True)
  data=json.dumps(doc,separators=(',',':')).encode();data+=b' '*((-len(data))%4);tail=raw[20+size:];path.write_bytes(struct.pack('<4sII',b'glTF',2,20+len(data)+len(tail))+struct.pack('<II',len(data),typ)+data+tail)
  return {'triangles':sum(triangles(o) for o in objects),'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
 
@@ -124,7 +140,7 @@ def setup_render(h,w):
  d=bpy.data.cameras.new('camera');o=bpy.data.objects.new('camera',d);sc.collection.objects.link(o);sc.camera=o;d.type='ORTHO';return o
 
 def render(path,camera,center,span,angle,elevation=.12):
- camera.data.ortho_scale=span;camera.location=center+Vector((math.sin(angle)*span*2,-math.cos(angle)*span*2,span*elevation));camera.rotation_euler=(center-camera.location).to_track_quat('-Z','Y').to_euler();bpy.context.scene.render.filepath=str(path);bpy.ops.render.render(write_still=True)
+ camera.data.ortho_scale=span;camera.data.clip_end=span*20;camera.location=center+(Vector((0,0,span*2)) if elevation>1000 else Vector((math.sin(angle)*span*2,-math.cos(angle)*span*2,span*elevation)));camera.rotation_euler=(center-camera.location).to_track_quat('-Z','Y').to_euler();bpy.context.scene.render.filepath=str(path);bpy.ops.render.render(write_still=True)
 
 def make(kind,index,img):
  clear();ident=f'{kind}_{index+1:02}';dest=OUT/ident;dest.mkdir(exist_ok=True)
@@ -132,11 +148,11 @@ def make(kind,index,img):
  heights=[.79,1.03,.91,1.19,1.08];widths=[.82,1.17,1.34,.90,1.05]
  p.update(seed=seed,scaleV=0.,scale=p['scale']*heights[index],makeMesh=True,useRig=False,windAnim=False,leafFlutter=False,bevelRes=0,resU=2,curveRes=(9,6,3,1),showLeaves=True,leafShape='rect',leaves=12,leafScale=.65,leafScaleX=.85)
  p['length']=list(p['length']);p['length'][1]*=widths[index];p['ratio']*= [1.,1.25,.85,.90,1.1][index];p['baseSize']=max(.12,min(.65,p['baseSize']+[.05,-.08,-.04,.10,0][index]));p['branches']=(p['branches'][0],min(40,p['branches'][1]),min(22,p['branches'][2]),p['branches'][3])
- if kind=='spruce':p.update(baseSize=.12+.025*index,shape='0',levels=3,branches=(0,42,14,0),length=(1.,.31*widths[index],.35,0.),leafScale=.42,leafScaleX=.9,leaves=16)
+ if kind=='spruce':p.update(scale=22*heights[index],baseSize=.12+.025*index,shape='0',levels=3,branches=(0,42,14,0),length=(1.,.31*widths[index],.35,0.),leafScale=.65,leafScaleX=.9,leaves=16)
  if kind=='pine':p.update(baseSize=.42+.025*index,levels=3,branches=(0,25,16,0),leafScale=.70)
  if kind=='lime':p.update(shape='2',baseSize=.20,levels=3,branches=(0,28,16,0),length=(1.,.48*widths[index],.5,.3),leafScale=.65)
  if kind=='birch':p.update(leafScale=.40,leafScaleX=.75,leaves=15)
- if kind=='palm':p.update(leaves=30,leafScale=.65)
+ if kind=='palm':p.update(leaves=36,leafScale=1.2,leafScaleX=.12)
  (dest/'recipe.json').write_text(json.dumps({'species':kind,'preset':PRESETS[kind],'seed':seed,'settings':p},indent=2))
  assert bpy.ops.curve.tree_add(**p)=={'FINISHED'}
  trunk=bpy.data.objects.get('tree');leaf=bpy.data.objects.get('leaves');assert trunk and leaf
@@ -146,7 +162,7 @@ def make(kind,index,img):
  neartrunk=bark_from_curves(curves,bm)
  midtrunk=bark_from_curves(curves,bm,6,3,4)
  dg=bpy.context.evaluated_depsgraph_get();leafmesh=bpy.data.meshes.new_from_object(leaf.evaluated_get(dg),depsgraph=dg)
- foliage=cards(leafmesh,material('foliage_'+kind,(1,1,1),img),min(1,800/max(1,len(leafmesh.polygons))),4.0,seed)
+ foliage=cards(leafmesh,material('foliage_'+kind,(1,1,1),img),min(1,800/max(1,len(leafmesh.polygons))),(1.3 if kind=='palm' else 4.0),seed)
  for o in list(bpy.context.scene.objects):
   if o not in (neartrunk,midtrunk,foliage):bpy.data.objects.remove(o,do_unlink=True)
  trunk=neartrunk
