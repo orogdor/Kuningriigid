@@ -1,0 +1,143 @@
+{
+  "passed": true,
+  "groups": [
+    {
+      "name": "Main game and wall syntax",
+      "exitCode": 0,
+      "seconds": 4.48,
+      "output": ""
+    },
+    {
+      "name": "Historic suburb geometry (V191)",
+      "exitCode": 0,
+      "seconds": 0.98,
+      "output": "plain {\"segments\":43,\"plots\":25,\"area\":6664,\"angles\":6}\ncliff {\"segments\":33,\"plots\":22,\"area\":6281,\"angles\":1}\n"
+    },
+    {
+      "name": "Continuous natural barriers and gaps (V194)",
+      "exitCode": 0,
+      "seconds": 0.12,
+      "output": "V202 continuous coast, cliff and geometric wall-course joins PASS\n"
+    },
+    {
+      "name": "Sea and cliff suburb demos (V194)",
+      "exitCode": 0,
+      "seconds": 20.7,
+      "output": "natural-plan-survey coast {\"partialFound\":1,\"naturalPreviewReject\":3,\"naturalAreaReject\":0,\"naturalPlotReject\":0,\"naturalSegmentsReject\":0,\"naturalFailures\":[{\"reason\":\"Teine hoone on liiga l\u00e4hedal.\",\"segment\":5,\"x\":36,\"z\":-53,\"nearest\":{\"type\":\"stonewall\",\"dist\":4.2,\"drawn\":false,\"span\":7,\"angle\":0,\"sideAngle\":-0.1920507847836808,\"joined\":false},\"joinedWalls\":[]},{\"reason\":\"Teine hoone on liiga l\u00e4hedal.\",\"segment\":2,\"x\":22,\"z\":-48,\"nearest\":{\"type\":\"stonewall\",\"dist\":1.5,\"drawn\":false,\"span\":7,\"angle\":0,\"sideAngle\":-0.2771183489054819,\"joined\":false},\"joinedWalls\":[]},{\"reason\":\"M\u00fc\u00fcr l\u00e4biks v\u00e4rava ava. \u00dchenda m\u00fc\u00fcr v\u00e4ravapostidega, j\u00e4ta keskkoh\",\"segment\":0,\"x\":-5,\"z\":-66,\"nearest\":{\"type\":\"woodgate\",\"dist\":1.8,\"drawn\":false,\"span\":7,\"angle\":-0.6103658730694412,\"sideAngle\":-0.09946358391206511,\"joined\":false},\"joinedWalls\":[]}],\"chosen\":\"water\"}\ncoast {\"kind\":\"coast\",\"targetCityId\":3,\"controlled\":true,\"organic\":true,\"outerSegments\":40,\"suburbArea\":8859.254982476486,\"naturalBoundary\":\"water\",\"naturalLength\":90.03182902136528,\"naturalPartial\":false,\"cliffUseVerified\":false}\nnatural-plan-survey mountain {\"partialFound\":8,\"naturalPreviewReject\":1,\"naturalAreaReject\":0,\"naturalPlotReject\":0,\"naturalSegmentsReject\":0,\"naturalFailures\":[{\"reason\":\"M\u00fc\u00fcr l\u00e4biks olemasolevat hoonet.\",\"segment\":1,\"x\":61,\"z\":10,\"nearest\":{\"type\":\"palisade\",\"dist\":5.9,\"drawn\":true,\"span\":7.476863973404111,\"angle\":-1.3105029917072264,\"sideAngle\":-0.643229424449443,\"joined\":false},\"joinedWalls\":[]}],\"chosen\":\"mountain\"}\nmountain survey radial hits [{\"direction\":45,\"distance\":197,\"kind\":\"mountain\"},{\"direction\":60,\"distance\":152,\"kind\":\"mountain\"},{\"direction\":75,\"distance\":110,\"kind\":\"mountain\"},{\"direction\":90,\"distance\":101,\"kind\":\"mountain\"},{\"direction\":105,\"distance\":104,\"kind\":\"mountain\"},{\"direction\":120,\"distance\":116,\"kind\":\"mountain\"},{\"direction\":135,\"distance\":140,\"kind\":\"mountain\"},{\"direction\":150,\"distance\":131,\"kind\":\"mountain\"},{\"direction\":165,\"distance\":119,\"kind\":\"mountain\"},{\"direction\":180,\"distance\":119,\"kind\":\"mountain\"},{\"direction\":195,\"distance\":140,\"kind\":\"mountain\"}]\nouter wall bounds {\"minX\":-131.77699951929284,\"maxX\":-31.56581052147928,\"minZ\":-37.032372106822834,\"maxZ\":53.674156141074164,\"sections\":[{\"x\":-46,\"z\":54},{\"x\":-78,\"z\":47},{\"x\":-111,\"z\":41},{\"x\":-58,\"z\":-22},{\"x\":-92,\"z\":-29},{\"x\":-125,\"z\":-36}],\"natural\":\"mountain\"}\ninner outline extents {\"minX\":-74.24621202458748,\"maxX\":56.198255498682016,\"minZ\":-19.18677210871126,\"maxZ\":110.0730374585271}\nmountain cliff usage is not yet confirmed; closed-wall fallback {\"natural\":\"mountain\",\"area\":5171.663824386335}\nmountain {\"kind\":\"mountain\",\"targetCityId\":0,\"controlled\":true,\"organic\":true,\"outerSegments\":27,\"suburbArea\":5171.663824386335,\"naturalBoundary\":\"mountain\",\"naturalLength\":83.50630026645445,\"naturalPartial\":false,\"cliffUseVerified\":true}\n"
+    },
+    {
+      "name": "Defense construction priority (V188)",
+      "exitCode": 0,
+      "seconds": 0.19,
+      "output": "V218: old curtain upgraded BEFORE any paid exterior wall\n"
+    },
+    {
+      "name": "Graphics settings V226 unit test",
+      "exitCode": 0,
+      "seconds": 0.14,
+      "output": "PASS V226 graphics persistence, validation, presets and LOD distances\n"
+    },
+    {
+      "name": "Three.js r187 engine and game material compatibility",
+      "exitCode": 0,
+      "seconds": 0.97,
+      "output": "PASS Three.js r187: official checksums, shared core, game exports, 4096-instance capacity, bridge relocation, sea shader hooks and cache aliases\nPASS r187 WGSL: 10 actual game material/geometry combinations; sea, sky, fire, large instancing and animated 17-bone GLB\nPASS r187 runtime: deferred initialization, synchronous frame submission and render error recovery\n"
+    },
+    {
+      "name": "V233 farm and Stone Age far LOD regression",
+      "exitCode": 0,
+      "seconds": 0.26,
+      "output": "V233 field + derived distant LOD PASS 38400 4785\n"
+    },
+    {
+      "name": "V234 equipment and V261 rigged warrior regressions",
+      "exitCode": 0,
+      "seconds": 0.37,
+      "output": "V234 equipment geometry OK: 18 types\nV261 rigged Stone Age warriors: 17 bones, three equipped variants and integration PASS\n"
+    },
+    {
+      "name": "V235 day cycle and city torch regression",
+      "exitCode": 0,
+      "seconds": 0.22,
+      "output": "V235 24h cycle / lighting presets / city torches PASS\n"
+    },
+    {
+      "name": "V236 scouts and door torch regressions",
+      "exitCode": 0,
+      "seconds": 0.24,
+      "output": "V236 scouts and entrance torches PASS\n"
+    },
+    {
+      "name": "V237 farm, field and green-preview regression",
+      "exitCode": 0,
+      "seconds": 0.22,
+      "output": "V237 GLB preview isolation + farm/field LOD regressions PASS\n"
+    },
+    {
+      "name": "V238 scout visibility and marker regression",
+      "exitCode": 0,
+      "seconds": 0.22,
+      "output": "V238/V239 scout finder compact label, names and sector PASS\n"
+    },
+    {
+      "name": "V239 visible scout meshes and names toggle",
+      "exitCode": 0,
+      "seconds": 0.2,
+      "output": "V239: scout meshes and soldier name preferences PASS\n"
+    },
+    {
+      "name": "V240 scout continuous world/detail movement",
+      "exitCode": 0,
+      "seconds": 0.12,
+      "output": "V240 scout world/detail coordinate + smooth motion PASS\n"
+    },
+    {
+      "name": "V241 demand loading and V242 detail streaming",
+      "exitCode": 0,
+      "seconds": 52.37,
+      "output": "V241 independent soldier bytes/clips, shared requests, offline fallback and all-team research policy PASS\nV242 shared tile identity, bounded cache, camera offsets and incremental navigation parity PASS\nV319 desktop 5x5 detail streaming PASS\nV320 progressive nearby vegetation PASS\nV321 tiled sea extent and shader coordinates PASS\nV322 independent river-mouth/sea ownership PASS 57\nV323 estuary shoreline, fade and sea sampling PASS\nV325 river appearance and coastal continuity PASS {\n  samples: 3705,\n  maxStep: 0.009645979409448557,\n  maxDelta: 0.46902909970139467,\n  riverVertices: 748,\n  inlandFlowRestored: true,\n  broadEstuaryExcavation: false\n}\nV326 shared river/sea style and planar shared coastline grid PASS\nWebGPU river AND sea compiled\nV327 adaptive atlas: conforming edges, shared sea grid, actual triangle sampler PASS { vertices: 1896, triangles: 3720 }\nV327 generated assets: 8 actual GLBs, colour/bounds/budgets, live instance replacement and cache PASS\n"
+    },
+    {
+      "name": "V243 wall connections and building rotation",
+      "exitCode": 0,
+      "seconds": 3.59,
+      "output": "V243 wall joins, open gate, rotating fields and gate footprint PASS\n"
+    },
+    {
+      "name": "V256 save compression and wildlife",
+      "exitCode": 0,
+      "seconds": 7.17,
+      "output": "V73 SAVE PASS: V72 cargo, research, roads, legacy slots, backup fallback, invalid imports and low-quota recovery\nV256 save compression PASS: 4002337 -> 955473 characters\nV255 wildlife flees people, hunter stalks and drops game, herder takes the flock out and home PASS\n"
+    },
+    {
+      "name": "V257 handheld torch and animal facing",
+      "exitCode": 0,
+      "seconds": 0.23,
+      "output": "V257 handheld torch: hand attachment, upright flame, rig replacement and fallback PASS\n"
+    },
+    {
+      "name": "V258 world and detail movement",
+      "exitCode": 0,
+      "seconds": 5.58,
+      "output": "V258 travel distance, speed, old-save continuity and neighbouring army PASS\n"
+    },
+    {
+      "name": "V293-V294 illustrated research menu regression",
+      "exitCode": 0,
+      "seconds": 2.14,
+      "output": "V293: 140 distinct research portraits, 1 active + 4 queued circles, original queue preserved\nV294: single painted research image, live 5-slot queue, 140 pictured technologies and responsive menus OK\nV295 single-image research desktop + portrait: live queue, close control, art and responsive layout OK\nV296: real game research dialog and illustrated HUD bridge both open correctly.\nV298: V297 picture assets, zero duplicate controls and unified frame-relative hitboxes PASS\nV298 unified picture-HUD geometry and painted hotspots PASS: 5 screens + 3 portrait drawers\nV299: 5 research rings, 3 minimap buttons, 4 selected-unit buttons, 6 bottom cards, zoom-out, pause/resume and header PASS\nV300 contextual picture panel: 17 individual icons, 9 selection states, dispatch actions PASS\nV301: transparent painted backdrop, six real commands, bottom-20% responsive layout PASS\nV302 side-to-side dock join, 28px overlaps, six command hitboxes PASS\nV303 6 command cards, 4 map controls, 4 contextual actions: PASS\nV304: 140 generated paintings (2.72 MB), context dispatch, enemy guards, live research rules PASS\nPASS V306: 17 painted action paths, classic isolation, real selection portrait, distinct pause/resume art and six cards (821 KB)\nPASS V311: browser harness includes all 37 production styles, including legacy construction rules\nPASS V312: every building has shipped content art; house and well use distinct building pictures\n"
+    },
+    {
+      "name": "V268 water carriers and river water",
+      "exitCode": 0,
+      "seconds": 146.45,
+      "output": "water carriers V268 ok\nworld city scale V273 ok, demo town x2.23\ntree growth V274 ok, sprouted 1\nregrowth with global state ok\nmigration V274 ok: Hiieoru ai towns 3\nlake outlets V275 ok: 2 outlets, 29 cells\nriver bank V276 ok: 36 sites\nvillages V276 ok: 8 raiders 11 traders, offers 8\nnatural shore V278 ok: 10839 resources checked\nstone age playthrough V280 ok: pop 5/11/6 known 18/15/19\nstone age economy V281 ok: grain/farm worker-min 2.09 longest settler trip 29 min, pop 4/7/5\nui V282 ok\nV287 painted UI: references, artwork, accessibility toggle, world layout and original controls OK\nV288 picture-backed UI: live commands, actual state, painted assets, opt-in and responsive fallbacks OK\nV289 independent responsive HUD references, real actions and image assets: OK\nV290 picture HUD: 19 actual WebP artwork files and active game actions PASS\nV291: artwork (38), real controls, responsive layout, rollback and version PASS\nV292 mobile: original cards, responsive sizes, pause/resume, live minimap, touch actions PASS\nstone animation V283 ok\nwork spots V284 ok\ncoast V286 ok\n"
+    },
+    {
+      "name": "Gameplay smoke test",
+      "exitCode": 0,
+      "seconds": 37.44,
+      "output": "PASS tests/traffic-v133/run.mjs --report artifacts-tests/traffic-cases.json (13.02s)\nPASS TEST_V133.mjs (22.38s)\nPASS TEST_V134.mjs (1.93s)\nPASS traffic: 3 checks in 37.33s\n"
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 # Kuningriigid – ühine tööjärg
 
+- V328: kasutaja lubas uued Sapling puud mängu panna. 30 heakskiidule esitatud mudelit ühendatud maailma biome-puude, maailma metsatukkade ja detailkaardi raiutavate/naaberruutude puude renderdusse. Algseid instantsmaatrikseid, ressursse ja forest-clumps-v270 välja ei muudeta; liigid valitakse detailis biomi järgi. Kolm ekraanipikslitest sõltuvat LOD-i, viis deterministlikku varianti, jagatud tekstuurid ning instancing. Detaili instantsid puhastatakse igal stseeni renderdusel: peidetud/raiutud/mahavõetud puud ei jää kummitusteks. Kaamera ja biome ühikkontrollid, 120 muutmata staatilist paigutust, 100 elavat puud, puhvrikasv ja kõik 23 CI kiirkontrolli gruppi läbisid. Päris mängu Actionsi brauserikatse käib eraldi; selle tulemust ei loeta enne raportit kinnitatuks. V328 vahemäluvõtmed ja versioonisilt; Pages ei paki Blenderi lähtefaile. Vt MUUDATUSED_V328.md.
+
+
 - Sapling 30-puu komplekt salvestatud (2026-11-06), draft PR #49. 6 liiki × 5 varianti; 90 GLB-d, tekstuuriatlased, source.blend ja tegelike GLB-de renderdused. Khronos 0 viga / 0 hoiatust, 23 CI kiirkontrolli gruppi läbisid. 300/3000/12000 InstancedMesh metsad ja 9 vaatekauguse mõõtmist: reports/sapling-trees-browser.json. SwiftShader andis 0.077–1.682 FPS, ainult 2–9 kaadrit; päris seadme jõudlus pole selle põhjal kinnitatud. 12000 puu kaugvaade 61 draw call'i / 72002 kolmnurka. Olemasoleva paigutuse test 2617 maailma puuinstantsi ja 24853 detailressursiga säilitab maatriksid ning x/z 4.5/3.9 koordinaadid. Põhimängu puid ei asendatud; järgmine samm visuaalne heakskiit, riistvaraprofiil ning kaartide renderdusse integratsioon. CCORE jääb väikeobjektidele.
 
 

@@ -33,5 +33,5 @@ for(const a of manifest.assets){
 }
 const props=await readFile(new URL('world-props.js',root),'utf8');assert.match(props,/for\(const kind of \['rock','bridge'\]\)/);assert.match(props,/o.name==='earth'/);
 const html=await readFile(new URL('index.html',root),'utf8');
-for(const name of ['world-models-v152.js','atlas-biomes-v47.js','world-props.js','atlas-sea-v326.js'])assert.ok(html.includes('"./'+name+'": "./'+name+'?v=327a"'));
+for(const name of ['world-models-v152.js','atlas-biomes-v47.js','world-props.js','atlas-sea-v326.js'])assert.ok(html.includes('"./'+name+'": "./'+name+'?v=328a"'));
 console.log('V327 generated assets: 8 actual GLBs, colour/bounds/budgets, live instance replacement and cache PASS');
