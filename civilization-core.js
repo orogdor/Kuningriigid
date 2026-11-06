@@ -68,7 +68,7 @@ import {BASIC_JOBS,allocateCity,housingCapacity,HALL_CAPACITY,HOUSE_CAPACITY,FOO
 import {TECHS,BUILD_TECH,UNIT_TECH,newResearch,initResearch,startResearch,tickResearch,techBlock,queueResearch,nextResearchForGoals} from './research.js?v=125a';
 import {BUILDINGS,RESOURCE_NAMES,START,RESOURCE_PRODUCTION_MULTIPLIER,FOOD_KEYS,storageLimit,takeFood,recordDelivery,realm as freshRealm,initialState,migrateEconomy,buildRule as placementRule,placeBuilding,tickEconomy,ready,canAfford,spendResources} from './economy.js';
 import {Navigation,clearFootprint,door,gather,plantTrees,naturalRegrowthV274} from './navigation.js?v=2273';
-import {isDrawableWallV175,wallPointInsideV175,wallCrossesGateOpeningV175} from './wall-draw-v175.js?v=1754a';
+import {isDrawableWallV175,wallPointInsideV175,towerJoinsWallV339,wallCrossesGateOpeningV175} from './wall-draw-v175.js?v=1754a';
 import {woodFortCostV1757,woodFortBuildTimeV1757,woodFortSurchargeV1757} from './wood-fort-levels-v1757.js?v=1757b';
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,makeGrid,findPath} from './campaign.js';
 import {bakeDetails,detailHeight} from './world-details.js?v=123a';
@@ -730,7 +730,7 @@ export class Civilization{
   return river.distance>=river.width*.97||river.fordStrength>=.75||!!tile.bridge&&river.distance<river.width*1.15;
  }
  placementEnv(city,type){const env=this.env(city);if(isDrawableWallV175(type)){const parent=this.parentCity(city);env.passable=(x,z)=>this.defenseTerrainPassableV177(city,x+(city.c-parent.c)*DETAIL_TILE_X,z+(city.r-parent.r)*DETAIL_TILE_Z);}if(isDrawableWallV175(type)||['woodgate','gatehouse','watchtower','stonetower'].includes(type)){const near=env.nearBuildings;env.nearBuildings=(p,t)=>{const bs=near(p,t),wall={...p,type};
- return bs.filter(b=>!wallEndJoinV1758(wall,b)&&!allowedSuburbJoinV191(wall,b)&&
+ return bs.filter(b=>!(['watchtower','stonetower'].includes(type)&&isDrawableWallV175(b.type)&&b.team===city.team&&towerJoinsWallV339(p,b))&&!wallEndJoinV1758(wall,b)&&!allowedSuburbJoinV191(wall,b)&&
   !allowedSuburbCornerV201(wall,b,bs)&&
   !(p.plannedDefense&&b.plannedDefense&&(
    (['watchtower','stonetower'].includes(type)&&isDrawableWallV175(b.type))||
@@ -793,7 +793,7 @@ export class Civilization{
      ['woodgate','gatehouse'].includes(g.type)&&wallCrossesGateOpeningV175(p,g)))
     return {error:'Müür läbiks värava ava. Ühenda müür väravapostidega, jäta keskkoht vabaks.'};
   const rule=placementRule(city.economy,city.team,type,p,env);if(rule.error)return rule;
-  const candidate={...p,type,...site},nav=this.nav(city);
+  const candidate={...p,type,team:city.team,...site},nav=this.nav(city);
   if(p.drawnWallV175&&isDrawableWallV175(type)){
    const span=p.palisadeSpanV167||7;
    for(const b of city.economy.buildings.filter(b=>b.hp>0&&!b.virtual&&!['palisade','stonewall','reinforced_wall','woodgate','gatehouse','watchtower','stonetower'].includes(b.type))){

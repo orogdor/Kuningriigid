@@ -1,6 +1,6 @@
 import {resourcesNear} from './perf-state-v131.js';
 import {CitizenRoutes} from './citizen-routes-v130.js';
-import {wallFootprintV175,wallPointInsideV175} from './wall-draw-v175.js?v=1754a';
+import {wallFootprintV175,wallPointInsideV175,towerJoinsWallV339} from './wall-draw-v175.js?v=1754a';
 // Shared small-agent navigation for citizens, carriers and soldiers.
 const length=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 // Horizontal exclusion zones contain the actual roof, steps, carts and
@@ -174,10 +174,16 @@ preservesAccess(building,cargo=[]){
  const existing=this.buildings().filter(b=>b.hp>0&&buildingClearance(b));
  // V252: buildings may stand closer: the walking margins around them may overlap a little (the models are
  // ~85-95 % of the clearance box). The flood-fill below still guarantees every door stays reachable.
- for(const b of existing){const other=buildingClearance(b);if(Math.abs(b.x-building.x)<(other.rx+size.rx)*.95+.3&&Math.abs(b.z-building.z)<(other.rz+size.rz)*.95+.3)return false;}
+ for(const b of existing){
+  // Allow a tower centred on a friendly wall; keep the access flood-fill.
+  if(['watchtower','stonetower'].includes(building.type)&&['palisade','stonewall','reinforced_wall'].includes(b.type)&&b.team===building.team&&towerJoinsWallV339(building,b))continue;
+  const other=buildingClearance(b),closeHouses=building.type==='house'&&b.type==='house';
+  const factor=closeHouses?.85:.95,margin=closeHouses?0:.3;
+  if(Math.abs(b.x-building.x)<(other.rx+size.rx)*factor+margin&&Math.abs(b.z-building.z)<(other.rz+size.rz)*factor+margin)return false;
+ }
  const hall=existing.find(b=>b.type==='hall');if(!hall)return true;
  const from=this.nearest(door(hall));if(!from)return false;
- const anchors=[...existing.map(door),...Object.values(this.world.workers||{}).filter(w=>(w.carried||0)>0),...cargo];
+ const anchors=[...existing.filter(b=>!(['watchtower','stonetower'].includes(building.type)&&['palisade','stonewall','reinforced_wall'].includes(b.type)&&b.team===building.team&&towerJoinsWallV339(building,b))).map(door),...Object.values(this.world.workers||{}).filter(w=>(w.carried||0)>0),...cargo];
  const protectedPoints=anchors.map(p=>this.nearest(p)).filter(p=>p&&this.reachable(from,p));
  const mask=this.mask.slice();
  for(let z=Math.floor(building.z-size.rz);z<=Math.ceil(building.z+size.rz);z++)for(let x=Math.floor(building.x-size.rx);x<=Math.ceil(building.x+size.rx);x++)if(Math.abs(x-building.x)<=size.rx&&Math.abs(z-building.z)<=size.rz){const i=this.index(x,z);if(i>=0)mask[i]=0;}
