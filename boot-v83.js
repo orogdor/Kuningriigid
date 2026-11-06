@@ -52,7 +52,7 @@ async function newWorld(){
 }
 const query=new URLSearchParams(location.search);
 const nativeLegacy=!!(window.KuningriigidNative||window.KuningriigidWindow);
-if(nativeLegacy||query.has('demo')||sessionStorage.getItem('kingdoms-civ-start')){
+if(nativeLegacy||query.has('demo')||query.has('autostart')||sessionStorage.getItem('kingdoms-civ-start')){
  // Existing native updaters consider a version healthy only after gameDebug exists.
  startEngine().catch(()=>{});
 }else{
