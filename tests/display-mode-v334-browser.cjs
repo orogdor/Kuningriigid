@@ -10,7 +10,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await page.goto('http://127.0.0.1:8772/tests/display-mode-v334.html');
   await page.locator('#menu-graphics-v226 summary').click();const select=page.locator('#graphics-v334-display-mode');await select.waitFor();
   if(await select.locator('option').count()!==3)throw Error('Expected three display modes');
-  if(await select.locator('option[value=borderless]').isDisabled()===desktop)throw Error('Wrong borderless availability');
+  const disabled=await select.locator('option[value=borderless]').evaluate(e=>e.disabled);if(disabled===desktop)throw Error('Wrong borderless availability: desktop='+desktop+' disabled='+disabled);
   if(desktop){await select.selectOption('borderless');await page.waitForFunction(()=>window.displayModes.includes('borderless'));await page.reload();await page.waitForFunction(()=>window.displayModes.includes('borderless'));}
   if(errors.length)throw Error(errors.join('\n'));await context.close();console.log('PASS display menu',desktop?'desktop':'browser');
  }
