@@ -1,0 +1,49 @@
+name: V336 startup improvements validation
+on:
+  push:
+    branches: [feature/startup-v336]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Source and cache regression
+        run: |
+          node --check boot-v83.js
+          node --check civilization.js
+          node --check atlas-terrain-v327.js
+          node --check terrain-cache-v336.js
+          node tests/terrain-cache-v336.mjs
+          node tests/generated-world-v331.mjs
+          node --test native/tests/*.test.cjs
+      - name: Install browser tester
+        run: npm install --prefix /tmp/startup-v336 playwright@1.56.1 --fetch-retries=1 --fetch-timeout=60000
+      - name: Verify menu and reloaded 3D mesh
+        env:
+          TREE_NODE_MODULES: /tmp/startup-v336/node_modules
+        run: |
+          export CHROMIUM_PATH=$(command -v google-chrome || command -v chromium || true)
+          if [ -z "$CHROMIUM_PATH" ]; then
+            /tmp/startup-v336/node_modules/.bin/playwright install chromium
+            export CHROMIUM_PATH=$(node -e "console.log(require('/tmp/startup-v336/node_modules/playwright').chromium.executablePath())")
+          fi
+          node tests/startup-v336-browser.cjs
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v3
+        with: {packages: platform-tools}
+      - uses: gradle/actions/setup-gradle@v4
+        with: {gradle-version: '8.13'}
+      - name: Android content updater unit tests
+        working-directory: native/android
+        run: gradle :app:testDebugUnitTest --stacktrace
