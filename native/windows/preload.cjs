@@ -1,4 +1,4 @@
 'use strict';
 const {ipcRenderer,contextBridge}=require('electron');
-contextBridge.exposeInMainWorld('KuningriigidWindow',{setMode:mode=>ipcRenderer.invoke('native-display-mode',mode)});
+contextBridge.exposeInMainWorld('KuningriigidWindow',{setMode:mode=>ipcRenderer.invoke('native-display-mode',mode),quit:()=>ipcRenderer.invoke('native-quit')});
 ipcRenderer.on('native-status',(_event,data)=>{let box=document.getElementById('native-update-status');if(!box){box=document.createElement('div');box.id='native-update-status';box.style.cssText='position:fixed;top:6px;right:6px;z-index:2147483647;max-width:330px;padding:10px;color:#f8e7ba;background:#152428f2;border:1px solid #b29960;border-radius:6px;font:13px sans-serif';document.body.append(box);}box.replaceChildren(document.createTextNode(data.message));if(data.restart){const b=document.createElement('button');b.textContent='Salvesta ja käivita uuesti';b.onclick=()=>ipcRenderer.send('native-restart');box.append(document.createElement('br'),b);}const x=document.createElement('button');x.textContent='×';x.title='Peida';x.onclick=()=>box.remove();box.append(x);});

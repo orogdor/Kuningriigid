@@ -1,5 +1,6 @@
 // V226 – scene/renderer integration for menu controls. No simulation timing is throttled.
 import * as T from './vendor/three.module.js';
+import {applyUiScaleV337} from './menu-controls-v337.js';
 import {graphicsNearDistanceV226} from './graphics-settings-v226.js';
 import {setStoneNearDistanceV226} from './stone-near-lod.js';
 export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,localScene,people,getQuality,getAdaptiveScale}){
@@ -96,9 +97,7 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
   const units=graphicsNearDistanceV226({...settings,buildingDetail:settings.unitDetail});
   setStoneNearDistanceV226(detail,units);
   applyMaterialEngine();textureFiltering();peopleShadows();
-  for(const id of ['startmenu','citypanel','tools','atlaspanel','commandhud']){
-   const el=document.getElementById(id);if(el)el.style.zoom=(settings.uiScale/100);
-  }
+  applyUiScaleV337(settings.uiScale);
   const legacy=document.getElementById('quality');
   if(legacy)legacy.textContent='⚙ Graafikaseaded ('+settings.preset+')';
  }

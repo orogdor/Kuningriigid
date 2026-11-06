@@ -1,0 +1,19 @@
+/* V337: shrink build, recruit and army text while keeping the existing two-row layout. */
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #tray>.v310-card .v310-caption,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows>.v310-card .v310-caption{font-size:max(6px,calc(9 * var(--hud-u)))!important;line-height:1.03!important;}
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #tray>.v310-card .v310-caption .v121-card-name,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows>.v310-card .v310-caption b{font-size:max(6.5px,calc(11 * var(--hud-u)))!important;line-height:1.03!important;}
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #tray>.v310-card .v310-caption .v121-card-cost,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows>.v310-card .v310-caption small{font-size:max(6px,calc(8 * var(--hud-u)))!important;line-height:1.03!important;}
+/* UI scale also changes the modern picture-based HUD's --hud-u, not only legacy panels. */
+body.v306-active{--hud-u:calc((100vw / 1672) * var(--ui-scale-v337,1));}
+@media (orientation:landscape){
+ body.v306-active{--hud-u:calc(min(var(--hud-safe-w) / 1672,var(--hud-safe-h) / 941) * var(--ui-scale-v337,1));}
+}
+#startmenu #menu-options-v337 .menu-options-v337-body{padding:12px 15px 15px;display:grid;gap:8px;}
+#startmenu #menu-options-v337 label{font-size:13px;font-weight:650;color:#e8ddbe;}
+#startmenu #menu-ui-scale-v337{width:100%;min-height:39px;border:1px solid #a5a58a;border-radius:8px;background:#233e37;color:#fff1cf;font-size:14px;padding:6px 10px;}
+#startmenu #menu-options-v337 p{margin:0;font-size:12px;}
+#startmenu #menu-exit-v337{display:block;width:100%;min-height:43px;margin:10px 0 4px;border:1px solid #b7a89170;border-radius:10px;background:#2b3532;color:#f1dfc5;font-size:13px;cursor:pointer;}
+#startmenu #menu-exit-v337:focus-visible{outline:2px solid #ead199;}
+#startmenu #menu-exit-note-v337:not([hidden]){margin:5px 0;color:#f6d69c;}

@@ -49,7 +49,7 @@ const choices={
  fpsLimit:[['30','30 FPS'],['60','60 FPS'],['120','120 FPS'],['unlimited','Piiramata']],
  antiAlias:[['off','Väljas'],['msaa','MSAA (taaskäivitus)']],
  texture:[['low','Madal (1×)'],['medium','Keskmine (2×)'],['high','Kõrge (4×)']],
- uiScale:[[80,'80%'],[100,'100%'],[125,'125%'],[150,'150%']]
+ uiScale:[[70,'70%'],[80,'80%'],[90,'90%'],[100,'100%'],[110,'110%'],[125,'125%'],[150,'150%']]
 };
 const groups=[
  ['Üldine',[['preset','Graafikaprofiil'],['renderer','Renderdusmootor'],['resolution','Resolutsiooniskaala'],['viewDistance','Nähtavuskaugus'],['antiAlias','Servade silumine'],['fpsLimit','FPS piirang'],['adaptiveResolution','Automaatne resolutsioon']]],
@@ -125,11 +125,12 @@ export function buildGraphicsMenuV226(settings,onChange){
   }
   else{settings[key]=value;
    if(['lightingEngine','lighting','toneMap','ambient','shadows','postProcessing'].includes(key))settings.lightingLook='custom';
-   if(!fromPreset&&key!=='renderer'&&key!=='antiAlias')settings.preset='custom';}
+   if(!fromPreset&&key!=='renderer'&&key!=='antiAlias'&&key!=='uiScale')settings.preset='custom';}
   if(key==='renderer'||key==='antiAlias')dirty.add(key);
   saveGraphicsSettingsV226(settings);
   controls.forEach((control,k)=>{control.value=String(settings[k]);});
   onChange?.(settings,key);
+  if(key==='uiScale')window.dispatchEvent(new CustomEvent('kingdoms-ui-scale-change-v337',{detail:settings.uiScale}));
   status.textContent=dirty.size?'Renderdaja või MSAA muutub pärast mängu uuesti laadimist.':'Seaded rakendatud ja salvestatud.';
   restart.hidden=!dirty.size;
  }

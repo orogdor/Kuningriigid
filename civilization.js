@@ -1670,6 +1670,11 @@ function applyQuality(){
  graphicsRuntime.apply();
 }
 $('quality').onclick=()=>{const panel=$('menu-graphics-v226');if(panel){panel.open=!panel.open;panel.scrollIntoView({behavior:'smooth',block:'nearest'});}};
+window.addEventListener('kingdoms-ui-scale-change-v337',event=>{
+ const value=Number(event.detail);
+ if(![70,80,90,100,110,125,150].includes(value)||graphicsV226.uiScale===value)return;
+ graphicsV226.uiScale=value;graphicsRuntime.apply();
+});
 function graphicsChangeV226(config,key){
  if(key==='preset'&&config.preset!=='custom')quality=config.preset==='low'?'low':config.preset==='medium'?'medium':'high';
  applyQuality();

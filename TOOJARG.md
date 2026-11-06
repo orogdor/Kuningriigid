@@ -1,5 +1,9 @@
 # Kuningriigid – ühine tööjärg
 
+- V337 (feature/menu-v337): Väiksem ehituse/värbamise/armeekaardi tekst, kohe avanevad „Valikud” UI skaalaga 70–150%, algusmenüüsse „Sulge mäng”. Ühildub salvestatud graphics-v226 skaalaga; uue native APK/EXE kestaga läbib sulgemine senise salvestamise/kinnitamise voogu. Vana kest vajab uut installerit, brauseris kuvatakse vahelehe sulgemise juhis. Enne avaldamist kontrollida brauseri ja native testid.
+
+
+
 - V336 käivituse optimeerimise kandidaat (feature/startup-v336): veebis on algusmenüü interaktiivne enne 232 sõltuvusega mängumootori importimist; esmakordsel uue mängu loomisel koostatakse alles valiku järel üks maailm. Vana APK/EXE sisu-uuenduse tervisekontroll vajab endiselt täislaadimist, seega nendes keskkondades jääb automaatne mängumootori käivitus ühilduvuse huvides alles. V331 maailmale lisatud eraldi IndexedDB 3D-maastiku puhver, mida kasutatakse ainult identse maailmatunnuse, maastikuversiooni ja kvaliteediseade korral; vigase/puuduva puhvriga vana tee säilib. Android ContentStore loeb diskilt ainult algse oleku ja hoiab kontrollitud koopiat mälus, atomaarne oleku salvestamine säilib. V336 testid: roundtrip/sampler/invalidatsioon, külm menüü + soe maailm brauseris, Android Java state-puhver; CI ja füüsilise seadme mõõtmised vajavad kinnitamist. Salvestuste formaati ei muudetud.
 
 
