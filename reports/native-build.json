@@ -1,0 +1,49 @@
+{
+  "source_commit": "5c526db4bc96980393b74512d0ed6cc3e1d51a8e",
+  "actions": "https://github.com/orogdor/Kuningriigid/actions/runs/42205504452",
+  "release": "https://github.com/orogdor/Kuningriigid/releases/tag/webapp-v0.1.0",
+  "game": "V328",
+  "files": 1627,
+  "game_bytes": 535611283,
+  "node_tests": 8,
+  "java_tests": 3,
+  "game_quick_check_groups": 23,
+  "windows": {
+    "title": "Kingdoms V328 – Real-Time Strategy",
+    "renderer": true,
+    "url": "kingdoms://game/ffffffffffffffffffffffffffffffffffffffff/index.html",
+    "save": "function",
+    "sentinel": "kept-across-revisions",
+    "saved": true,
+    "errors": [],
+    "menuHidden": true,
+    "preview": {
+      "width": 1008,
+      "height": 681
+    }
+  },
+  "linux": {
+    "title": "Kingdoms V328 – Real-Time Strategy",
+    "renderer": true,
+    "url": "kingdoms://game/ffffffffffffffffffffffffffffffffffffffff/index.html",
+    "save": "function",
+    "sentinel": "kept-across-revisions",
+    "saved": true,
+    "errors": [],
+    "menuHidden": true,
+    "preview": {
+      "width": 1280,
+      "height": 900
+    }
+  },
+  "android": {
+    "api": 35,
+    "offline_airplane_mode": true,
+    "installed_apk_boot": true,
+    "native_log": "--------- beginning of main\n11-06 10:52:59.198  3414  3414 I KuningriigidNative: GAME_READY https://appassets.androidplatform.net/game/5c526db4bc96980393b74512d0ed6cc3e1d51a8e/index.html\n",
+    "visual_note": "First-install Android immersive-mode tutorial overlays the menu in the screenshot. This validates startup, not an Android gameplay/performance benchmark."
+  },
+  "real_device_fps": null,
+  "real_device_frame_time_ms": null,
+  "real_device_memory_bytes": null
+}
