@@ -1,5 +1,8 @@
 # Kuningriigid – ühine tööjärg
 
+- V336 käivituse optimeerimise kandidaat (feature/startup-v336): veebis on algusmenüü interaktiivne enne 232 sõltuvusega mängumootori importimist; esmakordsel uue mängu loomisel koostatakse alles valiku järel üks maailm. Vana APK/EXE sisu-uuenduse tervisekontroll vajab endiselt täislaadimist, seega nendes keskkondades jääb automaatne mängumootori käivitus ühilduvuse huvides alles. V331 maailmale lisatud eraldi IndexedDB 3D-maastiku puhver, mida kasutatakse ainult identse maailmatunnuse, maastikuversiooni ja kvaliteediseade korral; vigase/puuduva puhvriga vana tee säilib. Android ContentStore loeb diskilt ainult algse oleku ja hoiab kontrollitud koopiat mälus, atomaarne oleku salvestamine säilib. V336 testid: roundtrip/sampler/invalidatsioon, külm menüü + soe maailm brauseris, Android Java state-puhver; CI ja füüsilise seadme mõõtmised vajavad kinnitamist. Salvestuste formaati ei muudetud.
+
+
 - V335 avaldamise CI tõrge: `tests/ui-v311.mjs` nõuab, et regressioonivaade sisaldaks kõiki põhiversiooni stiilifaile; V335 `ui-v335.css` puudus `tests/ui-v309-preview.html` vaates. Nüüd lisatud sama fail päris brauserivaatesse ja `tests/ui-v335-browser.cjs` ei laadi seda kunstlikult teist korda. See taastab põhikontrolli ning võimaldab eduka põhikontrolli järel avaldada uue APK/EXE sisumanifesti. Kontrolli Actionsi jooksude tulemusi ja seadme uuendust eraldi.
 
 
