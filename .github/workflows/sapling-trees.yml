@@ -63,6 +63,8 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add assets/sapling-trees previews/sapling-trees reports/sapling-trees*.json
           git diff --cached --quiet || git commit -m 'Generate Sapling tree assets and actual GLB renders [skip ci]'
+          git fetch origin experimental/sapling-trees-30
+          git rebase origin/experimental/sapling-trees-30
           git push origin HEAD:experimental/sapling-trees-30
       - uses: actions/upload-artifact@v4
         if: always()
