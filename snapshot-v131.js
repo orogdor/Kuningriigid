@@ -14,12 +14,17 @@ export function plainSnapshot(state){
 export const serializeSnapshot=state=>JSON.stringify(plainSnapshot(state));
 export class SnapshotEncoder{
  constructor(makeWorker=()=>new Worker(new URL('./snapshot-worker-v131.js',import.meta.url),{type:'module'})){
-  this.next=0;this.pending=new Map();
-  try{this.worker=makeWorker();this.worker.onmessage=({data})=>{const job=this.pending.get(data.id);if(!job)return;this.pending.delete(data.id);if(data.error)job.reject(Error(data.error));else job.resolve(data.json)};this.worker.onerror=()=>this.fallback();}catch{this.worker=null}
+  this.next=0;this.pending=new Map();this.makeWorker=makeWorker;this.worker=null;this.workerStarted=false;
+ }
+ startWorker(){
+  if(this.workerStarted)return;
+  this.workerStarted=true;
+  try{this.worker=this.makeWorker();this.worker.onmessage=({data})=>{const job=this.pending.get(data.id);if(!job)return;this.pending.delete(data.id);if(data.error)job.reject(Error(data.error));else job.resolve(data.json)};this.worker.onerror=()=>this.fallback();}catch{this.worker=null}
  }
  fallback(){this.worker?.terminate();this.worker=null;for(const job of this.pending.values())try{job.resolve(JSON.stringify(job.snapshot))}catch(e){job.reject(e)}this.pending.clear()}
  encode(state){
   const snapshot=plainSnapshot(state);
+  this.startWorker();
   if(!this.worker)return Promise.resolve(JSON.stringify(snapshot));
   const id=++this.next;
   return new Promise((resolve,reject)=>{this.pending.set(id,{resolve,reject,snapshot});try{this.worker.postMessage({id,snapshot})}catch{this.fallback()}});

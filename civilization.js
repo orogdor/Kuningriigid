@@ -14,32 +14,32 @@ import {nextStoneBatchLOD} from './stone-next-buildings-v2235.js';
 import {nextStoneBuildingLOD} from './stone-next-buildings-v2234.js?v=224';
 import {loadGraphicsSettingsV226,saveGraphicsSettingsV226,buildGraphicsMenuV226,graphicsVegetationQualityV226} from './graphics-settings-v226.js';
 import {graphicsRuntimeV226} from './graphics-runtime-v226.js';
-import {loadWallV184,loadOrganicWallV190} from './wall-demo-v184.js?v=211';
-import {loadSecondWallTakeoverV205} from './second-wall-takeover-v205.js?v=205';
-import {loadRealZeroV206} from './real-zero-takeover-v206.js?v=206';
-import {loadFreshBronzeV217} from './fresh-bronze-v217.js?v=217';
-import {loadFreshBronzeV219} from './fresh-bronze-v219.js?v=219';
-import {loadV220City} from './v220-cities.js?v=220';
-import {loadBronzeV183} from './bronze-ai-v183.js?v=183';
-import {loadAIMountainV176} from './ai-mountain-demo-v176.js?v=180test';
-import {loadIronCityV143} from './ai-iron-demo-v143.js';
-import {loadAIMedievalV144} from './ai-medieval-demo-v144.js';
-import {loadAIMedievalV145} from './ai-medieval-demo-v145.js';
-import {loadAIMedievalV146} from './ai-medieval-demo-v146.js';
-import {loadAIMedievalV147} from './ai-medieval-demo-v147.js?v=147b';
-import {loadAIMedievalV151} from './ai-medieval-demo-v151.js';
-import {loadAIMedievalV159} from './ai-medieval-demo-v159.js';
-import {loadAIStoneV171} from './ai-stone-demo-v171.js?v=171a';
-import {loadAIStoneV172} from './ai-stone-demo-v172.js?v=172a';
-import {loadAIStoneV173} from './ai-stone-demo-v173.js?v=173a';
-import {loadAIStoneV174} from './ai-stone-demo-v174.js?v=180test';
-import {loadAIMedievalV153} from './ai-medieval-demo-v153.js';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import {cityExtent,nextCityPopulation} from './city-area-v142.js';
-import {loadIronCityV142} from './ai-iron-demo-v142.js';
-import {loadArmyTrafficTest} from './army-traffic-demo-v133.js';
-import {SnapshotEncoder,serializeSnapshot} from './snapshot-v131.js';
+
+
+import {SnapshotEncoder,serializeSnapshot} from './snapshot-v131.js?v=332a';
 import {freezeStaticTransforms,updateStaticRoot,patchMenu} from './perf-render-v131.js';
-import {loadIronAITest} from './ai-takeover-v128.js';
+
 import {createFieldModel,createFarmhouseModel,createLivestockModel,updateFarmEquipment} from './farm-visuals-v127.js?v=224';
 import {setStonePreviewV237} from './stone-near-lod.js';
 import {fieldRect,fieldSize} from './farming-v127.js';
@@ -123,12 +123,12 @@ import {Civilization,createGame,migrateGame,AGES,BUILD_AGE,TROOPS,BUILDINGS,RESO
 import {COLS,ROWS,WORLD_WIDTH,WORLD_DEPTH,WORLD_CENTER_X,WORLD_CENTER_Z,ORIGIN_X,ORIGIN_Z,center,cellAt,findPath,createBattle,mobilizeCity,settleDefenders,tickBattle,deploymentFor,tickDeployments,rememberBattle} from './campaign.js?v=117a';
 import {detailHeight,featureNames} from './world-details.js?v=123a';
 import {createAgeBuilding,animateBuilding} from './buildings.js?v=1757a';
-import {createStoneDemoState,DEMO_CITY_NAME as DEMO_CITY_NAME_V77} from './stone-demo-v77.js?v=80c';import {createStoneTownDemoState,STONE_TOWN_NAME} from './stone-town-demo-v270.js';
-const DEMO_CITY_NAME=new URLSearchParams(location.search).get('demo')==='stonetown'?STONE_TOWN_NAME:DEMO_CITY_NAME_V77;
-import {createBronzeDemoState,BRONZE_DEMO_NAME} from './bronze-demo-v79.js?v=80c';
-import {createMedievalDemoState,MEDIEVAL_DEMO_NAME} from './medieval-demo-v80.js?v=80c';
-import {createRenaissanceDemoState,RENAISSANCE_DEMO_NAME} from './renaissance-demo-v81.js?v=81a';
-import {createIndustrialDemoState,INDUSTRIAL_DEMO_NAME} from './industrial-demo-v82.js?v=82a';
+
+
+
+
+
+
 import {createBuildingInspector,describeBuilding} from './building-inspector-v82.js?v=2273';
 import {createSoldier,animateSoldier,addTree} from './visuals.js?v=261s';
 import {createGroundCover} from './graphics-v46.js?v=123a';
@@ -161,16 +161,23 @@ import {localNaturalSeaGroundV322} from './estuary-v322.js?v=325a';
 import {buildingClearance} from './navigation.js?v=2273';
 import {door} from './navigation.js?v=2273';
 import {loadProtectedGame,writeAutosave,replaceProtectedGame} from './save-safety-v73.js?v=256';
-import {loadAICityV135} from './ai-city-demo-v135.js';
-import {loadAICityV136} from './ai-city-demo-v136.js';
-import {loadAICityV137} from './ai-city-demo-v137.js';
-import {loadAICityV138} from './ai-city-demo-v138.js';
-import {loadAICityV139} from './ai-city-demo-v139.js';
-import {loadAIModernV140} from './ai-modern-demo-v140.js';
+
+
+
+
+
+
 let uiTargets=null;
 const $=id=>uiTargets?.get(id)||document.getElementById(id),dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),copy=x=>JSON.parse(JSON.stringify(x));
 initializeLocalization({BUILDINGS,TECHS,TROOPS,AGES,RESOURCE_NAMES,SHIPS,BASIC_JOBS,ERA_NAMES,onChange:()=>{renderUI();if(typeof slotUI==='function')slotUI()}});
 const demoParam=new URLSearchParams(location.search).get('demo');
+const {createStoneDemoState,DEMO_CITY_NAME:DEMO_CITY_NAME_V77} = demoParam==='stone' ? await import('./stone-demo-v77.js?v=80c') : {};
+const {createStoneTownDemoState,STONE_TOWN_NAME} = demoParam==='stonetown' ? await import('./stone-town-demo-v270.js') : {};
+const {createBronzeDemoState,BRONZE_DEMO_NAME} = demoParam==='bronze' ? await import('./bronze-demo-v79.js?v=80c') : {};
+const {createMedievalDemoState,MEDIEVAL_DEMO_NAME} = demoParam==='medieval' ? await import('./medieval-demo-v80.js?v=80c') : {};
+const {createRenaissanceDemoState,RENAISSANCE_DEMO_NAME} = demoParam==='renaissance' ? await import('./renaissance-demo-v81.js?v=81a') : {};
+const {createIndustrialDemoState,INDUSTRIAL_DEMO_NAME} = demoParam==='industrial' ? await import('./industrial-demo-v82.js?v=82a') : {};
+const DEMO_CITY_NAME=demoParam==='stonetown'?STONE_TOWN_NAME:DEMO_CITY_NAME_V77;
 const replayMatch=/^v124-(10|[1-9])$/.exec(demoParam||'');
 const replayDemo=replayMatch?Number(replayMatch[1]):null;
 const wallV184Demo=['wall-v184-coast','wall-v184-mountain'].includes(demoParam);
@@ -207,7 +214,7 @@ const validState=v=>v?.version===4&&Number.isFinite(v.seed)&&Array.isArray(v.cit
 const loadedV73=sampleDemo?{state:v220CityDemo?await (async()=>{
  let saved=null;try{saved=JSON.parse(unpackSave(localStorage.getItem('kingdoms-v220-'+demoParam)||'null'))}catch{}
  return validState(saved)&&saved.v220City?.seed===({a:7531027,b:8419063,c:9622017}[demoParam.slice(-1)])
-  ?saved:loadV220City(demoParam);
+  ?saved:(await import('./v220-cities.js?v=220')).loadV220City(demoParam);
 })():freshStartV219Demo?(()=>{
  let state=null;
  try{state=JSON.parse(unpackSave(localStorage.getItem(freshStartStorageKeyV219)||'null'))}catch{}
@@ -216,8 +223,8 @@ const loadedV73=sampleDemo?{state:v220CityDemo?await (async()=>{
  let stored=null;
  try{stored=JSON.parse(unpackSave(localStorage.getItem(freshBronzeStorageKeyV219)||'null'))}catch{}
  return validState(stored)&&stored.seed===5932019&&stored.bronzeFreshV219?.seed===5932019
-  ?stored:loadFreshBronzeV219();
-})():freshBronzeV217Demo?await loadFreshBronzeV217():realZeroV206Demo?await loadRealZeroV206(demoParam):wallTakeoverV205Demo?await loadSecondWallTakeoverV205(demoParam):wallV190Demo?await loadOrganicWallV190(demoParam):wallV184Demo?await loadWallV184(demoParam):bronzeV183Demo?await loadBronzeV183(demoParam):aiMountainV176Demo?await loadAIMountainV176():aiStoneV174Demo?await loadAIStoneV174():aiStoneV173Demo?await loadAIStoneV173():aiStoneV172Demo?await loadAIStoneV172():aiStoneV171Demo?await loadAIStoneV171():aiMedievalV159Demo?await loadAIMedievalV159():aiMedievalV153Demo?await loadAIMedievalV153():aiMedievalV151Demo?await loadAIMedievalV151():aiMedievalV147Demo?await loadAIMedievalV147():aiMedievalV146Demo?await loadAIMedievalV146():aiMedievalV145Demo?await loadAIMedievalV145():aiMedievalV144Demo?await loadAIMedievalV144():ironCityV143Demo?await loadIronCityV143():ironCityV142Demo?await loadIronCityV142():trafficDemo?await loadArmyTrafficTest():aiModernV140Demo?await loadAIModernV140():aiCityV139Demo?await loadAICityV139():aiCityV138Demo?await loadAICityV138():aiCityV137Demo?await loadAICityV137():aiCityV136Demo?await loadAICityV136():aiCityDemo?await loadAICityV135():ironAIDemo?await loadIronAITest():replayDemo?createV124ReplayState(replayDemo):patrolDemo?createBronzePatrolState():siegeDemo?(demoParam==='iron-siege'?createIronSiegeState():createBronzeSiegeState()):battleDemo?createBronzeBattleState():stoneDemo?(demoParam==='stonetown'?createStoneTownDemoState():createStoneDemoState()):bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
+  ?stored:(await import('./fresh-bronze-v219.js?v=219')).loadFreshBronzeV219();
+})():freshBronzeV217Demo?await (await import('./fresh-bronze-v217.js?v=217')).loadFreshBronzeV217():realZeroV206Demo?await (await import('./real-zero-takeover-v206.js?v=206')).loadRealZeroV206(demoParam):wallTakeoverV205Demo?await (await import('./second-wall-takeover-v205.js?v=205')).loadSecondWallTakeoverV205(demoParam):wallV190Demo?await (await import('./wall-demo-v184.js?v=211')).loadOrganicWallV190(demoParam):wallV184Demo?await (await import('./wall-demo-v184.js?v=211')).loadWallV184(demoParam):bronzeV183Demo?await (await import('./bronze-ai-v183.js?v=183')).loadBronzeV183(demoParam):aiMountainV176Demo?await (await import('./ai-mountain-demo-v176.js?v=180test')).loadAIMountainV176():aiStoneV174Demo?await (await import('./ai-stone-demo-v174.js?v=180test')).loadAIStoneV174():aiStoneV173Demo?await (await import('./ai-stone-demo-v173.js?v=173a')).loadAIStoneV173():aiStoneV172Demo?await (await import('./ai-stone-demo-v172.js?v=172a')).loadAIStoneV172():aiStoneV171Demo?await (await import('./ai-stone-demo-v171.js?v=171a')).loadAIStoneV171():aiMedievalV159Demo?await (await import('./ai-medieval-demo-v159.js')).loadAIMedievalV159():aiMedievalV153Demo?await (await import('./ai-medieval-demo-v153.js')).loadAIMedievalV153():aiMedievalV151Demo?await (await import('./ai-medieval-demo-v151.js')).loadAIMedievalV151():aiMedievalV147Demo?await (await import('./ai-medieval-demo-v147.js?v=147b')).loadAIMedievalV147():aiMedievalV146Demo?await (await import('./ai-medieval-demo-v146.js')).loadAIMedievalV146():aiMedievalV145Demo?await (await import('./ai-medieval-demo-v145.js')).loadAIMedievalV145():aiMedievalV144Demo?await (await import('./ai-medieval-demo-v144.js')).loadAIMedievalV144():ironCityV143Demo?await (await import('./ai-iron-demo-v143.js')).loadIronCityV143():ironCityV142Demo?await (await import('./ai-iron-demo-v142.js')).loadIronCityV142():trafficDemo?await (await import('./army-traffic-demo-v133.js')).loadArmyTrafficTest():aiModernV140Demo?await (await import('./ai-modern-demo-v140.js')).loadAIModernV140():aiCityV139Demo?await (await import('./ai-city-demo-v139.js')).loadAICityV139():aiCityV138Demo?await (await import('./ai-city-demo-v138.js')).loadAICityV138():aiCityV137Demo?await (await import('./ai-city-demo-v137.js')).loadAICityV137():aiCityV136Demo?await (await import('./ai-city-demo-v136.js')).loadAICityV136():aiCityDemo?await (await import('./ai-city-demo-v135.js')).loadAICityV135():ironAIDemo?await (await import('./ai-takeover-v128.js')).loadIronAITest():replayDemo?createV124ReplayState(replayDemo):patrolDemo?createBronzePatrolState():siegeDemo?(demoParam==='iron-siege'?createIronSiegeState():createBronzeSiegeState()):battleDemo?createBronzeBattleState():stoneDemo?(demoParam==='stonetown'?createStoneTownDemoState():createStoneDemoState()):bronzeDemo?createBronzeDemoState():medievalDemo?createMedievalDemoState():renaissanceDemo?createRenaissanceDemoState():createIndustrialDemoState(),recovered:false}:loadProtectedGame(localStorage,validState);state=loadedV73.state;recovered=loadedV73.recovered;
 if(!state)try{state=migrateGame(JSON.parse(localStorage.getItem('kingdoms-v1')))}catch{}
 state??=Object.assign(createGame(Math.floor(Math.random()*2147483647)),{migrationV274:{until:120},peaceUntilV276:1200});
 await hydrateGeneratedWorldV331(state);
