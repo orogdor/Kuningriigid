@@ -1,0 +1,69 @@
+name: V334 display modes
+on:
+  push:
+    branches: [feature/display-mode-v334, main]
+    paths: ['native/windows/**', 'display-mode-v334.js', 'graphics-settings-v226.js', 'tests/display-mode-v334*', '.github/workflows/display-mode-v334.yml']
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency:
+  group: display-mode-v334
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node tests/display-mode-v334.mjs
+      - run: node scripts/test-graphics-v226.mjs
+      - run: npm install --prefix /tmp/display-check playwright@1.56.1 --fetch-retries=1 --fetch-timeout=60000
+      - name: Test display options in browser
+        env: {TREE_NODE_MODULES: /tmp/display-check/node_modules}
+        run: |
+          export CHROMIUM_PATH=$(command -v google-chrome || command -v chromium || true)
+          if [ -z "$CHROMIUM_PATH" ]; then
+            /tmp/display-check/node_modules/.bin/playwright install chromium
+            export CHROMIUM_PATH=$(node -e "console.log(require('/tmp/display-check/node_modules/playwright').chromium.executablePath())")
+          fi
+          node tests/display-mode-v334-browser.cjs
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node native/scripts/stage-game.cjs
+      - run: node native/scripts/prepare-windows.cjs
+      - run: npm ci --prefix native/windows --no-audit --no-fund
+      - run: npm run dist --prefix native/windows
+        env: {CSC_IDENTITY_AUTO_DISCOVERY: 'false'}
+      - name: Test installed Windows app and display bridge
+        shell: pwsh
+        env: {NATIVE_SMOKE_OUT: native/dist/windows}
+        run: |
+          $p = Start-Process -FilePath 'native/dist/windows/win-unpacked/Kuningriigid WebApp.exe' -ArgumentList '--native-smoke' -Wait -PassThru -RedirectStandardOutput native/dist/windows-smoke.log -RedirectStandardError native/dist/windows-smoke-errors.log
+          Get-Content native/dist/windows-smoke.log
+          Get-Content native/dist/windows-smoke-errors.log
+          if ($p.ExitCode -ne 0) { throw "Windows display test failed: $($p.ExitCode)" }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v334-windows
+          path: |
+            native/dist/windows/*.exe
+            native/dist/windows-smoke*.log
+  release-windows:
+    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Release display mode V334')
+    needs: [browser, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: v334-windows, path: packages}
+      - name: Publish Windows installer
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          gh release create webapp-v0.2.0 packages/*.exe --target "$GITHUB_SHA" --prerelease --title 'Kuningriigid WebApp 0.2.0 Windows' --notes 'Windows installer with V334 display options. Installs over the previous Windows WebApp and keeps application data. This is a developer build without a code-signing certificate.'

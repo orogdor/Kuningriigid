@@ -1,4 +1,5 @@
 // V226 – central, persistent graphics settings and menu. No gameplay state is changed.
+import {displayCapabilitiesV334,applyDisplayModeV334,savedDisplayModeV334} from './display-mode-v334.js';
 export const GRAPHICS_KEY_V226='kingdoms-graphics-v226';
 export const GRAPHICS_DEFAULTS_V226=Object.freeze({
  preset:'high',renderer:'webgl',resolution:100,viewDistance:'far',
@@ -98,6 +99,25 @@ export function buildGraphicsMenuV226(settings,onChange){
  const description=document.createElement('p');description.className='graphics-v226-note';
  description.textContent='V235: PBR + AgX, filmilik, pehme, kiire ja Toon profiil. Päev kestab 24 minutit: 1 päris minut = 1 mängutund. Päikese aega saab visuaalseks võrdluseks fikseerida. WebGPU on katseline; vigade korral kasutatakse WebGL-i.';body.append(description);
  const controls=new Map(),dirty=new Set();
+ const modeSection=document.createElement('fieldset');modeSection.className='graphics-v226-fieldset';
+ const modeLegend=document.createElement('legend');modeLegend.textContent='Ekraan';modeSection.append(modeLegend);
+ const modeLabel=document.createElement('label');modeLabel.className='graphics-v226-row';
+ const modeTitle=document.createElement('span');modeTitle.textContent='Kuvarežiim';modeLabel.append(modeTitle);
+ const modeSelect=document.createElement('select');modeSelect.id='graphics-v334-display-mode';modeSelect.setAttribute('aria-label','Kuvarežiim');
+ const capabilities=displayCapabilitiesV334(),androidApp=!!globalThis.KuningriigidNative;
+ for(const [value,title,available] of [['windowed','Aknas',true],['fullscreen','Täisekraan',capabilities.fullscreen],['borderless','Aknata täisekraan',capabilities.borderless]]){
+  const option=document.createElement('option');option.value=value;option.textContent=title+(available?'':' (pole saadaval)');option.disabled=!available;modeSelect.append(option);
+ }
+ let selected=capabilities.native?savedDisplayModeV334():(document.fullscreenElement?'fullscreen':'windowed');
+ if(selected==='borderless'&&!capabilities.borderless||selected==='fullscreen'&&!capabilities.fullscreen)selected='windowed';
+ modeSelect.value=selected;modeLabel.append(modeSelect);modeSection.append(modeLabel);
+ const modeStatus=document.createElement('p');modeStatus.className='graphics-v226-note';modeStatus.setAttribute('role','status');
+ modeStatus.textContent=androidApp?'Androidi rakendus kasutab täisekraani; aknarežiim sõltub telefonist.':capabilities.native?'Windowsi WebGL-is kasutavad mõlemad täisekraanivalikud ääristeta akent; eraldi eksklusiivset režiimi ei ole.': 'Aknata täisekraan vajab seda toetavat Windowsi rakendust.';
+ if(androidApp){modeSelect.value='fullscreen';const option=modeSelect.querySelector('option[value=fullscreen]');if(option)option.textContent='Täisekraan (aktiivne)';modeSelect.disabled=true;}
+ modeSelect.addEventListener('change',async()=>{const previous=selected;try{selected=await applyDisplayModeV334(modeSelect.value);modeStatus.textContent='Kuvarežiim rakendatud.';}catch(error){selected=previous;modeSelect.value=previous;modeStatus.textContent=error.message||'Kuvarežiimi ei saanud muuta.';}});
+ if(!capabilities.native)document.addEventListener('fullscreenchange',()=>{selected=document.fullscreenElement?'fullscreen':'windowed';modeSelect.value=selected;});
+ modeSection.append(modeStatus);body.append(modeSection);
+ if(capabilities.native&&selected!=='windowed')applyDisplayModeV334(selected).catch(()=>{selected='windowed';modeSelect.value=selected;modeStatus.textContent='Salvestatud kuvarežiimi ei saanud taastada.';});
  function changed(key,value,fromPreset=false){
   if(key==='preset'&&value!=='custom'){Object.assign(settings,GRAPHICS_PRESETS_V226[value]);settings.preset=value;}
   else if(key==='lightingLook'&&value!=='custom'){
