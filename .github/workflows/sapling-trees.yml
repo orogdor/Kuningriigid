@@ -1,0 +1,62 @@
+name: Sapling 1.0 tree production (review branch only)
+on:
+  push:
+    branches: [experimental/sapling-trees-30]
+    paths: ['tools/trees/**', '.github/workflows/sapling-trees.yml']
+  workflow_dispatch:
+    inputs:
+      species:
+        description: 'First batch: pine,spruce,oak; second batch: lime,birch,palm'
+        default: pine,spruce,oak
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: sapling-production
+  cancel-in-progress: false
+jobs:
+  produce:
+    if: github.ref == 'refs/heads/experimental/sapling-trees-30'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experimental/sapling-trees-30
+          fetch-depth: 1
+      - name: Install Blender 5.2.3 and pinned Sapling 1.0.0 source
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1
+          curl --fail --location --retry 3 https://download.blender.org/release/Blender5.2/blender-5.2.3-linux-x64.tar.xz -o /tmp/blender.tar.xz
+          curl --fail --location --retry 3 https://download.blender.org/release/Blender5.2/blender-5.2.3.sha256 -o /tmp/blender.sha256
+          cd /tmp
+          mv blender.tar.xz blender-5.2.3-linux-x64.tar.xz
+          grep 'blender-5.2.3-linux-x64.tar.xz' blender.sha256 | sha256sum --check
+          tar -xf blender-5.2.3-linux-x64.tar.xz
+          git clone https://github.com/meet-brad-ch/add_curve_sapling.git /tmp/sapling-source
+          git -C /tmp/sapling-source checkout 2fa50a8f6a5f1a9485bdc394c30c81d971dc751f
+      - name: Generate real GLBs and reimported-model renders
+        env:
+          SPECIES: ${{ inputs.species || 'pine,spruce,oak' }}
+        run: |
+          /tmp/blender-5.2.3-linux-x64/blender -b -t 4 --python-exit-code 1 --python tools/trees/generate.py -- --species "$SPECIES"
+          python tools/trees/validate.py
+          pip install Pillow
+          python tools/trees/contact_sheet.py
+      - name: Save outputs on review branch
+        run: |
+          test "$(git branch --show-current)" = experimental/sapling-trees-30
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/sapling-trees previews/sapling-trees reports/sapling-trees-validation.json
+          git diff --cached --quiet || git commit -m 'Generate Sapling tree assets and actual GLB renders [skip ci]'
+          git push origin HEAD:experimental/sapling-trees-30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sapling-trees-review
+          path: |
+            assets/sapling-trees/
+            previews/sapling-trees/
+            reports/sapling-trees*.json
