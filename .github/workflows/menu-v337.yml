@@ -1,0 +1,50 @@
+name: V337 menu controls and app exit validation
+on:
+  push:
+    branches: [feature/menu-v337]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: JS and regression tests
+        run: |
+          node --check menu-controls-v337.js
+          node --check graphics-settings-v226.js
+          node --check graphics-runtime-v226.js
+          node --check civilization.js
+          node --check native/windows/main.cjs
+          node --check native/windows/preload.cjs
+          node tests/ui-v311.mjs
+          node tests/ui-v312.mjs
+          node native/tests/display-modes.test.cjs
+      - run: npm install --prefix /tmp/kuningriigid-ui337 playwright@1.56.1 --fetch-retries=1 --fetch-timeout=60000
+      - name: Browser options, compact construction cards and exit fallback
+        env: {UI_NODE_MODULES: /tmp/kuningriigid-ui337/node_modules}
+        run: |
+          export CHROMIUM_PATH=$(command -v google-chrome || command -v chromium || true)
+          if [ -z "$CHROMIUM_PATH" ]; then
+            /tmp/kuningriigid-ui337/node_modules/.bin/playwright install chromium
+            export CHROMIUM_PATH=$(node -e "console.log(require('/tmp/kuningriigid-ui337/node_modules/playwright').chromium.executablePath())")
+          fi
+          node tests/menu-v337-browser.cjs
+          node tests/ui-v335-browser.cjs
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v3
+        with: {packages: platform-tools}
+      - uses: gradle/actions/setup-gradle@v4
+        with: {gradle-version: '8.13'}
+      - name: Android Java bridge and content updater
+        working-directory: native/android
+        run: gradle :app:testDebugUnitTest :app:compileDebugJavaWithJavac --stacktrace
