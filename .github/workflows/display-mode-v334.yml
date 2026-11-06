@@ -66,4 +66,6 @@ jobs:
       - name: Publish Windows installer
         env: {GH_TOKEN: '${{ github.token }}'}
         run: |
-          gh release create webapp-v0.2.0 packages/*.exe --target "$GITHUB_SHA" --prerelease --title 'Kuningriigid WebApp 0.2.0 Windows' --notes 'Windows installer with V334 display options. Installs over the previous Windows WebApp and keeps application data. This is a developer build without a code-signing certificate.'
+          mapfile -d '' installers < <(find packages -type f -name '*.exe' -print0)
+          test ${#installers[@]} -gt 0
+          gh release create webapp-v0.2.0 "${installers[@]}" --target "$GITHUB_SHA" --prerelease --title 'Kuningriigid WebApp 0.2.0 Windows' --notes 'Windows installer with V334 display options. Installs over the previous Windows WebApp and keeps application data. This is a developer build without a code-signing certificate.'
