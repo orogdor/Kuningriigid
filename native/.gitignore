@@ -1,0 +1,9 @@
+dist/
+windows/node_modules/
+windows/shared/
+android/.gradle/
+android/**/build/
+android/app/src/main/assets/
+android/local.properties
+*.jks
+*.keystore

@@ -1,0 +1,130 @@
+name: Native offline APK and Windows EXE
+on:
+  push:
+    branches: [feature/native-offline-updates]
+    paths: ['native/**', '.github/workflows/native-app.yml', 'civilization.js']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-app-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm, cache-dependency-path: native/windows/package-lock.json}
+      - run: node --test native/tests/*.test.cjs
+      - run: node native/scripts/stage-game.cjs
+      - run: node native/scripts/prepare-windows.cjs
+      - run: npm ci --prefix native/windows --no-audit --no-fund
+      - name: Launch real bundled game in Electron with network blocked
+        run: xvfb-run -a npm run smoke --prefix native/windows
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-content-manifest
+          path: |
+            native/dist/manifest.json
+            native/dist/native-game.png
+            native/dist/native-smoke.json
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with: {gradle-version: '8.13'}
+      - run: node native/scripts/stage-game.cjs native/android/app/src/main/assets/game
+      - name: Java updater tests and installable developer-signed APK
+        working-directory: native/android
+        run: gradle :app:testDebugUnitTest :app:assembleDebug --stacktrace
+      - name: Enable Android emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Start installed APK offline in a real Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: bash native/scripts/android-smoke.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-game-smoke
+          path: |
+            native/dist/android-game.png
+            native/dist/android-smoke.log
+      - name: Name APK
+        run: cp native/android/app/build/outputs/apk/debug/app-debug.apk native/dist/Kuningriigid-WebApp-0.1.0-android.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: native/dist/Kuningriigid-WebApp-0.1.0-android.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-unit-tests
+          path: native/android/app/build/test-results/
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm, cache-dependency-path: native/windows/package-lock.json}
+      - run: node native/scripts/stage-game.cjs
+      - run: node native/scripts/prepare-windows.cjs
+      - run: npm ci --prefix native/windows --no-audit --no-fund
+      - run: npm run dist --prefix native/windows
+        env: {CSC_IDENTITY_AUTO_DISCOVERY: 'false'}
+      - name: Launch Windows app and verify saves across content revisions
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath 'native/dist/windows/win-unpacked/Kuningriigid WebApp.exe' -ArgumentList '--native-smoke' -Wait -PassThru -RedirectStandardOutput native/dist/windows-smoke.log -RedirectStandardError native/dist/windows-smoke-errors.log
+          Get-Content native/dist/windows-smoke.log
+          Get-Content native/dist/windows-smoke-errors.log
+          if ($p.ExitCode -ne 0) { throw "Windows game smoke failed: $($p.ExitCode)" }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-game-smoke
+          path: |
+            native/dist/windows-smoke*.log
+            native/dist/windows/native-smoke.json
+            native/dist/windows/native-game.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: native/dist/windows/*.exe
+  release:
+    needs: [verify, android, windows]
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {path: packages, merge-multiple: true, pattern: '*'}
+      - name: Publish tested installers
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          find packages -type f \( -name '*.apk' -o -name '*.exe' \) -print0 | sort -z | xargs -0 sha256sum > packages/SHA256SUMS.txt
+          cat > /tmp/native-notes.md <<'NOTES'
+          Kuningriigid Three.js game bundled for offline startup, including V328 Sapling trees. Android 8+ APK and Windows 10/11 x64 NSIS installer. Game updates download only changed SHA-256 verified files and activate on next launch, with automatic failed-start rollback. Saves remain independent from game updates. Android build is developer-signed; Windows installer is unsigned. This is a separate app from Kuningriigid Godot AutoPort. Packaging does not guarantee higher FPS. First device validation is still required.
+          NOTES
+          gh release view webapp-v0.1.0 >/dev/null 2>&1 || gh release create webapp-v0.1.0 --target "$GITHUB_SHA" --prerelease --title 'Kuningriigid WebApp 0.1.0 — offline APK + EXE' --notes-file /tmp/native-notes.md
+          gh release upload webapp-v0.1.0 packages/*.apk packages/*.exe packages/SHA256SUMS.txt --clobber
