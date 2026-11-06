@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "checks": 109,
+  "actions": 42241753581,
+  "regressionJob": 127973535039,
+  "worldFixture": {
+    "seed": 77,
+    "cells": 36300,
+    "resources": 1858094,
+    "coldMs": 7936.167397,
+    "warmWithDecodeMs": 2912.793663,
+    "hash": "977f1350a4574be2d126bcf5b8eb8756baaf0cc7ff331d18bf72faad101c4894",
+    "worldPayloadBytes": 20354757,
+    "autosaveReferenceCharacters": 131,
+    "townAndPartlyHarvestedTreeRetained": true,
+    "generatorHeightCallsProhibitedOnRestore": true
+  },
+  "deviceAPKTimings": null
+}

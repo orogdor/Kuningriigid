@@ -1,0 +1,186 @@
+name: V331 saved world regression and browser
+on:
+  push:
+    branches: [feature/saved-world-v331]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Main game and wall syntax
+        run: |
+          node --check civilization.js
+          node --check graphics-settings-v226.js
+          node --check graphics-runtime-v226.js
+          node --check webgpu-safety-v227.js
+          node --check vendor/three-gpu-shim.js
+          node --check boot-v83.js
+          node --check ui-painted-v287.js
+          node --check ui-reference-v288.js
+          node --check hud-v289.js
+          node --check hud-v290.js
+          node --check hud-v291.js
+          node --check hud-v292-mobile.js
+          node --check hud-v293-research.js
+          node --check research-panel-v294.js
+          node --check research-panel-v295.js
+          node --check hud-v297-refinement.js
+          node --check hud-v298-layout.js
+          node --check hud-v301-background.js
+          node --check hud-v303-buttons.js
+          node --check hud-v302-pieces.js
+          node --check selection-context-v300.js
+          node --check ui-v304.js
+          node --check ui-v309.js
+          node --check ui-v310.js
+          node --check ui-catalog-v304.js
+          node --check research-art-v304.js
+          node --check research-art-v293.js
+          node --check research-tree-v119.js
+          node --check research-ui.js
+          node --check atmosphere-v158.js
+          node --check landscape-v149.js
+          node --check sea-v158.js
+          node --check stone-near-lod.js
+          node --check civilization-core.js
+          node --check ai-defenses-v128.js
+          node --check outer-ring-v184.js
+          node --check wall-demo-v184.js
+      - name: Historic suburb geometry (V191)
+        run: node scripts/test-historic-suburb-v191.mjs
+      - name: Continuous natural barriers and gaps (V194)
+        run: node scripts/test-natural-closure-v194.mjs
+      - name: Sea and cliff suburb demos (V194)
+        run: node scripts/test-organic-demo-v190.mjs
+      - name: Defense construction priority (V188)
+        run: node scripts/test-wall-priority-v188.mjs
+      - name: Graphics settings V226 unit test
+        run: node scripts/test-graphics-v226.mjs
+      - name: Three.js r187 engine and game material compatibility
+        run: |
+          node tests/three-r187-v305.mjs
+          node tests/three-r187-v305-tsl.mjs
+      - name: V233 farm and Stone Age far LOD regression
+        run: node scripts/test-farming-lod-v233.mjs
+      - name: V234 equipment and V261 rigged warrior regressions
+        run: |
+          node scripts/test-equipment-v234.mjs
+          node scripts/test-stone-warriors-v261.mjs
+      - name: V235 day cycle and city torch regression
+        run: node scripts/test-daynight-v235.mjs
+      - name: V236 scouts and door torch regressions
+        run: node scripts/test-scout-torch-v236.mjs
+      - name: V237 farm, field and green-preview regression
+        run: node scripts/test-field-green-v237.mjs
+      - name: V238 scout visibility and marker regression
+        run: node scripts/test-scout-marker-v238.mjs
+      - name: V239 visible scout meshes and names toggle
+        run: node scripts/test-scout-model-v239.mjs
+      - name: V240 scout continuous world/detail movement
+        run: node scripts/test-scout-motion-v240.mjs
+      - name: V241 demand loading and V242 detail streaming
+        run: |
+          node scripts/test-demand-v241.mjs
+          node scripts/test-stream-v242.mjs
+          node tests/detail-stream-v319.mjs
+          node tests/detail-vegetation-v320.mjs
+          node tests/tiled-sea-v321.mjs
+          node tests/estuary-v322.mjs
+          node tests/estuary-v323.mjs
+          node tests/river-estuary-v325.mjs
+          node tests/shared-water-v326.mjs
+          node tests/adaptive-atlas-v327.mjs
+          node tests/world-assets-v327.mjs
+      - name: V243 wall connections and building rotation
+        run: node scripts/test-build-v243.mjs
+      - name: V256 save compression and wildlife
+        run: |
+          node TEST_V73.mjs
+          node tests/save-compression-v256.mjs
+          node tests/wildlife-v255/run.mjs
+      - name: V257 handheld torch and animal facing
+        run: node tests/torch-hand-v257.mjs
+      - name: V258 world and detail movement
+        run: node tests/world-movement-v258.mjs
+      - name: V293-V294 illustrated research menu regression
+        run: |
+          node tests/ui-research-v293.mjs
+          node tests/ui-research-v294.mjs
+          node tests/ui-research-v295.mjs
+          node tests/ui-research-v296.mjs
+          node tests/ui-v297.mjs
+          node tests/ui-v298.mjs
+          node tests/ui-v299-buttons.mjs
+          node tests/ui-v300-selection.mjs
+          node tests/ui-v301-background.mjs
+          node tests/ui-v302-pieces.mjs
+          node tests/ui-v303-buttons.mjs
+          node tests/ui-v304.mjs
+          node tests/ui-v306.mjs
+          node tests/ui-v311.mjs
+          node tests/ui-v312.mjs
+      - name: V268 water carriers and river water
+        run: |
+          node tests/water-carriers-v268.mjs
+          node tests/world-city-scale-v273.mjs
+          node tests/tree-growth-v274.mjs
+          node tests/migration-v274.mjs
+          node tests/lake-outlets-v275.mjs
+          node tests/river-bank-v276.mjs
+          node tests/villages-v276.mjs
+          node tests/natural-shore-v278.mjs
+          node tests/stone-age-playthrough-v280.mjs
+          node tests/stone-age-economy-v281.mjs
+          node tests/ui-v282.mjs
+          node tests/ui-painted-v287.mjs
+          node tests/ui-reference-v288.mjs
+          node tests/ui-v289.mjs
+          node tests/ui-v290.mjs
+          node tests/ui-v291.mjs
+          node tests/ui-v292-mobile.mjs
+          node tests/stone-animation-v283.mjs
+          node tests/work-spots-v284.mjs
+          node tests/coast-v286.mjs
+      - name: Forest species and density V329
+        run: |
+          node tests/forest-ecology-v329.mjs
+          node tests/continuous-forest-v330.mjs
+      - name: Generated world save and restore V331
+        run: node tests/generated-world-v331.mjs
+      - name: Gameplay smoke test
+        run: node scripts/test.mjs traffic
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install browser control
+        timeout-minutes: 3
+        run: npm install --prefix /tmp/world-check playwright@1.56.1 --fetch-retries=1 --fetch-timeout=60000
+      - name: Actual saved-world reopen, file transfer and new game
+        env:
+          TREE_NODE_MODULES: /tmp/world-check/node_modules
+        run: |
+          export CHROMIUM_PATH=$(command -v google-chrome || command -v chromium || true)
+          if [ -z "$CHROMIUM_PATH" ]; then
+            /tmp/world-check/node_modules/.bin/playwright install chromium
+            export CHROMIUM_PATH=$(node -e "console.log(require('/tmp/world-check/node_modules/playwright').chromium.executablePath())")
+          fi
+          node tests/generated-world-v331-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: saved-world-v331-evidence
+          path: |
+            reports/generated-world-v331-browser.json
+            reports/generated-world-v331-menu.png
