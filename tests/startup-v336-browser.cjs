@@ -15,6 +15,7 @@ const server=http.createServer((req,res)=>{
   await context.addInitScript(()=>localStorage.setItem('kingdoms-graphics-v226',JSON.stringify({preset:'low',renderer:'webgl',resolution:50,shadows:'off',vegetation:'low',water:'simple',clouds:false,fpsLimit:'30'})));
   const page=await context.newPage(),errors=[],requests=[];
   page.on('pageerror',err=>errors.push(String(err)));
+  page.on('console',m=>{if(['warning','error'].includes(m.type()))console.log('BROWSER_CONSOLE',m.type(),m.text())});
   page.on('request',r=>requests.push(new URL(r.url()).pathname));
   const coldStart=Date.now();
   await page.goto('http://127.0.0.1:8774/',{waitUntil:'domcontentloaded',timeout:180000});
@@ -29,6 +30,8 @@ const server=http.createServer((req,res)=>{
   await page.waitForFunction(()=>gameDebug.generatedWorldV331().persisted,null,{timeout:180000});
   const key=await page.evaluate(()=>gameDebug.terrainCacheV336().key);
   if(!key)throw Error('New world did not get a persistent cache key');
+  await page.waitForTimeout(5000);
+  console.log('CACHE_DIAGNOSTIC',JSON.stringify(await page.evaluate(()=>gameDebug.terrainCacheV336())));
   await page.waitForFunction(key=>new Promise(resolve=>{
     const request=indexedDB.open('kuningriigid-atlas-cache-v336',1);
     request.onerror=()=>resolve(false);
@@ -37,7 +40,7 @@ const server=http.createServer((req,res)=>{
       r.onsuccess=()=>resolve(!!r.result?.geometry);
       r.onerror=()=>resolve(false);
     };
-  }),key,{timeout:180000});
+  }),key,{timeout:60000});
   await page.reload({waitUntil:'domcontentloaded',timeout:180000});
   await page.waitForFunction(()=>window.KUNINGRIIGID_MENU_READY_V336&&!window.gameDebug,null,{timeout:20000});
   const secondStart=Date.now();

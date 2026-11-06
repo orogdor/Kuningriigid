@@ -30,5 +30,5 @@ export async function writeTerrainMeshV336(key,geometry){
  try{const db=await open();await new Promise((resolve,reject)=>{
   const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put({schema:SCHEMA,geometry},key);
   tx.oncomplete=resolve;tx.onerror=tx.onabort=()=>reject(tx.error||Error('Cache write failed'));
- });return true;}catch{return false;}
+ });return true;}catch(error){console.warn('V336 terrain cache write failed',String(error?.message||error));return false;}
 }
