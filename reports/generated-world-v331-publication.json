@@ -1,0 +1,16 @@
+{
+  "version": "V331",
+  "runtime": "3da72a992c8d75a672125ed7e854b757b77f1462",
+  "pr": 53,
+  "featureRegressionAndBrowser": 42241753581,
+  "mainCI": 42248325071,
+  "pages": 42248325002,
+  "nativeContent": 42248984263,
+  "checks": 109,
+  "publicTitle": "Kuningriigid · V331",
+  "worldModuleHTTP": 200,
+  "allWorkflowsSucceeded": true,
+  "newInstallerRequired": false,
+  "legacySavePreparesWorldOnce": true,
+  "deviceAPKTimings": null
+}
