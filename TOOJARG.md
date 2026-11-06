@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V340 avaldamine: esimene põhiharu CI jäi V338 testi vananenud pealkirjakontrolli taha; test kontrollib nüüd jooksva versiooni ja käivitusskriptide kooskõla, säilitades automaatsalvestuse kontrollid. Järgmine töö: uuesti käivitunud CI, Windowsi sisupaketi ja seadme FPS-i kinnitamine.
+
 - V340 katse: kõigi moodulite alguses laadimine ja maailmakaardi maastiku vahemälu väljalülitamine. Tagasipööramise lipud ja katse piirid: MUUDATUSED_V340.md.
 
 - V339: tornide paigutamine oma müürile ja elumajade väiksem lubatud vahekaugus. Kontrollid ja piirangud: MUUDATUSED_V339.md.
