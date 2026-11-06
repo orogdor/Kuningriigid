@@ -4,6 +4,9 @@ on:
     branches: [feature/display-mode-v334]
   workflow_dispatch:
 permissions: {contents: read}
+concurrency:
+  group: display-mode-v334
+  cancel-in-progress: true
 jobs:
   browser:
     runs-on: ubuntu-latest
