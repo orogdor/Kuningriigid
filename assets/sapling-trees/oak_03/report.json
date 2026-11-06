@@ -1,0 +1,38 @@
+{
+  "id": "oak_03",
+  "species": "oak",
+  "variant": 3,
+  "blender": "5.2.3 LTS",
+  "sapling": "1.0.0",
+  "seed": 7535,
+  "boundsZUp": [
+    [
+      -10.575035095214844,
+      -8.15597915649414,
+      0.0
+    ],
+    [
+      11.079446792602539,
+      8.15014362335205,
+      18.221399307250977
+    ]
+  ],
+  "near": {
+    "triangles": 1770,
+    "bytes": 177084,
+    "sha256": "ea27984710fac588200e05572ec24ccccc9648cff31356813b4954d108c42df0"
+  },
+  "mid": {
+    "triangles": 228,
+    "bytes": 107108,
+    "sha256": "f1a0fca22eaf6836181b725a6653766480e591c99f52cf85cb52099df49ba71f"
+  },
+  "far": {
+    "triangles": 6,
+    "bytes": 565260,
+    "sha256": "372bf2054e69f06ec7bfb3f939a7dcc05e31049b3344a51b48ed0293c43ef022"
+  },
+  "preview": "preview.png",
+  "impostorViews": 8,
+  "status": "awaiting_visual_approval"
+}

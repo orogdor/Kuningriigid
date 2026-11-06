@@ -1,0 +1,38 @@
+{
+  "id": "pine_01",
+  "species": "pine",
+  "variant": 1,
+  "blender": "5.2.3 LTS",
+  "sapling": "1.0.0",
+  "seed": 7301,
+  "boundsZUp": [
+    [
+      -8.119735717773438,
+      -7.401712417602539,
+      0.0
+    ],
+    [
+      6.68642520904541,
+      7.190414905548096,
+      19.366958618164062
+    ]
+  ],
+  "near": {
+    "triangles": 1836,
+    "bytes": 112340,
+    "sha256": "da91e0053204dc480831a5216118db400dc4be163882701cac49cf88759de452"
+  },
+  "mid": {
+    "triangles": 228,
+    "bytes": 41252,
+    "sha256": "c725a2e7e9ec0a4ba6022c60c4c668b1dcaa7e5864a5dfa0c1de18a4e59d4ed1"
+  },
+  "far": {
+    "triangles": 6,
+    "bytes": 480292,
+    "sha256": "b2e436bcff994a4193d2a51cca6e8a274a98d083ace1413086aa793996639b30"
+  },
+  "preview": "preview.png",
+  "impostorViews": 8,
+  "status": "awaiting_visual_approval"
+}

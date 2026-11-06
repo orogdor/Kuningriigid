@@ -1,0 +1,320 @@
+{
+  "passed": true,
+  "files": [
+    {
+      "path": "assets/sapling-trees/oak_01/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 510400,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/oak_01/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 107100,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_01/near.glb",
+      "triangles": 1593,
+      "vertices": 2200,
+      "bytes": 173852,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_02/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 687928,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/oak_02/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 107108,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_02/near.glb",
+      "triangles": 1753,
+      "vertices": 2280,
+      "bytes": 176748,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_03/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 565260,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/oak_03/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 107108,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_03/near.glb",
+      "triangles": 1770,
+      "vertices": 2290,
+      "bytes": 177084,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_04/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 579244,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/oak_04/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 107104,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_04/near.glb",
+      "triangles": 1716,
+      "vertices": 2260,
+      "bytes": 176040,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_05/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 569356,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/oak_05/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 107108,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/oak_05/near.glb",
+      "triangles": 1686,
+      "vertices": 2245,
+      "bytes": 175504,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_01/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 480292,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/pine_01/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 41252,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_01/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 112340,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_02/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 503652,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/pine_02/mid.glb",
+      "triangles": 226,
+      "vertices": 284,
+      "bytes": 41120,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_02/near.glb",
+      "triangles": 1834,
+      "vertices": 2316,
+      "bytes": 112216,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_03/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 509708,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/pine_03/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 41256,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_03/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 112348,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_04/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 446168,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/pine_04/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 41260,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_04/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 112356,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_05/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 457916,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/pine_05/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 41260,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/pine_05/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 112348,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_01/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 329780,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/spruce_01/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 39924,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_01/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 111032,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_02/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 335928,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/spruce_02/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 39932,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_02/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 111044,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_03/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 345988,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/spruce_03/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 39956,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_03/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 111048,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_04/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 306064,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/spruce_04/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 39932,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_04/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 111024,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_05/far.glb",
+      "triangles": 6,
+      "vertices": 12,
+      "bytes": 328396,
+      "embeddedTextures": 2
+    },
+    {
+      "path": "assets/sapling-trees/spruce_05/mid.glb",
+      "triangles": 228,
+      "vertices": 288,
+      "bytes": 39932,
+      "embeddedTextures": 1
+    },
+    {
+      "path": "assets/sapling-trees/spruce_05/near.glb",
+      "triangles": 1836,
+      "vertices": 2320,
+      "bytes": 111024,
+      "embeddedTextures": 1
+    }
+  ]
+}
