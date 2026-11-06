@@ -13,7 +13,7 @@ permissions:
   contents: write
 concurrency:
   group: sapling-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   produce:
     if: github.ref == 'refs/heads/experimental/sapling-trees-30'
