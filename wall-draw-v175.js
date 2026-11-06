@@ -83,6 +83,14 @@ export function wallStrokePlanV175(points,shape='straight',maxSegments=WALL_DRAW
  if(!segments.length)return {error:'Müüril puuduvad lõigud.',segments:[],curve};
  return {shape,curve,sampled,segments,length,count:segments.length};
 }
+// A tower can join wall segments under its footprint, including neighbouring joints.
+export function towerJoinsWallV339(point,wall){
+ if(!point||!wall||!['palisade','stonewall','reinforced_wall'].includes(wall.type))return false;
+ const a=wall.wallAngleV175??(wall.wallAxis?Math.PI/2:0),dx=point.x-wall.x,dz=point.z-wall.z;
+ const along=dx*Math.cos(a)-dz*Math.sin(a),across=dx*Math.sin(a)+dz*Math.cos(a);
+ const depth=wall.type==='palisade'&&wall.woodFortTierV1757===2?2.35:1.1;
+ return Math.abs(along)<=(wall.palisadeSpanV167||7)/2+4.5&&Math.abs(across)<=depth+.5;
+}
 export function wallPointInsideV175(point,wall,pad=0){
  const angle=wall.wallAngleV175??(wall.wallAxis?Math.PI/2:0);
  const span=wall.palisadeSpanV167||7;

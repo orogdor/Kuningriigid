@@ -1,5 +1,9 @@
 # Kuningriigid – ühine tööjärg
 
+- V340 katse: kõigi moodulite alguses laadimine ja maailmakaardi maastiku vahemälu väljalülitamine. Tagasipööramise lipud ja katse piirid: MUUDATUSED_V340.md.
+
+- V339: tornide paigutamine oma müürile ja elumajade väiksem lubatud vahekaugus. Kontrollid ja piirangud: MUUDATUSED_V339.md.
+
 - V337 (feature/menu-v337): Väiksem ehituse/värbamise/armeekaardi tekst, kohe avanevad „Valikud” UI skaalaga 70–150%, algusmenüüsse „Sulge mäng”. Ühildub salvestatud graphics-v226 skaalaga; uue native APK/EXE kestaga läbib sulgemine senise salvestamise/kinnitamise voogu. Vana kest vajab uut installerit, brauseris kuvatakse vahelehe sulgemise juhis. Enne avaldamist kontrollida brauseri ja native testid.
 
 

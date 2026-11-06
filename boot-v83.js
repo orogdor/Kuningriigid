@@ -1,3 +1,4 @@
+import {EAGER_MODULES_V340} from './startup-mode-v340.js';
 // V336: show a real interactive start menu before importing the large game module.
 // Installed legacy APK/EXE shells still require the full renderer startup signal;
 // keep their eager initialization until the shell protocol can be upgraded safely.
@@ -22,7 +23,7 @@ async function startEngine(openContinue=false){
  status.textContent=english()?'Loading game…':'Mängu laadimine…';
  loading=(async()=>{
   try{
-   await import('./civilization.js?v=338a');
+   await import('./civilization.js?v=340a');
    if(!window.gameDebug)throw new Error('Game initialization did not finish');
    for(const id of ['continue','newgame','quality','v51export','v51import'])byId(id).disabled=false;
    status.hidden=true;
@@ -52,7 +53,7 @@ async function newWorld(){
 }
 const query=new URLSearchParams(location.search);
 const nativeLegacy=!!(window.KuningriigidNative||window.KuningriigidWindow);
-if(nativeLegacy||query.has('demo')||query.has('autostart')||sessionStorage.getItem('kingdoms-civ-start')){
+if(EAGER_MODULES_V340||nativeLegacy||query.has('demo')||query.has('autostart')||sessionStorage.getItem('kingdoms-civ-start')){
  // Existing native updaters consider a version healthy only after gameDebug exists.
  startEngine().catch(()=>{});
 }else{
