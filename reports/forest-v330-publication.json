@@ -1,0 +1,17 @@
+{
+  "version": "V330",
+  "runtime": "966841212bb96cfe3051bf19b3f9f48f8067bb85",
+  "pr": 52,
+  "browser": 42219661822,
+  "mainCI": 42220123041,
+  "pages": 42220123006,
+  "nativeContent": 42220611583,
+  "allWorkflowsSucceeded": true,
+  "manifest": {
+    "label": "V330",
+    "files": 1629,
+    "bytes": 535615486
+  },
+  "updaterTests": 8,
+  "realDeviceFPS": null
+}
