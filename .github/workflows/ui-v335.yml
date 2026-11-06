@@ -1,0 +1,28 @@
+name: V335 compact building and army cards
+on:
+  push:
+    branches: [feature/ui-v335]
+permissions: {contents: read}
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --prefix /tmp/ui-check playwright@1.56.1 --fetch-retries=1 --fetch-timeout=60000
+      - name: Test responsive live menu interactions
+        env: {UI_NODE_MODULES: /tmp/ui-check/node_modules}
+        run: |
+          export CHROMIUM_PATH=$(command -v google-chrome || command -v chromium || true)
+          if [ -z "$CHROMIUM_PATH" ]; then
+            /tmp/ui-check/node_modules/.bin/playwright install chromium
+            export CHROMIUM_PATH=$(node -e "console.log(require('/tmp/ui-check/node_modules/playwright').chromium.executablePath())")
+          fi
+          node tests/ui-v335-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-v335-screenshots
+          path: reports/ui-v335-*.png

@@ -1,0 +1,35 @@
+/* Two compact rows in the construction and army catalogues. */
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #citypanel #tray,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows {
+  display:grid!important;
+  grid-auto-flow:column!important;
+  grid-template-rows:repeat(2,minmax(0,1fr))!important;
+  grid-auto-columns:calc(var(--choice-w) / 2)!important;
+  gap:var(--choice-gap)!important;
+  align-items:stretch!important;
+  align-content:stretch!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+}
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #citypanel #tray > .v310-card,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows > .v310-card {
+  box-sizing:border-box!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:100%!important;min-height:0!important;max-height:none!important;
+  aspect-ratio:auto!important;
+}
+/* Keep the live title and cost legible in the shorter parchment caption. */
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #tray > .v310-card .v310-visual,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows > .v310-card .v310-visual {height:52%!important;}
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #tray > .v310-card .v310-caption,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows > .v310-card .v310-caption {
+  top:58%!important;bottom:7%!important;font-size:max(7px,calc(12 * var(--hud-u)))!important;line-height:1.05!important;
+}
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #tray > .v310-card .v310-caption .v121-card-name,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows > .v310-card .v310-caption b {
+  font-size:max(8px,calc(15 * var(--hud-u)))!important;line-height:1.05!important;
+}
+body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #tray > .v310-card .v310-caption .v121-card-cost,
+body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows > .v310-card .v310-caption small {
+  font-size:max(7px,calc(11 * var(--hud-u)))!important;line-height:1.05!important;
+}

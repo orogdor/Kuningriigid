@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V335: ehitus-, värbamis- ja armeekaardid kahes kompaktses reas; ülejäänud menüüd ja filtrid säilivad. Kontrollitakse päris menüü klõpsamist ning telefoni püst- ja rõhtvaates ja arvutis.
+
 - V334 kuvarežiimid: graafikaseadetes aknas, täisekraan ja Windowsi rakenduse aknata täisekraan. Brauseri fullscreen käivitub kasutaja valikul; Androidi olemasolev rakendus on juba täisekraanil ega saa neid režiime vahetada. Aknata täisekraan Windowsis vajab uuendatud EXE kestaprogrammi; Windowsi WebGL ei taga eraldi eksklusiivset ekraanirežiimi. Mooduli, graafikaseadete ja brauseri testid läbisid. Windowsi test leidis, et V333 esimene maailmasalvestus võib ületada senist 15 s sulgemise ooteaega; Windowsi kest ootab nüüd kuni 120 s. Windowsi ja brauseri testid läbisid, V334 sisukanal 42267833739 avaldatud ning Windowsi paigaldaja webapp-v0.2.0 loodud. Pagesi avaldamine ebaõnnestus GitHubi deploy-etapis; veebiversiooni uuenemine vajab eraldi kontrolli.
 
 - V333 Androidi käivituse leevendus (2026-11-06): V330 → V332 uuendus avanes API35 emulaatoris, kuid kasutaja telefon naaseb V330 juurde; täpne põhjus ei ole kinnitatud. Vana maailma esimene püsisalvestus lükatakse pärast menüü avanemist edasi, suure maailma pakkimine annab tööjärje iga 256 ruudu järel tagasi. Salvestus ootab maailma püsivat kirjutamist ja katkestusel ei asendata vanu andmeid salvestamata maailmaviitega. Kontrollitakse Node-is, brauseris ja V330-st uuendatud Androidi emulaatoris. Telefoni tulemus jääb eraldi kontrollida.
