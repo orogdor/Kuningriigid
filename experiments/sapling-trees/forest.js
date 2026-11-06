@@ -22,8 +22,8 @@ export function placementsFromInstances(source,assetIds){
  return out;
 }
 // Both views project the SAME world-space records, rather than independently reseeding.
-export function projectPlacements(placements,{originX=0,originZ=0,units=1}={}){
- return placements.map(p=>({...p,x:(p.x-originX)*units,z:(p.z-originZ)*units,y:p.y*units,scale:p.scale*units}));
+export function projectPlacements(placements,{originX=0,originZ=0,units=1,unitsX=units,unitsZ=units,unitsY=units}={}){
+ return placements.map(p=>({...p,x:(p.x-originX)*unitsX,z:(p.z-originZ)*unitsZ,y:p.y*unitsY,scale:p.scale*unitsY,scaleX:(p.scaleX??p.scale)*unitsX,scaleZ:(p.scaleZ??p.scale)*unitsZ}));
 }
 export async function createForest(scene,placements,manifest,{base='../../assets/sapling-trees/',near=90,mid=260}={}){
  const group=new T.Group();scene.add(group);const assets=new Map(),textures=new Map(),resources=new Set();let geometryBytes=0,textureBytes=0;

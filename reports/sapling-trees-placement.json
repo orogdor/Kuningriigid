@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "seed": 77,
+  "worldInstances": 2617,
+  "detailResources": 24853,
+  "species": 6,
+  "originalMatricesUnchanged": true,
+  "worldDetailScale": {
+    "x": 4.5,
+    "z": 3.9,
+    "y": 0.3
+  }
+}
