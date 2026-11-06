@@ -1,7 +1,7 @@
 {
-  "name": "kuningriigid-webapp",
-  "version": "0.1.0",
-  "description": "Kuningriigid offline desktop game",
+  "name": "kuningriigid-v330-frozen",
+  "version": "0.330.0",
+  "description": "Fixed offline V330 comparison build with no updates",
   "author": "orogdor",
   "private": true,
   "main": "main.cjs",
@@ -15,8 +15,8 @@
     "electron-builder": "26.18.1"
   },
   "build": {
-    "appId": "ee.kuningriigid.webapp",
-    "productName": "Kuningriigid WebApp",
+    "appId": "ee.kuningriigid.v330.frozen",
+    "productName": "Kuningriigid V330 Frozen",
     "directories": {
       "output": "../dist/windows"
     },
@@ -34,7 +34,7 @@
     ],
     "win": {
       "target": "nsis",
-      "artifactName": "Kuningriigid-WebApp-${version}-win-${arch}.${ext}",
+      "artifactName": "Kuningriigid-V330-FROZEN-win-${arch}.${ext}",
       "signAndEditExecutable": false
     },
     "nsis": {
