@@ -1,0 +1,38 @@
+{
+  "id": "spruce_01",
+  "species": "spruce",
+  "variant": 1,
+  "blender": "5.2.3 LTS",
+  "sapling": "1.0.0",
+  "seed": 7401,
+  "boundsZUp": [
+    [
+      -5.902955532073975,
+      -5.609379768371582,
+      0.0
+    ],
+    [
+      6.183197975158691,
+      6.136451721191406,
+      19.602291107177734
+    ]
+  ],
+  "near": {
+    "triangles": 2522,
+    "bytes": 192824,
+    "sha256": "d3fbc132cee577595db56479cd16e3e7d8ca8fb11b2a5782b57cc08a40151f9a"
+  },
+  "mid": {
+    "triangles": 310,
+    "bytes": 79448,
+    "sha256": "d6254bfaf7be3fa0164217c588bc2543991716308de36ab91615f63ed5bdf536"
+  },
+  "far": {
+    "triangles": 6,
+    "bytes": 450568,
+    "sha256": "a675a67a2c686b282d8ac1eea44dca2a3fee2db3d54bcff2be38fe57d7fc2513"
+  },
+  "preview": "preview.png",
+  "impostorViews": 8,
+  "status": "awaiting_visual_approval"
+}

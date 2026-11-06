@@ -1,0 +1,230 @@
+{
+  "species": "spruce",
+  "preset": "douglas_fir",
+  "seed": 7469,
+  "settings": {
+    "trunks": 1,
+    "trunksFaceOut": false,
+    "countAboveBase": true,
+    "fanAngles": false,
+    "leavesAboveBase": true,
+    "blossomRate": 0.0,
+    "blossomShape": "cherry",
+    "blossomScale": 0.10000000149011612,
+    "helix": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "bendV": [
+      0.0,
+      50.0,
+      0.0,
+      0.0
+    ],
+    "flutterStrength": 1.0,
+    "flutterSpeed": 1.0,
+    "flutterRandomness": 4.0,
+    "windAnim": false,
+    "jointLevels": 2,
+    "attractOut": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "attractUp": [
+      0.0,
+      0.0,
+      0.5,
+      0.5
+    ],
+    "autoTaper": true,
+    "baseSize": 0.22,
+    "baseSize_s": 0.5,
+    "baseSplits": 0,
+    "bend": 0.0,
+    "bevel": true,
+    "bevelRes": 0,
+    "jointStep": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "branchDist": 1.0,
+    "branches": [
+      0,
+      42,
+      14,
+      0
+    ],
+    "closeTip": false,
+    "curve": [
+      0.0,
+      -35.0,
+      0.0,
+      0.0
+    ],
+    "curveBack": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "curveRes": [
+      9,
+      6,
+      3,
+      1
+    ],
+    "curveV": [
+      0.0,
+      90.0,
+      150.0,
+      0.0
+    ],
+    "customShape": [
+      0.5,
+      1.0,
+      0.30000001192092896,
+      0.5
+    ],
+    "downAngle": [
+      0.0,
+      100.0,
+      40.0,
+      45.0
+    ],
+    "downAngleV": [
+      0.0,
+      -40.0,
+      10.0,
+      10.0
+    ],
+    "animationSpeed": 1.0,
+    "gustStrength": 1.0,
+    "gustFrequency": 0.07500000298023224,
+    "handleType": "0",
+    "horzLeaves": true,
+    "leafFlutter": false,
+    "leafDist": "3",
+    "leafDownAngle": 45.0,
+    "leafDownAngleV": -10.0,
+    "leafMaterial": true,
+    "leafRotate": 140.0,
+    "leafRotateV": 0.0,
+    "leafScale": 0.65,
+    "leafScaleT": 0.0,
+    "leafScaleV": 0.0,
+    "leafScaleX": 0.9,
+    "leafShape": "rect",
+    "leafangle": 0.0,
+    "leaves": 16,
+    "length": [
+      1.0,
+      0.3255,
+      0.35,
+      0.0
+    ],
+    "lengthV": [
+      0.0,
+      0.0,
+      0.1,
+      0.0
+    ],
+    "levels": 3,
+    "loopFrames": 0,
+    "makeMesh": true,
+    "minRadius": 0.0015,
+    "nrings": 0,
+    "fastPreview": false,
+    "prune": false,
+    "pruneBase": 0.30000001192092896,
+    "prunePowerHigh": 0.5,
+    "prunePowerLow": 0.0010000000474974513,
+    "pruneRatio": 1.0,
+    "pruneWidth": 0.4000000059604645,
+    "pruneWidthPeak": 0.6000000238418579,
+    "rMode": "rotate",
+    "radiusTweak": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "ratio": 0.0165,
+    "ratioPower": 1.2,
+    "resU": 2,
+    "rootFlare": 1.99,
+    "rotate": [
+      0.0,
+      140.0,
+      140.0,
+      140.0
+    ],
+    "rotateV": [
+      0.0,
+      60.0,
+      50.0,
+      0.0
+    ],
+    "scale": 23.76,
+    "scale0": 1.0,
+    "scaleV": 0.0,
+    "scaleV0": 0.0,
+    "seed": 7469,
+    "segSplits": [
+      0.0,
+      0.5,
+      0.0,
+      0.0
+    ],
+    "shape": "0",
+    "shapeS": "4",
+    "showLeaves": true,
+    "splitAngle": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "splitAngleV": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "splitBias": 0.0,
+    "splitByLen": false,
+    "splitHeight": 0.20000000298023224,
+    "taper": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "taperCrown": 0.0,
+    "useRig": false,
+    "useOldDownAngle": true,
+    "useParentAngle": true,
+    "windStrength": 1.0,
+    "windDir": 0.0,
+    "windShear": 0.0,
+    "windBend": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "branchBase": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "leafUp": 0.0,
+    "leafUpV": 0.0
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "lime_01",
+  "species": "lime",
+  "variant": 1,
+  "blender": "5.2.3 LTS",
+  "sapling": "1.0.0",
+  "seed": 7601,
+  "boundsZUp": [
+    [
+      -4.3875203132629395,
+      -4.418951988220215,
+      0.0
+    ],
+    [
+      4.34636116027832,
+      4.269721984863281,
+      8.220016479492188
+    ]
+  ],
+  "near": {
+    "triangles": 2536,
+    "bytes": 261708,
+    "sha256": "8ca3ca6cf77a06eb2fca655ebe0b81e40402080bf1229868e0492c5678351dd0"
+  },
+  "mid": {
+    "triangles": 312,
+    "bytes": 147500,
+    "sha256": "061d32c244bedeaf90d33a5d5b9254caf23d600b9a0ec6068cec317082879d53"
+  },
+  "far": {
+    "triangles": 6,
+    "bytes": 735664,
+    "sha256": "5cd53d59e53c2ba898d2877d217f0d50c841c1b7e8f2b38fb06c5080e16c412e"
+  },
+  "preview": "preview.png",
+  "impostorViews": 8,
+  "status": "awaiting_visual_approval"
+}

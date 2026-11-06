@@ -1,0 +1,38 @@
+{
+  "id": "palm_04",
+  "species": "palm",
+  "variant": 4,
+  "blender": "5.2.3 LTS",
+  "sapling": "1.0.0",
+  "seed": 7852,
+  "boundsZUp": [
+    [
+      -5.432150363922119,
+      -5.096038818359375,
+      0.0
+    ],
+    [
+      5.349095344543457,
+      4.45402717590332,
+      21.132461547851562
+    ]
+  ],
+  "near": {
+    "triangles": 2536,
+    "bytes": 166076,
+    "sha256": "9e33c9e1d0d9b79064d835d097363c6fd10cf82c5c547ee65a08114e0951af09"
+  },
+  "mid": {
+    "triangles": 312,
+    "bytes": 51860,
+    "sha256": "6443e5c57c0343142084c39c1570d7d15aee1ada9d5eb99b2102dc35e33bb66e"
+  },
+  "far": {
+    "triangles": 6,
+    "bytes": 366336,
+    "sha256": "af18ebf391b47c882458d85cf2f47ab9f470e24d69951de9f735054542394d35"
+  },
+  "preview": "preview.png",
+  "impostorViews": 8,
+  "status": "awaiting_visual_approval"
+}

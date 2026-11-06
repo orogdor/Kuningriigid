@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "staticInstances": 120,
+  "variants": 5,
+  "sourceMatricesUnchanged": true,
+  "nearFarExclusive": true,
+  "grounded": true,
+  "liveInstances": 100,
+  "capacityGrowthPreservesMatrices": true,
+  "hiddenAndRemovedTreesOmitted": true,
+  "previousSceneCallbackPreserved": true,
+  "biomeSpecies": true,
+  "glbRequests": 15
+}

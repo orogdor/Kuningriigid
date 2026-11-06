@@ -1,5 +1,8 @@
 name: Kuningriigid latest GitHub Pages
 on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'boot-v83.js', 'sapling-trees-v328.js']
   workflow_dispatch:
 permissions:
   contents: read
@@ -37,7 +40,7 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p /tmp/game-pages
-          tar --exclude=.git --exclude=node_modules --exclude='artifacts-*' -cf - . | tar -xf - -C /tmp/game-pages
+          tar --exclude=.git --exclude=node_modules --exclude='*.blend' --exclude='*.blend1' --exclude='artifacts-*' -cf - . | tar -xf - -C /tmp/game-pages
       - uses: actions/configure-pages@v5
       - name: Upload site
         uses: actions/upload-pages-artifact@v4

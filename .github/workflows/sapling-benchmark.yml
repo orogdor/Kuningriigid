@@ -1,0 +1,57 @@
+name: Resume generated 30 trees and measure forest
+on:
+  push:
+    branches: [experimental/sapling-trees-30]
+    paths: ['.github/workflows/sapling-benchmark.yml', 'experiments/sapling-trees/benchmark.cjs']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: sapling-production
+  cancel-in-progress: true
+jobs:
+  measure:
+    if: github.ref == 'refs/heads/experimental/sapling-trees-30'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experimental/sapling-trees-30
+      - name: Verify complete 30-tree set and binary files
+        run: |
+          pip install Pillow
+          python -c "import json; d=json.load(open('assets/sapling-trees/manifest.json')); assert len(d['trees'])==30"
+          python tools/trees/validate.py
+          python tools/trees/contact_sheet.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate glTF and measure bounded browser samples
+        env:
+          TREE_NODE_MODULES: /tmp/tree-qa/node_modules
+        run: |
+          npm install --prefix /tmp/tree-qa playwright@1.56.1 gltf-validator@2.0.0-dev.3.10
+          /tmp/tree-qa/node_modules/.bin/playwright install --with-deps chromium
+          node tools/trees/test-placement.mjs
+          node tests/sapling-trees/existing-placement.mjs
+          node tools/trees/validate-gltf.cjs
+          node experiments/sapling-trees/benchmark.cjs
+      - name: Save reviewed branch outputs even if benchmark reports a failure
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/sapling-trees previews/sapling-trees reports/sapling-trees*.json
+          git diff --cached --quiet || git commit -m 'Save all 30 Blender trees, renders and measured forest reports [skip ci]'
+          git fetch origin experimental/sapling-trees-30
+          git rebase origin/experimental/sapling-trees-30
+          git push origin HEAD:experimental/sapling-trees-30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sapling-trees-complete
+          path: |
+            assets/sapling-trees/
+            previews/sapling-trees/
+            reports/sapling-trees*.json

@@ -1,0 +1,10 @@
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
+const {chromium}=require(process.env.TREE_NODE_MODULES?process.env.TREE_NODE_MODULES+'/playwright':'playwright');
+const root=path.resolve(__dirname,'../..'),mime={'.js':'application/javascript','.html':'text/html','.json':'application/json','.glb':'model/gltf-binary','.png':'image/png'};
+const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+decodeURIComponent(req.url.split('?')[0]));if(!f.startsWith(root+path.sep)){res.writeHead(403).end();return}fs.readFile(f,(e,b)=>{if(e)res.writeHead(404).end();else{res.setHeader('Content-Type',mime[path.extname(f)]||'application/octet-stream');res.end(b)}})});
+(async()=>{await new Promise(r=>server.listen(8766,'127.0.0.1',r));const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const page=await browser.newPage({viewport:{width:1280,height:800}});const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('404'))errors.push(m.text())});await page.goto('http://127.0.0.1:8766/experiments/sapling-trees/index.html');await page.waitForFunction(()=>window.forestReady||window.forestError,null,{timeout:120000});const error=await page.evaluate(()=>window.forestError);if(error)throw Error(error);
+page.on('console',m=>console.log('browser:',m.type(),m.text()));console.log('Browser forest ready');const results=await page.evaluate(()=>window.runForestBench({samples:60,durationMs:5000}));
+const report={measuredAt:new Date().toISOString(),environment:'GitHub Actions Ubuntu / Chromium / explicit SwiftShader software GPU',hardwarePerformanceClaim:false,mobileHardwareTested:false,errors,results};
+fs.writeFileSync(path.join(root,'reports/sapling-trees-browser.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+await browser.close();server.close();if(errors.length)process.exitCode=1;
+})().catch(e=>{console.error(e);server.close();process.exit(1)});

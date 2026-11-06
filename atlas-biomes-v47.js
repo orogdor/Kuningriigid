@@ -1,3 +1,4 @@
+import {SAPLING_SPECIES_V328,withSaplingInstancesV328} from './sapling-trees-v328.js';
 // World-scale foliage and geological landmarks, light-weight instanced geometry.
 // This module affects only the presentation. No gameplay pathfinding or yield changes.
 import {treeKeepV270,KEEP_MEAN_V270,FOREST_BIOMES_V270} from './forest-clumps-v270.js';
@@ -103,5 +104,5 @@ function addWorldModelInstances(group,name,placements,opts={}){
  if(lod!=='low')mesh.userData.lodGeometries={high:getWorldModel(name,lod),low:getWorldModel(name,'low')};
  placements.forEach((p,i)=>{const s=p.scale||1;dummy.position.set(p.x,p.y,p.z);dummy.rotation.set(0,p.rot||0,0);dummy.scale.set(s,s*(.9+((i*.618)%1)*.22),s);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,new T.Color(p.tint||'#ffffff'));});
  mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=true;mesh.receiveShadow=false;mesh.userData.v152Model=name;mesh.name='world '+name;
- const result=opts.spatialChunks?spatialInstances(mesh):mesh;group.add(result);return result;
+ const fallback=opts.spatialChunks?spatialInstances(mesh):mesh,result=SAPLING_SPECIES_V328.has(name)?withSaplingInstancesV328(mesh,name,fallback,{quality:lod}):fallback;group.add(result);return result;
 }
