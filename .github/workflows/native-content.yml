@@ -1,0 +1,29 @@
+name: Publish native game file updates
+on:
+  workflow_run:
+    workflows: ['Kuningriigid Fast Game Check']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency:
+  group: native-content-feed
+  cancel-in-progress: true
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || 'main' }}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify updater
+        run: node --test native/tests/*.test.cjs
+      - run: node native/scripts/stage-game.cjs
+      - name: Publish manifest; immutable changed files come from this commit
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          gh release view webapp-content >/dev/null 2>&1 || gh release create webapp-content --target "$(git rev-parse HEAD)" --prerelease --title 'WebApp content update feed' --notes 'Machine-readable game content manifest. Installers are under webapp-v0.1.0.'
+          gh release upload webapp-content native/dist/manifest.json --clobber

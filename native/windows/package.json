@@ -1,0 +1,48 @@
+{
+  "name": "kuningriigid-webapp",
+  "version": "0.1.0",
+  "description": "Kuningriigid offline desktop game",
+  "author": "orogdor",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64",
+    "smoke": "electron . --native-smoke --no-sandbox"
+  },
+  "devDependencies": {
+    "electron": "45.2.3",
+    "electron-builder": "26.18.1"
+  },
+  "build": {
+    "appId": "ee.kuningriigid.webapp",
+    "productName": "Kuningriigid WebApp",
+    "directories": {
+      "output": "../dist/windows"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "shared/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist/game",
+        "to": "game"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "artifactName": "Kuningriigid-WebApp-${version}-win-${arch}.${ext}",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true
+    }
+  }
+}
