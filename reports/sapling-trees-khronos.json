@@ -1,0 +1,545 @@
+{
+  "validatorVersion": "2.0.0-dev.3.10",
+  "reports": [
+    {
+      "path": "assets/sapling-trees/birch_01/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_01/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_01/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_02/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_02/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_02/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_03/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_03/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_03/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_04/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_04/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_04/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_05/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_05/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/birch_05/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_01/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_01/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_01/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_02/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_02/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_02/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_03/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_03/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_03/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_04/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_04/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_04/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_05/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_05/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/lime_05/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_01/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_01/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_01/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_02/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_02/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_02/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_03/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_03/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_03/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_04/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_04/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_04/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_05/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_05/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/oak_05/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_01/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_01/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_01/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_02/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_02/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_02/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_03/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_03/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_03/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_04/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_04/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_04/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_05/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_05/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/palm_05/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_01/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_01/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_01/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_02/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_02/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_02/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_03/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_03/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_03/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_04/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_04/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_04/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_05/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_05/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/pine_05/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_01/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_01/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_01/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_02/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_02/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_02/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_03/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_03/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_03/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_04/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_04/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_04/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_05/near.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_05/mid.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "path": "assets/sapling-trees/spruce_05/far.glb",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    }
+  ]
+}

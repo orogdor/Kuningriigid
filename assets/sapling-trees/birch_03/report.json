@@ -1,0 +1,38 @@
+{
+  "id": "birch_03",
+  "species": "birch",
+  "variant": 3,
+  "blender": "5.2.3 LTS",
+  "sapling": "1.0.0",
+  "seed": 7735,
+  "boundsZUp": [
+    [
+      -8.214523315429688,
+      -8.34730339050293,
+      0.0
+    ],
+    [
+      8.139395713806152,
+      8.190535545349121,
+      26.512435913085938
+    ]
+  ],
+  "near": {
+    "triangles": 2536,
+    "bytes": 232680,
+    "sha256": "5e6ae7fcc6658f87df4898fc63f9dfb3da3a3b217d5d8b50515c00222248a560"
+  },
+  "mid": {
+    "triangles": 312,
+    "bytes": 118468,
+    "sha256": "32acda50ec2262ee0e7619eca392fc426c096384a098d4d459d3862a1b85e156"
+  },
+  "far": {
+    "triangles": 6,
+    "bytes": 602548,
+    "sha256": "ad3cb7afd9dc0e9708148793bdec41a0d6fc3069bfb213eccff2ed9acb5f3d19"
+  },
+  "preview": "preview.png",
+  "impostorViews": 8,
+  "status": "awaiting_visual_approval"
+}

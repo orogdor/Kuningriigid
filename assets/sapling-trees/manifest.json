@@ -2,6 +2,386 @@
   "approved": false,
   "trees": [
     {
+      "id": "birch_01",
+      "species": "birch",
+      "variant": 1,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7701,
+      "boundsZUp": [
+        [
+          -4.859106063842773,
+          -4.770329475402832,
+          0.0
+        ],
+        [
+          4.702472686767578,
+          4.883327007293701,
+          20.452808380126953
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 232676,
+        "sha256": "7492f27b2c48eed72e99b4bbdc1c86f12af6a0089b11ff5f197deae0debb6e66"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 118464,
+        "sha256": "9bdf3a7aae00fa097c878f5d4c3b5938c26b9f7e6b828522f961dd1d10f19882"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 455868,
+        "sha256": "51b227de0be27cc250be61903a241401808edabdbfcfdd560f1f820e8f420a7c"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "birch_02",
+      "species": "birch",
+      "variant": 2,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7718,
+      "boundsZUp": [
+        [
+          -7.823189735412598,
+          -8.093544006347656,
+          0.0
+        ],
+        [
+          7.583219528198242,
+          7.840380668640137,
+          28.22461700439453
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 232680,
+        "sha256": "3d1575f54c6ecd8450db953ec71c79092e294acfe63a57430fe50271b20c57c5"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 118464,
+        "sha256": "9e2b16c80d1289aa5ab6a509fbaf41edbb621a24fe9f1cfbc5c6e8463247f7e7"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 569448,
+        "sha256": "9ab89024940cfa04dfede02fee9568b31744041da9039e236025964733fb9049"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "birch_03",
+      "species": "birch",
+      "variant": 3,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7735,
+      "boundsZUp": [
+        [
+          -8.214523315429688,
+          -8.34730339050293,
+          0.0
+        ],
+        [
+          8.139395713806152,
+          8.190535545349121,
+          26.512435913085938
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 232680,
+        "sha256": "5e6ae7fcc6658f87df4898fc63f9dfb3da3a3b217d5d8b50515c00222248a560"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 118468,
+        "sha256": "32acda50ec2262ee0e7619eca392fc426c096384a098d4d459d3862a1b85e156"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 602548,
+        "sha256": "ad3cb7afd9dc0e9708148793bdec41a0d6fc3069bfb213eccff2ed9acb5f3d19"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "birch_04",
+      "species": "birch",
+      "variant": 4,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7752,
+      "boundsZUp": [
+        [
+          -7.079285621643066,
+          -6.844139099121094,
+          0.0
+        ],
+        [
+          7.172446250915527,
+          6.860354423522949,
+          31.005775451660156
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 232680,
+        "sha256": "4adde7c21e0ef690b6c53a815a915abbb2f5976829046dc89f958199fabdc62c"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 118468,
+        "sha256": "ad1f6e4ec79e4d917a306a63313255681f6db53246bcfdfd8577c0afe398fb90"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 452656,
+        "sha256": "790aead2675385db629c89fb34262116e82a3bc3edd937c4fbbc337624ad9a93"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "birch_05",
+      "species": "birch",
+      "variant": 5,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7769,
+      "boundsZUp": [
+        [
+          -7.117921829223633,
+          -7.304493427276611,
+          0.0
+        ],
+        [
+          7.491103649139404,
+          7.363650321960449,
+          28.857576370239258
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 232680,
+        "sha256": "3ea02f03a0ec80f2339558ab4b88e90eda873f571fcc0241da11aa888bb08219"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 118468,
+        "sha256": "9e7e9ba9133a306461d46a01b9a13add126942e689340b41e1116723c1bf9705"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 518896,
+        "sha256": "0e8117b997cd9597b727fd328daa71faeac8a1d3841ca61a5237d143e99859dd"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "lime_01",
+      "species": "lime",
+      "variant": 1,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7601,
+      "boundsZUp": [
+        [
+          -4.3875203132629395,
+          -4.418951988220215,
+          0.0
+        ],
+        [
+          4.34636116027832,
+          4.269721984863281,
+          8.220016479492188
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 261708,
+        "sha256": "8ca3ca6cf77a06eb2fca655ebe0b81e40402080bf1229868e0492c5678351dd0"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 147500,
+        "sha256": "061d32c244bedeaf90d33a5d5b9254caf23d600b9a0ec6068cec317082879d53"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 735664,
+        "sha256": "5cd53d59e53c2ba898d2877d217f0d50c841c1b7e8f2b38fb06c5080e16c412e"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "lime_02",
+      "species": "lime",
+      "variant": 2,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7618,
+      "boundsZUp": [
+        [
+          -6.431060314178467,
+          -6.259511470794678,
+          0.0
+        ],
+        [
+          6.657593727111816,
+          6.738564491271973,
+          10.499183654785156
+        ]
+      ],
+      "near": {
+        "triangles": 2506,
+        "bytes": 259616,
+        "sha256": "529b02f6371fbdcee1455d10390c34f10491835728d2e953433f52e0c6daef96"
+      },
+      "mid": {
+        "triangles": 308,
+        "bytes": 147224,
+        "sha256": "e8313cb6ef1ec1293e9bae669d203cb7f3ea527446ea609175a36d443dbe390e"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 717164,
+        "sha256": "6f66b9140e0d443a34cab21494695a04762b289102c94e2349009b6872dcb27a"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "lime_03",
+      "species": "lime",
+      "variant": 3,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7635,
+      "boundsZUp": [
+        [
+          -6.946959495544434,
+          -6.281269073486328,
+          0.0
+        ],
+        [
+          6.30149507522583,
+          6.555413246154785,
+          9.49732780456543
+        ]
+      ],
+      "near": {
+        "triangles": 2458,
+        "bytes": 256252,
+        "sha256": "c432e8486d8853099e9c60d260aefd2035e2bcb30c13319468d938818b7afc06"
+      },
+      "mid": {
+        "triangles": 302,
+        "bytes": 146808,
+        "sha256": "f1aea96c9bf9d9e6dce86999bd8fc8fcb0d2616d8717c5907db5db15c32b7abb"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 658592,
+        "sha256": "885275860820c509f65e7f8dd9b666fbfbf518c9188bb34f131e10cd16f86c85"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "lime_04",
+      "species": "lime",
+      "variant": 4,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7652,
+      "boundsZUp": [
+        [
+          -6.111817836761475,
+          -5.920813083648682,
+          0.0
+        ],
+        [
+          6.107081890106201,
+          6.241751194000244,
+          11.664807319641113
+        ]
+      ],
+      "near": {
+        "triangles": 2526,
+        "bytes": 261540,
+        "sha256": "559f48a4145515c5e5dfee925844b0216717dbbb4d012a67c05ff5842471a3c0"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 147504,
+        "sha256": "faa0e3d622106166fce9aefb619ca23a47ecc9e601674eb684782b73584ef369"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 803660,
+        "sha256": "e0c76340bde83c396637149e38491a60c9c8aa579cd74b60b77fb1368c3ad034"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "lime_05",
+      "species": "lime",
+      "variant": 5,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7669,
+      "boundsZUp": [
+        [
+          -6.353703498840332,
+          -6.370790004730225,
+          0.0
+        ],
+        [
+          6.532268524169922,
+          6.5248565673828125,
+          10.961648941040039
+        ]
+      ],
+      "near": {
+        "triangles": 2532,
+        "bytes": 261436,
+        "sha256": "0622969cbfd4716990466b7cd6ffedb1c3528c4ae3b3230891533984993e8c04"
+      },
+      "mid": {
+        "triangles": 310,
+        "bytes": 147368,
+        "sha256": "913e8613be5560319d6bd63d42e2a3682241fd5fc3cf47edb4fab1eb27207698"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 728492,
+        "sha256": "ca8f9a96f40f0381d118afb00079ebba344563904d13ffc0176a8da1bf78247a"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
       "id": "oak_01",
       "species": "oak",
       "variant": 1,
@@ -10,30 +390,30 @@
       "seed": 7501,
       "boundsZUp": [
         [
-          -6.145837783813477,
-          -9.721235275268555,
+          -6.643343448638916,
+          -10.22099494934082,
           0.0
         ],
         [
-          6.40825891494751,
-          8.520753860473633,
-          13.797870635986328
+          6.873780250549316,
+          9.063201904296875,
+          14.679326057434082
         ]
       ],
       "near": {
-        "triangles": 1593,
-        "bytes": 173852,
-        "sha256": "d17ad18dc1116f42083318216443e29d49d8174182b5dff4cef8510f2932f390"
+        "triangles": 2293,
+        "bytes": 239592,
+        "sha256": "dc8d6ae522ec68ab408d36eb28f491605c74783cfec53cfa030eb8a5ec40bf7c"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 107100,
-        "sha256": "a7673c28dfbeccb3306c89f64c9bc9e6abefb2bc8196eb8fb10020c976fcd53f"
+        "triangles": 312,
+        "bytes": 129720,
+        "sha256": "030581584cf9195f25a3e9b55b7c5c9aa2b411a92a7f4fc0101ef9c17af6874e"
       },
       "far": {
         "triangles": 6,
-        "bytes": 510400,
-        "sha256": "df0e234c459edb4d4f745b1536f5352219da1e4138b3a0a872175a760d97215e"
+        "bytes": 551968,
+        "sha256": "3abdf37b7736245dbc7214fd03dceb86b6d727717387f68a47145ef27e6d6a0d"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -49,29 +429,29 @@
       "boundsZUp": [
         [
           -10.962296485900879,
-          -10.026963233947754,
+          -10.878719329833984,
           0.0
         ],
         [
-          10.701019287109375,
-          8.74870777130127,
-          21.41754150390625
+          11.670930862426758,
+          9.594663619995117,
+          21.894222259521484
         ]
       ],
       "near": {
-        "triangles": 1753,
-        "bytes": 176748,
-        "sha256": "bbde776c746557fcb685e3051e298c7f5b50ee6326f0560e28a9d2dd928bd8d0"
+        "triangles": 2453,
+        "bytes": 242488,
+        "sha256": "3fcf3371c1363217f4e79838eeb523cdc66ea3579af8361bb9a43cdff177d59e"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 107108,
-        "sha256": "ebf3111f16b415cc8ec4346fbd42888faebb1f6e7c06fe64a6a3c084b551ecd1"
+        "triangles": 312,
+        "bytes": 129732,
+        "sha256": "a8e94e74472bce9d51fd3ad2a1fffc72c06fae89078a4c34d4dc0e0f9fcc35c8"
       },
       "far": {
         "triangles": 6,
-        "bytes": 687928,
-        "sha256": "515c58729dc5037190233b847d586c21c4e0bdca3d2dcca513add7da7c5e4b8a"
+        "bytes": 761868,
+        "sha256": "ad7c19b37db601567a46be815619cf47811e805e56bbebc46de2a35421b52bfd"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -86,30 +466,30 @@
       "seed": 7535,
       "boundsZUp": [
         [
-          -10.575035095214844,
-          -8.15597915649414,
+          -11.223628997802734,
+          -8.675612449645996,
           0.0
         ],
         [
-          11.079446792602539,
-          8.15014362335205,
-          18.221399307250977
+          11.607989311218262,
+          8.559128761291504,
+          18.742881774902344
         ]
       ],
       "near": {
-        "triangles": 1770,
-        "bytes": 177084,
-        "sha256": "ea27984710fac588200e05572ec24ccccc9648cff31356813b4954d108c42df0"
+        "triangles": 2470,
+        "bytes": 242828,
+        "sha256": "60a892f2e62c8c043f63950f185cd08e4f5749892f147542bcaa6ef3630b54de"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 107108,
-        "sha256": "f1a0fca22eaf6836181b725a6653766480e591c99f52cf85cb52099df49ba71f"
+        "triangles": 312,
+        "bytes": 129732,
+        "sha256": "d15b9c87d032028c283e1bd0f84f93c0ad7413b2d1e73370c43ae8161b75751b"
       },
       "far": {
         "triangles": 6,
-        "bytes": 565260,
-        "sha256": "372bf2054e69f06ec7bfb3f939a7dcc05e31049b3344a51b48ed0293c43ef022"
+        "bytes": 621228,
+        "sha256": "b5f086c1c9226dea9d0378fe5e5e43f76df02a59520c027eb56da705aac5b3f8"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -124,30 +504,30 @@
       "seed": 7552,
       "boundsZUp": [
         [
-          -11.359268188476562,
-          -13.157658576965332,
+          -12.105145454406738,
+          -13.839044570922852,
           0.0
         ],
         [
-          10.17765998840332,
-          13.539527893066406,
-          23.774585723876953
+          10.656684875488281,
+          13.892799377441406,
+          24.860855102539062
         ]
       ],
       "near": {
-        "triangles": 1716,
-        "bytes": 176040,
-        "sha256": "8163b38b6739fdd54660fa3507c11c76d68fa4aafd59284bbcba38cc6fa9f945"
+        "triangles": 2416,
+        "bytes": 241780,
+        "sha256": "1e534a7efccbf85945bd5a943ed52352b8f2a4d381bb5050087f317ea7e68bc6"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 107104,
-        "sha256": "8ff6b87b114e5ba059f10e197a130d302b70317c7ea246b0edbe727207135a7e"
+        "triangles": 312,
+        "bytes": 129732,
+        "sha256": "73b68a9f1be90ec6f88212c1f3cfa001c3ce7186840be431bf99d014a86a4af9"
       },
       "far": {
         "triangles": 6,
-        "bytes": 579244,
-        "sha256": "183d64203ed6057553e79bf1c00e55de18732a9766fe187c76ff97ba130e35a6"
+        "bytes": 673296,
+        "sha256": "db23f021792d2efde7b4b38cac3e3308093b5e445ff1925465fa4f34781f4454"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -163,29 +543,219 @@
       "boundsZUp": [
         [
           -12.067765235900879,
-          -8.663187026977539,
+          -9.109996795654297,
           0.0
         ],
         [
-          13.14193058013916,
-          7.934632778167725,
-          21.881481170654297
+          13.615917205810547,
+          8.471139907836914,
+          23.21251678466797
         ]
       ],
       "near": {
-        "triangles": 1686,
-        "bytes": 175504,
-        "sha256": "9c569cad6a04e9ccfbadb91cae69c585deb60b6bfab0535ce973d2549b727f6e"
+        "triangles": 2386,
+        "bytes": 241244,
+        "sha256": "399744ea8fd0fa1979c48bdc971edddf1359a85f15c5605b1aa565c77c52aa14"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 107108,
-        "sha256": "29fc2edfa8e1358ec4ce3803bb2249e9e0bb689f6a8714dbf48e88a47adc570d"
+        "triangles": 312,
+        "bytes": 129728,
+        "sha256": "c4c9a0b7f14b64dab9b1d4ffc3a5ed4be89949caee8b7e13d2eae9185929e78f"
       },
       "far": {
         "triangles": 6,
-        "bytes": 569356,
-        "sha256": "50008b95223b3f18d474e40f04006565af85a24096b315aa4a4df82067d803c1"
+        "bytes": 654860,
+        "sha256": "e3edd3bf5bb81aa385781a2404fc84362f16aacbbf1b1634ba9ca4bc6d140d06"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "palm_01",
+      "species": "palm",
+      "variant": 1,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7801,
+      "boundsZUp": [
+        [
+          -3.8474371433258057,
+          -4.38753604888916,
+          0.0
+        ],
+        [
+          3.696599006652832,
+          2.1000120639801025,
+          14.1090726852417
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 166068,
+        "sha256": "5326c50b1d3be3385e340430840cce60132c1e4ecb43eedbb7c94669fe89aae7"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 51860,
+        "sha256": "6977b3d12887025ef7f828006da92de969bee8b80abde7e46d74ad1e246cb4d2"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 397108,
+        "sha256": "67258160c15bb6e0e85b5ca2ce7cfbc7f632a26d2737a9c3d1d5cd3309c4f849"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "palm_02",
+      "species": "palm",
+      "variant": 2,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7818,
+      "boundsZUp": [
+        [
+          -5.671648979187012,
+          -6.437114715576172,
+          0.0
+        ],
+        [
+          6.113160610198975,
+          4.755502700805664,
+          19.40741729736328
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 166076,
+        "sha256": "ced2552d4c7a26190e49051c4e39b2de3ce369f59f7c09ecef97471b0a11d6dd"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 51868,
+        "sha256": "10ee1aae283f7b094e11d0775abbcc13f2d880b7ffaf8541f7074e7863f0aba3"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 414296,
+        "sha256": "241e349e7955c543b549e72afa23fff47bcb9897970d7aab176995a1ae0ce0e5"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "palm_03",
+      "species": "palm",
+      "variant": 3,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7835,
+      "boundsZUp": [
+        [
+          -6.0471954345703125,
+          -6.677911758422852,
+          0.0
+        ],
+        [
+          5.391674518585205,
+          5.08658504486084,
+          17.648151397705078
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 166076,
+        "sha256": "01176a34261671b1dba7dcb094158ed3c5805c68f60ad4d0660490a0dcbb7647"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 51864,
+        "sha256": "8f7055bce1a91b2dc62b32d378eb403c67a47fb274caea94bbec5dfad5e70b86"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 439088,
+        "sha256": "3426b63b0a099cc7f7b4a31d27452901fbd28842a497171028a08d65deefd4a0"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "palm_04",
+      "species": "palm",
+      "variant": 4,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7852,
+      "boundsZUp": [
+        [
+          -5.432150363922119,
+          -5.096038818359375,
+          0.0
+        ],
+        [
+          5.349095344543457,
+          4.45402717590332,
+          21.132461547851562
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 166076,
+        "sha256": "9e33c9e1d0d9b79064d835d097363c6fd10cf82c5c547ee65a08114e0951af09"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 51860,
+        "sha256": "6443e5c57c0343142084c39c1570d7d15aee1ada9d5eb99b2102dc35e33bb66e"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 366336,
+        "sha256": "af18ebf391b47c882458d85cf2f47ab9f470e24d69951de9f735054542394d35"
+      },
+      "preview": "preview.png",
+      "impostorViews": 8,
+      "status": "awaiting_visual_approval"
+    },
+    {
+      "id": "palm_05",
+      "species": "palm",
+      "variant": 5,
+      "blender": "5.2.3 LTS",
+      "sapling": "1.0.0",
+      "seed": 7869,
+      "boundsZUp": [
+        [
+          -4.261833190917969,
+          -6.474124431610107,
+          0.0
+        ],
+        [
+          5.52020788192749,
+          4.782935619354248,
+          19.958724975585938
+        ]
+      ],
+      "near": {
+        "triangles": 2536,
+        "bytes": 166076,
+        "sha256": "d98ae36fd8d6a0c01138bbb55d7e9835818699da4bb80e90511840b32030e1a8"
+      },
+      "mid": {
+        "triangles": 312,
+        "bytes": 51864,
+        "sha256": "1dd4cdfb7bbd891a017f7ecd86329837d7c2a3ce1b5b288529b3cf90d88fac9a"
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 390792,
+        "sha256": "c3b21dd16b04781a9bd78c3de4ac8d7edf32fa696d3f432912f24f2fb66ac878"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -200,30 +770,30 @@
       "seed": 7301,
       "boundsZUp": [
         [
-          -8.119735717773438,
-          -7.401712417602539,
+          -8.693595886230469,
+          -7.936079025268555,
           0.0
         ],
         [
-          6.68642520904541,
-          7.190414905548096,
-          19.366958618164062
+          7.872777938842773,
+          7.800976276397705,
+          19.930435180664062
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 112340,
-        "sha256": "da91e0053204dc480831a5216118db400dc4be163882701cac49cf88759de452"
+        "triangles": 2536,
+        "bytes": 195936,
+        "sha256": "07423db88d93f2f0122d7278428eb3bbef40cd73f32849088a5de315a40ccdbc"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 41252,
-        "sha256": "c725a2e7e9ec0a4ba6022c60c4c668b1dcaa7e5864a5dfa0c1de18a4e59d4ed1"
+        "triangles": 312,
+        "bytes": 81728,
+        "sha256": "7aad10ba7b1beae9835f5b1d358c993e6511ecd6961582aae784e65a6fe9b144"
       },
       "far": {
         "triangles": 6,
-        "bytes": 480292,
-        "sha256": "b2e436bcff994a4193d2a51cca6e8a274a98d083ace1413086aa793996639b30"
+        "bytes": 489476,
+        "sha256": "b6f4daab148c6f2bfb12bae2b20ab72613924deaf2e4ff68e6148be134a6b9ca"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -238,30 +808,30 @@
       "seed": 7318,
       "boundsZUp": [
         [
-          -10.456836700439453,
-          -11.361918449401855,
+          -10.97894287109375,
+          -11.854832649230957,
           0.0
         ],
         [
-          11.14743423461914,
-          11.106918334960938,
-          25.34722137451172
+          11.724032402038574,
+          11.58926010131836,
+          25.96724510192871
         ]
       ],
       "near": {
-        "triangles": 1834,
-        "bytes": 112216,
-        "sha256": "64bb188c7812c2213092822ddb7fa7425ef0c861c2cc7ee503145a79dba62eaa"
+        "triangles": 2534,
+        "bytes": 195808,
+        "sha256": "f9fecb7abb6927ce064dfec706a0f8fd5f6fbb5abd89103a43e5aac18622c553"
       },
       "mid": {
-        "triangles": 226,
-        "bytes": 41120,
-        "sha256": "995741295b9e1d6072c610e960ee58e36f27c6ac17e166d9945391cc871fc3cd"
+        "triangles": 310,
+        "bytes": 81596,
+        "sha256": "f602eba3c265f26e9294d2369eb3d15d8d14e3c40141ceff6f3cf5c7dfa0ce99"
       },
       "far": {
         "triangles": 6,
-        "bytes": 503652,
-        "sha256": "dc34df962fdb7595e09c5d40b7d75d890d51267c935fbfe11de9dd7c215178b9"
+        "bytes": 531132,
+        "sha256": "20d62ff9f1256d5fb2cc9fd3a18301375e9658721ae440de70397a778b3ff784"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -276,30 +846,30 @@
       "seed": 7335,
       "boundsZUp": [
         [
-          -10.57298469543457,
-          -8.53827953338623,
+          -11.156221389770508,
+          -9.139392852783203,
           0.0
         ],
         [
-          9.165970802307129,
-          9.927465438842773,
-          22.55704689025879
+          9.947160720825195,
+          10.562271118164062,
+          23.13321304321289
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 112348,
-        "sha256": "6135d9e465c3a3926a18d14ee4a8f88e6c6e48fa9c1bbd425e49de33392d96ba"
+        "triangles": 2394,
+        "bytes": 186004,
+        "sha256": "548a602ed746081943c7f97738b7c417157c348ec05fcd7aa2420b2904a029c9"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 41256,
-        "sha256": "88ef580d7eff7170f720ad5e53e8db6c05c0b882a10976b42f6ffcd3cfc56954"
+        "triangles": 294,
+        "bytes": 80472,
+        "sha256": "95d22dfa46f8da70c591209a9f356f3078f4862ea1400071ba44e400371cf70e"
       },
       "far": {
         "triangles": 6,
-        "bytes": 509708,
-        "sha256": "9d62a8fee80034883f3ca854a96f3e1f489cbcb062d3dbc4dbdd96859db81a7f"
+        "bytes": 530684,
+        "sha256": "6849cd7c082f52f0046233bf094f732c6e4b36647786657b09bcc12bcbed984b"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -314,30 +884,30 @@
       "seed": 7352,
       "boundsZUp": [
         [
-          -11.164916038513184,
-          -10.059074401855469,
+          -12.358001708984375,
+          -10.599791526794434,
           0.0
         ],
         [
-          9.312443733215332,
-          10.960838317871094,
-          28.540925979614258
+          10.05074691772461,
+          11.491891860961914,
+          29.17888069152832
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 112356,
-        "sha256": "2222e2c89365b652cdff225f7d024e60396db29140dd3ef76eb8328a48f904bf"
+        "triangles": 2536,
+        "bytes": 195948,
+        "sha256": "59874f522917be2b4fe637d697987a6a6470474701658e22632f53f894d63f51"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 41260,
-        "sha256": "37b6605786ad73eb8155a68cadf8c6a030c9070407c0567aca1a972ca4bd53a7"
+        "triangles": 312,
+        "bytes": 81736,
+        "sha256": "85a254f45454f976ef6c49b25104059412e84bb6d2ac9727eec8a1fe8c353479"
       },
       "far": {
         "triangles": 6,
-        "bytes": 446168,
-        "sha256": "cf400b9b405761c76ac4f87fd6fdc03d450335099e1c404684772ddef71b8204"
+        "bytes": 463540,
+        "sha256": "f20fe34643b4216bb83624a8ce3d2b85a65e403c027ca9a585333ede308952f5"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -352,30 +922,30 @@
       "seed": 7369,
       "boundsZUp": [
         [
-          -9.932151794433594,
-          -9.999273300170898,
+          -10.656952857971191,
+          -11.624509811401367,
           0.0
         ],
         [
-          11.05182933807373,
-          9.068879127502441,
-          26.163467407226562
+          11.561845779418945,
+          9.459802627563477,
+          26.794384002685547
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 112348,
-        "sha256": "b406960b87e14df36e860810eeb371256c294238cfbcddd9352b398aa64d5ce4"
+        "triangles": 2536,
+        "bytes": 195944,
+        "sha256": "20ad1cbfc52389afe536a556e4a179c9eb9353e2f73076720dab5b35c04eef38"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 41260,
-        "sha256": "4fc25eb373dc909a765ba3536fbfbc7967cdbe5735355547e6473e2d38d81afc"
+        "triangles": 312,
+        "bytes": 81736,
+        "sha256": "282725e79151ca57e7eca5ff9dd8d1dcb7dda624abea6363cfa146ae39170b3b"
       },
       "far": {
         "triangles": 6,
-        "bytes": 457916,
-        "sha256": "29c70a3ea53a18fecec4494d7b1d50bfe85832ccd02351aea9f13aac32a7668d"
+        "bytes": 476200,
+        "sha256": "3e11c9387e99b20edbdd03a3dac2b808042d08328d1aa68a861c922e04f96fb7"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -390,30 +960,30 @@
       "seed": 7401,
       "boundsZUp": [
         [
-          -8.327729225158691,
-          -7.396931171417236,
-          -1.1248078346252441
+          -5.902955532073975,
+          -5.609379768371582,
+          0.0
         ],
         [
-          8.38986587524414,
-          8.47593879699707,
-          32.40867233276367
+          6.183197975158691,
+          6.136451721191406,
+          19.602291107177734
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 111032,
-        "sha256": "ff335bc92772801bd559ec1f494e2f4e73f267588c5608ba2b7fd89c23a1d1e2"
+        "triangles": 2522,
+        "bytes": 192824,
+        "sha256": "d3fbc132cee577595db56479cd16e3e7d8ca8fb11b2a5782b57cc08a40151f9a"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 39924,
-        "sha256": "f652072abbfd9c72f3c2cf367eb511795e5a58d8f233f7c6f026870f724541df"
+        "triangles": 310,
+        "bytes": 79448,
+        "sha256": "d6254bfaf7be3fa0164217c588bc2543991716308de36ab91615f63ed5bdf536"
       },
       "far": {
         "triangles": 6,
-        "bytes": 329780,
-        "sha256": "58f6d9167727335ea53554edb363fe00101c8bc69930bc1fe4deeaabad77e102"
+        "bytes": 450568,
+        "sha256": "a675a67a2c686b282d8ac1eea44dca2a3fee2db3d54bcff2be38fe57d7fc2513"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -428,30 +998,30 @@
       "seed": 7418,
       "boundsZUp": [
         [
-          -15.100081443786621,
-          -13.834567070007324,
-          -0.9489047527313232
+          -9.96854305267334,
+          -8.868898391723633,
+          0.0
         ],
         [
-          15.449756622314453,
-          14.944131851196289,
-          42.86598205566406
+          9.957432746887207,
+          9.609277725219727,
+          25.103914260864258
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 111044,
-        "sha256": "e80815cccbcfb8158c3729267c12c2d72e1b39830766e69e9eab4d3b7e728d88"
+        "triangles": 2532,
+        "bytes": 193528,
+        "sha256": "c3a21305bc74587d1a2ee89bdc7af4a280ec24ba2af6edeaac213f0e81bba963"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 39932,
-        "sha256": "7617368458cb76de5bbf8e336d176bb5c835b40e24c7956134f18e194b3280e3"
+        "triangles": 310,
+        "bytes": 79460,
+        "sha256": "8948110f16bec26afb53733c90d4acc7b95aef51f11f4242d037d2d1f5e42c15"
       },
       "far": {
         "triangles": 6,
-        "bytes": 335928,
-        "sha256": "0d40e7e36fa59be85d953c77c11bce60d9cd44ba67c00b2c050c9b843753c50f"
+        "bytes": 552096,
+        "sha256": "bd669a2237bbeab2f2edd5816b82037d6aeed491889966a93e9c22366881fb97"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -466,30 +1036,30 @@
       "seed": 7435,
       "boundsZUp": [
         [
-          -14.193613052368164,
-          -13.981249809265137,
-          -2.3725461959838867
+          -10.055655479431152,
+          -8.844067573547363,
+          0.0
         ],
         [
-          13.795326232910156,
-          16.020973205566406,
-          38.19805908203125
+          9.005237579345703,
+          10.153644561767578,
+          22.487550735473633
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 111048,
-        "sha256": "521df456e4f42a4ce2c412f5334153fcfde281a9f608b5a15814e18d8ea616c6"
+        "triangles": 2510,
+        "bytes": 191992,
+        "sha256": "9880c76cb8e8af2ab23ce4380e32f4e63919e9bba2a1bb489e346d9e2bb8ad76"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 39956,
-        "sha256": "13389486bcbdd552a80579905d45c18cbdfdd012750fa19c673c98fdd87cb4ee"
+        "triangles": 308,
+        "bytes": 79316,
+        "sha256": "f77180308167c412c3bfe77c55aba48fb3ad6642872d3dc725302d4bb771c0c5"
       },
       "far": {
         "triangles": 6,
-        "bytes": 345988,
-        "sha256": "5066a14e464b760473d0d62a82ca8be12b98a63dc8f1372b9a9b9db733cf190f"
+        "bytes": 594572,
+        "sha256": "14628361d1968ddfbbc09422c885d4dc24a01eb40596d4a9be81351e589989cc"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -504,30 +1074,30 @@
       "seed": 7452,
       "boundsZUp": [
         [
-          -13.516944885253906,
-          -12.448955535888672,
+          -8.857603073120117,
+          -8.407084465026855,
           0.0
         ],
         [
-          13.323150634765625,
-          10.965240478515625,
-          49.23735809326172
+          8.811643600463867,
+          7.715045928955078,
+          28.5718994140625
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 111024,
-        "sha256": "972d873d25846533db44d882956683326789351c4f2fd2a7d920e3abc4a74a9d"
+        "triangles": 2536,
+        "bytes": 193808,
+        "sha256": "73876ed51aef80665b8f5f88c324399588cedd8d4188b66c3d7498a24819a528"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 39932,
-        "sha256": "d229c44bee50b6a399ee19e1baa46ae5f44e731eda03265723cd279f019e67b3"
+        "triangles": 312,
+        "bytes": 79600,
+        "sha256": "5f1cb6a06e82137bd163fb66c2d92d5878d7d88dda3e803b959f570abce6c408"
       },
       "far": {
         "triangles": 6,
-        "bytes": 306064,
-        "sha256": "e2bbcf1815503ee461ee5bee00431d00f4fe36a116bd5ec0130d880a1649ae92"
+        "bytes": 472336,
+        "sha256": "ebb06e6d395ed9b9eefb2988f26244fb37ee7ec47c41b5ea3948918be14994cf"
       },
       "preview": "preview.png",
       "impostorViews": 8,
@@ -542,30 +1112,30 @@
       "seed": 7469,
       "boundsZUp": [
         [
-          -12.514596939086914,
-          -12.660988807678223,
+          -8.626961708068848,
+          -8.861858367919922,
           0.0
         ],
         [
-          14.45132064819336,
-          14.096651077270508,
-          44.882484436035156
+          9.34911823272705,
+          8.898111343383789,
+          26.112422943115234
         ]
       ],
       "near": {
-        "triangles": 1836,
-        "bytes": 111024,
-        "sha256": "f51379f5b6fbaae367ffa6a0bef0dfb88077ed66ee0cd11a3b6ffff676979a31"
+        "triangles": 2536,
+        "bytes": 193808,
+        "sha256": "9a205590a2b4f219bcdc5b83b9eb9a7989d3c3cff75678658b97a3d2e690871f"
       },
       "mid": {
-        "triangles": 228,
-        "bytes": 39932,
-        "sha256": "198aa41903925cb520ae1198aba02923382da498ef9c0f1f8ec11c0ec013d9d6"
+        "triangles": 312,
+        "bytes": 79596,
+        "sha256": "030d25b2779b67fb7f2cdf3f1238bb4416ce5ff47fbd67afaa59a69a9cecff01"
       },
       "far": {
         "triangles": 6,
-        "bytes": 328396,
-        "sha256": "6464ed9e61e109013ed5841de3498c3cd3e0a0e91a0a7f801c587e7a2d4d0925"
+        "bytes": 513696,
+        "sha256": "ab543a201de1897d405cd476cc4087932aa8359fc4d6b3d1c7ac00318c9e5147"
       },
       "preview": "preview.png",
       "impostorViews": 8,

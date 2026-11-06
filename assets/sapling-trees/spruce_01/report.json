@@ -7,30 +7,30 @@
   "seed": 7401,
   "boundsZUp": [
     [
-      -8.327729225158691,
-      -7.396931171417236,
-      -1.1248078346252441
+      -5.902955532073975,
+      -5.609379768371582,
+      0.0
     ],
     [
-      8.38986587524414,
-      8.47593879699707,
-      32.40867233276367
+      6.183197975158691,
+      6.136451721191406,
+      19.602291107177734
     ]
   ],
   "near": {
-    "triangles": 1836,
-    "bytes": 111032,
-    "sha256": "ff335bc92772801bd559ec1f494e2f4e73f267588c5608ba2b7fd89c23a1d1e2"
+    "triangles": 2522,
+    "bytes": 192824,
+    "sha256": "d3fbc132cee577595db56479cd16e3e7d8ca8fb11b2a5782b57cc08a40151f9a"
   },
   "mid": {
-    "triangles": 228,
-    "bytes": 39924,
-    "sha256": "f652072abbfd9c72f3c2cf367eb511795e5a58d8f233f7c6f026870f724541df"
+    "triangles": 310,
+    "bytes": 79448,
+    "sha256": "d6254bfaf7be3fa0164217c588bc2543991716308de36ab91615f63ed5bdf536"
   },
   "far": {
     "triangles": 6,
-    "bytes": 329780,
-    "sha256": "58f6d9167727335ea53554edb363fe00101c8bc69930bc1fe4deeaabad77e102"
+    "bytes": 450568,
+    "sha256": "a675a67a2c686b282d8ac1eea44dca2a3fee2db3d54bcff2be38fe57d7fc2513"
   },
   "preview": "preview.png",
   "impostorViews": 8,

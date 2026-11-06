@@ -8,29 +8,29 @@
   "boundsZUp": [
     [
       -12.067765235900879,
-      -8.663187026977539,
+      -9.109996795654297,
       0.0
     ],
     [
-      13.14193058013916,
-      7.934632778167725,
-      21.881481170654297
+      13.615917205810547,
+      8.471139907836914,
+      23.21251678466797
     ]
   ],
   "near": {
-    "triangles": 1686,
-    "bytes": 175504,
-    "sha256": "9c569cad6a04e9ccfbadb91cae69c585deb60b6bfab0535ce973d2549b727f6e"
+    "triangles": 2386,
+    "bytes": 241244,
+    "sha256": "399744ea8fd0fa1979c48bdc971edddf1359a85f15c5605b1aa565c77c52aa14"
   },
   "mid": {
-    "triangles": 228,
-    "bytes": 107108,
-    "sha256": "29fc2edfa8e1358ec4ce3803bb2249e9e0bb689f6a8714dbf48e88a47adc570d"
+    "triangles": 312,
+    "bytes": 129728,
+    "sha256": "c4c9a0b7f14b64dab9b1d4ffc3a5ed4be89949caee8b7e13d2eae9185929e78f"
   },
   "far": {
     "triangles": 6,
-    "bytes": 569356,
-    "sha256": "50008b95223b3f18d474e40f04006565af85a24096b315aa4a4df82067d803c1"
+    "bytes": 654860,
+    "sha256": "e3edd3bf5bb81aa385781a2404fc84362f16aacbbf1b1634ba9ca4bc6d140d06"
   },
   "preview": "preview.png",
   "impostorViews": 8,

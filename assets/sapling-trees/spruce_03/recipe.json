@@ -115,7 +115,7 @@
     "leafMaterial": true,
     "leafRotate": 140.0,
     "leafRotateV": 0.0,
-    "leafScale": 0.42,
+    "leafScale": 0.65,
     "leafScaleT": 0.0,
     "leafScaleV": 0.0,
     "leafScaleX": 0.9,
@@ -170,7 +170,7 @@
       50.0,
       0.0
     ],
-    "scale": 36.4,
+    "scale": 20.02,
     "scale0": 1.0,
     "scaleV": 0.0,
     "scaleV0": 0.0,
