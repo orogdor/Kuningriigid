@@ -94,6 +94,7 @@ def bark_from_curves(curves,mat,limit=26,sections=4,sides=5):
    for k in range(sides):faces.append((r0+k,r0+(k+1)%sides,r1+(k+1)%sides,r1+k))
   faces.extend([tuple(reversed(range(ring[0],ring[0]+sides))),tuple(range(ring[-1],ring[-1]+sides))])
  me=bpy.data.meshes.new('sapling_branch_paths');me.from_pydata(verts,[],faces);me.materials.append(mat)
+ for vertex in me.vertices:vertex.co.z=max(0,vertex.co.z)
  ob=bpy.data.objects.new('bark',me);bpy.context.collection.objects.link(ob)
  for p in me.polygons:p.use_smooth=True
  return ob
