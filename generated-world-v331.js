@@ -1,7 +1,7 @@
 // Immutable generated geography belongs to the saved game. Large data lives in
 // IndexedDB; portable JSON saves carry the same compressed payload inline.
 import {packSave,unpackSave} from './save-compression-v256.js';
-const worlds=new WeakMap(),payloads=new WeakMap(),writes=new WeakMap(),stored=new WeakSet();
+const worlds=new WeakMap(),payloads=new WeakMap(),writes=new WeakMap(),packing=new WeakMap(),stored=new WeakSet();
 let database;
 function identity(s){return [s.seed,s.type??null,s.geographyVersion??0,s.worldScaleVersion??0];}
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
@@ -48,27 +48,34 @@ export async function hydrateGeneratedWorldV331(s,storage=generatedWorldStorageV
  if(!payload)throw Error('Selle salvestuse maailm puudub seadmes. Impordi eksporditud salvestus, kus maailm on kaasas.');
  attach(s,decode(s,payload),payload);if(!embedded)stored.add(s);return true;
 }
-function packedWorld(s){
+async function packedWorld(s){
  if(payloads.has(s))return payloads.get(s);
- const w=worlds.get(s);if(!w)throw Error('Mängu maailm pole salvestamiseks valmis.');validate(s,w,s.generatedWorldV331);
- // Bound temporary allocation: never stringify the entire generated world at once.
- const {cells,...header}=w,replacer=(_k,v)=>ArrayBuffer.isView(v)?Array.from(v):v;
- const packed={encoding:'world-chunks-v1',header:packSave(JSON.stringify(header,replacer)),cells:[]};
- for(let i=0;i<cells.length;i+=256)packed.cells.push(packSave(JSON.stringify(cells.slice(i,i+256))));
- const payload=JSON.stringify(packed);if(payload.length>64*1024*1024)throw Error('Genereeritud maailm on salvestamiseks liiga suur.');
- payloads.set(s,payload);s.generatedWorldV331=refFor(s,w);return payload;
+ if(packing.has(s))return packing.get(s);
+ const job=(async()=>{
+  const w=worlds.get(s);if(!w)throw Error('Mängu maailm pole salvestamiseks valmis.');validate(s,w,s.generatedWorldV331);
+  const {cells,...header}=w,replacer=(_k,v)=>ArrayBuffer.isView(v)?Array.from(v):v;
+  const packed={encoding:'world-chunks-v1',header:packSave(JSON.stringify(header,replacer)),cells:[]};
+  for(let i=0;i<cells.length;i+=256){
+   packed.cells.push(packSave(JSON.stringify(cells.slice(i,i+256))));
+   // Let the renderer and Android health check run between expensive chunks.
+   if(i+256<cells.length)await new Promise(resolve=>setTimeout(resolve,0));
+  }
+  const payload=JSON.stringify(packed);if(payload.length>64*1024*1024)throw Error('Genereeritud maailm on salvestamiseks liiga suur.');
+  payloads.set(s,payload);s.generatedWorldV331=refFor(s,w);return payload;
+ })();
+ packing.set(s,job);try{return await job;}finally{packing.delete(s);}
 }
 export async function persistGeneratedWorldV331(s,storage=generatedWorldStorageV331){
  if(stored.has(s))return;
  if(writes.has(s))return writes.get(s);
- const job=(async()=>{const payload=packedWorld(s);try{await storage.write(s.generatedWorldV331.id,payload);stored.add(s);s.generatedWorldV331=refFor(s,worlds.get(s));}catch(error){
+ const job=(async()=>{const payload=await packedWorld(s);try{await storage.write(s.generatedWorldV331.id,payload);stored.add(s);s.generatedWorldV331=refFor(s,worlds.get(s));}catch(error){
   // The self-contained fallback must be saved successfully by the normal save
   // transaction. Never publish a dangling reference after a quota/storage error.
   s.generatedWorldV331={...refFor(s,worlds.get(s)),payload};
  }})();writes.set(s,job);try{await job;}finally{writes.delete(s);}
 }
 export async function portableGeneratedWorldSaveV331(s,serialized){
- const payload=packedWorld(s),plain=JSON.parse(serialized);plain.generatedWorldV331={...refFor(s,worlds.get(s)),payload};return JSON.stringify(plain);
+ const payload=await packedWorld(s),plain=JSON.parse(serialized);plain.generatedWorldV331={...refFor(s,worlds.get(s)),payload};return JSON.stringify(plain);
 }
 export async function importGeneratedWorldV331(s,storage=generatedWorldStorageV331){
  if(!s.generatedWorldV331)return s;await hydrateGeneratedWorldV331(s,storage);await persistGeneratedWorldV331(s,storage);return s;

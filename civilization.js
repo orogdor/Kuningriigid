@@ -231,9 +231,8 @@ await hydrateGeneratedWorldV331(state);
 let buildCategory='all',buildSearch='';const tileDoubleTap=new TileDoubleTap();
 let commandMode='select',hoverPoint=null;const cameraKeys=new CameraKeys();let lastMenuRevision=0,lastOverviewStamp='';let selectedShip=null;let cityTab='info';let restarting=false;let game=new Civilization(state),s=game.s,view='world',activeTile=null,chosen=game.cell(s.settlers.find(a=>a.team===0)||s.cities.find(c=>c.team===0)||{c:10,r:11}),selectedMover=s.settlers.find(a=>a.team===0)?.id??null,armySelected=false,selectedArmyId=0,selectedTrade=null,selectedUnit=null,mode=null,wallAxis=0,tab='build',menuOpen=true,paused=false,toastTime=0,zoom=950,drag=null,focus=new T.Vector3(),last=performance.now(),saveTimer=0,uiTimer=0,signature='',localTerrain=null,frameDelta=0,selectedBuilding=null,buildingInspector=null,ghost=null,ghostPoint=null,ghostKey='',lastTrailTime=-1,lastTrailChanges=-1,lastTrailNavVersion=-1;
 if(game.worldSourceV331==='generated')captureGeneratedWorldV331(game);
-await persistGeneratedWorldV331(state);
-// Enrich the same active save without rotating away the pre-new-game backup.
-if(game.worldSourceV331==='generated'&&!sampleDemo)writeAutosave(localStorage,serializeSnapshot(state),s.time,s.time,validState);
+// Prepare an old or new world after the first usable menu, before publishing its save reference.
+const worldNeedsInitialPersistenceV333=game.worldSourceV331==='generated'&&!sampleDemo;
 const assetDemandV241=createAssetDemandV241(game,{TROOPS,UNIT_TECH,BUILD_TECH,BUILD_AGE});assetDemandV241.update();let assetPollV241=0;
 const graphicsV226=loadGraphicsSettingsV226();
 const renderer=new T.WebGLRenderer({canvas:$('world'),antialias:graphicsV226.antiAlias!=='off'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
@@ -582,6 +581,11 @@ const destination=new T.Group(),destinationRing=new T.Mesh(new T.RingGeometry(10
 const detailTravellers=createDetailTravellers(people);const villageLife=createVillageLife(game,(tile,x,z)=>ground(tile,x,z),{quality:()=>quality});const highlightGeometry=new T.PlaneGeometry(48,48,12,12);highlightGeometry.rotateX(-Math.PI/2);const highlight=new T.Mesh(highlightGeometry,new T.MeshBasicMaterial({color:'#ebcf7b',transparent:true,opacity:.28,depthTest:false,side:T.DoubleSide}));worldScene.add(highlight);
 function say(text){s.events??=[];if(s.events.at(-1)?.text!==text){s.events.push({time:s.time,text});if(s.events.length>40)s.events.shift()}$('toast').textContent=text;$('toast').style.display='block';toastTime=5}
 const snapshotEncoder=new SnapshotEncoder();let saveGeneration=0,pendingAutosaves=0;
+if(worldNeedsInitialPersistenceV333)setTimeout(async()=>{
+ const generation=saveGeneration;
+ try{await persistGeneratedWorldV331(s);if(!restarting&&generation===saveGeneration)writeAutosave(localStorage,serializeSnapshot(s),s.time,s.time,validState);}
+ catch(error){console.error('Generated world persistence failed',error);say('Maailma salvestamine ebaõnnestus. Proovi uuesti salvestada.');}
+},6000);
 async function save(){
  if(restarting||(sampleDemo&&!freshStartV219Demo&&!freshBronzeV219Demo&&!v220CityDemo))return;
  const generation=++saveGeneration,savedTime=s.time;pendingAutosaves++;
@@ -600,6 +604,8 @@ async function save(){
  }catch{say('Salvestusruum on täis või salvestamine on blokeeritud.');return false;}finally{pendingAutosaves--}
 }
 addEventListener('pagehide',()=>{if(pendingAutosaves&&!restarting&&(!sampleDemo||v220CityDemo||freshStartV219Demo||freshBronzeV219Demo)){saveGeneration++;
+ // Never replace a recoverable old save with a reference that has not been persisted.
+ if(worldNeedsInitialPersistenceV333&&!generatedWorldStatusV331(game).persisted&&typeof s.generatedWorldV331?.payload!=='string')return;
  try{
   if(v220CityDemo)localStorage.setItem('kingdoms-v220-'+demoParam,packSave(snapshotV51()));
   else if(freshStartV219Demo)localStorage.setItem(freshStartStorageKeyV219,packSave(snapshotV51()));
