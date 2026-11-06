@@ -10,6 +10,18 @@ public class ContentStoreTest {
  private ContentStore fresh()throws Exception{return new ContentStore(new File(root,"content"),p->new FileInputStream(new File(bundle,p)));}
  @Test public void deltaAndAtomicActivation()throws Exception{JSONObject m=manifest(2,Map.of("index.html","TWO","same.glb","MODEL","renamed.glb","MODEL","new.js","NEW"));List<String> calls=new ArrayList<>();JSONObject r=store.stage(m,(f,x)->{calls.add(f.getString("path"));return new ByteArrayInputStream(b(f.getString("path").equals("index.html")?"TWO":"NEW"));},(n,c)->{});assertEquals(2,r.getInt("changed"));assertEquals(2,calls.size());assertNotNull(store.resolve(base.getString("version"),"deleted.js"));JSONObject boot=store.beginLaunch();String v=boot.getJSONObject("manifest").getString("version");assertEquals(m.getString("version"),v);assertNull(store.resolve(v,"deleted.js"));try(InputStream in=store.resolve(v,"index.html")){assertArrayEquals(b("TWO"),ContentStore.read(in,10));}store.healthy();assertEquals(v,fresh().beginLaunch().getJSONObject("manifest").getString("version"));}
  @Test public void corruptNeverActivatesAndFailedBootRollsBack()throws Exception{JSONObject m=manifest(2,Map.of("index.html","TWO"));try{store.stage(m,(f,x)->new ByteArrayInputStream(b("BAD")),(n,c)->{});fail();}catch(IOException expected){}assertEquals(base.getString("version"),store.beginLaunch().getJSONObject("manifest").getString("version"));store.stage(m,(f,x)->new ByteArrayInputStream(b("TWO")),(n,c)->{});assertEquals(m.getString("version"),store.beginLaunch().getJSONObject("manifest").getString("version"));assertTrue(fresh().beginLaunch().getBoolean("rolledBack"));assertFalse(ContentStore.safe("../secret"));assertFalse(ContentStore.safe("%2e%2e/secret"));}
+ @Test public void cachedStatePersistsPendingAndReopenStillReadsDisk()throws Exception{
+  JSONObject next=manifest(2,Map.of("index.html","TWO","same.glb","MODEL"));
+  store.stage(next,(f,m)->new ByteArrayInputStream(b("TWO")),(n,c)->{});
+  File stateFile=new File(root,"content/state.json");
+  assertTrue(stateFile.delete());
+  // A disk reread here would forget pending revision 2 and boot revision 1.
+  for(int i=0;i<50;i++)try(InputStream in=store.resolve(base.getString("version"),"index.html")){assertArrayEquals(b("ONE"),ContentStore.read(in,10));}
+  assertEquals(next.getString("version"),store.beginLaunch().getJSONObject("manifest").getString("version"));
+  assertTrue(stateFile.isFile());
+  store.healthy();
+  assertEquals(next.getString("version"),fresh().beginLaunch().getJSONObject("manifest").getString("version"));
+ }
  @Test public void interruptedDownloadResumesVerifiedObjects()throws Exception{Map<String,String> f=new LinkedHashMap<>();f.put("index.html","TWO");f.put("a.js","A");JSONObject m=manifest(2,f);try{store.stage(m,(file,x)->{if(file.getString("path").equals("a.js"))throw new IOException("offline");return new ByteArrayInputStream(b("TWO"));},(n,c)->{});fail();}catch(IOException expected){}assertEquals(base.getString("version"),store.beginLaunch().getJSONObject("manifest").getString("version"));List<String> calls=new ArrayList<>();store.stage(m,(file,x)->{calls.add(file.getString("path"));return new ByteArrayInputStream(b("A"));},(n,c)->{});assertEquals(Collections.singletonList("a.js"),calls);}
 
 }

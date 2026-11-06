@@ -17,6 +17,8 @@ public final class ContentStore {
  private final Map<String,String> baseHashes=new HashMap<>();
  private final Map<String,JSONObject> manifests=new HashMap<>();
  private final Map<String,Map<String,JSONObject>> indexes=new HashMap<>();
+ // The active/pending revision changes only through this store. Requests must not reparse state.json.
+ private JSONObject stateSnapshot;
  private boolean updating;
  public ContentStore(File root, Bundle bundle) throws Exception {
   this.root=root;this.bundle=bundle;
@@ -36,9 +38,9 @@ public final class ContentStore {
  private static List<JSONObject> files(JSONObject m)throws Exception{List<JSONObject> out=new ArrayList<>();JSONArray fs=m.getJSONArray("files");for(int i=0;i<fs.length();i++)out.add(fs.getJSONObject(i));return out;}
  private synchronized void cache(JSONObject m)throws Exception{String v=m.getString("version");manifests.put(v,m);Map<String,JSONObject> idx=new HashMap<>();for(JSONObject f:files(m))idx.put(f.getString("path"),f);indexes.put(v,idx);}
  private synchronized JSONObject manifest(String v)throws Exception{if(manifests.containsKey(v))return manifests.get(v);if(!v.matches("[0-9a-f]{40}"))throw new IOException("Invalid revision");JSONObject m=validate(new JSONObject(new String(Files.readAllBytes(new File(root,"manifests/"+v+".json").toPath()),StandardCharsets.UTF_8)));if(!m.getString("version").equals(v))throw new IOException("Revision mismatch");cache(m);return m;}
- private synchronized JSONObject state()throws Exception{try{return new JSONObject(new String(Files.readAllBytes(new File(root,"state.json").toPath()),StandardCharsets.UTF_8));}catch(Exception e){return new JSONObject().put("active",base.getString("version")).put("previous",JSONObject.NULL).put("pending",JSONObject.NULL).put("blocked",JSONObject.NULL).put("booting",false);}}
+ private synchronized JSONObject state()throws Exception{if(stateSnapshot!=null)return new JSONObject(stateSnapshot.toString());try{stateSnapshot=new JSONObject(new String(Files.readAllBytes(new File(root,"state.json").toPath()),StandardCharsets.UTF_8));}catch(Exception e){stateSnapshot=new JSONObject().put("active",base.getString("version")).put("previous",JSONObject.NULL).put("pending",JSONObject.NULL).put("blocked",JSONObject.NULL).put("booting",false);}return new JSONObject(stateSnapshot.toString());}
  private static void atomic(File dest,byte[] data)throws Exception{dest.getParentFile().mkdirs();File tmp=new File(dest.getParentFile(),dest.getName()+"."+UUID.randomUUID()+".tmp");try(FileOutputStream out=new FileOutputStream(tmp)){out.write(data);out.getFD().sync();}try{Files.move(tmp.toPath(),dest.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}catch(AtomicMoveNotSupportedException e){Files.move(tmp.toPath(),dest.toPath(),StandardCopyOption.REPLACE_EXISTING);}finally{tmp.delete();}}
- private void writeState(JSONObject s)throws Exception{atomic(new File(root,"state.json"),s.toString().getBytes(StandardCharsets.UTF_8));}
+ private synchronized void writeState(JSONObject s)throws Exception{atomic(new File(root,"state.json"),s.toString().getBytes(StandardCharsets.UTF_8));stateSnapshot=new JSONObject(s.toString());}
  public synchronized JSONObject beginLaunch()throws Exception{JSONObject s=state();boolean reverted=false;if(s.optBoolean("booting")){s.put("blocked",s.getString("active"));s.put("active",s.optString("previous",base.getString("version")));s.put("pending",JSONObject.NULL).put("booting",false);reverted=true;}else if(!s.isNull("pending")){s.put("previous",s.getString("active")).put("active",s.getString("pending")).put("pending",JSONObject.NULL).put("booting",true);}
   JSONObject m;try{m=manifest(s.getString("active"));}catch(Exception e){s.put("active",base.getString("version")).put("booting",false);m=base;}writeState(s);return new JSONObject().put("manifest",m).put("rolledBack",reverted);
  }
