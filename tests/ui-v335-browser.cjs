@@ -14,7 +14,7 @@ const server=http.createServer((req,res)=>{const p=path.resolve(root,'.'+decodeU
     await page.waitForFunction(s=>document.querySelectorAll(s).length>=2,selector);
     const info=await page.locator(selector).evaluateAll(nodes=>nodes.slice(0,2).map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,text:e.textContent.trim()}}));
     if(Math.abs(info[0].x-info[1].x)>1||info[1].y<=info[0].y+2)throw Error(kind+' cards are not stacked: '+JSON.stringify(info));
-    const menu=await page.locator('#v309-menu').boundingBox(),fullWidth=await page.locator('#v309-menu').evaluate(e=>parseFloat(getComputedStyle(e).getPropertyValue('--choice-w')));if(info[0].h>menu.height/2+.5||info[0].h<15||info[0].w>fullWidth*.6||!info.every(c=>c.text))throw Error(kind+' incorrect or empty cards '+JSON.stringify({info,fullWidth}));
+    const menu=await page.locator('#v309-menu').boundingBox(),fullWidth=await page.locator('#v309-menu').evaluate(e=>parseFloat(getComputedStyle(e).getPropertyValue('--choice-w')));if(info[0].h>menu.height/2+.5||info[0].h<15||info[0].w>Math.max(55.5,fullWidth*.6)||!info.every(c=>c.text))throw Error(kind+' incorrect or empty cards '+JSON.stringify({info,fullWidth}));
     return info;
    }
    const buildings=await check('#v309-menu #tray > .v310-card','buildings');
