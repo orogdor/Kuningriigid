@@ -43,4 +43,7 @@ function boot(){
   hint('Brauser ei luba seda vahelehte automaatselt sulgeda. Sulge mäng brauseri vahelehe X-nupuga.');
  });
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+// The renderer's graphics settings are also imported by headless Node.js regression tests.
+if(typeof document!=='undefined'){
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+}
