@@ -3,6 +3,7 @@ body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) 
 body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows {
   display:grid!important;
   grid-auto-flow:column!important;
+  grid-template-columns:none!important;
   grid-template-rows:repeat(2,minmax(0,1fr))!important;
   grid-auto-columns:calc(var(--choice-w) / 2)!important;
   gap:var(--choice-gap)!important;
@@ -10,6 +11,17 @@ body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows {
   align-content:stretch!important;
   overflow-x:auto!important;
   overflow-y:hidden!important;
+}
+/* The full-size Back and filter cards otherwise consume the narrow portrait strip. */
+@media (orientation:portrait) and (max-width:800px){
+  body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit],[data-kind=armies]) > .v309-back {
+    flex:0 0 64px!important;width:64px!important;min-width:64px!important;max-width:64px!important;
+  }
+  body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #citypanel #buildcatalogtools,
+  body.v306-active #v304-hud #v309-menu[data-kind=armies] .v310-filter {
+    flex:0 0 64px!important;width:64px!important;min-width:64px!important;max-width:64px!important;
+  }
+  body.v306-active #v309-menu[data-kind=build] .v313-build-scroll{padding-left:68px;}
 }
 body.v306-active #v304-hud #v309-menu:is([data-kind=build],[data-kind=recruit]) #citypanel #tray > .v310-card,
 body.v306-active #v304-hud #v309-menu[data-kind=armies] .v264-rows > .v310-card {
