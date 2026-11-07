@@ -985,12 +985,13 @@ function addForestFillV346(g,tile,world){
   if(y<.5||water.distance<water.width*1.55+2||insideCrossing(crossing,wxm,wzm))continue;
   if(buildings.some(b=>{const field=b.type==='field'?fieldSize(b):null,size=field?{rx:field.width/2,rz:field.depth/2}:buildingClearance(b);return size&&Math.abs(x-b.x)<size.rx+5&&Math.abs(z-b.z)<size.rz+5;}))continue;
   const id=Math.floor(forestRandomV330(wx,wz,seed,348)*1e6),kind=saplingSpeciesV328(tile,id);if(!kind)continue;
-  (byKind.get(kind)||byKind.set(kind,[]).get(kind)).push({x,y,z,id,scale:.72+forestRandomV330(wx,wz,seed,349)*.3});note(x,z);
+  (byKind.get(kind)||byKind.set(kind,[]).get(kind)).push({x,y,z,id,scale:.8+forestRandomV330(wx,wz,seed,349)*.35});note(x,z);
  }
  const m=new T.Matrix4(),q=new T.Quaternion(),up=new T.Vector3(0,1,0);
  for(const [kind,rows]of byKind){const broadleaf=!['pine','spruce'].includes(kind),src=createV48Mesh(broadleaf?'oak_1000_3':'pine_1000_3');
   const mesh=new T.InstancedMesh(src.geometry,src.material,rows.length);mesh.name='V346 forest fill '+kind;
-  rows.forEach((r,i)=>{q.setFromAxisAngle(up,r.id*.39);m.compose(new T.Vector3(r.x,r.y,r.z),q,new T.Vector3(r.scale*.9,r.scale*.9,r.scale*.9));mesh.setMatrixAt(i,m);});
+  src.geometry.computeBoundingBox();const unit=Math.max(.1,src.geometry.boundingBox.max.y-src.geometry.boundingBox.min.y),tall=(kind==='pine'||kind==='spruce'?9:kind==='palm'?10:7)*.9; // same height as resource trees
+  rows.forEach((r,i)=>{const k=tall*r.scale/unit;q.setFromAxisAngle(up,r.id*.39);m.compose(new T.Vector3(r.x,r.y,r.z),q,new T.Vector3(k,k,k));mesh.setMatrixAt(i,m);});
   mesh.instanceMatrix.needsUpdate=true;mesh.visible=false;
   const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality,cellSize:45});stand.name='V346 forest fill '+kind;g.add(stand);}
 }
