@@ -1,0 +1,76 @@
+{
+  "note": "Actual game, Chromium/SwiftShader, software renderer. Behaviour/visual smoke checks, not hardware FPS.",
+  "scenarios": [
+    {
+      "demo": "stonetown",
+      "version": "Kingdoms V343 – Real-Time Strategy",
+      "before": {
+        "time": 202.99999999999983
+      },
+      "state": {
+        "time": 205.99999999999966,
+        "buildings": 39,
+        "meshes": 789,
+        "skin": 10,
+        "instances": 12462,
+        "invalid": 0,
+        "trees": {
+          "staticRoots": 0,
+          "staticReady": 0,
+          "liveRoots": 1311,
+          "liveReady": 256,
+          "variants": 10,
+          "errors": [],
+          "visibleMeshes": 28,
+          "levels": {
+            "near": 0,
+            "mid": 484,
+            "far": 28
+          }
+        },
+        "visibleTiles": 25,
+        "readyTiles": 25,
+        "calls": 505,
+        "triangles": 1438262
+      },
+      "errors": []
+    },
+    {
+      "demo": "bronze-battle",
+      "version": "Kingdoms V343 – Real-Time Strategy",
+      "before": {
+        "time": 0,
+        "battle": 0
+      },
+      "state": {
+        "time": 0.5,
+        "battleElapsed": 0.25,
+        "men": 480,
+        "buildings": 0,
+        "meshes": 331,
+        "skin": 0,
+        "instances": 21236,
+        "invalid": 0,
+        "trees": {
+          "staticRoots": 0,
+          "staticReady": 0,
+          "liveRoots": 2662,
+          "liveReady": 1289,
+          "variants": 23,
+          "errors": [],
+          "visibleMeshes": 64,
+          "levels": {
+            "near": 0,
+            "mid": 42,
+            "far": 2536
+          }
+        },
+        "visibleTiles": 0,
+        "readyTiles": 0,
+        "calls": 303,
+        "triangles": 8131820
+      },
+      "errors": []
+    }
+  ]
+}
