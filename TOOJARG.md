@@ -1,6 +1,6 @@
 # Kuningriigid – ühine tööjärg
 
-- V345 arendus (2026-11-07, experimental/forest-spruce-v345, Claude): kõik 30 puud (kuusk, mänd, tamm, pärn, kask, palm × 5) uue Pythoni generaatoriga tools/forest-trees-v345 (numpy+Pillow, ilma Blenderita), põhjamaise metsa stiilis. Sapling-formaat samas kaustas, sapling-trees-v328.js muutmata. near ≤2000 (kesk. 1104), mid ≤250 (kesk. 187), far 6 (küpsetatud bake.html + make_far.py). GLB-d 26→14 MB, puude kaust 347→25 MB (Blenderi lähtefailid eemaldatud). Test tests/forest-trees-v345.mjs. Vt MUUDATUSED_V345.md.
+- V345 arendus (2026-11-07, experimental/forest-spruce-v345, Claude): kõik 30 puud (kuusk, mänd, tamm, pärn, kask, palm × 5) uue Pythoni generaatoriga tools/forest-trees-v345 (numpy+Pillow, ilma Blenderita), põhjamaise metsa stiilis. Sapling-formaat samas kaustas, sapling-trees-v328.js muutmata. near ≤2000 (kesk. 1104), mid ≤250 (kesk. 187), far 6 (küpsetatud bake.html + make_far.py). GLB-d 26→22 MB, puude kaust 347→25 MB (Blenderi lähtefailid eemaldatud). Test tests/forest-trees-v345.mjs. Vt MUUDATUSED_V345.md.
 
 - V344 avaldatud (2026-11-07): PR #69 ühendatud main-i (f717125). Fast Game Check, V341 detailkaardi laadimistest, GitHub Pages ja pages build läbisid. Järgmine: kasutaja seadmel jõesuudmete visuaalne kontroll. Märkus: tests/detail-stream-v342.mjs sünteetiline ajamõõtmine on kohapeal ebastabiilne ka main-il (~1/3 kordadest).
 

@@ -19,7 +19,7 @@ Kasutaja soov: põhjamaise metsa stiilis puud (Sketchfabi "forest with a road at
   - **near:** kuni 2000 kolmnurka (keskmiselt 1104; varem ~2530);
   - **mid:** kuni 250 (keskmiselt 187; varem ~310);
   - **far:** 6 kolmnurka. `bake.html` renderdab near-mudeli eest, küljelt ja ülalt, `make_far.py` teeb neist ristuvad kaardid.
-- GLB-failid kokku 26,1 MB → 14,3 MB. Vanad Blenderi lähtefailid ja vaatepildid on eemaldatud: puude kaust 347 MB → 25 MB.
+- GLB-failid kokku 26,1 MB → 22,4 MB. Tekstuurid on PNG-d (WebP renderdus mängus mustana), läbipaistvate tekslite all on lehe värv, et kaugel olevad puud ei tumeneks. Vanad Blenderi lähtefailid ja vaatepildid on eemaldatud: puude kaust 347 MB → 25 MB.
 - Versioon V345.
 
 ## Kontrollid

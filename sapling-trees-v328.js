@@ -17,7 +17,7 @@ export function loadSaplingV328(kind,variant,level){
  const promise=task(async()=>{
   const meta=await manifest(),id=kind+'_'+String(variant+1).padStart(2,'0'),rec=meta.trees.find(t=>t.id===id),ref=meta.trees.filter(t=>t.species===kind).sort((a,b)=>a.boundsZUp[1][2]-b.boundsZUp[1][2])[2];
   if(!rec||!ref)throw Error('Missing Sapling '+id);
-  const data=await loadGLB(new URL(id+'/'+level+'.glb',ROOT));
+  const data=await loadGLB(new URL(id+'/'+level+'.glb',ROOT),{premultiplyAlpha:'none'});
   const parts=data.primitives.map((p,i)=>{
    let map=null;if(p.image){const tk=level==='far'?id+':'+i:kind+':foliage';map=textures.get(tk);
     if(!map){map=new T.Texture(p.image);map.flipY=false;map.colorSpace=T.SRGBColorSpace;map.needsUpdate=true;textures.set(tk,map);}else p.image.close?.();}

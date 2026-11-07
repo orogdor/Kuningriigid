@@ -28,12 +28,20 @@ def bleed(im):
         wa = a.filter(ImageFilter.GaussianBlur(r))
         arr = np.asarray(blur, np.float32) / np.maximum(np.asarray(wa, np.float32)[..., None] / 255, 1e-3)
         fill = Image.composite(fill, Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8)), a.point(lambda v: 255 if v > 8 else 0))
-    return Image.merge('RGBA', (*fill.split(), a))
+    # Every transparent texel gets a colour: far from the leaves, the mean leaf
+    # colour, so mipmap averages never pull in black.
+    arr = np.asarray(fill, np.float32); al = np.asarray(a)
+    mean = arr[al > 128].mean(0) if (al > 128).any() else np.array([60, 80, 40], np.float32)
+    w = np.asarray(a.filter(ImageFilter.GaussianBlur(16)), np.float32)[..., None] / 255
+    far = np.clip(w * 6, 0, 1)
+    arr = np.where(al[..., None] > 8, arr, arr * far + mean * (1 - far))
+    return Image.merge('RGBA', (*Image.fromarray(arr.astype(np.uint8)).split(), a))
 
 
 def png_bytes(im):
-    q = im.quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
-    b = io.BytesIO(); q.save(b, 'PNG', optimize=True); return b.getvalue()
+    # WebP, exact=True: bled colour under transparent texels survives, so the
+    # tiny mipmaps used for distant trees keep their green.
+    b = io.BytesIO(); im.save(b, 'PNG', optimize=True); return b.getvalue()
 
 
 def glb(path, quads, images):
@@ -80,7 +88,7 @@ for rec in manifest['trees']:
     sheet = Image.new('RGBA', (front.width * 2, front.height), (0, 0, 0, 0))
     sheet.paste(front, (0, 0)); sheet.paste(side, (front.width, 0))
     sheet, top = bleed(sheet), bleed(top)
-    sheet.save(dest / 'impostor.png'); top.save(dest / 'top.png')
+    sheet.save(dest / 'impostor.png'); top.save(dest / 'top.png')   # bled RGB kept
     cx, cy, cz = b['center']; ws, hs, ts = b['ws'], b['hs'], b['ts']
     x0, x1, y0, y1, z0, z1 = cx - ws / 2, cx + ws / 2, cy - hs / 2, cy + hs / 2, cz - ws / 2, cz + ws / 2
     # glTF UV origin is the top-left texel: bottom of the tree -> v = 1.

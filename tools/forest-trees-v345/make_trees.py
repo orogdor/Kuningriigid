@@ -222,6 +222,11 @@ def make_atlas(kind):
         blur = np.asarray(rgb.filter(ImageFilter.GaussianBlur(r)), np.float32)
         wa = np.asarray(alpha.filter(ImageFilter.GaussianBlur(r)), np.float32)[..., None] / 255
         fill = Image.composite(fill, Image.fromarray(np.clip(blur / np.maximum(wa, 1e-3), 0, 255).astype(np.uint8)), alpha.point(lambda v: 255 if v > 8 else 0))
+    arr = np.asarray(fill, np.float32); al = np.asarray(alpha)
+    mean = arr[al > 128].mean(0)
+    w = np.clip(np.asarray(alpha.filter(ImageFilter.GaussianBlur(16)), np.float32)[..., None] / 255 * 6, 0, 1)
+    arr = np.where(al[..., None] > 8, arr, arr * w + mean * (1 - w))   # no black anywhere under alpha
+    fill = Image.fromarray(arr.astype(np.uint8))
     atlas = Image.new('RGBA', (A, A), (0, 0, 0, 255))
     atlas.paste(Image.merge('RGBA', (*fill.split(), alpha)), (0, 0))
     atlas.paste(bark_rows(kind, rng).convert('RGBA'), (0, BARK_Y))
@@ -553,9 +558,11 @@ manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else 
 keep = {t['id']: t for t in manifest.get('trees', [])}
 for kind in args.species.split(','):
     atlas = make_atlas(kind)
+    # WebP with exact=True keeps the colour bled into transparent texels, so
+    # small mipmaps of distant trees stay green instead of turning black.
     small = atlas.quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
-    buf = io.BytesIO(); small.save(buf, 'PNG', optimize=True); png = buf.getvalue()
-    (OUT / f'{kind}_foliage.png').write_bytes(png)
+    buf = io.BytesIO(); small.save(buf, 'PNG', optimize=True); png = buf.getvalue()   # PNG: WebP ImageBitmaps rendered black in game
+    atlas.save(OUT / f'{kind}_foliage.png', optimize=True)
     for v in range(VARIANTS):
         ident = f'{kind}_{v + 1:02}'; dest = OUT / ident; dest.mkdir(exist_ok=True)
         for old in dest.iterdir():   # previous Sapling/Blender files
