@@ -11,11 +11,11 @@ const W=innerWidth,H=innerHeight;
 const renderer=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(W,H);renderer.setPixelRatio(1);
 renderer.toneMapping=T.ACESFilmicToneMapping;renderer.outputColorSpace=T.SRGBColorSpace;document.body.append(renderer.domElement);
 const scene=new T.Scene(),camera=new T.PerspectiveCamera(mode==='lineup'?32:55,W/H,.1,600);
-let tex=null;const textureOf=img=>{if(!tex){tex=new T.Texture(img);tex.flipY=false;tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=8;tex.needsUpdate=true;}return tex;};
+let tex=null;const textureOf=img=>{if(lod==='far'){const t=new T.Texture(img);t.flipY=false;t.colorSpace=T.SRGBColorSpace;t.needsUpdate=true;return t;}if(!tex){tex=new T.Texture(img);tex.flipY=false;tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=8;tex.needsUpdate=true;}return tex;};
 async function tree(i){
  const d=await loadGLB(`../../assets/forest-spruce-v345/spruce_0${i+1}/${lod}.glb`),g=new T.Group();
  for(const p of d.primitives){const map=p.image?textureOf(p.image):null;
-  const m=new T.MeshStandardMaterial({color:new T.Color().fromArray(p.color),map,alphaTest:.4,side:T.DoubleSide,roughness:.95,metalness:0});
+  const opts={color:new T.Color().fromArray(p.color),map,alphaTest:.4,side:T.DoubleSide},m=lod==='far'?new T.MeshBasicMaterial(opts):new T.MeshStandardMaterial({...opts,roughness:.95,metalness:0});
   const mesh=new T.Mesh(p.geometry,m);mesh.castShadow=mesh.receiveShadow=true;g.add(mesh);}
  g.userData.height=d.extras.height;return g;}
 const trees=await Promise.all([0,1,2,3].map(tree));
