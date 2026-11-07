@@ -980,7 +980,7 @@ function addForestFillV346(g,tile,world){
  for(let gz=Math.floor(-DETAIL_HALF_Z/spacing);gz<=Math.ceil(DETAIL_HALF_Z/spacing);gz++)for(let gx=Math.floor(-DETAIL_HALF_X/spacing);gx<=Math.ceil(DETAIL_HALF_X/spacing);gx++){
   const wx=tile.c*DETAIL_TILE_X+gx*spacing,wz=tile.r*DETAIL_TILE_Z+gz*spacing;   // world lattice: seamless between tiles
   const x=gx*spacing+(forestRandomV330(wx,wz,seed,346)-.5)*spacing*.8,z=gz*spacing+(forestRandomV330(wx,wz,seed,347)-.5)*spacing*.8;
-  if(Math.abs(x)>DETAIL_HALF_X-3||Math.abs(z)>DETAIL_HALF_Z-3||Math.abs(z)<18||near(x,z,5.2)||!near(x,z,14))continue;
+  if(Math.abs(x)>DETAIL_HALF_X-3||Math.abs(z)>DETAIL_HALF_Z-3||Math.abs(z)<18||near(x,z,4.6)||!near(x,z,24))continue;
   const y=ground(tile,x,z),wxm=tile.x+x/DETAIL_X,wzm=tile.z+z/DETAIL_Z,water=riverNear(game,wxm,wzm);
   if(y<.5||water.distance<water.width*1.55+2||insideCrossing(crossing,wxm,wzm))continue;
   if(buildings.some(b=>{const field=b.type==='field'?fieldSize(b):null,size=field?{rx:field.width/2,rz:field.depth/2}:buildingClearance(b);return size&&Math.abs(x-b.x)<size.rx+5&&Math.abs(z-b.z)<size.rz+5;}))continue;

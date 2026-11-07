@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V346 arendus (2026-11-08, feature/stone-tower-v346, Claude): kiviaja tornikaitsja stone_guard (kirves + viskekivid), madal puitvall/küla­värav pole enam käidav, vahitornis kaitsja tekil rinnatise sees, detailmetsa tühjad laigud täidetud dekoratiivsete Saplingi puudega (addForestFillV346). Vt MUUDATUSED_V346.md.
+
 - V345 arendus (2026-11-07, experimental/forest-spruce-v345, Claude): kõik 30 puud (kuusk, mänd, tamm, pärn, kask, palm × 5) uue Pythoni generaatoriga tools/forest-trees-v345 (numpy+Pillow, ilma Blenderita), põhjamaise metsa stiilis. Sapling-formaat samas kaustas, sapling-trees-v328.js muutmata. near ≤2000 (kesk. 1104), mid ≤250 (kesk. 187), far 6 (küpsetatud bake.html + make_far.py). GLB-d 26→22 MB, puude kaust 347→25 MB (Blenderi lähtefailid eemaldatud). Test tests/forest-trees-v345.mjs. Vt MUUDATUSED_V345.md.
 
 - V344 avaldatud (2026-11-07): PR #69 ühendatud main-i (f717125). Fast Game Check, V341 detailkaardi laadimistest, GitHub Pages ja pages build läbisid. Järgmine: kasutaja seadmel jõesuudmete visuaalne kontroll. Märkus: tests/detail-stream-v342.mjs sünteetiline ajamõõtmine on kohapeal ebastabiilne ka main-il (~1/3 kordadest).
