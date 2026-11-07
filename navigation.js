@@ -1,4 +1,5 @@
 import {resourcesNear} from './perf-state-v131.js';
+import {sliceDueV342} from './frame-slice-v342.js';
 import {CitizenRoutes} from './citizen-routes-v130.js';
 import {wallFootprintV175,wallPointInsideV175,towerJoinsWallV339} from './wall-draw-v175.js?v=1754a';
 // Shared small-agent navigation for citizens, carriers and soldiers.
@@ -64,7 +65,7 @@ world.navBounds={minX:this.minX,minZ:this.minZ,w:this.w,h:this.h};this.base=new 
  this.preparationV242=this.prepareBaseV242();if(!bounds.deferred)this.finishPreparationV242();}
 *prepareBaseV242(){
  for(let i=0;i<this.n;i++){
-  if(i&&i%192===0)yield;
+  if(i&&(i%192===0||((i&15)===0&&sliceDueV342())))yield;
   this.base[i]=this.passable(i%this.w+this.minX,Math.floor(i/this.w)+this.minZ)?1:0;
  }
  this.rebuild();

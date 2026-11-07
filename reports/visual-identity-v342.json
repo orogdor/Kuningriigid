@@ -1,0 +1,31 @@
+{
+ "method": "tests/visual-identity-v342.cjs: same seed, same camera, geometry/instance hashes of every visible detail tile; \"second\" after crossing two tiles north (second tile was paused in V342 before becoming centre).",
+ "V341_vs_V342": {
+  "first": {
+   "identical": 197,
+   "different": []
+  },
+  "second": {
+   "identical": 220,
+   "different": [
+    "0:2 scenery"
+   ]
+  }
+ },
+ "V342_vs_V342_repeat": {
+  "first": {
+   "identical": 195,
+   "different": [
+    "0:0 holeMask",
+    "0:0 distant"
+   ]
+  },
+  "second": {
+   "identical": 220,
+   "different": [
+    "0:2 scenery"
+   ]
+  }
+ },
+ "conclusion": "All geometry identical. The only differences (centre horizon hole index mask and one building animation) also differ between two V342 runs: they depend on the moment of the snapshot (simulation time), not on the version."
+}

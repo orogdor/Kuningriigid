@@ -8,7 +8,8 @@ import {pickTreeV329,forestV329,detailCompanionsV329} from './forest-ecology-v32
 import {withSaplingInstancesV328,saplingStatsV328} from './sapling-trees-v328.js';
 import {createAtlasTerrainV327} from './atlas-terrain-v327.js';
 import {packSave,unpackSave} from './save-compression-v256.js';
-import {DetailStreamV242} from './detail-stream-v242.js?v=341';
+import {DetailStreamV242} from './detail-stream-v242.js?v=342';
+import {sliceDueV342} from './frame-slice-v342.js';
 import {createAssetDemandV241} from './asset-demand-v241.js';
 import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
 import {rotateBuilding,pauseConstruction,removeBuilding} from './building-operations-v228.js';
@@ -431,7 +432,7 @@ function* distantTerrainStepsV242(cell,streaming=false){
  const geo=new T.PlaneGeometry(W,D,nx,nz);geo.rotateX(-Math.PI/2);
  const rev=(s.terrainRevision||0)+':'+(s.crossingRevision||0);if(distantCache.key!==rev){distantCache.key=rev;distantCache.map.clear();}
  const p=geo.attributes.position,colors=new Float32Array(p.count*3),aL=new Float32Array(p.count*2),rock=new T.Color('#7d8174'),snow=new T.Color('#dfe2e4');
- for(let i=0;i<p.count;i++){if(i&&i%192===0)yield;
+ for(let i=0;i<p.count;i++){if(i&&(i%192===0||((i&15)===0&&sliceDueV342())))yield;
   const x=p.getX(i),z=p.getZ(i),gx=Math.round((cell.x*DETAIL_X+x)/sx),gz=Math.round((cell.z*DETAIL_Z+z)/sz),key=gx*100000+gz;
   let v=distantCache.map.get(key);
   if(!v){const wx=cell.x+x/DETAIL_X,wz=cell.z+z/DETAIL_Z,e=worldElevation(game,wx,wz,true),h=visualProject(game,e,wx,wz),at=cellAt(wx,wz),mountain=!!at&&!!game.cell(at)?.mountain;
@@ -443,10 +444,10 @@ function* distantTerrainStepsV242(cell,streaming=false){
  }
  // Do not leave coarse triangles under the detailed mountain. A six-metre
  // offset was insufficient on steep cliffs and cut through their faces.
- const oldIndex=geo.index.array,kept=[];
- for(let i=0;i<oldIndex.length;i+=3){const a=oldIndex[i],b=oldIndex[i+1],c=oldIndex[i+2],cx=(p.getX(a)+p.getX(b)+p.getX(c))/3,cz=(p.getZ(a)+p.getZ(b)+p.getZ(c))/3;if(Math.abs(cx)<DETAIL_TILE_X*1.5-sx&&Math.abs(cz)<DETAIL_TILE_Z*1.5-sz)continue;kept.push(a,b,c);}
+ if(streaming)yield;const oldIndex=geo.index.array,kept=[];
+ for(let i=0;i<oldIndex.length;i+=3){if(streaming&&i&&i%3072===0&&sliceDueV342())yield;const a=oldIndex[i],b=oldIndex[i+1],c=oldIndex[i+2],cx=(p.getX(a)+p.getX(b)+p.getX(c))/3,cz=(p.getZ(a)+p.getZ(b)+p.getZ(c))/3;if(Math.abs(cx)<DETAIL_TILE_X*1.5-sx&&Math.abs(cz)<DETAIL_TILE_Z*1.5-sz)continue;kept.push(a,b,c);}
  if(!streaming)geo.setIndex(kept);
- geo.setAttribute('color',new T.BufferAttribute(colors,3));geo.setAttribute('aL161',new T.BufferAttribute(aL,2));geo.computeVertexNormals();
+ geo.setAttribute('color',new T.BufferAttribute(colors,3));geo.setAttribute('aL161',new T.BufferAttribute(aL,2));if(streaming)yield;geo.computeVertexNormals();
  const mesh=new T.Mesh(geo,terrainMaterial('detail',cell));mesh.userData.terrain=true;mesh.receiveShadow=false;mesh.name='v161 distant land';
  if(streaming)mesh.userData.streamHorizonV242={all:oldIndex.slice(),mask:''};return mesh;
 }
@@ -457,11 +458,11 @@ function* terrainStepsV242(scene,cell=null,chunk=false){const world=!cell,battle
  geo=world?createAtlasTerrainV327({width:WORLD_WIDTH,depth:WORLD_DEPTH,nx:COLS*(quality==='low'?2:3),nz:ROWS*(quality==='low'?2:3),originX:WORLD_CENTER_X-WORLD_WIDTH/2,originZ:WORLD_CENTER_Z-WORLD_DEPTH/2,rivers:getRivers(game),coasts:game.cells.filter(c=>c.land&&c.coast),height:naturalAtlasHeightV327,maxLevel:quality==='high'?3:quality==='low'?1:2}):new T.PlaneGeometry(world?WORLD_WIDTH:battle?1800:chunk?DETAIL_TILE_X+detailSX*8:675,
  world?WORLD_DEPTH:battle?1560:chunk?DETAIL_TILE_Z+detailSZ*8:585,
  world?COLS*(quality==='low'?2:3):chunk?detailNX/3+8:detailNX,
- world?ROWS*(quality==='low'?2:3):chunk?detailNZ/3+8:detailNZ);if(!world)geo.rotateX(-Math.PI/2);if(battle)geo.translate(DETAIL_HALF_X,0,DETAIL_HALF_Z);const p=geo.attributes.position,colors=[];const cached=!world&&!battle,segX=geo.parameters.widthSegments,segZ=geo.parameters.heightSegments,csx=chunk?detailSX:675/segX,csz=chunk?detailSZ:585/segZ,cnX=Math.round(DETAIL_TILE_X/csx),cnZ=Math.round(DETAIL_TILE_Z/csz),mountainV=cached?new Uint8Array(p.count):null,aL161=world?null:new Float32Array(p.count*2);for(let i=0;i<p.count;i++){if(chunk&&i&&i%192===0)yield;if(cached){const x=p.getX(i),z=p.getZ(i),gx=Math.round((cell.x*DETAIL_X+x)/csx),gz=Math.round((cell.z*DETAIL_Z+z)/csz),[b,o]=terrainVertex(gx,gz,csx,csz,cnX,cnZ);p.setY(i,b[o]);colors.push(b[o+1],b[o+2],b[o+3]);mountainV[i]=b[o+4];aL161[i*2]=b[o+5];aL161[i*2+1]=b[o+6];continue;}if(aL161){const x=p.getX(i),z=p.getZ(i),wx=cell.x+x/DETAIL_X,wz=cell.z+z/DETAIL_Z;aL161[i*2]=visualElevation(game,wx,wz);aL161[i*2+1]=mountainMask(game,wx,wz);}const x=p.getX(i),z=p.getZ(i),h=world?p.getY(i):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
+ world?ROWS*(quality==='low'?2:3):chunk?detailNZ/3+8:detailNZ);if(!world)geo.rotateX(-Math.PI/2);if(battle)geo.translate(DETAIL_HALF_X,0,DETAIL_HALF_Z);const p=geo.attributes.position,colors=[];const cached=!world&&!battle,segX=geo.parameters.widthSegments,segZ=geo.parameters.heightSegments,csx=chunk?detailSX:675/segX,csz=chunk?detailSZ:585/segZ,cnX=Math.round(DETAIL_TILE_X/csx),cnZ=Math.round(DETAIL_TILE_Z/csz),mountainV=cached?new Uint8Array(p.count):null,aL161=world?null:new Float32Array(p.count*2);for(let i=0;i<p.count;i++){if(chunk&&i&&(i%192===0||((i&15)===0&&sliceDueV342())))yield;if(cached){const x=p.getX(i),z=p.getZ(i),gx=Math.round((cell.x*DETAIL_X+x)/csx),gz=Math.round((cell.z*DETAIL_Z+z)/csz),[b,o]=terrainVertex(gx,gz,csx,csz,cnX,cnZ);p.setY(i,b[o]);colors.push(b[o+1],b[o+2],b[o+3]);mountainV[i]=b[o+4];aL161[i*2]=b[o+5];aL161[i*2+1]=b[o+6];continue;}if(aL161){const x=p.getX(i),z=p.getZ(i),wx=cell.x+x/DETAIL_X,wz=cell.z+z/DETAIL_Z;aL161[i*2]=visualElevation(game,wx,wz);aL161[i*2+1]=mountainMask(game,wx,wz);}const x=p.getX(i),z=p.getZ(i),h=world?p.getY(i):ground(cell,x,z),at=world?cellAt(x,z):cellAt(cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z),biome=at?game.cell(at).biome:'sea';p.setY(i,h);const mountain=!!at&&game.cell(at)?.mountain;
  const color=world?atlasColor(game,x,z,h):detailGroundColor(game,cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z,h,mountain);if(!world&&h>.3){const patch=game.smooth((cell.x*DETAIL_X+x)/31+8,(cell.z*DETAIL_Z+z)/31+7);color.lerp(new T.Color(patch>.65?'#9b9570':'#486b46'),Math.abs(patch-.5)*.13)}color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.07);colors.push(color.r,color.g,color.b)}// V69 cliff strata: colour actual steep mesh faces, not the entire mountain tile.
-geo.computeVertexNormals();const norm=geo.attributes.normal;
+if(chunk)yield;geo.computeVertexNormals();if(chunk)yield;const norm=geo.attributes.normal;
 const shale=new T.Color('#484743'),sunRock=new T.Color('#9e9481'),peakSnow=new T.Color('#d9d5c5');
-for(let i=0;i<p.count;i++){if(chunk&&i&&i%192===0)yield;
+for(let i=0;i<p.count;i++){if(chunk&&i&&(i%192===0||((i&15)===0&&sliceDueV342())))yield;
  const x=p.getX(i),z=p.getZ(i),height=p.getY(i);if(mountainV&&!mountainV[i])continue;const at=mountainV?true:world?cellAt(x,z):cellAt(cell.x+x/DETAIL_X,cell.z+z/DETAIL_Z);
  const rocky=mountainV?true:at&&game.cell(at)?.mountain;if(!rocky||height<1)continue;
  const wx=world?x:cell.x+x/DETAIL_X,wz=world?z:cell.z+z/DETAIL_Z,wy=world?height:aL161[i*2];
@@ -469,10 +470,10 @@ for(let i=0;i<p.count;i++){if(chunk&&i&&i%192===0)yield;
  const shade=mountainShade(new T.Color(colors[i*3],colors[i*3+1],colors[i*3+2]),wx,wz,wy,ny/(Math.hypot(nx,ny,nz)||1));
  colors[i*3]=shade.r;colors[i*3+1]=shade.g;colors[i*3+2]=shade.b;
 }
-geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));if(aL161)geo.setAttribute('aL161',new T.BufferAttribute(aL161,2));bakeRelief(geo,world?{ring:1}:{ring:4,hScale:DETAIL_X,vScale:.30});
+geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));if(aL161)geo.setAttribute('aL161',new T.BufferAttribute(aL161,2));if(chunk)yield;bakeRelief(geo,world?{ring:1}:{ring:4,hScale:DETAIL_X,vScale:.30});
 if(chunk){
- const forest=new Float32Array(p.count);for(let i=0;i<p.count;i++){if(i&&i%192===0)yield;forest[i]=forestBlendV242(cell.x+p.getX(i)/DETAIL_X,cell.z+p.getZ(i)/DETAIL_Z);}
- geo.setAttribute('aForestV242',new T.BufferAttribute(forest,1));
+ const forest=new Float32Array(p.count);for(let i=0;i<p.count;i++){if(i&&(i%192===0||((i&15)===0&&sliceDueV342())))yield;forest[i]=forestBlendV242(cell.x+p.getX(i)/DETAIL_X,cell.z+p.getZ(i)/DETAIL_Z);}
+ geo.setAttribute('aForestV242',new T.BufferAttribute(forest,1));yield;
  // Four sampling rows beyond each edge keep normals and relief identical
  // across tile boundaries; only the central tile's triangles are drawn.
  const kept=[],index=geo.index.array;
@@ -753,7 +754,7 @@ function* buildDetailTileV242(entry){
    const water=riverNear(game,tile.x+res.x/DETAIL_X,tile.z+res.z/DETAIL_Z);
    if(tile.mountain||water.distance<water.width*1.55||insideCrossing(crossing,tile.x+res.x/DETAIL_X,tile.z+res.z/DETAIL_Z))continue;
   }
-  entry.resources.set(res.id,resourceView(res,tile,entry.scenery));if(++batch%4===0)yield;
+  entry.resources.set(res.id,resourceView(res,tile,entry.scenery));if(++batch%4===0||sliceDueV342())yield;
  }
  entry.stage='ground cover';
  const cover=createGroundCoverV156(tile,coverHeight(tile),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(tile),{fraction:.55,deferred:true});
@@ -774,7 +775,9 @@ function* buildDetailTileV242(entry){
   const value=makeStreamBuildingV242(b,tile,context);entry.scenery.add(value.model);entry.buildings.set(b,value);yield;
  }
  // V341: centre-only layers (in decor) follow everything a neighbour shows.
- entry.stage='horizon';
+ // V342: yield on the stage change so the stream can stop here for tiles
+ // that cannot become the centre next.
+ entry.stage='horizon';yield;
  entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
  entry.stage='rivers';
  entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
@@ -868,9 +871,9 @@ function refreshStreamHoldersV242(){
   if(!entry.root.visible)continue;live.add(entry.key);
   if(entry.terrain&&entry.tile!==activeTile)neighbourTerrains.push(entry.terrain);
   detailObjectHolders.set(entry.key,{tile:entry.tile,holder:entry.sites});
-  if(entry.tile!==activeTile&&entry.ready){
-   const context=game.contextAt(entry.tile,false),buildings=context?.economy.buildings||[];
-   for(const [b,value] of entry.buildings)if(!buildings.includes(b)||b.virtual||b.hp<=0){value.model.removeFromParent();entry.buildings.delete(b);}
+  if(entry.tile!==activeTile&&(entry.ready||entry.visualReady)){
+   const context=game.contextAt(entry.tile,false),buildings=context?.economy.buildings||[],present=new Set(buildings);
+   for(const [b,value] of entry.buildings)if(!present.has(b)||b.virtual||b.hp<=0){value.model.removeFromParent();entry.buildings.delete(b);}
    for(const b of buildings){
     if(b.virtual||b.hp<=0)continue;let value=entry.buildings.get(b);
     if((!value||value.streamStamp!==streamBuildingStampV242(b))&&visualUpdates<1){
@@ -1861,7 +1864,12 @@ function refreshAutomaticUI(now){
 // V161: on tall detail-map mountains the camera rides with the ground under the focus
 let camLiftV161=0;const camLookV161=new T.Vector3();
 function fitDepthRange(){const n=Math.max(.1,Math.min(40,zoom*.04));if(Math.abs(camera.near-n)>n*.02){camera.near=n;camera.updateProjectionMatrix();}}
-function frame(now){requestAnimationFrame(frame);if(now-assetPollV241>1000){assetPollV241=now;assetDemandV241.update();}if(view==='local'&&!s.battle){detailStreamV242.setView(camera,focus.x,focus.z);detailStreamV242.tick();refreshStreamHoldersV242();}if(view==='local'&&coverJobs.length)runCoverJobs();const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}if(view==='local'&&walker.placing)walker.pollPlacing(pick);walker.update(real);if(walker.active&&view==='local'){focus.set(walker.position.x,0,walker.position.z);zoom=45}else updateCameraKeys(real);followDetail();if(view==='world'){updateSpatialBatches(zoom,focus);fadeAtlasGrid(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12 }else{syncLocal();refreshCityTorchesV235();
+function frame(now){requestAnimationFrame(frame);if(now-assetPollV241>1000){assetPollV241=now;assetDemandV241.update();}
+// V342: the camera window and neighbour-tile visual refresh run only on frames that are drawn.
+// Frames skipped by the FPS limit (e.g. 144 Hz screen, 60 FPS limit) still load, but at most for
+// half a display frame so they never push back the next drawn frame.
+const drawnV342=graphicsRuntime.canRender(now);
+if(view==='local'&&!s.battle){if(drawnV342){detailStreamV242.setView(camera,focus.x,focus.z);detailStreamV242.tick();refreshStreamHoldersV242();}else detailStreamV242.tick(Math.min(detailStreamV242.budget,Math.max(1,(now-last)*.5)));}if(view==='local'&&coverJobs.length)runCoverJobs();const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}if(view==='local'&&walker.placing)walker.pollPlacing(pick);walker.update(real);if(walker.active&&view==='local'){focus.set(walker.position.x,0,walker.position.z);zoom=45}else updateCameraKeys(real);followDetail();if(view==='world'){updateSpatialBatches(zoom,focus);fadeAtlasGrid(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12 }else{syncLocal();refreshCityTorchesV235();
   const selectedTime=graphicsV226.daylight==='day'?240:graphicsV226.daylight==='evening'?540:graphicsV226.daylight==='night'?840:s.time;
   updateCityTorchesV235(cityTorchesV235,dayClockV235(selectedTime),s.time);
   if(!s.battle)villageLife.update(s.time,frameDelta);updateGhost()}updateCommandVisuals();if(view==='local'&&activeTile){const target=Math.max(0,ground(activeTile,focus.x,focus.z));camLiftV161+=(target-camLiftV161)*Math.min(1,real*5+.02);}else camLiftV161=0;camera.position.set(focus.x+zoom*(view==='world'?.1:.48),camLiftV161+zoom*(view==='world'?.76:.78),focus.z+zoom*(view==='world'?.7:.8));if(view==='local'&&activeTile){const under=ground(activeTile,camera.position.x,camera.position.z)+4;if(camera.position.y<under)camera.position.y=under;}camLookV161.set(focus.x,camLiftV161,focus.z);camera.lookAt(camLookV161);if(walker.active&&view==='local')walker.applyCamera(camera);else fitDepthRange();atmosphere.update(view==='world'?worldScene:localScene,focus,walker.active?60:zoom,real,s.time);
