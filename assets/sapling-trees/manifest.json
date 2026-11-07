@@ -1,1145 +1,1116 @@
 {
-  "approved": false,
+  "approved": true,
+  "generator": "V345 make_trees.py",
   "trees": [
-    {
-      "id": "birch_01",
-      "species": "birch",
-      "variant": 1,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7701,
-      "boundsZUp": [
-        [
-          -4.859106063842773,
-          -4.770329475402832,
-          0.0
-        ],
-        [
-          4.702472686767578,
-          4.883327007293701,
-          20.452808380126953
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 232676,
-        "sha256": "7492f27b2c48eed72e99b4bbdc1c86f12af6a0089b11ff5f197deae0debb6e66"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 118464,
-        "sha256": "9bdf3a7aae00fa097c878f5d4c3b5938c26b9f7e6b828522f961dd1d10f19882"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 455868,
-        "sha256": "51b227de0be27cc250be61903a241401808edabdbfcfdd560f1f820e8f420a7c"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "birch_02",
-      "species": "birch",
-      "variant": 2,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7718,
-      "boundsZUp": [
-        [
-          -7.823189735412598,
-          -8.093544006347656,
-          0.0
-        ],
-        [
-          7.583219528198242,
-          7.840380668640137,
-          28.22461700439453
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 232680,
-        "sha256": "3d1575f54c6ecd8450db953ec71c79092e294acfe63a57430fe50271b20c57c5"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 118464,
-        "sha256": "9e2b16c80d1289aa5ab6a509fbaf41edbb621a24fe9f1cfbc5c6e8463247f7e7"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 569448,
-        "sha256": "9ab89024940cfa04dfede02fee9568b31744041da9039e236025964733fb9049"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "birch_03",
-      "species": "birch",
-      "variant": 3,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7735,
-      "boundsZUp": [
-        [
-          -8.214523315429688,
-          -8.34730339050293,
-          0.0
-        ],
-        [
-          8.139395713806152,
-          8.190535545349121,
-          26.512435913085938
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 232680,
-        "sha256": "5e6ae7fcc6658f87df4898fc63f9dfb3da3a3b217d5d8b50515c00222248a560"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 118468,
-        "sha256": "32acda50ec2262ee0e7619eca392fc426c096384a098d4d459d3862a1b85e156"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 602548,
-        "sha256": "ad3cb7afd9dc0e9708148793bdec41a0d6fc3069bfb213eccff2ed9acb5f3d19"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "birch_04",
-      "species": "birch",
-      "variant": 4,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7752,
-      "boundsZUp": [
-        [
-          -7.079285621643066,
-          -6.844139099121094,
-          0.0
-        ],
-        [
-          7.172446250915527,
-          6.860354423522949,
-          31.005775451660156
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 232680,
-        "sha256": "4adde7c21e0ef690b6c53a815a915abbb2f5976829046dc89f958199fabdc62c"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 118468,
-        "sha256": "ad1f6e4ec79e4d917a306a63313255681f6db53246bcfdfd8577c0afe398fb90"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 452656,
-        "sha256": "790aead2675385db629c89fb34262116e82a3bc3edd937c4fbbc337624ad9a93"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "birch_05",
-      "species": "birch",
-      "variant": 5,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7769,
-      "boundsZUp": [
-        [
-          -7.117921829223633,
-          -7.304493427276611,
-          0.0
-        ],
-        [
-          7.491103649139404,
-          7.363650321960449,
-          28.857576370239258
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 232680,
-        "sha256": "3ea02f03a0ec80f2339558ab4b88e90eda873f571fcc0241da11aa888bb08219"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 118468,
-        "sha256": "9e7e9ba9133a306461d46a01b9a13add126942e689340b41e1116723c1bf9705"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 518896,
-        "sha256": "0e8117b997cd9597b727fd328daa71faeac8a1d3841ca61a5237d143e99859dd"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "lime_01",
-      "species": "lime",
-      "variant": 1,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7601,
-      "boundsZUp": [
-        [
-          -4.3875203132629395,
-          -4.418951988220215,
-          0.0
-        ],
-        [
-          4.34636116027832,
-          4.269721984863281,
-          8.220016479492188
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 261708,
-        "sha256": "8ca3ca6cf77a06eb2fca655ebe0b81e40402080bf1229868e0492c5678351dd0"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 147500,
-        "sha256": "061d32c244bedeaf90d33a5d5b9254caf23d600b9a0ec6068cec317082879d53"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 735664,
-        "sha256": "5cd53d59e53c2ba898d2877d217f0d50c841c1b7e8f2b38fb06c5080e16c412e"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "lime_02",
-      "species": "lime",
-      "variant": 2,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7618,
-      "boundsZUp": [
-        [
-          -6.431060314178467,
-          -6.259511470794678,
-          0.0
-        ],
-        [
-          6.657593727111816,
-          6.738564491271973,
-          10.499183654785156
-        ]
-      ],
-      "near": {
-        "triangles": 2506,
-        "bytes": 259616,
-        "sha256": "529b02f6371fbdcee1455d10390c34f10491835728d2e953433f52e0c6daef96"
-      },
-      "mid": {
-        "triangles": 308,
-        "bytes": 147224,
-        "sha256": "e8313cb6ef1ec1293e9bae669d203cb7f3ea527446ea609175a36d443dbe390e"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 717164,
-        "sha256": "6f66b9140e0d443a34cab21494695a04762b289102c94e2349009b6872dcb27a"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "lime_03",
-      "species": "lime",
-      "variant": 3,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7635,
-      "boundsZUp": [
-        [
-          -6.946959495544434,
-          -6.281269073486328,
-          0.0
-        ],
-        [
-          6.30149507522583,
-          6.555413246154785,
-          9.49732780456543
-        ]
-      ],
-      "near": {
-        "triangles": 2458,
-        "bytes": 256252,
-        "sha256": "c432e8486d8853099e9c60d260aefd2035e2bcb30c13319468d938818b7afc06"
-      },
-      "mid": {
-        "triangles": 302,
-        "bytes": 146808,
-        "sha256": "f1aea96c9bf9d9e6dce86999bd8fc8fcb0d2616d8717c5907db5db15c32b7abb"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 658592,
-        "sha256": "885275860820c509f65e7f8dd9b666fbfbf518c9188bb34f131e10cd16f86c85"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "lime_04",
-      "species": "lime",
-      "variant": 4,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7652,
-      "boundsZUp": [
-        [
-          -6.111817836761475,
-          -5.920813083648682,
-          0.0
-        ],
-        [
-          6.107081890106201,
-          6.241751194000244,
-          11.664807319641113
-        ]
-      ],
-      "near": {
-        "triangles": 2526,
-        "bytes": 261540,
-        "sha256": "559f48a4145515c5e5dfee925844b0216717dbbb4d012a67c05ff5842471a3c0"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 147504,
-        "sha256": "faa0e3d622106166fce9aefb619ca23a47ecc9e601674eb684782b73584ef369"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 803660,
-        "sha256": "e0c76340bde83c396637149e38491a60c9c8aa579cd74b60b77fb1368c3ad034"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "lime_05",
-      "species": "lime",
-      "variant": 5,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7669,
-      "boundsZUp": [
-        [
-          -6.353703498840332,
-          -6.370790004730225,
-          0.0
-        ],
-        [
-          6.532268524169922,
-          6.5248565673828125,
-          10.961648941040039
-        ]
-      ],
-      "near": {
-        "triangles": 2532,
-        "bytes": 261436,
-        "sha256": "0622969cbfd4716990466b7cd6ffedb1c3528c4ae3b3230891533984993e8c04"
-      },
-      "mid": {
-        "triangles": 310,
-        "bytes": 147368,
-        "sha256": "913e8613be5560319d6bd63d42e2a3682241fd5fc3cf47edb4fab1eb27207698"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 728492,
-        "sha256": "ca8f9a96f40f0381d118afb00079ebba344563904d13ffc0176a8da1bf78247a"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "oak_01",
-      "species": "oak",
-      "variant": 1,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7501,
-      "boundsZUp": [
-        [
-          -6.643343448638916,
-          -10.22099494934082,
-          0.0
-        ],
-        [
-          6.873780250549316,
-          9.063201904296875,
-          14.679326057434082
-        ]
-      ],
-      "near": {
-        "triangles": 2293,
-        "bytes": 239592,
-        "sha256": "dc8d6ae522ec68ab408d36eb28f491605c74783cfec53cfa030eb8a5ec40bf7c"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 129720,
-        "sha256": "030581584cf9195f25a3e9b55b7c5c9aa2b411a92a7f4fc0101ef9c17af6874e"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 551968,
-        "sha256": "3abdf37b7736245dbc7214fd03dceb86b6d727717387f68a47145ef27e6d6a0d"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "oak_02",
-      "species": "oak",
-      "variant": 2,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7518,
-      "boundsZUp": [
-        [
-          -10.962296485900879,
-          -10.878719329833984,
-          0.0
-        ],
-        [
-          11.670930862426758,
-          9.594663619995117,
-          21.894222259521484
-        ]
-      ],
-      "near": {
-        "triangles": 2453,
-        "bytes": 242488,
-        "sha256": "3fcf3371c1363217f4e79838eeb523cdc66ea3579af8361bb9a43cdff177d59e"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 129732,
-        "sha256": "a8e94e74472bce9d51fd3ad2a1fffc72c06fae89078a4c34d4dc0e0f9fcc35c8"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 761868,
-        "sha256": "ad7c19b37db601567a46be815619cf47811e805e56bbebc46de2a35421b52bfd"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "oak_03",
-      "species": "oak",
-      "variant": 3,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7535,
-      "boundsZUp": [
-        [
-          -11.223628997802734,
-          -8.675612449645996,
-          0.0
-        ],
-        [
-          11.607989311218262,
-          8.559128761291504,
-          18.742881774902344
-        ]
-      ],
-      "near": {
-        "triangles": 2470,
-        "bytes": 242828,
-        "sha256": "60a892f2e62c8c043f63950f185cd08e4f5749892f147542bcaa6ef3630b54de"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 129732,
-        "sha256": "d15b9c87d032028c283e1bd0f84f93c0ad7413b2d1e73370c43ae8161b75751b"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 621228,
-        "sha256": "b5f086c1c9226dea9d0378fe5e5e43f76df02a59520c027eb56da705aac5b3f8"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "oak_04",
-      "species": "oak",
-      "variant": 4,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7552,
-      "boundsZUp": [
-        [
-          -12.105145454406738,
-          -13.839044570922852,
-          0.0
-        ],
-        [
-          10.656684875488281,
-          13.892799377441406,
-          24.860855102539062
-        ]
-      ],
-      "near": {
-        "triangles": 2416,
-        "bytes": 241780,
-        "sha256": "1e534a7efccbf85945bd5a943ed52352b8f2a4d381bb5050087f317ea7e68bc6"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 129732,
-        "sha256": "73b68a9f1be90ec6f88212c1f3cfa001c3ce7186840be431bf99d014a86a4af9"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 673296,
-        "sha256": "db23f021792d2efde7b4b38cac3e3308093b5e445ff1925465fa4f34781f4454"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "oak_05",
-      "species": "oak",
-      "variant": 5,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7569,
-      "boundsZUp": [
-        [
-          -12.067765235900879,
-          -9.109996795654297,
-          0.0
-        ],
-        [
-          13.615917205810547,
-          8.471139907836914,
-          23.21251678466797
-        ]
-      ],
-      "near": {
-        "triangles": 2386,
-        "bytes": 241244,
-        "sha256": "399744ea8fd0fa1979c48bdc971edddf1359a85f15c5605b1aa565c77c52aa14"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 129728,
-        "sha256": "c4c9a0b7f14b64dab9b1d4ffc3a5ed4be89949caee8b7e13d2eae9185929e78f"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 654860,
-        "sha256": "e3edd3bf5bb81aa385781a2404fc84362f16aacbbf1b1634ba9ca4bc6d140d06"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "palm_01",
-      "species": "palm",
-      "variant": 1,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7801,
-      "boundsZUp": [
-        [
-          -3.8474371433258057,
-          -4.38753604888916,
-          0.0
-        ],
-        [
-          3.696599006652832,
-          2.1000120639801025,
-          14.1090726852417
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 166068,
-        "sha256": "5326c50b1d3be3385e340430840cce60132c1e4ecb43eedbb7c94669fe89aae7"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 51860,
-        "sha256": "6977b3d12887025ef7f828006da92de969bee8b80abde7e46d74ad1e246cb4d2"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 397108,
-        "sha256": "67258160c15bb6e0e85b5ca2ce7cfbc7f632a26d2737a9c3d1d5cd3309c4f849"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "palm_02",
-      "species": "palm",
-      "variant": 2,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7818,
-      "boundsZUp": [
-        [
-          -5.671648979187012,
-          -6.437114715576172,
-          0.0
-        ],
-        [
-          6.113160610198975,
-          4.755502700805664,
-          19.40741729736328
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 166076,
-        "sha256": "ced2552d4c7a26190e49051c4e39b2de3ce369f59f7c09ecef97471b0a11d6dd"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 51868,
-        "sha256": "10ee1aae283f7b094e11d0775abbcc13f2d880b7ffaf8541f7074e7863f0aba3"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 414296,
-        "sha256": "241e349e7955c543b549e72afa23fff47bcb9897970d7aab176995a1ae0ce0e5"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "palm_03",
-      "species": "palm",
-      "variant": 3,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7835,
-      "boundsZUp": [
-        [
-          -6.0471954345703125,
-          -6.677911758422852,
-          0.0
-        ],
-        [
-          5.391674518585205,
-          5.08658504486084,
-          17.648151397705078
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 166076,
-        "sha256": "01176a34261671b1dba7dcb094158ed3c5805c68f60ad4d0660490a0dcbb7647"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 51864,
-        "sha256": "8f7055bce1a91b2dc62b32d378eb403c67a47fb274caea94bbec5dfad5e70b86"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 439088,
-        "sha256": "3426b63b0a099cc7f7b4a31d27452901fbd28842a497171028a08d65deefd4a0"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "palm_04",
-      "species": "palm",
-      "variant": 4,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7852,
-      "boundsZUp": [
-        [
-          -5.432150363922119,
-          -5.096038818359375,
-          0.0
-        ],
-        [
-          5.349095344543457,
-          4.45402717590332,
-          21.132461547851562
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 166076,
-        "sha256": "9e33c9e1d0d9b79064d835d097363c6fd10cf82c5c547ee65a08114e0951af09"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 51860,
-        "sha256": "6443e5c57c0343142084c39c1570d7d15aee1ada9d5eb99b2102dc35e33bb66e"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 366336,
-        "sha256": "af18ebf391b47c882458d85cf2f47ab9f470e24d69951de9f735054542394d35"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
-    {
-      "id": "palm_05",
-      "species": "palm",
-      "variant": 5,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7869,
-      "boundsZUp": [
-        [
-          -4.261833190917969,
-          -6.474124431610107,
-          0.0
-        ],
-        [
-          5.52020788192749,
-          4.782935619354248,
-          19.958724975585938
-        ]
-      ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 166076,
-        "sha256": "d98ae36fd8d6a0c01138bbb55d7e9835818699da4bb80e90511840b32030e1a8"
-      },
-      "mid": {
-        "triangles": 312,
-        "bytes": 51864,
-        "sha256": "1dd4cdfb7bbd891a017f7ecd86329837d7c2a3ce1b5b288529b3cf90d88fac9a"
-      },
-      "far": {
-        "triangles": 6,
-        "bytes": 390792,
-        "sha256": "c3b21dd16b04781a9bd78c3de4ac8d7edf32fa696d3f432912f24f2fb66ac878"
-      },
-      "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
-    },
     {
       "id": "pine_01",
       "species": "pine",
       "variant": 1,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7301,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 944,
+        "bytes": 300536,
+        "sha256": "f32fee683b5808a21c26f11f6e39a92eefa4ff86a229ce312e934da1d1d3a0e9",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -8.693595886230469,
-          -7.936079025268555,
+          -3.506648302078247,
+          -3.322125196456909,
           0.0
         ],
         [
-          7.872777938842773,
-          7.800976276397705,
-          19.930435180664062
+          2.930506467819214,
+          3.9420032501220703,
+          17.695253372192383
         ]
       ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 195936,
-        "sha256": "07423db88d93f2f0122d7278428eb3bbef40cd73f32849088a5de315a40ccdbc"
-      },
       "mid": {
-        "triangles": 312,
-        "bytes": 81728,
-        "sha256": "7aad10ba7b1beae9835f5b1d358c993e6511ecd6961582aae784e65a6fe9b144"
+        "triangles": 142,
+        "bytes": 251256,
+        "sha256": "f81d1d971b67759088b8147335a476b213576205801209b6972c76ca2c538806",
+        "density": 1.0
       },
       "far": {
         "triangles": 6,
-        "bytes": 489476,
-        "sha256": "b6f4daab148c6f2bfb12bae2b20ab72613924deaf2e4ff68e6148be134a6b9ca"
+        "bytes": 28992,
+        "sha256": "cdf2d7c76013e3e391a0c099422c47481f92679d0369a6591440501a947c385e"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "pine_02",
       "species": "pine",
       "variant": 2,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7318,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1106,
+        "bytes": 309188,
+        "sha256": "6bfbfac8494b4fd5277f1787d5cc3dd0a0ed184ac67a79262b57f0a67f3c1bbc",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -10.97894287109375,
-          -11.854832649230957,
+          -3.9432992935180664,
+          -3.5746688842773438,
           0.0
         ],
         [
-          11.724032402038574,
-          11.58926010131836,
-          25.96724510192871
+          4.547979354858398,
+          4.091543197631836,
+          19.994827270507812
         ]
       ],
-      "near": {
-        "triangles": 2534,
-        "bytes": 195808,
-        "sha256": "f9fecb7abb6927ce064dfec706a0f8fd5f6fbb5abd89103a43e5aac18622c553"
-      },
       "mid": {
-        "triangles": 310,
-        "bytes": 81596,
-        "sha256": "f602eba3c265f26e9294d2369eb3d15d8d14e3c40141ceff6f3cf5c7dfa0ce99"
+        "triangles": 128,
+        "bytes": 250268,
+        "sha256": "41280e7245ea70716d919f0f27fce55fb0df77c72f2c858ca6439cb31d03b960",
+        "density": 1.0
       },
       "far": {
         "triangles": 6,
-        "bytes": 531132,
-        "sha256": "20d62ff9f1256d5fb2cc9fd3a18301375e9658721ae440de70397a778b3ff784"
+        "bytes": 28128,
+        "sha256": "d4c562f3468f210a6f24ee0479f5c2dbdf97691a95eec53739618e541fdb4937"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "pine_03",
       "species": "pine",
       "variant": 3,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7335,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 692,
+        "bytes": 284816,
+        "sha256": "b1a9838b7f3702e48ab0a1c563d64f1b32f8a702e09524316ce15d6c1c337152",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -11.156221389770508,
-          -9.139392852783203,
+          -3.076655626296997,
+          -2.6110806465148926,
           0.0
         ],
         [
-          9.947160720825195,
-          10.562271118164062,
-          23.13321304321289
+          3.486800193786621,
+          3.285388946533203,
+          15.329489707946777
         ]
       ],
-      "near": {
-        "triangles": 2394,
-        "bytes": 186004,
-        "sha256": "548a602ed746081943c7f97738b7c417157c348ec05fcd7aa2420b2904a029c9"
-      },
       "mid": {
-        "triangles": 294,
-        "bytes": 80472,
-        "sha256": "95d22dfa46f8da70c591209a9f356f3078f4862ea1400071ba44e400371cf70e"
+        "triangles": 120,
+        "bytes": 249712,
+        "sha256": "ab6d9fa009f9c1105998e9c4d7e32c48ad4e0f0b5e06cff1dc7bac5fdddb378a",
+        "density": 1.0
       },
       "far": {
         "triangles": 6,
-        "bytes": 530684,
-        "sha256": "6849cd7c082f52f0046233bf094f732c6e4b36647786657b09bcc12bcbed984b"
+        "bytes": 27900,
+        "sha256": "db94eff2403e0786069fa7a0c00c5aab2dab57876aaba31110f8eb8abaffce2d"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "pine_04",
       "species": "pine",
       "variant": 4,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7352,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1230,
+        "bytes": 315948,
+        "sha256": "d8d9ee5e3facbb464ac82b7097c969e35e9545b1f33c087dd2a988c13d81cf7a",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -12.358001708984375,
-          -10.599791526794434,
+          -4.942185878753662,
+          -3.5754549503326416,
           0.0
         ],
         [
-          10.05074691772461,
-          11.491891860961914,
-          29.17888069152832
+          3.8633482456207275,
+          4.251673221588135,
+          22.044933319091797
         ]
       ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 195948,
-        "sha256": "59874f522917be2b4fe637d697987a6a6470474701658e22632f53f894d63f51"
-      },
       "mid": {
-        "triangles": 312,
-        "bytes": 81736,
-        "sha256": "85a254f45454f976ef6c49b25104059412e84bb6d2ac9727eec8a1fe8c353479"
+        "triangles": 130,
+        "bytes": 250408,
+        "sha256": "b67e355e1161fe4c202c3f09c2fc0c4db09408711b5af7eddc849e39426bf2fa",
+        "density": 1.0
       },
       "far": {
         "triangles": 6,
-        "bytes": 463540,
-        "sha256": "f20fe34643b4216bb83624a8ce3d2b85a65e403c027ca9a585333ede308952f5"
+        "bytes": 29060,
+        "sha256": "439c17ff97487672c78999069be1d90652b0f5b0d4630cc9a49b7f17ed1501ff"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "pine_05",
       "species": "pine",
       "variant": 5,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7369,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1052,
+        "bytes": 307712,
+        "sha256": "ba7de065e01d5f070e89573428e98a114d4055fadb5b07b4b9c01343e9a6c627",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -10.656952857971191,
-          -11.624509811401367,
+          -3.972200632095337,
+          -3.637176752090454,
           0.0
         ],
         [
-          11.561845779418945,
-          9.459802627563477,
-          26.794384002685547
+          3.4359004497528076,
+          3.1015946865081787,
+          18.169208526611328
         ]
       ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 195944,
-        "sha256": "20ad1cbfc52389afe536a556e4a179c9eb9353e2f73076720dab5b35c04eef38"
-      },
       "mid": {
-        "triangles": 312,
-        "bytes": 81736,
-        "sha256": "282725e79151ca57e7eca5ff9dd8d1dcb7dda624abea6363cfa146ae39170b3b"
+        "triangles": 156,
+        "bytes": 252236,
+        "sha256": "0b37533e81302b9d948e463c2bb15093a7fedbc5072faf42607cfa503c02e8ae",
+        "density": 1.0
       },
       "far": {
         "triangles": 6,
-        "bytes": 476200,
-        "sha256": "3e11c9387e99b20edbdd03a3dac2b808042d08328d1aa68a861c922e04f96fb7"
+        "bytes": 29560,
+        "sha256": "9655a4428e010497bdc35ca00d6218f30f8aa977eb79bf6f55b4b2ef7bf89b10"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "spruce_01",
       "species": "spruce",
       "variant": 1,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7401,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1546,
+        "bytes": 369164,
+        "sha256": "e11a52247ab07cdb37110649269df873d7e3d818e33210058f2bca6f5eeb8be2",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -5.902955532073975,
-          -5.609379768371582,
+          -3.8435158729553223,
+          -3.809337615966797,
           0.0
         ],
         [
-          6.183197975158691,
-          6.136451721191406,
-          19.602291107177734
+          4.1157073974609375,
+          4.04044771194458,
+          16.34217071533203
         ]
       ],
-      "near": {
-        "triangles": 2522,
-        "bytes": 192824,
-        "sha256": "d3fbc132cee577595db56479cd16e3e7d8ca8fb11b2a5782b57cc08a40151f9a"
-      },
       "mid": {
-        "triangles": 310,
-        "bytes": 79448,
-        "sha256": "d6254bfaf7be3fa0164217c588bc2543991716308de36ab91615f63ed5bdf536"
+        "triangles": 240,
+        "bytes": 298044,
+        "sha256": "9c29d665afa09b0cc7b9624f8814e45c054beb43b7b798a1758574ede0b3f347",
+        "density": 1.0
       },
       "far": {
         "triangles": 6,
-        "bytes": 450568,
-        "sha256": "a675a67a2c686b282d8ac1eea44dca2a3fee2db3d54bcff2be38fe57d7fc2513"
+        "bytes": 35916,
+        "sha256": "a749a145565dc99026098dde87064de2d9ee70dcac7ce2c71df93ec7648fff82"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "spruce_02",
       "species": "spruce",
       "variant": 2,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7418,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1956,
+        "bytes": 393256,
+        "sha256": "36be4571086df0e1235744f3dc99e18f4182cadff7d89902ac24a0e8e1745c00",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -9.96854305267334,
-          -8.868898391723633,
+          -4.091915130615234,
+          -4.363918781280518,
           0.0
         ],
         [
-          9.957432746887207,
-          9.609277725219727,
-          25.103914260864258
+          4.485471725463867,
+          4.5873847007751465,
+          19.634462356567383
         ]
       ],
-      "near": {
-        "triangles": 2532,
-        "bytes": 193528,
-        "sha256": "c3a21305bc74587d1a2ee89bdc7af4a280ec24ba2af6edeaac213f0e81bba963"
-      },
       "mid": {
-        "triangles": 310,
-        "bytes": 79460,
-        "sha256": "8948110f16bec26afb53733c90d4acc7b95aef51f11f4242d037d2d1f5e42c15"
+        "triangles": 242,
+        "bytes": 298180,
+        "sha256": "309b44a9f177431e3dfa4b9156858be30e8ea62bc75128cd5a579e6420fe5b30",
+        "density": 0.865
       },
       "far": {
         "triangles": 6,
-        "bytes": 552096,
-        "sha256": "bd669a2237bbeab2f2edd5816b82037d6aeed491889966a93e9c22366881fb97"
+        "bytes": 35804,
+        "sha256": "6977da0d2e93f1f7a2ad0d4f63a5b8fa8eb2cf9df60dd02345c6301a0665a6b0"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "spruce_03",
       "species": "spruce",
       "variant": 3,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7435,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1150,
+        "bytes": 349896,
+        "sha256": "de0b2e0d2faa71cb69662910eac6793aaa1bb8f39973784537ced388bc9d399b",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -10.055655479431152,
-          -8.844067573547363,
+          -3.1241917610168457,
+          -3.4109461307525635,
           0.0
         ],
         [
-          9.005237579345703,
-          10.153644561767578,
-          22.487550735473633
+          3.5050923824310303,
+          3.8980352878570557,
+          13.969659805297852
         ]
       ],
-      "near": {
-        "triangles": 2510,
-        "bytes": 191992,
-        "sha256": "9880c76cb8e8af2ab23ce4380e32f4e63919e9bba2a1bb489e346d9e2bb8ad76"
-      },
       "mid": {
-        "triangles": 308,
-        "bytes": 79316,
-        "sha256": "f77180308167c412c3bfe77c55aba48fb3ad6642872d3dc725302d4bb771c0c5"
+        "triangles": 212,
+        "bytes": 296084,
+        "sha256": "6a7edf31257dfecad4683cfca93cc70db0760a16743841d8eaeccd9245c8cff3",
+        "density": 1.0
       },
       "far": {
         "triangles": 6,
-        "bytes": 594572,
-        "sha256": "14628361d1968ddfbbc09422c885d4dc24a01eb40596d4a9be81351e589989cc"
+        "bytes": 34552,
+        "sha256": "d9576b560c6a90c0163ca83fa182c20339ca49b0bec56136205d09f8c318cdaf"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "spruce_04",
       "species": "spruce",
       "variant": 4,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7452,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1914,
+        "bytes": 388016,
+        "sha256": "bad8fbb80d0338466800510d92cc4fd4c87269bee5363c7c34c47043b75fe06e",
+        "density": 0.865
+      },
       "boundsZUp": [
         [
-          -8.857603073120117,
-          -8.407084465026855,
+          -4.883389949798584,
+          -4.747827529907227,
           0.0
         ],
         [
-          8.811643600463867,
-          7.715045928955078,
-          28.5718994140625
+          4.604214668273926,
+          4.5762858390808105,
+          21.750078201293945
         ]
       ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 193808,
-        "sha256": "73876ed51aef80665b8f5f88c324399588cedd8d4188b66c3d7498a24819a528"
-      },
       "mid": {
-        "triangles": 312,
-        "bytes": 79600,
-        "sha256": "5f1cb6a06e82137bd163fb66c2d92d5878d7d88dda3e803b959f570abce6c408"
+        "triangles": 250,
+        "bytes": 298740,
+        "sha256": "6300b751f6d05d9262fd5d0d4bb7d843230e629e93a38edfcbcb1bedf2cd337d",
+        "density": 0.865
       },
       "far": {
         "triangles": 6,
-        "bytes": 472336,
-        "sha256": "ebb06e6d395ed9b9eefb2988f26244fb37ee7ec47c41b5ea3948918be14994cf"
+        "bytes": 34248,
+        "sha256": "441ceaa1413b642071d602a54f63c013f5df6fc9d7d1d6b9ffd2691bb2021b1f"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
     },
     {
       "id": "spruce_05",
       "species": "spruce",
       "variant": 5,
-      "blender": "5.2.3 LTS",
-      "sapling": "1.0.0",
-      "seed": 7469,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1672,
+        "bytes": 376832,
+        "sha256": "d3d4e381f4619edadf6c9a9ff4bd735b49351ba35bb1e177498da16d2652ea86",
+        "density": 1.0
+      },
       "boundsZUp": [
         [
-          -8.626961708068848,
-          -8.861858367919922,
+          -4.212584018707275,
+          -4.1408538818359375,
           0.0
         ],
         [
-          9.34911823272705,
-          8.898111343383789,
-          26.112422943115234
+          4.337934494018555,
+          3.844435453414917,
+          18.096302032470703
         ]
       ],
-      "near": {
-        "triangles": 2536,
-        "bytes": 193808,
-        "sha256": "9a205590a2b4f219bcdc5b83b9eb9a7989d3c3cff75678658b97a3d2e690871f"
-      },
       "mid": {
-        "triangles": 312,
-        "bytes": 79596,
-        "sha256": "030d25b2779b67fb7f2cdf3f1238bb4416ce5ff47fbd67afaa59a69a9cecff01"
+        "triangles": 242,
+        "bytes": 298184,
+        "sha256": "f6b99db99d03918be4e033f43cf368ad6f89f7a7b76f6758241712d9154408d2",
+        "density": 0.93
       },
       "far": {
         "triangles": 6,
-        "bytes": 513696,
-        "sha256": "ab543a201de1897d405cd476cc4087932aa8359fc4d6b3d1c7ac00318c9e5147"
+        "bytes": 34812,
+        "sha256": "96d052450ddc00a29f47f803e5ee1f0173b868bf3fa8bb46730ef32adf76a7a1"
       },
       "preview": "preview.png",
-      "impostorViews": 8,
-      "status": "awaiting_visual_approval"
+      "impostorViews": 2
+    },
+    {
+      "id": "oak_01",
+      "species": "oak",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1320,
+        "bytes": 189856,
+        "sha256": "22afb35bba66f0d2f32128c082a13bf735a8e6e162febebfd4a92bc43bd8f02e",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -7.916095733642578,
+          -8.438432693481445,
+          0.0
+        ],
+        [
+          7.933363914489746,
+          7.87333345413208,
+          15.335702896118164
+        ]
+      ],
+      "mid": {
+        "triangles": 224,
+        "bytes": 123516,
+        "sha256": "1d206460a35455ade4c654a2a6e66bce1cd2197fb85e7b61e521e21e1a419f95",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 61700,
+        "sha256": "7011c1dee1de4bd273c7d74ddaef11b8152f75382bf1f3a27eb91a959fa5cc48"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "oak_02",
+      "species": "oak",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1428,
+        "bytes": 195664,
+        "sha256": "25619972efefb8d0b563393ab71c40c10c0d6f58cbd95d231cb2c772a155355d",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -11.889758110046387,
+          -11.874143600463867,
+          0.0
+        ],
+        [
+          12.186819076538086,
+          11.172264099121094,
+          16.765729904174805
+        ]
+      ],
+      "mid": {
+        "triangles": 242,
+        "bytes": 124396,
+        "sha256": "ca210e17ec93a71f3b25f9da76d71d74ba507a49974ed2ceb17f4cd1fa4f11fa",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 55192,
+        "sha256": "2949e4dc483845cbbb03094755742f8dd3d1f08260abb2359065f2016e43adbe"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "oak_03",
+      "species": "oak",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1212,
+        "bytes": 184056,
+        "sha256": "e6058d29f8fbf07c1586f659d315fcf2f9151057d172c8397a0318a1c1740046",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -6.456626892089844,
+          -6.946076393127441,
+          0.0
+        ],
+        [
+          7.017178058624268,
+          6.960765361785889,
+          13.493865013122559
+        ]
+      ],
+      "mid": {
+        "triangles": 206,
+        "bytes": 122640,
+        "sha256": "ef38345c548898c30cd3b361c6b7cfaa7fad4e79ce5d5a4cf8455ed4df277249",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 57012,
+        "sha256": "529a5e56eed0baff5e336077d2b3e4e9fc1f31ad472ef7bd85fef646f0ed081a"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "oak_04",
+      "species": "oak",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1428,
+        "bytes": 195660,
+        "sha256": "cd8b40536f30190db5bd415a8c19c716ef9cc8e9c68c51d2be07409f64f87a0b",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -12.553228378295898,
+          -11.68826675415039,
+          0.0
+        ],
+        [
+          9.917386054992676,
+          12.08608341217041,
+          18.333232879638672
+        ]
+      ],
+      "mid": {
+        "triangles": 242,
+        "bytes": 124396,
+        "sha256": "45a4e233110c01443fa8bd4bfcc5bcb6615586f1a3cdd2827fe6e7b56f2354aa",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 58224,
+        "sha256": "64ae24ee7c9c95f587294c01884339cd2c03f203d866bd4226fc8e37f9663221"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "oak_05",
+      "species": "oak",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1320,
+        "bytes": 189856,
+        "sha256": "848ebc251b0395a6c21697bdede9e1397f9f70e947abdba767ff5f933dfe78c1",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -8.688957214355469,
+          -9.117990493774414,
+          0.0
+        ],
+        [
+          8.331914901733398,
+          9.83449935913086,
+          17.081897735595703
+        ]
+      ],
+      "mid": {
+        "triangles": 224,
+        "bytes": 123516,
+        "sha256": "02ecc68d530e2f27591eabb0225c4a25e3b2db8fd42edaf43e03f67460f4bef9",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 57164,
+        "sha256": "c5fc1b487dc14d476a4a0a5f1ab3c0e0e59ab8aa86e474434204331bd5407fe5"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "lime_01",
+      "species": "lime",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1306,
+        "bytes": 175672,
+        "sha256": "f9fbf17e2f533724b297b70324511b51b15006c754a374d8f28d9de32a4a5ab3",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -8.78212833404541,
+          -7.3705549240112305,
+          0.0
+        ],
+        [
+          8.320781707763672,
+          7.079756736755371,
+          18.466968536376953
+        ]
+      ],
+      "mid": {
+        "triangles": 246,
+        "bytes": 112340,
+        "sha256": "647c537ed9bbeec50b54b83307ac6314f15d8d85c3b9694d466d85b91aadb269",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 60812,
+        "sha256": "7ab19aeded18ad1944c28e949d2e0a3be83484bf3795aa5951b3e7fc6a3f6c48"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "lime_02",
+      "species": "lime",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1396,
+        "bytes": 180344,
+        "sha256": "2b147d896fd546d68b51c0e365bd8d4fa4b9c92a3d1be87879a0db07f3dff45e",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -10.206181526184082,
+          -7.754749298095703,
+          0.0
+        ],
+        [
+          9.522598266601562,
+          7.3880534172058105,
+          21.540386199951172
+        ]
+      ],
+      "mid": {
+        "triangles": 244,
+        "bytes": 111812,
+        "sha256": "5d02cdba30ed4c6bb81a472ed8f3344bd620ac7bde5e2cf390c2923fbd003b0d",
+        "density": 0.865
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 63172,
+        "sha256": "2b6307cd69dd6909a6da268cdc04a0fb56e30e5f74927040fca1b5e018755d7b"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "lime_03",
+      "species": "lime",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1216,
+        "bytes": 171004,
+        "sha256": "7efed45777e35cbe29ef3c0bfda7d3c661a572160bc643783f34c4cc14073569",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.870512962341309,
+          -5.865037441253662,
+          0.0
+        ],
+        [
+          6.082279205322266,
+          6.246008396148682,
+          17.6407527923584
+        ]
+      ],
+      "mid": {
+        "triangles": 228,
+        "bytes": 111460,
+        "sha256": "17f39ca01ad1be258db32b82d1a90d2bef24cb96e0e395d420c563b810a2daa2",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 66992,
+        "sha256": "56062a6809732d2473b6e030708111e03d03ccde21ea3ab591e5c703747b0594"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "lime_04",
+      "species": "lime",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1396,
+        "bytes": 180340,
+        "sha256": "97b8ad5a670db454810d865337ebf23522f77f0a109097d1cb74211cbbf9360d",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -11.419485092163086,
+          -9.743465423583984,
+          0.0
+        ],
+        [
+          8.81557846069336,
+          9.23522663116455,
+          21.422199249267578
+        ]
+      ],
+      "mid": {
+        "triangles": 246,
+        "bytes": 111956,
+        "sha256": "0209578a42f00bbef9767d1ed6b5e65f16506b69d9ed194a5fcaef8e4c8d560b",
+        "density": 0.865
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 65896,
+        "sha256": "9c654ab7734946acaf877fbaf2c868753c93d8ed54107e758132789c68e9464d"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "lime_05",
+      "species": "lime",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1306,
+        "bytes": 175676,
+        "sha256": "3f7d12bce1e607f6cb0df097107c256653283d0160e5acb053a8d39efcdec69d",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -10.002814292907715,
+          -9.502227783203125,
+          0.0
+        ],
+        [
+          7.536496162414551,
+          6.7335991859436035,
+          20.280078887939453
+        ]
+      ],
+      "mid": {
+        "triangles": 246,
+        "bytes": 112336,
+        "sha256": "e746ad9fa5430bfbf00aa2eaa719004afe6e229bf834629cd9110a8b039e4930",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 62228,
+        "sha256": "eacda1f4f2f8af6d10852c18824f350d0386d421cd9dfd7f8b2761df0107ca49"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "birch_01",
+      "species": "birch",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1068,
+        "bytes": 184476,
+        "sha256": "56b63ab970435a92ce306b4bc0492ad14e7fad3cd59a55eebd68f289b12bf7f2",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.846634387969971,
+          -4.528517246246338,
+          0.0
+        ],
+        [
+          4.499840259552002,
+          4.35861349105835,
+          17.45639991760254
+        ]
+      ],
+      "mid": {
+        "triangles": 204,
+        "bytes": 133616,
+        "sha256": "d0bf0c2ac2f11075d43216c8afbe6a66ec374c1fbf3085bf4d464354f098ca76",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 62824,
+        "sha256": "1edeee83430d4047f00ec0fa841d0624ca42c4d93ee986e45054e2958e5a869f"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "birch_02",
+      "species": "birch",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1170,
+        "bytes": 189988,
+        "sha256": "0556829eed0364582d9e7c6e4241ba111f7eec25ec4b5b0566e2b12ad0ca4b07",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.740736484527588,
+          -5.122096061706543,
+          0.0
+        ],
+        [
+          5.30575704574585,
+          5.136019706726074,
+          19.270471572875977
+        ]
+      ],
+      "mid": {
+        "triangles": 222,
+        "bytes": 134492,
+        "sha256": "4310eeb7ee385615c7349d18099c41addef2e114104f082e4e30f06c370d899b",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 63788,
+        "sha256": "a5035f3da3f9ac5cb2e90d10bf6f332877e4d5969b8536e377a2ec726534c6c8"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "birch_03",
+      "species": "birch",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 966,
+        "bytes": 178972,
+        "sha256": "c69692155a87802ce524c0b4ddda568341699bcc23f1a63276a772d986c814b4",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -3.684420347213745,
+          -3.8605449199676514,
+          0.0
+        ],
+        [
+          5.146899223327637,
+          3.7351298332214355,
+          15.279339790344238
+        ]
+      ],
+      "mid": {
+        "triangles": 186,
+        "bytes": 132736,
+        "sha256": "125c891948bba834a410c6acd5ecb19545790607d43c397625bf1e56bb2cc8ad",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 62020,
+        "sha256": "a64d30c8174df7c5af0b3c68665e18d75914a064ed62e32036eece5b05d60b3f"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "birch_04",
+      "species": "birch",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1170,
+        "bytes": 189988,
+        "sha256": "40b74b5534ed83b58beb7975357c484cea3605d67e633b7f4d99c92229086a0b",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.791233539581299,
+          -5.321291446685791,
+          0.0
+        ],
+        [
+          4.455024719238281,
+          4.992455959320068,
+          20.06039810180664
+        ]
+      ],
+      "mid": {
+        "triangles": 222,
+        "bytes": 134488,
+        "sha256": "dd86eda2cc73913dba93e28547e4dbd322fdbf0c0710932e735a188fe8eef3be",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 62676,
+        "sha256": "14e6e04f3f0cc42b42f5bcf3a23139515ab53eef79d083ac3dace1359c070a0d"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "birch_05",
+      "species": "birch",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1068,
+        "bytes": 184480,
+        "sha256": "513ee7ee38596f0992371a3b28fa657319883fef4a2f27cc8eef39ecfac82e58",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.785700798034668,
+          -4.172800540924072,
+          0.0
+        ],
+        [
+          5.7212395668029785,
+          5.379880905151367,
+          18.25660514831543
+        ]
+      ],
+      "mid": {
+        "triangles": 204,
+        "bytes": 133612,
+        "sha256": "0d2ef6b3b5c18fbc306fbbcbca4aa6a837a4b30bba630ea657a6a7a76375540b",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 57508,
+        "sha256": "b52082a8a63ec5953e9db46a0d894697c1b3151207cdf4d527de25dee7dd7604"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "palm_01",
+      "species": "palm",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 223520,
+        "sha256": "89eee5ee9dfb6f6cab6d5b28bb12a77565eb9edb582784cfa14213c9757030b5",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -6.144310474395752,
+          -6.0927581787109375,
+          0.0
+        ],
+        [
+          4.63822078704834,
+          5.529337406158447,
+          12.787697792053223
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 216768,
+        "sha256": "1cc31dddf9c4cb1a55dfdcf3a34b4a2a89aca1334ebc54beb4690ad902325d91",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 30644,
+        "sha256": "5575038a973eeffeb6bd47c2b737312405811d9a317365a291aa1f0e3d1bb062"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "palm_02",
+      "species": "palm",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 223520,
+        "sha256": "6d53934a859b0e06610b0fbd4bd272a4e76c85d3214d970348030ace1b5da346",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.817974090576172,
+          -3.678788661956787,
+          0.0
+        ],
+        [
+          5.815366268157959,
+          7.005742073059082,
+          14.173798561096191
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 216764,
+        "sha256": "d671e196f9d12090442308de2e461fd865c3eb21513f6446aee8d809bb2a06f7",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 32812,
+        "sha256": "37978fa8475576a31c794e0922cea320c69192d0b8a6776c42aed9822eaf8fe2"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "palm_03",
+      "species": "palm",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 223516,
+        "sha256": "c0ef92d05f66b1dfd80a6e0a6946aaffc0a9625a49b91698b517bf43d2f2d9d7",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.660891532897949,
+          -4.285628795623779,
+          0.0
+        ],
+        [
+          5.9691033363342285,
+          6.07138729095459,
+          11.090121269226074
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 216764,
+        "sha256": "231d21fe3a624aaa84dc52156abd593a596fe958fc7724e2bd80b0da57560f41",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 32916,
+        "sha256": "a4f9513109f1dd22301974dc52e8da57902c223104c6ca010572a3bdbbd6cde7"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "palm_04",
+      "species": "palm",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 223516,
+        "sha256": "167cb574d0f58e7ee2dd38d37a5c7d72ad71f4fb292100a82c95c6ff8bcaf9b4",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.053040504455566,
+          -6.465446949005127,
+          0.0
+        ],
+        [
+          6.906040668487549,
+          5.197301387786865,
+          15.70926284790039
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 216760,
+        "sha256": "28d3804fd4dee2881056d070d31072b960cb9b5eac75b48fa164a56bbf22a96e",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 28616,
+        "sha256": "54e6b52f84ab094032408cdbce8e5c3fd475a7df2485c12230eaba3b2c2918a7"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "palm_05",
+      "species": "palm",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 223520,
+        "sha256": "697eb57e321e05c11acf3e80a5ccaeaa1e118d757229a9081be49a2478eec0da",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.465304374694824,
+          -5.4305419921875,
+          0.0
+        ],
+        [
+          6.879410266876221,
+          6.2695136070251465,
+          13.549843788146973
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 216764,
+        "sha256": "341cc26d0be452380a8c85f939ca42cf6f2547d9dfd5b38cec79b0da1777dff4",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 28968,
+        "sha256": "c2c3f926e223b96ab897de368f514d7ed85c52eb277ecf6636d12847c0347bb3"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
     }
   ]
 }

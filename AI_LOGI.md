@@ -729,3 +729,15 @@ Kasutaja: three.js jääb nõrgaks ja ta soovis uuemat renderdajat.
   - Väga laiade jõgede (poollaius >40 m) suudmetes jäävad vanad sirged kaldavallijooned alles.
   - Lahe madalas osas võivad üksused kahlata, sest füüsiline maa on seal kuiv.
 
+---
+
+## V345 – uued puud kõigile liikidele (Claude, 2026-11-07)
+
+- Kasutaja: põhjamaise metsa stiilis puud väiksema kolmnurkade arvuga, eri kaugustele, otse mängu.
+- Generaator: `python3 tools/forest-trees-v345/make_trees.py`. See kirjutab `assets/sapling-trees` near/mid-failid ja `manifest.json`.
+- Kaugtase:
+  - `tools/forest-trees-v345/bake.html` renderdab vaated, käivitatakse brauseris HTTP-serveri kaudu ja väljund on `window.__bake` JSON;
+  - `python3 tools/forest-trees-v345/make_far.py bake.json` kirjutab far.glb.
+- Eelarved: near ≤2000, mid ≤250, far 6. Iga liigi kõik near- ja mid-failid kasutavad sama atlast, sest mäng hoiab tekstuuri vahemälus liigi kaupa.
+- Kontroll: `node tests/forest-trees-v345.mjs`, `node tests/sapling-trees/live-integration.mjs`.
+
