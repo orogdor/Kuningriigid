@@ -11,7 +11,7 @@ import * as T from './vendor/three.module.js';
 import {releaseMaterial} from './program-keep-v161.js';
 import {waterMaterial,roadMaterial,animate} from './landscape-v149.js?v=2231';
 import {createCrossingNetwork} from './landscape-polish-v84.js?v=2232';
-import {riverNear,visibleRiverHeight,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal,smoothAtlasHeight} from './continuous-landscape.js?v=323';
+import {estuaryFlareV344,riverNear,visibleRiverHeight,localToWorld,getRivers,roadNetwork,surface,visualSurface,visualElevation,visualProject,baseHeight,projectHeight,worldToLocal,smoothAtlasHeight} from './continuous-landscape.js?v=323';
 const colors=['#000000','#bba078','#c0aa83','#aaa497','#9eacae'];
 const V=(arr,p)=>arr.push(p.x,p.y,p.z);
 const field=(game,x,z,view,tile)=>view==='world'?{x,z}:{...worldToLocal(tile,x,z)};
@@ -164,7 +164,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  const toWorld=(x,z)=>scope==='world'?{x,z}:localToWorld(tile,x,z);
  const mud=new T.Color('#5a523f'),damp=new T.Color('#6e6a4c');
  // V249: mud and gravel banks fade out on the beach instead of ending in a hard edge at the shore
- const shoreFadeV249=p=>{const h=scope==='world'&&ground?ground(p.x,p.z):smoothAtlasHeight(game,p.x,p.z);const t=Math.max(0,Math.min(1,(h-.3)/2.2));return t*t*(3-2*t);};
+ const shoreFadeV249=p=>{const h=scope==='world'&&ground?ground(p.x,p.z):smoothAtlasHeight(game,p.x,p.z);const t=Math.max(0,Math.min(1,(h-.3)/2.2));return t*t*(3-2*t)*(1-estuaryFlareV344(game,p.x,p.z).strength);}; // V344: no mud strip inside a rounded mouth
  const bankMesh=yield* buffersStepsV242(banks,'#6e6a4c',{standard:true,shade:(x,y,z)=>{
   const p=toWorld(x,z),near=riverNear(game,p.x,p.z),t=Math.max(0,Math.min(1,(near.distance-near.width)/Math.max(.6,near.width*.4)));
   return mud.clone().lerp(damp,t).multiplyScalar(.92+.16*Math.sin(p.x*.37+Math.sin(p.z*.29)*2));

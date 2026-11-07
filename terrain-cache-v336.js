@@ -15,7 +15,7 @@ function open(){
 export function terrainMeshKeyV336(state,quality){
  const w=state?.generatedWorldV331;
  if(!w?.id||typeof w.id!=='string'||w.id.length>128)return null;
- return ['v336-1',w.id,JSON.stringify(w.identity||[]),quality,state.terrainRevision||0,state.crossingRevision||0].join('|');
+ return ['v344-1',w.id,JSON.stringify(w.identity||[]),quality,state.terrainRevision||0,state.crossingRevision||0].join('|');
 }
 export async function readTerrainMeshV336(key){
  if(!key)return null;

@@ -1,5 +1,6 @@
 import {adaptiveAtlasSamplerV327} from './atlas-terrain-v327.js';
 import * as T from './vendor/three.module.js';
+import {estuaryFlareV344} from './continuous-landscape.js';
 // Sample the actual overview triangles, rather than the detailed river-bed
 // function that can be metres below or above this coarser mesh.
 export function atlasGroundSamplerV326(geometry){
@@ -21,7 +22,10 @@ export function atlasSeaGeometryV326(game,terrainGeometry){
   const x=p.getX(i),z=p.getZ(i),ground=p.getY(i);
   // The terrain triangles and sea triangles now share all x/z vertices.
   // The natural mask keeps deep inland river trenches from becoming ocean.
-  depth[i]=Math.min(.72-ground,.72-game.atlasHeight(x,z));
+  // V344: a rounded river mouth lowers the natural shore, so the sea may
+  // fill it; elsewhere the raw atlas still keeps inland trenches dry.
+  const flare=game.cells?estuaryFlareV344(game,x,z):null,natural=flare?.strength>0?Math.min(game.atlasHeight(x,z),flare.ground):game.atlasHeight(x,z);
+  depth[i]=Math.min(.72-ground,.72-natural);
   p.setY(i,0);
  }
  for(const name of Object.keys(geo.attributes))if(name!=='position')geo.deleteAttribute(name);
