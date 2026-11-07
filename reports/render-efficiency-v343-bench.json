@@ -3,7 +3,7 @@
   "note": "Node isolated CPU microbenchmark, seven samples after warmup. Same models/transforms. No GPU or user-device FPS claim.",
   "trees2000": {
     "before": {
-      "ms": 1.3798396750000008,
+      "ms": 1.3192130999999996,
       "ancestorUpdates": 4000,
       "instances": [
         2000,
@@ -11,33 +11,44 @@
       ]
     },
     "after": {
-      "ms": 0.7149915749999991,
+      "ms": 0.6826710249999991,
       "ancestorUpdates": 0,
       "instances": [
         2000,
         2000
       ]
     },
-    "reductionPercent": 48.2
+    "reductionPercent": 48.3
   },
   "soldiers1000HalfHidden": {
     "before": {
-      "ms": 11.056647500000008,
+      "ms": 10.153450599999996,
       "parts": 6000
     },
     "after": {
-      "ms": 7.1358568999999985,
+      "ms": 6.044140199999992,
       "parts": 6000
     },
-    "reductionPercent": 35.5
+    "reductionPercent": 40.5
+  },
+  "soldiers1000AllVisible": {
+    "before": {
+      "ms": 12.419326799999999,
+      "parts": 12000
+    },
+    "after": {
+      "ms": 12.030346149999968,
+      "parts": 12000
+    },
+    "reductionPercent": 3.1
   },
   "height100000CacheHits": {
     "before": {
-      "ms": 5.45594600000004
+      "ms": 5.050196000000142
     },
     "after": {
-      "ms": 4.687930333333497
+      "ms": 4.6093080000000555
     },
-    "reductionPercent": 14.1
+    "reductionPercent": 8.7
   }
 }
