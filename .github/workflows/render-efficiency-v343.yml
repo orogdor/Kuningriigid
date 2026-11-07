@@ -1,0 +1,43 @@
+name: Kuningriigid V343 render efficiency
+on:
+  push:
+    branches: [feature/render-efficiency-v343]
+    paths: ['**.js', '**.mjs', '**.cjs', 'index.html', '.github/workflows/render-efficiency-v343.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Timing, tree and soldier regressions
+        run: |
+          node tests/render-efficiency-v343.mjs
+          node tests/sapling-trees/live-integration.mjs
+          node scripts/test-scout-model-v239.mjs
+          node scripts/test-demand-v241.mjs
+          node tests/detail-stream-v342.mjs
+      - name: Install browser control
+        run: npm install --prefix /tmp/render-check playwright@1.56.1 --fetch-retries=1 --fetch-timeout=60000
+      - name: Town, forest, tile crossing and 480-soldier battle
+        env:
+          TREE_NODE_MODULES: /tmp/render-check/node_modules
+        run: |
+          export CHROMIUM_PATH=$(command -v google-chrome || command -v chromium || true)
+          if [ -z "$CHROMIUM_PATH" ]; then
+            /tmp/render-check/node_modules/.bin/playwright install chromium
+            export CHROMIUM_PATH=$(node -e "console.log(require('/tmp/render-check/node_modules/playwright').chromium.executablePath())")
+          fi
+          node tests/render-efficiency-v343-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: render-efficiency-v343-evidence
+          path: |
+            reports/render-efficiency-v343-browser.json
+            previews/render-v343/

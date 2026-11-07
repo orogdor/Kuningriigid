@@ -1,7 +1,7 @@
 import * as T from './vendor/three.module.js';
 // Share draw calls, while preserving every man's animated limb matrices.
 export class SoldierBatch{
- constructor(parent){this.parent=parent;this.root=new T.Group();this.root.name='Instanced squad soldiers';parent.add(this.root);this.models=[];this.batches=[];this.matrix=new T.Matrix4();}
+ constructor(parent){this.parent=parent;this.root=new T.Group();this.root.name='Instanced squad soldiers';parent.add(this.root);this.models=[];this.batches=[];this.matrix=new T.Matrix4();this.inverse=new T.Matrix4();this.visibility=new Map();}
  update(models){
   // Single scouts render directly; instancing hides their source meshes.
   const included=models.filter(m=>!m.userData.noBatchV239);
@@ -16,7 +16,24 @@ export class SoldierBatch{
    this.assetRevisionsV241=included.map(m=>m.userData.assetRevisionV241||0);
    this.batches=[...groups.values()].map(parts=>{const p=parts[0],mesh=new T.InstancedMesh(p.geometry,p.material,parts.length);mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);mesh.frustumCulled=false;mesh.castShadow=p.castShadow;mesh.receiveShadow=p.receiveShadow;this.root.add(mesh);return {mesh,parts};});
   }
-  for(const m of included)m.updateMatrixWorld(true);this.parent.updateWorldMatrix(true,false);const inverse=this.parent.matrixWorld.clone().invert();
-  for(const {mesh,parts}of this.batches){let n=0;for(const p of parts){let visible=p.userData.batchWasVisible;for(let a=p.parent;a&&a!==this.parent;a=a.parent)if(!a.visible){visible=false;break;}if(!visible)continue;this.matrix.multiplyMatrices(inverse,p.matrixWorld);mesh.setMatrixAt(n++,this.matrix);}mesh.count=n;mesh.instanceMatrix.needsUpdate=true;}
+  // Cache ancestor visibility for this update: a squad/man's ancestors are
+  // shared by all its animated limbs. Hidden squads need no matrix walk.
+  this.visibility.clear();
+  const visible=node=>{
+   if(!node||node===this.parent)return true;
+   if(this.visibility.has(node))return this.visibility.get(node);
+   const result=node.visible&&visible(node.parent);this.visibility.set(node,result);return result;
+  };
+  this.parent.updateWorldMatrix(true,false);this.inverse.copy(this.parent.matrixWorld).invert();
+  for(const m of included)if(visible(m))m.updateMatrixWorld(true);
+  for(const {mesh,parts}of this.batches){
+   let n=0;for(const p of parts){if(!p.userData.batchWasVisible||!visible(p.parent))continue;
+    this.matrix.multiplyMatrices(this.inverse,p.matrixWorld);mesh.setMatrixAt(n++,this.matrix);
+   }
+   mesh.count=n;
+   // Upload only active soldiers, not the capacity of dead/hidden squads.
+   mesh.instanceMatrix.clearUpdateRanges();
+   if(n){mesh.instanceMatrix.addUpdateRange(0,n*16);mesh.instanceMatrix.needsUpdate=true;}
+  }
  }
 }

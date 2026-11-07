@@ -1,0 +1,572 @@
+[
+  {
+    "command": "node --check civilization.js",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node --check graphics-settings-v226.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check graphics-runtime-v226.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check webgpu-safety-v227.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check vendor/three-gpu-shim.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check boot-v83.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check ui-painted-v287.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check ui-reference-v288.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v289.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v290.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v291.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v292-mobile.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v293-research.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check research-panel-v294.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check research-panel-v295.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v297-refinement.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v298-layout.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v301-background.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v303-buttons.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check hud-v302-pieces.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check selection-context-v300.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check ui-v304.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check ui-v309.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check ui-v310.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check ui-catalog-v304.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check research-art-v304.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check research-art-v293.js",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node --check research-tree-v119.js",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node --check research-ui.js",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node --check atmosphere-v158.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check landscape-v149.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check sea-v158.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check stone-near-lod.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check civilization-core.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check ai-defenses-v128.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check outer-ring-v184.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node --check wall-demo-v184.js",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "command": "node tests/three-r187-v305.mjs",
+    "exit": 0,
+    "seconds": 0.21
+  },
+  {
+    "command": "node tests/three-r187-v305-tsl.mjs",
+    "exit": 0,
+    "seconds": 0.24
+  },
+  {
+    "command": "node scripts/test-equipment-v234.mjs",
+    "exit": 0,
+    "seconds": 0.12
+  },
+  {
+    "command": "node scripts/test-stone-warriors-v261.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node scripts/test-demand-v241.mjs",
+    "exit": 0,
+    "seconds": 3.07
+  },
+  {
+    "command": "node scripts/test-stream-v242.mjs",
+    "exit": 0,
+    "seconds": 5.55
+  },
+  {
+    "command": "node tests/detail-stream-v319.mjs",
+    "exit": 0,
+    "seconds": 0.09
+  },
+  {
+    "command": "node tests/detail-vegetation-v320.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "command": "node tests/detail-stream-v341.mjs",
+    "exit": 0,
+    "seconds": 0.15
+  },
+  {
+    "command": "node tests/detail-stream-v342.mjs",
+    "exit": 0,
+    "seconds": 0.85
+  },
+  {
+    "command": "node tests/render-efficiency-v343.mjs",
+    "exit": 0,
+    "seconds": 0.15
+  },
+  {
+    "command": "node tests/sapling-trees/live-integration.mjs",
+    "exit": 0,
+    "seconds": 0.14
+  },
+  {
+    "command": "node tests/tiled-sea-v321.mjs",
+    "exit": 0,
+    "seconds": 0.12
+  },
+  {
+    "command": "node tests/estuary-v322.mjs",
+    "exit": 0,
+    "seconds": 6.78
+  },
+  {
+    "command": "node tests/estuary-v323.mjs",
+    "exit": 0,
+    "seconds": 6.91
+  },
+  {
+    "command": "node tests/river-estuary-v325.mjs",
+    "exit": 0,
+    "seconds": 7.41
+  },
+  {
+    "command": "node tests/shared-water-v326.mjs",
+    "exit": 0,
+    "seconds": 0.37
+  },
+  {
+    "command": "node tests/adaptive-atlas-v327.mjs",
+    "exit": 0,
+    "seconds": 0.13
+  },
+  {
+    "command": "node tests/world-assets-v327.mjs",
+    "exit": 0,
+    "seconds": 0.2
+  },
+  {
+    "command": "node TEST_V73.mjs",
+    "exit": 0,
+    "seconds": 3.13
+  },
+  {
+    "command": "node tests/save-compression-v256.mjs",
+    "exit": 0,
+    "seconds": 1.36
+  },
+  {
+    "command": "node tests/wildlife-v255/run.mjs",
+    "exit": 0,
+    "seconds": 0.12
+  },
+  {
+    "command": "node tests/ui-research-v293.mjs",
+    "exit": 0,
+    "seconds": 0.09
+  },
+  {
+    "command": "node tests/ui-research-v294.mjs",
+    "exit": 0,
+    "seconds": 0.07
+  },
+  {
+    "command": "node tests/ui-research-v295.mjs",
+    "exit": 0,
+    "seconds": 0.07
+  },
+  {
+    "command": "node tests/ui-research-v296.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v297.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v298.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v299-buttons.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v300-selection.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v301-background.mjs",
+    "exit": 0,
+    "seconds": 0.12
+  },
+  {
+    "command": "node tests/ui-v302-pieces.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v303-buttons.mjs",
+    "exit": 0,
+    "seconds": 0.12
+  },
+  {
+    "command": "node tests/ui-v304.mjs",
+    "exit": 0,
+    "seconds": 0.07
+  },
+  {
+    "command": "node tests/ui-v306.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v311.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v312.mjs",
+    "exit": 0,
+    "seconds": 0.07
+  },
+  {
+    "command": "node tests/water-carriers-v268.mjs",
+    "exit": 0,
+    "seconds": 0.11
+  },
+  {
+    "command": "node tests/world-city-scale-v273.mjs",
+    "exit": 0,
+    "seconds": 3.23
+  },
+  {
+    "command": "node tests/tree-growth-v274.mjs",
+    "exit": 0,
+    "seconds": 0.07
+  },
+  {
+    "command": "node tests/migration-v274.mjs",
+    "exit": 0,
+    "seconds": 4.02
+  },
+  {
+    "command": "node tests/lake-outlets-v275.mjs",
+    "exit": 0,
+    "seconds": 13.76
+  },
+  {
+    "command": "node tests/river-bank-v276.mjs",
+    "exit": 0,
+    "seconds": 6.66
+  },
+  {
+    "command": "node tests/villages-v276.mjs",
+    "exit": 0,
+    "seconds": 6.46
+  },
+  {
+    "command": "node tests/natural-shore-v278.mjs",
+    "exit": 0,
+    "seconds": 6.81
+  },
+  {
+    "command": "node tests/stone-age-playthrough-v280.mjs",
+    "exit": 0,
+    "seconds": 18.09
+  },
+  {
+    "command": "node tests/stone-age-economy-v281.mjs",
+    "exit": 0,
+    "seconds": 19.13
+  },
+  {
+    "command": "node tests/ui-v282.mjs",
+    "exit": 0,
+    "seconds": 0.22
+  },
+  {
+    "command": "node tests/ui-painted-v287.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-reference-v288.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v289.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v290.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v291.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/ui-v292-mobile.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/stone-animation-v283.mjs",
+    "exit": 0,
+    "seconds": 0.11
+  },
+  {
+    "command": "node tests/work-spots-v284.mjs",
+    "exit": 0,
+    "seconds": 0.11
+  },
+  {
+    "command": "node tests/coast-v286.mjs",
+    "exit": 0,
+    "seconds": 6.71
+  },
+  {
+    "command": "node tests/forest-ecology-v329.mjs",
+    "exit": 0,
+    "seconds": 0.28
+  },
+  {
+    "command": "node tests/continuous-forest-v330.mjs",
+    "exit": 0,
+    "seconds": 0.34
+  },
+  {
+    "command": "node scripts/test-historic-suburb-v191.mjs",
+    "exit": 0,
+    "seconds": 0.51
+  },
+  {
+    "command": "node scripts/test-natural-closure-v194.mjs",
+    "exit": 0,
+    "seconds": 0.07
+  },
+  {
+    "command": "node scripts/test-organic-demo-v190.mjs",
+    "exit": 0,
+    "seconds": 11.84
+  },
+  {
+    "command": "node scripts/test-wall-priority-v188.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "command": "node scripts/test-graphics-v226.mjs",
+    "exit": 0,
+    "seconds": 0.07
+  },
+  {
+    "command": "node scripts/test-farming-lod-v233.mjs",
+    "exit": 0,
+    "seconds": 0.14
+  },
+  {
+    "command": "node scripts/test-daynight-v235.mjs",
+    "exit": 0,
+    "seconds": 0.12
+  },
+  {
+    "command": "node scripts/test-scout-torch-v236.mjs",
+    "exit": 0,
+    "seconds": 0.11
+  },
+  {
+    "command": "node scripts/test-field-green-v237.mjs",
+    "exit": 0,
+    "seconds": 0.11
+  },
+  {
+    "command": "node scripts/test-scout-marker-v238.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "command": "node scripts/test-scout-model-v239.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "command": "node scripts/test-scout-motion-v240.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node scripts/test-build-v243.mjs",
+    "exit": 0,
+    "seconds": 1.91
+  },
+  {
+    "command": "node tests/autosave-v338.mjs",
+    "exit": 0,
+    "seconds": 0.06
+  },
+  {
+    "command": "node tests/torch-hand-v257.mjs",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "command": "node tests/world-movement-v258.mjs",
+    "exit": 0,
+    "seconds": 3.18
+  },
+  {
+    "command": "node tests/generated-world-v331.mjs",
+    "exit": 0,
+    "seconds": 16.47
+  },
+  {
+    "command": "node scripts/test.mjs traffic",
+    "exit": 0,
+    "seconds": 22.18
+  }
+]

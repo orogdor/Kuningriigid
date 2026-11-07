@@ -1,8 +1,8 @@
 // Exact-coordinate cache: no rounding or reduced terrain detail.
 const scalarCaches=new WeakMap();
 export function memoHeight(game,x,z,compute){
- const revision=(game.s?.terrainRevision||0)+':'+(game.s?.crossingRevision||0);let cache=scalarCaches.get(game);
- if(!cache||cache.revision!==revision){cache={revision,rows:new Map(),size:0,hits:0};scalarCaches.set(game,cache)}
+ const terrain=game.s?.terrainRevision||0,crossing=game.s?.crossingRevision||0;let cache=scalarCaches.get(game);
+ if(!cache||cache.terrain!==terrain||cache.crossing!==crossing){cache={terrain,crossing,rows:new Map(),size:0,hits:0};scalarCaches.set(game,cache)}
  let row=cache.rows.get(x);if(row?.has(z)){cache.hits++;return row.get(z)}
  const value=compute();if(!row){row=new Map();cache.rows.set(x,row)}row.set(z,value);cache.size++;
  if(cache.size>30000){const key=cache.rows.keys().next().value;cache.size-=cache.rows.get(key).size;cache.rows.delete(key)}
