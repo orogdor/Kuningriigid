@@ -758,6 +758,7 @@ function* buildDetailTileV242(entry){
   }
   entry.resources.set(res.id,resourceView(res,tile,entry.scenery));if(++batch%4===0||sliceDueV342())yield;
  }
+ entry.stage='forest fill';addForestFillV346(entry.scenery,tile,entry.world);yield; // V346
  entry.stage='ground cover';
  const cover=createGroundCoverV156(tile,coverHeight(tile),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(tile),{fraction:.55,deferred:true});
  entry.cover=cover.group;entry.root.add(cover.group);
