@@ -8,7 +8,7 @@ import {pickTreeV329,forestV329,detailCompanionsV329} from './forest-ecology-v32
 import {withSaplingInstancesV328,saplingStatsV328} from './sapling-trees-v328.js';
 import {createAtlasTerrainV327} from './atlas-terrain-v327.js';
 import {packSave,unpackSave} from './save-compression-v256.js';
-import {DetailStreamV242} from './detail-stream-v242.js?v=320';
+import {DetailStreamV242} from './detail-stream-v242.js?v=341';
 import {createAssetDemandV241} from './asset-demand-v241.js';
 import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
 import {rotateBuilding,pauseConstruction,removeBuilding} from './building-operations-v228.js';
@@ -759,8 +759,6 @@ function* buildDetailTileV242(entry){
  const cover=createGroundCoverV156(tile,coverHeight(tile),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(tile),{fraction:.55,deferred:true});
  entry.cover=cover.group;entry.root.add(cover.group);
  for(const step of cover.steps){step();yield;}
- entry.stage='horizon';
- entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
  let water=0;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const neighbour=game.cell({c:tile.c+dc,r:tile.r+dr});if(!neighbour||!neighbour.land)water++;}
  entry.water=water;
  // V321: one non-overlapping sea tile per terrain tile, each sampling its
@@ -770,15 +768,18 @@ function* buildDetailTileV242(entry){
  entry.stage='sea';if(water){entry.sea=yield* detailSeaStepsV242((x,z)=>localNaturalSeaGroundV322(game,tile,x,z,DETAIL_X,DETAIL_Z),{origin:tile,
    halfX:DETAIL_HALF_X,halfZ:DETAIL_HALF_Z,seg:quality==='high'?100:quality==='low'?48:72});
    if(entry.sea)entry.root.add(entry.sea);}yield;
- entry.stage='rivers';
- entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
- entry.stage='outcrops';
- entry.outcrops=createMountainOutcrops(game,'detail',tile);entry.decor.add(entry.outcrops);yield;
  const context=game.contextAt(tile,false);
  entry.stage='buildings';if(context)for(const b of context.economy.buildings){
   if(b.virtual)continue;
   const value=makeStreamBuildingV242(b,tile,context);entry.scenery.add(value.model);entry.buildings.set(b,value);yield;
  }
+ // V341: centre-only layers (in decor) follow everything a neighbour shows.
+ entry.stage='horizon';
+ entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
+ entry.stage='rivers';
+ entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
+ entry.stage='outcrops';
+ entry.outcrops=createMountainOutcrops(game,'detail',tile);entry.decor.add(entry.outcrops);yield;
  entry.root.updateMatrixWorld(true);
  entry.stage='navigation';const nav=yield* game.prepareNavV242(tile);entry.navigation=nav;
  entry.stage='roads';const plots=plotRects(tile),city=game.contextAt(tile,false);
@@ -855,7 +856,8 @@ function refreshStreamHoldersV242(){
    for(let i=0;i<coarse.all.length;i+=3){
     const a=coarse.all[i],b=coarse.all[i+1],c=coarse.all[i+2],x=(p.getX(a)+p.getX(b)+p.getX(c))/3,z=(p.getZ(a)+p.getZ(b)+p.getZ(c))/3;
     const dc=Math.floor((x+DETAIL_HALF_X)/DETAIL_TILE_X),dr=Math.floor((z+DETAIL_HALF_Z)/DETAIL_TILE_Z);
-    if(Math.abs(dc)<=detailStreamV242.radius&&Math.abs(dr)<=detailStreamV242.radius&&ready.has((activeTile.c+dc)+':'+(activeTile.r+dr)))continue;
+    // V341: the camera-chosen window may reach one ring further forward.
+    if(ready.has((activeTile.c+dc)+':'+(activeTile.r+dr)))continue;
     kept.push(a,b,c);
    }
    horizon.geometry.index.array.set(kept);horizon.geometry.index.needsUpdate=true;horizon.geometry.setDrawRange(0,kept.length);
@@ -1859,7 +1861,7 @@ function refreshAutomaticUI(now){
 // V161: on tall detail-map mountains the camera rides with the ground under the focus
 let camLiftV161=0;const camLookV161=new T.Vector3();
 function fitDepthRange(){const n=Math.max(.1,Math.min(40,zoom*.04));if(Math.abs(camera.near-n)>n*.02){camera.near=n;camera.updateProjectionMatrix();}}
-function frame(now){requestAnimationFrame(frame);if(now-assetPollV241>1000){assetPollV241=now;assetDemandV241.update();}if(view==='local'&&!s.battle){detailStreamV242.tick();refreshStreamHoldersV242();}if(view==='local'&&coverJobs.length)runCoverJobs();const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}if(view==='local'&&walker.placing)walker.pollPlacing(pick);walker.update(real);if(walker.active&&view==='local'){focus.set(walker.position.x,0,walker.position.z);zoom=45}else updateCameraKeys(real);followDetail();if(view==='world'){updateSpatialBatches(zoom,focus);fadeAtlasGrid(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12 }else{syncLocal();refreshCityTorchesV235();
+function frame(now){requestAnimationFrame(frame);if(now-assetPollV241>1000){assetPollV241=now;assetDemandV241.update();}if(view==='local'&&!s.battle){detailStreamV242.setView(camera,focus.x,focus.z);detailStreamV242.tick();refreshStreamHoldersV242();}if(view==='local'&&coverJobs.length)runCoverJobs();const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}if(view==='local'&&walker.placing)walker.pollPlacing(pick);walker.update(real);if(walker.active&&view==='local'){focus.set(walker.position.x,0,walker.position.z);zoom=45}else updateCameraKeys(real);followDetail();if(view==='world'){updateSpatialBatches(zoom,focus);fadeAtlasGrid(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12 }else{syncLocal();refreshCityTorchesV235();
   const selectedTime=graphicsV226.daylight==='day'?240:graphicsV226.daylight==='evening'?540:graphicsV226.daylight==='night'?840:s.time;
   updateCityTorchesV235(cityTorchesV235,dayClockV235(selectedTime),s.time);
   if(!s.battle)villageLife.update(s.time,frameDelta);updateGhost()}updateCommandVisuals();if(view==='local'&&activeTile){const target=Math.max(0,ground(activeTile,focus.x,focus.z));camLiftV161+=(target-camLiftV161)*Math.min(1,real*5+.02);}else camLiftV161=0;camera.position.set(focus.x+zoom*(view==='world'?.1:.48),camLiftV161+zoom*(view==='world'?.76:.78),focus.z+zoom*(view==='world'?.7:.8));if(view==='local'&&activeTile){const under=ground(activeTile,camera.position.x,camera.position.z)+4;if(camera.position.y<under)camera.position.y=under;}camLookV161.set(focus.x,camLiftV161,focus.z);camera.lookAt(camLookV161);if(walker.active&&view==='local')walker.applyCamera(camera);else fitDepthRange();atmosphere.update(view==='world'?worldScene:localScene,focus,walker.active?60:zoom,real,s.time);

@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V341 detailkaardi kaamerapõhine laadimine (2026-11-07): parandatud viga, kus 5×5 laadimine läks liikudes 3×3 peale (välimine rõngas jäi lähiruutude ja nende keskruudukihtide taha). Täisdetailsuse 25 ruutu valitakse nüüd kaamera vaatepüramiidi järgi, alati koos 3×3 naabrusega; meri ja hooned ehitatakse enne horisonti/jõgesid/navigatsiooni. Telefonis 3×3 kulu muutmata. Uued testid tests/detail-stream-v341.mjs (vana koodiga kukub läbi) ja päris mängu tests/detail-stream-v341-browser.cjs: Shift-kiirusel V340 püsivalt 3/16 täielikku välisruutu, V341 keskmiselt 14,8/16. Kõik 111 kohalikku kiirkontrolli läbisid. Vt MUUDATUSED_V341.md. FPS/laadimise leiud on ainult raportis RAPORT_FPS_V341.md (midagi ei muudetud): pikad 60–370 ms laadimissammud, keskruudukihid ehitatakse kõigile ruutudele, loogika jookseb ka joonistamata kaadritel, hashV278 27% käivitusest, maailma pakkimine põhilõimes. Järgmine töö: kasutaja seadmel kontroll; raporti punktid kasutaja otsusel.
+
 - V340 teine avaldamiskontroll: algusmenüü versioonikiri oli V339, kuigi lehe pealkiri V340. Kirjaviide parandatud; V293/V294 menüü- ja V338 salvestustestid läbisid. Järgmine töö: põhiharu CI ja Windowsi sisupaketi avaldumise kontroll.
 
 - V340 avaldamine: esimene põhiharu CI jäi V338 testi vananenud pealkirjakontrolli taha; test kontrollib nüüd jooksva versiooni ja käivitusskriptide kooskõla, säilitades automaatsalvestuse kontrollid. Järgmine töö: uuesti käivitunud CI, Windowsi sisupaketi ja seadme FPS-i kinnitamine.

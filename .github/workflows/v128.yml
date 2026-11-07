@@ -98,6 +98,7 @@ jobs:
           node scripts/test-stream-v242.mjs
           node tests/detail-stream-v319.mjs
           node tests/detail-vegetation-v320.mjs
+          node tests/detail-stream-v341.mjs
           node tests/tiled-sea-v321.mjs
           node tests/estuary-v322.mjs
           node tests/estuary-v323.mjs

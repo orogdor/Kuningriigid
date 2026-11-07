@@ -23,7 +23,7 @@ async function startEngine(openContinue=false){
  status.textContent=english()?'Loading game…':'Mängu laadimine…';
  loading=(async()=>{
   try{
-   await import('./civilization.js?v=340a');
+   await import('./civilization.js?v=341a');
    if(!window.gameDebug)throw new Error('Game initialization did not finish');
    for(const id of ['continue','newgame','quality','v51export','v51import'])byId(id).disabled=false;
    status.hidden=true;

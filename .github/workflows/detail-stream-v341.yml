@@ -1,0 +1,41 @@
+name: Kuningriigid V341 camera-driven detail streaming
+on:
+  push:
+    branches: [main]
+    paths: ['detail-stream-v242.js', 'civilization.js', 'tests/detail-stream-v341*.{mjs,cjs}']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stream:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Stream unit checks
+        run: |
+          node tests/detail-stream-v341.mjs
+          node tests/detail-stream-v319.mjs
+          node tests/detail-vegetation-v320.mjs
+          node scripts/test-stream-v242.mjs
+      - name: Install browser control
+        timeout-minutes: 3
+        run: npm install --prefix /tmp/stream-check playwright@1.56.1 --fetch-retries=1 --fetch-timeout=60000
+      - name: Real game, camera moving across the detail map
+        env:
+          TREE_NODE_MODULES: /tmp/stream-check/node_modules
+        run: |
+          export CHROMIUM_PATH=$(command -v google-chrome || command -v chromium || true)
+          if [ -z "$CHROMIUM_PATH" ]; then
+            /tmp/stream-check/node_modules/.bin/playwright install chromium
+            export CHROMIUM_PATH=$(node -e "console.log(require('/tmp/stream-check/node_modules/playwright').chromium.executablePath())")
+          fi
+          node tests/detail-stream-v341-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: detail-stream-v341-evidence
+          path: reports/detail-stream-v341-browser.json
