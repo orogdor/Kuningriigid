@@ -1,6 +1,6 @@
 # V341 raport: mis võib veel FPS-i ja laadimisaega piirata
 
-Selle raporti leide **ei ole muudetud**. Allikad:
+Selle raporti leide V341-s **ei muudetud**; punktid 1–3 on tehtud V342-s (vt `MUUDATUSED_V342.md`). Allikad:
 - `reports/perf-survey-v341.json`: `tests/perf-profile-v341.cjs`, Chrome'i CPU-profiil päris mängust.
 - `reports/detail-stream-v341-browser.json`: laadimisetappide ajad.
 - Koodi ülevaatus.
@@ -9,7 +9,7 @@ Mõõdetud on SwiftShaderiga, mis on tarkvaraline WebGL ja kus GPU töö jookseb
 
 ## A. Detailkaardi hakkimine ja laadimine
 
-1. **Üks laadimissamm võib kesta 60–370 ms** (suur). Laadija kontrollib 11 ms eelarvet ainult sammude vahel. Mõõdetud pikimad üksiksammud: maastik 110 ms, navigatsioon 138 ms, ressursid 105 ms; V340-s horisont 373 ms ja jõed 154 ms. Iga selline samm on ühe kaadri nähtav nõks. Väiksemad sammud oleksid vajalikud maastiku/jõe võrgu ehitamisel ja `prepareNavV242`-s.
+1. **Üks laadimissamm võib kesta 60–370 ms** (V342 parandus: hiljem selgus, et need väärtused mõõdeti kahe paralleelse brauseri CPU-konkurentsi ajal; üksinda mõõdetuna oli pikim samm ~15 ms. Pikkade sammude oht jääb aeglasemale protsessorile, V342 piirab need ajalõiguga). Laadija kontrollib 11 ms eelarvet ainult sammude vahel. Mõõdetud pikimad üksiksammud: maastik 110 ms, navigatsioon 138 ms, ressursid 105 ms; V340-s horisont 373 ms ja jõed 154 ms. Iga selline samm on ühe kaadri nähtav nõks. Väiksemad sammud oleksid vajalikud maastiku/jõe võrgu ehitamisel ja `prepareNavV242`-s.
 2. **Umbes 65% ühe ruudu ehitusajast läheb kihtidele, mida kasutab ainult keskruut** (suur). Ruudu kohta keskmiselt: jõed 45 ms, horisont 28 ms, navigatsioon 32 ms, maastik 37 ms, meri 8,5 ms. Jõed, 9×9 horisont, teed ja piirid on `decor`-is ning nähtavad ainult keskruudul. Neid ehitatakse siiski kõigile kuni 49 vahemälus olevale ruudule. V341 lükkab need järjekorras tahapoole, aga ei jäta neid ära. Kui need ehitada ainult siis, kui ruut võib saada keskruuduks, väheneks taustatöö umbes kolm korda.
 3. **Laadimise eelarve on lauaarvutis 11 ms kaadri kohta** (keskmine). 60 FPS juures jääb ülejäänud mängule ja joonistamisele 5,7 ms, nii et laadimise ajal langeb FPS paratamatult. Eelarvet võiks siduda tegeliku kaadriajaga.
 4. **Loogika jookseb ka kaadritel, mida FPS-piirang ei joonista** (keskmine kuni suur, kui ekraan on üle 60 Hz). `frame()` teeb igal `requestAnimationFrame`-il simulatsiooni, laadija `tick()`-i (kuni 11 ms), `syncLocal()`-i jne, ning alles lõpus kontrollib `canRender`. 144 Hz ekraanil 60 FPS piiranguga tehakse laadimis- ja sünkroonimistööd 2,4 korda rohkem, kui kaadreid näidatakse.

@@ -25,7 +25,7 @@ const server=http.createServer((req,res)=>{const pathname=decodeURIComponent(req
  const start=await page.evaluate(()=>{
   const g=gameDebug.gameV249(),st=gameDebug.detailStreamV242;
   window.stageCostV341={};const step=st.step.bind(st);
-  st.step=(entry,bg)=>{const s0=performance.now(),stage=entry?.stage;step(entry,bg);const ms=performance.now()-s0,k=stage||'start';const c=window.stageCostV341[k]||(window.stageCostV341[k]={ms:0,steps:0,max:0});c.ms+=ms;c.steps++;c.max=Math.max(c.max,ms);};
+  st.step=(entry,bg)=>{const s0=performance.now(),stage=entry?.stage;step(entry,bg);const ms=performance.now()-s0,k=stage||'start';const c=window.stageCostV341[k]||(window.stageCostV341[k]={ms:0,steps:0,max:0});c.ms+=ms;c.steps++;c.max=Math.max(c.max,ms);if(ms>20)(window.longStepsV342||(window.longStepsV342=[])).push({stage:k,ms:+ms.toFixed(1)});};
   // A land tile with visible land around it, far from the map edge.
   const own=g.s.armies.find(a=>a.team===0)||g.s.cities.find(c=>c.team===0);
   let best=null,score=-1;
@@ -39,7 +39,7 @@ const server=http.createServer((req,res)=>{const pathname=decodeURIComponent(req
  await page.evaluate(t=>gameDebug.openTileV249(t.c,t.r),start);
  // Initial 5x5 window, with the same simulated 60 fps tick budget.
  const initialMs=await page.evaluate(async()=>{const st=gameDebug.detailStreamV242,t=performance.now();
-  while(performance.now()-t<240000){const s=st.status();if(s.tiles.filter(x=>x.visible).every(x=>x.ready))break;for(let k=0;k<15;k++)st.tick();await new Promise(r=>setTimeout(r,250));}
+  while(performance.now()-t<240000){const s=st.status();if(s.tiles.filter(x=>x.visible).every(x=>x.ready||x.visualReady))break;for(let k=0;k<15;k++)st.tick();await new Promise(r=>setTimeout(r,250));}
   return performance.now()-t;});
  const initial=await page.evaluate(()=>{const s=gameDebug.detailStreamV242.status();return {visible:s.tiles.filter(t=>t.visible).length,ready:s.tiles.filter(t=>t.visible&&t.ready).length,outerTiles:s.tiles.filter(t=>t.visible).length-9,desired:s.desired?.length};});
  console.log('initial',initial);
@@ -72,11 +72,11 @@ const server=http.createServer((req,res)=>{const pathname=decodeURIComponent(req
   done=true;times.sort((a,b)=>a-b);
   return {out,frames,worst,median:times[times.length>>1],p95:times[Math.floor(times.length*.95)],crossings:st.stats.crossings};
  },{SPEED,TICKS,STEPS});
- const stages=await page.evaluate(()=>window.stageCostV341);
+ const stages=await page.evaluate(()=>window.stageCostV341);const longSteps=await page.evaluate(()=>window.longStepsV342||[]);
  const last=samples.out;
  const outerAvg=last.reduce((a,s)=>a+s.outer,0)/last.length,loadedAvg=last.reduce((a,s)=>a+s.outerLoaded,0)/last.length;
  const report={version:await page.title(),movement:{unitsPerStep:SPEED,ticksPerStep:TICKS,steps:STEPS},bootMs,start,initial,initialMs,crossings:samples.crossings,frames:samples.frames,frameMs:{median:samples.median,p95:samples.p95,worst:samples.worst},
-  outerVisibleAvg:outerAvg,outerLoadedAvg:loadedAvg,outerCompleteAvg:last.reduce((a,s)=>a+s.outerComplete,0)/last.length,samples:samples.out,stageCostMs:stages,errors,
+  outerVisibleAvg:outerAvg,outerLoadedAvg:loadedAvg,outerCompleteAvg:last.reduce((a,s)=>a+s.outerComplete,0)/last.length,samples:samples.out,stageCostMs:stages,longSteps,errors,
   renderer:'SwiftShader software WebGL, 1280x720 at 50% resolution; loading behaviour check, not a hardware FPS test'};
  fs.mkdirSync(path.join(root,'reports'),{recursive:true});
  fs.writeFileSync(path.join(root,process.env.V341_REPORT||'reports/detail-stream-v341-browser.json'),JSON.stringify(report,null,2));

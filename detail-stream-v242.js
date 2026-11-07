@@ -1,6 +1,7 @@
 // Visual streaming only. Simulation coordinates and save data never move.
 import * as T from './vendor/three.module.js';
 import {DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z} from './detail-scale-v123.js';
+import {beginSliceV342} from './frame-slice-v342.js';
 // V341: stages that put something on screen for a non-central tile. Horizon,
 // rivers, outcrops, roads and borders live in `decor`, which only the active
 // centre tile shows; navigation is needed only when a tile becomes the centre.
@@ -27,12 +28,16 @@ export class DetailStreamV242{
   if(entry)return entry;
   const root=new T.Group(),scenery=new T.Group(),actors=new T.Group(),sites=new T.Group(),decor=new T.Group();root.add(scenery,actors,sites,decor);
   root.name='V242 tile '+key;root.visible=false;
-  entry={tile,key,root,scenery,actors,sites,decor,resources:new Map(),buildings:new Map(),workers:new Map(),units:new Map(),ready:false};
+  entry={tile,key,root,scenery,actors,sites,decor,resources:new Map(),buildings:new Map(),workers:new Map(),units:new Map(),ready:false,visualReady:false};
   this.entries.set(key,entry);this.root.add(root);entry.jobs=this.build(entry);this.stats.created++;return entry;
  }
  step(entry,background=false){
   if(!entry||entry.ready)return;const start=this.clock();
+  beginSliceV342();
   const next=entry.jobs.next();entry.ready=!!next.done;
+  // V342: everything a non-central tile shows exists once its builder moves
+  // past the visible stages (or finishes).
+  if(entry.ready||(entry.stage&&!VISIBLE_STAGES.has(entry.stage)))entry.visualReady=true;
   const ms=this.clock()-start;
   this.stats.maxJobMs=Math.max(this.stats.maxJobMs,ms);
   if(background&&ms>(this.stats.maxBackgroundJobMs||0)){this.stats.maxBackgroundJobMs=ms;this.stats.slowestStage=entry.stage;}
@@ -74,7 +79,7 @@ export class DetailStreamV242{
    // Out-of-view tiles of the classic ring only fill a spare budget. Current
    // members and already loaded tiles are preferred, so moving the camera does
    // not swap a finished tile for an empty one a little further away.
-   const entry=this.entries.get(this.key(tile)),loaded=entry&&(entry.ready||(entry.stage&&!VISIBLE_STAGES.has(entry.stage)));
+   const entry=this.entries.get(this.key(tile)),loaded=entry&&entry.visualReady;
    const keep=(this.desired.has(this.key(tile))?DETAIL_TILE_X*.35:0)+(loaded?DETAIL_TILE_X*.75:0);
    extra.push({key:this.key(tile),score:this.viewDistance(dc,dr)+(seen?0:1e6)-keep});
   }
@@ -137,21 +142,26 @@ export class DetailStreamV242{
   if(visibleStage&&desired&&ring<=1)return 2;            // neighbour behind the camera
   const near=ring<=1||(target&&Math.max(Math.abs(entry.tile.c-target.c),Math.abs(entry.tile.r-target.r))<=1);
   if(near)return 3; // possible next centre: its centre-only layers
+  // V342: centre-only layers (horizon, rivers, navigation, roads, borders) of
+  // tiles that cannot become the centre next are not built at all for now.
+  // The builder resumes when the tile moves next to the centre or target.
+  if(!visibleStage)return null;
   return desired?4:5; // spare budget outside the view, then the rest
  }
- tick(){
+ tick(budget=this.budget){
   if(!this.enabled||!this.center)return;
   const start=this.clock();
   const target=this.targetKey&&this.entries.get(this.targetKey)?.tile;
   const pending=[...this.entries.values()].filter(e=>!e.ready);
   if(!pending.length)return;
+  this.stats.paused=0;
   const order=(a,b)=>a.tier-b.tier||a.distance-b.distance||a.entry.tile.r-b.entry.tile.r||a.entry.tile.c-b.entry.tile.c;
-  const rank=()=>pending.filter(e=>!e.ready).map(entry=>{const {dc,dr}=this.offset(entry);return {entry,tier:this.tier(entry,target),distance:this.viewDistance(dc,dr)};}).sort(order);
+  const rank=()=>pending.filter(e=>!e.ready).map(entry=>{const {dc,dr}=this.offset(entry);return {entry,tier:this.tier(entry,target),distance:this.viewDistance(dc,dr)};}).filter(item=>item.tier!==null).sort(order);
   // V341: strict priority. Each tile's on-screen stages are short, so the
   // nearest visible tile is completed before the next; centre-only layers
   // (the expensive horizon) never delay terrain and trees that are in view.
-  let list=rank();
-  while(list.length&&this.clock()-start<this.budget){
+  let list=rank();this.stats.paused=pending.length-list.length;
+  while(list.length&&this.clock()-start<budget){
    const item=list[0];
    this.step(item.entry,true);
    if(item.entry.ready||this.tier(item.entry,target)!==item.tier)list=rank();
@@ -162,5 +172,5 @@ export class DetailStreamV242{
  pause(){this.enabled=false;this.root.visible=false;}
  status(){return {...this.stats,cached:this.entries.size,ready:[...this.entries.values()].filter(e=>e.ready).length,
   active:this.center&&this.key(this.center),desired:[...this.desired],
-  tiles:[...this.entries.values()].map(e=>({key:e.key,ready:e.ready,visible:e.root.visible,stage:e.stage,terrain:e.terrain?.uuid}))};}
+  tiles:[...this.entries.values()].map(e=>({key:e.key,ready:e.ready,visualReady:e.visualReady,visible:e.root.visible,stage:e.stage,terrain:e.terrain?.uuid}))};}
 }

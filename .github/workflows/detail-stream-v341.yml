@@ -18,6 +18,7 @@ jobs:
       - name: Stream unit checks
         run: |
           node tests/detail-stream-v341.mjs
+          node tests/detail-stream-v342.mjs
           node tests/detail-stream-v319.mjs
           node tests/detail-vegetation-v320.mjs
           node scripts/test-stream-v242.mjs

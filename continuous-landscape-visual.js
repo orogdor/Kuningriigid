@@ -1,4 +1,5 @@
 import {WATER_STYLE_V326} from './water-style-v326.js';
+import {sliceDueV342} from './frame-slice-v342.js';
 import {detailWorldRoadWidth,roadWidthScaleV250} from './road-width-v89.js';
 import {mouthZonesV322,riverSurfaceOpacityV322} from './estuary-v322.js?v=323';
 import {roadSurfaceLevelV216,roadWidthRatioV216,roadEdgeVarianceV216,roadSurfaceV251} from './road-appearance-v216.js';
@@ -55,7 +56,7 @@ function* buffersStepsV242(vertices,color,{standard=false,opacity=1,shade=null,a
  // sections now share actual vertices and normals, instead of separate
  // face triangles placed edge-to-edge (which caused faceting and seams).
  const unique=[],indices=[],lookup=new Map();
- for(let i=0;i<vertices.length;i+=3){if(i&&i%576===0)yield;
+ for(let i=0;i<vertices.length;i+=3){if(i&&(i%576===0||((i%48)===0&&sliceDueV342())))yield;
   const x=vertices[i],y=vertices[i+1],z=vertices[i+2];
   const key=Math.round(x*1000)+','+Math.round(y*1000)+','+Math.round(z*1000);
   let n=lookup.get(key);
@@ -64,9 +65,9 @@ function* buffersStepsV242(vertices,color,{standard=false,opacity=1,shade=null,a
  }
  const geo=new T.BufferGeometry();
  geo.setAttribute('position',new T.Float32BufferAttribute(unique,3));
- geo.setIndex(indices);geo.computeVertexNormals();geo.computeBoundingSphere();
+ geo.setIndex(indices);yield;geo.computeVertexNormals();geo.computeBoundingSphere();yield;
  const tint=new T.Color(color),stride=alpha?4:3,vertexColors=new Float32Array(unique.length/3*stride);
- for(let i=0,j=0;i<unique.length;i+=3,j+=stride){if(i&&i%576===0)yield;const c=shade?shade(unique[i],unique[i+1],unique[i+2]):tint;vertexColors[j]=c.r;vertexColors[j+1]=c.g;vertexColors[j+2]=c.b;if(alpha)vertexColors[j+3]=alpha(unique[i],unique[i+1],unique[i+2])}
+ for(let i=0,j=0;i<unique.length;i+=3,j+=stride){if(i&&(i%576===0||((i%48)===0&&sliceDueV342())))yield;const c=shade?shade(unique[i],unique[i+1],unique[i+2]):tint;vertexColors[j]=c.r;vertexColors[j+1]=c.g;vertexColors[j+2]=c.b;if(alpha)vertexColors[j+3]=alpha(unique[i],unique[i+1],unique[i+2])}
  geo.setAttribute('color',new T.Float32BufferAttribute(vertexColors,stride));
  const mat=standard?new T.MeshStandardMaterial({vertexColors:true,roughness:alpha?.95:.55,metalness:alpha?0:.10,transparent:opacity!==1||!!alpha,opacity,side:T.DoubleSide,depthWrite:opacity===1&&!alpha}):new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide,transparent:opacity!==1,opacity,depthWrite:opacity===1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  return new T.Mesh(geo,mat);
@@ -137,7 +138,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
    return {...field(game,p.x,p.z,scope,tile),y:q?ground(q.x,q.z)+.012:vp(game,y,scope,p.x,p.z)};
   });for(let k=1;k<points.length-1;k++)tri(array,points[0],points[k],points[k+1]);
  };
- let batchV242=0;for(const key of cells){if(batchV242++%96===0)yield;
+ let batchV242=0;for(const key of cells){if(batchV242++%96===0||((batchV242&7)===0&&sliceDueV342()))yield;
   const [x,z]=key.split(',').map(Number),a=node(x,z),b=node(x+1,z),c=node(x,z+1),d=node(x+1,z+1);
   for(const triangle of [[a,c,b],[b,c,d]]){
    const land=clip(triangle,'shore');
@@ -200,7 +201,7 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
  if(waterMesh){
   waterMesh.material.dispose();waterMesh.material=waterMaterial(scope,tile);animate(waterMesh);
   const pos=waterMesh.geometry.attributes.position,flow=new Float32Array(pos.count*2),shore=new Float32Array(pos.count);
-  for(let i=0;i<pos.count;i++){if(i&&i%192===0)yield;
+  for(let i=0;i<pos.count;i++){if(i&&(i%192===0||((i&15)===0&&sliceDueV342())))yield;
    const p=toWorld(pos.getX(i),pos.getZ(i)),f=riverFlow(game,p.x,p.z);
    const near=riverNear(game,p.x,p.z),speed=Math.max(.45,Math.min(1.35,1.5-(near.width||3)*.09));
    flow[i*2]=f.x*speed;flow[i*2+1]=f.z*speed;shore[i]=Math.max(0,Math.min(1,near.distance/Math.max(.5,near.width)));
