@@ -971,7 +971,8 @@ function addForestFillV346(g,tile,world){
  if(tile.mountain)return;
  // Any tile with trees: fill the gaps BETWEEN trees (a tree within 14 m, none within 5 m); open meadows stay open.
  const quality=graphicsVegetationQualityV226(graphicsV226)==="low"?"low":"high";
- const forestTile=forestV329(tile),spacing=quality==='low'?(forestTile?7.5:10):(forestTile?6:8),keep=[],bins=new Map(),cs=8;
+ const forestTile=forestV329(tile);if(!forestTile)return; // V346b: only forest tiles (frame cost)
+ const spacing=quality==='low'?8.5:7,keep=[],bins=new Map(),cs=8;
  const note=(x,z)=>{const k=Math.floor(x/cs)+':'+Math.floor(z/cs);(bins.get(k)||bins.set(k,[]).get(k)).push({x,z});};
  for(const r of world.resources)if(r.kind==='tree'&&!r.removed&&r.amount>0){note(r.x,r.z);for(const p of detailCompanionsV329(tile,r))note(p.x,p.z);}
  const near=(x,z,lim)=>{const gx=Math.floor(x/cs),gz=Math.floor(z/cs),k=Math.ceil(lim/cs);for(let j=-k;j<=k;j++)for(let i=-k;i<=k;i++)for(const q of bins.get((gx+i)+':'+(gz+j))||[])if(Math.hypot(q.x-x,q.z-z)<lim)return true;return false;};
