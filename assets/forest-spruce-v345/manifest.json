@@ -5,65 +5,186 @@
       "id": "spruce_01",
       "species": "spruce",
       "variant": 1,
+      "generator": "tools/forest-spruce-v345/make_spruce.py",
       "near": {
-        "bytes": 1654352,
-        "sha256": "9d8eb700573168f9e6faf9723cdcba544a5f74d500c1442715fa5c45038e9209",
-        "triangles": 7084
+        "bytes": 437904,
+        "sha256": "c4db4b227961afbd01ac089c04f90d6c684550cf285e4b096c873b1c3312ccfa",
+        "triangles": 2444,
+        "cardDensity": 0.93
       },
-      "height": 16.04217130572489,
+      "boundsZUp": [
+        [
+          -3.6764369010925293,
+          -3.539598226547241,
+          -0.011130569502711296
+        ],
+        [
+          3.8422389030456543,
+          4.122193336486816,
+          16.34217071533203
+        ]
+      ],
       "mid": {
-        "bytes": 1387136,
-        "sha256": "c86d16846bdddc9cce056b63509f47e7dfa69c5eee10deab9a309e86f73f71b5",
-        "triangles": 834
-      }
+        "bytes": 312308,
+        "sha256": "8431737a22c828f62806ffcc1f14693e17acb2a5b78d6d7fa0362038592475ec",
+        "triangles": 298,
+        "cardDensity": 0.93
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 37780,
+        "sha256": "bd8fb6b0e4d654f05a0a4c436ae4695fbc1bf616a90f54c1fa3f44dad22f319d"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
     },
     {
       "id": "spruce_02",
       "species": "spruce",
       "variant": 2,
+      "generator": "tools/forest-spruce-v345/make_spruce.py",
       "near": {
-        "bytes": 1732636,
-        "sha256": "b4e57aa6c6291a0cbdbe1c25a72c18f840e76c88620982c85c85aaa0f296922f",
-        "triangles": 8482
+        "bytes": 433132,
+        "sha256": "cfc58a5c370d935ea6af4c725e5638ac544d31cb30c46a479946337ee1db0736",
+        "triangles": 2452,
+        "cardDensity": 0.647
       },
-      "height": 19.33446259462545,
+      "boundsZUp": [
+        [
+          -4.072847366333008,
+          -4.256840229034424,
+          -0.012548226863145828
+        ],
+        [
+          4.006780624389648,
+          4.424097061157227,
+          19.634462356567383
+        ]
+      ],
       "mid": {
-        "bytes": 1397928,
-        "sha256": "0c748c7696820b5e96359c79a1722eee0e87485dbf2be70c009274ebfe4dd967",
-        "triangles": 976
-      }
+        "bytes": 313980,
+        "sha256": "1f9c4cdc0a8679e09fbaf5382035a7763973c6ed3aa23799a4cf4c0ec7515423",
+        "triangles": 320,
+        "cardDensity": 0.865
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 35560,
+        "sha256": "8343f16d341fc78171dc2e9e60203a09b487bdfa51d2926aee29e5e507bb5ebe"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
     },
     {
       "id": "spruce_03",
       "species": "spruce",
       "variant": 3,
+      "generator": "tools/forest-spruce-v345/make_spruce.py",
       "near": {
-        "bytes": 1648536,
-        "sha256": "d6d51f0324a3f2a827738da147c0daace6213a367c94f038bc7fc441d92c53b4",
-        "triangles": 7106
+        "bytes": 414924,
+        "sha256": "f2bf0abdf75780fff540f943536d4ec06b55279149033668657727487b543473",
+        "triangles": 2076,
+        "cardDensity": 1.0
       },
-      "height": 13.669659558198989,
+      "boundsZUp": [
+        [
+          -3.3515775203704834,
+          -3.2267935276031494,
+          -0.012179071083664894
+        ],
+        [
+          3.324944257736206,
+          3.3362457752227783,
+          13.969659805297852
+        ]
+      ],
       "mid": {
-        "bytes": 1380604,
-        "sha256": "e7f0ad537ce40859a9024b1e0b212fb9ac5c7221b9f38ee42c785ef15f87f67a",
-        "triangles": 748
-      }
+        "bytes": 313072,
+        "sha256": "44924db2d6c475a326da241e3957a08e8769b10191dd5ac1819d0460864ddc57",
+        "triangles": 308,
+        "cardDensity": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 39304,
+        "sha256": "1462851211c69a32c135bd65a46b726bf92f0b261b34598db13fad25aa4b61ad"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
     },
     {
       "id": "spruce_04",
       "species": "spruce",
       "variant": 4,
+      "generator": "tools/forest-spruce-v345/make_spruce.py",
       "near": {
-        "bytes": 1758888,
-        "sha256": "9541dd98a73c75181a885e8c40aa28f3e4f8f1428f6ff42088121c0fbf0f83ed",
-        "triangles": 8878
+        "bytes": 430412,
+        "sha256": "e5a6ea054652d029c19aa28027935ba6bb678ec1f8c103ea69a2c8880c50a9e2",
+        "triangles": 2492,
+        "cardDensity": 0.45
       },
-      "height": 21.45007727508373,
+      "boundsZUp": [
+        [
+          -4.769371509552002,
+          -4.279397010803223,
+          -0.013212740421295166
+        ],
+        [
+          4.6586809158325195,
+          4.571224212646484,
+          21.750078201293945
+        ]
+      ],
       "mid": {
-        "bytes": 1401728,
-        "sha256": "ffd83a09ea8a45eafa387539221e26ba9cb73c546953991b72021868c6226c6c",
-        "triangles": 1026
-      }
+        "bytes": 312768,
+        "sha256": "eeb541d362127710d091bdbce6a8c2de8acffa2aaa79c0d47da49b3ae23f06d7",
+        "triangles": 304,
+        "cardDensity": 0.804
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 30440,
+        "sha256": "6d44f291c22055898398e13ecdb44fb2584eb3da4b88f87ce8a8a7d6537bd209"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
+    },
+    {
+      "id": "spruce_05",
+      "species": "spruce",
+      "variant": 5,
+      "generator": "tools/forest-spruce-v345/make_spruce.py",
+      "near": {
+        "bytes": 431912,
+        "sha256": "a09076eff7a927bc630ed557e9384f3275d01a66739e4e5e6476d15fbed1b4c3",
+        "triangles": 2446,
+        "cardDensity": 0.696
+      },
+      "boundsZUp": [
+        [
+          -3.9300806522369385,
+          -3.9296159744262695,
+          -0.011621142737567425
+        ],
+        [
+          3.8389363288879395,
+          3.4957892894744873,
+          18.096302032470703
+        ]
+      ],
+      "mid": {
+        "bytes": 313372,
+        "sha256": "f19a8f0aa7e60cbc6eb370bdc025971252117f54d9abb0f9a33b39466ceb1d2b",
+        "triangles": 312,
+        "cardDensity": 0.93
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 37076,
+        "sha256": "3899f05d941e4c410dd2b843d749a056e15ccbb2abaa1b653b03e6e926cfc7c9"
+      },
+      "preview": "preview.png",
+      "impostorViews": 2
     }
   ]
 }

@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw, ImageFilter
 ROOT = Path(__file__).resolve().parents[2]
 ap = argparse.ArgumentParser()
 ap.add_argument('--out', default=str(ROOT / 'assets/forest-spruce-v345'))
-ap.add_argument('--variants', type=int, default=4)
+ap.add_argument('--variants', type=int, default=5)
 args = ap.parse_args()
 OUT = Path(args.out); OUT.mkdir(parents=True, exist_ok=True)
 
@@ -219,13 +219,22 @@ def rot_about(v, axis, ang):
     return tuple(v[i] * c + cr[i] * s + axis[i] * d * (1 - c) for i in range(3))
 
 
-def spruce(variant, lod='near'):
+SHAPES = [  # height m, crown base fraction
+    (16.5, .28), (19.0, .34), (14.0, .22), (21.0, .38), (17.5, .30)]
+BUDGET = {'near': 2500, 'mid': 320}
+
+
+def spruce(variant, lod='near', density=1.0):
+    """near: real branches and many sprays; mid: one large spray card per
+    kept branch. density thins the cards until the triangle budget fits."""
     rng = random.Random(9100 + variant * 31)
-    H = [16.5, 19.0, 14.0, 21.0][variant % 4] * rng.uniform(.97, 1.03)
-    crown_base = H * [.38, .46, .30, .52][variant % 4]
+    h0, cb = SHAPES[variant % len(SHAPES)]
+    H = h0 * rng.uniform(.97, 1.03)
+    crown_base = H * cb
     r0 = .07 + H * .0048
     lean = (rng.uniform(-.25, .25), rng.uniform(-.25, .25))
     bark, leaf = Mesh(), Mesh()
+    near = lod == 'near'
 
     def trunk_at(z):
         t = z / H
@@ -235,83 +244,87 @@ def spruce(variant, lod='near'):
         t = z / H
         return r0 * (1 - t) ** .85 + .018 + r0 * .35 * math.exp(-z / .35)
 
-    # trunk
-    nz = 22 if lod == 'near' else 9
-    zs = [H * (k / nz) ** 1.0 for k in range(nz + 1)]
-    tube(bark, [trunk_at(z) for z in zs], [radius_at(z) for z in zs], 9 if lod == 'near' else 5, ulen=1.3)
-
-    # dead stubs on the bare lower trunk
-    if lod == 'near':
-        for k in range(int(crown_base * 2.2)):
+    nz = 12 if near else 4
+    zs = [H * (k / nz) ** 1.15 for k in range(nz + 1)]
+    tube(bark, [trunk_at(z) for z in zs], [radius_at(z) for z in zs], 7 if near else 4, ulen=1.3)
+    if near:
+        for k in range(8):
             z = rng.uniform(1.4, crown_base)
             az = rng.uniform(0, math.tau)
             d = (math.cos(az), 0, math.sin(az))
             base = add(trunk_at(z), d, radius_at(z) * .8)
-            ln = rng.uniform(.25, .9) * (z / crown_base) ** .5
-            tip = add(add(base, d, ln), (0, -1, 0), ln * rng.uniform(.15, .5))
-            tube(bark, [base, tip], [.022, .006], 3)
+            ln = rng.uniform(.3, .9) * (z / crown_base) ** .5
+            tube(bark, [base, add(add(base, d, ln), (0, -1, 0), ln * rng.uniform(.15, .5))], [.022, .006], 3)
 
-    # whorls
     z = crown_base
     whorl = 0
     golden = math.radians(137.5)
-    max_len = H * .19
+    max_len = H * .22
+    pick = random.Random(77 + variant)        # thinning, independent of shape
     while z < H - .5:
         t = (z - crown_base) / (H - crown_base)
         n = rng.randint(4, 6)
         for b in range(n):
-            if lod != 'near' and (b + whorl) % 2:
-                continue
             az = whorl * golden + b * math.tau / n + rng.uniform(-.35, .35)
             env = (1 - t) ** .95 * (.82 + .18 * math.sin(t * math.pi * 1.7))
             L = max(.35, max_len * env * rng.uniform(.8, 1.12))
             pitch0 = math.radians(18 * t - 4 + rng.uniform(-6, 6))
             droop = math.radians((34 - 26 * t) * rng.uniform(.8, 1.2))
+            rolls = [rng.random() for _ in range(120)]   # consume the same randoms in every LOD
             dir0 = (math.cos(az), 0, math.sin(az))
             start = add(trunk_at(z), dir0, radius_at(z) * .7)
             pts = [start]
-            seg = 5
+            seg = 4
             for k in range(1, seg + 1):
                 s = k / seg
                 p = pitch0 - droop * s ** 1.6
-                d = (math.cos(az) * math.cos(p), math.sin(p), math.sin(az) * math.cos(p))
-                pts.append(add(pts[-1], d, L / seg))
-            if lod == 'near':
-                tube(bark, pts, [max(.012, .055 * L / max_len) * (1 - .8 * k / seg) + .006 for k in range(seg + 1)], 4)
-            # foliage sprays along the branch: a main spray + two side sprays
+                pts.append(add(pts[-1], (math.cos(az) * math.cos(p), math.sin(p), math.sin(az) * math.cos(p)), L / seg))
             side_h = (-math.sin(az), 0, math.cos(az))
-            count = max(1, round(L / .45))
-            for c in range(count):
-                s = .18 + .8 * c / max(1, count) + rng.uniform(-.04, .04)
-                k = min(seg - 1, int(s * seg))
-                f = s * seg - k
-                o = add(pts[k], (pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1], pts[k + 1][2] - pts[k][2]), f)
-                ax = norm((pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1], pts[k + 1][2] - pts[k][2]))
-                ln = min(1.6, max(.6, L * .7)) * rng.uniform(.85, 1.1) * (1 - .2 * s)
-                wd = ln * .9
-                up = norm(cross(side_h, ax))
-                hint = norm(add(add((0, .8, 0), dir0, .6), up, .25))
-                roll = rng.uniform(-.45, .45)
-                sd = rot_about(side_h, ax, roll)
-                card(leaf, o, ax, sd, ln, wd, rng.randrange(4), hint, rng.random() < .5)
-                if lod == 'near' or c % 2 == 0:
+            up_hint = lambda ax: norm(add(add((0, .8, 0), dir0, .6), norm(cross(side_h, ax)), .25))
+            r = iter(rolls)
+            if near:
+                if L > 1.2:
+                    tube(bark, pts[::2], [max(.012, .05 * L / max_len) + .006, .02, .006], 3)
+                count = max(1, round(L / .8))
+                for c in range(count):
+                    if pick.random() > density and c:
+                        continue
+                    s = .2 + .78 * c / count + (next(r) - .5) * .08
+                    k = min(seg - 1, int(s * seg)); f = s * seg - k
+                    dv = (pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1], pts[k + 1][2] - pts[k][2])
+                    o = add(pts[k], dv, f); ax = norm(dv)
+                    ln = min(1.8, max(.7, L * .75)) * (.85 + .25 * next(r)) * (1 - .2 * s)
+                    hint = up_hint(ax)
+                    card(leaf, o, ax, rot_about(side_h, ax, (next(r) - .5) * .9), ln, ln * .9, int(next(r) * 4) % 4, hint, next(r) < .5)
                     for sg in (-1, 1):
-                        if rng.random() < .25:
+                        if next(r) < .3 or pick.random() > density:
                             continue
-                        a2 = rot_about(ax, (0, 1, 0), sg * rng.uniform(.6, .95))
-                        a2 = norm(add(a2, (0, -1, 0), rng.uniform(.1, .3)))
-                        s2 = norm(cross((0, 1, 0), a2))
-                        s2 = rot_about(s2, a2, rng.uniform(-.5, .5) + sg * .35)
-                        card(leaf, o, a2, s2, ln * .8, wd * .8, rng.randrange(4), hint, sg < 0)
+                        a2 = norm(add(rot_about(ax, (0, 1, 0), sg * (.6 + .35 * next(r))), (0, -1, 0), .1 + .2 * next(r)))
+                        s2 = rot_about(norm(cross((0, 1, 0), a2)), a2, (next(r) - .5) + sg * .35)
+                        card(leaf, o, a2, s2, ln * .8, ln * .72, int(next(r) * 4) % 4, hint, sg < 0)
+            else:
+                if pick.random() > density:
+                    continue
+                ax = norm((pts[-1][0] - pts[0][0], pts[-1][1] - pts[0][1], pts[-1][2] - pts[0][2]))
+                hint = up_hint(ax)
+                card(leaf, start, ax, rot_about(side_h, ax, (next(r) - .5) * .5), L * 1.12, L * 1.05, int(next(r) * 4) % 4, hint)
         z += rng.uniform(.36, .52) * (1 - .25 * t)
         whorl += 1
-    # leader: crossed vertical sprays at the top
     top = trunk_at(H - .2)
     for k in range(2):
         az = k * math.pi / 2 + .3
-        side = (math.cos(az), 0, math.sin(az))
-        card(leaf, add(top, (0, -1.4, 0)), (0, 1, 0), side, 1.9, .55, k, (0, 1, 0))
+        card(leaf, add(top, (0, -1.4, 0)), (0, 1, 0), (math.cos(az), 0, math.sin(az)), 1.9, .55, k, (0, 1, 0))
     return H, bark, leaf
+
+
+def budgeted(variant, lod):
+    density = 1.0
+    while True:
+        H, bark, leaf = spruce(variant, lod, density)
+        tris = (len(bark.i) + len(leaf.i)) // 3
+        if tris <= BUDGET[lod] or density < .2:
+            return H, bark, leaf, density
+        density *= .93
 
 
 # ---------------------------------------------------------------- GLB
@@ -356,16 +369,23 @@ def write_glb(path, prims, atlas_png, extras):
 
 
 atlas = make_atlas()
-atlas.save(OUT / 'spruce_atlas.png')
-buf = io.BytesIO(); atlas.save(buf, 'PNG', optimize=True); png = buf.getvalue()
+# 256-colour palette PNG with alpha: about a quarter of the size, same look.
+small = atlas.quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
+small.save(OUT / 'spruce_atlas.png', optimize=True)
+png = (OUT / 'spruce_atlas.png').read_bytes()
 records = []
 for v in range(args.variants):
     ident = f'spruce_{v + 1:02}'; dest = OUT / ident; dest.mkdir(exist_ok=True)
-    rec = {'id': ident, 'species': 'spruce', 'variant': v + 1}
+    rec = {'id': ident, 'species': 'spruce', 'variant': v + 1, 'generator': 'tools/forest-spruce-v345/make_spruce.py'}
     for lod in ('near', 'mid'):
-        H, bark, leaf = spruce(v, lod)
+        H, bark, leaf, density = budgeted(v, lod)
         rec[lod] = write_glb(dest / f'{lod}.glb', [(bark, 0), (leaf, 1)], png, {'height': H, 'lod': lod})
-        rec['height'] = H
+        rec[lod]['cardDensity'] = round(density, 3)
+        if lod == 'near':
+            P = np.array(bark.p + leaf.p, np.float32)
+            lo, hi = P.min(0), P.max(0)
+            # Sapling manifests store Blender Z-up bounds: [x, -z, y]
+            rec['boundsZUp'] = [[float(lo[0]), float(-hi[2]), float(lo[1])], [float(hi[0]), float(-lo[2]), float(hi[1])]]
     records.append(rec)
     print(json.dumps(rec))
 (OUT / 'manifest.json').write_text(json.dumps({'approved': False, 'trees': records}, indent=2))
