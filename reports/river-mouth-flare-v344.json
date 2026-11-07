@@ -1,0 +1,31 @@
+{
+  "seeds": [
+    {
+      "seed": 77,
+      "mouths": 57,
+      "opened": 57,
+      "landToWaterSamples": 1710,
+      "samples": 47937,
+      "maxStep": 0.013096795566143626,
+      "maxDepth": 3.745218476103762
+    },
+    {
+      "seed": 12345,
+      "mouths": 49,
+      "opened": 49,
+      "landToWaterSamples": 1743,
+      "samples": 41209,
+      "maxStep": 0.014971455970226089,
+      "maxDepth": 3.7697929085724273
+    },
+    {
+      "seed": 20261103,
+      "mouths": 54,
+      "opened": 54,
+      "landToWaterSamples": 1995,
+      "samples": 45414,
+      "maxStep": 0.013548134943664358,
+      "maxDepth": 3.9237427076359435
+    }
+  ]
+}

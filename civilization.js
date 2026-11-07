@@ -97,7 +97,7 @@ import {minimapCell} from './minimap.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=60';
 import {createDetailTrailLinks} from './detail-roads.js?v=2232';
 import {riverNetworkStepsV242,createRiverNetwork,createUnifiedRoadNetwork,disposeNetwork} from './continuous-landscape-visual.js?v=323';
-import {surface,localSurface,localVisualSurface,worldElevation,visualElevation,visualProject,mountainMask,projectHeight as projectHeightV161,riverNear,overviewSurface,roadNetwork,worldToLocal,getRivers} from './continuous-landscape.js?v=323';
+import {estuaryFlareV344,surface,localSurface,localVisualSurface,worldElevation,visualElevation,visualProject,mountainMask,projectHeight as projectHeightV161,riverNear,overviewSurface,roadNetwork,worldToLocal,getRivers} from './continuous-landscape.js?v=323';
 import {SHIPS,cargoArmy,navyExpedition,landingRoute} from './naval.js?v=125b';
 import {createShipModel} from './naval-visual.js';
 import {renderLabor,timeLabel} from './labor-ui.js?v=86a';
@@ -380,7 +380,7 @@ function updateBuildingInfo(){
 }
 // The overview mesh has a coarse vertex spacing. Conservatively open the
 // channel at neighbouring vertices so it cannot roof over a narrow river.
-function naturalAtlasHeightV327(x,z){const old=atlasTerrainHeight(x,z),near=riverNear(game,x,z);if(!Number.isFinite(near.distance))return old;const t=Math.max(0,Math.min(1,(near.distance-near.width-8)/18)),weight=1-t*t*(3-2*t);return old+(visualElevation(game,x,z)-old)*weight;}
+function naturalAtlasHeightV327(x,z){const old=atlasTerrainHeight(x,z),near=riverNear(game,x,z),flare=Math.min(1,estuaryFlareV344(game,x,z).strength*4);if(!Number.isFinite(near.distance)&&!flare)return old;const t=Number.isFinite(near.distance)?Math.max(0,Math.min(1,(near.distance-near.width-8)/18)):1,weight=Math.max(1-t*t*(3-2*t),flare);return weight>0?old+(visualElevation(game,x,z)-old)*weight:old;} // V344: the rounded river mouth also opens on the world map
 function atlasTerrainHeight(x,z){const spacing=50/(quality==='low'?2:3);return smoothedOverview((a,b)=>overviewSurface(game,a,b,spacing),x,z,spacing)}
 
 // V161: detail terrain vertices are cached per tile block in a global grid (the 3x3 meshes of
@@ -637,7 +637,7 @@ function resourceIconV282(kind){const art=RES_ART_V282[kind];if(!art)return icon
  if(!icons.has(key)){const canvas=document.createElement('canvas');canvas.width=canvas.height=96;const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(30,20,11,.88)';ctx.beginPath();ctx.arc(48,48,43,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#d9b673';ctx.lineWidth=4;ctx.stroke();
   const tx=new T.CanvasTexture(canvas),img=new Image();img.onload=()=>{ctx.drawImage(img,16,16,64,64);tx.needsUpdate=true};img.src='ui-art-v263/'+art+'.webp';icons.set(key,new T.SpriteMaterial({map:tx,depthTest:false}))}
  const sprite=new T.Sprite(icons.get(key));sprite.scale.set(11,11,1);return sprite}
-const resourceSprites=[],forestSpots=[];/* V286: no forest stand in a river bed or on the beach */const forestSpotV286=p=>{const n=riverNear(game,p.x,p.z);if(n.distance<n.width+5||game.atlasHeight(p.x,p.z)<2.5)return;forestSpots.push(p);};let manualResourceOverlay=false;try{manualResourceOverlay=localStorage.getItem('kingdoms-resource-layer')==='1'}catch{}let showResourceOverlay=manualResourceOverlay,resourceDetailsOpen=false;const depositIcons={clay:'◈',copper:'◇',tin:'◆',wood:'♣',stone:'◆',ore:'⚒',grain:'♧',water:'≈',game:'🦌',fish:'🐟',oil:'🛢️'},depositNames={clay:'Savi',copper:'Vasemaak',tin:'Tinamaak',wood:'Mets',stone:'Kivi',ore:'Rauamaak',grain:'Viljakas maa',water:'Magevesi',game:'Ulukid',fish:'Kala',oil:'Naftamaardla',...Object.fromEntries(Object.entries(GOODS).map(([k,d])=>[k,d.name]))},depositColors={clay:'#c89b78',copper:'#d7a77d',tin:'#c1ced3',wood:'#a4cc8e',stone:'#d8dac9',ore:'#dfac83',grain:'#eed28b',water:'#8fd6ee',game:'#dcb993',fish:'#9cd8e0',oil:'#463b34'};
+const resourceSprites=[],forestSpots=[];/* V286: no forest stand in a river bed or on the beach */const forestSpotV286=p=>{const n=riverNear(game,p.x,p.z);if(n.distance<n.width+5||game.atlasHeight(p.x,p.z)<2.5||estuaryFlareV344(game,p.x,p.z).ground<2.5)return;forestSpots.push(p);};let manualResourceOverlay=false;try{manualResourceOverlay=localStorage.getItem('kingdoms-resource-layer')==='1'}catch{}let showResourceOverlay=manualResourceOverlay,resourceDetailsOpen=false;const depositIcons={clay:'◈',copper:'◇',tin:'◆',wood:'♣',stone:'◆',ore:'⚒',grain:'♧',water:'≈',game:'🦌',fish:'🐟',oil:'🛢️'},depositNames={clay:'Savi',copper:'Vasemaak',tin:'Tinamaak',wood:'Mets',stone:'Kivi',ore:'Rauamaak',grain:'Viljakas maa',water:'Magevesi',game:'Ulukid',fish:'Kala',oil:'Naftamaardla',...Object.fromEntries(Object.entries(GOODS).map(([k,d])=>[k,d.name]))},depositColors={clay:'#c89b78',copper:'#d7a77d',tin:'#c1ced3',wood:'#a4cc8e',stone:'#d8dac9',ore:'#dfac83',grain:'#eed28b',water:'#8fd6ee',game:'#dcb993',fish:'#9cd8e0',oil:'#463b34'};
 for(const cell of game.cells){if(!cell.land||cell.mountain||!forestV329(cell))continue;for(const p of forestCandidatesV330(cell,14,s.seed,71)){if(forestRandomV330(p.gx,p.gz,s.seed,73)>treeKeepV270(p.x,p.z,true))continue;forestSpotV286({cell,x:p.x,z:p.z,size:.65+forestRandomV330(p.gx,p.gz,s.seed,74)*.5});}}
 // V152 mixed forest: the dense forest stands use the new procedural spruce/pine/oak/lime/birch models.
 {const kinds=['spruce','pine','oak','lime','birch','palm'],sets=new Map(kinds.map(k=>[k,[]])),forestDummy=new T.Object3D(),lod=quality==='high'?'high':quality==='low'?'low':'medium';
@@ -720,7 +720,7 @@ function groundAvoidance(cell){const segments=[],rects=[];
 // full density (two layers), neighbours one lighter layer. When you step onto the next tile the
 // six shared tiles are reused and only the new pieces are built, a few per frame (coverJobs).
 const coverCache=new Map(),coverJobs=[];
-function coverHeight(tile){return (x,z)=>{if(tile.mountain&&!s.battle)return -100;const y=ground(tile,x,z),p=riverNear(game,tile.x+x/DETAIL_X,tile.z+z/DETAIL_Z);return p.distance<p.width*1.35?-100:y}}
+function coverHeight(tile){return (x,z)=>{if(tile.mountain&&!s.battle)return -100;const y=ground(tile,x,z),wx=tile.x+x/DETAIL_X,wz=tile.z+z/DETAIL_Z,p=riverNear(game,wx,wz);return p.distance<p.width*1.35||y<.08&&estuaryFlareV344(game,wx,wz).strength>.05?-100:y}} // V344: no grass in a rounded river mouth
 function syncGroundCover(cell){
  coverJobs.length=0;for(const [k,e] of coverCache)if(e.pending>0){disposeGroundCover(e.group);coverCache.delete(k);}
  if(s.battle){environment.add(createGroundCoverV156(cell,coverHeight(cell),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(cell)));return;}

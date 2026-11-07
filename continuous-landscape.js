@@ -222,6 +222,9 @@ export function estuaryShoreHeightV323(game,x,z,near=null){
  const h=baseHeight(game,x,z),waterline=.72;
  const coastal=1-smooth(Math.abs(h-waterline)/4);
  if(coastal<=0)return h;
+ return estuaryFlareGroundV344(game,x,z,h,estuarySmoothV323(game,x,z,h,coastal,near));
+}
+function estuarySmoothV323(game,x,z,h,coastal,near){
  near??=riverNear(game,x,z);
  if(!Number.isFinite(near.distance))return h;
  const corridor=1-smooth((near.distance-near.width-6)/18);
@@ -232,6 +235,88 @@ export function estuaryShoreHeightV323(game,x,z,near=null){
  for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)
   average+=baseHeight(game,x+i*radius,z+j*radius)*weights[i+1]*weights[j+1]/16;
  return h+(average-h)*coastal*corridor*.65;
+}
+// V344: rounded river mouths. Where a river reaches the sea, its banks
+// curve outward and continue as the sea shore instead of meeting the
+// coastline in a sharp corner. This is a smooth union of two water bodies:
+// distance to the river bank and distance to the coast (height above the
+// waterline divided by the local slope). Near the corner, where both are
+// similar, the ground is lowered by exactly the amount that moves the
+// shoreline out by the smooth-union distance, so beach slopes stay natural.
+// Drawing only: riverNear() widths, navigation, fords and saves are unchanged.
+const SEA_V344=.72,flareCachesV344=new WeakMap();
+export function flareRadiusV344(coastWidth){return clamp(coastWidth*2+28,32,80);}
+export function smoothUnionCutV344(a,b,k){const h=Math.max(k-Math.abs(a-b),0)/k;return h*h*k*.25;}
+export function estuaryMouthsV344(game){
+ let cache=flareCachesV344.get(game);if(cache)return cache;
+ const edges=getRivers(game),byCell=new Map();
+ for(const e of edges)byCell.set(idx(e.c),e);
+ const graph=prep(game),mouths=[],bucket=new Map();
+ for(const e of edges){
+  if(e.to?.land!==false||!e.points||e.points.length<2)continue;
+  // Include the upstream reach, so a wide opening never stops at a cell centre.
+  const up=graph.incoming.get(idx(e.c))?.[0],before=up?byCell.get(idx(up))?.points||[]:[];
+  const pts=[...before.slice(0,-1),...e.points].map(p=>({x:p.x,z:p.z,w:p.width}));
+  const ci=Math.max(1,pts.findIndex(p=>baseHeight(game,p.x,p.z)<=SEA_V344)),coast=ci>0?pts[ci]:pts.at(-1);
+  const k=flareRadiusV344(coast.w),reach=Math.max(...pts.map(p=>p.w))+k+4;
+  // One beach slope per mouth, measured beside both banks at the coast.
+  // A per-point gradient would jump at atlas cell edges and leave squares.
+  const prev=pts[ci-1]||pts[0],dl=Math.hypot(coast.x-prev.x,coast.z-prev.z)||1,nx=-(coast.z-prev.z)/dl,nz=(coast.x-prev.x)/dl;
+  let slopeSum=0,slopeN=0;
+  for(const off of [coast.w+8,coast.w+20,-(coast.w+8),-(coast.w+20)]){
+   const x=coast.x+nx*off,z=coast.z+nz*off,e=4;
+   slopeSum+=Math.hypot(baseHeight(game,x+e,z)-baseHeight(game,x-e,z),baseHeight(game,x,z+e)-baseHeight(game,x,z-e))/(2*e);slopeN++;
+  }
+  const slope=clamp(slopeSum/slopeN,.06,.8);
+  const m={pts,k,slope,minX:Math.min(...pts.map(p=>p.x))-reach,maxX:Math.max(...pts.map(p=>p.x))+reach,
+   minZ:Math.min(...pts.map(p=>p.z))-reach,maxZ:Math.max(...pts.map(p=>p.z))+reach};
+  mouths.push(m);
+  const c0=Math.floor((m.minX+650)/S),c1=Math.floor((m.maxX+650)/S),r0=Math.floor((m.minZ+550)/S),r1=Math.floor((m.maxZ+550)/S);
+  for(let r=Math.max(0,r0);r<=Math.min(ROWS-1,r1);r++)for(let c=Math.max(0,c0);c<=Math.min(COLS-1,c1);c++){
+   const key=r*COLS+c,list=bucket.get(key)||[];list.push(m);bucket.set(key,list);
+  }
+ }
+ cache={mouths,bucket};flareCachesV344.set(game,cache);return cache;
+}
+// strength 0..1 and the reshaped natural ground at x,z. Only low coastal
+// ground is reshaped (never above 4.7 m), and the sea floor is never dug
+// deeper than 1.2 m below the waterline.
+let lastFlareV344=null;
+export function estuaryFlareV344(game,x,z,h=null){
+ const pos=cellAt(x,z),list=pos&&estuaryMouthsV344(game).bucket.get(idx(pos));
+ const near=list&&list.some(m=>x>=m.minX&&x<=m.maxX&&z>=m.minZ&&z<=m.maxZ)?list.filter(m=>x>=m.minX&&x<=m.maxX&&z>=m.minZ&&z<=m.maxZ):null;
+ if(!near)return {strength:0,ground:h??baseHeight(game,x,z)};
+ h??=baseHeight(game,x,z);
+ // worldElevation() and the shore filter ask for the same point in a row.
+ const last=lastFlareV344;
+ if(last&&last.game===game&&last.x===x&&last.z===z&&last.h===h)return last.result;
+ const result=flareAtV344(game,x,z,h,near);
+ lastFlareV344={game,x,z,h,result};return result;
+}
+function flareAtV344(game,x,z,h,near){
+ const lift=1-smooth((h-2.4)/2.3);
+ if(lift<=0)return {strength:0,ground:h};
+ let drop=0;
+ for(const m of near){
+  let bank=Infinity;
+  for(let i=1;i<m.pts.length;i++){
+   const a=m.pts[i-1],b=m.pts[i],dx=b.x-a.x,dz=b.z-a.z,len=dx*dx+dz*dz||1;
+   const t=clamp(((x-a.x)*dx+(z-a.z)*dz)/len,0,1);
+   bank=Math.min(bank,Math.hypot(a.x+dx*t-x,a.z+dz*t-z)-(a.w+(b.w-a.w)*t));
+  }
+  if(bank>=m.k)continue;
+  // The fillet only exists close to BOTH shores; a plain smooth union
+  // would also lower ground far inland along the river/coast bisector.
+  const shore=(h-SEA_V344)/m.slope,close=1-smooth((Math.max(bank,shore)-.45*m.k)/(.45*m.k));
+  if(close>0)drop=Math.max(drop,smoothUnionCutV344(bank,shore,m.k)*close*m.slope);
+ }
+ if(drop<=0)return {strength:0,ground:h};
+ const ground=Math.max(h-drop*lift,Math.min(h,SEA_V344-1.2));
+ return {strength:smooth(drop/1.5)*lift,ground};
+}
+function estuaryFlareGroundV344(game,x,z,h,smoothed){
+ const flare=estuaryFlareV344(game,x,z,h);
+ return flare.strength>0||flare.ground<h?Math.min(smoothed,smoothed+(flare.ground-h)):smoothed;
 }
 // visual=true (drawing only): where the rolling ground dips below a river's water level, the banks
 // rise gently to just above the water (natural levees), so the river sits in its bed instead of
@@ -247,14 +332,18 @@ export function visibleRiverHeight(game,x,z,rawHeight=null){
 export function worldElevation(game,x,z,visual=false){
  let base=baseHeight(game,x,z);
  const {distance:d,width:w,waterHeight,fordStrength=0}=riverNear(game,x,z);
- if(!Number.isFinite(d))return base;
+ // V344: a rounded mouth can reach past the river's own lookup radius.
+ if(!Number.isFinite(d))return visual&&Math.abs(base-.72)<5?estuaryShoreHeightV323(game,x,z,{distance:d,width:w}):base;
  const inner=w*1.04,outer=Math.max(inner+3.5,w*1.8+3);
  if(visual&&w>.05){
   // Shore terrain and the new sea mask share the same local smoothing.
-  if(d<w+30&&Math.abs(base-.72)<5)
+  // V344: the rounded opening can reach beyond the old 30 m shore band.
+  const flare=Math.abs(base-.72)<5?estuaryFlareV344(game,x,z,base).strength:0;
+  if((d<w+30||flare>0)&&Math.abs(base-.72)<5)
    base=estuaryShoreHeightV323(game,x,z,{distance:d,width:w});
   const level=visibleRiverHeight(game,x,z,waterHeight);
-  const rim=level+.60,reach=outer+18,land=landnessV249(game,x,z);
+  // No levee or raised bank inside the opening: there the bank IS the shore.
+  const rim=level+.60,reach=outer+18,land=landnessV249(game,x,z)*(1-flare);
   if(base<rim&&d<reach)
    base+=(rim-base)*(1-smooth((d-outer)/(reach-outer)))*land; // V249: no levee wall out into the sea
   // The former V161 drawing terrain was 2.2 m below the water all

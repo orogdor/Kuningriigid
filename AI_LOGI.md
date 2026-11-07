@@ -709,3 +709,23 @@ Kasutaja: three.js jääb nõrgaks ja ta soovis uuemat renderdajat.
 - Parandus failis `vendor/three.webgpu.js`: tingimus on nüüd `instanceAttribute.count <= 1000 && usage !== DynamicDrawUsage`. Shim ja bundle on `?v=245`.
 - Kontroll sama meetodiga (ajutine prototüübi parandus kasutaja brauseris): vigu pole, 1 146 joonistuskäsku, 4,6 mln kolmnurka, pikslid nähtavad.
 - NB! Kui three.js-i uuendatakse, tuleb see parandus uuesti teha või kontrollida, kas upstream on vea parandanud.
+
+---
+
+## V344 – ümarad, laienevad jõesuudmed (Claude, 2026-11-07)
+
+- Kasutaja (õpikupildi järgi): jõe lõpu kaldad peaksid minema üle mererannaks ja keerama siis piki maismaad.
+- `continuous-landscape.js`:
+  - `estuaryMouthsV344` leiab suudmed ja mõõdab igaühele ühe rannanõlva;
+  - `estuaryFlareV344` arvutab langetatud loodusliku maapinna jõe ja ranniku sujuva ühendina;
+  - rakendub `estuaryShoreHeightV323` kaudu.
+- Kõik joonistusteed kasutavad sama kõrgust: detailmeri, maailmakaardi meri (`atlas-sea-v326.js`), maailmakaardi maastik (`naturalAtlasHeightV327`) ja detailmaastik.
+- Füüsiline `worldElevation(…, false)` ja `riverNear` on muutmata; test võrdleb kontrollsummat.
+- Testid:
+  - `node tests/river-mouth-flare-v344.mjs`;
+  - jõe/suudme testid V314, V318, V322, V323, V325, V326;
+  - v128 quick-check.
+- Pooleli: kasutaja seadmel tuleb visuaalselt üle vaadata.
+  - Väga laiade jõgede (poollaius >40 m) suudmetes jäävad vanad sirged kaldavallijooned alles.
+  - Lahe madalas osas võivad üksused kahlata, sest füüsiline maa on seal kuiv.
+
