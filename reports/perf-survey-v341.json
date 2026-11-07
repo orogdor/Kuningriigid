@@ -1,0 +1,962 @@
+{
+  "version": "Kingdoms V341 – Real-Time Strategy",
+  "note": "SwiftShader software rendering at 1280x720, 50% resolution, low preset. Frame times include CPU-rendered GPU work and are not hardware FPS. JS self-time shares are the useful signal.",
+  "boot": {
+    "domMs": 782,
+    "bootMs": 23620,
+    "files": {
+      "served": 434,
+      "bytes": 10216213
+    },
+    "timing": {
+      "resources": 250,
+      "scripts": 191,
+      "slowest": [
+        {
+          "name": "css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap",
+          "ms": 329,
+          "kb": 1
+        },
+        {
+          "name": "card_journal.webp",
+          "ms": 278,
+          "kb": 0
+        },
+        {
+          "name": "card_build.webp",
+          "ms": 278,
+          "kb": 0
+        },
+        {
+          "name": "card_armies.webp",
+          "ms": 278,
+          "kb": 0
+        },
+        {
+          "name": "card_trade.webp",
+          "ms": 278,
+          "kb": 0
+        },
+        {
+          "name": "card_diplomacy.webp",
+          "ms": 278,
+          "kb": 0
+        },
+        {
+          "name": "card_cities.webp",
+          "ms": 277,
+          "kb": 0
+        },
+        {
+          "name": "navigation.js?v=339",
+          "ms": 223,
+          "kb": 27
+        }
+      ]
+    },
+    "profile": {
+      "totalMs": 24394,
+      "top": [
+        {
+          "fn": "hashV278 civilization-core.js:248",
+          "ms": 6546.7,
+          "pct": 26.8
+        },
+        {
+          "fn": "memoHeight perf-render-v131.js:3",
+          "ms": 2162.6,
+          "pct": 8.9
+        },
+        {
+          "fn": "riverNear continuous-landscape.js:156",
+          "ms": 1746.9,
+          "pct": 7.2
+        },
+        {
+          "fn": "(program) :0",
+          "ms": 1504.7,
+          "pct": 6.2
+        },
+        {
+          "fn": "riverNetworkStepsV242 continuous-landscape-visual.js:92",
+          "ms": 946.5,
+          "pct": 3.9
+        },
+        {
+          "fn": "Civilization.noise civilization-core.js:288",
+          "ms": 894.7,
+          "pct": 3.7
+        },
+        {
+          "fn": "distance continent-map.js:9",
+          "ms": 797.8,
+          "pct": 3.3
+        },
+        {
+          "fn": "buffersStepsV242 continuous-landscape-visual.js:52",
+          "ms": 682.4,
+          "pct": 2.8
+        },
+        {
+          "fn": "(garbage collector) :0",
+          "ms": 650.8,
+          "pct": 2.7
+        },
+        {
+          "fn": "sample civilization-core.js:372",
+          "ms": 614.8,
+          "pct": 2.5
+        },
+        {
+          "fn": "(idle) :0",
+          "ms": 595,
+          "pct": 2.4
+        },
+        {
+          "fn": "onFirstUse three.module.js:6799",
+          "ms": 519,
+          "pct": 2.1
+        },
+        {
+          "fn": "clip continuous-landscape-visual.js:121",
+          "ms": 485.9,
+          "pct": 2
+        },
+        {
+          "fn": "node continuous-landscape-visual.js:108",
+          "ms": 482.4,
+          "pct": 2
+        },
+        {
+          "fn": "atlasHeight civilization-core.js:372",
+          "ms": 467.3,
+          "pct": 1.9
+        },
+        {
+          "fn": "valueV278 civilization-core.js:249",
+          "ms": 416.5,
+          "pct": 1.7
+        },
+        {
+          "fn": "bakeDetails world-details.js:7",
+          "ms": 281.1,
+          "pct": 1.2
+        },
+        {
+          "fn": "riverFlow continuous-landscape-visual.js:77",
+          "ms": 264.2,
+          "pct": 1.1
+        },
+        {
+          "fn": "shoreWarpV278 civilization-core.js:251",
+          "ms": 251.4,
+          "pct": 1
+        },
+        {
+          "fn": "(anonymous) atlas-terrain-v327.js:62",
+          "ms": 242.8,
+          "pct": 1
+        },
+        {
+          "fn": "nearOutlet estuary-v322.js:37",
+          "ms": 223.6,
+          "pct": 0.9
+        },
+        {
+          "fn": "createAtlasDecor atlas-style.js:65",
+          "ms": 187.8,
+          "pct": 0.8
+        },
+        {
+          "fn": "random world-details.js:8",
+          "ms": 162,
+          "pct": 0.7
+        },
+        {
+          "fn": "(anonymous) atlas-terrain-v327.js:66",
+          "ms": 157.2,
+          "pct": 0.6
+        },
+        {
+          "fn": "createBuffer three.module.js:66",
+          "ms": 141.5,
+          "pct": 0.6
+        }
+      ],
+      "byFile": [
+        {
+          "file": "civilization-core.js",
+          "ms": 9375.6,
+          "pct": 38.4
+        },
+        {
+          "file": "continuous-landscape-visual.js",
+          "ms": 3233.8,
+          "pct": 13.3
+        },
+        {
+          "file": "(native)",
+          "ms": 2778.5,
+          "pct": 11.4
+        },
+        {
+          "file": "continuous-landscape.js",
+          "ms": 2170.4,
+          "pct": 8.9
+        },
+        {
+          "file": "perf-render-v131.js",
+          "ms": 2163.2,
+          "pct": 8.9
+        },
+        {
+          "file": "continent-map.js",
+          "ms": 836.4,
+          "pct": 3.4
+        },
+        {
+          "file": "atlas-terrain-v327.js",
+          "ms": 770.9,
+          "pct": 3.2
+        },
+        {
+          "file": "three.module.js",
+          "ms": 755.1,
+          "pct": 3.1
+        },
+        {
+          "file": "world-details.js",
+          "ms": 518.1,
+          "pct": 2.1
+        },
+        {
+          "file": "three.core.js",
+          "ms": 498.8,
+          "pct": 2
+        },
+        {
+          "file": "estuary-v322.js",
+          "ms": 287.4,
+          "pct": 1.2
+        },
+        {
+          "file": "atlas-style.js",
+          "ms": 213.2,
+          "pct": 0.9
+        },
+        {
+          "file": "civilization.js",
+          "ms": 208.2,
+          "pct": 0.9
+        },
+        {
+          "file": "localization.js",
+          "ms": 111.1,
+          "pct": 0.5
+        },
+        {
+          "file": "campaign.js",
+          "ms": 71.2,
+          "pct": 0.3
+        }
+      ]
+    }
+  },
+  "start": {
+    "c": 104,
+    "r": 60
+  },
+  "world": {
+    "label": "world map idle",
+    "frames": {
+      "count": 12,
+      "median": 1116.7,
+      "p95": 3166.5
+    },
+    "renderer": {
+      "calls": 356,
+      "triangles": 2759023,
+      "geometries": 101,
+      "textures": 66,
+      "programs": 26,
+      "visibleMeshes": 3978,
+      "instancedMeshes": 3808,
+      "instances": 42976,
+      "lights": 3,
+      "shadowCasters": 554
+    },
+    "profile": {
+      "totalMs": 15719,
+      "top": [
+        {
+          "fn": "(idle) :0",
+          "ms": 9306.8,
+          "pct": 59.2
+        },
+        {
+          "fn": "L pako.min.mjs:1",
+          "ms": 2981.6,
+          "pct": 19
+        },
+        {
+          "fn": "(program) :0",
+          "ms": 561.8,
+          "pct": 3.6
+        },
+        {
+          "fn": "K pako.min.mjs:1",
+          "ms": 535.6,
+          "pct": 3.4
+        },
+        {
+          "fn": "packSave save-compression-v256.js:5",
+          "ms": 325,
+          "pct": 2.1
+        },
+        {
+          "fn": "(anonymous) generated-world-v331.js:54",
+          "ms": 296.6,
+          "pct": 1.9
+        },
+        {
+          "fn": "e.exports pako.min.mjs:1",
+          "ms": 277.3,
+          "pct": 1.8
+        },
+        {
+          "fn": "a.string2buf pako.min.mjs:1",
+          "ms": 197,
+          "pct": 1.3
+        },
+        {
+          "fn": "(garbage collector) :0",
+          "ms": 186.5,
+          "pct": 1.2
+        },
+        {
+          "fn": "H pako.min.mjs:1",
+          "ms": 138.7,
+          "pct": 0.9
+        },
+        {
+          "fn": "q pako.min.mjs:1",
+          "ms": 78.3,
+          "pct": 0.5
+        },
+        {
+          "fn": "a._tr_tally pako.min.mjs:1",
+          "ms": 65.4,
+          "pct": 0.4
+        },
+        {
+          "fn": "F pako.min.mjs:1",
+          "ms": 57.3,
+          "pct": 0.4
+        },
+        {
+          "fn": "translateEstonian localization.js:36",
+          "ms": 52.7,
+          "pct": 0.3
+        },
+        {
+          "fn": "updateMatrix three.core.js:13039",
+          "ms": 47.6,
+          "pct": 0.3
+        },
+        {
+          "fn": "intersectsObject three.core.js:26073",
+          "ms": 28.1,
+          "pct": 0.2
+        },
+        {
+          "fn": "updateMatrixWorld three.core.js:13071",
+          "ms": 27.3,
+          "pct": 0.2
+        },
+        {
+          "fn": "U pako.min.mjs:1",
+          "ms": 26,
+          "pct": 0.2
+        },
+        {
+          "fn": "T pako.min.mjs:1",
+          "ms": 23.4,
+          "pct": 0.1
+        },
+        {
+          "fn": "validate generated-world-v331.js:9",
+          "ms": 23,
+          "pct": 0.1
+        },
+        {
+          "fn": "arraySet pako.min.mjs:1",
+          "ms": 22.6,
+          "pct": 0.1
+        },
+        {
+          "fn": "(anonymous) terrain-cache-v336.js:30",
+          "ms": 21.6,
+          "pct": 0.1
+        },
+        {
+          "fn": "btoa :0",
+          "ms": 20.6,
+          "pct": 0.1
+        },
+        {
+          "fn": "projectObject three.module.js:17696",
+          "ms": 20.6,
+          "pct": 0.1
+        },
+        {
+          "fn": "a.deflate pako.min.mjs:1",
+          "ms": 18.9,
+          "pct": 0.1
+        }
+      ],
+      "byFile": [
+        {
+          "file": "(native)",
+          "ms": 10101.4,
+          "pct": 64.3
+        },
+        {
+          "file": "pako.min.mjs",
+          "ms": 4504.2,
+          "pct": 28.7
+        },
+        {
+          "file": "generated-world-v331.js",
+          "ms": 354.9,
+          "pct": 2.3
+        },
+        {
+          "file": "save-compression-v256.js",
+          "ms": 325,
+          "pct": 2.1
+        },
+        {
+          "file": "three.core.js",
+          "ms": 150.9,
+          "pct": 1
+        },
+        {
+          "file": "localization.js",
+          "ms": 88.9,
+          "pct": 0.6
+        },
+        {
+          "file": "three.module.js",
+          "ms": 83.5,
+          "pct": 0.5
+        },
+        {
+          "file": "civilization.js",
+          "ms": 25.7,
+          "pct": 0.2
+        },
+        {
+          "file": "terrain-cache-v336.js",
+          "ms": 21.6,
+          "pct": 0.1
+        },
+        {
+          "file": "atlas-terrain-v327.js",
+          "ms": 14.6,
+          "pct": 0.1
+        },
+        {
+          "file": "ui-art-v263.js",
+          "ms": 8.3,
+          "pct": 0.1
+        },
+        {
+          "file": "sapling-trees-v328.js",
+          "ms": 7.6,
+          "pct": 0
+        },
+        {
+          "file": "ui-v304.js",
+          "ms": 6.1,
+          "pct": 0
+        },
+        {
+          "file": "ui-v264.js",
+          "ms": 5.9,
+          "pct": 0
+        },
+        {
+          "file": "graphics-runtime-v226.js",
+          "ms": 4.2,
+          "pct": 0
+        }
+      ]
+    }
+  },
+  "detailIdle": {
+    "label": "detail map idle (own city, 5x5 loaded)",
+    "frames": {
+      "count": 21,
+      "median": 816.6,
+      "p95": 849.9
+    },
+    "renderer": {
+      "calls": 192,
+      "triangles": 903517,
+      "geometries": 205,
+      "textures": 87,
+      "programs": 40,
+      "visibleMeshes": 344,
+      "instancedMeshes": 222,
+      "instances": 10398,
+      "lights": 3,
+      "shadowCasters": 86
+    },
+    "profile": {
+      "totalMs": 15499,
+      "top": [
+        {
+          "fn": "(idle) :0",
+          "ms": 14296.6,
+          "pct": 92.2
+        },
+        {
+          "fn": "(program) :0",
+          "ms": 359.7,
+          "pct": 2.3
+        },
+        {
+          "fn": "translateEstonian localization.js:36",
+          "ms": 83.8,
+          "pct": 0.5
+        },
+        {
+          "fn": "updateMatrix three.core.js:13039",
+          "ms": 63,
+          "pct": 0.4
+        },
+        {
+          "fn": "Civilization.smooth civilization-core.js:288",
+          "ms": 40.5,
+          "pct": 0.3
+        },
+        {
+          "fn": "riverNear continuous-landscape.js:156",
+          "ms": 39.4,
+          "pct": 0.3
+        },
+        {
+          "fn": "hashV278 civilization-core.js:248",
+          "ms": 34.4,
+          "pct": 0.2
+        },
+        {
+          "fn": "updateMatrixWorld three.core.js:13071",
+          "ms": 33,
+          "pct": 0.2
+        },
+        {
+          "fn": "projectObject three.module.js:17696",
+          "ms": 30.2,
+          "pct": 0.2
+        },
+        {
+          "fn": "(garbage collector) :0",
+          "ms": 26.5,
+          "pct": 0.2
+        },
+        {
+          "fn": "atlasHeight civilization-core.js:372",
+          "ms": 25.3,
+          "pct": 0.2
+        },
+        {
+          "fn": "n2 continuous-landscape.js:197",
+          "ms": 21.1,
+          "pct": 0.1
+        },
+        {
+          "fn": "updateWorldMatrix three.core.js:13120",
+          "ms": 18.8,
+          "pct": 0.1
+        },
+        {
+          "fn": "translateAttributes localization.js:84",
+          "ms": 17.8,
+          "pct": 0.1
+        },
+        {
+          "fn": "portrait ui-art-v263.js:11",
+          "ms": 17.6,
+          "pct": 0.1
+        },
+        {
+          "fn": "riverNetworkStepsV242 continuous-landscape-visual.js:92",
+          "ms": 17.1,
+          "pct": 0.1
+        },
+        {
+          "fn": "traverse three.core.js:12976",
+          "ms": 16.7,
+          "pct": 0.1
+        },
+        {
+          "fn": "shoreWarpV278 civilization-core.js:251",
+          "ms": 16.1,
+          "pct": 0.1
+        },
+        {
+          "fn": "set scrollTop :0",
+          "ms": 15.5,
+          "pct": 0.1
+        },
+        {
+          "fn": "root.update sapling-trees-v328.js:89",
+          "ms": 14.9,
+          "pct": 0.1
+        },
+        {
+          "fn": "terrainVertex civilization.js:388",
+          "ms": 13.4,
+          "pct": 0.1
+        },
+        {
+          "fn": "multiplyMatrices three.core.js:10564",
+          "ms": 13.2,
+          "pct": 0.1
+        },
+        {
+          "fn": "translateNode localization.js:75",
+          "ms": 13.1,
+          "pct": 0.1
+        },
+        {
+          "fn": "saplingLevelV328 sapling-trees-v328.js:37",
+          "ms": 11.8,
+          "pct": 0.1
+        },
+        {
+          "fn": "renderUI civilization.js:1244",
+          "ms": 10.5,
+          "pct": 0.1
+        }
+      ],
+      "byFile": [
+        {
+          "file": "(native)",
+          "ms": 14734.1,
+          "pct": 95.1
+        },
+        {
+          "file": "three.core.js",
+          "ms": 163.9,
+          "pct": 1.1
+        },
+        {
+          "file": "civilization-core.js",
+          "ms": 130.8,
+          "pct": 0.8
+        },
+        {
+          "file": "localization.js",
+          "ms": 122.3,
+          "pct": 0.8
+        },
+        {
+          "file": "three.module.js",
+          "ms": 72.8,
+          "pct": 0.5
+        },
+        {
+          "file": "continuous-landscape.js",
+          "ms": 70.8,
+          "pct": 0.5
+        },
+        {
+          "file": "civilization.js",
+          "ms": 62.3,
+          "pct": 0.4
+        },
+        {
+          "file": "continuous-landscape-visual.js",
+          "ms": 36,
+          "pct": 0.2
+        },
+        {
+          "file": "sapling-trees-v328.js",
+          "ms": 26.8,
+          "pct": 0.2
+        },
+        {
+          "file": "ui-art-v263.js",
+          "ms": 19.3,
+          "pct": 0.1
+        },
+        {
+          "file": "navigation.js",
+          "ms": 7.5,
+          "pct": 0
+        },
+        {
+          "file": "ui-v264.js",
+          "ms": 6.9,
+          "pct": 0
+        },
+        {
+          "file": "mountain-foot-v178.js",
+          "ms": 4.6,
+          "pct": 0
+        },
+        {
+          "file": "perf-render-v131.js",
+          "ms": 4,
+          "pct": 0
+        },
+        {
+          "file": "ui-v304.js",
+          "ms": 4,
+          "pct": 0
+        }
+      ]
+    }
+  },
+  "detailMove": {
+    "label": "detail map moving north",
+    "frames": {
+      "count": 26,
+      "median": 816.6,
+      "p95": 1483.6
+    },
+    "renderer": {
+      "calls": 4,
+      "triangles": 60440,
+      "geometries": 210,
+      "textures": 87,
+      "programs": 38,
+      "visibleMeshes": 168,
+      "instancedMeshes": 136,
+      "instances": 4553,
+      "lights": 3,
+      "shadowCasters": 28
+    },
+    "profile": {
+      "totalMs": 20514,
+      "top": [
+        {
+          "fn": "(idle) :0",
+          "ms": 17982.9,
+          "pct": 87.7
+        },
+        {
+          "fn": "(program) :0",
+          "ms": 446.3,
+          "pct": 2.2
+        },
+        {
+          "fn": "(garbage collector) :0",
+          "ms": 231.9,
+          "pct": 1.1
+        },
+        {
+          "fn": "translateEstonian localization.js:36",
+          "ms": 111.1,
+          "pct": 0.5
+        },
+        {
+          "fn": "Civilization.noise civilization-core.js:288",
+          "ms": 81.8,
+          "pct": 0.4
+        },
+        {
+          "fn": "frame civilization.js:1864",
+          "ms": 69.7,
+          "pct": 0.3
+        },
+        {
+          "fn": "updateMatrix three.core.js:13039",
+          "ms": 63.2,
+          "pct": 0.3
+        },
+        {
+          "fn": "Civilization.smooth civilization-core.js:288",
+          "ms": 61.9,
+          "pct": 0.3
+        },
+        {
+          "fn": "riverNear continuous-landscape.js:156",
+          "ms": 56,
+          "pct": 0.3
+        },
+        {
+          "fn": "drawOverview civilization.js:1750",
+          "ms": 52,
+          "pct": 0.3
+        },
+        {
+          "fn": "hashV278 civilization-core.js:248",
+          "ms": 42.5,
+          "pct": 0.2
+        },
+        {
+          "fn": "ensureComponents navigation.js:144",
+          "ms": 35.3,
+          "pct": 0.2
+        },
+        {
+          "fn": "atlasHeight civilization-core.js:372",
+          "ms": 35.1,
+          "pct": 0.2
+        },
+        {
+          "fn": "updateMatrixWorld three.core.js:13071",
+          "ms": 33.8,
+          "pct": 0.2
+        },
+        {
+          "fn": "fillRect :0",
+          "ms": 32.3,
+          "pct": 0.2
+        },
+        {
+          "fn": "set scrollTop :0",
+          "ms": 27.5,
+          "pct": 0.1
+        },
+        {
+          "fn": "createDetailBorders detail-borders-v85.js:5",
+          "ms": 26.8,
+          "pct": 0.1
+        },
+        {
+          "fn": "refreshStreamHoldersV242 civilization.js:849",
+          "ms": 25.4,
+          "pct": 0.1
+        },
+        {
+          "fn": "distantTerrainStepsV242 civilization.js:429",
+          "ms": 25,
+          "pct": 0.1
+        },
+        {
+          "fn": "shoreWarpV278 civilization-core.js:251",
+          "ms": 23.6,
+          "pct": 0.1
+        },
+        {
+          "fn": "projectObject three.module.js:17696",
+          "ms": 23.6,
+          "pct": 0.1
+        },
+        {
+          "fn": "mountDetailV242 civilization.js:833",
+          "ms": 23.4,
+          "pct": 0.1
+        },
+        {
+          "fn": "traverse three.core.js:12976",
+          "ms": 22.2,
+          "pct": 0.1
+        },
+        {
+          "fn": "translateAttributes localization.js:84",
+          "ms": 21.1,
+          "pct": 0.1
+        },
+        {
+          "fn": "renderUIImpl civilization.js:1251",
+          "ms": 20.9,
+          "pct": 0.1
+        }
+      ],
+      "byFile": [
+        {
+          "file": "(native)",
+          "ms": 18805.2,
+          "pct": 91.7
+        },
+        {
+          "file": "civilization-core.js",
+          "ms": 358.9,
+          "pct": 1.7
+        },
+        {
+          "file": "civilization.js",
+          "ms": 291.1,
+          "pct": 1.4
+        },
+        {
+          "file": "three.core.js",
+          "ms": 230.8,
+          "pct": 1.1
+        },
+        {
+          "file": "localization.js",
+          "ms": 158,
+          "pct": 0.8
+        },
+        {
+          "file": "navigation.js",
+          "ms": 109.5,
+          "pct": 0.5
+        },
+        {
+          "file": "continuous-landscape.js",
+          "ms": 104.6,
+          "pct": 0.5
+        },
+        {
+          "file": "perf-state-v131.js",
+          "ms": 56.8,
+          "pct": 0.3
+        },
+        {
+          "file": "three.module.js",
+          "ms": 46,
+          "pct": 0.2
+        },
+        {
+          "file": "sapling-trees-v328.js",
+          "ms": 31.7,
+          "pct": 0.2
+        },
+        {
+          "file": "detail-borders-v85.js",
+          "ms": 30.9,
+          "pct": 0.2
+        },
+        {
+          "file": "continuous-landscape-visual.js",
+          "ms": 21,
+          "pct": 0.1
+        },
+        {
+          "file": "ui-art-v263.js",
+          "ms": 20.4,
+          "pct": 0.1
+        },
+        {
+          "file": "terrain-defenses-v176.js",
+          "ms": 16,
+          "pct": 0.1
+        },
+        {
+          "file": "detail-scale-v123.js",
+          "ms": 13.7,
+          "pct": 0.1
+        }
+      ]
+    }
+  },
+  "extra": {
+    "cities": 4,
+    "armies": 4,
+    "units": 4,
+    "settlers": 0,
+    "cells": 36300,
+    "streamTiles": 36,
+    "resourcesInStreamTiles": 1184,
+    "stream": 23.90000000037253,
+    "slowestStage": "resources"
+  },
+  "errors": []
+}
