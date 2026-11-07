@@ -20,7 +20,7 @@ export function loadSaplingV328(kind,variant,level){
   const data=await loadGLB(new URL(id+'/'+level+'.glb',ROOT),{premultiplyAlpha:'none'});
   const parts=data.primitives.map((p,i)=>{
    let map=null;if(p.image){const tk=level==='far'?id+':'+i:kind+':foliage';map=textures.get(tk);
-    if(!map){map=new T.Texture(p.image);map.flipY=false;map.colorSpace=T.SRGBColorSpace;map.needsUpdate=true;textures.set(tk,map);}else p.image.close?.();}
+    if(!map){map=new T.Texture(p.image);map.flipY=false;map.colorSpace=T.SRGBColorSpace;map.needsUpdate=true;textures.set(tk,map);}else if(p.image!==map.image)p.image.close?.();} // V345: two primitives may share one bitmap; never close the one the texture uses
    const params={color:new T.Color().fromArray(p.color),map,alphaTest:map?.4:0,side:T.DoubleSide,depthWrite:true};
    const material=level==='far'?new T.MeshBasicMaterial(params):new T.MeshStandardMaterial({...params,roughness:.95});material.userData.shared=true;
    p.geometry.userData.shared=true;p.geometry.computeBoundingSphere();return {geometry:p.geometry,material};
