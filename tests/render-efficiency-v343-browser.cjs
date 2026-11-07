@@ -4,10 +4,10 @@ const root=path.resolve(__dirname,'..'),mime={'.js':'application/javascript','.m
 const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+decodeURIComponent(req.url.split('?')[0]));if(!f.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(f,(e,b)=>{if(e)return res.writeHead(404).end();res.setHeader('Content-Type',mime[path.extname(f)]||'application/octet-stream');res.end(b)})});
 (async()=>{await new Promise(r=>server.listen(8783,'127.0.0.1',r));const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const report={note:'Actual game, Chromium/SwiftShader, software renderer. Behaviour/visual smoke checks, not hardware FPS.',scenarios:[]};
- try{for(const demo of ['stonetown','bronze-battle']){
-  const page=await browser.newPage({viewport:{width:960,height:640}}),errors=[];page.on('pageerror',e=>errors.push(String(e)));
+ try{for(const demo of (process.env.RENDER_DEMOS||'stonetown,bronze-battle').split(',')){
+  const page=await browser.newPage({viewport:{width:960,height:640}}),errors=[];page.on('pageerror',e=>{errors.push(String(e));console.log('PAGE ERROR',demo,String(e))});page.on('console',m=>{if(m.type()==='error')console.log('CONSOLE ERROR',demo,m.text())});
   await page.addInitScript(()=>{let x=8417;Math.random=()=>((x=(x*1103515245+12345)>>>0)/4294967296);localStorage.setItem('kingdoms-graphics-v226',JSON.stringify({preset:'low',renderer:'webgl',resolution:50,shadows:'off',vegetation:'low',water:'simple',clouds:false,fpsLimit:'30',adaptiveResolution:false}));});
-  await page.goto('http://127.0.0.1:8783/index.html?autostart=1&gpu=0&demo='+demo,{waitUntil:'domcontentloaded',timeout:180000});await page.waitForFunction(()=>window.gameDebug,null,{timeout:240000});console.log('booted',demo);
+  await page.goto('http://127.0.0.1:8783/index.html?autostart=1&gpu=0&demo='+demo,{waitUntil:'domcontentloaded',timeout:180000});await page.waitForFunction(()=>window.gameDebug||document.querySelector('#menu-status.menu-error'),null,{timeout:90000}).catch(async e=>{console.log('BOOT DIAGNOSTIC',demo,await page.locator('body').innerText());throw e;});if(!await page.evaluate(()=>!!window.gameDebug))throw Error(await page.locator('#menu-status').innerText());console.log('booted',demo);
   await page.evaluate(()=>{gameDebug.rendererV328.setPixelRatio(.35);document.getElementById('continue')?.click();});
   if(demo==='stonetown')await page.evaluate(()=>{const g=gameDebug.gameV249(),own=g.s.cities.find(c=>c.team===0);g.seen=()=>true;gameDebug.openTileV249(own.c,own.r);gameDebug.focusV250(0,0,180);});
   await page.waitForTimeout(3000);
@@ -26,7 +26,7 @@ const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+decodeU
    const crossed=await page.evaluate(async()=>{const st=gameDebug.detailStreamV242,old=st.center.r;gameDebug.focusV250(0,-210,180);const t=performance.now();while(st.center.r===old&&performance.now()-t<60000){for(let i=0;i<8;i++)st.tick();await new Promise(r=>setTimeout(r,50));}return st.center.r!==old;});assert.ok(crossed,'tile crossing works');
    await page.evaluate(()=>document.getElementById('world').click());await page.waitForTimeout(500);
   }
-  report.scenarios.push({demo,version:await page.title(),before,state,errors});console.log(demo,JSON.stringify(state));await page.close();
+  report.scenarios.push({demo,version:await page.title(),before,state,errors});fs.writeFileSync(path.join(root,'reports/render-efficiency-v343-browser.json'),JSON.stringify(report,null,2));console.log(demo,JSON.stringify(state));await page.close();
  }}finally{await browser.close();server.close();}
  fs.writeFileSync(path.join(root,'reports/render-efficiency-v343-browser.json'),JSON.stringify(report,null,2));console.log('V343 real-game smoke PASS');
 })().catch(e=>{console.error(e);server.close();process.exit(1)});
