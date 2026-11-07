@@ -1,5 +1,7 @@
 # Kuningriigid – ühine tööjärg
 
+- V342 avaldatud (2026-11-07): PR #66 ühendatud main-i (09f7afe). Kiirkontroll 42351358767, detailkaardi laadimistest 42351358857, Pages 42351358792 ja APK/EXE sisukanal 42351639322 läbisid. Järgmine: kasutaja seadmel FPS ja ruutude vahel liikumise kontroll.
+
 - V342 (2026-11-07): RAPORT_FPS_V341 punktid 1–3 graafikat muutmata. Keskruudu kihid (horisont, jõed, navigatsioon, teed, piirid) ehitatakse ainult kesk-/sihtruudu naabritele, kaugemad ruudud peatuvad pärast nähtavaid etappe ja jätkavad naabriks saades; uus frame-slice-v342.js piirab laadimissammud 4 ms ajalõiguga (tulemus identne); FPS-piirangu vahele jäetud kaadritel ainult piiratud laadimine, kaamera aken ja naabrite värskendus joonistatud kaadritel. Graafika identsus kontrollitud geomeetria räsidega (reports/visual-identity-v342.json). Päris mäng sama seemnega: laadimise CPU-aeg 13,1 → 9,1 s, esialgne aken 7,7 → 5,8 s, välisruudud samad. Parandus V341 raportile: 60–370 ms sammud olid paralleelse mõõtmise CPU-konkurentsi viga. 112 kiirkontrolli ja uus tests/detail-stream-v342.mjs läbisid. Muutmata: syncLocal (frameDelta animatsioonid) ja applyMaterialEngine (ehituse eelvaate materjalid). Järgmine: kasutaja seadmel FPS ja liikumine; raporti punktid 10–12 (käivitus, maailma pakkimine).
 
 - V341 avaldatud (2026-11-07): PR #64 ühendatud main-i (419f91f). Kiirkontroll 42348196897, V341 päris mängu laadimistest 42348196883, Pages 42348196899 ja APK/EXE sisukanal 42348485604 läbisid. Järgmine töö: kasutaja seadmel detailkaardil liikumise ja FPS-i kontroll.
