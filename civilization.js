@@ -6,7 +6,8 @@ import {captureGeneratedWorldV331,hydrateGeneratedWorldV331,persistGeneratedWorl
 import {forestCandidatesV330,forestRandomV330} from './forest-placement-v330.js';
 import {treeKeepV270} from './forest-clumps-v270.js';
 import {pickTreeV329,forestV329,detailCompanionsV329} from './forest-ecology-v329.js';
-import {withSaplingInstancesV328,saplingStatsV328} from './sapling-trees-v328.js';
+import {withSaplingInstancesV328,saplingStatsV328,saplingSpeciesV328} from './sapling-trees-v328.js';
+import {createV48Mesh} from './model-runtime-v48.js';
 import {createAtlasTerrainV327} from './atlas-terrain-v327.js';
 import {packSave,unpackSave} from './save-compression-v256.js';
 import {DetailStreamV242} from './detail-stream-v242.js?v=342';
@@ -939,7 +940,7 @@ function syncDetailWorldObjects(){
 }
 
 function loadNeighbours(cell){for(let dr=s.battle?-3:-1;dr<=(s.battle?4:1);dr++)for(let dc=s.battle?-3:-1;dc<=(s.battle?4:1);dc++){if(!dc&&!dr)continue;const c=cell.c+dc,r=cell.r+dr;if(c<0||r<0||c>=COLS||r>=ROWS)continue;const tile=game.cell({c,r}),g=new T.Group();g.position.set(dc*DETAIL_TILE_X,0,dr*DETAIL_TILE_Z);environment.add(g);installDetailObjectHolder(tile,g);// The active tile and its eight neighbours now share ONE terrain mesh.
-  g.add(createGroundCover(tile,(x,z)=>{if(tile.mountain)return -100;const y=ground(tile,x,z),p=riverNear(game,tile.x+x/3,tile.z+z/2.6);return p.distance<p.width*1.27?-100:y},graphicsVegetationQualityV226(graphicsV226)));const world=game.localWorld(tile),vegetationCrossing=tile.river&&(tile.bridge||tile.ford)?crossingFrame(game,tile):null;for(const res of world.resources){if(res.removed||res.amount<=0||(res.depositSite&&game.contextAt(tile,false)?.economy.buildings.some(b=>b.depositId===res.id&&b.hp>0)))continue;if(['tree','berry','game'].includes(res.kind)){const water=riverNear(game,tile.x+res.x/3,tile.z+res.z/2.6);if(tile.mountain||water.distance<water.width*1.55||insideCrossing(vegetationCrossing,tile.x+res.x/3,tile.z+res.z/2.6))continue;}const v=new T.Group();if(res.kind==='tree')addForestResourceV329(v,res,tile);else if(['game','fish','berry'].includes(res.kind))v.add(createWildlife(res.kind));else if(res.depositSite)v.add(createDepositPile(res.kind));else box(v,0,.6,0,1.5,1.2,1.5,res.kind==='ore'?'#9e7356':'#a4a68e');v.position.set(res.x,res.kind==='fish'?.18:ground(tile,res.x,res.z),res.z);g.add(v)}const ctx=game.contextAt(tile,false);if(ctx)for(const b of ctx.economy.buildings.filter(b=>!b.virtual)){const m=b.type==='bridge'?createBridgeBuilding(game,tile,(x,z)=>ground(tile,x,z)):townBuildingModel(b.type,b.team,visualBuildingAge(b),0,buildingSeed(b),b.woodFortTierV1757);if(b.type==='field'){const d=fieldSize(b);m.scale.set(d.width/16,1,d.depth/16);}
+  g.add(createGroundCover(tile,(x,z)=>{if(tile.mountain)return -100;const y=ground(tile,x,z),p=riverNear(game,tile.x+x/3,tile.z+z/2.6);return p.distance<p.width*1.27?-100:y},graphicsVegetationQualityV226(graphicsV226)));const world=game.localWorld(tile),vegetationCrossing=tile.river&&(tile.bridge||tile.ford)?crossingFrame(game,tile):null;for(const res of world.resources){if(res.removed||res.amount<=0||(res.depositSite&&game.contextAt(tile,false)?.economy.buildings.some(b=>b.depositId===res.id&&b.hp>0)))continue;if(['tree','berry','game'].includes(res.kind)){const water=riverNear(game,tile.x+res.x/3,tile.z+res.z/2.6);if(tile.mountain||water.distance<water.width*1.55||insideCrossing(vegetationCrossing,tile.x+res.x/3,tile.z+res.z/2.6))continue;}const v=new T.Group();if(res.kind==='tree')addForestResourceV329(v,res,tile);else if(['game','fish','berry'].includes(res.kind))v.add(createWildlife(res.kind));else if(res.depositSite)v.add(createDepositPile(res.kind));else box(v,0,.6,0,1.5,1.2,1.5,res.kind==='ore'?'#9e7356':'#a4a68e');v.position.set(res.x,res.kind==='fish'?.18:ground(tile,res.x,res.z),res.z);g.add(v)}addForestFillV346(g,tile,world);const ctx=game.contextAt(tile,false);if(ctx)for(const b of ctx.economy.buildings.filter(b=>!b.virtual)){const m=b.type==='bridge'?createBridgeBuilding(game,tile,(x,z)=>ground(tile,x,z)):townBuildingModel(b.type,b.team,visualBuildingAge(b),0,buildingSeed(b),b.woodFortTierV1757);if(b.type==='field'){const d=fieldSize(b);m.scale.set(d.width/16,1,d.depth/16);}
     if(b.type==='house'&&b.houseUpgradeLevelV218)m.scale.set(1.12,1.42,1.10);m.position.set(b.x,buildingBaseV2231(tile,b),b.z);
     if(b.palisadeSpanV167&&isDrawableWallV175(b.type)){const a=b.cliffEmbedStartV179||0,e=b.cliffEmbedEndV179||0,shift=(e-a)/2;m.scale.x=(b.palisadeSpanV167+a+e)/7;m.position.x+=Math.cos(b.wallAngleV175||0)*shift;m.position.z-=Math.sin(b.wallAngleV175||0)*shift;}
     else if(b.extendedPalisadeV166&&['palisade','woodgate','gatehouse'].includes(b.type))m.scale.x=2;
@@ -962,6 +963,35 @@ function followDetail(){
 
 function insideCrossing(frame,x,z){if(!frame)return false;const dx=x-frame.x,dz=z-frame.z;return Math.abs(dx*frame.normal.x+dz*frame.normal.z)<frame.halfSpan*1.5&&Math.abs(-dx*frame.normal.z+dz*frame.normal.x)<4.5;}
 // Companions belong to the resource root: cutting, clearing and seedling scaling apply together.
+// V346: forest floor filler. Resource trees alone leave wide grass gaps
+// between groves; decorative trees (not harvestable, no gameplay) fill every
+// gap wider than ~6 m on forest tiles. One instanced Sapling stand per species.
+function addForestFillV346(g,tile,world){
+ if(tile.mountain||!forestV329(tile))return;
+ const quality=graphicsVegetationQualityV226(graphicsV226)==="low"?"low":"high";
+ const spacing=quality==='low'?9.5:7,keep=[],bins=new Map(),cs=8;
+ const note=(x,z)=>{const k=Math.floor(x/cs)+':'+Math.floor(z/cs);(bins.get(k)||bins.set(k,[]).get(k)).push({x,z});};
+ for(const r of world.resources)if(r.kind==='tree'&&!r.removed&&r.amount>0){note(r.x,r.z);for(const p of detailCompanionsV329(tile,r))note(p.x,p.z);}
+ const near=(x,z,lim)=>{const gx=Math.floor(x/cs),gz=Math.floor(z/cs);for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)for(const q of bins.get((gx+i)+':'+(gz+j))||[])if(Math.hypot(q.x-x,q.z-z)<lim)return true;return false;};
+ const buildings=game.contextAt(tile,false)?.economy.buildings.filter(b=>!b.virtual&&b.hp>0)||[],crossing=tile.river&&(tile.bridge||tile.ford)?crossingFrame(game,tile):null;
+ const byKind=new Map(),seed=s.seed|0;
+ for(let gz=Math.floor(-DETAIL_HALF_Z/spacing);gz<=Math.ceil(DETAIL_HALF_Z/spacing);gz++)for(let gx=Math.floor(-DETAIL_HALF_X/spacing);gx<=Math.ceil(DETAIL_HALF_X/spacing);gx++){
+  const wx=tile.c*DETAIL_TILE_X+gx*spacing,wz=tile.r*DETAIL_TILE_Z+gz*spacing;   // world lattice: seamless between tiles
+  const x=gx*spacing+(forestRandomV330(wx,wz,seed,346)-.5)*spacing*.8,z=gz*spacing+(forestRandomV330(wx,wz,seed,347)-.5)*spacing*.8;
+  if(Math.abs(x)>DETAIL_HALF_X-3||Math.abs(z)>DETAIL_HALF_Z-3||Math.abs(z)<18||near(x,z,5.2))continue;
+  const y=ground(tile,x,z),wxm=tile.x+x/DETAIL_X,wzm=tile.z+z/DETAIL_Z,water=riverNear(game,wxm,wzm);
+  if(y<.5||water.distance<water.width*1.55+2||insideCrossing(crossing,wxm,wzm))continue;
+  if(buildings.some(b=>{const field=b.type==='field'?fieldSize(b):null,size=field?{rx:field.width/2,rz:field.depth/2}:buildingClearance(b);return size&&Math.abs(x-b.x)<size.rx+5&&Math.abs(z-b.z)<size.rz+5;}))continue;
+  const id=Math.floor(forestRandomV330(wx,wz,seed,348)*1e6),kind=saplingSpeciesV328(tile,id);if(!kind)continue;
+  (byKind.get(kind)||byKind.set(kind,[]).get(kind)).push({x,y,z,id,scale:.72+forestRandomV330(wx,wz,seed,349)*.3});note(x,z);
+ }
+ const m=new T.Matrix4(),q=new T.Quaternion(),up=new T.Vector3(0,1,0);
+ for(const [kind,rows]of byKind){const broadleaf=!['pine','spruce'].includes(kind),src=createV48Mesh(broadleaf?'oak_1000_3':'pine_1000_3');
+  const mesh=new T.InstancedMesh(src.geometry,src.material,rows.length);mesh.name='V346 forest fill '+kind;
+  rows.forEach((r,i)=>{q.setFromAxisAngle(up,r.id*.39);m.compose(new T.Vector3(r.x,r.y,r.z),q,new T.Vector3(r.scale*.9,r.scale*.9,r.scale*.9));mesh.setMatrixAt(i,m);});
+  mesh.instanceMatrix.needsUpdate=true;mesh.visible=false;
+  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality,cellSize:45});stand.name='V346 forest fill '+kind;g.add(stand);}
+}
 function addForestResourceV329(parent,r,tile){
  addTree(parent,0,0,0,r.id,.9,tile);
  const buildings=game.contextAt(tile,false)?.economy.buildings||[],base=ground(tile,r.x,r.z);
@@ -1007,7 +1037,7 @@ function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory
  if(b.type==='field'){const d=fieldSize(b),q=!b.freeRotationV243&&Math.abs(Math.sin(b.buildingRotationV228||0))>.5;model.scale.set((q?d.depth:d.width)/16,1,(q?d.width:d.depth)/16);}if(b.type==='market')model.scale.set(2,1,2);
  if(b.type==='house'&&b.houseUpgradeLevelV218)model.scale.set(1.12,1.42,1.10);
  model.userData.buildingRef=b;model.userData.buildingAge=buildingAge;model.userData.streamTeamV242=b.team;
- if(TOWER_TYPES.has(b.type)){const guard=new T.Group();createSoldier(guard,0,0,b.team?'#b98961':'#a4ab8d','archer');guard.scale.setScalar(.85);guard.position.set(0,towerRoof(b),0);guard.userData.isTowerGuard=true;model.add(guard);model.userData.towerGuard=guard;const ballista=createBallista();ballista.position.y=guard.position.y;model.add(ballista);model.userData.roofBallista=ballista;}
+ if(TOWER_TYPES.has(b.type)){const guard=new T.Group();createSoldier(guard,0,0,b.team?'#b98961':'#a4ab8d',(s.ages?.[city.team]||0)===0?'stone_guard':'archer');guard.scale.setScalar(.85);guard.position.set(0,towerRoof(b),0);guard.userData.isTowerGuard=true;model.add(guard);model.userData.towerGuard=guard;const ballista=createBallista();ballista.position.y=guard.position.y;model.add(ballista);model.userData.roofBallista=ballista;}
  model.position.set(b.x,buildingBaseV2231(activeTile,b),b.z);if(b.palisadeSpanV167&&isDrawableWallV175(b.type)){const a=b.cliffEmbedStartV179||0,e=b.cliffEmbedEndV179||0,shift=(e-a)/2;model.scale.x=(b.palisadeSpanV167+a+e)/7;model.position.x+=Math.cos(b.wallAngleV175||0)*shift;model.position.z-=Math.sin(b.wallAngleV175||0)*shift;}else if(b.extendedPalisadeV166&&['palisade','woodgate','gatehouse'].includes(b.type))model.scale.x=2;freezeStaticTransforms(model);localObjects.add(model);entry={model,age:buildingAge,stage,type:b.type,woodTier:b.woodFortTierV1757,houseTier:b.houseUpgradeLevelV218||0};localModels.set(b,entry)}if(b.type==='field'){const d=fieldSize(b),q=!b.freeRotationV243&&Math.abs(Math.sin(b.buildingRotationV228||0))>.5;entry.model.scale.x=(q?d.depth:d.width)/16;entry.model.scale.z=(q?d.width:d.depth)/16;}entry.model.scale.y=(b.type==='house'&&b.houseUpgradeLevelV218?1.42:1)*
    (b.ready?1:.15+.85*Math.min(1,(b.progress||0)/game.constructionTime(b.type)));entry.model.rotation.y=b.buildingRotationV228??(b.type==='watchtower'?towerDoorDirectionV1757(city,b).angle:(b.wallAngleV175??b.shoreAngle??((WALL_TYPES.has(b.type)||['gatehouse','woodgate'].includes(b.type))&&b.wallAxis?Math.PI/2:
  (b.team>0&&s.ages[b.team]<=2&&['house','warehouse','cellar','library','school','public_school','high_school','study','scriptorium'].includes(b.type)?
@@ -1278,7 +1308,7 @@ function renderUIImpl(){updateBuildingInfo();syncResourceLayer();const resourceC
  const select=document.createElement('select');select.id='recruit-grade';select.style.width='100%';select.style.maxWidth='100%';select.setAttribute('aria-label','Üksuse varustustase');
  for(const [id,g]of Object.entries(UNIT_GRADES)){const option=document.createElement('option');option.value=id;option.textContent=g.name+(id==='mobilized'?' · hind −50%, tervis/jõud −60%':id==='elite'?' · hind +30%, tervis/jõud +40%':' · tavahind ja tavatugevus');select.append(option);}
  select.value=recruitGrade;select.onchange=()=>{recruitGrade=select.value;renderUI();};label.append(select);$('tray').append(label);
- for(const[k,d]of Object.entries(TROOPS).filter(([k,d])=>k!=='militia'&&k!=='bronze_cavalry'&&!game.obsoleteUnit(localCity.team,k)&&(SHIPS[k]?s.research[0].known.includes('shipbuilding')&&game.cityReady(localCity,'harbor'):d.age<=age&&(!UNIT_TECH[k]||s.research[0].known.includes(UNIT_TECH[k]))))){
+ for(const[k,d]of Object.entries(TROOPS).filter(([k,d])=>k!=='militia'&&k!=='stone_guard'&&k!=='bronze_cavalry'&&!game.obsoleteUnit(localCity.team,k)&&(SHIPS[k]?s.research[0].known.includes('shipbuilding')&&game.cityReady(localCity,'harbor'):d.age<=age&&(!UNIT_TECH[k]||s.research[0].known.includes(UNIT_TECH[k]))))){
   const cost=troopCost(d,recruitGrade),g=UNIT_GRADES[recruitGrade],strength=Math.round(d.hp*g.strength),damage=+((d.dmg||d.damage||0)*g.strength).toFixed(1);
   const b=button($('tray'),d.name+' · '+g.name+'\n'+price(cost)+(!SHIPS[k]?' · 👥 '+(d.population||1):'')+'\n♥ '+strength+' · ⚔ '+damage+'\n⏱ '+timeLabel(d.time*tempoMultiplier(s)),()=>{const r=game.recruit(localCity,k,recruitGrade);say(r.error||d.name+' ('+g.name+') lisatud väljaõppejärjekorda.');renderUI();save();});b.dataset.unit=k;b.dataset.grade=recruitGrade;
  }

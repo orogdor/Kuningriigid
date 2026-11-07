@@ -31,6 +31,13 @@ export function createSoldier(parent,x,z,color,kind,grade='standard'){
  // V283: the scout is the same fur-clad Stone Age person as everyone else (spear in hand) with his dog,
  // instead of the old boxy V148 soldier figure
  if(kind==='scout'){const root=createSoldier(parent,x,z,color,'stone_hunter',grade);root.userData.scoutV283=true;addScoutCompanionsV274(root,{spear:false});return root;}
+ // V346: Stone Age tower guard = the stone axeman with a leather sling-bag of throwing stones.
+ if(kind==='stone_guard'){const root=createSoldier(parent,x,z,color,'axeman',grade);const bag=new T.Group();bag.name='stoneGuardBagV346';
+  const leather=new T.MeshStandardMaterial({color:'#6b4a2c',roughness:.95}),rock=new T.MeshStandardMaterial({color:'#8e8a80',roughness:1,flatShading:true});
+  const pouch=new T.Mesh(new T.SphereGeometry(.14,7,5),leather);pouch.scale.set(1,1.15,.75);bag.add(pouch);
+  for(const [sx,sy,sz,r] of [[-.05,.13,.02,.06],[.05,.14,-.02,.055],[0,.17,.04,.05]]){const st=new T.Mesh(new T.IcosahedronGeometry(r,0),rock);st.position.set(sx,sy,sz);bag.add(st);}
+  const strap=new T.Mesh(new T.BoxGeometry(.05,.62,.03),leather);strap.position.set(-.14,.36,0);strap.rotation.z=.55;bag.add(strap);
+  bag.scale.setScalar(.7);bag.position.set(-.22,.78,.06);root.add(bag);root.userData.stoneGuardV346=true;return root;}
  const root=createSoldierNow(parent,x,z,color,kind,grade);
  const human=STONE_HUMAN_KINDS.has(kind)&&!isStoneHumanKind(kind);
  const rigged=isRiggedStoneWarriorV261(kind);

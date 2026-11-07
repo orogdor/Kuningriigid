@@ -1,6 +1,6 @@
 import {troopRole} from './military-v88.js?v=117a';
 const originalBuildings=new Map(),originalUnits=new Map();
-export const combatUnit=u=>u.hp>0&&!['scout','militia','transport','warship'].includes(u.kind);
+export const combatUnit=u=>u.hp>0&&!['scout','militia','stone_guard','transport','warship'].includes(u.kind);
 // Compatibility exports: military readiness never gates research or era entry.
 // Actual prerequisites, research points and era material payments live in research.js.
 export function readyForNextEra(){return true;}
@@ -16,7 +16,7 @@ export function applyDevelopmentBalance(buildings,troops){
  }
  buildings.farm.workers=2;
  for(const [id,d]of Object.entries(troops)){
-  if(['scout','militia','transport','warship'].includes(id)||!d.cost)continue;
+  if(['scout','militia','stone_guard','transport','warship'].includes(id)||!d.cost)continue;
   if(!originalUnits.has(id))originalUnits.set(id,{cost:{...d.cost},time:d.time});
   const base=originalUnits.get(id),role=troopRole(id);
   d.cost=Object.fromEntries(Object.entries(base.cost).map(([k,n])=>[k,Math.max(1,Math.ceil(n*.65))]));
@@ -32,7 +32,7 @@ export function militaryChoices(game,team,city,troops,tech){
  const weights=age<1?{melee:.65,ranged:.35}:age<2?{melee:.5,ranged:.3,cavalry:.2}:age<4?{melee:.45,ranged:.3,cavalry:.2,siege:.05}:age<5?{melee:.3,ranged:.4,cavalry:.2,siege:.1}:age<6?{ranged:.65,cavalry:.2,siege:.15}:{ranged:.65,vehicle:.2,siege:.15};
  const n=actual.length+queued.length+1;
  return Object.keys(troops).filter(id=>{
-  const d=troops[id];return !['scout','militia','transport','warship','bronze_cavalry'].includes(id)&&d.age<=age&&
+  const d=troops[id];return !['scout','militia','stone_guard','transport','warship','bronze_cavalry'].includes(id)&&d.age<=age&&
    !game.obsoleteUnit(team,id)&&(!tech[id]||known.includes(tech[id]))&&d.requires.every(k=>game.cityReady(city,k));
  }).sort((a,b)=>{
   const score=id=>{const d=troops[id],role=troopRole(id);return ((weights[role]||.03)*n-(counts[role]||0))*100+d.age*8+(d.dmg||0)*.02;};
@@ -52,5 +52,5 @@ export function militaryInfrastructure(game,team,city){
 }
 export function towerGuardKind(state,team){
  const age=state.ages[team]||0,known=state.research?.[team]?.known||[],has=id=>known.includes(id);
- return age>=6&&has('modernity')?'modern_infantry':age>=5&&has('rifles')?'rifleman':age>=4&&has('firearms')?'musketeer':age>=3&&has('crossbows')?'crossbowman':age>=2&&has('iron')?'iron_archer':age>=1&&has('bronze')?'bronze_archer':'archer';
+ return age>=6&&has('modernity')?'modern_infantry':age>=5&&has('rifles')?'rifleman':age>=4&&has('firearms')?'musketeer':age>=3&&has('crossbows')?'crossbowman':age>=2&&has('iron')?'iron_archer':age>=1&&has('bronze')?'bronze_archer':age===0?'stone_guard':'archer'; // V346: Stone Age tower guard: axe up close, thrown stones further out
 }

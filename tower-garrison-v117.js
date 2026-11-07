@@ -4,7 +4,8 @@ import {WOOD_FORT_V1757} from './wood-fort-levels-v1757.js?v=1757a';
 import {wallNodes,wallPath,wallRankPoint} from './wall-walk-v111.js?v=117a';
 const d=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const tower=b=>['watchtower','stonetower'].includes(b.type);
-export const towerRoof=b=>b.bronzeWall?6.4:b.type==='stonetower'?7.55:WOOD_FORT_V1757.walkHeight;
+// V346: wooden watchtower guards stand ON the deck inside the parapet, not 0.4m above it.
+export const towerRoof=b=>b.bronzeWall?6.4:b.type==='stonetower'?7.55:WOOD_FORT_V1757.deckSurface;
 export function towerSections(city){return city.economy.buildings.flatMap((t,index)=>tower(t)&&t.ready&&t.hp>0&&!t.disabled?[{index,type:t.type,tower:true,walkable:true,x:t.x,z:t.z,height:towerRoof(t),hp:t.hp,team:city.team}]:[]);}
 export function addTowerGuards(city,state,b){
  b.siegeSections??=[];for(const w of towerSections(city))if(!b.siegeSections.some(n=>n.index===w.index))b.siegeSections.push(w);
@@ -59,7 +60,7 @@ export function tickTowerGuards(b,dt){
   if(next){const elevation=next.height||3.8,dx=next.x-u.x,dz=next.z-u.z,dy=elevation-(u.wallElevation||0),length=Math.hypot(dx,dz,dy),f=Math.min(1,2*dt/Math.max(.001,length)),to={x:u.x+dx*f,z:u.z+dz*f,elevation:(u.wallElevation||0)+dy*f};
    const peers=b.squads.filter(v=>v!==u&&v.hp>0&&v.guardPost).flatMap(v=>(v.men||[]).filter(n=>n.hp>0&&!n.escaped));
    const free=p=>peers.every(n=>Math.abs((n.elevation||0)-p.elevation)>=1||d(n,p)>=.71);
-   const onWalk=p=>wallNodes(b).some(w=>w.tower?d(w,p)<2.7:Math.abs(p.x-w.x)<(w.wallAxis?1.25:3.6)&&Math.abs(p.z-w.z)<(w.wallAxis?3.6:1.25));
+   const onWalk=p=>wallNodes(b).some(w=>w.tower?Math.max(Math.abs(p.x-w.x),Math.abs(p.z-w.z))<=1.7:Math.abs(p.x-w.x)<(w.wallAxis?1.25:3.6)&&Math.abs(p.z-w.z)<(w.wallAxis?3.6:1.25));
    let selected=to;
    if(!free(to)||u.guardDetourUntil>(b.elapsed||0)){
     const angle=Math.atan2(dz,dx),step=2*dt,angles=u.guardDetourUntil>(b.elapsed||0)?[u.guardDetourAngle,angle,angle+.8,angle-.8]:[angle+.8,angle-.8,angle+1.5,angle-1.5,angle+2.3,angle-2.3,angle+Math.PI];

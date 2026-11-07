@@ -20,7 +20,7 @@ export class BattleFeedback{
   shot.visible=!u.retreated&&f>=0&&f<1;
   if(shot.visible){const a=u.shot,x=a.x+(a.toX-a.x)*f,z=a.z+(a.toZ-a.z)*f,y0=this.height(a.x,a.z)+(gun?1.3:1.5),y1=this.height(a.toX,a.toZ)+1;
    shot.position.set(x,y0+(y1-y0)*f+(gun?0:Math.sin(Math.PI*f)*(u.projectile==='stone'?8:3)),z);
-   if(u.kind!=='slinger')shot.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),new T.Vector3(a.toX-a.x,y1-y0+(gun?0:Math.cos(Math.PI*f)*9),a.toZ-a.z).normalize());
+   if(u.kind!=='slinger'&&u.kind!=='stone_guard')shot.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),new T.Vector3(a.toX-a.x,y1-y0+(gun?0:Math.cos(Math.PI*f)*9),a.toZ-a.z).normalize());
   }
  }else if(shot)shot.visible=false;
  // Short golden muzzle flash on rifle shots, smoke-gray flash for muskets.

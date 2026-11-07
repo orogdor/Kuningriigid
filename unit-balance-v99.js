@@ -1,6 +1,6 @@
 export const UNIT_BALANCE_VERSION=99;
 export const BOW_DAMAGE_MULTIPLIER=.75;
-export const BOW_UNITS=new Set(['archer','bronze_archer','iron_archer','crossbowman','chariot']);
+export const BOW_UNITS=new Set(['archer','bronze_archer','iron_archer','crossbowman','chariot','stone_guard']);
 // Definitions are shared with the naval/medieval modules. Apply once even
 // when a legacy import URL loads another instance of civilization-core.
 export function balanceUnitDefinitions(definitions){
