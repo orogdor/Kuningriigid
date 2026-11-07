@@ -971,7 +971,7 @@ function addForestFillV346(g,tile,world){
  if(tile.mountain)return;
  // Any tile with trees: fill the gaps BETWEEN trees (a tree within 14 m, none within 5 m); open meadows stay open.
  const quality=graphicsVegetationQualityV226(graphicsV226)==="low"?"low":"high";
- const spacing=quality==='low'?9.5:7,keep=[],bins=new Map(),cs=8;
+ const forestTile=forestV329(tile),spacing=quality==='low'?(forestTile?7:9.5):(forestTile?5:7),keep=[],bins=new Map(),cs=8;
  const note=(x,z)=>{const k=Math.floor(x/cs)+':'+Math.floor(z/cs);(bins.get(k)||bins.set(k,[]).get(k)).push({x,z});};
  for(const r of world.resources)if(r.kind==='tree'&&!r.removed&&r.amount>0){note(r.x,r.z);for(const p of detailCompanionsV329(tile,r))note(p.x,p.z);}
  const near=(x,z,lim)=>{const gx=Math.floor(x/cs),gz=Math.floor(z/cs),k=Math.ceil(lim/cs);for(let j=-k;j<=k;j++)for(let i=-k;i<=k;i++)for(const q of bins.get((gx+i)+':'+(gz+j))||[])if(Math.hypot(q.x-x,q.z-z)<lim)return true;return false;};
@@ -980,7 +980,7 @@ function addForestFillV346(g,tile,world){
  for(let gz=Math.floor(-DETAIL_HALF_Z/spacing);gz<=Math.ceil(DETAIL_HALF_Z/spacing);gz++)for(let gx=Math.floor(-DETAIL_HALF_X/spacing);gx<=Math.ceil(DETAIL_HALF_X/spacing);gx++){
   const wx=tile.c*DETAIL_TILE_X+gx*spacing,wz=tile.r*DETAIL_TILE_Z+gz*spacing;   // world lattice: seamless between tiles
   const x=gx*spacing+(forestRandomV330(wx,wz,seed,346)-.5)*spacing*.8,z=gz*spacing+(forestRandomV330(wx,wz,seed,347)-.5)*spacing*.8;
-  if(Math.abs(x)>DETAIL_HALF_X-3||Math.abs(z)>DETAIL_HALF_Z-3||Math.abs(z)<(forest?7:18)||near(x,z,4.6)||(!forest&&!near(x,z,24)))continue;
+  if(Math.abs(x)>DETAIL_HALF_X-3||Math.abs(z)>DETAIL_HALF_Z-3||Math.abs(z)<(forest?7:18)||near(x,z,forest?3.6:4.6)||(!forest&&!near(x,z,24)))continue;
   const y=ground(tile,x,z),wxm=tile.x+x/DETAIL_X,wzm=tile.z+z/DETAIL_Z,water=riverNear(game,wxm,wzm);
   if(y<.5||water.distance<water.width*1.55+2||insideCrossing(crossing,wxm,wzm))continue;
   if(buildings.some(b=>{const field=b.type==='field'?fieldSize(b):null,size=field?{rx:field.width/2,rz:field.depth/2}:buildingClearance(b);return size&&Math.abs(x-b.x)<size.rx+5&&Math.abs(z-b.z)<size.rz+5;}))continue;
