@@ -59,7 +59,7 @@ export function withSaplingInstancesV328(source,kind,fallback=source,{quality='h
      rows.forEach((r,i)=>{mesh.setMatrixAt(i,r.matrix);if(r.tint)mesh.setColorAt(i,r.tint);});mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=level==='near';mesh.computeBoundingSphere();lod.add(mesh);return mesh;});levels.set(level,meshes);return meshes;
    }
    make('far');lod.update=camera=>{
-    position.copy(center).applyMatrix4(lod.matrixWorld);lod.getWorldScale(worldScale);
+    position.copy(center).applyMatrix4(lod.matrixWorld);worldScale.setFromMatrixScale(lod.matrixWorld);
     const wanted=quality==='low'?'far':saplingLevelV328(camera,position,unitHeight*tallest*worldScale.y,selected);
     let next=wanted;if(!levels.has(wanted)){if(!make(wanted)){request(kind,variant,wanted,root);next='far';}}
     for(const [level,meshes]of levels)for(const mesh of meshes)mesh.visible=level===next;selected=next;
@@ -73,8 +73,8 @@ export function withSaplingInstancesV328(source,kind,fallback=source,{quality='h
 // Hidden/chopped/streamed-out roots never submit another instance, so no ghost trees remain.
 const liveScenes=new WeakMap();
 function liveFor(scene){
- let map=liveScenes.get(scene);if(map)return map;map=new Map();liveScenes.set(scene,map);const before=scene.onBeforeRender;
- scene.onBeforeRender=function(...args){before?.apply(this,args);const camera=args[2];if(camera){camera.updateMatrixWorld();map.frustum=new T.Frustum().setFromProjectionMatrix(new T.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse),camera.coordinateSystem);}for(const b of map.values())for(const mesh of b.meshes)mesh.count=0;};return map;
+ let map=liveScenes.get(scene);if(map)return map;map=new Map();map.frustum=new T.Frustum();map.viewMatrix=new T.Matrix4();map.viewReady=false;liveScenes.set(scene,map);const before=scene.onBeforeRender;
+ scene.onBeforeRender=function(...args){before?.apply(this,args);const camera=args[2];if(camera){camera.updateMatrixWorld();map.frustum.setFromProjectionMatrix(map.viewMatrix.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse),camera.coordinateSystem);map.viewReady=true;}for(const b of map.values())for(const mesh of b.meshes)mesh.count=0;};return map;
 }
 function liveBatch(scene,key,parts){
  const map=liveFor(scene);let b=map.get(key);if(b)return b;
@@ -84,13 +84,15 @@ function liveBatch(scene,key,parts){
   b.meshes=parts.map((p,index)=>{const mesh=new T.InstancedMesh(p.geometry,p.material,cap);mesh.count=old[index]?.count||0;if(old[index])mesh.instanceMatrix.array.set(old[index].instanceMatrix.array);mesh.frustumCulled=false;mesh.name='Sapling resource '+key;mesh.userData.saplingV328=true;mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);scene.add(mesh);return mesh;});b.capacity=cap;};b.grow(1);map.set(key,b);return b;
 }
 export function withSaplingTreeV328(kind,fallback,seed=0,{height=kind==='pine'||kind==='spruce'?9:kind==='palm'?10:7}={}){
- const root=new T.LOD(),variant=saplingVariantV328(seed,seed*.13),position=new T.Vector3(),scale=new T.Vector3();root.name='Sapling resource '+kind;root.add(fallback);root.userData.saplingV328=kind;root.userData.saplingVariantV328=variant;
+ const root=new T.LOD(),variant=saplingVariantV328(seed,seed*.13),position=new T.Vector3(),scale=new T.Vector3(),sphere=new T.Sphere();root.name='Sapling resource '+kind;root.add(fallback);root.userData.saplingV328=kind;root.userData.saplingVariantV328=variant;
  request(kind,variant,'far',root);
  root.update=camera=>{
-  root.getWorldPosition(position);root.getWorldScale(scale);let level=saplingLevelV328(camera,position,height*scale.y,root.userData.saplingLOD);
+  // The renderer already updated matrixWorld before traversing LOD nodes.
+  // getWorldPosition/getWorldScale would walk and update every ancestor again.
+  position.setFromMatrixPosition(root.matrixWorld);scale.setFromMatrixScale(root.matrixWorld);let level=saplingLevelV328(camera,position,height*scale.y,root.userData.saplingLOD);
   let parts=template(kind,variant,level,height);if(!parts){request(kind,variant,level,root);level='far';parts=template(kind,variant,level,height);}
   if(!parts){fallback.visible=true;return;}let scene=root;while(scene.parent)scene=scene.parent;if(!scene.isScene)return;
-  fallback.visible=false;const map=liveFor(scene);if(!map.frustum)map.frustum=new T.Frustum().setFromProjectionMatrix(new T.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse),camera.coordinateSystem);const sphere=new T.Sphere(position.clone().add(new T.Vector3(0,height*scale.y*.5,0)),height*Math.max(scale.x,scale.y,scale.z));if(!map.frustum.intersectsSphere(sphere))return;root.userData.saplingLOD=level;const batch=liveBatch(scene,kind+':'+variant+':'+level+':'+height,parts);
+  fallback.visible=false;const map=liveFor(scene);if(!map.viewReady){map.frustum.setFromProjectionMatrix(map.viewMatrix.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse),camera.coordinateSystem);map.viewReady=true;}sphere.center.copy(position);sphere.center.y+=height*scale.y*.5;sphere.radius=height*Math.max(scale.x,scale.y,scale.z);if(!map.frustum.intersectsSphere(sphere))return;root.userData.saplingLOD=level;const batch=liveBatch(scene,kind+':'+variant+':'+level+':'+height,parts);
   const i=batch.meshes[0].count;if(i>=batch.capacity)batch.grow(i+1);
   for(const mesh of batch.meshes){mesh.setMatrixAt(i,root.matrixWorld);mesh.count=i+1;mesh.instanceMatrix.needsUpdate=true;mesh.castShadow=level==='near';}
  };
