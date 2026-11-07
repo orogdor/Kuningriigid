@@ -1,0 +1,24 @@
+// V346: Stone Age tower guard, wall walks only where a walk exists, guards inside the tower.
+import assert from 'node:assert/strict';
+import {towerGuardKind} from '../ai-development-v128.js';
+import {towerRoof} from '../tower-garrison-v117.js';
+import {WOOD_FORT_V1757} from '../wood-fort-levels-v1757.js';
+import {siegeSection} from '../medieval-v62.js';
+import {troopRole} from '../military-v88.js';
+import {carriesSword} from '../combat-equipment-v100.js';
+import {TROOPS} from '../civilization-core.js';
+const state=age=>({ages:[age],research:[{known:age?['bronze']:[]}]});
+assert.equal(towerGuardKind(state(0),0),'stone_guard');
+assert.equal(towerGuardKind(state(1),0),'bronze_archer');
+assert.equal(troopRole('stone_guard'),'ranged');
+assert.ok(carriesSword({kind:'stone_guard'}),'axe up close, stones at range');
+assert.ok(TROOPS.stone_guard&&TROOPS.stone_guard.range>8);
+assert.equal(towerRoof({type:'watchtower'},1),WOOD_FORT_V1757.deckSurface,'bronze tower: feet on the deck');
+assert.ok(towerRoof({type:'watchtower'},0)<6,'Stone Age tower: in the gallery under the thatched roof (roof starts ~6.3 m)');
+assert.ok(towerRoof({type:'watchtower'})<WOOD_FORT_V1757.towerParapetTop-1);
+const wall=type=>siegeSection({type,x:0,z:0,hp:400,ready:true},0);
+assert.equal(wall('palisade').walkable,false,'low palisade: no wall walk');
+assert.equal(wall('woodgate').walkable,false);
+assert.equal(siegeSection({type:'palisade',woodFortTierV1757:2,x:0,z:0,hp:400},0).walkable,true,'tier II gallery is walkable');
+assert.equal(wall('stonewall').walkable,true);
+console.log('V346 stone tower guard PASS');

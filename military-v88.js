@@ -27,6 +27,6 @@ export const ERA_UNITS={
  rocket_team:unit('Tankitõrjerühm',6,'modernity','rifleman','ranged',{steel:12,weapons:8,gunpowder:14,bread:12},['barracks','powdermill'],250,78,23,3,92)
 };
 export const visualKind=kind=>ERA_UNITS[kind]?.visual||kind;
-export const troopRole=kind=>ERA_UNITS[kind]?.role||(['archer','slinger','crossbowman','musketeer','rifleman','motorized'].includes(kind)?'ranged':['cavalry','knight','heavy_cavalry'].includes(kind)?'cavalry':['catapult','battering_ram','siege_tower'].includes(kind)?'siege':'melee');
+export const troopRole=kind=>ERA_UNITS[kind]?.role||(['archer','slinger','stone_guard','crossbowman','musketeer','rifleman','motorized'].includes(kind)?'ranged':['cavalry','knight','heavy_cavalry'].includes(kind)?'cavalry':['catapult','battering_ram','siege_tower'].includes(kind)?'siege':'melee');
 export const rangedTroop=kind=>['ranged','siege'].includes(troopRole(kind));
 export function installEraUnits(troops,tech){for(const[id,d]of Object.entries(ERA_UNITS)){troops[id]={...d};tech[id]=d.tech;}}

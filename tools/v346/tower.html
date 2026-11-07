@@ -1,0 +1,16 @@
+<!doctype html><meta charset="utf-8"><style>html,body{margin:0;overflow:hidden}</style>
+<script type="importmap">{"imports":{}}</script>
+<script type="module">
+import * as T from '../../vendor/three.module.js';
+import {createBuildingModel} from '../../buildings.js';
+import {createSoldier} from '../../visuals.js';
+import {towerRoof} from '../../tower-garrison-v117.js';
+const W=innerWidth,H=innerHeight,r=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});r.setSize(W,H);r.outputColorSpace=T.SRGBColorSpace;r.toneMapping=T.ACESFilmicToneMapping;document.body.append(r.domElement);
+const scene=new T.Scene();scene.background=new T.Color('#c9d6dc');scene.add(new T.HemisphereLight('#e4eef4','#5a5236',1.4));const sun=new T.DirectionalLight('#fff',2.2);sun.position.set(20,40,30);scene.add(sun);
+const g=new T.Mesh(new T.PlaneGeometry(200,200),new T.MeshStandardMaterial({color:'#6b6040'}));g.rotation.x=-Math.PI/2;scene.add(g);
+const tw=createBuildingModel('watchtower',0);scene.add(tw);
+for(const [x,z] of [[-1.5,-1],[0,0],[1.5,1],[1.4,-1.4],[-1.4,1.3]]){const s=new T.Group();createSoldier(s,0,0,'#a4ab8d','stone_guard');s.position.set(x,towerRoof({type:'watchtower'}),z);s.scale.setScalar(.85);scene.add(s);}
+const gs=new T.Group();createSoldier(gs,0,0,'#a4ab8d','stone_guard');gs.position.set(5,0,3);gs.scale.setScalar(2.2);scene.add(gs);
+const cam=new T.PerspectiveCamera(35,W/H,.1,300);cam.position.set(12,13,14);cam.lookAt(1.5,5,0);
+setTimeout(()=>{r.render(scene,cam);window.__done=1},4000);
+</script>
