@@ -5,7 +5,7 @@ import {createBuildingModel} from './buildings.js';
 import {stoneFortLOD} from './stone-forts-detailed.js';
 import {createSoldier} from './visuals.js';
 import {towerRoof} from './tower-garrison-v117.js';
-const q=new URLSearchParams(location.search),yy=q.get('y')?+q.get('y'):towerRoof({type:'watchtower'});
+const q=new URLSearchParams(location.search),yy=q.get('y')?+q.get('y'):towerRoof({type:'watchtower'},0);
 const W=innerWidth,H=innerHeight,r=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});r.setSize(W,H);r.outputColorSpace=T.SRGBColorSpace;r.toneMapping=T.ACESFilmicToneMapping;document.body.append(r.domElement);
 const scene=new T.Scene();scene.background=new T.Color('#c9d6dc');scene.add(new T.HemisphereLight('#e4eef4','#5a5236',1.4));const sun=new T.DirectionalLight('#fff',2.2);sun.position.set(20,40,30);scene.add(sun);
 const g=new T.Mesh(new T.PlaneGeometry(200,200),new T.MeshStandardMaterial({color:'#6b6040'}));g.rotation.x=-Math.PI/2;scene.add(g);
