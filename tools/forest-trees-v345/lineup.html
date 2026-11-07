@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8"><title>V345 tree lineup</title><style>html,body{margin:0;overflow:hidden}</style>
+<script type="module">
+// ?root=assets/sapling-trees&kinds=oak,lime&lod=near  : five variants per row, game material settings.
+import * as T from '../../vendor/three.module.js';
+import {loadGLB} from '../../glb-lite-v221.js';
+const q=new URLSearchParams(location.search),root='../../'+(q.get('root')||'assets/sapling-trees')+'/',kinds=(q.get('kinds')||'spruce').split(','),lod=q.get('lod')||'near';
+const W=innerWidth,H=innerHeight,r=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});r.setSize(W,H);r.setPixelRatio(1);r.toneMapping=T.ACESFilmicToneMapping;r.outputColorSpace=T.SRGBColorSpace;r.shadowMap.enabled=true;document.body.append(r.domElement);
+const scene=new T.Scene();scene.background=new T.Color('#c9d6dc');scene.add(new T.HemisphereLight('#e4eef4','#5a5236',1.3));
+const sun=new T.DirectionalLight('#fff1dc',2.4);sun.position.set(30,60,45);sun.castShadow=true;sun.shadow.bias=+(q.get('bias')||-.0004);sun.shadow.normalBias=+(q.get('nb')||.05);sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-60,right:60,top:60,bottom:-60,far:300});scene.add(sun);
+const g=new T.Mesh(new T.PlaneGeometry(400,400),new T.MeshStandardMaterial({color:'#5b5236',roughness:1}));g.rotation.x=-Math.PI/2;g.receiveShadow=true;scene.add(g);
+let maxH=0;
+for(const [row,kind] of kinds.entries()){let tex=null;
+ for(let v=0;v<5;v++){const d=await loadGLB(`${root}${kind}_0${v+1}/${lod}.glb`,{premultiplyAlpha:q.get('pm')||'none'}),grp=new T.Group();
+  for(const [i,p] of d.primitives.entries()){let map=null;if(p.image){if(lod==='far'||!tex){map=new T.Texture(p.image);map.flipY=false;map.colorSpace=T.SRGBColorSpace;map.needsUpdate=true;if(lod!=='far')tex=map;}else map=tex;}
+   const o={color:new T.Color().fromArray(p.color),map,alphaTest:map?.4:0,side:T.DoubleSide};const mesh=new T.Mesh(p.geometry,lod==='far'?new T.MeshBasicMaterial(o):new T.MeshStandardMaterial({...o,roughness:.95}));mesh.castShadow=mesh.receiveShadow=true;grp.add(mesh);}
+  const b=new T.Box3().setFromObject(grp);maxH=Math.max(maxH,b.max.y);grp.position.set((v-2)*13,0,-row*26);grp.rotation.y=v*1.1;scene.add(grp);}}
+const cam=new T.PerspectiveCamera(+(q.get('fov')||30),W/H,.5,800);const dist=(Math.max(70,maxH*3.3)+kinds.length*14)*+(q.get('far')||1),elev=+(q.get('elev')||0);cam.position.set(0,maxH*.55+kinds.length*6+elev,dist);cam.lookAt(0,maxH*.42,-(kinds.length-1)*13);
+r.render(scene,cam);r.render(scene,cam);window.__done=1;
+</script>

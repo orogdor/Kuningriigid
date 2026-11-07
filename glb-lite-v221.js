@@ -7,7 +7,7 @@ import * as T from './vendor/three.module.js';
 const COMP={5120:Int8Array,5121:Uint8Array,5122:Int16Array,5123:Uint16Array,5125:Uint32Array,5126:Float32Array};
 const SIZE={SCALAR:1,VEC2:2,VEC3:3,VEC4:4,MAT4:16};
 
-export async function loadGLB(url){
+export async function loadGLB(url,{premultiplyAlpha='default'}={}){
  const buf=await (await fetch(url)).arrayBuffer();
  const dv=new DataView(buf);if(dv.getUint32(0,true)!==0x46546c67)throw new Error('not a GLB: '+url);
  const jsonLen=dv.getUint32(12,true),json=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,20,jsonLen)));
@@ -22,7 +22,9 @@ export async function loadGLB(url){
  };
  const images=await Promise.all((json.images||[]).map(async im=>{
   const v=view(im.bufferView),blob=new Blob([new Uint8Array(bin,v.offset,v.length)],{type:im.mimeType||'image/jpeg'});
-  return await createImageBitmap(blob,{imageOrientation:'none'});
+  // V345: callers with alpha-tested foliage pass premultiplyAlpha:'none', so
+  // colour under transparent texels survives into the GPU mipmaps.
+  return await createImageBitmap(blob,{imageOrientation:'none',premultiplyAlpha});
  }));
  const texSource=t=>{const tex=json.textures?.[t];return tex?(tex.source??Object.values(tex.extensions||{})[0]?.source):undefined;};
  const primitives=[];
