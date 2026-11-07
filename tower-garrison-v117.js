@@ -5,12 +5,14 @@ import {wallNodes,wallPath,wallRankPoint} from './wall-walk-v111.js?v=117a';
 const d=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const tower=b=>['watchtower','stonetower'].includes(b.type);
 // V346: wooden watchtower guards stand ON the deck inside the parapet, not 0.4m above it.
-export const towerRoof=b=>b.bronzeWall?6.4:b.type==='stonetower'?7.55:WOOD_FORT_V1757.deckSurface;
-export function towerSections(city){return city.economy.buildings.flatMap((t,index)=>tower(t)&&t.ready&&t.hp>0&&!t.disabled?[{index,type:t.type,tower:true,walkable:true,x:t.x,z:t.z,height:towerRoof(t),hp:t.hp,team:city.team}]:[]);}
+// The Stone Age watchtower is the thatched GLB model: guards stand in its open wattle gallery under the roof.
+export const STONE_TOWER_GALLERY_V346=4.85;
+export const towerRoof=(b,age=null)=>b.bronzeWall?6.4:b.type==='stonetower'?7.55:b.type==='watchtower'&&age===0?STONE_TOWER_GALLERY_V346:WOOD_FORT_V1757.deckSurface;
+export function towerSections(city,age=null){return city.economy.buildings.flatMap((t,index)=>tower(t)&&t.ready&&t.hp>0&&!t.disabled?[{index,type:t.type,tower:true,walkable:true,x:t.x,z:t.z,height:towerRoof(t,age),hp:t.hp,team:city.team}]:[]);}
 export function addTowerGuards(city,state,b){
- b.siegeSections??=[];for(const w of towerSections(city))if(!b.siegeSections.some(n=>n.index===w.index))b.siegeSections.push(w);
  const age=state.ages[city.team]||0,kind=towerGuardKind(state,city.team);
- for(const t of towerSections(city)){
+ b.siegeSections??=[];for(const w of towerSections(city,age))if(!b.siegeSections.some(n=>n.index===w.index))b.siegeSections.push(w);
+ for(const t of towerSections(city,age)){
   const building=city.economy.buildings[t.index];
   if(building.guardOwner!==city.team){building.guardOwner=city.team;building.towerGuards=Array.from({length:5},(_,slot)=>({slot,hp:20,maxHp:20}));}
   for(const saved of building.towerGuards||[]){const source=-100000-t.index*5-saved.slot;if(b.squads.some(u=>u.source===source))continue;
