@@ -12,12 +12,13 @@ const server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+decodeU
   if(demo==='stonetown')await page.evaluate(()=>{const g=gameDebug.gameV249(),own=g.s.cities.find(c=>c.team===0);g.seen=()=>true;gameDebug.openTileV249(own.c,own.r);gameDebug.focusV250(0,0,180);});
   await page.waitForTimeout(3000);
   const before=await page.evaluate(()=>({time:gameDebug.gameV249().s.time,battle:gameDebug.gameV249().s.battle?.elapsed}));
-  if(demo==='bronze-battle')await page.evaluate(()=>{const b=document.getElementById('pause');if(b?.textContent.includes('▶'))b.click();});
+  if(demo==='bronze-battle')await page.evaluate(()=>{if(window.kingdomsUiV288.snapshot().paused)document.getElementById('pause').click();});
   await page.waitForTimeout(3000);
   if(demo==='stonetown'){
    await page.evaluate(async()=>{const st=gameDebug.detailStreamV242,start=performance.now();while(performance.now()-start<90000){if(st.status().tiles.filter(t=>t.visible).every(t=>t.ready||t.visualReady))break;for(let i=0;i<8;i++)st.tick();await new Promise(r=>setTimeout(r,30));}});
   }
   const state=await page.evaluate(()=>{const g=gameDebug.gameV249(),r=gameDebug.rendererV328,st=gameDebug.detailStreamV242;let meshes=0,skin=0,instances=0,invalid=0;gameDebug.localScene.traverseVisible(o=>{if(o.isMesh){meshes++;if(o.isSkinnedMesh)skin++;if(!o.matrixWorld.elements.every(Number.isFinite))invalid++;}if(o.isInstancedMesh)instances+=o.count;});return {time:g.s.time,battleElapsed:g.s.battle?.elapsed,men:g.s.battle?.squads.reduce((n,s)=>n+(s.men?.length||0),0),buildings:gameDebug.buildingBoundsV252().length,meshes,skin,instances,invalid,trees:gameDebug.saplingTreesV328().detail,visibleTiles:st.status().tiles.filter(t=>t.visible).length,readyTiles:st.status().tiles.filter(t=>t.visible&&(t.ready||t.visualReady)).length,calls:r.info.render.calls,triangles:r.info.render.triangles};});
+  console.log('STATE',demo,JSON.stringify({before,state}));
   assert.equal(state.invalid,0);assert.ok(state.calls>0);assert.ok(state.meshes>0);assert.deepEqual(errors,[]);
   if(demo==='stonetown'){assert.ok(state.buildings>0);assert.equal(state.visibleTiles,25);assert.equal(state.readyTiles,25);assert.ok(state.trees.liveReady>0);assert.deepEqual(state.trees.errors,[]);}
   else {assert.ok(state.men>=400);assert.ok(state.battleElapsed>before.battle,'battle advances');}
