@@ -1,0 +1,69 @@
+{
+  "approved": false,
+  "trees": [
+    {
+      "id": "spruce_01",
+      "species": "spruce",
+      "variant": 1,
+      "near": {
+        "bytes": 1654352,
+        "sha256": "9d8eb700573168f9e6faf9723cdcba544a5f74d500c1442715fa5c45038e9209",
+        "triangles": 7084
+      },
+      "height": 16.04217130572489,
+      "mid": {
+        "bytes": 1387136,
+        "sha256": "c86d16846bdddc9cce056b63509f47e7dfa69c5eee10deab9a309e86f73f71b5",
+        "triangles": 834
+      }
+    },
+    {
+      "id": "spruce_02",
+      "species": "spruce",
+      "variant": 2,
+      "near": {
+        "bytes": 1732636,
+        "sha256": "b4e57aa6c6291a0cbdbe1c25a72c18f840e76c88620982c85c85aaa0f296922f",
+        "triangles": 8482
+      },
+      "height": 19.33446259462545,
+      "mid": {
+        "bytes": 1397928,
+        "sha256": "0c748c7696820b5e96359c79a1722eee0e87485dbf2be70c009274ebfe4dd967",
+        "triangles": 976
+      }
+    },
+    {
+      "id": "spruce_03",
+      "species": "spruce",
+      "variant": 3,
+      "near": {
+        "bytes": 1648536,
+        "sha256": "d6d51f0324a3f2a827738da147c0daace6213a367c94f038bc7fc441d92c53b4",
+        "triangles": 7106
+      },
+      "height": 13.669659558198989,
+      "mid": {
+        "bytes": 1380604,
+        "sha256": "e7f0ad537ce40859a9024b1e0b212fb9ac5c7221b9f38ee42c785ef15f87f67a",
+        "triangles": 748
+      }
+    },
+    {
+      "id": "spruce_04",
+      "species": "spruce",
+      "variant": 4,
+      "near": {
+        "bytes": 1758888,
+        "sha256": "9541dd98a73c75181a885e8c40aa28f3e4f8f1428f6ff42088121c0fbf0f83ed",
+        "triangles": 8878
+      },
+      "height": 21.45007727508373,
+      "mid": {
+        "bytes": 1401728,
+        "sha256": "ffd83a09ea8a45eafa387539221e26ba9cb73c546953991b72021868c6226c6c",
+        "triangles": 1026
+      }
+    }
+  ]
+}

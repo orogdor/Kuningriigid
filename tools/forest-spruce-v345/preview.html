@@ -1,0 +1,57 @@
+<!doctype html><meta charset="utf-8"><title>V345 spruce preview</title>
+<style>html,body{margin:0;background:#111;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"./vendor/three.module.js":"../../vendor/three.module.js"}}</script>
+<script type="module">
+// Renders the generated spruces with the game's own GLB loader and the same
+// material settings as sapling-trees-v328.js. ?mode=lineup | night | day
+import * as T from '../../vendor/three.module.js';
+import {loadGLB} from '../../glb-lite-v221.js';
+const q=new URLSearchParams(location.search),mode=q.get('mode')||'lineup',lod=q.get('lod')||'near';
+const W=innerWidth,H=innerHeight;
+const renderer=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(W,H);renderer.setPixelRatio(1);
+renderer.toneMapping=T.ACESFilmicToneMapping;renderer.outputColorSpace=T.SRGBColorSpace;document.body.append(renderer.domElement);
+const scene=new T.Scene(),camera=new T.PerspectiveCamera(mode==='lineup'?32:55,W/H,.1,600);
+let tex=null;const textureOf=img=>{if(!tex){tex=new T.Texture(img);tex.flipY=false;tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=8;tex.needsUpdate=true;}return tex;};
+async function tree(i){
+ const d=await loadGLB(`../../assets/forest-spruce-v345/spruce_0${i+1}/${lod}.glb`),g=new T.Group();
+ for(const p of d.primitives){const map=p.image?textureOf(p.image):null;
+  const m=new T.MeshStandardMaterial({color:new T.Color().fromArray(p.color),map,alphaTest:.4,side:T.DoubleSide,roughness:.95,metalness:0});
+  const mesh=new T.Mesh(p.geometry,m);mesh.castShadow=mesh.receiveShadow=true;g.add(mesh);}
+ g.userData.height=d.extras.height;return g;}
+const trees=await Promise.all([0,1,2,3].map(tree));
+const rnd=(()=>{let x=345;return()=>(x=(x*1103515245+12345)>>>0)/4294967296})();
+function canvasTex(w,h,draw,rep){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(rep,rep);t.colorSpace=T.SRGBColorSpace;t.anisotropy=8;return t;}
+const floor=canvasTex(512,512,(g,w,h)=>{g.fillStyle='#2e2818';g.fillRect(0,0,w,h);
+ for(let i=0;i<9000;i++){const x=rnd()*w,y=rnd()*h,a=rnd()*6.3,l=3+rnd()*7;g.strokeStyle=`rgb(${45+rnd()*45|0},${36+rnd()*30|0},${18+rnd()*16|0})`;g.lineWidth=1;g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke();}
+ for(let i=0;i<500;i++){g.fillStyle=`rgba(${50+rnd()*30|0},${66+rnd()*30|0},${26+rnd()*16|0},.5)`;g.beginPath();g.arc(rnd()*w,rnd()*h,1+rnd()*4,0,6.3);g.fill();}},40);
+if(mode==='lineup'){
+ scene.background=new T.Color('#c9d6dc');scene.add(new T.HemisphereLight('#dfeaf2','#4a4430',1.1));
+ const sun=new T.DirectionalLight('#fff3dd',2.6);sun.position.set(30,50,40);sun.castShadow=true;sun.shadow.bias=-.0004;sun.shadow.normalBias=.04;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-30,right:30,top:30,bottom:-5});scene.add(sun);
+ const ground=new T.Mesh(new T.PlaneGeometry(200,200),new T.MeshStandardMaterial({map:floor,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ trees.forEach((t,i)=>{t.position.set((i-1.5)*11,0,0);t.rotation.y=i*1.3;scene.add(t);});
+ camera.position.set(0,9,62);camera.lookAt(0,9.5,0);
+}else{
+ // Night: a forest path lit by a warm light near the viewer, like the reference.
+ const night=mode==='night';
+ scene.background=new T.Color(night?'#05070a':'#b8c8d0');scene.fog=new T.FogExp2(night?'#06080b':'#b8c8d0',night?.045:.012);
+ scene.add(new T.HemisphereLight(night?'#2a3550':'#dfeaf2',night?'#0b0a07':'#4a4430',night?.35:1.0));
+ if(!night){const sun=new T.DirectionalLight('#fff1d8',2.4);sun.position.set(-40,60,20);sun.castShadow=true;sun.shadow.bias=-.0004;sun.shadow.normalBias=.04;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-40,right:40,top:40,bottom:-40});scene.add(sun);}
+ else{const lamp=new T.PointLight('#ffc98a',80,60,1.25);lamp.position.set(.8,3.6,7);lamp.castShadow=true;lamp.shadow.bias=-.002;lamp.shadow.normalBias=.05;lamp.shadow.mapSize.set(1024,1024);scene.add(lamp);}
+ const ground=new T.Mesh(new T.PlaneGeometry(240,240,120,120),new T.MeshStandardMaterial({map:floor,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;
+ const gp=ground.geometry.attributes.position;for(let i=0;i<gp.count;i++){const x=gp.getX(i),y=gp.getY(i);gp.setZ(i,Math.sin(x*.11)*.4+Math.cos(y*.07+x*.03)*.6);}ground.geometry.computeVertexNormals();scene.add(ground);
+ const pathX=z=>Math.sin(z*.05)*3;
+ const soil=canvasTex(256,256,(g,w,h)=>{g.fillStyle='#4c3d29';g.fillRect(0,0,w,h);for(let i=0;i<2500;i++){const v=60+rnd()*60|0;g.fillStyle=`rgba(${v},${v*.82|0},${v*.6|0},.6)`;g.beginPath();g.arc(rnd()*w,rnd()*h,.5+rnd()*2.2,0,6.3);g.fill();}},1);
+ const pg=new T.PlaneGeometry(3.4,200,8,200);pg.rotateX(-Math.PI/2);const pp=pg.attributes.position,pu=pg.attributes.uv;
+ for(let i=0;i<pp.count;i++){const z=pp.getZ(i),x=pp.getX(i);pp.setX(i,x+pathX(z));pp.setY(i,Math.sin((x+pathX(z))*.11)*.4+Math.cos(-z*.07+(x+pathX(z))*.03)*.6+.03);pu.setXY(i,pu.getX(i),pu.getY(i)*60);}
+ const path=new T.Mesh(pg,new T.MeshStandardMaterial({map:soil,roughness:1,transparent:true,alphaMap:canvasTex(64,4,(g,w,h)=>{const gr=g.createLinearGradient(0,0,w,0);gr.addColorStop(0,'#000');gr.addColorStop(.25,'#fff');gr.addColorStop(.75,'#fff');gr.addColorStop(1,'#000');g.fillStyle=gr;g.fillRect(0,0,w,h);},1)}));
+ path.material.alphaMap.repeat.set(1,1);path.receiveShadow=true;scene.add(path);
+ for(let k=0;k<260;k++){const z=-rnd()*120+8,side=rnd()<.5?-1:1,x=pathX(z)+side*(2.6+rnd()*rnd()*30);if(Math.abs(x-pathX(z))<2.4)continue;
+  const t=trees[k%4].clone();const s=.75+rnd()*.5;t.scale.setScalar(s);t.rotation.y=rnd()*6.3;t.position.set(x,Math.sin(x*.11)*.4+Math.cos(-z*.07+x*.03)*.6-.1,z);scene.add(t);}
+ // Young spruces in the undergrowth, close to the path.
+ for(let k=0;k<70;k++){const z=-rnd()*60+6,side=rnd()<.5?-1:1,x=pathX(z)+side*(2.2+rnd()*9);const t=trees[k%4].clone();t.scale.setScalar(.16+rnd()*.22);t.rotation.y=rnd()*6.3;t.position.set(x,Math.sin(x*.11)*.4+Math.cos(-z*.07+x*.03)*.6-.05,z);scene.add(t);}
+ camera.position.set(pathX(10),1.7,10);camera.lookAt(pathX(-20),3.2,-20);
+}
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFShadowMap;
+renderer.render(scene,camera);renderer.render(scene,camera);
+window.__done=true;
+</script>
