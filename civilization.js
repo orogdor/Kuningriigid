@@ -993,7 +993,7 @@ function addForestFillV346(g,tile,world){
   src.geometry.computeBoundingBox();const unit=Math.max(.1,src.geometry.boundingBox.max.y-src.geometry.boundingBox.min.y),tall=(kind==='pine'||kind==='spruce'?9:kind==='palm'?10:7)*.9; // same height as resource trees
   rows.forEach((r,i)=>{const k=tall*r.scale/unit;q.setFromAxisAngle(up,r.id*.39);m.compose(new T.Vector3(r.x,r.y,r.z),q,new T.Vector3(k,k,k));mesh.setMatrixAt(i,m);});
   mesh.instanceMatrix.needsUpdate=true;mesh.visible=false;
-  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality,cellSize:45});stand.name='V346 forest fill '+kind;g.add(stand);}
+  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality:'low',cellSize:90});stand.name='V346 forest fill '+kind;g.add(stand);}
 }
 function addForestResourceV329(parent,r,tile){
  addTree(parent,0,0,0,r.id,.9,tile);
