@@ -968,6 +968,7 @@ function insideCrossing(frame,x,z){if(!frame)return false;const dx=x-frame.x,dz=
 // between groves; decorative trees (not harvestable, no gameplay) fill every
 // gap wider than ~6 m on forest tiles. One instanced Sapling stand per species.
 function addForestFillV346(g,tile,world){
+ return; // bisect
  if(tile.mountain)return;
  // Any tile with trees: fill the gaps BETWEEN trees (a tree within 14 m, none within 5 m); open meadows stay open.
  const quality=graphicsVegetationQualityV226(graphicsV226)==="low"?"low":"high";
