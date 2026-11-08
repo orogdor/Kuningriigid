@@ -971,8 +971,7 @@ function addForestFillV346(g,tile,world){
  if(tile.mountain)return;
  // Any tile with trees: fill the gaps BETWEEN trees (a tree within 14 m, none within 5 m); open meadows stay open.
  const quality=graphicsVegetationQualityV226(graphicsV226)==="low"?"low":"high";
- const forestTile=forestV329(tile);if(!forestTile)return; // V346b: only forest tiles (frame cost)
- const spacing=quality==='low'?8.5:7,keep=[],bins=new Map(),cs=8;
+ const forestTile=forestV329(tile),spacing=quality==='low'?(forestTile?7:9.5):(forestTile?5:7),keep=[],bins=new Map(),cs=8;
  const note=(x,z)=>{const k=Math.floor(x/cs)+':'+Math.floor(z/cs);(bins.get(k)||bins.set(k,[]).get(k)).push({x,z});};
  for(const r of world.resources)if(r.kind==='tree'&&!r.removed&&r.amount>0){note(r.x,r.z);for(const p of detailCompanionsV329(tile,r))note(p.x,p.z);}
  const near=(x,z,lim)=>{const gx=Math.floor(x/cs),gz=Math.floor(z/cs),k=Math.ceil(lim/cs);for(let j=-k;j<=k;j++)for(let i=-k;i<=k;i++)for(const q of bins.get((gx+i)+':'+(gz+j))||[])if(Math.hypot(q.x-x,q.z-z)<lim)return true;return false;};
@@ -994,7 +993,7 @@ function addForestFillV346(g,tile,world){
   src.geometry.computeBoundingBox();const unit=Math.max(.1,src.geometry.boundingBox.max.y-src.geometry.boundingBox.min.y),tall=(kind==='pine'||kind==='spruce'?9:kind==='palm'?10:7)*.9; // same height as resource trees
   rows.forEach((r,i)=>{const k=tall*r.scale/unit;q.setFromAxisAngle(up,r.id*.39);m.compose(new T.Vector3(r.x,r.y,r.z),q,new T.Vector3(k,k,k));mesh.setMatrixAt(i,m);});
   mesh.instanceMatrix.needsUpdate=true;mesh.visible=false;
-  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality:'low',cellSize:90});stand.name='V346 forest fill '+kind;g.add(stand);} // V346b: fillers stay at the 6-triangle far level; resource trees still switch to near/mid
+  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality,cellSize:45});stand.name='V346 forest fill '+kind;g.add(stand);}
 }
 function addForestResourceV329(parent,r,tile){
  addTree(parent,0,0,0,r.id,.9,tile);
