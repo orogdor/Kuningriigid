@@ -10,7 +10,7 @@ import {withSaplingInstancesV328,saplingStatsV328,saplingSpeciesV328} from './sa
 import {createV48Mesh} from './model-runtime-v48.js';
 import {createAtlasTerrainV327} from './atlas-terrain-v327.js';
 import {packSave,unpackSave} from './save-compression-v256.js';
-import {DetailStreamV242} from './detail-stream-v242.js?v=342';
+import {DetailStreamV242} from './detail-stream-v242.js?v=346b';
 import {sliceDueV342} from './frame-slice-v342.js';
 import {createAssetDemandV241} from './asset-demand-v241.js';
 import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
