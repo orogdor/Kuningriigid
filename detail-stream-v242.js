@@ -5,7 +5,7 @@ import {beginSliceV342} from './frame-slice-v342.js';
 // V341: stages that put something on screen for a non-central tile. Horizon,
 // rivers, outcrops, roads and borders live in `decor`, which only the active
 // centre tile shows; navigation is needed only when a tile becomes the centre.
-const VISIBLE_STAGES=new Set(['terrain','local world','resources','ground cover','sea','buildings']);
+const VISIBLE_STAGES=new Set(['terrain','local world','resources','forest fill','ground cover','sea','buildings']); // V346b: forest fill is part of the visible tile
 export class DetailStreamV242{
  constructor({scene,cell,build,dispose,clock=()=>performance.now(),budget=3}){
   Object.assign(this,{cell,build,dispose,clock,budget});
