@@ -4,7 +4,7 @@ import * as T from './vendor/three.module.js';
 import {loadGLB} from './glb-lite-v221.js';
 export const SAPLING_SPECIES_V328=new Set(['pine','spruce','oak','lime','birch','palm']);
 const ROOT=new URL('./assets/sapling-trees/',import.meta.url),loads=new Map(),ready=new Map(),scaled=new Map(),textures=new Map();
-let manifestPromise,active=0;const queue=[];
+let manifestPromise,active=0,assetRevision=0;const queue=[];
 const manifest=()=>manifestPromise??=fetch(new URL('manifest.json',ROOT)).then(r=>{if(!r.ok)throw Error('Sapling manifest '+r.status);return r.json()});
 function task(fn){return new Promise((resolve,reject)=>{queue.push(()=>fn().then(resolve,reject));pump()});}
 function pump(){while(active<4&&queue.length){active++;queue.shift()().finally(()=>{active--;pump()});}}
@@ -25,7 +25,7 @@ export function loadSaplingV328(kind,variant,level){
    const material=level==='far'?new T.MeshBasicMaterial(params):new T.MeshStandardMaterial({...params,roughness:.95});material.userData.shared=true;
    p.geometry.userData.shared=true;p.geometry.computeBoundingSphere();return {geometry:p.geometry,material};
   });
-  const result={parts,referenceHeight:ref.boundsZUp[1][2],height:rec.boundsZUp[1][2],key};ready.set(key,result);return result;
+  const result={parts,referenceHeight:ref.boundsZUp[1][2],height:rec.boundsZUp[1][2],key};ready.set(key,result);assetRevision++;return result;
  });loads.set(key,promise);return promise;
 }
 function template(kind,variant,level,height){
@@ -39,9 +39,83 @@ export function saplingLevelV328(camera,position,height,previous='far'){
  const pixels=camera.isOrthographicCamera?height*vh*camera.zoom/(camera.top-camera.bottom):height*vh/(2*Math.tan((camera.fov||50)*Math.PI/360)*Math.max(1,camera.position.distanceTo(position)));
  return pixels>(previous==='near'?37:45)?'near':pixels>(previous==='mid'?10:12)?'mid':'far';
 }
+function buildDetailStand(root,kind,height,bins,quality,cellSize,onMeshAdded){
+ const sectors=new Map(),cells=[];
+ for(const rows of bins.values()){
+  const variant=rows[0].variant,center=new T.Vector3(),scale=new T.Vector3();
+  let tallest=1;
+  for(const row of rows){
+   const m=row.matrix.elements;
+   center.x+=m[12];center.y+=m[13];center.z+=m[14];
+   tallest=Math.max(tallest,scale.setFromMatrixScale(row.matrix).y);
+  }
+  center.divideScalar(rows.length);center.y+=height*tallest*.5;
+  const key=Math.floor(center.x/(cellSize*3))+':'+Math.floor(center.z/(cellSize*3))+':'+variant;
+  let sector=sectors.get(key);
+  if(!sector){sector={variant,capacity:0,levels:new Map()};sectors.set(key,sector);}
+  sector.capacity+=rows.length;
+  cells.push({rows,center,tallest,sector,level:null});
+ }
+ const position=new T.Vector3(),scale=new T.Vector3(),lastPosition=new T.Vector3(),lastWorld=new T.Matrix4();
+ const lastProjection=new T.Matrix4(),requested=new Set();
+ let lastHeight=0,lastRevision=-1;
+ root.update=camera=>{
+  const viewportHeight=typeof innerHeight==='number'?innerHeight:800;
+  if(lastRevision===assetRevision&&lastHeight===viewportHeight&&lastPosition.equals(camera.position)
+   &&lastProjection.equals(camera.projectionMatrix)&&lastWorld.equals(root.matrixWorld))return;
+  lastRevision=assetRevision;lastHeight=viewportHeight;lastPosition.copy(camera.position);
+  lastProjection.copy(camera.projectionMatrix);lastWorld.copy(root.matrixWorld);
+  scale.setFromMatrixScale(root.matrixWorld);
+  let changed=false;
+  for(const cell of cells){
+   const {variant}=cell.sector;
+   position.copy(cell.center).applyMatrix4(root.matrixWorld);
+   let level=quality==='low'?'far':saplingLevelV328(camera,position,height*cell.tallest*scale.y,cell.level??'far');
+   const key=kind+':'+variant+':'+level;
+   if(!ready.has(key)){
+    if(!requested.has(key)){requested.add(key);request(kind,variant,level,root);}
+    level='far';
+   }
+   if(cell.level!==level){cell.level=level;changed=true;}
+  }
+  if(!changed)return;
+  for(const sector of sectors.values())for(const meshes of sector.levels.values())for(const mesh of meshes)mesh.count=0;
+  for(const {sector,level,rows} of cells){
+   let meshes=sector.levels.get(level);
+   if(!meshes){
+    const parts=template(kind,sector.variant,level,height);
+    if(!parts)continue;
+    meshes=parts.map(({geometry,material})=>{
+     const mesh=new T.InstancedMesh(geometry,material,sector.capacity);
+     mesh.name='Sapling '+kind+' '+sector.variant+' '+level;
+     mesh.userData.saplingV328=kind;mesh.userData.saplingLOD=level;mesh.castShadow=level==='near';
+     mesh.count=0;mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);root.add(mesh);
+     mesh.updateWorldMatrix(false,false);onMeshAdded();
+     return mesh;
+    });
+    sector.levels.set(level,meshes);
+   }
+   for(const mesh of meshes){
+    for(const row of rows){
+     const i=mesh.count++;
+     mesh.setMatrixAt(i,row.matrix);
+     if(row.tint)mesh.setColorAt(i,row.tint);
+    }
+   }
+  }
+  for(const sector of sectors.values())for(const meshes of sector.levels.values())for(const mesh of meshes){
+   mesh.visible=mesh.count>0;
+   if(!mesh.visible)continue;
+   mesh.instanceMatrix.clearUpdateRanges();
+   mesh.instanceMatrix.addUpdateRange(0,mesh.count*16);mesh.instanceMatrix.needsUpdate=true;
+   if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;
+   mesh.computeBoundingSphere();
+  }
+ };
+}
 // Static world stands: three GPU levels per spatial cell; exact instance matrices are copied.
-export function withSaplingInstancesV328(source,kind,fallback=source,{quality='high',cellSize=600,staticTransforms=false}={}){
- const root=new T.Group();root.name='Sapling '+source.name;root.userData.saplingV328=kind;root.add(fallback);
+export function withSaplingInstancesV328(source,kind,fallback=source,{quality='high',cellSize=600,staticTransforms=false,batchCells=false}={}){
+ const root=batchCells?new T.LOD():new T.Group();root.name='Sapling '+source.name;root.userData.saplingV328=kind;root.add(fallback);
  let transformsDirty=true;
  if(staticTransforms){
   const update=root.updateMatrixWorld,local=new T.Matrix4(),parentWorld=new T.Matrix4();
@@ -68,7 +142,8 @@ export function withSaplingInstancesV328(source,kind,fallback=source,{quality='h
  }
  root.sourceSaplingV328=source;root.userData.instanceCount=source.count;root.userData.saplingReadyV328=false;
  root.userData.saplingPromiseV328=Promise.all(Array.from({length:5},(_,i)=>loadSaplingV328(kind,i,'far'))).then(()=>{
-  for(const rows of bins.values()){
+  if(batchCells)buildDetailStand(root,kind,unitHeight,bins,quality,cellSize,()=>{transformsDirty=true;});
+  else for(const rows of bins.values()){
    const variant=rows[0].variant,lod=new T.LOD(),levels=new Map(),center=new T.Vector3(),position=new T.Vector3(),worldScale=new T.Vector3();let tallest=1,selected='far';
    for(const r of rows){center.add(new T.Vector3().setFromMatrixPosition(r.matrix));tallest=Math.max(tallest,new T.Vector3().setFromMatrixScale(r.matrix).y);}
    center.divideScalar(rows.length);center.y+=unitHeight*tallest*.5;

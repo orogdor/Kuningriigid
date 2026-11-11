@@ -27,6 +27,24 @@ await Promise.all(Array.from({length:5},(_,i)=>loadSaplingV328('pine',i,'mid')))
 assert.ok(shown().every(mesh=>mesh.matrixWorld.equals(mesh.parent.matrixWorld)),'newly loaded LOD uses the rebased position on its first frame');
 await Promise.all(Array.from({length:5},(_,i)=>loadSaplingV328('pine',i,'near')));camera.zoom=150;camera.updateProjectionMatrix();for(const cell of cells)cell.update(camera);assert.ok(shown().every(m=>m.userData.saplingLOD==='near'));assert.equal(shown().reduce((n,m)=>n+m.count,0),240);assert.deepEqual(source.instanceMatrix.array,original);
 for(const mesh of shown()){mesh.geometry.computeBoundingBox();assert.ok(mesh.geometry.boundingBox.min.y>=-1e-6);}
+const batchSource=source.clone(),batched=withSaplingInstancesV328(batchSource,'pine',batchSource,{staticTransforms:true,batchCells:true});
+await batched.userData.saplingPromiseV328;
+tileRoot.add(batched);
+tileRoot.updateMatrixWorld(true);
+function instances(meshes){
+ return meshes.flatMap(mesh=>Array.from({length:mesh.count},(_,i)=>{
+  mesh.getMatrixAt(i,m);m.premultiply(mesh.matrixWorld);mesh.getColorAt(i,c);
+  return [mesh.geometry.id,mesh.material.id,mesh.castShadow,...m.elements,c.r,c.g,c.b].join(',');
+ })).sort();
+}
+for(const zoom of [1,3,150,1]){
+ camera.zoom=zoom;camera.updateProjectionMatrix();
+ for(const cell of cells)cell.update(camera);
+ batched.update(camera);
+ const visible=batched.children.filter(mesh=>mesh.isInstancedMesh&&mesh.visible);
+ assert.deepEqual(instances(visible),instances(shown()),'batching preserves geometry, tint, LOD and rebased transforms');
+ assert.ok(visible.length<=shown().length,'forest parts use fewer or equal draw calls');
+}
 const scene=new T.Scene();let originalBefore=0;scene.onBeforeRender=()=>originalBefore++;const trees=[];
 for(let i=0;i<100;i++){const tree=withSaplingTreeV328('pine',new T.Group(),123);tree.position.set(i*.01,0,0);scene.add(tree);trees.push(tree);}
 await loadSaplingV328('pine',saplingVariantV328(123,123*.13),'near');camera.zoom=1;camera.left=-5;camera.right=5;camera.top=5;camera.bottom=-5;camera.updateProjectionMatrix();camera.position.set(0,3,20);camera.lookAt(0,3,0);camera.updateMatrixWorld();

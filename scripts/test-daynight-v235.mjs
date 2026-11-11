@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import * as T from '../vendor/three.module.js';
 import {DAY_LENGTH_V235,START_HOUR_V235,dayClockV235,torchLocationsV235,createCityTorchesV235,updateCityTorchesV235,createFireV252} from '../daynight-v235.js';
 import {GRAPHICS_DEFAULTS_V226,LIGHTING_LOOKS_V235} from '../graphics-settings-v226.js';
+import {batchStaticMeshParts} from '../static-mesh-batches-v346e.js';
 assert.equal(DAY_LENGTH_V235,1440,'one game day must be 24 real minutes');
 assert.equal(START_HOUR_V235,8);
 assert.equal(dayClockV235(0).clock,'08:00');
@@ -37,4 +38,25 @@ assert.ok(models.filter(m=>m.light).every(m=>m.light.intensity>0));
 updateCityTorchesV235(root,dayClockV235(240),240);
 assert.ok(models.every(m=>!m.flame.visible),'daytime flames hidden');
 assert.ok(models.filter(m=>m.light).every(m=>m.light.intensity===0));
+if(!T.GPU_MODE_V225){
+ assert.ok(root.userData.bodyBatchesV346e.count>0,'WebGL torch bodies are batched');
+ const parent=new T.Group(),geometry=new T.BoxGeometry(),material=new T.MeshStandardMaterial();
+ const walls=[2,4].map(x=>{
+  const model=new T.Group(),mesh=new T.Mesh(geometry,material);
+  model.position.x=x;mesh.position.y=1;mesh.castShadow=true;
+  model.add(mesh);parent.add(model);return model;
+ });
+ const merged=batchStaticMeshParts(parent,walls);
+ assert.equal(merged.count,1);
+ const batch=parent.children.find(child=>child.isInstancedMesh);
+ assert.equal(batch.count,2);
+ assert.equal(batch.castShadow,true);
+ const matrix=new T.Matrix4();batch.getMatrixAt(1,matrix);
+ assert.deepEqual(new T.Vector3().setFromMatrixPosition(matrix).toArray(),[4,1,0]);
+ const ray=new T.Raycaster(new T.Vector3(4,1,5),new T.Vector3(0,0,-1));
+ assert.equal(ray.intersectObject(parent,true)[0].object,walls[1].children[0],'picking still returns the original wall');
+ merged.dispose();
+ assert.equal(parent.children.length,2);
+ assert.ok(walls.every(wall=>wall.children[0].visible));
+}
 console.log('V235 24h cycle / lighting presets / city torches PASS');
