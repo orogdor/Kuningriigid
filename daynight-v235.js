@@ -1,6 +1,7 @@
 // V235 — 24-hour visual clock: 60 real seconds = 1 in-game hour.
 // The same saved game s.time drives time-of-day. It never affects economy ticks.
 import * as T from './vendor/three.module.js';
+import {batchStaticMeshParts} from './static-mesh-batches-v346e.js';
 
 export const DAY_LENGTH_V235=24*60; // simulation seconds per 24-hour day
 export const START_HOUR_V235=8;
@@ -308,6 +309,7 @@ export function createCityTorchesV235(buildings,heightAt,{age=0,boundsOf=null}={
   group.add(model.root);models.push(model);
  });
  group.userData.torchModelsV235=models;group.userData.fixtureV251=kind;
+ if(!T.GPU_MODE_V225)group.userData.bodyBatchesV346e=batchStaticMeshParts(group,models.map(model=>model.root),{directOnly:true,name:'Town light bodies'});
  return group;
 }
 export function updateCityTorchesV235(group,clock,elapsed=0){

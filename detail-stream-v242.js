@@ -205,7 +205,7 @@ export class DetailStreamV242{
   if(!visibleStage)return null;
   return desired?4:5; // spare budget outside the view, then the rest
  }
- tick(budget=this.budget){
+ tick(budget=this.budget,backgroundBudget=budget){
   if(!this.enabled||!this.center)return;
   const start=this.clock();
   const target=this.targetKey&&this.entries.get(this.targetKey)?.tile;
@@ -218,7 +218,8 @@ export class DetailStreamV242{
   // nearest visible tile is completed before the next; centre-only layers
   // (the expensive horizon) never delay terrain and trees that are in view.
   let list=rank();this.stats.paused=pending.length-list.length;
-  while(list.length&&this.clock()-start<budget){
+  // When crossing, the destination and its visible ring can use the full frame budget.
+  while(list.length&&this.clock()-start<(list[0].tier<=1?budget:backgroundBudget)){
    const item=list[0];
    this.step(item.entry,true);
    if(item.entry.ready||this.tier(item.entry,target)!==item.tier)list=rank();

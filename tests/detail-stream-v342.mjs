@@ -58,7 +58,34 @@ const ring=(e,c)=>Math.max(Math.abs(e.tile.c-c.c),Math.abs(e.tile.r-c.r));
  assert.ok(small<calls,'small budget does less work ('+small+' vs '+calls+')');
 }
 
-{ // 4. Time slices split long loops without changing results.
+{ // 4. Slow frames limit background loading without slowing the destination ring.
+ const {stream,cells}=makeStream();
+ const center=cells.get('20:20');stream.finish(center);stream.activate(center);look(stream,0,0);
+ const steps=[];
+ let elapsed=0;
+ stream.clock=()=>elapsed;
+ const step=stream.step.bind(stream);
+ stream.step=(entry,...args)=>{
+  steps.push(stream.tier(entry,stream.entries.get(stream.targetKey)?.tile));
+  step(entry,...args);
+  elapsed++;
+ };
+ stream.tick(11,4);
+ assert.equal(steps.length,4,'background work stops at the reduced time budget');
+ assert.ok(steps.every(tier=>tier>=2));
+ stream.prefetch(0,-DETAIL_TILE_Z*.4);
+ steps.length=0;
+ stream.tick(11,4);
+ assert.equal(steps.length,11,'crossing work can use the full time budget');
+ assert.ok(steps.every(tier=>tier===0),'the destination loads first');
+ stream.finish(stream.entries.get(stream.targetKey).tile);
+ steps.length=0;
+ stream.tick(11,4);
+ assert.equal(steps.length,11,'the visible destination ring can also use the full budget');
+ assert.ok(steps.every(tier=>tier===1));
+}
+
+{ // 5. Time slices split long loops without changing results.
  beginSliceV342();assert.equal(sliceDueV342(),false);
  const t=performance.now();while(performance.now()-t<SLICE_MS_V342+1);assert.equal(sliceDueV342(),true);
  // Slow sea sampling: steps stay short, the mesh is identical to the one-shot build.
