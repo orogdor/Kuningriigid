@@ -37,7 +37,10 @@ export class DetailStreamV242{
   const next=entry.jobs.next();entry.ready=!!next.done;
   // V342: everything a non-central tile shows exists once its builder moves
   // past the visible stages (or finishes).
-  if(entry.ready||(entry.stage&&!VISIBLE_STAGES.has(entry.stage)))entry.visualReady=true;
+  if(!entry.visualReady&&(entry.ready||(entry.stage&&!VISIBLE_STAGES.has(entry.stage)))){
+   entry.visualReady=true;
+   this.updateVisibility(entry);
+  }
   const ms=this.clock()-start;
   this.stats.maxJobMs=Math.max(this.stats.maxJobMs,ms);
   if(background&&ms>(this.stats.maxBackgroundJobMs||0)){this.stats.maxBackgroundJobMs=ms;this.stats.slowestStage=entry.stage;}
@@ -54,6 +57,25 @@ export class DetailStreamV242{
   if(this.enabled&&this.center){this.choose();if(this.dirty)this.position();}
  }
  offset(entry){return {dc:entry.tile.c-this.center.c,dr:entry.tile.r-this.center.r};}
+ neighbours(tile){
+  const cells=[];
+  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+   const cell=this.cell(tile.c+dc,tile.r+dr);
+   if(cell)cells.push(cell);
+  }
+  return cells;
+ }
+ canCross(tile){
+  if(!tile||!this.entries.get(this.key(tile))?.ready)return false;
+  return this.neighbours(tile).every(cell=>this.entries.get(this.key(cell))?.visualReady);
+ }
+ updateVisibility(entry){
+  if(!this.center)return;
+  const target=this.entries.get(this.targetKey)?.tile;
+  const {dc,dr}=this.offset(entry);
+  const ahead=target&&Math.abs(target.c-entry.tile.c)<=1&&Math.abs(target.r-entry.tile.r)<=1&&this.inView(dc,dr);
+  entry.root.visible=this.enabled&&entry.visualReady&&(this.desired.has(entry.key)||!!ahead);
+ }
  inView(dc,dr){
   if(!this.view)return true;
   const x=dc*DETAIL_TILE_X,z=dr*DETAIL_TILE_Z;
@@ -111,16 +133,27 @@ export class DetailStreamV242{
   for(const entry of [...this.entries.values()]){
    const {dc,dr}=this.offset(entry),ring=Math.max(Math.abs(dc),Math.abs(dr));
    entry.root.position.set(dc*DETAIL_TILE_X,0,dr*DETAIL_TILE_Z);
-   entry.root.visible=this.enabled&&this.desired.has(entry.key);
+   this.updateVisibility(entry);
    entry.decor.visible=dc===0&&dr===0;
    if(ring>this.reach+1||(ring>this.radius+1&&!this.desired.has(entry.key)&&entry.key!==this.targetKey))this.remove(entry);
   }
   this.dirty=false;
  }
- prefetch(x,z){
+ prefetch(x,z,dx=0,dz=0){
   if(!this.enabled||!this.center)return;
-  const dc=Math.abs(x)>DETAIL_TILE_X*.18?Math.sign(x):0,dr=Math.abs(z)>DETAIL_TILE_Z*.18?Math.sign(z):0;
-  if(!dc&&!dr){this.targetKey=null;return;}
+  let dc=0,dr=0;
+  if(dx||dz){
+   // Prioritise the edge the input reaches first, even when moving along
+   // another edge. A diagonal lookahead can miss part of that tile's ring.
+   const toX=dx?(DETAIL_HALF_X-Math.sign(dx)*x)/Math.abs(dx):Infinity;
+   const toZ=dz?(DETAIL_HALF_Z-Math.sign(dz)*z)/Math.abs(dz):Infinity;
+   if(toX<=toZ)dc=Math.sign(dx);
+   else dr=Math.sign(dz);
+  }else{
+   dc=Math.abs(x)>DETAIL_TILE_X*.18?Math.sign(x):0;
+   dr=Math.abs(z)>DETAIL_TILE_Z*.18?Math.sign(z):0;
+  }
+  if(!dc&&!dr)return;
   const target=this.cell(this.center.c+dc,this.center.r+dr);if(!target)return;
   const key=this.key(target);
   this.ensure(target);
@@ -128,8 +161,30 @@ export class DetailStreamV242{
   this.targetKey=key;
   // Only the next centre's own neighbourhood is required for the crossing;
   // its wider ring is chosen from the camera view once it becomes active.
-  for(let r=-1;r<=1;r++)for(let c=-1;c<=1;c++)this.ensure(this.cell(target.c+c,target.r+r));
+  for(const cell of this.neighbours(target))this.ensure(cell);
   this.position();
+ }
+ limitMovement(x,z,dx,dz,canEnter){
+  this.prefetch(x,z,dx,dz);
+  const c=this.center.c,r=this.center.r;
+  const ready=(dc,dr)=>{
+   const tile=this.cell(c+dc,r+dr);
+   return tile&&canEnter(tile)&&this.canCross(tile);
+  };
+  const limit=(value,delta,half,available)=>{
+   if(!delta)return value;
+   const direction=Math.sign(delta),edge=half-.25,approach=direction*value;
+   if(available)return direction*Math.min(half*1.12,approach+Math.abs(delta));
+   const scale=Math.max(.14,Math.min(1,(edge-approach)/(half*.45)));
+   return direction*Math.min(edge,approach+Math.abs(delta)*scale);
+  };
+  let nx=limit(x,dx,DETAIL_HALF_X,dx&&ready(Math.sign(dx),0));
+  let nz=limit(z,dz,DETAIL_HALF_Z,dz&&ready(0,Math.sign(dz)));
+  if(Math.abs(nx)>DETAIL_HALF_X&&Math.abs(nz)>DETAIL_HALF_Z&&!ready(Math.sign(nx),Math.sign(nz))){
+   if(Math.abs(dx)/DETAIL_HALF_X>=Math.abs(dz)/DETAIL_HALF_Z)nz=Math.sign(nz)*(DETAIL_HALF_Z-.25);
+   else nx=Math.sign(nx)*(DETAIL_HALF_X-.25);
+  }
+  return {x:nx,z:nz};
  }
  // Lower tier is loaded first.
  tier(entry,target){
@@ -138,9 +193,11 @@ export class DetailStreamV242{
   const visibleStage=!entry.stage||VISIBLE_STAGES.has(entry.stage);
   const desired=this.desired.has(entry.key);
   const ring=Math.max(Math.abs(dc),Math.abs(dr));
-  if(visibleStage&&desired&&this.inView(dc,dr))return 1; // on screen now
+  const ahead=target&&Math.max(Math.abs(entry.tile.c-target.c),Math.abs(entry.tile.r-target.r))<=1;
+  if(visibleStage&&ahead)return 1; // complete the destination's visible ring before crossing
+  if(visibleStage&&desired&&this.inView(dc,dr))return 2;
   if(visibleStage&&desired&&ring<=1)return 2;            // neighbour behind the camera
-  const near=ring<=1||(target&&Math.max(Math.abs(entry.tile.c-target.c),Math.abs(entry.tile.r-target.r))<=1);
+  const near=ring<=1||ahead;
   if(near)return 3; // possible next centre: its centre-only layers
   // V342: centre-only layers (horizon, rivers, navigation, roads, borders) of
   // tiles that cannot become the centre next are not built at all for now.

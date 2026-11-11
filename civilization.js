@@ -10,7 +10,7 @@ import {withSaplingInstancesV328,saplingStatsV328,saplingSpeciesV328} from './sa
 import {createV48Mesh} from './model-runtime-v48.js';
 import {createAtlasTerrainV327} from './atlas-terrain-v327.js';
 import {packSave,unpackSave} from './save-compression-v256.js';
-import {DetailStreamV242} from './detail-stream-v242.js?v=346b';
+import {DetailStreamV242} from './detail-stream-v242.js?v=346c';
 import {sliceDueV342} from './frame-slice-v342.js';
 import {createAssetDemandV241} from './asset-demand-v241.js';
 import {stoneBuildingModel} from './stone-age-models-v221.js?v=224';
@@ -162,7 +162,7 @@ const wildlifeV255=createWildlifeV255();let siteSuggestV280=null,waterCarriersV2
 const peopleLifeV252=createPeopleLifeV252();
 // V252: idle townsfolk chat or go home, keep personal space and carry torches at night (Stone Age)
 function peopleLifeCtxV252(city,age){if(!city)return {time:s.time,enabled:false,night:false,open:()=>true,homes:[]};const nav=game.nav(city);return {time:s.time,enabled:age===0,night:dayClockV235(s.time).torch>.3,open:(x,z)=>nav.open(x,z),homes:(city.economy?.buildings||[]).filter(b=>b.type==='house'&&b.ready&&b.hp>0).map(b=>door(b))};}
-import {detailSeaStepsV242,createDetailSea} from './sea-v158.js?v=321';
+import {detailSeaStepsV242,createDetailSea,seaMaterial} from './sea-v158.js?v=321';
 import {localNaturalSeaGroundV322} from './estuary-v322.js?v=325a';
 import {buildingClearance} from './navigation.js?v=2273';
 import {door} from './navigation.js?v=2273';
@@ -291,6 +291,12 @@ const graphicsRuntime=graphicsRuntimeV226({settings:graphicsV226,renderer,atmosp
 let walkerTile=null,walkRects={key:'',rects:[]};
 function walkBlocked(x,z){
  if(!activeTile)return true;if(Math.abs(x)>DETAIL_TILE_X*1.5-2||Math.abs(z)>DETAIL_TILE_Z*1.5-2)return true;
+ if(!s.battle&&detailStreamV242.enabled){
+  const position=walker.position;
+  detailStreamV242.prefetch(position.x,position.z,x-position.x,z-position.z);
+  const dc=Math.abs(x)>DETAIL_HALF_X?Math.sign(x):0,dr=Math.abs(z)>DETAIL_HALF_Z?Math.sign(z):0;
+  if(dc||dr){const next=game.cell({c:activeTile.c+dc,r:activeTile.r+dr});if(!next||!game.seen(0,next)||!detailStreamV242.canCross(next))return true;}
+ }
  if(ground(activeTile,x,z)<-.25)return true;
  const key=activeTile.c+':'+activeTile.r+':'+Math.floor(performance.now()/2000);
  if(walkRects.key!==key){const rects=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){let ctx=null;try{ctx=game.contextAt({c:activeTile.c+dc,r:activeTile.r+dr},false)}catch{}
@@ -434,6 +440,7 @@ function* distantTerrainStepsV242(cell,streaming=false){
  const geo=new T.PlaneGeometry(W,D,nx,nz);geo.rotateX(-Math.PI/2);
  const rev=(s.terrainRevision||0)+':'+(s.crossingRevision||0);if(distantCache.key!==rev){distantCache.key=rev;distantCache.map.clear();}
  const p=geo.attributes.position,colors=new Float32Array(p.count*3),aL=new Float32Array(p.count*2),rock=new T.Color('#7d8174'),snow=new T.Color('#dfe2e4');
+ const waterDepth=streaming?new Float32Array(p.count):null;
  for(let i=0;i<p.count;i++){if(i&&(i%192===0||((i&15)===0&&sliceDueV342())))yield;
   const x=p.getX(i),z=p.getZ(i),gx=Math.round((cell.x*DETAIL_X+x)/sx),gz=Math.round((cell.z*DETAIL_Z+z)/sz),key=gx*100000+gz;
   let v=distantCache.map.get(key);
@@ -442,7 +449,9 @@ function* distantTerrainStepsV242(cell,streaming=false){
    v=[h,c.r,c.g,c.b,e,mountainMask(game,wx,wz)];if(distantCache.map.size>90000)distantCache.map.clear();distantCache.map.set(key,v);}
   // inside the detailed 3x3 area the coarse land hides under the real terrain
   const inside=Math.abs(x)<DETAIL_TILE_X*1.5-sx&&Math.abs(z)<DETAIL_TILE_Z*1.5-sz;
-  p.setY(i,inside?v[0]-6:v[0]-.15);aL[i*2]=v[4];aL[i*2+1]=v[5];colors[i*3]=v[1];colors[i*3+1]=v[2];colors[i*3+2]=v[3];
+  p.setY(i,!streaming&&inside?v[0]-6:v[0]-.15);
+  if(waterDepth)waterDepth[i]=.02-v[0]/.30;
+  aL[i*2]=v[4];aL[i*2+1]=v[5];colors[i*3]=v[1];colors[i*3+1]=v[2];colors[i*3+2]=v[3];
  }
  // Do not leave coarse triangles under the detailed mountain. A six-metre
  // offset was insufficient on steep cliffs and cut through their faces.
@@ -451,7 +460,14 @@ function* distantTerrainStepsV242(cell,streaming=false){
  if(!streaming)geo.setIndex(kept);
  geo.setAttribute('color',new T.BufferAttribute(colors,3));geo.setAttribute('aL161',new T.BufferAttribute(aL,2));if(streaming)yield;geo.computeVertexNormals();
  const mesh=new T.Mesh(geo,terrainMaterial('detail',cell));mesh.userData.terrain=true;mesh.receiveShadow=false;mesh.name='v161 distant land';
- if(streaming)mesh.userData.streamHorizonV242={all:oldIndex.slice(),mask:''};return mesh;
+ if(streaming){
+  const waterGeometry=new T.PlaneGeometry(W,D,nx,nz);waterGeometry.rotateX(-Math.PI/2);
+  waterGeometry.setAttribute('aDepth',new T.BufferAttribute(waterDepth,1));
+  const water=new T.Mesh(waterGeometry,seaMaterial({scale:DETAIL_X,scaleZ:DETAIL_Z,origin:cell}));
+  water.name='detail fallback sea';water.position.y=.006;water.renderOrder=5;water.receiveShadow=true;
+  mesh.userData.streamHorizonV242={all:oldIndex.slice(),mask:'',water,waterDepth};
+ }
+ return mesh;
 }
 function terrain(scene,cell=null,chunk=false){const steps=terrainStepsV242(scene,cell,chunk);let result;do{result=steps.next();}while(!result.done);return result.value;}
 function* terrainStepsV242(scene,cell=null,chunk=false){const world=!cell,battle=!world&&!!s.battle,
@@ -742,6 +758,24 @@ function runCoverJobs(){const t0=performance.now();while(coverJobs.length&&perfo
 const detailStreamV242=new DetailStreamV242({scene:localScene,
  cell:(c,r)=>c>=0&&r>=0&&c<COLS&&r<ROWS?game.cell({c,r}):null,
  build:buildDetailTileV242,dispose:disposeDetailTileV242,budget:typeof matchMedia==='function'&&matchMedia('(min-width:900px) and (pointer:fine)').matches?11:3});
+const detailTrailMaterial=trailMaterial(true);
+let detailTrailDrawn=false;
+function createDetailTrailMesh(){
+ const mesh=new T.InstancedMesh(new T.CircleGeometry(.85,10),detailTrailMaterial,4096);
+ mesh.count=0;
+ mesh.setColorAt(0,new T.Color(0xffffff));
+ if(!detailTrailDrawn){
+  // Prepare the actual instanced trail program on the first detail view,
+  // including when the initial tile has no worn spots to draw.
+  mesh.frustumCulled=false;
+  mesh.onAfterRender=()=>{
+   detailTrailDrawn=true;
+   mesh.frustumCulled=true;
+   delete mesh.onAfterRender;
+  };
+ }
+ return mesh;
+}
 let streamRevisionV242='';
 function* buildDetailTileV242(entry){
  const tile=entry.tile;
@@ -758,7 +792,7 @@ function* buildDetailTileV242(entry){
   }
   entry.resources.set(res.id,resourceView(res,tile,entry.scenery));if(++batch%4===0||sliceDueV342())yield;
  }
- entry.stage='forest fill';addForestFillV346(entry.scenery,tile,entry.world);yield; // V346
+ entry.stage='forest fill';yield* addForestFillV346(entry.scenery,tile,entry.world);yield;
  entry.stage='ground cover';
  const cover=createGroundCoverV156(tile,coverHeight(tile),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(tile),{fraction:.55,deferred:true});
  entry.cover=cover.group;entry.root.add(cover.group);
@@ -781,7 +815,7 @@ function* buildDetailTileV242(entry){
  // V342: yield on the stage change so the stream can stop here for tiles
  // that cannot become the centre next.
  entry.stage='horizon';yield;
- entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant);yield;
+ entry.distant=yield* distantTerrainStepsV242(tile,true);entry.decor.add(entry.distant,entry.distant.userData.streamHorizonV242.water);yield;
  entry.stage='rivers';
  entry.rivers=yield* riverNetworkStepsV242(game,'detail',tile,quality,(x,z)=>ground(tile,x,z));entry.decor.add(entry.rivers);yield;
  entry.stage='outcrops';
@@ -816,9 +850,11 @@ function disposeDetailTileV242(entry){
  const occupied=[...s.armies,...s.settlers].some(p=>p.c===entry.tile.c&&p.r===entry.tile.r);
  if(!occupied&&!game.contextAt(entry.tile,false)&&game.localNavs.get(entry.key)===entry.navigation)game.localNavs.delete(entry.key);
  disposeGroundCover(entry.cover);
+ entry.trails?.geometry.dispose();
+ if(entry.trailLinks)disposeNetwork(entry.trailLinks);
  entry.terrain?.geometry.dispose();entry.terrain?.material.dispose();
  for(const network of [entry.roads,entry.rivers,entry.borders])if(network)disposeNetwork(network);
- for(const mesh of [entry.distant,entry.sea])if(mesh){mesh.geometry.dispose();mesh.material.dispose();}
+ for(const mesh of [entry.distant,entry.distant?.userData.streamHorizonV242?.water,entry.sea])if(mesh){mesh.geometry.dispose();mesh.material.dispose();}
  entry.outcrops?.traverse(o=>{if(o.geometry&&!o.geometry.userData.sharedLandscape)o.geometry.dispose();if(o.material)releaseMaterial(o.material);});
  // Shared GLB geometry, textures and town-model caches belong to their loaders.
  // Only per-instance buffers owned by this tile may be released here.
@@ -830,6 +866,9 @@ function stashDetailV242(tile){
  for(const [id,model] of resourceModels){entry.resources.set(id,model);entry.scenery.add(model);}
  for(const [b,value] of localModels)if(typeof b==='object'&&value?.model){entry.buildings.set(b,value);entry.scenery.add(value.model);}
  for(const [id,model] of workerModels){entry.workers.set(id,model);entry.actors.add(model);}
+ if(cityTorchesV235){entry.torches=cityTorchesV235;entry.torchStamp=cityTorchStampV235;entry.scenery.add(cityTorchesV235);}
+ if(localTrails){entry.trails=localTrails;entry.scenery.add(localTrails);localTrails=null;}
+ if(localTrailLinks){entry.trailLinks=localTrailLinks;entry.scenery.add(localTrailLinks);localTrailLinks=null;}
  for(const [key,node] of [['roads',detailWorldRoads],['rivers',localRivers],['borders',localBorders]])if(node){entry[key]=node;entry.decor.add(node);}
  entry.roadStamp=detailRoadStamp;entry.borderStamp=localBorderStamp;
  detailWorldRoads=null;localRivers=null;localBorders=null;
@@ -846,6 +885,9 @@ function mountDetailV242(cell){
   localObjects.add(value.model);localModels.set(b,value);
  }
  for(const [id,model] of entry.workers){people.add(model);workerModels.set(id,model);}
+ if(entry.torches){cityTorchesV235=entry.torches;cityTorchStampV235=entry.torchStamp;localObjects.add(entry.torches);entry.torches=null;}
+ if(entry.trails){localTrails=entry.trails;environment.add(localTrails);entry.trails=null;}
+ if(entry.trailLinks){localTrailLinks=entry.trailLinks;environment.add(localTrailLinks);entry.trailLinks=null;}
  localTerrain=entry.terrain;refreshStreamHoldersV242();
  localRivers=entry.rivers;localCrossingRevision=s.crossingRevision||0;
  detailWorldRoads=entry.roads;detailRoadStamp=entry.roadStamp;
@@ -858,15 +900,17 @@ function refreshStreamHoldersV242(){
  if(coarse){
   const ready=new Set([...detailStreamV242.entries.values()].filter(e=>e.terrain&&e.root.visible).map(e=>e.key)),mask=[...ready].sort().join('|');
   if(mask!==coarse.mask){
-   coarse.mask=mask;const p=horizon.geometry.attributes.position,kept=[];
+   coarse.mask=mask;const p=horizon.geometry.attributes.position,kept=[],water=[];
    for(let i=0;i<coarse.all.length;i+=3){
     const a=coarse.all[i],b=coarse.all[i+1],c=coarse.all[i+2],x=(p.getX(a)+p.getX(b)+p.getX(c))/3,z=(p.getZ(a)+p.getZ(b)+p.getZ(c))/3;
     const dc=Math.floor((x+DETAIL_HALF_X)/DETAIL_TILE_X),dr=Math.floor((z+DETAIL_HALF_Z)/DETAIL_TILE_Z);
     // V341: the camera-chosen window may reach one ring further forward.
     if(ready.has((activeTile.c+dc)+':'+(activeTile.r+dr)))continue;
     kept.push(a,b,c);
+    if(Math.max(coarse.waterDepth[a],coarse.waterDepth[b],coarse.waterDepth[c])>-.5)water.push(a,b,c);
    }
    horizon.geometry.index.array.set(kept);horizon.geometry.index.needsUpdate=true;horizon.geometry.setDrawRange(0,kept.length);
+   coarse.water.geometry.index.array.set(water);coarse.water.geometry.index.needsUpdate=true;coarse.water.geometry.setDrawRange(0,water.length);
   }
  }
  const live=new Set();neighbourTerrains=[];let visualUpdates=0;
@@ -949,7 +993,6 @@ function loadNeighbours(cell){for(let dr=s.battle?-3:-1;dr<=(s.battle?4:1);dr++)
     m.scale.y=b.ready?1:.25;g.add(m)}}}
 function followDetail(){
  if(view!=='local'||s.battle||!activeTile)return;
- detailStreamV242.prefetch(focus.x,focus.z);
  const dc=focus.x>DETAIL_HALF_X?1:focus.x< -DETAIL_HALF_X?-1:0,dr=focus.z>DETAIL_HALF_Z?1:focus.z< -DETAIL_HALF_Z?-1:0;
  if(!dc&&!dr)return;
  const target=game.cell({c:activeTile.c+dc,r:activeTile.r+dr});
@@ -957,8 +1000,12 @@ function followDetail(){
   // Refused transitions must not rebase the camera onto an unopened tile.
   focus.x=Math.max(-DETAIL_HALF_X+1,Math.min(DETAIL_HALF_X-1,focus.x));focus.z=Math.max(-DETAIL_HALF_Z+1,Math.min(DETAIL_HALF_Z-1,focus.z));return;
  }
- const prepared=detailStreamV242.ensure(target);
- if(!prepared.ready)return; // The existing 3x3 scene remains visible meanwhile.
+ if(!detailStreamV242.canCross(target)){
+  detailStreamV242.prefetch(focus.x,focus.z);
+  focus.x=Math.max(-DETAIL_HALF_X+.25,Math.min(DETAIL_HALF_X-.25,focus.x));
+  focus.z=Math.max(-DETAIL_HALF_Z+.25,Math.min(DETAIL_HALF_Z-.25,focus.z));
+  return;
+ }
  openTile(target,{seamless:true});
 }
 
@@ -967,7 +1014,7 @@ function insideCrossing(frame,x,z){if(!frame)return false;const dx=x-frame.x,dz=
 // V346: forest floor filler. Resource trees alone leave wide grass gaps
 // between groves; decorative trees (not harvestable, no gameplay) fill every
 // gap wider than ~6 m on forest tiles. One instanced Sapling stand per species.
-function addForestFillV346(g,tile,world){
+function* addForestFillV346(g,tile,world){
  if(tile.mountain)return;
  // Any tile with trees: fill the gaps BETWEEN trees (a tree within 14 m, none within 5 m); open meadows stay open.
  const quality=graphicsVegetationQualityV226(graphicsV226)==="low"?"low":"high";
@@ -977,7 +1024,9 @@ function addForestFillV346(g,tile,world){
  const near=(x,z,lim)=>{const gx=Math.floor(x/cs),gz=Math.floor(z/cs),k=Math.ceil(lim/cs);for(let j=-k;j<=k;j++)for(let i=-k;i<=k;i++)for(const q of bins.get((gx+i)+':'+(gz+j))||[])if(Math.hypot(q.x-x,q.z-z)<lim)return true;return false;};
  const buildings=game.contextAt(tile,false)?.economy.buildings.filter(b=>!b.virtual&&b.hp>0)||[],crossing=tile.river&&(tile.bridge||tile.ford)?crossingFrame(game,tile):null;
  const byKind=new Map(),seed=s.seed|0,forest=forestV329(tile); // forest tiles: closed canopy everywhere
- for(let gz=Math.floor(-DETAIL_HALF_Z/spacing);gz<=Math.ceil(DETAIL_HALF_Z/spacing);gz++)for(let gx=Math.floor(-DETAIL_HALF_X/spacing);gx<=Math.ceil(DETAIL_HALF_X/spacing);gx++){
+ const firstX=Math.floor(-DETAIL_HALF_X/spacing);
+ for(let gz=Math.floor(-DETAIL_HALF_Z/spacing);gz<=Math.ceil(DETAIL_HALF_Z/spacing);gz++)for(let gx=firstX;gx<=Math.ceil(DETAIL_HALF_X/spacing);gx++){
+  if((gx-firstX)%16===0&&sliceDueV342())yield;
   const wx=tile.c*DETAIL_TILE_X+gx*spacing,wz=tile.r*DETAIL_TILE_Z+gz*spacing;   // world lattice: seamless between tiles
   const x=gx*spacing+(forestRandomV330(wx,wz,seed,346)-.5)*spacing*.8,z=gz*spacing+(forestRandomV330(wx,wz,seed,347)-.5)*spacing*.8;
   if(Math.abs(x)>DETAIL_HALF_X-3||Math.abs(z)>DETAIL_HALF_Z-3||Math.abs(z)<(forest?7:18)||near(x,z,forest?3.6:4.6)||(!forest&&!near(x,z,24)))continue;
@@ -988,7 +1037,7 @@ function addForestFillV346(g,tile,world){
   (byKind.get(kind)||byKind.set(kind,[]).get(kind)).push({x,y,z,id,scale:.8+forestRandomV330(wx,wz,seed,349)*.35});note(x,z);
  }
  const m=new T.Matrix4(),q=new T.Quaternion(),up=new T.Vector3(0,1,0);
- for(const [kind,rows]of byKind){const broadleaf=!['pine','spruce'].includes(kind),src=createV48Mesh(broadleaf?'oak_1000_3':'pine_1000_3');
+ for(const [kind,rows]of byKind){if(sliceDueV342())yield;const broadleaf=!['pine','spruce'].includes(kind),src=createV48Mesh(broadleaf?'oak_1000_3':'pine_1000_3');
   const mesh=new T.InstancedMesh(src.geometry,src.material,rows.length);mesh.name='V346 forest fill '+kind;
   src.geometry.computeBoundingBox();const unit=Math.max(.1,src.geometry.boundingBox.max.y-src.geometry.boundingBox.min.y),tall=(kind==='pine'||kind==='spruce'?9:kind==='palm'?10:7)*.9; // same height as resource trees
   rows.forEach((r,i)=>{const k=tall*r.scale/unit;q.setFromAxisAngle(up,r.id*.39);m.compose(new T.Vector3(r.x,r.y,r.z),q,new T.Vector3(k,k,k));mesh.setMatrixAt(i,m);});
@@ -1066,7 +1115,7 @@ function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory
  for(const [key,model]of unitModels)if(key.startsWith('ballista:')&&(!battle||!(battle.ballistaShots||[]).some(s=>key==='ballista:'+s.id))){people.remove(model);unitModels.delete(key);}
  for(const [key,model] of unitModels)if(key.startsWith('siege:'))model.visible=!!battle&&(battle.siegeWorks||[]).some(w=>key==='siege:'+w.id&&!w.destroyed);
  soldierBatch??=new SoldierBatch(people);soldierBatch.update([...unitModels].filter(([key])=>key.startsWith('unit:')).map(([,model])=>model));
- const feedbackSquads=battle?.individualVersion===1?squads.filter(u=>!u.reserve).flatMap(u=>(u.men||[]).filter(m=>!m.escaped).map(m=>({...m,source:m.id,team:u.team,kind:u.kind,retreated:u.retreated,projectile:m.projectile}))):squads;const selectedFeedback=feedbackSquads.find(m=>m.source===selectedSoldierId),selectedSquadFeedback=battle&&!selectedFeedback&&selectedUnit&&!selectedUnit.retreated&&!selectedUnit.reserve?{...selectedUnit,source:'selected-squad:'+selectedUnit.source,shot:null,projectile:null,attackTime:null}:null;const visibleFeedback=selectedSquadFeedback?[...feedbackSquads,selectedSquadFeedback]:feedbackSquads;battleFeedback.update(visibleFeedback,selectedFeedback||selectedSquadFeedback||selectedUnit,battle,TROOPS);if(battle)return;if(!localTrails){localTrails=new T.InstancedMesh(new T.CircleGeometry(.85,10),trailMaterial(true),4096);localTrails.count=0;localTrails.rotation.x=0;environment.add(localTrails)}if(lastTrailTime>=0&&lastTrailNavVersion===nav.version&&s.time-lastTrailTime<(lastTrailChanges===world.trailChanges?10:2))return;lastTrailTime=s.time;lastTrailChanges=world.trailChanges;lastTrailNavVersion=nav.version;const dummy=new T.Object3D(),roadColors=['#000000','#b3a07e','#c1a781','#a49b8a','#8b9693'];let count=0;
+ const feedbackSquads=battle?.individualVersion===1?squads.filter(u=>!u.reserve).flatMap(u=>(u.men||[]).filter(m=>!m.escaped).map(m=>({...m,source:m.id,team:u.team,kind:u.kind,retreated:u.retreated,projectile:m.projectile}))):squads;const selectedFeedback=feedbackSquads.find(m=>m.source===selectedSoldierId),selectedSquadFeedback=battle&&!selectedFeedback&&selectedUnit&&!selectedUnit.retreated&&!selectedUnit.reserve?{...selectedUnit,source:'selected-squad:'+selectedUnit.source,shot:null,projectile:null,attackTime:null}:null;const visibleFeedback=selectedSquadFeedback?[...feedbackSquads,selectedSquadFeedback]:feedbackSquads;battleFeedback.update(visibleFeedback,selectedFeedback||selectedSquadFeedback||selectedUnit,battle,TROOPS);if(battle)return;if(!localTrails){localTrails=createDetailTrailMesh();environment.add(localTrails)}if(lastTrailTime>=0&&lastTrailNavVersion===nav.version&&s.time-lastTrailTime<(lastTrailChanges===world.trailChanges?10:2))return;lastTrailTime=s.time;lastTrailChanges=world.trailChanges;lastTrailNavVersion=nav.version;const dummy=new T.Object3D(),roadColors=['#000000','#b3a07e','#c1a781','#a49b8a','#8b9693'];let count=0;
  const spots=Object.keys(world.heat||{}).map(key=>({key:Number(key),heat:nav.roadStrength(Number(key))})).filter(e=>nav.roadLevel(e.key)>0&&nav.open(nav.point(e.key).x,nav.point(e.key).z)).sort((a,b)=>b.heat-a.heat).slice(0,4096);
  // V223.2: legacy circular wear decals hovered 24 cm above the land.
  // Flat disks are only safe on almost-flat patches; elsewhere the new
@@ -1870,8 +1919,15 @@ function renderCommandHUD(){const q=currentSelection(),e=q?.entity,goal=q?.local
 function setCommandMode(next){if(next==='move'&&!currentSelection()?.movable)return say('Vali esmalt oma üksus.');if(next==='attack'&&(!s.battle||s.battle.result||currentSelection()?.kind!=='unit'||!currentSelection()?.movable))return say('Vali esmalt lahingus oma salk.');commandMode=next;mode=null;hoverPoint=null;updateGhost();renderCommandHUD()}
 function stopSelected(){const q=currentSelection();if(!q?.movable)return;const e=q.entity;if(q.local){const actual=q.kind==='unit'&&!s.battle?deploymentFor(s,activeTile,e.source,s.units[e.source]):e;actual.target=null;actual.localTarget=null;actual.attackTargetSource=null;actual.advance=false;actual.manualOrder=false;if(q.kind==='unit'&&s.battle)setFormation(actual,'hold',TROOPS,s.battle.elapsed,true);}else {e.path=[];if(q.kind==='army')e.autoExplore=false;}commandMode='select';renderUI();save()}
 function focusSelected(){const q=currentSelection();if(!q)return;const p=q.local?q.entity:center(q.entity.c,q.entity.r);focus.set(p.x,0,p.z)}
-function panCamera(x,z){const p=cameraKeys.project(x,z,view==='world');focus.x+=p.x;focus.z+=p.z}
-function updateCameraKeys(real){if(inputBlocked()){cameraKeys.clear();return}const p=cameraKeys.step(real,zoom,view==='world');focus.x+=p.x;focus.z+=p.z;if(view==='world'){focus.x=Math.max(ORIGIN_X+25,Math.min(ORIGIN_X+WORLD_WIDTH-25,focus.x));focus.z=Math.max(ORIGIN_Z+25,Math.min(ORIGIN_Z+WORLD_DEPTH-25,focus.z))}else if(s.battle){focus.x=Math.max(BATTLEFIELD.outerMinX,Math.min(BATTLEFIELD.outerMaxX,focus.x));focus.z=Math.max(BATTLEFIELD.outerMinZ,Math.min(BATTLEFIELD.outerMaxZ,focus.z))}}
+function moveMapFocus(dx,dz){
+ if(!dx&&!dz)return;
+ if(view==='local'&&!s.battle&&detailStreamV242.enabled){
+  const next=detailStreamV242.limitMovement(focus.x,focus.z,dx,dz,tile=>game.seen(0,tile));
+  focus.x=next.x;focus.z=next.z;
+ }else{focus.x+=dx;focus.z+=dz;}
+}
+function panCamera(x,z){const p=cameraKeys.project(x,z,view==='world');moveMapFocus(p.x,p.z)}
+function updateCameraKeys(real){if(inputBlocked()){cameraKeys.clear();return}const p=cameraKeys.step(view==='local'&&!s.battle?Math.min(real,.06):real,zoom,view==='world');moveMapFocus(p.x,p.z);if(view==='world'){focus.x=Math.max(ORIGIN_X+25,Math.min(ORIGIN_X+WORLD_WIDTH-25,focus.x));focus.z=Math.max(ORIGIN_Z+25,Math.min(ORIGIN_Z+WORLD_DEPTH-25,focus.z))}else if(s.battle){focus.x=Math.max(BATTLEFIELD.outerMinX,Math.min(BATTLEFIELD.outerMaxX,focus.x));focus.z=Math.max(BATTLEFIELD.outerMinZ,Math.min(BATTLEFIELD.outerMaxZ,focus.z))}}
 function updateCommandVisuals(){commandOverlay.update({world:view==='world',game,tile:activeTile,selection:currentSelection(),hover:hoverPoint,moving:commandMode==='move',blocked:inputBlocked(),navigation:view==='local'?detailNav():null,height:(x,z)=>ground(activeTile,x,z)})}
 $('commandselect').onclick=()=>setCommandMode('select');$('commandmove').onclick=()=>setCommandMode('move');$('commandattack').onclick=()=>setCommandMode('attack');$('commandstop').onclick=stopSelected;$('commandfocus').onclick=focusSelected;
 addEventListener('keydown',e=>{const editing=['INPUT','TEXTAREA','SELECT'].includes(e.target?.tagName)||e.target?.isContentEditable;if(e.key==='Escape'){cameraKeys.clear();if(document.body.classList.contains('hud-explore-open')){toggleExploreMenu(false);return}if(!$('journalpanel').hidden)$('closejournal').onclick();else if(!$('researchpanel').hidden)$('closeresearch').onclick();else if(!$('help').hidden)$('help').hidden=true;else if(!menuOpen){if(commandMode==='move'||commandMode==='attack'||mode)setCommandMode('select');else{selectedUnit=null;selectedBuilding=null;selectedMover=null;selectedShip=null;selectedTrade=null;armySelected=false;renderUI()}}return}if(cameraKeys.handle(e,true,inputBlocked()||editing||e.ctrlKey||e.metaKey||e.altKey))return;if(inputBlocked()||editing||e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;const code=e.code||e.key;if(['KeyM','KeyT','KeyV','KeyX','KeyF','KeyG','Enter','Space','Equal','Minus','NumpadAdd','NumpadSubtract','Home'].includes(code))e.preventDefault();if(code==='KeyR'&&view==='local'&&WALL_TYPES.has(mode)){wallAxis=wallAxis?0:1;buildAngleV243=(buildAngleV243+90)%360;updateGhost();say('Müüri suund muudetud.');renderUI()}if(code==='KeyM')setCommandMode('move');if(code==='KeyT')setCommandMode('attack');if(code==='KeyV')setCommandMode('select');if(code==='KeyX')stopSelected();if(code==='KeyF')focusSelected();if(code==='KeyG')$('maptoggle').onclick();if(code==='Enter'&&view==='world')openTile(chosen);if(code==='Space')$('pause').onclick();if(code==='Equal'||code==='NumpadAdd')$('zin').onclick();if(code==='Minus'||code==='NumpadSubtract')$('zout').onclick();if(code==='Home')$('home').onclick()});
@@ -1907,6 +1963,10 @@ const drawnV342=graphicsRuntime.canRender(now);
 if(view==='local'&&!s.battle){if(drawnV342){detailStreamV242.setView(camera,focus.x,focus.z);detailStreamV242.tick();refreshStreamHoldersV242();}else detailStreamV242.tick(Math.min(detailStreamV242.budget,Math.max(1,(now-last)*.5)));}if(view==='local'&&coverJobs.length)runCoverJobs();const real=Math.min(.5,Math.max(0,(now-last)/1000));last=now;const dt=menuOpen||paused||document.hidden?0:real;frameDelta=dt;sampleV51FPS(real);let remaining=dt;while(remaining>1e-8){const step=Math.min(.1,remaining);game.tick(step);if(!s.battle){tickDeployments(s,s.units,TROOPS,step,p=>game.nav(p));checkEncounter()}else if(!s.battle.result){refreshBattleTowers(s.battle);planSiegeAI(s.battle,s,game.battleNavigation());tickBattle(s.battle,step,TROOPS,s.ages.map(age=>age>=2?1:0),game.battleNavigation());applyArmyRetreats(game,s.battle);applyBattle();if(s.battle?.result&&!s.battle.squads.some(u=>u.team===0)&&s.battle.fortress?.team!==0)s.battle=null}remaining-=step}if(s.winner!=null&&!s.victoryNotified){s.victoryNotified=true;say(s.winner===0?'Võit! Kõik vastased on alistatud.':'Kaotus! Sinu kuningriik on alistatud.');save();renderUI()}refreshAutomaticUI(now);for(const text of game.discoveryEvents.splice(0))say(text);for(const event of game.researchEvents.splice(0))if(event.team===0){say(event.boost?'⚡ Avastusboonus: '+TECHS[event.id].name+' (+35% teadusest)':'Uuritud: '+TECHS[event.id].name+'! Avatud: '+TECHS[event.id].unlocks);renderUI()}if(view==='local'&&walker.placing)walker.pollPlacing(pick);walker.update(real);if(walker.active&&view==='local'){focus.set(walker.position.x,0,walker.position.z);zoom=45}else updateCameraKeys(real);followDetail();const visualDtV343=renderDeltaV343.step(dt,drawnV342,view==='local'?activeTile:view);if(visualDtV343!==null){frameDelta=visualDtV343;if(view==='world'){updateSpatialBatches(zoom,focus);fadeAtlasGrid(zoom);worldSync();atlasDecor.group.userData.water.position.y=.72;atlasDecor.group.userData.waveLines.position.y=Math.sin(s.time*.5)*.12 }else{syncLocal();refreshCityTorchesV235();
   const selectedTime=graphicsV226.daylight==='day'?240:graphicsV226.daylight==='evening'?540:graphicsV226.daylight==='night'?840:s.time;
   updateCityTorchesV235(cityTorchesV235,dayClockV235(selectedTime),s.time);
+  if(!s.battle){
+   const clock=dayClockV235(selectedTime);
+   for(const entry of detailStreamV242.entries.values())if(entry.root.visible&&entry.torches)updateCityTorchesV235(entry.torches,clock,s.time);
+  }
   if(!s.battle)villageLife.update(s.time,frameDelta);updateGhost()}updateCommandVisuals();}frameDelta=dt;if(view==='local'&&activeTile){const target=Math.max(0,ground(activeTile,focus.x,focus.z));camLiftV161+=(target-camLiftV161)*Math.min(1,real*5+.02);}else camLiftV161=0;camera.position.set(focus.x+zoom*(view==='world'?.1:.48),camLiftV161+zoom*(view==='world'?.76:.78),focus.z+zoom*(view==='world'?.7:.8));if(view==='local'&&activeTile){const under=ground(activeTile,camera.position.x,camera.position.z)+4;if(camera.position.y<under)camera.position.y=under;}camLookV161.set(focus.x,camLiftV161,focus.z);camera.lookAt(camLookV161);if(walker.active&&view==='local')walker.applyCamera(camera);else fitDepthRange();atmosphere.update(view==='world'?worldScene:localScene,focus,walker.active?60:zoom,real,s.time);
  if(game.uiMessagesV276?.length&&!(toastTime>1.5)){const mV276=game.uiMessagesV276.shift();say((mV276.warn?'⚠ ':'')+mV276.text);}const v235Clock=$('dayclock-v235');if(v235Clock){const face=dayClockV235(s.time);{const day=Math.floor((s.time/60+8)/24)+1,frac=((s.time/60+8)%24)/24;if(v235Clock.dataset.v264!==day+face.clock){v235Clock.dataset.v264=day+face.clock;v235Clock.innerHTML=`<span class="v264-day">${(document.documentElement.lang||'').startsWith('en')?'Day':'Päev'} ${day}</span><span class="v264-sun">${face.night?'☾':'☀'}</span><span class="v264-time">${face.clock}</span><span class="v264-dayline"><i style="left:${(frac*100).toFixed(1)}%"></i></span>`;v235Clock.classList.toggle('v264-night',!!face.night);}}v235Clock.title='24 h mängupäev · 1 minut = 1 tund';}if(graphicsRuntime.canRender(now)){graphicsRuntime.render(view==='world'?worldScene:localScene,camera,now);}if(toastTime>0){toastTime-=real;if(toastTime<=0)$('toast').style.display='none'}$('clock').value=s.time%TURN_SECONDS;if(!menuOpen&&!paused&&!document.hidden)saveTimer+=real;uiTimer+=real;if(saveTimer>=AUTOSAVE_INTERVAL_SECONDS_V338&&!menuOpen){saveTimer=0;save()}}
 // V51 empire panels and manual saves. No network storage is used.
