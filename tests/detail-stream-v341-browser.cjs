@@ -39,7 +39,7 @@ const server=http.createServer((req,res)=>{const pathname=decodeURIComponent(req
  await page.evaluate(t=>gameDebug.openTileV249(t.c,t.r),start);
  // Initial 5x5 window, with the same simulated 60 fps tick budget.
  const initialMs=await page.evaluate(async()=>{const st=gameDebug.detailStreamV242,t=performance.now();
-  while(performance.now()-t<240000){const s=st.status();if(s.tiles.filter(x=>x.visible).every(x=>x.ready||x.visualReady))break;for(let k=0;k<15;k++)st.tick();await new Promise(r=>setTimeout(r,250));}
+  while(performance.now()-t<240000){const s=st.status();const desired=new Set(s.desired);if(s.tiles.filter(x=>desired.has(x.key)&&x.visualReady).length===desired.size)break;for(let k=0;k<15;k++)st.tick();await new Promise(r=>setTimeout(r,250));}
   return performance.now()-t;});
  const initial=await page.evaluate(()=>{const s=gameDebug.detailStreamV242.status();return {visible:s.tiles.filter(t=>t.visible).length,ready:s.tiles.filter(t=>t.visible&&t.ready).length,outerTiles:s.tiles.filter(t=>t.visible).length-9,desired:s.desired?.length};});
  console.log('initial',initial);
@@ -57,14 +57,16 @@ const server=http.createServer((req,res)=>{const pathname=decodeURIComponent(req
   // them after the horizon; V341 before it).
   const after=document.title.includes('V340')?['navigation','roads']:['horizon','rivers','outcrops','navigation','roads'];
   for(let i=0;i<STEPS;i++){
-   const key=centre();
-   gameDebug.focusV250((window.__fx||0),(window.__fz=(window.__fz||0)-SPEED),0);
+   // Read the actual focus after each frame. A blocked edge clamps it until
+   // the next 3x3 is ready, and crossing changes its coordinate origin.
+   const focus=gameDebug.detailFocus;
+   const next=st.limitMovement(focus.x,focus.z,0,-SPEED,()=>true);
+   gameDebug.focusV250(next.x,next.z,0);
    // Software rendering gives ~1 frame/s; run the loader budget of the 60 fps
    // frames this movement takes, so SwiftShader does not limit loading.
    for(let k=0;k<TICKS;k++)st.tick();
    // Wait for two real game frames so followDetail/prefetch/setView have run.
    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-   if(centre()!==key){window.__fz+=195;} // the game rebased the camera by one tile
    const s=st.status(),c=st.center;
    const vis=s.tiles.filter(t=>t.visible),outer=vis.filter(t=>{const [x,y]=t.key.split(':').map(Number);return Math.max(Math.abs(x-c.c),Math.abs(y-c.r))>=2;});
    out.push({i,centre:centre(),visible:vis.length,outer:outer.length,outerLoaded:outer.filter(t=>t.terrain&&!['terrain','local world','resources','ground cover'].includes(t.stage)||t.ready).length,outerComplete:outer.filter(t=>t.ready||(after||[]).includes(t.stage)).length,ahead:vis.filter(t=>Number(t.key.split(':')[1])<c.r-1).length,target:st.targetKey,targetStage:st.targetKey&&st.entries.get(st.targetKey)?.stage,targetReady:!!(st.targetKey&&st.entries.get(st.targetKey)?.ready)});
