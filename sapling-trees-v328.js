@@ -40,8 +40,26 @@ export function saplingLevelV328(camera,position,height,previous='far'){
  return pixels>(previous==='near'?37:45)?'near':pixels>(previous==='mid'?10:12)?'mid':'far';
 }
 // Static world stands: three GPU levels per spatial cell; exact instance matrices are copied.
-export function withSaplingInstancesV328(source,kind,fallback=source,{quality='high',cellSize=600}={}){
+export function withSaplingInstancesV328(source,kind,fallback=source,{quality='high',cellSize=600,staticTransforms=false}={}){
  const root=new T.Group();root.name='Sapling '+source.name;root.userData.saplingV328=kind;root.add(fallback);
+ let transformsDirty=true;
+ if(staticTransforms){
+  const update=root.updateMatrixWorld,local=new T.Matrix4(),parentWorld=new T.Matrix4();
+  let previousParent=null;
+  root.updateMatrixWorld=function(){
+   if(this.matrixAutoUpdate)this.updateMatrix();
+   const parent=this.parent;
+   if(!transformsDirty&&parent===previousParent&&local.equals(this.matrix)&&(!parent||parentWorld.equals(parent.matrixWorld))){
+    this.matrixWorldNeedsUpdate=false;
+    return;
+   }
+   update.call(this,true);
+   local.copy(this.matrix);
+   if(parent)parentWorld.copy(parent.matrixWorld);
+   previousParent=parent;
+   transformsDirty=false;
+  };
+ }
  source.geometry.computeBoundingBox();const unitHeight=source.geometry.boundingBox.max.y-source.geometry.boundingBox.min.y;
  const bins=new Map(),matrix=new T.Matrix4(),color=new T.Color();
  for(let i=0;i<source.count;i++){
@@ -56,7 +74,10 @@ export function withSaplingInstancesV328(source,kind,fallback=source,{quality='h
    center.divideScalar(rows.length);center.y+=unitHeight*tallest*.5;
    function make(level){const parts=template(kind,variant,level,unitHeight);if(!parts)return null;
     const meshes=parts.map(p=>{const mesh=new T.InstancedMesh(p.geometry,p.material,rows.length);mesh.name='Sapling '+kind+' '+variant+' '+level;mesh.userData.saplingV328=kind;mesh.userData.saplingLOD=level;
-     rows.forEach((r,i)=>{mesh.setMatrixAt(i,r.matrix);if(r.tint)mesh.setColorAt(i,r.tint);});mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=level==='near';mesh.computeBoundingSphere();lod.add(mesh);return mesh;});levels.set(level,meshes);return meshes;
+     rows.forEach((r,i)=>{mesh.setMatrixAt(i,r.matrix);if(r.tint)mesh.setColorAt(i,r.tint);});mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=level==='near';mesh.computeBoundingSphere();lod.add(mesh);
+     // A new LOD can be created during render traversal, after the scene's matrix update.
+     if(staticTransforms)mesh.updateWorldMatrix(false,false);
+     return mesh;});levels.set(level,meshes);transformsDirty=true;return meshes;
    }
    make('far');lod.update=camera=>{
     position.copy(center).applyMatrix4(lod.matrixWorld);worldScale.setFromMatrixScale(lod.matrixWorld);

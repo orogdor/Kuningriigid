@@ -286,7 +286,7 @@ worldScene.background=new T.Color('#203f52');worldScene.fog=new T.Fog('#87aab0',
 for(const scene of [worldScene,localScene]){scene.add(new T.HemisphereLight(0xf0f1e0,0x45574a,1.55));const light=new T.DirectionalLight(0xffe4be,2.15);light.position.set(-80,150,90);light.castShadow=scene===localScene;light.shadow.mapSize.set(1024,1024);light.shadow.normalBias=.015;Object.assign(light.shadow.camera,{left:-85,right:85,top:85,bottom:-85,near:1,far:350});light.shadow.bias=-.0004;scene.add(light);const fill=new T.DirectionalLight(0xb4d3df,.52);fill.position.set(130,90,-120);scene.add(fill)}
 const atmosphere=setupAtmosphere({renderer,worldScene,localScene,quality});
 const graphicsRuntime=graphicsRuntimeV226({settings:graphicsV226,renderer,atmosphere,worldScene,localScene,people,
- getQuality:()=>quality,getAdaptiveScale:()=>v51Resolution});
+ getQuality:()=>quality,getAdaptiveScale:()=>v51Resolution,allowShadowReuse:()=>!s.battle&&!walker.active});
 // V161: first-person walker (see fpv-walker-v161.js)
 let walkerTile=null,walkRects={key:'',rects:[]};
 function walkBlocked(x,z){
@@ -1042,7 +1042,7 @@ function* addForestFillV346(g,tile,world){
   src.geometry.computeBoundingBox();const unit=Math.max(.1,src.geometry.boundingBox.max.y-src.geometry.boundingBox.min.y),tall=(kind==='pine'||kind==='spruce'?9:kind==='palm'?10:7)*.9; // same height as resource trees
   rows.forEach((r,i)=>{const k=tall*r.scale/unit;q.setFromAxisAngle(up,r.id*.39);m.compose(new T.Vector3(r.x,r.y,r.z),q,new T.Vector3(k,k,k));mesh.setMatrixAt(i,m);});
   mesh.instanceMatrix.needsUpdate=true;mesh.visible=false;
-  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality,cellSize:45});stand.name='V346 forest fill '+kind;g.add(stand);}
+  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality,cellSize:45,staticTransforms:true});stand.name='V346 forest fill '+kind;g.add(stand);}
 }
 function addForestResourceV329(parent,r,tile){
  addTree(parent,0,0,0,r.id,.9,tile);
