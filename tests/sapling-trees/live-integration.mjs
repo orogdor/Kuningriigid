@@ -6,14 +6,25 @@ const requests=[];globalThis.fetch=async url=>{requests.push(String(url));const 
 globalThis.createImageBitmap=async()=>({width:512,height:512,close(){}});
 const source=new T.InstancedMesh(new T.CylinderGeometry(.1,.2,3),new T.MeshBasicMaterial(),120),m=new T.Matrix4(),c=new T.Color();
 for(let i=0;i<120;i++){m.compose(new T.Vector3(i%20*12,20,Math.floor(i/20)*12),new T.Quaternion().setFromEuler(new T.Euler(0,i*.37,0)),new T.Vector3(.8,1+i%3*.1,.9));source.setMatrixAt(i,m);source.setColorAt(i,c.setHex(0xeeffdd));}
-const original=source.instanceMatrix.array.slice(),root=withSaplingInstancesV328(source,'pine');assert.equal(source.visible,true);await root.userData.saplingPromiseV328;assert.equal(root.userData.saplingReadyV328,true);assert.equal(source.visible,false);
+const original=source.instanceMatrix.array.slice(),root=withSaplingInstancesV328(source,'pine',source,{staticTransforms:true});assert.equal(source.visible,true);await root.userData.saplingPromiseV328;assert.equal(root.userData.saplingReadyV328,true);assert.equal(source.visible,false);
 const camera=new T.OrthographicCamera(-200,200,200,-200,.1,5000);camera.position.set(0,100,200);camera.lookAt(0,0,0);camera.updateMatrixWorld();root.updateMatrixWorld();const cells=root.children.filter(o=>o.isLOD);
 for(const cell of cells)cell.update(camera);
 let shown=()=>cells.flatMap(c=>c.children.filter(m=>m.visible));assert.equal(shown().reduce((n,m)=>n+m.count,0),240);assert.ok(shown().every(m=>m.userData.saplingLOD==='far'));
 assert.equal(new Set(cells.flatMap(c=>c.children.map(m=>m.name.split(' ')[2]))).size,5,'all five variants instantiated');
 const copied=cells.map(c=>c.children.find(m=>m.visible)).flatMap(mesh=>Array.from({length:mesh.count},(_,i)=>{mesh.getMatrixAt(i,m);return m.elements.join(',')}));
 assert.deepEqual(new Set(copied),new Set(Array.from({length:source.count},(_,i)=>Array.from(original.slice(i*16,i*16+16)).join(','))));
+const tileRoot=new T.Group();tileRoot.add(root);
+let updates=0;const updateCell=cells[0].updateMatrixWorld;
+cells[0].updateMatrixWorld=function(force){updates++;return updateCell.call(this,force);};
+tileRoot.updateMatrixWorld(true);
+tileRoot.updateMatrixWorld(true);
+assert.equal(updates,1,'stationary stands reuse their descendant transforms');
+tileRoot.position.set(225,0,-195);tileRoot.updateMatrixWorld(true);
+assert.equal(updates,2,'a rebased tile updates all stand transforms');
+assert.equal(cells[0].matrixWorld.elements[12],225);
+assert.equal(cells[0].matrixWorld.elements[14],-195);
 await Promise.all(Array.from({length:5},(_,i)=>loadSaplingV328('pine',i,'mid')));camera.zoom=3;camera.updateProjectionMatrix();for(const cell of cells)cell.update(camera);assert.ok(shown().every(m=>m.userData.saplingLOD==='mid'));
+assert.ok(shown().every(mesh=>mesh.matrixWorld.equals(mesh.parent.matrixWorld)),'newly loaded LOD uses the rebased position on its first frame');
 await Promise.all(Array.from({length:5},(_,i)=>loadSaplingV328('pine',i,'near')));camera.zoom=150;camera.updateProjectionMatrix();for(const cell of cells)cell.update(camera);assert.ok(shown().every(m=>m.userData.saplingLOD==='near'));assert.equal(shown().reduce((n,m)=>n+m.count,0),240);assert.deepEqual(source.instanceMatrix.array,original);
 for(const mesh of shown()){mesh.geometry.computeBoundingBox();assert.ok(mesh.geometry.boundingBox.min.y>=-1e-6);}
 const scene=new T.Scene();let originalBefore=0;scene.onBeforeRender=()=>originalBefore++;const trees=[];

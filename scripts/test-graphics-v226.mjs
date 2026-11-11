@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import * as T from '../vendor/three.module.js';
+import {graphicsRuntimeV226} from '../graphics-runtime-v226.js';
 import {GRAPHICS_DEFAULTS_V226,GRAPHICS_PRESETS_V226,GRAPHICS_KEY_V226,
  loadGraphicsSettingsV226,saveGraphicsSettingsV226,graphicsNearDistanceV226,
  graphicsViewFactorV226} from '../graphics-settings-v226.js';
@@ -34,4 +36,25 @@ assert.equal(safe.resolution,100);
 assert.equal(safe.renderer,'webgl');
 assert.equal(safe.lightingEngine,'pbr');
 assert.equal(safe.shadows,'off');
+const localScene=new T.Scene(),worldScene=new T.Scene(),camera=new T.PerspectiveCamera();
+const sun=new T.DirectionalLight();sun.castShadow=true;sun.shadow.map={};localScene.add(sun);
+let reuse=true;
+const draws=[];
+const shadowMap={enabled:true,autoUpdate:true,needsUpdate:false};
+const renderer={shadowMap,render(){
+ draws.push(shadowMap.autoUpdate||shadowMap.needsUpdate);
+ shadowMap.needsUpdate=false;sun.shadow.needsUpdate=false;
+}};
+const runtime=graphicsRuntimeV226({settings:{performanceOverlay:false},renderer,worldScene,localScene,allowShadowReuse:()=>reuse});
+const draw=(scene=localScene)=>runtime.render(scene,camera,draws.length*17);
+draw();draw();draw();draw();
+camera.position.x=5;draw();
+camera.rotation.y=.2;draw();
+camera.zoom=1.2;camera.updateProjectionMatrix();draw();
+shadowMap.needsUpdate=true;draw();
+sun.shadow.needsUpdate=true;draw();
+reuse=false;draw();draw();
+reuse=true;draw();draw(worldScene);draw();
+assert.deepEqual(draws,[true,false,true,false,true,true,true,true,true,true,true,true,true,true]);
+assert.equal(shadowMap.autoUpdate,true,'the renderer keeps its original shadow setting outside the draw');
 console.log('PASS V226 graphics persistence, validation, presets and LOD distances');

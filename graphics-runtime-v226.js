@@ -3,7 +3,7 @@ import * as T from './vendor/three.module.js';
 import {applyUiScaleV337} from './menu-controls-v337.js';
 import {graphicsNearDistanceV226} from './graphics-settings-v226.js';
 import {setStoneNearDistanceV226} from './stone-near-lod.js';
-export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,localScene,people,getQuality,getAdaptiveScale}){
+export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,localScene,people,getQuality,getAdaptiveScale,allowShadowReuse}){
  const originals=new WeakMap(),originalMaterials=new WeakMap(),convertedMaterials=new WeakMap();
  const gpuFallbackMaterials=new WeakMap();
  // WebGPU cannot compile legacy ShaderMaterial/RawShaderMaterial GLSL.
@@ -32,6 +32,23 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
  }
  let pendingGPU=false,gpuSuccessfulFrames=0;
  let lastDraw=0,lastStats=performance.now(),frames=0,lastPeople=0,overlay=null;
+ const lastCameraPosition=new T.Vector3(),lastCameraRotation=new T.Quaternion(),lastCameraProjection=new T.Matrix4();
+ let lastShadowLight=null,shadowSkipped=false;
+ function skipShadowUpdate(scene,camera){
+  const shadow=renderer.shadowMap;
+  const light=scene===localScene&&shadow.enabled&&shadow.autoUpdate&&allowShadowReuse?.()
+   ?scene.children.find(o=>o.isDirectionalLight&&o.visible&&o.castShadow):null;
+  if(!light){lastShadowLight=null;shadowSkipped=false;return false;}
+  const unchanged=light===lastShadowLight&&lastCameraPosition.equals(camera.position)
+   &&lastCameraRotation.equals(camera.quaternion)&&lastCameraProjection.equals(camera.projectionMatrix);
+  // At most one rendered frame may use the previous map. Camera changes
+  // and explicit invalidations always draw fresh shadows immediately.
+  const skip=unchanged&&!shadowSkipped&&!!light.shadow.map&&!shadow.needsUpdate&&!light.shadow.needsUpdate;
+  lastShadowLight=light;shadowSkipped=skip;
+  lastCameraPosition.copy(camera.position);lastCameraRotation.copy(camera.quaternion);
+  lastCameraProjection.copy(camera.projectionMatrix);
+  return skip;
+ }
  function pixelRatio(){return Math.min(3,Math.min(devicePixelRatio||1,2)*(settings.resolution/100)*(getAdaptiveScale?.()||1));}
  function peopleShadows(){
   if(!people)return;
@@ -133,7 +150,10 @@ export function graphicsRuntimeV226({settings,renderer,atmosphere,worldScene,loc
    }).catch(error=>{pendingGPU=false;window.KINGDOMS_WEBGPU_RECOVER_V227?.(error);});
    return;
   }
+  const skipShadows=skipShadowUpdate(scene,camera);
+  if(skipShadows)renderer.shadowMap.autoUpdate=false;
   try{renderer.render(scene,camera);afterRender(now);}catch(error){console.error('WebGL render error',error);throw error;}
+  finally{if(skipShadows)renderer.shadowMap.autoUpdate=true;}
  }
  return {apply,canRender,afterRender,pixelRatio,render};
 }
