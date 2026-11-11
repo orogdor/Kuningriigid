@@ -48,7 +48,7 @@ const ring=(e,center)=>Math.max(Math.abs(e.tile.c-center.c),Math.abs(e.tile.r-ce
  assert.ok(spare.length>0&&spare.every(k=>!shown.includes(k)),'spare out-of-view tiles wait');
  assert.ok(inView.filter(k=>k!=='20:20').every(k=>shown.includes(k)),'all on-screen tiles show terrain, trees and buildings first');
  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)assert.ok(stream.desired.has((20+dc)+':'+(20+dr)),'3x3 neighbourhood is always kept for crossings');
- assert.equal([...stream.entries.values()].filter(e=>e.root.visible).length,25);
+ assert.ok([...stream.entries.values()].every(e=>!e.root.visible||e.visualReady),'unfinished tiles keep the horizon fallback');
  // Looking from the far side moves the window with the view direction.
  camera.position.set(-96,156,-160);camera.lookAt(0,0,0);camera.updateMatrixWorld(true);stream.setView(camera,0,0);
  assert.ok([...stream.desired].some(k=>k.endsWith(':23')),'reversed view direction loads the opposite side');
