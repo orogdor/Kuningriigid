@@ -45,6 +45,14 @@ for(const zoom of [1,3,150,1]){
  assert.deepEqual(instances(visible),instances(shown()),'batching preserves geometry, tint, LOD and rebased transforms');
  assert.ok(visible.length<=shown().length,'forest parts use fewer or equal draw calls');
 }
+const mask=new Uint8Array(source.count).fill(1);mask[11]=0;
+batched.setSaplingVisibilityV346f(mask);batched.update(camera);
+const countBatch=()=>batched.children.filter(mesh=>mesh.isInstancedMesh&&mesh.visible).reduce((n,mesh)=>n+mesh.count,0);
+assert.equal(countBatch(),238,'a cut tree disappears even with a stationary camera');
+mask.fill(0);batched.setSaplingVisibilityV346f(mask);batched.update(camera);
+assert.equal(countBatch(),0,'a cleared stand has no remaining draw instances');
+mask.fill(1);batched.setSaplingVisibilityV346f(mask);batched.update(camera);
+assert.equal(countBatch(),240,'instances can return when the forest regrows');
 const scene=new T.Scene();let originalBefore=0;scene.onBeforeRender=()=>originalBefore++;const trees=[];
 for(let i=0;i<100;i++){const tree=withSaplingTreeV328('pine',new T.Group(),123);tree.position.set(i*.01,0,0);scene.add(tree);trees.push(tree);}
 await loadSaplingV328('pine',saplingVariantV328(123,123*.13),'near');camera.zoom=1;camera.left=-5;camera.right=5;camera.top=5;camera.bottom=-5;camera.updateProjectionMatrix();camera.position.set(0,3,20);camera.lookAt(0,3,0);camera.updateMatrixWorld();

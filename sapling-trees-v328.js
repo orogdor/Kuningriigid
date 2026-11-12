@@ -39,7 +39,7 @@ export function saplingLevelV328(camera,position,height,previous='far'){
  const pixels=camera.isOrthographicCamera?height*vh*camera.zoom/(camera.top-camera.bottom):height*vh/(2*Math.tan((camera.fov||50)*Math.PI/360)*Math.max(1,camera.position.distanceTo(position)));
  return pixels>(previous==='near'?37:45)?'near':pixels>(previous==='mid'?10:12)?'mid':'far';
 }
-function buildDetailStand(root,kind,height,bins,quality,cellSize,onMeshAdded){
+function buildDetailStand(root,kind,height,bins,quality,cellSize,onMeshAdded,visibility){
  const sectors=new Map(),cells=[];
  for(const rows of bins.values()){
   const variant=rows[0].variant,center=new T.Vector3(),scale=new T.Vector3();
@@ -58,15 +58,16 @@ function buildDetailStand(root,kind,height,bins,quality,cellSize,onMeshAdded){
  }
  const position=new T.Vector3(),scale=new T.Vector3(),lastPosition=new T.Vector3(),lastWorld=new T.Matrix4();
  const lastProjection=new T.Matrix4(),requested=new Set();
- let lastHeight=0,lastRevision=-1;
+ let lastHeight=0,lastRevision=-1,lastVisibility=-1;
  root.update=camera=>{
   const viewportHeight=typeof innerHeight==='number'?innerHeight:800;
-  if(lastRevision===assetRevision&&lastHeight===viewportHeight&&lastPosition.equals(camera.position)
+  if(lastRevision===assetRevision&&lastVisibility===visibility.revision&&lastHeight===viewportHeight&&lastPosition.equals(camera.position)
    &&lastProjection.equals(camera.projectionMatrix)&&lastWorld.equals(root.matrixWorld))return;
   lastRevision=assetRevision;lastHeight=viewportHeight;lastPosition.copy(camera.position);
   lastProjection.copy(camera.projectionMatrix);lastWorld.copy(root.matrixWorld);
   scale.setFromMatrixScale(root.matrixWorld);
-  let changed=false;
+  let changed=lastVisibility!==visibility.revision;
+  lastVisibility=visibility.revision;
   for(const cell of cells){
    const {variant}=cell.sector;
    position.copy(cell.center).applyMatrix4(root.matrixWorld);
@@ -97,6 +98,7 @@ function buildDetailStand(root,kind,height,bins,quality,cellSize,onMeshAdded){
    }
    for(const mesh of meshes){
     for(const row of rows){
+     if(visibility.mask&&!visibility.mask[row.index])continue;
      const i=mesh.count++;
      mesh.setMatrixAt(i,row.matrix);
      if(row.tint)mesh.setColorAt(i,row.tint);
@@ -116,6 +118,8 @@ function buildDetailStand(root,kind,height,bins,quality,cellSize,onMeshAdded){
 // Static world stands: three GPU levels per spatial cell; exact instance matrices are copied.
 export function withSaplingInstancesV328(source,kind,fallback=source,{quality='high',cellSize=600,staticTransforms=false,batchCells=false}={}){
  const root=batchCells?new T.LOD():new T.Group();root.name='Sapling '+source.name;root.userData.saplingV328=kind;root.add(fallback);
+ const visibility={revision:0,mask:null};
+ if(batchCells)root.setSaplingVisibilityV346f=mask=>{visibility.mask=mask;visibility.revision++;};
  let transformsDirty=true;
  if(staticTransforms){
   const update=root.updateMatrixWorld,local=new T.Matrix4(),parentWorld=new T.Matrix4();
@@ -138,11 +142,11 @@ export function withSaplingInstancesV328(source,kind,fallback=source,{quality='h
  const bins=new Map(),matrix=new T.Matrix4(),color=new T.Color();
  for(let i=0;i<source.count;i++){
   source.getMatrixAt(i,matrix);const x=matrix.elements[12],z=matrix.elements[14],variant=saplingVariantV328(x,z),key=Math.floor(x/cellSize)+':'+Math.floor(z/cellSize)+':'+variant;
-  const rows=bins.get(key)||[];rows.push({matrix:matrix.clone(),tint:source.instanceColor?(source.getColorAt(i,color),color.clone()):null,variant});bins.set(key,rows);
+  const rows=bins.get(key)||[];rows.push({matrix:matrix.clone(),tint:source.instanceColor?(source.getColorAt(i,color),color.clone()):null,variant,index:i});bins.set(key,rows);
  }
  root.sourceSaplingV328=source;root.userData.instanceCount=source.count;root.userData.saplingReadyV328=false;
  root.userData.saplingPromiseV328=Promise.all(Array.from({length:5},(_,i)=>loadSaplingV328(kind,i,'far'))).then(()=>{
-  if(batchCells)buildDetailStand(root,kind,unitHeight,bins,quality,cellSize,()=>{transformsDirty=true;});
+  if(batchCells)buildDetailStand(root,kind,unitHeight,bins,quality,cellSize,()=>{transformsDirty=true;},visibility);
   else for(const rows of bins.values()){
    const variant=rows[0].variant,lod=new T.LOD(),levels=new Map(),center=new T.Vector3(),position=new T.Vector3(),worldScale=new T.Vector3();let tallest=1,selected='far';
    for(const r of rows){center.add(new T.Vector3().setFromMatrixPosition(r.matrix));tallest=Math.max(tallest,new T.Vector3().setFromMatrixScale(r.matrix).y);}

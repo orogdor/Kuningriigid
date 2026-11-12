@@ -1,6 +1,6 @@
 // V274: cut forest regrows next to mature trees, seedlings are not harvestable until mature,
 // nothing sprouts on building sites or far from living trees; wells need the "water" discovery.
-import {naturalRegrowthV274,TREE_GROW_V274} from '../navigation.js';
+import {gather,naturalRegrowthV274,TREE_GROW_V274} from '../navigation.js';
 import {BUILD_TECH} from '../research.js';
 const ok=(c,m)=>{if(!c){console.error('FAIL',m);process.exit(1);}};
 ok(BUILD_TECH.well==='water','well requires the water discovery');
@@ -17,3 +17,12 @@ console.log('tree growth V274 ok, sprouted',total);
 // regression: the live game passes the global state (no .buildings) plus the city's building list
 {const st={time:0};const w={resources:[{id:0,kind:'tree',x:0,z:0,amount:24,capacity:24,removed:false},{id:1,kind:'tree',x:3,z:0,amount:0,capacity:24,removed:true}],revision:0};
  for(let t=0;t<600;t+=30){st.time=t;naturalRegrowthV274(st,w,null,30,[{x:50,z:50}]);}console.log('regrowth with global state ok');}
+// A legacy or filtered resource array can have stable IDs different from array indices.
+{
+ const tree=mk(2,0,0,false),stone={id:8,kind:'stone',amount:99};
+ const world={resources:[tree,mk(4,20,20,false),stone],revision:0,workers:{wood:{phase:'work',x:1.8,z:0,work:0,resourceId:tree.id}}};
+ const lumber={type:'lumber',team:0,x:0,z:0,workerKey:'wood'};
+ gather({time:0,buildings:[lumber]},lumber,{cycle:1,rate:24},2,{world});
+ ok(tree.removed&&tree.amount===0&&world.revision===1,'woodcutting depletes the selected resource ID');
+ ok(stone.amount===99,'woodcutting does not consume the array slot of another resource');
+}

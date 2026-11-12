@@ -1,6 +1,7 @@
 import {RenderDeltaV343} from './render-delta-v343.js';
 import {EAGER_MODULES_V340,USE_TERRAIN_CACHE_V340} from './startup-mode-v340.js';
 import {snapshotAtlasTerrainV336,restoreAtlasTerrainV336} from './atlas-terrain-v327.js';
+import {atlasGroundSamplerV326} from './atlas-sea-v326.js';
 import {terrainMeshKeyV336,readTerrainMeshV336,writeTerrainMeshV336} from './terrain-cache-v336.js';
 import {captureGeneratedWorldV331,hydrateGeneratedWorldV331,persistGeneratedWorldV331,portableGeneratedWorldSaveV331,importGeneratedWorldV331,generatedWorldStatusV331} from './generated-world-v331.js';
 import {forestCandidatesV330,forestRandomV330} from './forest-placement-v330.js';
@@ -541,40 +542,19 @@ if(quality!=='low'){
 const atlasGrid=grid.length?new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(grid,3)),new T.LineBasicMaterial({color:'#e4ead2',transparent:true,opacity:.06,depthWrite:false})):null;if(atlasGrid)worldScene.add(atlasGrid);
 function fadeAtlasGrid(z){if(!atlasGrid)return;const o=.065*Math.max(0,Math.min(1,(330-z)/150));atlasGrid.material.opacity=o;atlasGrid.visible=o>.003;}
 
-function parchmentColor(x,z){const n=game.smooth(x/40+17,z/40+61),grain=game.smooth(x/12+91,z/12+35),c=new T.Color('#c7b488');c.lerp(new T.Color('#dcc7a1'),n*.45);c.lerp(new T.Color('#af9a73'),Math.max(0,grain-.55)*.33);return c}
-const visionDelta=new VisionDelta(s),atlasVisibleColors=atlasLand.geometry.attributes.color.array.slice();
+const visionDelta=new VisionDelta(s),atlasGround=atlasGroundSamplerV326(atlasLand.geometry);
 function saveTerrainCacheV336(){
  const key=terrainMeshKeyV336(s,quality);
  if(!key||terrainCacheHitV336||terrainCacheStoredV336)return;
  terrainCacheStoredV336=true;
  setTimeout(async()=>{
   try{
-   const snapshot=snapshotAtlasTerrainV336(atlasLand.geometry,atlasVisibleColors);
+   const snapshot=snapshotAtlasTerrainV336(atlasLand.geometry);
    if(!await writeTerrainMeshV336(key,snapshot))terrainCacheStoredV336=false;
   }catch(error){terrainCacheStoredV336=false;console.warn('Atlas cache skipped:',error);}
  },1000);
 }
 if(terrainCacheKeyV336&&!terrainCacheHitV336)saveTerrainCacheV336();
-let atlasVertexCells=null,atlasFogSerial=-1;
-function refreshAtlasFog(){
- const delta=visionDelta.update(),pos=atlasLand.geometry.attributes.position,col=atlasLand.geometry.attributes.color;
- if(!atlasVertexCells){
-  atlasVertexCells=new Map();
-  for(let i=0;i<pos.count;i++){
-   const x=pos.getX(i),z=pos.getZ(i),at=cellAt(x,z);if(!at)continue;
-   const key=at.c+':'+at.r;if(!atlasVertexCells.has(key))atlasVertexCells.set(key,[]);atlasVertexCells.get(key).push(i);
-   if(!game.seen(0,at)){const color=parchmentColor(x,z),ink=Math.max(0,game.smooth(x/23+11,z/23+97)-.72);if(ink>.001)color.lerp(new T.Color('#8b7753'),ink*.35);color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.18);col.setXYZ(i,color.r,color.g,color.b);}
-  }
-  col.needsUpdate=true;atlasFogSerial=delta.serial;return;
- }
- if(atlasFogSerial===delta.serial)return;atlasFogSerial=delta.serial;
- for(const at of delta.changed)for(const i of atlasVertexCells.get(at.key)||[]){
-  if(delta.known.has(at.key))col.setXYZ(i,atlasVisibleColors[i*3],atlasVisibleColors[i*3+1],atlasVisibleColors[i*3+2]);
-  else {const x=pos.getX(i),z=pos.getZ(i),color=parchmentColor(x,z);color.multiplyScalar(.90+game.smooth(x/19+20,z/19+30)*.18);col.setXYZ(i,color.r,color.g,color.b);}
-  col.addUpdateRange?.(i*3,3);
- }
- if(delta.changed.length)col.needsUpdate=true;
-}
 const fogSketchGroup=new T.Group();worldScene.add(fogSketchGroup);let fogSketchStamp='';const fogTextures=new Map();
 const fogCoverGroup=new T.Group();worldScene.add(fogCoverGroup);let fogCoverStamp='';
 function sketchTexture(kind){if(fogTextures.has(kind))return fogTextures.get(kind);const canvas=document.createElement('canvas');canvas.width=canvas.height=128;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,128,128);ctx.strokeStyle='rgba(76,55,27,.72)';ctx.fillStyle='rgba(76,55,27,.25)';ctx.lineWidth=4;ctx.lineCap='round';ctx.lineJoin='round';if(kind==='sea'){ctx.beginPath();ctx.moveTo(16,78);ctx.bezierCurveTo(36,50,54,52,67,77);ctx.bezierCurveTo(80,101,92,91,110,66);ctx.stroke();for(const y of [92,101]){ctx.beginPath();ctx.moveTo(20,y);ctx.quadraticCurveTo(34,y-6,48,y);ctx.quadraticCurveTo(62,y+6,76,y);ctx.quadraticCurveTo(90,y-6,108,y);ctx.stroke();}}else if(kind==='mountain'){ctx.beginPath();ctx.moveTo(18,96);ctx.lineTo(46,48);ctx.lineTo(72,96);ctx.moveTo(56,96);ctx.lineTo(86,38);ctx.lineTo(111,96);ctx.stroke();ctx.beginPath();ctx.moveTo(41,57);ctx.lineTo(47,50);ctx.lineTo(54,60);ctx.moveTo(81,51);ctx.lineTo(87,42);ctx.lineTo(95,58);ctx.stroke();}else if(kind==='forest'){for(const x of [34,64,94]){ctx.beginPath();ctx.moveTo(x,98);ctx.lineTo(x,82);ctx.stroke();ctx.beginPath();ctx.moveTo(x,50);ctx.lineTo(x-16,82);ctx.lineTo(x+16,82);ctx.closePath();ctx.stroke();}}else{ctx.beginPath();ctx.arc(64,64,26,0,Math.PI*2);ctx.stroke();for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(64+Math.cos(a)*30,64+Math.sin(a)*30);ctx.lineTo(64+Math.cos(a)*46,64+Math.sin(a)*46);ctx.stroke();}}const tx=new T.CanvasTexture(canvas);fogTextures.set(kind,tx);return tx}
@@ -587,10 +567,16 @@ function refreshFogCover(){
  const delta=visionDelta.update();
  if(!fogCoverMesh){
   const data=new Uint8Array(COLS*ROWS);
-  for(const [i,cell] of game.cells.entries())data[i]=game.seen(0,cell)?255:0;
+  for(const cell of game.cells)data[cell.r*COLS+cell.c]=game.seen(0,cell)?255:0;
   const seenTex=new T.DataTexture(data,COLS,ROWS,T.RedFormat);seenTex.magFilter=seenTex.minFilter=T.LinearFilter;seenTex.needsUpdate=true;
-  const geometry=new T.PlaneGeometry(WORLD_WIDTH+400,WORLD_DEPTH+400,1,1);geometry.rotateX(-Math.PI/2);geometry.translate(WORLD_CENTER_X,120,WORLD_CENTER_Z);
-  const pos=geometry.attributes.position,uv=geometry.attributes.uv;for(let i=0;i<pos.count;i++)uv.setXY(i,pos.getX(i)/50.8,pos.getZ(i)/50.8);
+  // An elevated flat plane shifted the explored mask sideways in the tilted camera.
+  const geometry=new T.PlaneGeometry(WORLD_WIDTH+400,WORLD_DEPTH+400,COLS+8,ROWS+8);
+  geometry.rotateX(-Math.PI/2);geometry.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);
+  const pos=geometry.attributes.position,uv=geometry.attributes.uv;
+  for(let i=0;i<pos.count;i++){
+   const x=pos.getX(i),z=pos.getZ(i);
+   pos.setY(i,Math.max(.72,atlasGround(x,z)));uv.setXY(i,x/50.8,z/50.8);
+  }
   const map=fogCoverTexture();map.wrapS=map.wrapT=T.RepeatWrapping;map.needsUpdate=true;
   let material;
   if(T.GPU_MODE_V225){
@@ -603,7 +589,9 @@ function refreshFogCover(){
    const w=positionLocal.xz;
    const fw=w.add(vec2(fogN(w.mul(.021)).sub(.5),fogN(w.mul(.021).add(17)).sub(.5)).mul(38)).add(vec2(fogN(w.mul(.08).add(3)).sub(.5),fogN(w.mul(.08).add(9)).sub(.5)).mul(10));
    const su=vec2(fw.x.sub(ORIGIN_X).div(WORLD_WIDTH),fw.y.sub(ORIGIN_Z).div(WORLD_DEPTH));
-   const seen=texture(seenTex,su).r;
+   const cells=vec2(COLS,ROWS),base=vec2(w.x.sub(ORIGIN_X).div(WORLD_WIDTH),w.y.sub(ORIGIN_Z).div(WORLD_DEPTH));
+   const exact=texture(seenTex,floor(base.mul(cells)).add(.5).div(cells)).r;
+   const seen=texture(seenTex,su).r.max(exact);
    const paper=texture(map,uv());
    material=new T.MeshBasicNodeMaterial({side:T.DoubleSide,transparent:true,depthTest:false,depthWrite:false,toneMapped:false,fog:false});
    material.colorNode=vec4(paper.rgb.mul(smoothstep(0,.30,seen).mul(.06).add(.94)),paper.a);
@@ -619,13 +607,18 @@ function refreshFogCover(){
     .replace('#include <map_fragment>',`#include <map_fragment>
  vec2 fw=vFogW+vec2(fogN(vFogW*.021)-.5,fogN(vFogW*.021+17.0)-.5)*38.0+vec2(fogN(vFogW*.08+3.0)-.5,fogN(vFogW*.08+9.0)-.5)*10.0;
  vec2 su=vec2((fw.x-(${ORIGIN_X.toFixed(1)}))/${WORLD_WIDTH.toFixed(1)},(fw.y-(${ORIGIN_Z.toFixed(1)}))/${WORLD_DEPTH.toFixed(1)});
- float seen=texture2D(uSeen,su).r;
+ vec2 cells=vec2(${COLS}.0,${ROWS}.0);
+ vec2 base=(vFogW-vec2(${ORIGIN_X.toFixed(1)},${ORIGIN_Z.toFixed(1)}))/vec2(${WORLD_WIDTH.toFixed(1)},${WORLD_DEPTH.toFixed(1)});
+ float exact=texture2D(uSeen,(floor(base*cells)+.5)/cells).r;
+ float seen=max(texture2D(uSeen,su).r,exact);
  diffuseColor.a*=1.0-smoothstep(.30,.62,seen);
  diffuseColor.rgb*=.94+.06*smoothstep(.0,.30,seen);`);
   };
-  fogCoverMesh=new T.Mesh(geometry,material);fogCoverMesh.renderOrder=900;fogCoverMesh.frustumCulled=false;fogCoverMesh.userData.seenTexture=seenTex;fogCoverGroup.add(fogCoverMesh);fogCoverSerial=delta.serial;return;
+  fogCoverMesh=new T.Mesh(geometry,material);fogCoverMesh.renderOrder=900;fogCoverMesh.frustumCulled=false;fogCoverMesh.userData.seenTexture=seenTex;fogCoverGroup.add(fogCoverMesh);fogCoverSerial=delta.serial;
+  fogCoverMesh.visible=delta.known.size<COLS*ROWS;return;
  }
  if(fogCoverSerial===delta.serial)return;fogCoverSerial=delta.serial;
+ fogCoverMesh.visible=delta.known.size<COLS*ROWS;
  const tex=fogCoverMesh.userData.seenTexture;
  for(const at of delta.changed){tex.image.data[at.r*COLS+at.c]=delta.known.has(at.key)?255:0;}
  if(delta.changed.length)tex.needsUpdate=true;
@@ -639,15 +632,15 @@ function refreshFogSketches(){
   for(const [kind,cells]of Object.entries(symbols)){
    if(!cells.length)continue;const geometry=new T.PlaneGeometry(42,42);geometry.rotateX(-Math.PI/2);
    const mesh=new T.InstancedMesh(geometry,new T.MeshBasicMaterial({map:sketchTexture(kind),transparent:true,opacity:.8,depthTest:false,depthWrite:false,side:T.DoubleSide,toneMapped:false}),cells.length);
-   cells.forEach((cell,i)=>{dummy.position.set(cell.x,122,cell.z);dummy.scale.setScalar(game.seen(0,cell)?0:1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);fogSketchCells.set(cell.c+':'+cell.r,{mesh,index:i,cell});});
+   cells.forEach((cell,i)=>{dummy.position.set(cell.x,Math.max(.72,atlasGround(cell.x,cell.z))+2,cell.z);dummy.scale.setScalar(game.seen(0,cell)?0:1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);fogSketchCells.set(cell.c+':'+cell.r,{mesh,index:i,cell});});
    mesh.instanceMatrix.needsUpdate=true;mesh.frustumCulled=false;mesh.renderOrder=901;fogSketchGroup.add(mesh);
   }
   fogSketchReady=true;fogSketchSerial=delta.serial;return;
  }
  if(fogSketchSerial===delta.serial)return;fogSketchSerial=delta.serial;
- for(const at of delta.changed){const entry=fogSketchCells.get(at.key);if(!entry)continue;const{mesh,index,cell}=entry;dummy.position.set(cell.x,122,cell.z);dummy.scale.setScalar(delta.known.has(at.key)?0:1);dummy.updateMatrix();mesh.setMatrixAt(index,dummy.matrix);mesh.instanceMatrix.addUpdateRange?.(index*16,16);mesh.instanceMatrix.needsUpdate=true;}
+ for(const at of delta.changed){const entry=fogSketchCells.get(at.key);if(!entry)continue;const{mesh,index,cell}=entry;dummy.position.set(cell.x,Math.max(.72,atlasGround(cell.x,cell.z))+2,cell.z);dummy.scale.setScalar(delta.known.has(at.key)?0:1);dummy.updateMatrix();mesh.setMatrixAt(index,dummy.matrix);mesh.instanceMatrix.addUpdateRange?.(index*16,16);mesh.instanceMatrix.needsUpdate=true;}
 }
-refreshAtlasFog();refreshFogCover();refreshFogSketches();
+refreshFogCover();refreshFogSketches();
 const icons=new Map();function icon(text,color='#fff'){const key=text+color;if(!icons.has(key)){const canvas=document.createElement('canvas');canvas.width=canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(30,20,11,.86)';ctx.beginPath();ctx.arc(32,32,28,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(217,182,115,.85)';ctx.lineWidth=3;ctx.stroke();/* V282: warm badge instead of teal */ctx.fillStyle=color;ctx.font='bold 38px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,32,34);const tx=new T.CanvasTexture(canvas),material=new T.SpriteMaterial({map:tx,depthTest:false});icons.set(key,material)}const sprite=new T.Sprite(icons.get(key));sprite.scale.set(12,12,1);return sprite}
 // V282: map resource badges use the painted resource art of the interface (glyphs only where no art exists)
 const RES_ART_V282={clay:'res_clay',copper:'res_copper',tin:'res_tin',wood:'res_wood',stone:'res_stone',ore:'res_iron',grain:'res_grain',water:'res_water',coal:'res_coal'};
@@ -793,7 +786,7 @@ function* buildDetailTileV242(entry){
   }
   entry.resources.set(res.id,resourceView(res,tile,entry.scenery));if(++batch%4===0||sliceDueV342())yield;
  }
- entry.stage='forest fill';yield* addForestFillV346(entry.scenery,tile,entry.world);yield;
+ entry.stage='forest fill';entry.forestFill=yield* addForestFillV346(entry.scenery,tile,entry.world);yield;
  entry.stage='ground cover';
  const cover=createGroundCoverV156(tile,coverHeight(tile),graphicsVegetationQualityV226(graphicsV226),groundAvoidance(tile),{fraction:.55,deferred:true});
  entry.cover=cover.group;entry.root.add(cover.group);
@@ -922,6 +915,7 @@ function refreshStreamHoldersV242(){
   detailObjectHolders.set(entry.key,{tile:entry.tile,holder:entry.sites});
   if(entry.tile!==activeTile&&(entry.ready||entry.visualReady)){
    const context=game.contextAt(entry.tile,false),buildings=context?.economy.buildings||[],present=new Set(buildings);
+   updateDetailForestV346f(entry.forestFill,entry.world,buildings);
    for(const [b,value] of entry.buildings)if(!present.has(b)||b.virtual||b.hp<=0){value.model.removeFromParent();entry.buildings.delete(b);}
    for(const b of buildings){
     if(b.virtual||b.hp<=0)continue;let value=entry.buildings.get(b);
@@ -1012,40 +1006,80 @@ function followDetail(){
 }
 
 function insideCrossing(frame,x,z){if(!frame)return false;const dx=x-frame.x,dz=z-frame.z;return Math.abs(dx*frame.normal.x+dz*frame.normal.z)<frame.halfSpan*1.5&&Math.abs(-dx*frame.normal.z+dz*frame.normal.x)<4.5;}
-// Companions belong to the resource root: cutting, clearing and seedling scaling apply together.
-// V346: forest floor filler. Resource trees alone leave wide grass gaps
-// between groves; decorative trees (not harvestable, no gameplay) fill every
-// gap wider than ~6 m on forest tiles. One instanced Sapling stand per species.
+// The canopy between resource trees follows a continuous lattice. Each extra
+// tree belongs to a nearby resource, so cutting leaves a lasting clearing.
 function* addForestFillV346(g,tile,world){
  if(tile.mountain)return;
- // Any tile with trees: fill the gaps BETWEEN trees (a tree within 14 m, none within 5 m); open meadows stay open.
  const quality=graphicsVegetationQualityV226(graphicsV226)==="low"?"low":"high";
- const forestTile=forestV329(tile),spacing=quality==='low'?(forestTile?7:9.5):(forestTile?5:7),keep=[],bins=new Map(),cs=8;
- const note=(x,z)=>{const k=Math.floor(x/cs)+':'+Math.floor(z/cs);(bins.get(k)||bins.set(k,[]).get(k)).push({x,z});};
- for(const r of world.resources)if(r.kind==='tree'&&!r.removed&&r.amount>0){note(r.x,r.z);for(const p of detailCompanionsV329(tile,r))note(p.x,p.z);}
- const near=(x,z,lim)=>{const gx=Math.floor(x/cs),gz=Math.floor(z/cs),k=Math.ceil(lim/cs);for(let j=-k;j<=k;j++)for(let i=-k;i<=k;i++)for(const q of bins.get((gx+i)+':'+(gz+j))||[])if(Math.hypot(q.x-x,q.z-z)<lim)return true;return false;};
- const buildings=game.contextAt(tile,false)?.economy.buildings.filter(b=>!b.virtual&&b.hp>0)||[],crossing=tile.river&&(tile.bridge||tile.ford)?crossingFrame(game,tile):null;
- const byKind=new Map(),seed=s.seed|0,forest=forestV329(tile); // forest tiles: closed canopy everywhere
- const firstX=Math.floor(-DETAIL_HALF_X/spacing);
- for(let gz=Math.floor(-DETAIL_HALF_Z/spacing);gz<=Math.ceil(DETAIL_HALF_Z/spacing);gz++)for(let gx=firstX;gx<=Math.ceil(DETAIL_HALF_X/spacing);gx++){
-  if((gx-firstX)%16===0&&sliceDueV342())yield;
-  const wx=tile.c*DETAIL_TILE_X+gx*spacing,wz=tile.r*DETAIL_TILE_Z+gz*spacing;   // world lattice: seamless between tiles
-  const x=gx*spacing+(forestRandomV330(wx,wz,seed,346)-.5)*spacing*.8,z=gz*spacing+(forestRandomV330(wx,wz,seed,347)-.5)*spacing*.8;
-  if(Math.abs(x)>DETAIL_HALF_X-3||Math.abs(z)>DETAIL_HALF_Z-3||Math.abs(z)<(forest?7:18)||near(x,z,forest?3.6:4.6)||(!forest&&!near(x,z,24)))continue;
+ const forest=forestV329(tile),spacing=quality==='low'?(forest?7:9.5):(forest?5:7),bins=new Map(),cs=16;
+ const note=(x,z,owner=null)=>{
+  const key=Math.floor(x/cs)+':'+Math.floor(z/cs);
+  const bin=bins.get(key)||[];bin.push({x,z,owner});bins.set(key,bin);
+ };
+ for(const r of world.resources)if(r.kind==='tree'&&!(r.cleared&&r.amount>0)){
+  note(r.x,r.z,r);
+  for(const p of detailCompanionsV329(tile,r)){
+   if(Math.abs(p.x)<=DETAIL_HALF_X-3&&Math.abs(p.z)<=DETAIL_HALF_Z-3&&Math.abs(p.z)>=18)note(p.x,p.z,r);
+  }
+ }
+ if(!bins.size)return;
+ const crossing=tile.river&&(tile.bridge||tile.ford)?crossingFrame(game,tile):null;
+ const byKind=new Map(),seed=s.seed|0,origin={x:tile.c*DETAIL_TILE_X,z:tile.r*DETAIL_TILE_Z};
+ const radius=forest?36:24,spread=Math.ceil(radius/cs),separation=(forest?3.6:4.6)**2;
+ let n=0;
+ for(const p of forestCandidatesV330(origin,spacing,seed,346,{halfX:DETAIL_HALF_X,halfZ:DETAIL_HALF_Z})){
+  if(++n%16===0&&sliceDueV342())yield;
+  const x=p.x-origin.x,z=p.z-origin.z;
+  const cx=Math.floor(x/cs),cz=Math.floor(z/cs);
+  let owner=null,closest=radius*radius,blocked=false;
+  for(let j=-spread;j<=spread&&!blocked;j++)for(let i=-spread;i<=spread&&!blocked;i++){
+   for(const q of bins.get((cx+i)+':'+(cz+j))||[]){
+    const dist=(q.x-x)**2+(q.z-z)**2;
+    if(dist<separation){blocked=true;break;}
+    if(q.owner&&dist<closest){owner=q.owner;closest=dist;}
+   }
+  }
+  if(blocked||!owner)continue;
   const y=ground(tile,x,z),wxm=tile.x+x/DETAIL_X,wzm=tile.z+z/DETAIL_Z,water=riverNear(game,wxm,wzm);
   if(y<.5||water.distance<water.width*1.55+2||insideCrossing(crossing,wxm,wzm))continue;
-  if(buildings.some(b=>{const field=b.type==='field'?fieldSize(b):null,size=field?{rx:field.width/2,rz:field.depth/2}:buildingClearance(b);return size&&Math.abs(x-b.x)<size.rx+5&&Math.abs(z-b.z)<size.rz+5;}))continue;
-  const id=Math.floor(forestRandomV330(wx,wz,seed,348)*1e6),kind=saplingSpeciesV328(tile,id);if(!kind)continue;
-  (byKind.get(kind)||byKind.set(kind,[]).get(kind)).push({x,y,z,id,scale:.8+forestRandomV330(wx,wz,seed,349)*.35});note(x,z);
+  const id=Math.floor(forestRandomV330(p.gx,p.gz,seed,348)*1e6),kind=saplingSpeciesV328(tile,id);if(!kind)continue;
+  (byKind.get(kind)||byKind.set(kind,[]).get(kind)).push({x,y,z,id,owner,scale:.8+forestRandomV330(p.gx,p.gz,seed,349)*.35});note(x,z);
  }
+ const fill={stands:[]};
  const m=new T.Matrix4(),q=new T.Quaternion(),up=new T.Vector3(0,1,0);
  for(const [kind,rows]of byKind){if(sliceDueV342())yield;const broadleaf=!['pine','spruce'].includes(kind),src=createV48Mesh(broadleaf?'oak_1000_3':'pine_1000_3');
   const mesh=new T.InstancedMesh(src.geometry,src.material,rows.length);mesh.name='V346 forest fill '+kind;
   src.geometry.computeBoundingBox();const unit=Math.max(.1,src.geometry.boundingBox.max.y-src.geometry.boundingBox.min.y),tall=(kind==='pine'||kind==='spruce'?9:kind==='palm'?10:7)*.9; // same height as resource trees
   rows.forEach((r,i)=>{const k=tall*r.scale/unit;q.setFromAxisAngle(up,r.id*.39);m.compose(new T.Vector3(r.x,r.y,r.z),q,new T.Vector3(k,k,k));mesh.setMatrixAt(i,m);});
   mesh.instanceMatrix.needsUpdate=true;mesh.visible=false;
-  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality,cellSize:45,staticTransforms:true,batchCells:!T.GPU_MODE_V225});stand.name='V346 forest fill '+kind;g.add(stand);}
+  const stand=withSaplingInstancesV328(mesh,kind,mesh,{quality,cellSize:45,staticTransforms:true,batchCells:true});stand.name='V346 forest fill '+kind;g.add(stand);
+  fill.stands.push({stand,rows,mask:new Uint8Array(rows.length)});
+ }
+ updateDetailForestV346f(fill,world,game.contextAt(tile,false)?.economy.buildings||[]);
+ return fill;
 }
+function updateDetailForestV346f(fill,world,buildings){
+ if(!fill?.stands.length)return;
+ const footprints=[];
+ for(const b of buildings){
+  if(b.virtual||b.hp<=0)continue;
+  const field=b.type==='field'?fieldSize(b):null,size=field?{rx:field.width/2,rz:field.depth/2}:buildingClearance(b);
+  if(size)footprints.push([b.x,b.z,size.rx+1.5,size.rz+1.5]);
+ }
+ const stamp=footprints.join(';');
+ if(fill.revision===world.revision&&fill.stamp===stamp)return;
+ fill.revision=world.revision;fill.stamp=stamp;
+ for(const {stand,rows,mask} of fill.stands){
+  let changed=false;
+  for(let i=0;i<rows.length;i++){
+   const {x,z,owner}=rows[i];
+   const visible=Number(!owner.removed&&owner.amount>0&&!footprints.some(([bx,bz,rx,rz])=>Math.abs(x-bx)<rx&&Math.abs(z-bz)<rz));
+   if(mask[i]!==visible){mask[i]=visible;changed=true;}
+  }
+  if(changed||!stand.userData.forestMaskReadyV346f){stand.setSaplingVisibilityV346f(mask);stand.userData.forestMaskReadyV346f=true;}
+ }
+}
+// Companions belong to the resource root: cutting, clearing and seedling scaling apply together.
 function addForestResourceV329(parent,r,tile){
  addTree(parent,0,0,0,r.id,.9,tile);
  const buildings=game.contextAt(tile,false)?.economy.buildings||[],base=ground(tile,r.x,r.z);
@@ -1223,7 +1257,7 @@ function refreshCultivation(){game.refreshTerritory();const stamp=game.territory
  const v=new Uint8Array(COLS*ROWS);for(const cell of game.cells){if(!cell.land||cell.mountain)continue;const city=game.territory.get(cell.c+':'+cell.r);if(!city||!game.seen(0,cell))continue;
   let f=game.isCountyTile(cell,city)?.6:1;if(['forest','taiga','jungle'].includes(cell.biome))f*=.35;if(cell.biome==='desert')f*=.4;v[cell.r*COLS+cell.c]=Math.round(f*255);}
  setCultivation(v);}
-function worldSync(){refreshCultivation();worldProps.update();refreshResourceArea();if(worldSync.lastVision!==s.visionRevision){worldSync.lastVision=s.visionRevision;refreshAtlasFog();refreshFogCover();refreshFogSketches();} const mover=selectedShip!==null?s.ships.find(a=>a.id===selectedShip):selectedTrade!==null?s.shipments.find(a=>a.id===selectedTrade):armySelected?activeArmy():s.settlers.find(a=>a.id===selectedMover),goal=mover?.path?.at(-1);destination.visible=!!goal;if(goal){const p=center(goal.c,goal.r);destination.position.set(p.x,Math.max(.8,surface(game,p.x,p.z))+1,p.z);destinationArrow.position.y=12+Math.sin(s.time*3)*2}atlasDecor.territory(s);atlasDecor.roads(s);atlasDecor.route(s,mover);for(const r of resourceSprites)r.sprite.visible=showResourceOverlay&&game.seen(0,r.cell);const live=new Set();for(const city of s.cities){if(city.team!==0&&!game.visibleNow(0,city))continue;const key='city:'+city.id;live.add(key);let model=worldMarkers.get(key);if(!model){model=new T.Group();const village=createCityMiniature(city.team,game.upgrade(city.team));village.scale.setScalar(1+Math.min(1.2,city.economy.realms[city.team].pop/40));model.add(village);model.userData.village=village;model.userData.team=city.team;const banner=cityBanner(city.name+' · '+city.economy.realms[city.team].pop,city.team);banner.position.set(0,34,-27);model.userData.banner=banner;model.add(banner);model.add(icon('⌂',city.team?'#ed9e83':'#e7d49c'));model.children[2].scale.set(17,17,1);model.children[2].position.y=28;worldObjects.add(model);worldMarkers.set(key,model)}if(model.userData.village.userData.age!==game.upgrade(city.team)||model.userData.team!==city.team){if(model.userData.team!==city.team){model.remove(model.userData.banner);model.userData.banner=cityBanner(city.name+' · '+city.economy.realms[city.team].pop,city.team);model.userData.banner.position.set(0,34,-27)/* V282: at the north edge of the tile, not over the town */;model.add(model.userData.banner)}model.remove(model.userData.village);model.userData.village=createCityMiniature(city.team,game.upgrade(city.team));model.userData.village.scale.setScalar(1+Math.min(1.2,city.economy.realms[city.team].pop/40));model.userData.team=city.team;model.add(model.userData.village)}const label=city.name+':'+city.team+':'+city.economy.realms[city.team].pop;if(model.userData.label!==label){const old=model.userData.banner;model.remove(old);old.material.map?.dispose();old.material.dispose();model.userData.banner=cityBanner(city.name+' · '+city.economy.realms[city.team].pop,city.team);model.userData.banner.position.set(0,34,-27)/* V282: at the north edge of the tile, not over the town */;model.add(model.userData.banner);model.userData.label=label}const p=center(city.c,city.r);model.position.set(p.x,surface(game,p.x,p.z),p.z);syncWorldCityV269(model,city,p)}for(const parent of s.cities){if(parent.team!==0&&!game.visibleNow(0,parent))continue;for(const region of Object.values(parent.districts||{})){const real=region.economy.buildings.filter(b=>!b.virtual);if(!real.length)continue;const key='region:'+parent.id+':'+tileKey(region);live.add(key);let model=worldMarkers.get(key);if(model&&model.userData.upgrade!==game.buildingAge(parent.team,real[0].type)){worldObjects.remove(model);worldMarkers.delete(key);model=null}if(!model){model=townBuildingModel(real[0].type,parent.team,game.buildingAge(parent.team,real[0].type));model.userData.upgrade=game.buildingAge(parent.team,real[0].type);model.scale.setScalar(2.5);worldObjects.add(model);worldMarkers.set(key,model)}const p=center(region.c,region.r);model.position.set(p.x,surface(game,p.x,p.z),p.z)}}if(game.migrationActiveV274?.()){if(!siteSuggestV280||s.time-siteSuggestV280.at>3)siteSuggestV280={at:s.time,list:game.siteSuggestionsV280(0)};siteSuggestV280.list.forEach((p,i)=>{const key='suggest:'+i;live.add(key);let m=worldMarkers.get(key);if(!m){m=new T.Group();const b=icon(String(i+1),'#8fe0a0');b.scale.set(18,18,1);b.position.y=14;m.add(b);const ring=new T.Mesh(new T.RingGeometry(9,11,32),new T.MeshBasicMaterial({color:'#8fe0a0',transparent:true,opacity:.8,side:T.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=1;m.add(ring);worldObjects.add(m);worldMarkers.set(key,m);}const cell=game.cell(p);m.position.set(cell.x,surface(game,cell.x,cell.z)+.5,cell.z);});}/* V280: suggested town sites during the migration */for(const r of s.raidsV276||[]){const pos=raidPositionV276(game,r);if(!pos||!game.seen(0,{c:Math.round(pos.c),r:Math.round(pos.r)}))continue;const key='raid:'+r.id;live.add(key);let m=worldMarkers.get(key);if(!m){m=createWorldUnit('army',1);m.userData.body.scale.multiplyScalar(1/3);worldObjects.add(m);worldMarkers.set(key,m)}const a0=center(Math.floor(pos.c),Math.floor(pos.r)),a1=center(Math.ceil(pos.c),Math.ceil(pos.r)),fx=pos.c-Math.floor(pos.c),fz=pos.r-Math.floor(pos.r),x=a0.x+(a1.x-a0.x)*fx,z=a0.z+(a1.z-a0.z)*fz;m.position.set(x,surface(game,x,z),z);m.rotation.y=pos.heading;for(const man of m.userData.men||[])animateSoldier(man,s.time,true,false)}for(const a of s.settlers.filter(a=>a.embarked==null)){if(a.team!==0&&!game.visibleNow(0,a))continue;const key='settler:'+a.id;live.add(key);let m=worldMarkers.get(key);if(!m){m=createWorldUnit('settler',a.team);worldObjects.add(m);worldMarkers.set(key,m)}updateWorldUnit(m,a,s.time,(x,z)=>surface(game,x,z),a.team===0&&a.id===selectedMover)}for(const cargo of s.shipments){if(cargo.team!==0&&!game.visibleNow(0,cargo))continue;const key='trade:'+cargo.id;live.add(key);let m=worldMarkers.get(key);if(!m||m.userData.type!==(cargo.mode==='sea'?'merchantsea':cargo.mode==='air'?'plane':cargo.mode==='rail'?'train':'caravan')){if(m)worldObjects.remove(m);m=cargo.mode==='sea'?createShipModel({kind:'transport',team:cargo.team,upgrade:game.upgrade(cargo.team)}):createWorldUnit(cargo.mode==='air'?'plane':cargo.mode==='rail'?'train':'caravan',cargo.team);if(cargo.mode==='sea')m.userData.type='merchantsea';worldObjects.add(m);worldMarkers.set(key,m)}updateWorldUnit(m,cargo,s.time,(x,z)=>cargo.mode==='sea'?.7:surface(game,x,z),cargo.id===selectedTrade)}for(const a of s.armies){if(a.embarked!=null||a.hiddenInBandV274)continue;if(!armyUnits(s,a).length)continue;if(a.team!==0&&!game.visibleNow(0,a))continue;const key='army:'+a.team+':'+(a.id||0);live.add(key);let m=worldMarkers.get(key);const scouting=armyUnits(s,a).every(u=>u.kind==='scout');const motorized=armyUnits(s,a).some(u=>u.kind==='motorized');if(m&&(m.userData.scouting!==scouting||m.userData.motorized!==motorized)){worldObjects.remove(m);worldMarkers.delete(key);m=null}if(m&&m.userData.stoneSmallV276!==(game.upgrade(a.team)===0)){worldObjects.remove(m);worldMarkers.delete(key);m=null}if(!m){m=createWorldUnit(motorized?'motorizedArmy':scouting?'scout':'army',a.team);m.userData.scouting=scouting;m.userData.stoneSmallV276=game.upgrade(a.team)===0;if(m.userData.stoneSmallV276)m.userData.body.scale.multiplyScalar(1/3)/* V276: Stone Age armies 3x smaller on the world map */;m.userData.motorized=motorized;worldObjects.add(m);worldMarkers.set(key,m)}updateWorldUnit(m,a,s.time,(x,z)=>surface(game,x,z),a.team===0&&armySelected&&a===activeArmy())}for(const a of s.ships.filter(a=>a.hp>0)){if(a.team!==0&&!game.visibleNow(0,a))continue;const key='ship:'+a.id;live.add(key);let model=worldMarkers.get(key);if(model&&model.userData.upgrade!==game.upgrade(a.team)){worldObjects.remove(model);worldMarkers.delete(key);model=null}if(!model){model=createShipModel({...a,upgrade:game.upgrade(a.team)});model.userData.upgrade=game.upgrade(a.team);worldObjects.add(model);worldMarkers.set(key,model)}updateWorldUnit(model,a,s.time,()=>.7,a.id===selectedShip);model.userData.body.position.y=Math.sin(s.time*1.6+a.id)*.45;}for(const landmark of s.landmarks||[]){if(!game.seen(0,landmark))continue;
+function worldSync(){refreshCultivation();worldProps.update();refreshResourceArea();if(worldSync.lastVision!==s.visionRevision){worldSync.lastVision=s.visionRevision;refreshFogCover();refreshFogSketches();} const mover=selectedShip!==null?s.ships.find(a=>a.id===selectedShip):selectedTrade!==null?s.shipments.find(a=>a.id===selectedTrade):armySelected?activeArmy():s.settlers.find(a=>a.id===selectedMover),goal=mover?.path?.at(-1);destination.visible=!!goal;if(goal){const p=center(goal.c,goal.r);destination.position.set(p.x,Math.max(.8,surface(game,p.x,p.z))+1,p.z);destinationArrow.position.y=12+Math.sin(s.time*3)*2}atlasDecor.territory(s);atlasDecor.roads(s);atlasDecor.route(s,mover);for(const r of resourceSprites)r.sprite.visible=showResourceOverlay&&game.seen(0,r.cell);const live=new Set();for(const city of s.cities){if(city.team!==0&&!game.visibleNow(0,city))continue;const key='city:'+city.id;live.add(key);let model=worldMarkers.get(key);if(!model){model=new T.Group();const village=createCityMiniature(city.team,game.upgrade(city.team));village.scale.setScalar(1+Math.min(1.2,city.economy.realms[city.team].pop/40));model.add(village);model.userData.village=village;model.userData.team=city.team;const banner=cityBanner(city.name+' · '+city.economy.realms[city.team].pop,city.team);banner.position.set(0,34,-27);model.userData.banner=banner;model.add(banner);model.add(icon('⌂',city.team?'#ed9e83':'#e7d49c'));model.children[2].scale.set(17,17,1);model.children[2].position.y=28;worldObjects.add(model);worldMarkers.set(key,model)}if(model.userData.village.userData.age!==game.upgrade(city.team)||model.userData.team!==city.team){if(model.userData.team!==city.team){model.remove(model.userData.banner);model.userData.banner=cityBanner(city.name+' · '+city.economy.realms[city.team].pop,city.team);model.userData.banner.position.set(0,34,-27)/* V282: at the north edge of the tile, not over the town */;model.add(model.userData.banner)}model.remove(model.userData.village);model.userData.village=createCityMiniature(city.team,game.upgrade(city.team));model.userData.village.scale.setScalar(1+Math.min(1.2,city.economy.realms[city.team].pop/40));model.userData.team=city.team;model.add(model.userData.village)}const label=city.name+':'+city.team+':'+city.economy.realms[city.team].pop;if(model.userData.label!==label){const old=model.userData.banner;model.remove(old);old.material.map?.dispose();old.material.dispose();model.userData.banner=cityBanner(city.name+' · '+city.economy.realms[city.team].pop,city.team);model.userData.banner.position.set(0,34,-27)/* V282: at the north edge of the tile, not over the town */;model.add(model.userData.banner);model.userData.label=label}const p=center(city.c,city.r);model.position.set(p.x,surface(game,p.x,p.z),p.z);syncWorldCityV269(model,city,p)}for(const parent of s.cities){if(parent.team!==0&&!game.visibleNow(0,parent))continue;for(const region of Object.values(parent.districts||{})){const real=region.economy.buildings.filter(b=>!b.virtual);if(!real.length)continue;const key='region:'+parent.id+':'+tileKey(region);live.add(key);let model=worldMarkers.get(key);if(model&&model.userData.upgrade!==game.buildingAge(parent.team,real[0].type)){worldObjects.remove(model);worldMarkers.delete(key);model=null}if(!model){model=townBuildingModel(real[0].type,parent.team,game.buildingAge(parent.team,real[0].type));model.userData.upgrade=game.buildingAge(parent.team,real[0].type);model.scale.setScalar(2.5);worldObjects.add(model);worldMarkers.set(key,model)}const p=center(region.c,region.r);model.position.set(p.x,surface(game,p.x,p.z),p.z)}}if(game.migrationActiveV274?.()){if(!siteSuggestV280||s.time-siteSuggestV280.at>3)siteSuggestV280={at:s.time,list:game.siteSuggestionsV280(0)};siteSuggestV280.list.forEach((p,i)=>{const key='suggest:'+i;live.add(key);let m=worldMarkers.get(key);if(!m){m=new T.Group();const b=icon(String(i+1),'#8fe0a0');b.scale.set(18,18,1);b.position.y=14;m.add(b);const ring=new T.Mesh(new T.RingGeometry(9,11,32),new T.MeshBasicMaterial({color:'#8fe0a0',transparent:true,opacity:.8,side:T.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=1;m.add(ring);worldObjects.add(m);worldMarkers.set(key,m);}const cell=game.cell(p);m.position.set(cell.x,surface(game,cell.x,cell.z)+.5,cell.z);});}/* V280: suggested town sites during the migration */for(const r of s.raidsV276||[]){const pos=raidPositionV276(game,r);if(!pos||!game.seen(0,{c:Math.round(pos.c),r:Math.round(pos.r)}))continue;const key='raid:'+r.id;live.add(key);let m=worldMarkers.get(key);if(!m){m=createWorldUnit('army',1);m.userData.body.scale.multiplyScalar(1/3);worldObjects.add(m);worldMarkers.set(key,m)}const a0=center(Math.floor(pos.c),Math.floor(pos.r)),a1=center(Math.ceil(pos.c),Math.ceil(pos.r)),fx=pos.c-Math.floor(pos.c),fz=pos.r-Math.floor(pos.r),x=a0.x+(a1.x-a0.x)*fx,z=a0.z+(a1.z-a0.z)*fz;m.position.set(x,surface(game,x,z),z);m.rotation.y=pos.heading;for(const man of m.userData.men||[])animateSoldier(man,s.time,true,false)}for(const a of s.settlers.filter(a=>a.embarked==null)){if(a.team!==0&&!game.visibleNow(0,a))continue;const key='settler:'+a.id;live.add(key);let m=worldMarkers.get(key);if(!m){m=createWorldUnit('settler',a.team);worldObjects.add(m);worldMarkers.set(key,m)}updateWorldUnit(m,a,s.time,(x,z)=>surface(game,x,z),a.team===0&&a.id===selectedMover)}for(const cargo of s.shipments){if(cargo.team!==0&&!game.visibleNow(0,cargo))continue;const key='trade:'+cargo.id;live.add(key);let m=worldMarkers.get(key);if(!m||m.userData.type!==(cargo.mode==='sea'?'merchantsea':cargo.mode==='air'?'plane':cargo.mode==='rail'?'train':'caravan')){if(m)worldObjects.remove(m);m=cargo.mode==='sea'?createShipModel({kind:'transport',team:cargo.team,upgrade:game.upgrade(cargo.team)}):createWorldUnit(cargo.mode==='air'?'plane':cargo.mode==='rail'?'train':'caravan',cargo.team);if(cargo.mode==='sea')m.userData.type='merchantsea';worldObjects.add(m);worldMarkers.set(key,m)}updateWorldUnit(m,cargo,s.time,(x,z)=>cargo.mode==='sea'?.7:surface(game,x,z),cargo.id===selectedTrade)}for(const a of s.armies){if(a.embarked!=null||a.hiddenInBandV274)continue;if(!armyUnits(s,a).length)continue;if(a.team!==0&&!game.visibleNow(0,a))continue;const key='army:'+a.team+':'+(a.id||0);live.add(key);let m=worldMarkers.get(key);const scouting=armyUnits(s,a).every(u=>u.kind==='scout');const motorized=armyUnits(s,a).some(u=>u.kind==='motorized');if(m&&(m.userData.scouting!==scouting||m.userData.motorized!==motorized)){worldObjects.remove(m);worldMarkers.delete(key);m=null}if(m&&m.userData.stoneSmallV276!==(game.upgrade(a.team)===0)){worldObjects.remove(m);worldMarkers.delete(key);m=null}if(!m){m=createWorldUnit(motorized?'motorizedArmy':scouting?'scout':'army',a.team);m.userData.scouting=scouting;m.userData.stoneSmallV276=game.upgrade(a.team)===0;if(m.userData.stoneSmallV276)m.userData.body.scale.multiplyScalar(1/3)/* V276: Stone Age armies 3x smaller on the world map */;m.userData.motorized=motorized;worldObjects.add(m);worldMarkers.set(key,m)}updateWorldUnit(m,a,s.time,(x,z)=>surface(game,x,z),a.team===0&&armySelected&&a===activeArmy())}for(const a of s.ships.filter(a=>a.hp>0)){if(a.team!==0&&!game.visibleNow(0,a))continue;const key='ship:'+a.id;live.add(key);let model=worldMarkers.get(key);if(model&&model.userData.upgrade!==game.upgrade(a.team)){worldObjects.remove(model);worldMarkers.delete(key);model=null}if(!model){model=createShipModel({...a,upgrade:game.upgrade(a.team)});model.userData.upgrade=game.upgrade(a.team);worldObjects.add(model);worldMarkers.set(key,model)}updateWorldUnit(model,a,s.time,()=>.7,a.id===selectedShip);model.userData.body.position.y=Math.sin(s.time*1.6+a.id)*.45;}for(const landmark of s.landmarks||[]){if(!game.seen(0,landmark))continue;
  const key='landmark:'+landmark.id;live.add(key);let marker=worldMarkers.get(key);
  if(!marker){marker=new T.Group();const badge=icon(landmark.kind==='village'?'⌂':'✦',landmark.kind==='village'?'#f6cf87':'#c5adf5');badge.scale.set(22,22,1);badge.position.y=16;marker.add(badge);const plinth=new T.Mesh(new T.CylinderGeometry(landmark.kind==='village'?7:5,8,4,6),mat(landmark.kind==='village'?'#a38d60':'#938ca2'));plinth.position.y=3;marker.add(plinth);worldObjects.add(marker);worldMarkers.set(key,marker)}
  // V276: villages are drawn from the same Stone Age buildings as the towns (raiders: palisade + towers)
@@ -1984,6 +2018,8 @@ if(view==='local'&&!s.battle){if(drawnV342){detailStreamV242.setView(camera,focu
   const selectedTime=graphicsV226.daylight==='day'?240:graphicsV226.daylight==='evening'?540:graphicsV226.daylight==='night'?840:s.time;
   updateCityTorchesV235(cityTorchesV235,dayClockV235(selectedTime),s.time);
   if(!s.battle){
+   const current=activeTile&&detailStreamV242.entries.get(tileKey(activeTile));
+   updateDetailForestV346f(current?.forestFill,current?.world,activeCity()?.economy.buildings||[]);
    const clock=dayClockV235(selectedTime);
    for(const entry of detailStreamV242.entries.values())if(entry.root.visible&&entry.torches)updateCityTorchesV235(entry.torches,clock,s.time);
   }
