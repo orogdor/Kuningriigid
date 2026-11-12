@@ -59,6 +59,25 @@ await loadSaplingV328('pine',saplingVariantV328(123,123*.13),'near');camera.zoom
 function render(){scene.updateMatrixWorld();scene.onBeforeRender(null,scene,camera);for(const tree of trees)if(tree.parent&&tree.visible)tree.update(camera);}
 render();render();const batches=scene.children.filter(o=>o.isInstancedMesh);assert.equal(batches.length,2);assert.ok(batches.every(b=>b.count===100));batches[0].getMatrixAt(0,m);assert.ok(Math.abs(m.elements[12])<1e-6,'growing buffer retains early matrices');batches[0].getMatrixAt(99,m);assert.ok(Math.abs(m.elements[12]-.99)<1e-5);
 trees[3].visible=false;render();assert.ok(batches.every(b=>b.count===99),'chopped/hidden tree omitted');for(const tree of trees)scene.remove(tree);render();assert.ok(batches.every(b=>b.count===0),'map clear removes every live tree');assert.equal(originalBefore,4,'existing render callback retained');
+// V348: one GPU buffer upload for a changed batch, including the shadow pass.
+for(const mesh of batches){
+ const previous=mesh.instanceMatrix.version;
+ mesh.onBeforeShadow();
+ assert.equal(mesh.instanceMatrix.version,previous+1,'shadow draw uploads changed matrices once');
+ mesh.onBeforeRender();
+ assert.equal(mesh.instanceMatrix.version,previous+1,'main draw reuses GPU buffer until modified');
+ assert.equal(mesh.castShadow,mesh.name.includes(':near:'),'castShadow is fixed for the batch LOD');
+}
+// Moving a shared parent must not leave a resource tree in its original scene.
+const parentGroup=new T.Group(),secondScene=new T.Scene();
+const moved=withSaplingTreeV328('pine',new T.Group(),123);
+scene.add(parentGroup);parentGroup.add(moved);scene.updateMatrixWorld();scene.onBeforeRender(null,scene,camera);moved.update(camera);
+secondScene.add(parentGroup);secondScene.updateMatrixWorld();secondScene.onBeforeRender(null,secondScene,camera);moved.update(camera);
+assert.ok(secondScene.children.some(o=>o.isInstancedMesh&&o.count>0),'reparented subtree uses the new scene batch');
+const listenerCount=secondScene._listeners?.removed?.length||0;
+assert.ok(listenerCount>0,'ancestor cache is observed for reparenting');
+secondScene.remove(parentGroup);
+assert.equal(secondScene._listeners?.removed?.length||0,listenerCount-1,'detaching subtree releases ancestor listeners');
 const biomeKinds=new Set(Array.from({length:200},(_,i)=>saplingSpeciesV328('taiga',i)));assert.deepEqual([...biomeKinds].sort(),['birch','pine','spruce']);assert.equal(saplingSpeciesV328('jungle',3),'palm');
 const result={passed:true,staticInstances:120,variants:5,sourceMatricesUnchanged:true,nearFarExclusive:true,grounded:true,liveInstances:100,capacityGrowthPreservesMatrices:true,hiddenAndRemovedTreesOmitted:true,previousSceneCallbackPreserved:true,biomeSpecies:true,glbRequests:requests.filter(x=>x.endsWith('.glb')).length};
 await writeFile('reports/sapling-trees-live-integration.json',JSON.stringify(result,null,2));console.log(result);
