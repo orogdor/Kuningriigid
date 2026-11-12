@@ -181,20 +181,95 @@ function liveBatch(scene,key,parts){
  b={capacity:0,meshes:[],count:0};
  b.grow=n=>{let cap=Math.max(64,b.capacity);while(cap<n)cap*=2;if(cap===b.capacity)return;
   const old=b.meshes;for(const mesh of old){scene.remove(mesh);mesh.dispose();}
-  b.meshes=parts.map((p,index)=>{const mesh=new T.InstancedMesh(p.geometry,p.material,cap);mesh.count=old[index]?.count||0;if(old[index])mesh.instanceMatrix.array.set(old[index].instanceMatrix.array);mesh.frustumCulled=false;mesh.name='Sapling resource '+key;mesh.userData.saplingV328=true;mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);scene.add(mesh);return mesh;});b.capacity=cap;};b.grow(1);map.set(key,b);return b;
+  const near=key.split(':')[2]==='near';
+  b.meshes=parts.map((p,index)=>{
+   const mesh=new T.InstancedMesh(p.geometry,p.material,cap);
+   mesh.count=old[index]?.count||0;
+   if(old[index])mesh.instanceMatrix.array.set(old[index].instanceMatrix.array);
+   mesh.frustumCulled=false;mesh.name='Sapling resource '+key;
+   mesh.userData.saplingV328=true;mesh.castShadow=near;
+   mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);
+   // Flush only before a real GPU submission. Shadow passes do not run onBeforeRender.
+   const flush=()=>{
+    if(mesh.userData.saplingBufferDirty){
+     mesh.instanceMatrix.needsUpdate=true;
+     mesh.userData.saplingBufferDirty=false;
+    }
+   };
+   mesh.onBeforeRender=flush;mesh.onBeforeShadow=flush;
+   scene.add(mesh);return mesh;
+  });
+  b.capacity=cap;
+ };
+ b.grow(1);map.set(key,b);return b;
 }
 export function withSaplingTreeV328(kind,fallback,seed=0,{height=kind==='pine'||kind==='spruce'?9:kind==='palm'?10:7}={}){
- const root=new T.LOD(),variant=saplingVariantV328(seed,seed*.13),position=new T.Vector3(),scale=new T.Vector3(),sphere=new T.Sphere();root.name='Sapling resource '+kind;root.add(fallback);root.userData.saplingV328=kind;root.userData.saplingVariantV328=variant;
- request(kind,variant,'far',root);
+ const root=new T.LOD(),variant=saplingVariantV328(seed,seed*.13),position=new T.Vector3(),scale=new T.Vector3(),sphere=new T.Sphere();
+ root.name='Sapling resource '+kind;root.add(fallback);
+ root.userData.saplingV328=kind;root.userData.saplingVariantV328=variant;
+ const partsByLevel={far:null,mid:null,near:null},batchesByLevel={far:null,mid:null,near:null};
+ const keysByLevel={
+  far:kind+':'+variant+':far:'+height,
+  mid:kind+':'+variant+':mid:'+height,
+  near:kind+':'+variant+':near:'+height
+ };
+ const requested=new Set();
+ const requestOnce=level=>{if(requested.has(level))return;requested.add(level);request(kind,variant,level,root);};
+ requestOnce('far');
+ // Observe ancestor detach/reparent events so a reused parent cannot keep a stale scene.
+ let cachedScene=null,cachedParent=null;const observedAncestors=[];
+ function invalidateScene(){
+  cachedScene=null;cachedParent=null;
+  for(const object of observedAncestors)object.removeEventListener('removed',invalidateScene);
+  observedAncestors.length=0;
+  batchesByLevel.far=null;batchesByLevel.mid=null;batchesByLevel.near=null;
+ }
+ // Detached roots must release their ancestor listeners immediately.
+ root.addEventListener('removed',invalidateScene);
+ function sceneForRoot(){
+  if(root.parent===cachedParent&&cachedScene)return cachedScene;
+  const previousScene=cachedScene;
+  for(const object of observedAncestors)object.removeEventListener('removed',invalidateScene);
+  observedAncestors.length=0;
+  let top=root;
+  while(top.parent){
+   top=top.parent;
+   top.addEventListener('removed',invalidateScene);
+   observedAncestors.push(top);
+  }
+  cachedParent=root.parent;
+  cachedScene=top.isScene?top:null;
+  if(previousScene!==cachedScene){
+   batchesByLevel.far=null;batchesByLevel.mid=null;batchesByLevel.near=null;
+  }
+  return cachedScene;
+ }
  root.update=camera=>{
   // The renderer already updated matrixWorld before traversing LOD nodes.
-  // getWorldPosition/getWorldScale would walk and update every ancestor again.
-  position.setFromMatrixPosition(root.matrixWorld);scale.setFromMatrixScale(root.matrixWorld);let level=saplingLevelV328(camera,position,height*scale.y,root.userData.saplingLOD);
-  let parts=template(kind,variant,level,height);if(!parts){request(kind,variant,level,root);level='far';parts=template(kind,variant,level,height);}
-  if(!parts){fallback.visible=true;return;}let scene=root;while(scene.parent)scene=scene.parent;if(!scene.isScene)return;
-  fallback.visible=false;const map=liveFor(scene);if(!map.viewReady){map.frustum.setFromProjectionMatrix(map.viewMatrix.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse),camera.coordinateSystem);map.viewReady=true;}sphere.center.copy(position);sphere.center.y+=height*scale.y*.5;sphere.radius=height*Math.max(scale.x,scale.y,scale.z);if(!map.frustum.intersectsSphere(sphere))return;root.userData.saplingLOD=level;const batch=liveBatch(scene,kind+':'+variant+':'+level+':'+height,parts);
+  position.setFromMatrixPosition(root.matrixWorld);scale.setFromMatrixScale(root.matrixWorld);
+  let level=saplingLevelV328(camera,position,height*scale.y,root.userData.saplingLOD);
+  let parts=partsByLevel[level]||(partsByLevel[level]=template(kind,variant,level,height));
+  if(!parts){
+   requestOnce(level);level='far';
+   parts=partsByLevel.far||(partsByLevel.far=template(kind,variant,'far',height));
+  }
+  if(!parts){fallback.visible=true;return;}
+  const scene=sceneForRoot();if(!scene)return;
+  fallback.visible=false;const map=liveFor(scene);
+  if(!map.viewReady){
+   map.frustum.setFromProjectionMatrix(map.viewMatrix.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse),camera.coordinateSystem);
+   map.viewReady=true;
+  }
+  sphere.center.copy(position);sphere.center.y+=height*scale.y*.5;
+  sphere.radius=height*Math.max(scale.x,scale.y,scale.z);
+  if(!map.frustum.intersectsSphere(sphere))return;
+  root.userData.saplingLOD=level;
+  const batch=batchesByLevel[level]||(batchesByLevel[level]=liveBatch(scene,keysByLevel[level],parts));
   const i=batch.meshes[0].count;if(i>=batch.capacity)batch.grow(i+1);
-  for(const mesh of batch.meshes){mesh.setMatrixAt(i,root.matrixWorld);mesh.count=i+1;mesh.instanceMatrix.needsUpdate=true;mesh.castShadow=level==='near';}
+  for(const mesh of batch.meshes){
+   mesh.setMatrixAt(i,root.matrixWorld);
+   mesh.count=i+1;mesh.userData.saplingBufferDirty=true;
+  }
  };
  return root;
 }
