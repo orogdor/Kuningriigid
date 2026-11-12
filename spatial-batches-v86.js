@@ -67,7 +67,11 @@ export function updateSpatialBatches(zoom,focus=null){
   for(const mesh of near.children){
    const dx=high?mesh.userData.spatialCenterX-focus.x:0;
    const dz=high?mesh.userData.spatialCenterZ-focus.z:0;
-   const geo=high&&dx*dx+dz*dz<limitSq?lod.high:lod.low;
+   const distanceSq=dx*dx+dz*dz;
+   // For boundary cases, keep Math.hypot's exact legacy LOD decision.
+   const near=high&&(Math.abs(distanceSq-limitSq)<=limitSq*1e-12
+    ?Math.hypot(dx,dz)<radius:distanceSq<limitSq);
+   const geo=near?lod.high:lod.low;
    if(mesh.geometry!==geo)mesh.geometry=geo;
    refreshGeneratedBoundsV327(mesh);
   }
