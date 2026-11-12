@@ -59,3 +59,25 @@ Puude `root.update` on päris veebimängus umbes **31% kiirem kutse kohta**, kui
 - `sapling-live-integration-v348.mjs` ning `sapling-live-upstream-test-v348.mjs`.
 - `profile-sapling-v348-ab.mjs`, `sapling-live-v348-browser-comparison.json`.
 - `2026-11-12-sapling-v348-baseline/` ja `2026-11-12-sapling-v348-optimized/`, sh 5 ja 120 kaadri CPU profiilid.
+
+
+## Pikem veebimängu FPS-võrdlus (2026-11-12, kell ~15 Eesti aja järgi)
+
+Pärast esialgset 5/120 kaadri A/B-testi tehti teine, iseseisev pikem katse. Kummaski variandis **2400 tegelikult joonistatud kaadrit**, jaotatuna 800 paigal kaamera, 800 deterministliku panoraami ja 800 lähi-/liikuva vaate kaadriks. Kokku 4800 kaadrit. Eraldi Chrome'i WebGL käivitused samal Windowsi masinal (RTX 2080 SUPER, D3D11), 1600×900, medium, 100% resolutsioon, piiramatu FPS. Kivikalda küla `?demo=stonetown&gpu=0&v=346`. Mõlemal katsel vastas veebimängu laadimine GitHub Pagesi avalikule versioonile; ainult üks HTTP vastus `sapling-trees-v328.js` asendati kohaliku V347 või V348 koodiga, asenduste arv 1. Mõlemas 0 JavaScripti viga.
+
+Mängu tegelikele **1311 elavale ressursipuule** lisati samas jaotuses **500** `withSaplingTreeV328` testipuud. Iga faasi alguses pandi paika sama fookus ja suum; 1,8-sekundiline üleminek jäeti mõõtmisest välja. Detailvoog oli mõlema käivituse ajal 9/31 jälgitavat kirjet ready; selle piiranguga tuleb arvestada.
+
+| Faas (800 renderdatud kaadrit) | V347 FPS | V348 FPS | V348 muutus | V347 kaadri CPU (ms) | V348 kaadri CPU (ms) |
+|---|---:|---:|---:|---:|---:|
+| Paigal, suum 150 | 56,26 | 54,97 | −2,29% | 16,950 | 17,380 |
+| Liikuv kaamera, suum 150 | 47,67 | 46,30 | −2,87% | 20,111 | 20,729 |
+| Lähi-/liikuv kaamera, suum 95 | 47,73 | 46,37 | −2,85% | 19,902 | 20,550 |
+| **Kokku, 2400 kaadrit kummaski versioonis** | **50,25** | **48,89** | **−2,71%** | — | — |
+
+FPS = renderdatud kaadrite arv / mõõdetud monotoonkella järgi kulunud aeg (mitte graafikaseadmete juhtpaneelil näidatud FPS). Kaamera liikumine järgib sama deterministlikku sinusoidaalset marsruuti, st katseolud on ligikaudu võrdsed, kuid sõltumatu mängumaailma laadimise, süsteemi ajastuse ja shaderite tippkoormuse tõttu mitte bititäpselt identsed.
+
+**Aeglased kaadrid:** faaside lõikes üle 50 ms intervalle V347=1/2/8, V348=1/2/7 (kokku vastavalt 11 ja 10). 99. protsentiili intervall oli paigal ~33 ms, panoraamil ~42 ms ning lähivaates ~50 ms mõlemas variandis. Mõlema paigal lõigu jooksul esines umbes 320 ms üksikpiik. Renderduskorralduste arv oli suures osas samaväärne (~1092 paigal, ~1225 panoraamil, ~1056 lähivaates).
+
+**Tõlgendus:** V348 `root.update` oli eelnevas isoleeritud ja lühikeses pärisbrauseri katses kiirem, kuid pikema 1811 puuga koormatud päris mängukaadri FPS ei paranenud ja jäi umbes 2,7% alla lähteversioonile. Erinevus on väike ja mõõdetud üks kord ühe variandi kohta; kindlalt ei saa järeldada, et V348 alati aeglustab, küll aga puudub tõend üldise FPS-võidu kohta. Seetõttu **mitte ühendada V348 praegu main-harusse**. Järgmine mõistlik test on kordus A/B ümberpööratud käivitusjärjestusega ning varjupassi GPU ajamõõt, või muuta kitsalt vaid osade/mallide vahemälu ning jätta buffer dirty muutmine katsevariandiks.
+
+Kohalikud pikema testi toorandmed: `E:\KuningriigidTest\bench-five-frames\long-sapling-v348-ab.mjs` ja `long-sapling-v348-baseline/` ning `long-sapling-v348-optimized/` (`summary.json`, `idle-frames.json`, `pan-frames.json`, `near-frames.json`).
