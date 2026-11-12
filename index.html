@@ -19,9 +19,9 @@
 </div></section><script type="application/json" id="kingdoms-importmap">{
   "imports": {
     "./generated-world-v331.js": "./generated-world-v331.js?v=333a",
-    "./forest-placement-v330.js": "./forest-placement-v330.js?v=330a",
+    "./forest-placement-v330.js": "./forest-placement-v330.js?v=346f",
     "./forest-ecology-v329.js": "./forest-ecology-v329.js?v=329a",
-    "./sapling-trees-v328.js": "./sapling-trees-v328.js?v=346e",
+    "./sapling-trees-v328.js": "./sapling-trees-v328.js?v=346f",
     "./glb-lite-v221.js": "./glb-lite-v221.js?v=345a",
     "./atlas-sea-v326.js": "./atlas-sea-v326.js?v=344a",
     "./atlas-biomes-v47.js": "./atlas-biomes-v47.js?v=330a",
@@ -66,10 +66,10 @@
     "./road-gates-v177.js": "./road-gates-v177.js?v=182a",
     "./continuous-landscape.js?v=162a": "./continuous-landscape.js?v=344a",
     "./continuous-landscape.js": "./continuous-landscape.js?v=344a",
-    "./navigation.js?v=1752a": "./navigation.js?v=342",
-    "./navigation.js?v=1751a": "./navigation.js?v=342",
-    "./navigation.js?v=1755a": "./navigation.js?v=342",
-    "./navigation.js": "./navigation.js?v=342",
+    "./navigation.js?v=1752a": "./navigation.js?v=346f",
+    "./navigation.js?v=1751a": "./navigation.js?v=346f",
+    "./navigation.js?v=1755a": "./navigation.js?v=346f",
+    "./navigation.js": "./navigation.js?v=346f",
     "./ai-rural-v143.js": "./ai-rural-v143.js?v=168a",
     "./civilization-core.js?v=1754a": "./civilization-core.js?v=346a",
     "./wall-draw-v175.js?v=1754a": "./wall-draw-v175.js?v=339",
@@ -97,7 +97,7 @@
     "./ai-foundation-v88.js?v=117a": "./ai-foundation-v88.js?v=153a",
     "./tower-garrison-v117.js?v=117a": "./tower-garrison-v117.js?v=346a",
     "./fortifications.js?v=1751a": "./fortifications.js?v=1754a",
-    "./navigation.js?v=87a": "./navigation.js?v=342",
+    "./navigation.js?v=87a": "./navigation.js?v=346f",
     "./combat-equipment-v100.js": "./combat-equipment-v100.js?v=118a",
     "./catapult-accuracy-v105.js": "./catapult-accuracy-v105.js?v=118a",
     "./siege-assault-v108.js?v=118a": "./siege-assault-v108.js?v=118a",
@@ -153,7 +153,7 @@
     "./naval.js": "./naval.js?v=131a",
     "./victory-v72.js": "./victory-v72.js?v=118a",
     "./civilization-core.js?v=123a": "./civilization-core.js?v=346a",
-    "./civilization.js?v=118a": "./civilization.js?v=346e",
+    "./civilization.js?v=118a": "./civilization.js?v=346f",
     "./resource-sites-v88.js": "./resource-sites-v88.js?v=280a",
     "./settlement-ai-v88.js": "./settlement-ai-v88.js?v=118a",
     "./world-models-v152.js?v=161a": "./world-models-v152.js?v=328a",
@@ -229,11 +229,11 @@
     "./village-life-v76.js": "./village-life-v76.js?v=257",
     "./stone-motion-v222.js": "./stone-motion-v222.js?v=283a",
     "./stone-age-models-v221.js": "./stone-age-models-v221.js?v=283a",
-    "./civilization.js?v=2273": "./civilization.js?v=346e",
-    "./navigation.js?v=2273": "./navigation.js?v=342",
+    "./civilization.js?v=2273": "./civilization.js?v=346f",
+    "./navigation.js?v=2273": "./navigation.js?v=346f",
     "./village-life-v76.js?v=224": "./village-life-v76.js?v=257",
     "./civilization-core.js?v=2273": "./civilization-core.js?v=346a",
-    "./navigation.js?v=1754a": "./navigation.js?v=342",
+    "./navigation.js?v=1754a": "./navigation.js?v=346f",
     "./stone-age-models-v221.js?v=224": "./stone-age-models-v221.js?v=283a",
     "./civilization-core.js?v=202": "./civilization-core.js?v=346a",
     "./landscape-v149.js?v=162a": "./landscape-v149.js?v=328a",
@@ -304,6 +304,6 @@ b.onclick=function(){try{localStorage.setItem('kingdoms-reveal-v248',on?'0':'1')
 (function(){try{var q=new URLSearchParams(location.search),prefs={};try{prefs=JSON.parse(localStorage.getItem('kingdoms-graphics-v226')||'{}')}catch(e){}var wanted=prefs.renderer==='webgpu'||(prefs.renderer==null&&localStorage.getItem('kingdoms-gpu')==='1');var on=q.get('gpu')==='1'||(q.get('gpu')!=='0'&&wanted);
 if(q.get('gpu')==='1')localStorage.setItem('kingdoms-gpu','1');if(q.get('gpu')==='0')localStorage.removeItem('kingdoms-gpu');
 if(on&&!navigator.gpu)window.KINGDOMS_WEBGPU_RECOVER_V227?.('Brauser ei toeta WebGPU-d');
-var imports=JSON.parse(document.getElementById('kingdoms-importmap').textContent).imports;imports['./vendor/three.module.js']=on&&navigator.gpu?'./vendor/three-gpu-shim.js?v=305r187':'./vendor/three.module.js?v=305r187';var m=document.createElement('script');m.type='importmap';m.textContent=JSON.stringify({imports:imports});document.currentScript.after(m);}catch(e){}})();</script><script type="module" src="menu-controls-v337.js?v=337a"></script><script type="module" src="boot-v83.js?v=346e"></script><script type="module" src="hud-v69.js?v=69a"></script><script type="module" src="hud-v74.js?v=74a"></script><section id="citypanel" hidden aria-label="Linna juhtimine"><div class="city-panel-heading"><div class="city-identity"><span class="eyebrow">CITY MANAGEMENT</span><h2 id="citypaneltitle"></h2><p id="citypanelsub" class="v155-sub"></p></div><div class="hud-city-controls"><button id="hud-queue-toggle" type="button" aria-label="Linna tööjärjekord" aria-pressed="false">⏱</button><button id="hud-city-collapse" type="button" aria-label="Sulge linna paneel">✕</button></div></div><div class="city-tabs" role="tablist" aria-label="Linna vaated"><button id="citytab-info" role="tab">Overview</button><button id="citytab-build" role="tab">Construction</button><button id="citytab-workers" role="tab">Workers</button></div><div id="citypane-info" role="tabpanel"><aside><span class="eyebrow">PÕHJALA KROONIKA</span><h1>Üks maa.<br>Sinu kuningriik.</h1><p id="objective">Puit → lauad · vili → jahu → leib.<br>Raud → relvad → sõjavägi.</p><div class="line"></div><b id="selection">Pealinn · Kadakalinn</b><p id="detail">Puuduta hoonet või väeüksust. Seejärel anna kaardil käsk.</p><div id="progression"></div><p id="workforce"></p><div id="cityhealth" hidden></div><div id="actions"></div><button id="research">⚗ Uuri terast · 80 kulda</button><p class="hint">Lohista kaarti · rullik või +/− suum<br>Vali vägi → M → puuduta sihtkohta</p></aside></div><div id="citypane-build" role="tabpanel" hidden><p class="muted">Vali hoone ja seejärel ehituskoht kaardil. Ajad kehtivad täistööjõuga.</p><div class="city-build-tabs"><button data-tab="build" class="active">⌂ Buildings</button><button data-tab="army">⚔ Units</button></div><div id="hud-build-guidance" role="status"></div><div id="buildcatalogtools" class="v121-catalog-toolbar"><label class="v121-build-search-label" for="buildsearch">Find a building</label><input id="buildsearch" type="search" placeholder="Search buildings…" autocomplete="off" aria-label="Search building types"><div id="buildcategories" class="v121-build-categories" role="group" aria-label="Building categories"></div></div><section id="tray" aria-label="Available construction"></section><details id="buildqueuefolder" class="v121-queue-folder"><summary>Construction queue</summary><section id="cityqueue" hidden aria-label="City work queue"></section></details></div><div id="citypane-workers" role="tabpanel" hidden><div id="laborsummary"></div><p class="muted">Soovitud tööjõud 0,25 kaupa. Kõikide materjalide, toidu ja vee tootmine ning korjamine on endiselt 4,5× aeglasem. Ehitamise ja väljaõppe ajad ei muutu.</p><div id="laborrows"></div></div></section><section id="building-inspector" role="region" aria-label="Hoone info" aria-labelledby="building-inspector-title" hidden></section><script type="module" src="ui-art-v263.js?v=263c"></script><script type="module" src="ui-v264.js?v=282a"></script><script src="ui-painted-v287.js?v=287a" defer></script><script src="ui-reference-v288.js?v=288a\&amp;r=304" defer></script><script src="hud-v289.js?v=289b\&amp;r=304" defer></script><script src="hud-v290.js?v=290a\&amp;r=304" defer></script><script src="selection-context-v300.js?v=300b" defer></script>
+var imports=JSON.parse(document.getElementById('kingdoms-importmap').textContent).imports;imports['./vendor/three.module.js']=on&&navigator.gpu?'./vendor/three-gpu-shim.js?v=305r187':'./vendor/three.module.js?v=305r187';var m=document.createElement('script');m.type='importmap';m.textContent=JSON.stringify({imports:imports});document.currentScript.after(m);}catch(e){}})();</script><script type="module" src="menu-controls-v337.js?v=337a"></script><script type="module" src="boot-v83.js?v=346f"></script><script type="module" src="hud-v69.js?v=69a"></script><script type="module" src="hud-v74.js?v=74a"></script><section id="citypanel" hidden aria-label="Linna juhtimine"><div class="city-panel-heading"><div class="city-identity"><span class="eyebrow">CITY MANAGEMENT</span><h2 id="citypaneltitle"></h2><p id="citypanelsub" class="v155-sub"></p></div><div class="hud-city-controls"><button id="hud-queue-toggle" type="button" aria-label="Linna tööjärjekord" aria-pressed="false">⏱</button><button id="hud-city-collapse" type="button" aria-label="Sulge linna paneel">✕</button></div></div><div class="city-tabs" role="tablist" aria-label="Linna vaated"><button id="citytab-info" role="tab">Overview</button><button id="citytab-build" role="tab">Construction</button><button id="citytab-workers" role="tab">Workers</button></div><div id="citypane-info" role="tabpanel"><aside><span class="eyebrow">PÕHJALA KROONIKA</span><h1>Üks maa.<br>Sinu kuningriik.</h1><p id="objective">Puit → lauad · vili → jahu → leib.<br>Raud → relvad → sõjavägi.</p><div class="line"></div><b id="selection">Pealinn · Kadakalinn</b><p id="detail">Puuduta hoonet või väeüksust. Seejärel anna kaardil käsk.</p><div id="progression"></div><p id="workforce"></p><div id="cityhealth" hidden></div><div id="actions"></div><button id="research">⚗ Uuri terast · 80 kulda</button><p class="hint">Lohista kaarti · rullik või +/− suum<br>Vali vägi → M → puuduta sihtkohta</p></aside></div><div id="citypane-build" role="tabpanel" hidden><p class="muted">Vali hoone ja seejärel ehituskoht kaardil. Ajad kehtivad täistööjõuga.</p><div class="city-build-tabs"><button data-tab="build" class="active">⌂ Buildings</button><button data-tab="army">⚔ Units</button></div><div id="hud-build-guidance" role="status"></div><div id="buildcatalogtools" class="v121-catalog-toolbar"><label class="v121-build-search-label" for="buildsearch">Find a building</label><input id="buildsearch" type="search" placeholder="Search buildings…" autocomplete="off" aria-label="Search building types"><div id="buildcategories" class="v121-build-categories" role="group" aria-label="Building categories"></div></div><section id="tray" aria-label="Available construction"></section><details id="buildqueuefolder" class="v121-queue-folder"><summary>Construction queue</summary><section id="cityqueue" hidden aria-label="City work queue"></section></details></div><div id="citypane-workers" role="tabpanel" hidden><div id="laborsummary"></div><p class="muted">Soovitud tööjõud 0,25 kaupa. Kõikide materjalide, toidu ja vee tootmine ning korjamine on endiselt 4,5× aeglasem. Ehitamise ja väljaõppe ajad ei muutu.</p><div id="laborrows"></div></div></section><section id="building-inspector" role="region" aria-label="Hoone info" aria-labelledby="building-inspector-title" hidden></section><script type="module" src="ui-art-v263.js?v=263c"></script><script type="module" src="ui-v264.js?v=282a"></script><script src="ui-painted-v287.js?v=287a" defer></script><script src="ui-reference-v288.js?v=288a\&amp;r=304" defer></script><script src="hud-v289.js?v=289b\&amp;r=304" defer></script><script src="hud-v290.js?v=290a\&amp;r=304" defer></script><script src="selection-context-v300.js?v=300b" defer></script>
 <script src="hud-v291.js?v=300a\&amp;r=304" defer></script><script src="hud-v292-mobile.js?v=296a\&amp;r=304" defer></script><script type="module" src="research-art-v293.js?v=304a"></script><script src="hud-v293-research.js?v=296a\&amp;r=304" defer></script><script src="research-panel-v294.js?v=294a\&amp;r=304" defer></script><script src="research-panel-v295.js?v=295a\&amp;r=304" defer></script><script src="hud-v298-layout.js?v=300a\&amp;r=304" defer></script><script src="hud-v301-background.js?v=301b\&amp;r=304" defer></script><script src="hud-v302-pieces.js?v=303a\&amp;r=304" defer></script><script src="hud-v303-buttons.js?v=303a\&amp;r=304" defer></script><script src="ui-v304.js?v=309a" defer></script><script type="module" src="ui-catalog-v304.js?v=312a"></script><script src="ui-v306.js?v=306a" defer></script><script src="ui-v309.js?v=309a" defer></script><script src="ui-v310.js?v=312a" defer></script><script src="ui-v313.js?v=313a" defer></script></body></html>
 
