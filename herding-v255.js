@@ -5,6 +5,7 @@
 // The sheep model is a small procedural placeholder. It is meant to be replaced by a TRELLIS.2
 // (MIT licence) model once one is generated; see MUUDATUSED_V255.md for how.
 import * as T from './vendor/three.module.js';
+import {markRigidPartsV349} from './rigid-part-batches-v349.js';
 
 const wool=new T.MeshStandardMaterial({color:'#e8e1cf',roughness:1}),woolDark=new T.MeshStandardMaterial({color:'#5b4a3a',roughness:1}),
  face=new T.MeshStandardMaterial({color:'#3b2f27',roughness:.9}),horn=new T.MeshStandardMaterial({color:'#b9a98a',roughness:.8});
@@ -22,7 +23,7 @@ export function createSheepV255(seed=0){
  const legs=[];for(const [x,z] of [[-.22,.4],[.22,.4],[-.22,-.4],[.22,-.4]]){const l=m(G.leg,face,x,.21,z);legs.push(l);}
  root.userData={body,head,legs,phase:seed*1.7};
  const s=.75+((seed*37)%10)/40;root.scale.setScalar(s);
- return root;
+ return markRigidPartsV349(root); // V349: the flock's parts are drawn in shared batches
 }
 export function poseSheepV255(sheep,time,moving){
  const u=sheep.userData,t=time+u.phase;

@@ -2,6 +2,7 @@
 // All pieces are proper curved/extruded meshes, reuse geometry and materials,
 // and are attached to animated wrist bones, never floating in world space.
 import * as T from './vendor/three.module.js';
+import {markRigidPartsV349} from './rigid-part-batches-v349.js';
 
 const geometry=new Map(),materials=new Map();
 const palettes={
@@ -128,7 +129,7 @@ export function createStoneEquipment(kind){
   const q=add(g,'leather-sheath',()=>new T.CylinderGeometry(.02,.042,.26,8),0,-.12,0);
   q.rotation.z=.06;rope(g,[[-.022,-.015,.02],[.025,-.015,.02]],'cord');
  }
- return g;
+ return markRigidPartsV349(g); // V349: parts are drawn in shared batches
 }
 export function createStoneLoad(kind='sack'){
  const g=new T.Group();g.name='v234-load-'+kind;g.userData.loadV234=kind;
@@ -139,6 +140,6 @@ export function createStoneLoad(kind='sack'){
   sack(g,0,0,0,1.15);
   const a=rope(g,[[-.09,.06,-.05],[-.20,.13,-.035],[-.17,.22,.045]],'leather');
  }else sack(g,0,-.09,0,1.2);
- return g;
+ return markRigidPartsV349(g);
 }
 export const STONE_EQUIPMENT_KINDS=['stone_lumber','stone_forester','stone_worker','stone_miner','stone_builder','stone_farmer','stone_fisher','stone_hunter','stone_gatherer','stone_watercarrier','spearman','axeman','scout','militia','slinger','archer-bow','stone-knife','knife-sheath'];
