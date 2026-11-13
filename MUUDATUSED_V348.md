@@ -35,7 +35,7 @@ Mäng oli selle salvestusega juba langetanud resolutsiooni 72% peale (adaptive r
 - `tests/sapling-trees/live-integration.mjs`: far-tasemel puud tulevad sektori mesh'ist. Maatriksite hulk on sama, LOD-tasemed far/mid/near toimivad endiselt.
 - `tests/world-assets-v327.mjs` oli V347-s katki: V347 nimetas piiride vahemälu võtme ümber (`boundsGeometryV347`/`boundsTrellisV347`). Test kontrollib nüüd uut võtit ja V348 importmap'i versiooni.
 - `torch-batches-v348.js` loob sprite'i geomeetria alles esimesel kasutusel. Muidu kulutaks moodul laadimisel Three.js objektide ID-de jaoks `Math.random` väärtusi, seemnega testi maailm muutuks ja V341 brauseritest satuks teisele kaardile. Sama kaardiga on tulemus V347-ga sama (outerCompleteAvg 15,06 vs 15,1).
-- Kiirkontrolli 118 käsku läbisid kohapeal.
+- Kiirkontrolli 118 käsku läbisid kohapeal. `tests/adaptive-atlas-v327.mjs` kontrollib nüüd sama reeglit: jagatud võrk, kuivad kolmnurgad välja.
 
 ## Tegemata
 - **Maastiku kauguse-LOD** (2,29 M kolmnurka). Maastik on kohanduv atlasevõrk, mille kõrgused on seotud mere, jõgede ja metsa paigutusega. Tükeldatud LOD vajab õmbluste käsitlemist ja eraldi visuaalset kontrolli. Jäi järgmiseks sammuks.

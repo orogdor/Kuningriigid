@@ -18,5 +18,7 @@ for(const [key,count] of counts){assert.ok(count<=2);if(count===2)continue;const
  const boundary=(x,z)=>Math.abs(x)<1e-5||Math.abs(x-200)<1e-5||Math.abs(z)<1e-5||Math.abs(z-200)<1e-5;
  assert.ok(boundary(p.getX(a),p.getZ(a))&&boundary(p.getX(b),p.getZ(b)),'no unpaired interior edge '+key);
 }
-const sea=atlasSeaGeometryV326({atlasHeight:()=>0},geo);assert.deepEqual(sea.index.array,index);assert.equal(sea.attributes.position.count,p.count);
+const sea=atlasSeaGeometryV326({atlasHeight:()=>0},geo);assert.equal(sea.attributes.position.count,p.count);
+// V348: same shared grid; only triangles that can never show water (all three depths <= -0.12) are left out.
+{const d=sea.attributes.aDepth.array,kept=[];for(let i=0;i<index.length;i+=3){const t=[index[i],index[i+1],index[i+2]];if(t.some(k=>d[k]>-.12))kept.push(...t);}assert.deepEqual(Array.from(sea.index.array),kept);}
 console.log('V327 adaptive atlas: conforming edges, shared sea grid, actual triangle sampler PASS',{vertices:p.count,triangles:index.length/3});
