@@ -12,13 +12,45 @@ export function saplingVariantV328(x,z,seed=0){const n=Math.sin(x*12.9898+z*78.2
 export function saplingSpeciesV328(biome='',seed=0){
  const n=Math.sin(seed*127.1+93.7)*43758.5453;return pickTreeV329(biome,n-Math.floor(n));
 }
+// V349: primitives that end up with the same texture and colour get the same
+// material here (bark and foliage of near/mid share one atlas; the far card
+// has one atlas for its side and top views), so they are drawn as one
+// geometry: one draw call per tree variant instead of two. Same triangles,
+// same material, same pixels.
+export function mergeSameTextureV349(primitives){
+ const groups=[];
+ for(const p of primitives){
+  const g=groups.find(g=>g[0].image===p.image&&g[0].color.every((v,i)=>v===p.color[i])&&sameLayoutV349(g[0].geometry,p.geometry));
+  if(g)g.push(p);else groups.push([p]);
+ }
+ return groups.map(g=>g.length===1?g[0]:{...g[0],geometry:mergeGeometriesV349(g.map(p=>p.geometry))});
+}
+function sameLayoutV349(a,b){
+ const ka=Object.keys(a.attributes).sort(),kb=Object.keys(b.attributes).sort();
+ return !!a.index===!!b.index&&ka.length===kb.length&&ka.every((k,i)=>k===kb[i]&&a.attributes[k].itemSize===b.attributes[k].itemSize&&a.attributes[k].normalized===b.attributes[k].normalized&&a.attributes[k].array.constructor===b.attributes[k].array.constructor);
+}
+function mergeGeometriesV349(list){
+ const out=new T.BufferGeometry(),first=list[0];
+ for(const name of Object.keys(first.attributes)){
+  const src=first.attributes[name],total=list.reduce((n,g)=>n+g.attributes[name].array.length,0),array=new src.array.constructor(total);
+  let at=0;for(const g of list){array.set(g.attributes[name].array,at);at+=g.attributes[name].array.length;}
+  out.setAttribute(name,new T.BufferAttribute(array,src.itemSize,src.normalized));
+ }
+ if(first.index){
+  const vertices=list.reduce((n,g)=>n+g.attributes.position.count,0),total=list.reduce((n,g)=>n+g.index.count,0),array=new (vertices>65535?Uint32Array:Uint16Array)(total);
+  let at=0,base=0;for(const g of list){const a=g.index.array;for(let i=0;i<a.length;i++)array[at++]=a[i]+base;base+=g.attributes.position.count;}
+  out.setIndex(new T.BufferAttribute(array,1));
+ }
+ for(const g of list)g.dispose();
+ return out;
+}
 export function loadSaplingV328(kind,variant,level){
  const key=kind+':'+variant+':'+level;if(loads.has(key))return loads.get(key);
  const promise=task(async()=>{
   const meta=await manifest(),id=kind+'_'+String(variant+1).padStart(2,'0'),rec=meta.trees.find(t=>t.id===id),ref=meta.trees.filter(t=>t.species===kind).sort((a,b)=>a.boundsZUp[1][2]-b.boundsZUp[1][2])[2];
   if(!rec||!ref)throw Error('Missing Sapling '+id);
   const data=await loadGLB(new URL(id+'/'+level+'.glb',ROOT),{premultiplyAlpha:'none'});
-  const parts=data.primitives.map((p,i)=>{
+  const parts=mergeSameTextureV349(data.primitives).map((p,i)=>{
    let map=null;if(p.image){const tk=level==='far'?id+':'+i:kind+':foliage';map=textures.get(tk);
     if(!map){map=new T.Texture(p.image);map.flipY=false;map.colorSpace=T.SRGBColorSpace;map.needsUpdate=true;textures.set(tk,map);}else if(p.image!==map.image)p.image.close?.();} // V345: two primitives may share one bitmap; never close the one the texture uses
    const params={color:new T.Color().fromArray(p.color),map,alphaTest:map?.4:0,side:T.DoubleSide,depthWrite:true};

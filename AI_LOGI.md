@@ -765,3 +765,25 @@ Kasutaja salvestuse `Kuningriigid_V82_kaik_94.json` põhjal leida ja teha parand
 - Maastiku kauguse-LOD (2,29 M kolmnurka) jäi tegemata.
 - Riistvara FPS kasutaja seadmel on mõõtmata.
 
+---
+
+## 2026-11-13 · Claude (Anthropic) · V349 – FPS: mudelite joonistamine maailma- ja detailkaardil
+
+### Ülesanne
+Kasutaja: vaata mudelite laadimine maailmakaardil ja detailkaardil üle, et graafika ei väheneks, aga FPS tõuseks.
+
+### Mis tehti (haru `feature/fps-v349`, alus main d7377e1)
+- `rigid-part-batches-v349.js` (uus): väikesed jäigad animeeritud osad (lambad, kiviaja tööriistad ja kandamid, vöörihm, koer, oda) joonistatakse ühe InstancedMesh'iga geomeetria+materjali kohta. Algsed mesh'id jäävad alles; märgitud mesh vastab renderdaja `intersectsFrustum` küsimusele „ei“ ja annab oma `matrixWorld`-i partiile. Märkimine: `markRigidPartsV349(root)`; stseenid: `attachRigidPartBatchesV349(scene)` failis `civilization.js`. Ainult WebGL.
+- `sapling-trees-v328.js`: `mergeSameTextureV349` liidab sama tekstuuri ja värviga primitiivid (tüvi + lehestik) üheks osaks.
+- `assets/sapling-trees/*/far.glb`: üks primitiiv ja üks 1024×512 atlas (`tools/forest-trees-v349/atlas_far.py`), `manifest.json` uuendatud.
+- `index.html`, `boot-v83.js`: V349, muudetud moodulite `?v=349`.
+
+### Tulemus (stonetown näidis, SwiftShader, draw call'e kaadris)
+Maailmakaart 398 → 270, maailmakaardi lähivaade 406 → 275, detailkaart 550 → 248, detailkaardi lähivaade 550 → 268. Kolmnurkade arv sisuliselt sama. Partiid sees/väljas samas kaadris: 0 erinevat pikslit kolmes vaates, 1 piksel neljandas.
+
+### Kuidas testida
+`node tests/render-batches-v349.mjs`; brauseris `gameDebug.rigidPartsV349()` näitab partiide ja instantside arvu, `gameDebug.rigidPartBatchingV349(false)` lülitab partiid võrdluseks välja.
+
+### Pooleli / järgmised
+Kasutaja seadmel FPS mõõtmata; 94. käigu salvestusega mõõtmata (faili polnud hoidlas). Kandidaadid: maailmakaardi linnad ja varemed instantsideks, kaktuse kauguse-LOD, V50-inimeste osad samasse partiisüsteemi. Vt `MUUDATUSED_V349.md`.
+

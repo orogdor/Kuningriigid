@@ -1,6 +1,7 @@
 // V274: the Stone Age scout travels with a dog and carries a spear (worker model + dog + spear).
 // Small procedural models in the unit's local frame (a person is ~1.66 units tall).
 import * as T from './vendor/three.module.js';
+import {markRigidPartsV349} from './rigid-part-batches-v349.js';
 const fur=new T.MeshStandardMaterial({color:'#7a5a3a',roughness:1}),furDark=new T.MeshStandardMaterial({color:'#4a3626',roughness:1});
 const wood=new T.MeshStandardMaterial({color:'#6b4f33',roughness:1}),flint=new T.MeshStandardMaterial({color:'#8d8a80',roughness:.8,flatShading:true});
 // V283: a nicer dog: smooth body with chest and haunch, neck, long muzzle, upright ears, legs that swing from the
@@ -26,7 +27,7 @@ export function createDogV274(){
   hip.userData.knee=knee;return hip;});
  const tail=new T.Group();tail.position.set(0,.05,-.27);body.add(tail);m(tail,G.tail,fur,0,.1,0);tail.rotation.x=-.7;
  dog.userData={legs,tail,head,body,neck};
- return dog;
+ return markRigidPartsV349(dog); // V349
 }
 export function poseDogV274(dog,time,moving){
  const u=dog.userData;if(!u?.legs)return;
@@ -40,7 +41,7 @@ export function poseDogV274(dog,time,moving){
 export function createSpearV274(){
  const g=new T.Group();g.name='V274 scout spear';
  const shaft=new T.Mesh(G.shaft,wood);shaft.position.y=.95;g.add(shaft);
- const tip=new T.Mesh(G.tip,flint);tip.position.y=1.98;g.add(tip);return g;
+ const tip=new T.Mesh(G.tip,flint);tip.position.y=1.98;g.add(tip);return markRigidPartsV349(g);
 }
 // dog trots at the scout's left heel, the spear is held upright at the right side
 export function addScoutCompanionsV274(root,{spear=true}={}){

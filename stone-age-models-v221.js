@@ -6,6 +6,7 @@
 // If the files fail to load the game keeps its earlier models (ASSETS stays null).
 import * as T from './vendor/three.module.js';
 import {createStoneEquipment} from './stone-equipment-v234.js';
+import {markRigidPartsV349} from './rigid-part-batches-v349.js';
 import {withStoneBuildingLOD,withStoneHumanLOD} from './stone-near-lod.js?v=224';
 import {animateStoneWorkerV222} from './stone-motion-v222.js';
 import {loadGLB} from './glb-lite-v221.js';
@@ -62,7 +63,7 @@ export function createStoneHuman(parent,x,z,color,kind){
  mesh.add(bones[0]);mesh.updateMatrixWorld(true);mesh.bind(new T.Skeleton(bones));body.add(bones[0]);body.add(withStoneHumanLOD(mesh));
  const B=Object.fromEntries(bones.map(b=>[b.name,b]));
  // a small team-coloured band on the belt keeps factions recognisable
- const band=new T.Mesh(tg('band',()=>new T.TorusGeometry(.105,.012,4,14)),tm(color));band.rotation.x=Math.PI/2;band.scale.set(1,.72,1);band.position.y=.03;B.hips.add(band);
+ const band=new T.Mesh(tg('band',()=>new T.TorusGeometry(.105,.012,4,14)),tm(color));band.rotation.x=Math.PI/2;band.scale.set(1,.72,1);band.position.y=.03;B.hips.add(markRigidPartsV349(band));
  const tool=createStoneEquipment(kind);if(kind in TOOL_FLIP_V283){tool.rotation.z=Math.PI;tool.position.y=TOOL_FLIP_V283[kind];}if(kind==='stone_herder')tool.rotation.x=globalThis.HERD_TILT_V283??1.4; /* V283: the staff stands on the ground */B.hand_R.add(tool);
  // legs/arms/body/head mirror the older rigs, so code that poses people directly (village life) keeps working
  const rig={stoneHuman:true,kind,bones:B,tool,phase:(Math.abs(x*7.3+z*3.1)%6.28)||Math.random()*6.28,scale:body,
