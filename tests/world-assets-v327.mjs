@@ -13,10 +13,11 @@ const source=new T.InstancedMesh(getWorldModel('oak','low'),new T.MeshBasicMater
 source.userData.lodGeometries={low:getWorldModel('oak','low'),high:getWorldModel('oak','high')};
 for(let i=0;i<40;i++)source.setMatrixAt(i,new T.Matrix4().makeTranslation(i*10,0,0));
 const spatial=spatialInstances(source);updateSpatialBatches(400,{x:100,z:100});
-const oldKey=source.userData.boundsKeyV327;
+// V347 keys the bounds cache by geometry object and trellis state.
+const oldGeometry=source.userData.boundsGeometryV347,oldTrellis=source.userData.boundsTrellisV347;
 const results=await installWorldAssetsV327(getWorldModel);
 assert.equal(results.length,8);assert.ok(results.every(r=>r.status==='fulfilled'),JSON.stringify(results));
-updateSpatialBatches(400,{x:100,z:100});assert.notEqual(source.userData.boundsKeyV327,oldKey,'async replacement refreshes instance bounds');
+updateSpatialBatches(400,{x:100,z:100});assert.ok(source.userData.boundsGeometryV347!==oldGeometry||source.userData.boundsTrellisV347!==oldTrellis,'async replacement refreshes instance bounds');
 assert.ok(source.boundingSphere.radius>0);assert.ok(spatial.children[1].children.every(m=>m.geometry.userData.trellisV327&&m.boundingSphere.radius>0));
 for(const a of manifest.assets){
  const file=await readFile(new URL('assets/world-v327/'+a.kind+'_'+a.lod+'.glb',root));
@@ -33,5 +34,5 @@ for(const a of manifest.assets){
 }
 const props=await readFile(new URL('world-props.js',root),'utf8');assert.match(props,/for\(const kind of \['rock','bridge'\]\)/);assert.match(props,/o.name==='earth'/);
 const html=await readFile(new URL('index.html',root),'utf8');
-for(const name of ['world-models-v152.js','atlas-biomes-v47.js','world-props.js','atlas-sea-v326.js'])assert.ok(html.includes('"./'+name+'": "./'+name+'?v='+(name==='atlas-biomes-v47.js'?'330a':name==='atlas-sea-v326.js'?'344a':'328a')+'"'));
+for(const name of ['world-models-v152.js','atlas-biomes-v47.js','world-props.js','atlas-sea-v326.js'])assert.ok(html.includes('"./'+name+'": "./'+name+'?v='+(name==='atlas-biomes-v47.js'?'330a':name==='atlas-sea-v326.js'?'348':'328a')+'"'));
 console.log('V327 generated assets: 8 actual GLBs, colour/bounds/budgets, live instance replacement and cache PASS');

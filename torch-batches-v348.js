@@ -7,7 +7,10 @@
 // matrix), same render order. WebGL only; WebGPU keeps the old path.
 import * as T from './vendor/three.module.js';
 
-const SPRITE_GEO_V348=new T.Sprite().geometry;SPRITE_GEO_V348.userData.shared=true;
+// Created on first use: object ids come from Math.random, and seeded tests
+// must see the same random sequence at start-up as before V348.
+let spriteGeoV348=null;
+function spriteGeometry(){if(!spriteGeoV348){spriteGeoV348=new T.Sprite().geometry;spriteGeoV348.userData.shared=true;}return spriteGeoV348;}
 const spriteClones=new WeakMap();
 // Same SpriteMaterial (map, colour, opacity, blending, fog), but the sprite
 // centre and scale come from modelMatrix*instanceMatrix.
@@ -30,7 +33,7 @@ export function createTorchBatchesV348(group,models){
   const kind=sourceKind(obj);if(!kind)return;
   const mat=obj.material;if(!mat||Array.isArray(mat))return;
   if(kind==='mesh'&&!(mat.isMeshBasicMaterial||mat.isMeshStandardMaterial||mat.isShaderMaterial))return;
-  const geo=kind==='sprite'?SPRITE_GEO_V348:obj.geometry;
+  const geo=kind==='sprite'?spriteGeometry():obj.geometry;
   const key=kind+':'+geo.id+':'+mat.id+':'+obj.renderOrder+':'+obj.castShadow+':'+obj.receiveShadow;
   let b=buckets.get(key);if(!b){b={kind,geo,mat,renderOrder:obj.renderOrder,castShadow:obj.castShadow,receiveShadow:obj.receiveShadow,items:[]};buckets.set(key,b);}
   const item={obj,model,logical};b.items.push(item);sources.push(item);

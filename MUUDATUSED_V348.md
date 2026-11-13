@@ -33,7 +33,9 @@ Mäng oli selle salvestusega juba langetanud resolutsiooni 72% peale (adaptive r
 - Uus `tests/torch-batches-v348.mjs` kontrollib, et iga nähtav leegiosa on identse maatriksiga instants, päeval instantse pole, algsed osad ei jõua renderdajani ja `dispose` eemaldab partiid. Lisatud kiirkontrolli (`v128.yml`).
 - `tests/shared-water-v326.mjs`: rannajoone kolmnurgad peavad olema identsed ja ainult täiesti kuivad kolmnurgad jäetakse välja.
 - `tests/sapling-trees/live-integration.mjs`: far-tasemel puud tulevad sektori mesh'ist. Maatriksite hulk on sama, LOD-tasemed far/mid/near toimivad endiselt.
-- Kiirkontrolli 117 käsku läbisid kohapeal. `tests/world-assets-v327.mjs` kukub läbi ka muutmata V347-l.
+- `tests/world-assets-v327.mjs` oli V347-s katki: V347 nimetas piiride vahemälu võtme ümber (`boundsGeometryV347`/`boundsTrellisV347`). Test kontrollib nüüd uut võtit ja V348 importmap'i versiooni.
+- `torch-batches-v348.js` loob sprite'i geomeetria alles esimesel kasutusel. Muidu kulutaks moodul laadimisel Three.js objektide ID-de jaoks `Math.random` väärtusi, seemnega testi maailm muutuks ja V341 brauseritest satuks teisele kaardile. Sama kaardiga on tulemus V347-ga sama (outerCompleteAvg 15,06 vs 15,1).
+- Kiirkontrolli 118 käsku läbisid kohapeal.
 
 ## Tegemata
 - **Maastiku kauguse-LOD** (2,29 M kolmnurka). Maastik on kohanduv atlasevõrk, mille kõrgused on seotud mere, jõgede ja metsa paigutusega. Tükeldatud LOD vajab õmbluste käsitlemist ja eraldi visuaalset kontrolli. Jäi järgmiseks sammuks.

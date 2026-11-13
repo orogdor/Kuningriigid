@@ -757,7 +757,8 @@ Kasutaja salvestuse `Kuningriigid_V82_kaik_94.json` põhjal leida ja teha parand
 
 ### Testimine
 - `node tests/torch-batches-v348.mjs`, `node tests/shared-water-v326.mjs`, `node tests/sapling-trees/live-integration.mjs`.
-- Kiirkontrolli (`.github/workflows/v128.yml`) 117 käsku.
+- Kiirkontrolli (`.github/workflows/v128.yml`) 118 käsku, sh parandatud `tests/world-assets-v327.mjs`, mis oli V347-st katki.
+- `tests/detail-stream-v341-browser.cjs`: sama kaardiga 15,06 (V347: 15,1). NB: uued Three.js objektid mooduli laadimisel muudavad seemnega testide kaarti, sest uuid kasutab `Math.random`-it.
 - Päris mäng kasutaja salvestusega Chrome SwiftShaderis: `renderer.info` ja ekraanipiltide võrdlus V347-ga (vt MUUDATUSED_V348.md).
 
 ### Pooleli
