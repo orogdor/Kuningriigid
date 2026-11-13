@@ -2,6 +2,7 @@
 // The same saved game s.time drives time-of-day. It never affects economy ticks.
 import * as T from './vendor/three.module.js';
 import {batchStaticMeshParts} from './static-mesh-batches-v346e.js';
+import {createTorchBatchesV348} from './torch-batches-v348.js';
 
 export const DAY_LENGTH_V235=24*60; // simulation seconds per 24-hour day
 export const START_HOUR_V235=8;
@@ -146,7 +147,11 @@ function fireMaterial(){
   return fireMat;
  }
  fireMat=new T.ShaderMaterial({uniforms:{uTime:FIRE_TIME},transparent:true,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending,
-  vertexShader:`varying vec2 vUv;varying float vSeed;void main(){vUv=uv;vec4 w=modelMatrix*vec4(position,1.0);vSeed=fract(modelMatrix[3].x*.371+modelMatrix[3].z*.713);gl_Position=projectionMatrix*viewMatrix*w;}`,
+  vertexShader:`varying vec2 vUv;varying float vSeed;void main(){vUv=uv;mat4 mm=modelMatrix;
+#ifdef USE_INSTANCING
+ mm=modelMatrix*instanceMatrix;
+#endif
+ vec4 w=mm*vec4(position,1.0);vSeed=fract(mm[3].x*.371+mm[3].z*.713);gl_Position=projectionMatrix*viewMatrix*w;}`,
   fragmentShader:`uniform float uTime;varying vec2 vUv;varying float vSeed;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
@@ -309,7 +314,8 @@ export function createCityTorchesV235(buildings,heightAt,{age=0,boundsOf=null}={
   group.add(model.root);models.push(model);
  });
  group.userData.torchModelsV235=models;group.userData.fixtureV251=kind;
- if(!T.GPU_MODE_V225)group.userData.bodyBatchesV346e=batchStaticMeshParts(group,models.map(model=>model.root),{directOnly:true,name:'Town light bodies'});
+ if(!T.GPU_MODE_V225){group.userData.bodyBatchesV346e=batchStaticMeshParts(group,models.map(model=>model.root),{directOnly:true,name:'Town light bodies'});
+  group.userData.partBatchesV348=createTorchBatchesV348(group,models);}
  return group;
 }
 export function updateCityTorchesV235(group,clock,elapsed=0){
@@ -331,4 +337,5 @@ export function updateCityTorchesV235(group,clock,elapsed=0){
   const cfg=FIXTURE_LIGHT_V251[o.kind||'torch'];
   if(o.light)o.light.intensity=visible?cfg.intensity*power*(fire?(.95+.05*Math.sin(elapsed*9+i)):1):0;
  }
+ group.userData.partBatchesV348?.sync();
 }

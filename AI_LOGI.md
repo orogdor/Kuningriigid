@@ -741,3 +741,26 @@ Kasutaja: three.js jääb nõrgaks ja ta soovis uuemat renderdajat.
 - Eelarved: near ≤2000, mid ≤250, far 6. Iga liigi kõik near- ja mid-failid kasutavad sama atlast, sest mäng hoiab tekstuuri vahemälus liigi kaupa.
 - Kontroll: `node tests/forest-trees-v345.mjs`, `node tests/sapling-trees/live-integration.mjs`.
 
+---
+
+## 2026-11-13 · Claude (Anthropic) · V348 – FPS ilma graafikat halvendamata
+
+### Ülesanne
+Kasutaja salvestuse `Kuningriigid_V82_kaik_94.json` põhjal leida ja teha parandused, mis tõstavad FPS-i vähemalt 60-ni nii, et graafika ei halveneks.
+
+### Mis tehti
+- Läbipaistev kahepoolne vesi (meri, jõgi, jõe kaldad ja õlad) joonistatakse ühe korraga: `forceSinglePass:true`.
+- `atlas-sea-v326.js` funktsioon `dropDryTrianglesV348`: merevõrgust jäetakse välja kolmnurgad, mille kõik tipud on sügavusel ≤ −0,12. Shader ei joonistaks neist ühtegi pikslit.
+- Uus `torch-batches-v348.js`: tõrvikute animeeritud osad on InstancedMesh'id ja algsetest objektidest saavad maatriksite allikad. Leegi shader ja sprite-shader loevad `instanceMatrix`-it. Ainult WebGL.
+- `sapling-trees-v328.js`: maailmakaardi far-tasemel puud joonistatakse 6×6 lahtri sektori kaupa ühe InstancedMesh'iga variandi kohta.
+- Versioon V348: pealkiri, menüü silt, `boot-v83.js?v=348a`, `civilization.js?v=348a` ja importmap'i vahemälu võtmed muudetud failidele.
+
+### Testimine
+- `node tests/torch-batches-v348.mjs`, `node tests/shared-water-v326.mjs`, `node tests/sapling-trees/live-integration.mjs`.
+- Kiirkontrolli (`.github/workflows/v128.yml`) 117 käsku.
+- Päris mäng kasutaja salvestusega Chrome SwiftShaderis: `renderer.info` ja ekraanipiltide võrdlus V347-ga (vt MUUDATUSED_V348.md).
+
+### Pooleli
+- Maastiku kauguse-LOD (2,29 M kolmnurka) jäi tegemata.
+- Riistvara FPS kasutaja seadmel on mõõtmata.
+

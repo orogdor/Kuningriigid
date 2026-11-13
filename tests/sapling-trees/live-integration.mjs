@@ -11,7 +11,8 @@ const camera=new T.OrthographicCamera(-200,200,200,-200,.1,5000);camera.position
 for(const cell of cells)cell.update(camera);
 let shown=()=>cells.flatMap(c=>c.children.filter(m=>m.visible));assert.equal(shown().reduce((n,m)=>n+m.count,0),240);assert.ok(shown().every(m=>m.userData.saplingLOD==='far'));
 assert.equal(new Set(cells.flatMap(c=>c.children.map(m=>m.name.split(' ')[2]))).size,5,'all five variants instantiated');
-const copied=cells.map(c=>c.children.find(m=>m.visible)).flatMap(mesh=>Array.from({length:mesh.count},(_,i)=>{mesh.getMatrixAt(i,m);return m.elements.join(',')}));
+// V348: far cells are drawn by shared sector meshes, so collect every visible mesh.
+const copied=cells.flatMap(c=>c.children.filter(m=>m.visible)).flatMap(mesh=>Array.from({length:mesh.count},(_,i)=>{mesh.getMatrixAt(i,m);return m.elements.join(',')}));
 assert.deepEqual(new Set(copied),new Set(Array.from({length:source.count},(_,i)=>Array.from(original.slice(i*16,i*16+16)).join(','))));
 const tileRoot=new T.Group();tileRoot.add(root);
 let updates=0;const updateCell=cells[0].updateMatrixWorld;

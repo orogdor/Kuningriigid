@@ -147,10 +147,19 @@ export function withSaplingInstancesV328(source,kind,fallback=source,{quality='h
  root.sourceSaplingV328=source;root.userData.instanceCount=source.count;root.userData.saplingReadyV328=false;
  root.userData.saplingPromiseV328=Promise.all(Array.from({length:5},(_,i)=>loadSaplingV328(kind,i,'far'))).then(()=>{
   if(batchCells)buildDetailStand(root,kind,unitHeight,bins,quality,cellSize,()=>{transformsDirty=true;},visibility);
-  else for(const rows of bins.values()){
+  else{
+   // V348: cells at the 'far' level are drawn through one shared InstancedMesh
+   // per 6×6-cell sector and variant instead of one per cell. Same far
+   // impostors, matrices and tints; mid/near stay per cell as before. A sector
+   // is refilled only when one of its cells changes between far and closer.
+   const sectors=new Map(),sectorSize=cellSize*6;
+   for(const rows of bins.values()){
    const variant=rows[0].variant,lod=new T.LOD(),levels=new Map(),center=new T.Vector3(),position=new T.Vector3(),worldScale=new T.Vector3();let tallest=1,selected='far';
    for(const r of rows){center.add(new T.Vector3().setFromMatrixPosition(r.matrix));tallest=Math.max(tallest,new T.Vector3().setFromMatrixScale(r.matrix).y);}
    center.divideScalar(rows.length);center.y+=unitHeight*tallest*.5;
+   const sectorKey=Math.floor(center.x/sectorSize)+':'+Math.floor(center.z/sectorSize)+':'+variant;
+   let sector=sectors.get(sectorKey);if(!sector){sector={variant,cells:[],capacity:0,dirty:true,meshes:null};sectors.set(sectorKey,sector);}
+   const cell={rows,far:true};sector.cells.push(cell);sector.capacity+=rows.length;
    function make(level){const parts=template(kind,variant,level,unitHeight);if(!parts)return null;
     const meshes=parts.map(p=>{const mesh=new T.InstancedMesh(p.geometry,p.material,rows.length);mesh.name='Sapling '+kind+' '+variant+' '+level;mesh.userData.saplingV328=kind;mesh.userData.saplingLOD=level;
      rows.forEach((r,i)=>{mesh.setMatrixAt(i,r.matrix);if(r.tint)mesh.setColorAt(i,r.tint);});mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.castShadow=level==='near';mesh.computeBoundingSphere();lod.add(mesh);
@@ -158,12 +167,30 @@ export function withSaplingInstancesV328(source,kind,fallback=source,{quality='h
      if(staticTransforms)mesh.updateWorldMatrix(false,false);
      return mesh;});levels.set(level,meshes);transformsDirty=true;return meshes;
    }
-   make('far');lod.update=camera=>{
+   lod.update=camera=>{
     position.copy(center).applyMatrix4(lod.matrixWorld);worldScale.setFromMatrixScale(lod.matrixWorld);
     const wanted=quality==='low'?'far':saplingLevelV328(camera,position,unitHeight*tallest*worldScale.y,selected);
-    let next=wanted;if(!levels.has(wanted)){if(!make(wanted)){request(kind,variant,wanted,root);next='far';}}
+    let next=wanted;if(wanted!=='far'&&!levels.has(wanted)){if(!make(wanted)){request(kind,variant,wanted,root);next='far';}}
     for(const [level,meshes]of levels)for(const mesh of meshes)mesh.visible=level===next;selected=next;
+    const far=next==='far';if(cell.far!==far){cell.far=far;sector.dirty=true;}
    };root.add(lod);
+   }
+   // Sector holders come after every cell LOD, so the renderer updates the
+   // cells first and the sector refills before its meshes are projected.
+   for(const sector of sectors.values()){
+    const parts=template(kind,sector.variant,'far',unitHeight);if(!parts)continue;
+    const holder=new T.LOD();holder.name='Sapling far sector '+kind+' '+sector.variant;
+    sector.meshes=parts.map(p=>{const mesh=new T.InstancedMesh(p.geometry,p.material,sector.capacity);mesh.name='Sapling '+kind+' '+sector.variant+' far';mesh.userData.saplingV328=kind;mesh.userData.saplingLOD='far';mesh.castShadow=false;mesh.count=0;holder.add(mesh);return mesh;});
+    holder.update=()=>{
+     if(!sector.dirty)return;sector.dirty=false;
+     for(const mesh of sector.meshes){let n=0;
+      for(const cell of sector.cells)if(cell.far)for(const r of cell.rows){mesh.setMatrixAt(n,r.matrix);if(r.tint)mesh.setColorAt(n,r.tint);n++;}
+      mesh.count=n;mesh.visible=n>0;mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;if(n)mesh.computeBoundingSphere();
+     }
+    };
+    root.add(holder);holder.updateWorldMatrix(false,true);
+   }
+   transformsDirty=true;
   }
   fallback.visible=false;root.userData.saplingReadyV328=true;return root;
  }).catch(e=>{root.userData.saplingErrorV328=String(e);return root});

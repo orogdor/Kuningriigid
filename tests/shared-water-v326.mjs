@@ -29,7 +29,13 @@ for(let i=0;i<p.count;i++)assert.ok(Math.abs(sample(p.getX(i),p.getZ(i))-p.getY(
 const original=p.array.slice(),indices=terrain.index.array.slice();
 const game={atlasHeight:(x,z)=>x<0?-3:8};
 const geo=atlasSeaGeometryV326(game,terrain),v=geo.attributes.position;
-assert.deepEqual(p.array,original,'do not mutate actual terrain');assert.deepEqual(geo.index.array,indices,'identical coast triangles');
+assert.deepEqual(p.array,original,'do not mutate actual terrain');
+// V348: the sea keeps exactly the terrain triangles that can show water; a
+// triangle whose three vertices are all at depth <= -0.12 is discarded by the
+// shader everywhere (smoothstep(-.12,.20,d)<.008), so it is left out.
+{const d=geo.attributes.aDepth.array,kept=[];for(let i=0;i<indices.length;i+=3){const t=[indices[i],indices[i+1],indices[i+2]];if(t.some(k=>d[k]>-.12))kept.push(...t);}
+ assert.deepEqual(Array.from(geo.index.array),kept,'identical coast triangles, dry inland triangles dropped');
+ assert.ok(geo.index.count<indices.length,'inland triangles were removed');}
 for(let i=0;i<v.count;i++){
  assert.equal(v.getY(i),0,'no lowered inland sea vertices');
  assert.equal(v.getX(i),p.getX(i));assert.equal(v.getZ(i),p.getZ(i));

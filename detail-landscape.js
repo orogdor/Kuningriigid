@@ -42,7 +42,7 @@ export function createDetailLandscape(game,tile,height){
  }
  if(rivers.length){
   const geometry=new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(rivers,3));
-  const water=new T.Mesh(geometry,new T.MeshBasicMaterial({color:'#488da5',transparent:true,opacity:.92,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2}));
+  const water=new T.Mesh(geometry,new T.MeshBasicMaterial({color:'#488da5',transparent:true,opacity:.92,depthWrite:false,side:T.DoubleSide,forceSinglePass:true,polygonOffset:true,polygonOffsetFactor:-2}));
   water.renderOrder=5;group.add(water);
  }
  if(banks.length){

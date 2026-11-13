@@ -36,7 +36,7 @@ export function waterNodeMaterialV326({sea=false,scale=1,scaleZ=scale,origin={x:
  const normal=normalize(normalView.add(vec3(rx.sub(ripple).div(e).mul(-.32).mul(fx),0,rz.sub(ripple).div(e).mul(-.32).mul(fx))));
  const fres=pow(float(1).sub(clamp(dot(positionViewDirection,normal),0,1)),5).mul(.97).add(.03);
  const m=new T.MeshStandardNodeMaterial({roughness:WATER_STYLE_V326.roughness,metalness:WATER_STYLE_V326.metalness,
-  side:T.DoubleSide,transparent:true,depthWrite:false});
+  side:T.DoubleSide,transparent:true,depthWrite:false,forceSinglePass:true});/* V348: one pass; water is a heightfield seen from above */
  m.colorNode=mix(water,sky.mul(ripple.mul(.22).add(.78)),clamp(fres.mul(.75),0,.75));
  const alpha=sea?float(.94).sub(pow(shore,2.5).mul(.36)):vertex.a;
  m.opacityNode=clamp(alpha.add(fres.mul(.35)),0,1).mul(sea?smoothstep(-.12,.20,depth):1);

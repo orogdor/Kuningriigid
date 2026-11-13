@@ -29,6 +29,21 @@ export function atlasSeaGeometryV326(game,terrainGeometry){
   p.setY(i,0);
  }
  for(const name of Object.keys(geo.attributes))if(name!=='position')geo.deleteAttribute(name);
- p.needsUpdate=true;geo.setAttribute('aDepth',new T.BufferAttribute(depth,1));geo.computeVertexNormals();geo.computeBoundingBox();geo.computeBoundingSphere();
+ p.needsUpdate=true;geo.setAttribute('aDepth',new T.BufferAttribute(depth,1));geo.computeVertexNormals();
+ dropDryTrianglesV348(geo,depth);geo.computeBoundingBox();geo.computeBoundingSphere();
  geo.userData.sharedCoastGridV326=true;return geo;
+}
+
+// V348: the sea grid is a full copy of the terrain grid, but the water shader
+// discards every fragment with interpolated depth below -0.103
+// (smoothstep(-.12,.20,d)<.008). A triangle whose three vertices are all at or
+// below SEA_DRY_LIMIT_V348 can therefore never draw a pixel; dropping it from
+// the index changes no pixel and removes the inland part of the sea mesh.
+export const SEA_DRY_LIMIT_V348=-.12;
+export function dropDryTrianglesV348(geo,depth,limit=SEA_DRY_LIMIT_V348){
+ const count=geo.attributes.position.count,src=geo.index?geo.index.array:null,n=src?src.length:count;
+ const keep=new (count>65535?Uint32Array:Uint16Array)(n);let k=0;
+ for(let i=0;i<n;i+=3){const a=src?src[i]:i,b=src?src[i+1]:i+1,c=src?src[i+2]:i+2;
+  if(depth[a]<=limit&&depth[b]<=limit&&depth[c]<=limit)continue;keep[k++]=a;keep[k++]=b;keep[k++]=c;}
+ geo.setIndex(new T.BufferAttribute(keep.slice(0,k),1));geo.userData.seaTrianglesV348={before:n/3,after:k/3};return geo;
 }

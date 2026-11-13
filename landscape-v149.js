@@ -177,7 +177,7 @@ export function smoothedOverview(sample,x,z,spacing){
 export function waterMaterial(scope='world',tile=null,{sea=false,scale=1,scaleZ=scale}={}){
  if(T.GPU_MODE_V225)return waterNodeMaterialV326({sea,scale:sea?scale:scope==='detail'?4.5:1,scaleZ:sea?scaleZ:scope==='detail'?3.9:1,origin:tile||{x:0,z:0}});
  // V249: transparent, so river water can thin out into the sea (alpha comes from the vertex colours)
- const material=new T.MeshStandardMaterial({vertexColors:true,roughness:WATER_STYLE_V326.roughness,metalness:WATER_STYLE_V326.metalness,side:T.DoubleSide,transparent:true,depthWrite:false});
+ const material=new T.MeshStandardMaterial({vertexColors:true,roughness:WATER_STYLE_V326.roughness,metalness:WATER_STYLE_V326.metalness,side:T.DoubleSide,transparent:true,depthWrite:false,forceSinglePass:true});/* V348: one pass; water is a heightfield seen from above */
  const map=worldMapping(scope,tile);
  if(sea){map.pos=`vec3(position.x/${scale.toFixed(3)}+uSeaOriginV326.x,position.y,position.z/${scaleZ.toFixed(3)}+uSeaOriginV326.y)`;map.head='uniform vec2 uSeaOriginV326;';map.uniforms={uSeaOriginV326:{value:new T.Vector2(tile?.x||0,tile?.z||0)}};}
  material.onBeforeCompile=shader=>{

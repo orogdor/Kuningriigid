@@ -208,6 +208,8 @@ export function* riverNetworkStepsV242(game,scope='world',tile=null,quality='med
   }
   waterMesh.geometry.setAttribute('aFlow',new T.BufferAttribute(flow,2));waterMesh.geometry.setAttribute('aShore',new T.BufferAttribute(shore,1));
  }
+ /* V348: transparent double-sided river sheets render in one pass, not back+front. */
+ for(const m of [dryMesh,bankMesh,waterMesh])if(m&&m.material?.transparent&&m.material.side===T.DoubleSide)m.material.forceSinglePass=true;
  if(dryMesh){dryMesh.name='V223 gravel and meadow river shoulders';dryMesh.renderOrder=7;group.add(dryMesh)}
  if(bankMesh){bankMesh.name='continuous river banks';bankMesh.renderOrder=8;group.add(bankMesh)}
  if(waterMesh){waterMesh.name='continuous water surface';waterMesh.renderOrder=9;group.add(waterMesh)}
