@@ -1,6 +1,6 @@
 # V352 – maailmakaardi meri: lame pind ja sügavuskaart
 
-Alus: FPS-analüüs (allpool) ja kasutaja küsimus, kas meri ja jõed saaksid kasutada sügavuskaardiga animatsiooni. See on esimene osa: **meri**. Jõed on veel muutmata. Haru `feature/sea-depth-v352`.
+Alus: FPS-analüüs (allpool) ja kasutaja küsimus, kas meri ja jõed saaksid kasutada sügavuskaardiga animatsiooni. See on esimene osa: **meri**. Jõed on veel muutmata. Haru `feature/sea-depth-v352`, kasutaja palvel peaharusse ühendatud.
 
 ## Mis muutus
 

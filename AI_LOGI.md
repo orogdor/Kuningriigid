@@ -838,7 +838,7 @@ Kasutaja andis ChatGPT koostatud plaani "sündmuspõhine maailmakaardi sünkroon
 ## 2026-11-14 · Claude (Anthropic) · V352 – maailmakaardi meri sügavuskaardiga
 
 ### Ülesanne
-Kasutaja küsis FPS-analüüsi ja seejärel, kas meri ja jõed saaksid kasutada sügavuskaardiga animatsiooni. Tehtud on meri. Haru `feature/sea-depth-v352`, peaharusse ühendamata.
+Kasutaja küsis FPS-analüüsi ja seejärel, kas meri ja jõed saaksid kasutada sügavuskaardiga animatsiooni. Tehtud on meri. Haru `feature/sea-depth-v352`, kasutaja palvel peaharusse ühendatud.
 
 ### Mis tehti
 - `atlas-sea-v326.js`: `atlasSeaDepthTextureV352` (sügavus ja kaldategur maastikutippudest, kolmnurgad rasterdatud tekstuuri) ja `atlasSeaPlaneV352` (lame pind).
