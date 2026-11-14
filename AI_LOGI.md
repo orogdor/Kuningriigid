@@ -816,7 +816,7 @@ Uurida, kuidas UI kiiremaks saada, nii et see ei hoiaks FPS-i tagasi, ja panna p
 ## 2026-11-14 · Claude (Anthropic) · V351 – maailmakaardi sünkroonimine ainult muutuse korral, 1. osa
 
 ### Ülesanne
-Kasutaja andis ChatGPT koostatud plaani "sündmuspõhine maailmakaardi sünkroonimine" ja palus see ära teha. Tehtud on plaani esimene osa. Haru `feature/world-sync-v351`, peaharusse ühendamata; selles seansis puudus GitHubi kirjutusõigus, seega haru on üle antud paiga ja bundle'ina.
+Kasutaja andis ChatGPT koostatud plaani "sündmuspõhine maailmakaardi sünkroonimine" ja palus see ära teha. Tehtud on plaani esimene osa. Kasutaja palus selle peaharusse panna; ühendatud main'i, GitHubi kontrollid läbisid.
 
 ### Mis tehti
 - Uus `territory-chunks-v351.js`: territooriumi täide ja piirid 8×8 ruudu tükkidena, tükk arvutatakse uuesti ainult oma nähtavate territooriumiruutude muutumisel; 5 ms kaadrieelarve pärast esimest ehitust.

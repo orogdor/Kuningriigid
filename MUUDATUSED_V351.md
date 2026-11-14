@@ -1,6 +1,6 @@
 # V351 – maailmakaardi sünkroonimine ainult muutuse korral (1. osa: territooriumid, nähtavus, teed, ressursid, põllumaa)
 
-Alus: kasutaja plaan "sündmuspõhine maailmakaardi sünkroonimine". See on plaani esimene osa. Haru `feature/world-sync-v351`, peaharusse ühendamata. NativeThreeBridge'i ei muudetud. Mudelite välimust, shader'eid ja UI-d ei muudetud.
+Alus: kasutaja plaan "sündmuspõhine maailmakaardi sünkroonimine". See on plaani esimene osa. Ühendatud peaharusse kasutaja palvel (haru `feature/world-sync-v351`). NativeThreeBridge'i ei muudetud. Mudelite välimust, shader'eid ja UI-d ei muudetud.
 
 ## Mis leiti
 
