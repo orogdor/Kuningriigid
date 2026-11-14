@@ -5,6 +5,7 @@ import * as T from './vendor/three.module.js';
 import {smoothBiomeColor,groundBaseColor,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=162a';
 import {createMountainOutcrops} from './landscape-polish-v84.js?v=162a';
 import {createV48Mesh} from './model-runtime-v48.js';
+import {createTerritoryChunksV351} from './territory-chunks-v351.js';
 import {roadPoints,roadLevel,roadStrength} from './roads.js?v=59';
 import {createAtlasBiomeDetail} from './atlas-biomes-v47.js?v=162a';
 import {settlementGeometry,getWorldModel,WORLD_MODEL_MATERIAL,SETTLEMENT_MATERIAL} from './world-models-v152.js?v=161a';
@@ -89,10 +90,16 @@ export function createAtlasDecor(game,scene,quality='medium',{terrainGeometry=nu
  // All tributaries and banks are one connected world-space 3D network.
  let rivers=createRiverNetwork(game,'world',null,quality,worldGroundV326),crossingRevision=game.s.crossingRevision||0;group.add(rivers);group.add(createMountainOutcrops(game,'world'));
  // Real-world traffic generates the atlas road network (no roads appear just because a route was planned).
- const roadGroup=new T.Group();roadGroup.name='V67 continuous road graph';roadGroup.userData.roadNetwork=true;group.add(roadGroup);let roadStamp='';
+ const roadGroup=new T.Group();roadGroup.name='V67 continuous road graph';roadGroup.userData.roadNetwork=true;group.add(roadGroup);let roadStamp='',roadRaw='';
  function roads(state){
   if(crossingRevision!==(state.crossingRevision||0)){crossingRevision=state.crossingRevision||0;group.remove(rivers);disposeNetwork(rivers);rivers=createRiverNetwork(game,'world',null,quality,worldGroundV326);group.add(rivers)}
-  const stamp=(state.roadRevision||0)+':'+(state.railRevision||0)+':'+(state.visionRevision||0);
+  const raw=(state.roadRevision||0)+':'+(state.railRevision||0)+':'+(state.visionRevision||0);
+  if(raw===roadRaw)return;roadRaw=raw;
+  // V351: a road or rail piece is drawn when both of its ends are known. Discovering map cells
+  // rebuilds the network only when that changes for some piece, not for every new cell.
+  let known='';
+  for(const edges of [state.worldRoads,state.railEdges]){for(const key of Object.keys(edges||{})){const [a,b]=roadPoints(key);known+=a&&b&&game.seen(0,a)&&game.seen(0,b)?'1':'0';}known+='|';}
+  const stamp=(state.roadRevision||0)+':'+(state.railRevision||0)+':'+known;
   if(stamp===roadStamp)return;roadStamp=stamp;
   for(const o of [...roadGroup.children]){roadGroup.remove(o);disposeNetwork(o)}
   const network=createUnifiedRoadNetwork(game,'world');
@@ -118,65 +125,78 @@ export function createAtlasDecor(game,scene,quality='medium',{terrainGeometry=nu
  }
  const territories=new T.Group(),routes=new T.Group();group.add(territories,routes);let previous='',lastRoute='';
  function disposeGroup(g){for(const o of [...g.children]){o.geometry?.dispose();o.material?.dispose();g.remove(o)}}
+ // V351: territory fills and borders are kept in 8x8-cell chunks (territory-chunks-v351.js). Discovering
+ // a map cell or moving a border recomputes only the chunks whose visible territory cells changed;
+ // the meshes, their names, materials and draw order are the same as before.
+ const territoryChunks=createTerritoryChunksV351(game,{height,vision:()=>({revision:game.s.visionRevision||0,explored:game.s.explored?.[0],all:!!globalThis.KINGDOMS_REVEAL_V248}),stamp:()=>game.territoryStamp}),territoryGeo=new Map(),territoryMat=new Map(),territoryObj=new Map();
+ let territoryLayout='',territoryBuilt=false;
+ const TERRITORY_BUDGET_MS=5,teamColor=['#3fd2c6','#ff8a66','#b98cff','#ffd75e'];
+ const territoryMaterial=(key,make)=>{if(!territoryMat.has(key))territoryMat.set(key,make());return territoryMat.get(key)};
+ const territoryGeometry=(key,attributes)=>{const geo=new T.BufferGeometry();for(const [name,array,size] of attributes)geo.setAttribute(name,new T.Float32BufferAttribute(array,size));territoryGeo.get(key)?.dispose();territoryGeo.set(key,geo);const o=territoryObj.get(key);if(o)o.geometry=geo;};
+ function territoryObject(key){
+  const [kind,a,b,c]=key.split('|'),geo=territoryGeo.get(key);let o;
+  if(kind==='fill'||kind==='edge'){
+   const team=+b,rural=c==='true',color=rural?['#b6ce75','#dba082','#bca3d6','#dfcc87'][team]:['#69d4c3','#e77e64','#ac87e2','#ead06b'][team];
+   if(kind==='fill'){o=new T.Mesh(geo,territoryMaterial(key,()=>new T.MeshBasicMaterial({color,vertexColors:true,transparent:true,opacity:rural?.07:.11,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-8})));o.name=rural?'county area':'urban area';}
+   else{o=new T.LineSegments(geo,territoryMaterial(key,()=>new T.LineBasicMaterial({color,transparent:true,opacity:rural?.95:.9})));o.name=rural?'county border':'urban border';}
+  }else if(kind==='glow'){
+   o=new T.Mesh(geo,territoryMaterial(key,()=>new T.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:.42,side:T.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-8})));o.name='national border glow '+a;o.renderOrder=13;
+  }else{
+   const i=kind==='underlay'?0:+a+1;
+   o=new T.Mesh(geo,territoryMaterial(key,()=>new T.MeshBasicMaterial({color:i===0?'#f4ecd4':teamColor[i-1],side:T.DoubleSide,transparent:true,opacity:i===0?.85:1,depthWrite:false,depthTest:false})));o.name=i===0?'national border outline':'national border '+(i-1);o.renderOrder=i===0?14:15;
+  }
+  return o;
+ }
  function territory(state){
   game.refreshTerritory();const stamp=game.territoryStamp+':'+(state.visionRevision||0);
-  if(stamp===previous)return;previous=stamp;disposeGroup(territories);
-  // V150: rounded, natural-looking territory shapes (same cells, smooth outline).
-  const groups=new Map(),teams=new Map();
-  for(const cell of game.cells){
-   const city=game.territory.get(cell.c+':'+cell.r);if(!city||!game.seen(0,cell))continue;
-   const rural=!!game.isCountyTile(cell,city),key=city.team+'|'+rural,k=cell.c+':'+cell.r;
-   if(!groups.has(key))groups.set(key,{team:city.team,rural,cells:[],cities:new Map()});
-   const g=groups.get(key);g.cells.push(k);if(!g.cities.has(city.id))g.cities.set(city.id,[]);g.cities.get(city.id).push(k);
-   if(!teams.has(city.team))teams.set(city.team,[]);teams.get(city.team).push(k);
-  }
-  for(const {team,rural,cells,cities} of groups.values()){
-   const color=rural?['#b6ce75','#dba082','#bca3d6','#dfcc87'][team]:['#69d4c3','#e77e64','#ac87e2','#ead06b'][team];
-   const fillData=regionFill(cellRegion(cells)),fill=[],rgba=[];
-   for(let i=0;i<fillData.alpha.length;i++){const x=fillData.pos[i*2],z=fillData.pos[i*2+1];fill.push(x,height(x,z)+.45,z);rgba.push(1,1,1,fillData.alpha[i]);}
-   const edges=[];
-   for(const keys of cities.values()){const seg=regionContour(cellRegion(keys));for(let i=0;i<seg.length;i+=4)if(game.atlasHeight((seg[i]+seg[i+2])/2,(seg[i+1]+seg[i+3])/2)>=.6)edges.push(seg[i],height(seg[i],seg[i+1])+.9,seg[i+1],seg[i+2],height(seg[i+2],seg[i+3])+.9,seg[i+3]);}
-   const geo=new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(fill,3)).setAttribute('color',new T.Float32BufferAttribute(rgba,4));
-   const mesh=new T.Mesh(geo,new T.MeshBasicMaterial({color,vertexColors:true,transparent:true,opacity:rural?.07:.11,depthWrite:false,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-8}));
-   mesh.name=rural?'county area':'urban area';
-   const line=new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(edges,3)),new T.LineBasicMaterial({color,transparent:true,opacity:rural?.95:.9}));line.name=rural?'county border':'urban border';territories.add(mesh,line);
-  }
-  // V152: country borders read as a map border, not as a river: a dashed line (cream edge, team core)
-  // plus a soft team-coloured glow that fades inwards from the border.
-  const national=[[],[],[],[]],underlay=[],glow=[[],[],[],[]];
-  const quad=(vertices,p,q,r,t)=>vertices.push(...p,...r,...q,...q,...r,...t);
-  for(const [team,keys] of teams){
-   const region=cellRegion(keys),seg=regionContour(region,5);
-   for(let i=0;i<seg.length;i+=4){
-    const ax=seg[i],az=seg[i+1],bx=seg[i+2],bz=seg[i+3],len=Math.hypot(bx-ax,bz-az)||1,nx=-(bz-az)/len,nz=(bx-ax)/len;
-    if(game.atlasHeight((ax+bx)/2,(az+bz)/2)<.6)continue; // V286: the coast is the border; no dashes out at sea
-    const mx=(ax+bx)/2,mz=(az+bz)/2,side=region.field(mx+nx*3,mz+nz*3)>=region.field(mx-nx*3,mz-nz*3)?1:-1;
-    // glow: alpha 1 at the line, 0 eleven metres inside (alpha stored in the 4th colour channel)
-    const g=glow[team],w=11*side,ex=(bx-ax)/len*.6,ez=(bz-az)/len*.6;
-    const A=[ax-ex,az-ez],B=[bx+ex,bz+ez];
-    g.push(A[0],height(A[0],A[1])+.55,A[1],1, B[0],height(B[0],B[1])+.55,B[1],1, A[0]+nx*w,height(A[0]+nx*w,A[1]+nz*w)+.55,A[1]+nz*w,0,
-           A[0]+nx*w,height(A[0]+nx*w,A[1]+nz*w)+.55,A[1]+nz*w,0, B[0],height(B[0],B[1])+.55,B[1],1, B[0]+nx*w,height(B[0]+nx*w,B[1]+nz*w)+.55,B[1]+nz*w,0);
-    // dashes: every 5 m contour piece becomes a 3 m dash
-    const dx=(bx-ax)*.2,dz=(bz-az)*.2;
-    for(const [vertices,half,lift] of [[underlay,2.3,1.15],[national[team],1.35,1.22]]){
-     const pt=(x,z,sd)=>{const X=x+nx*half*sd,Z=z+nz*half*sd;return [X,height(X,Z)+lift,Z];};
-     quad(vertices,pt(ax+dx,az+dz,-1),pt(ax+dx,az+dz,1),pt(bx-dx,bz-dz,-1),pt(bx-dx,bz-dz,1));
-    }
+  if(stamp===previous&&!territoryChunks.pending)return;
+  if(stamp!==previous){previous=stamp;territoryChunks.sync();}
+  // The first build (new game, loaded save) is done at once; later changes are spread over frames.
+  const {changed}=territoryChunks.work(territoryBuilt?TERRITORY_BUDGET_MS:Infinity);territoryBuilt=true;
+  const layers=territoryChunks.layers;let teamChanged=false;
+  for(const id of changed){
+   const L=layers.get(id);if(!L)continue;
+   if(L.kind==='group'){
+    // V150: rounded, natural-looking territory shapes (same cells, smooth outline).
+    territoryGeometry('fill|'+id,[['position',L.arrays.fill,3],['color',L.arrays.rgba,4]]);
+    territoryGeometry('edge|'+id,[['position',L.arrays.edges,3]]);
+   }else{
+    // V152: country borders read as a map border, not as a river: a dashed line (cream edge, team core)
+    // plus a soft team-coloured glow that fades inwards from the border.
+    teamChanged=true;
+    const c=new T.Color(teamColor[L.team]),n=L.arrays.glowAlpha.length,col=new Float32Array(n*4);
+    for(let i=0;i<n;i++){col[i*4]=c.r;col[i*4+1]=c.g;col[i*4+2]=c.b;col[i*4+3]=L.arrays.glowAlpha[i];}
+    territoryGeometry('glow|'+L.team,[['position',L.arrays.glowPos,3],['color',col,4]]);
+    territoryGeometry('national|'+L.team,[['position',L.arrays.national,3]]);
    }
   }
-  const teamColor=['#3fd2c6','#ff8a66','#b98cff','#ffd75e'];
-  for(const [team,v] of glow.entries())if(v.length){
-   const pos=[],col=[],c=new T.Color(teamColor[team]);for(let i=0;i<v.length;i+=4){pos.push(v[i],v[i+1],v[i+2]);col.push(c.r,c.g,c.b,v[i+3]);}
-   const mesh=new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(pos,3)).setAttribute('color',new T.Float32BufferAttribute(col,4)),
-    new T.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:.42,side:T.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-8}));
-   mesh.name='national border glow '+team;mesh.renderOrder=13;territories.add(mesh);
+  const teams=[0,1,2,3].map(team=>layers.get('t|'+team)).filter(L=>L?.arrays);
+  const underlayKey=teams.map(L=>L.id+':'+L.version).join(' ');
+  if(teamChanged||underlayKey!==territory.underlayKey){
+   territory.underlayKey=underlayKey;
+   const size=teams.reduce((n,L)=>n+L.arrays.underlay.length,0),underlay=new Float32Array(size);let offset=0;
+   for(const L of teams){underlay.set(L.arrays.underlay,offset);offset+=L.arrays.underlay.length;}
+   territoryGeometry('underlay',[['position',underlay,3]]);
   }
-  for(const [i,vertices]of [underlay,...national].entries())if(vertices.length){const mesh=new T.Mesh(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(vertices,3)),new T.MeshBasicMaterial({color:i===0?'#f4ecd4':teamColor[i-1],side:T.DoubleSide,transparent:true,opacity:i===0?.85:1,depthWrite:false,depthTest:false}));mesh.name=i===0?'national border outline':'national border '+(i-1);mesh.renderOrder=i===0?14:15;territories.add(mesh);}
-
+  // Same children in the same order as the old whole-world pass created them.
+  const want=[];
+  for(const id of territoryChunks.order){const L=layers.get(id);if(L.kind==='group'&&L.arrays)want.push('fill|'+id,'edge|'+id);}
+  for(const L of teams)if(L.arrays.glowPos.length)want.push('glow|'+L.team);
+  if(teams.some(L=>L.arrays.underlay.length))want.push('underlay');
+  for(const L of teams)if(L.arrays.national.length)want.push('national|'+L.team);
+  const layout=want.join(' ');
+  if(layout!==territoryLayout){
+   territoryLayout=layout;
+   for(const o of [...territories.children])territories.remove(o);territoryObj.clear();
+   for(const key of want){const o=territoryObject(key);territoryObj.set(key,o);territories.add(o);}
+   const keep=new Set(want);
+   for(const [key,geo] of territoryGeo)if(!keep.has(key)){geo.dispose();territoryGeo.delete(key);}
+   for(const [key,material] of territoryMat)if(!keep.has(key)){material.dispose();territoryMat.delete(key);}
+  }
  }
  function route(state,mover){const path=mover?.path||[],stamp=(mover?.c??'')+':'+(mover?.r??'')+JSON.stringify(path);if(stamp===lastRoute)return;lastRoute=stamp;disposeGroup(routes);if(!path.length)return;const tiles=[mover,...path],points=[];for(let i=1;i<tiles.length;i++){const a=center(tiles[i-1].c,tiles[i-1].r),b=center(tiles[i].c,tiles[i].r);for(let j=0;j<10;j++){const x=a.x+(b.x-a.x)*j/10,z=a.z+(b.z-a.z)*j/10;points.push(new T.Vector3(x,height(x,z)+2,z))}}const end=center(path.at(-1).c,path.at(-1).r);points.push(new T.Vector3(end.x,height(end.x,end.z)+2,end.z));const line=new T.Line(new T.BufferGeometry().setFromPoints(points),new T.LineDashedMaterial({color:'#f4d48b',dashSize:5,gapSize:3,transparent:true,opacity:1,depthTest:false}));line.computeLineDistances();routes.add(line);const dots=new T.InstancedMesh(new T.RingGeometry(2,3,12),new T.MeshBasicMaterial({color:'#fae4a4',side:T.DoubleSide,depthTest:false,depthWrite:false}),path.length);path.forEach((p,i)=>{const q=center(p.c,p.r);dummy.position.set(q.x,height(q.x,q.z)+2,q.z);dummy.rotation.set(-Math.PI/2,0,0);dummy.scale.set(1,1,1);dummy.updateMatrix();dots.setMatrixAt(i,dummy.matrix)});routes.add(dots)}
 
- return {group,ground:worldGroundV326,territory,route,roads,routes,waveLines,peaks:peaks.length,shoreSegments:shore.length/6,nature};
+ return {group,ground:worldGroundV326,territory,territoryChunks,territories,route,roads,routes,waveLines,peaks:peaks.length,shoreSegments:shore.length/6,nature};
 }
 // V46: readable settlement silhouettes from prehistoric huts to modern urban skylines.
 const cityMaterials=new Map(),cityGeometries=new Map();

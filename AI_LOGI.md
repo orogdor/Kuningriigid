@@ -810,3 +810,26 @@ Uurida, kuidas UI kiiremaks saada, nii et see ei hoiaks FPS-i tagasi, ja panna p
 ### Pooleli
 - Riistvara FPS ja videokaardi kulu mõõtmata; suure riigiga mõõtmata.
 - `renderUI()` tingimusteta kirjutused iga 0,8 s, `ui-v264.js` kiipide ümberehitus, 12 taimerit, 39 CSS-faili.
+
+---
+
+## 2026-11-14 · Claude (Anthropic) · V351 – maailmakaardi sünkroonimine ainult muutuse korral, 1. osa
+
+### Ülesanne
+Kasutaja andis ChatGPT koostatud plaani "sündmuspõhine maailmakaardi sünkroonimine" ja palus see ära teha. Tehtud on plaani esimene osa. Haru `feature/world-sync-v351`, peaharusse ühendamata; selles seansis puudus GitHubi kirjutusõigus, seega haru on üle antud paiga ja bundle'ina.
+
+### Mis tehti
+- Uus `territory-chunks-v351.js`: territooriumi täide ja piirid 8×8 ruudu tükkidena, tükk arvutatakse uuesti ainult oma nähtavate territooriumiruutude muutumisel; 5 ms kaadrieelarve pärast esimest ehitust.
+- `atlas-style.js` `territory()` kasutab tükke; mesh'ide nimed, materjalid ja järjekord samad. `roads()` uueneb ainult siis, kui mõne lõigu nähtavus muutus.
+- `civilization-core.js` `reveal()` logib mängija uued ruudud; `fog-delta-v88.js` `VisionDelta` võtab muutuse logist, muidu vana täisvõrdlus.
+- `civilization.js`: `refreshResourceArea()` ja `refreshCultivation()` ei tee tööd, kui tulemus ei muutu.
+- Versioon V351 ja vahemälu võtmed.
+
+### Testimine
+- `tests/territory-chunks-v351.mjs`, `tests/vision-delta-v351.mjs`, `tests/world-sync-v351.mjs` (kiirkontrollis). Kiirkontroll 125/126; `tests/detail-stream-v342.mjs` on kellaajast sõltuv ja kukub vahel ka peaharul.
+- `tests/world-sync-v351-browser.cjs` (Playwright + Chrome): `worldSync()` 40 avastaja sammu peale 4600 → 240 ms (kogu kaart nähtav), 2728 → 234 ms (päris udu). Ekraanipildid enne/pärast: piirid ja täide samad.
+
+### Pooleli
+- 94. käigu salvestusega, NativeThreeBridge'is ja päris videokaardil mõõtmata.
+- Majad, linnamarkerid, metsad, detailkaardi piirid ja `allocateTerritory()` on muutmata. Vt `MUUDATUSED_V351.md`.
+

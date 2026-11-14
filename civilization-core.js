@@ -30,6 +30,7 @@ import {migrateBattleAmmunition} from './combat-equipment-v100.js';
 import {balanceUnitDefinitions,migrateUnitHealth,UNIT_BALANCE_VERSION} from './unit-balance-v99.js';
 import {createBattleNavigation} from './battle-navigation-v88.js?v=1751a';
 import {BATTLEFIELD} from './battlefield-v88.js';
+import {noteDiscoveredV351} from './fog-delta-v88.js';
 import {installEraUnits,troopCost,UNIT_GRADES} from './military-v88.js?v=117a';
 import {initArmyExperience,syncArmyStats,unitStats,armyTravelMultiplier,rallyArmies} from './army-experience-v88.js';
 import {productivityBonus,productivityResearchOrder} from './productivity-techs-v88.js';
@@ -512,7 +513,7 @@ export class Civilization{
 
  // V248 temporary: menu switch "show whole map" reveals everything to the player (team 0).
  seen(team,p){if(team===0&&globalThis.KINGDOMS_REVEAL_V248)return true;return !!this.s.explored?.[team]?.[tileKey(p)]}
- reveal(team,p,radius=2){this.s.explored??=Array.from({length:4},()=>({}));for(let dr=-radius;dr<=radius;dr++)for(let dc=-radius;dc<=radius;dc++){const c=p.c+dc,r=p.r+dr;if(c<0||c>=COLS||r<0||r>=ROWS||Math.abs(dc)+Math.abs(dr)>radius+1)continue;if(!this.s.explored[team][c+':'+r]){this.s.explored[team][c+':'+r]=1;if(team===0)this.s.visionRevision=(this.s.visionRevision||0)+1}}}
+ reveal(team,p,radius=2){this.s.explored??=Array.from({length:4},()=>({}));for(let dr=-radius;dr<=radius;dr++)for(let dc=-radius;dc<=radius;dc++){const c=p.c+dc,r=p.r+dr;if(c<0||c>=COLS||r<0||r>=ROWS||Math.abs(dc)+Math.abs(dr)>radius+1)continue;if(!this.s.explored[team][c+':'+r]){this.s.explored[team][c+':'+r]=1;if(team===0){this.s.visionRevision=(this.s.visionRevision||0)+1;noteDiscoveredV351(this.s.explored[0],c+':'+r)}}}}
  visibleNow(team,p){return visibleNow(this,team,p)}
  enemyIntel(team=0){return updateEnemyIntel(this,team)}
  splitArmy(army){return splitArmy(this.s,army)}

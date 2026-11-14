@@ -89,6 +89,13 @@ jobs:
         run: node tests/render-batches-v349.mjs
       - name: V350 change-only HUD writes and translation cache
         run: node tests/ui-writes-v350.mjs
+      - name: V351 chunked territory geometry, vision delta, change-driven world sync
+        run: |
+          node --check territory-chunks-v351.js
+          node --check fog-delta-v88.js
+          node tests/territory-chunks-v351.mjs
+          node tests/vision-delta-v351.mjs
+          node tests/world-sync-v351.mjs
       - name: V236 scouts and door torch regressions
         run: node scripts/test-scout-torch-v236.mjs
       - name: V237 farm, field and green-preview regression
