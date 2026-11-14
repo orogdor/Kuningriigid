@@ -96,6 +96,8 @@ jobs:
           node tests/territory-chunks-v351.mjs
           node tests/vision-delta-v351.mjs
           node tests/world-sync-v351.mjs
+      - name: V352 world sea as flat plane with a depth texture
+        run: node tests/sea-depth-v352.mjs
       - name: V236 scouts and door torch regressions
         run: node scripts/test-scout-torch-v236.mjs
       - name: V237 farm, field and green-preview regression

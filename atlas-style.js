@@ -1,5 +1,6 @@
 import {WATER_STYLE_V326} from './water-style-v326.js';
-import {atlasSeaGeometryV326,atlasGroundSamplerV326} from './atlas-sea-v326.js';
+import {atlasSeaGeometryV326,atlasGroundSamplerV326,atlasSeaDepthTextureV352,atlasSeaPlaneV352} from './atlas-sea-v326.js';
+const SEA_TEXEL_V352=4; // metres per depth texel (2750 x 2063, RG half float, about 23 MB)
 import {spatialInstances} from './spatial-batches-v86.js?v=86a';
 import * as T from './vendor/three.module.js';
 import {smoothBiomeColor,groundBaseColor,cellRegion,regionContour,regionFill} from './landscape-v149.js?v=162a';
@@ -69,8 +70,11 @@ export function createAtlasDecor(game,scene,quality='medium',{terrainGeometry=nu
  if(!terrainGeometry){seaSource.rotateX(-Math.PI/2);seaSource.translate(WORLD_CENTER_X,0,WORLD_CENTER_Z);
   const p=seaSource.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,game.atlasHeight(p.getX(i),p.getZ(i)));}
  const worldGroundV326=atlasGroundSamplerV326(seaSource);
- const geo=atlasSeaGeometryV326(game,seaSource);if(!terrainGeometry)seaSource.dispose();
- const water=new T.Mesh(geo,seaMaterial({scale:1}));water.position.y=.72;water.userData.water=true;group.add(water);group.userData.water=water;
+ // V352: WebGL draws the sea as a flat plane with a depth texture; the WebGPU node material still
+ // reads the per-vertex depth of the V326 terrain-grid copy.
+ const depthMapV352=T.GPU_MODE_V225?null:atlasSeaDepthTextureV352(game,seaSource,{texel:SEA_TEXEL_V352});
+ const geo=depthMapV352?atlasSeaPlaneV352(depthMapV352.box):atlasSeaGeometryV326(game,seaSource);if(!terrainGeometry)seaSource.dispose();
+ const water=new T.Mesh(geo,seaMaterial({scale:1,depthMap:depthMapV352}));if(depthMapV352){water.name='V352 world sea';water.userData.seaDepthV352=depthMapV352;}water.position.y=.72;water.userData.water=true;group.add(water);group.userData.water=water;
  const shore=[];for(let z=ORIGIN_Z;z<ORIGIN_Z+WORLD_DEPTH;z+=10)for(let x=ORIGIN_X;x<ORIGIN_X+WORLD_WIDTH;x+=10){const points=[[x,z],[x+10,z],[x+10,z+10],[x,z+10]],hits=[];for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],ha=game.atlasHeight(...a)-.8,hb=game.atlasHeight(...b)-.8;if((ha>0)!==(hb>0)){const t=ha/(ha-hb);hits.push([a[0]+(b[0]-a[0])*t,1.04,a[1]+(b[1]-a[1])*t])}}if(hits.length===2){const near=riverNear(game,x+5,z+5);/* V249: no coast line drawn across a river mouth */if(near.distance>near.width*1.6+4)shore.push(...hits[0],...hits[1])}}group.add(new T.LineSegments(new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(shore,3)),new T.LineBasicMaterial({color:WATER_STYLE_V326.shallow,transparent:true,opacity:.06})));
  // The shared flowing-water shader supplies ocean motion; no extra pale strokes.
  const waveLines=new T.Group();group.add(waveLines);group.userData.waveLines=waveLines;

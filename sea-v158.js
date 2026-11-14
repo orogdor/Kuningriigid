@@ -2,8 +2,8 @@
 import {sliceDueV342} from './frame-slice-v342.js';
 import * as T from './vendor/three.module.js';
 import {waterMaterial} from './landscape-v149.js';
-export function seaMaterial({scale=1,scaleZ=scale,origin={x:0,z:0}}={}){
- return waterMaterial(scale===1?'world':'detail',origin,{sea:true,scale,scaleZ});
+export function seaMaterial({scale=1,scaleZ=scale,origin={x:0,z:0},depthMap=null}={}){
+ return waterMaterial(scale===1?'world':'detail',origin,{sea:true,scale,scaleZ,depthMap});
 }
 // Detail map sea: a plane at sea level over the 3×3 area; depth from the local ground height.
 export function createDetailSea(...args){const steps=detailSeaStepsV242(...args);let result;do{result=steps.next();}while(!result.done);return result.value;}

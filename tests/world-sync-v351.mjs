@@ -23,7 +23,11 @@ const core=read('civilization-core.js'),fog=read('fog-delta-v88.js');
 assert.ok(core.includes("import {noteDiscoveredV351} from './fog-delta-v88.js'")&&core.includes("noteDiscoveredV351(this.s.explored[0],c+':'+r)"));
 assert.ok(fog.indexOf('revision-this.revision===log.length-this.logged')<fog.indexOf('Object.keys(explored)'),'the log is tried before the full comparison');
 // version and cache keys
-for(const key of ['<title>Kuningriigid · V351</title>','KUNINGRIIGID · V351','boot-v83.js?v=351a','"./atlas-style.js?v=162a": "./atlas-style.js?v=351a"','"./atlas-style.js": "./atlas-style.js?v=351a"','"./fog-delta-v88.js": "./fog-delta-v88.js?v=351"','"./civilization.js?v=118a": "./civilization.js?v=351a"','"./civilization-core.js": "./civilization-core.js?v=351a"'])assert.ok(index.includes(key),key);
-assert.ok(boot.includes("import('./civilization.js?v=351a')"));
+// (later releases bump the title and the atlas-style key; both atlas-style aliases must point to one current file)
+assert.match(index,/<title>Kuningriigid · V3\d\d<\/title>/);assert.match(index,/KUNINGRIIGID · V3\d\d/);
+{const a=index.match(/"\.\/atlas-style\.js": "\.\/atlas-style\.js\?v=(\d+)a"/),b=index.match(/"\.\/atlas-style\.js\?v=162a": "\.\/atlas-style\.js\?v=(\d+)a"/);assert.ok(a&&b&&a[1]===b[1]&&+a[1]>=351,'atlas-style cache key');}
+// startup and main module keys are bumped together each release (tests/autosave-v338.mjs checks they match)
+{const k=index.match(/boot-v83\.js\?v=(\d+)a/)?.[1];assert.ok(+k>=351);assert.ok(index.includes('"./civilization.js?v=118a": "./civilization.js?v='+k+'a"'));assert.ok(boot.includes("import('./civilization.js?v="+k+"a')"));}
+for(const key of ['"./fog-delta-v88.js": "./fog-delta-v88.js?v=351"','"./civilization-core.js": "./civilization-core.js?v=351a"'])assert.ok(index.includes(key),key);
 assert.ok(!index.includes('atlas-style.js?v=328a')&&!index.includes('civilization.js?v=350a')&&!index.includes('civilization-core.js?v=346a'));
 console.log('PASS V351 change-driven world map sync wiring');

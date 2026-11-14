@@ -67,7 +67,9 @@ assert.ok(artSrc.includes('changes.some(relevantV350)'),'art observer filters HU
 assert.equal((artSrc.match(/getComputedStyle/g)||[]).length,1);assert.ok(artSrc.includes('v350Position'),'forced style read happens once');
 const index=read('index.html');
 assert.ok(index.indexOf('ui-write-v350.js')>0&&index.indexOf('ui-write-v350.js')<index.indexOf('ui-v304.js'),'helper loads before the HUD');
-for(const key of ['<title>Kuningriigid · V351</title>','boot-v83.js?v=351a','ui-v304.js?v=350a','ui-v306.js?v=350a','ui-art-v263.js?v=350a','"./localization.js?v=155a": "./localization.js?v=350a"'])assert.ok(index.includes(key),key);
+assert.match(index,/<title>Kuningriigid · V3\d\d<\/title>/);
+assert.match(index,/boot-v83\.js\?v=3\d\da/);
+for(const key of ['ui-v304.js?v=350a','ui-v306.js?v=350a','ui-art-v263.js?v=350a','"./localization.js?v=155a": "./localization.js?v=350a"'])assert.ok(index.includes(key),key);
 
 // --- translation cache gives the same answers as the uncached path -----------------------------
 const loc=await import('../localization.js');

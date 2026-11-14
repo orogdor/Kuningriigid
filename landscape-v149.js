@@ -174,7 +174,7 @@ export function smoothedOverview(sample,x,z,spacing){
 
 // ---------------------------------------------------------------- water
 // attributes: aFlow (downstream direction * relative speed), aShore (0 mid-channel .. 1 at the bank)
-export function waterMaterial(scope='world',tile=null,{sea=false,scale=1,scaleZ=scale}={}){
+export function waterMaterial(scope='world',tile=null,{sea=false,scale=1,scaleZ=scale,depthMap=null}={}){
  if(T.GPU_MODE_V225)return waterNodeMaterialV326({sea,scale:sea?scale:scope==='detail'?4.5:1,scaleZ:sea?scaleZ:scope==='detail'?3.9:1,origin:tile||{x:0,z:0}});
  // V249: transparent, so river water can thin out into the sea (alpha comes from the vertex colours)
  const material=new T.MeshStandardMaterial({vertexColors:true,roughness:WATER_STYLE_V326.roughness,metalness:WATER_STYLE_V326.metalness,side:T.DoubleSide,transparent:true,depthWrite:false,forceSinglePass:true});/* V348: one pass; water is a heightfield seen from above */
@@ -183,11 +183,13 @@ export function waterMaterial(scope='world',tile=null,{sea=false,scale=1,scaleZ=
  material.onBeforeCompile=shader=>{
   shader.uniforms.uL149Time=CLOUD_TIME;shader.uniforms.uWaterSky=WATER_SKY_V251;shader.uniforms.uWaterFXV326=sea?SEA_EFFECT_V226:{value:1};
   if(sea){shader.uniforms.uWaterDeepV326={value:new T.Color(WATER_STYLE_V326.deep)};shader.uniforms.uWaterShallowV326={value:new T.Color(WATER_STYLE_V326.shallow)};}
+  // V352: sea depth from a texture (world sea plane) instead of a per-vertex attribute
+  const tex=sea&&depthMap;if(tex){shader.uniforms.uSeaDepthV352={value:depthMap.texture};shader.uniforms.uSeaDepthBoxV352={value:depthMap.box};}
   inject(shader,{map,
-   vertexHead:(sea?'attribute float aDepth;varying float vSeaD;':'attribute vec2 aFlow;attribute float aShore;')+'varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;',
-   vertexBody:`vL149P=${map.pos};`+(sea?'vSeaD=aDepth;vL149F=vec2(.65,.12);vL149S=1.0-smoothstep(0.0,3.6,aDepth);':'vL149F=aFlow;vL149S=aShore;'),
-   fragHead:'uniform float uL149Time;uniform float uWaterFXV326;varying vec3 vL149P;varying vec2 vL149F;varying float vL149S;'+(sea?'varying float vSeaD;uniform vec3 uWaterDeepV326;uniform vec3 uWaterShallowV326;':''),
-   color:(sea?`vec3 sea=mix(uWaterDeepV326,uWaterShallowV326,pow(vL149S,2.2)*.85);
+   vertexHead:(tex?'':sea?'attribute float aDepth;varying float vSeaD;':'attribute vec2 aFlow;attribute float aShore;')+'varying vec3 vL149P;varying vec2 vL149F;'+(tex?'':'varying float vL149S;'),
+   vertexBody:`vL149P=${map.pos};`+(tex?'vL149F=vec2(.65,.12);':sea?'vSeaD=aDepth;vL149F=vec2(.65,.12);vL149S=1.0-smoothstep(0.0,3.6,aDepth);':'vL149F=aFlow;vL149S=aShore;'),
+   fragHead:'uniform float uL149Time;uniform float uWaterFXV326;varying vec3 vL149P;varying vec2 vL149F;'+(tex?'uniform sampler2D uSeaDepthV352;uniform vec4 uSeaDepthBoxV352;float vSeaD;float vL149S;':'varying float vL149S;'+(sea?'varying float vSeaD;':''))+(sea?'uniform vec3 uWaterDeepV326;uniform vec3 uWaterShallowV326;':''),
+   color:(tex?'{vec2 sd=texture2D(uSeaDepthV352,(vL149P.xz-uSeaDepthBoxV352.xy)/uSeaDepthBoxV352.zw).rg;vSeaD=sd.r;vL149S=sd.g;}\n':'')+(sea?`vec3 sea=mix(uWaterDeepV326,uWaterShallowV326,pow(vL149S,2.2)*.85);
  diffuseColor.rgb=sea*(.97+.03*sin(vL149P.x*.11+vL149P.z*.07));
  diffuseColor.a=.94-.36*pow(vL149S,2.5);`:'')+`
  // V250: flow-map animation. The noise is sampled in plain world coordinates and only SHIFTED along
@@ -230,7 +232,7 @@ export function waterMaterial(scope='world',tile=null,{sea=false,scale=1,scaleZ=
    'float wetV326=smoothstep(-.12,.20,vSeaD);if(wetV326<.008)discard;diffuseColor.a*=wetV326;\n#include <opaque_fragment>');};
   material.vertexColors=false;
  }
- material.customProgramCacheKey=()=>'water-v326-'+scope+'-'+sea+'-'+(sea?scale+':'+scaleZ:'');
+ material.customProgramCacheKey=()=>'water-v326-'+scope+'-'+sea+'-'+(sea?scale+':'+scaleZ:'')+(sea&&depthMap?'-depthmap-v352':'');
  material.userData.animated=true;
  return material;
 }

@@ -833,3 +833,26 @@ Kasutaja andis ChatGPT koostatud plaani "sündmuspõhine maailmakaardi sünkroon
 - 94. käigu salvestusega, NativeThreeBridge'is ja päris videokaardil mõõtmata.
 - Majad, linnamarkerid, metsad, detailkaardi piirid ja `allocateTerritory()` on muutmata. Vt `MUUDATUSED_V351.md`.
 
+---
+
+## 2026-11-14 · Claude (Anthropic) · V352 – maailmakaardi meri sügavuskaardiga
+
+### Ülesanne
+Kasutaja küsis FPS-analüüsi ja seejärel, kas meri ja jõed saaksid kasutada sügavuskaardiga animatsiooni. Tehtud on meri. Haru `feature/sea-depth-v352`, peaharusse ühendamata.
+
+### Mis tehti
+- `atlas-sea-v326.js`: `atlasSeaDepthTextureV352` (sügavus ja kaldategur maastikutippudest, kolmnurgad rasterdatud tekstuuri) ja `atlasSeaPlaneV352` (lame pind).
+- `landscape-v149.js` `waterMaterial` ja `sea-v158.js` `seaMaterial`: valik `depthMap`; shader loeb sügavust tekstuurist.
+- `atlas-style.js`: WebGL kasutab lamedat pinda ja tekstuuri, WebGPU vana võrku.
+- Versioon V352 ja vahemälu võtmed (boot, civilization.js, atlas-style, landscape-v149, sea-v158, atlas-sea-v326).
+- Versioonikontrollid `tests/ui-writes-v350.mjs` ja `tests/world-sync-v351.mjs` kontrollivad nüüd kooskõla, mitte kindlat numbrit.
+
+### Testimine
+- `tests/sea-depth-v352.mjs` (kiirkontrollis), kiirkontroll 127 käsku.
+- `tests/sea-depth-v352-browser.cjs`: ekraanipildid main'iga võrreldes (erinevad ainult kauged sädemed), kolmnurgad ja kaadriajad.
+- `tests/fps-analysis-v352-browser.cjs`: FPS-analüüs (tulemused failis MUUDATUSED_V352.md).
+
+### Pooleli
+- Jõed, maastiku tükkideks jagamine ja LOD, detailkaardi ehitamise eelarve, maailma pakkimine workerisse.
+- NativeThreeBridge, päris graafikakaart ja 94. käigu salvestus mõõtmata.
+
