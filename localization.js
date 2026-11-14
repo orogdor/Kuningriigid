@@ -33,9 +33,19 @@ const specialSelectors=[
 ];
 const originalHTML=new Map();
 export const currentLanguage=()=>language;
+// V350: the HUD repeats the same strings on every refresh. The slow path below tests a few
+// thousand phrases per string, so its results are remembered. The translation depends only
+// on the text (the tables never change at run time); the cache is emptied when it fills up.
+const translatedV350=new Map();
 export function translateEstonian(v){
  if(typeof v!=='string'||language!=='en'||!v)return v;
  const whole=english.get(v);if(whole!==undefined)return whole;
+ const known=translatedV350.get(v);if(known!==undefined)return known;
+ const out=translateSlowV350(v);
+ if(translatedV350.size>=4000)translatedV350.clear();
+ translatedV350.set(v,out);return out;
+}
+function translateSlowV350(v){
  const match=/^(\s*)(.*?)(\s*)$/s.exec(v);
  if(match){const full=english.get(match[2]);if(full!==undefined)return match[1]+full+match[3]
   // V282: messages with names and numbers

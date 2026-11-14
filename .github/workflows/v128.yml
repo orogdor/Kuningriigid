@@ -29,6 +29,7 @@ jobs:
           node --check webgpu-safety-v227.js
           node --check vendor/three-gpu-shim.js
           node --check boot-v83.js
+          node --check ui-write-v350.js
           node --check ui-painted-v287.js
           node --check ui-reference-v288.js
           node --check hud-v289.js
@@ -86,6 +87,8 @@ jobs:
         run: node tests/torch-batches-v348.mjs
       - name: V349 rigid part batches, merged tree primitives, far atlas
         run: node tests/render-batches-v349.mjs
+      - name: V350 change-only HUD writes and translation cache
+        run: node tests/ui-writes-v350.mjs
       - name: V236 scouts and door torch regressions
         run: node scripts/test-scout-torch-v236.mjs
       - name: V237 farm, field and green-preview regression

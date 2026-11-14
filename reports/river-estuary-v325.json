@@ -1,7 +1,7 @@
 {
   "samples": 3705,
   "maxStep": 0.009645979409448557,
-  "maxDelta": 0.46902909970139467,
+  "maxDelta": 3.2813202807855912,
   "riverVertices": 748,
   "inlandFlowRestored": true,
   "broadEstuaryExcavation": false

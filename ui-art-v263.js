@@ -12,19 +12,24 @@ function portrait(){
  const hud=document.getElementById('commandhud');if(!hud)return;
  const kind=hud.dataset.unitKind||'',show=PORTRAITS.has(kind);let img=hud.querySelector(':scope > img.v263-portrait');
  if(show&&!img){img=document.createElement('img');img.className='v263-portrait';img.alt='';hud.prepend(img);}
- if(img){img.hidden=!show;if(show&&img.dataset.kind!==kind){img.dataset.kind=kind;img.src='ui-art-v263/unit_'+kind+'.webp';}}
- if(getComputedStyle(hud).position==='static')hud.style.position='relative';
- hud.classList.toggle('v263-has-portrait',show);
+ if(img){if(img.hidden!==!show)img.hidden=!show;if(show&&img.dataset.kind!==kind){img.dataset.kind=kind;img.src='ui-art-v263/unit_'+kind+'.webp';}}
+ // V350: the forced style read is needed once, not on every pass.
+ if(!hud.dataset.v350Position){hud.dataset.v350Position='1';if(getComputedStyle(hud).position==='static')hud.style.position='relative';}
+ if(hud.classList.contains('v263-has-portrait')!==show)hud.classList.toggle('v263-has-portrait',show);
 }
 function decorate(){
  portrait();
- for(const id of BUTTONS){const el=document.getElementById(id);if(!el)continue;el.classList.add('v263-btn');strip(el);}
+ for(const id of BUTTONS){const el=document.getElementById(id);if(!el)continue;if(!el.classList.contains('v263-btn'))el.classList.add('v263-btn');strip(el);}
  for(const icon of document.querySelectorAll('.v121-build-card[data-building] .v121-card-icon:not(.v263-art)')){
   const type=icon.closest('[data-building]').dataset.building;if(ART_BUILDINGS.has(type))icon.classList.add('v263-art');}
 }
 const ART_BUILDINGS=new Set(["hall", "house", "lumber", "forester", "quarry", "hunter", "well", "farm", "pasture", "cellar", "mason", "watchtower", "stonewall", "barracks"]);
 let queued=false;
-const observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;observer.disconnect();decorate();watch();});});
+// V350: the illustrated HUD and the resource bar hold none of the decorated buttons, build
+// cards or the unit portrait, but they change on every refresh. Their changes are ignored.
+const IGNORED_V350='#v304-hud,#resources,#dayclock-v235,#toast,#clock';
+const relevantV350=change=>{const t=change.target,e=t.nodeType===1?t:t.parentElement;return !e||!e.closest(IGNORED_V350);};
+const observer=new MutationObserver(changes=>{if(queued||!changes.some(relevantV350))return;queued=true;requestAnimationFrame(()=>{queued=false;observer.disconnect();decorate();watch();});});
 function watch(){observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['data-unit-kind']});}
 export function startUiArtV263(){decorate();watch();}
 if(typeof document!=='undefined')startUiArtV263();

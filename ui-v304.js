@@ -7,6 +7,8 @@
  const $=id=>document.getElementById(id);
  const tr=(et,en)=>(document.documentElement.lang||'en').startsWith('et')?et:en;
  const snapshot=()=>window.kingdomsUiV288?.snapshot?.();
+ // V350: write only what changed (see ui-write-v350.js). Without the helper the old direct writes are used.
+ const W=window.KuningriigidUiWriteV350||{text(n,v){if(n)n.textContent=v;},attr(n,k,v){n?.setAttribute(k,v);},prop(n,k,v){if(n)n[k]=v;},data(n,k,v){if(n)n.dataset[k]=v;}};
  const el=(tag,cls,parent,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;parent?.append(n);return n;};
  const picture=(parent,src,cls='')=>{const n=el('img',cls,parent);n.src=src;n.alt='';n.draggable=false;return n;};
  const original=(...ids)=>{for(const id of ids){const b=$(id);if(b&&!b.disabled){b.click();return true;}}return false;};
@@ -145,44 +147,47 @@
  }
  function update(){
   const bigMenu=['startmenu','researchpanel','journalpanel','help'].some(id=>$(id)&&!$(id).hidden);
-  root.hidden=bigMenu||document.body.classList.contains('fpv-mode');
+  W.prop(root,'hidden',bigMenu||document.body.classList.contains('fpv-mode'));
   const s=snapshot();if(!s)return;
   for(const [key,{button:b,value}] of counters){
    const source=document.querySelector('#resources [data-resource="'+key+'"] b');
-   value.textContent=key==='population'?s.leaders?.[0]?.population||'0':key==='science'?s.researchRate||'0':source?.textContent||'0';
-   b.setAttribute('aria-label',b.title+': '+value.textContent);
+   const shown=String(key==='population'?s.leaders?.[0]?.population||'0':key==='science'?s.researchRate||'0':source?.textContent||'0');
+   W.text(value,shown);
+   W.attr(b,'aria-label',b.title+': '+shown);
   }
-  world.querySelector('span').textContent=s.view==='world'?tr('Maailmakaart','World map'):tr('Detailkaart','Detail map');
-  walk.disabled=s.view==='world';
+  W.text(world.querySelector('span'),s.view==='world'?tr('Maailmakaart','World map'):tr('Detailkaart','Detail map'));
+  W.prop(walk,'disabled',s.view==='world');
   const t=$('dayclock-v235')?.textContent.match(/\d{1,2}:\d{2}/)?.[0]||'';
-  clock.textContent=tr('Käik ','Turn ')+s.turn+(t?' · '+t:'');
+  W.text(clock,tr('Käik ','Turn ')+s.turn+(t?' · '+t:''));
   const pauseArt=window.KuningriigidArtV306?.pauseSrc?.(s.paused);
   if(pauseArt){let im=pause.querySelector('img');if(!im)im=picture(pause,pauseArt);if(im.getAttribute('src')!==pauseArt)im.src=pauseArt;}
-  else pause.textContent=s.paused?'▶':'Ⅱ';
-  pause.setAttribute('aria-pressed',String(s.paused));
-  researchName.textContent=s.research||tr('Vali esimene avastus','Choose a discovery');
-  researchValue.textContent=s.research?(s.researchPaused?tr('Pausil','Paused'):s.researchPercent+'%')+' · '+s.researchRate+tr(' teadust/min',' science/min'):tr('Uuri uusi teadmisi →','Explore new knowledge →');
-  researchBar.value=s.researchPercent||0;researchBar.setAttribute('aria-label',researchName.textContent);
+  else W.text(pause,s.paused?'▶':'Ⅱ');
+  W.attr(pause,'aria-pressed',String(s.paused));
+  const researchTitle=s.research||tr('Vali esimene avastus','Choose a discovery');
+  W.text(researchName,researchTitle);
+  W.text(researchValue,s.research?(s.researchPaused?tr('Pausil','Paused'):s.researchPercent+'%')+' · '+s.researchRate+tr(' teadust/min',' science/min'):tr('Uuri uusi teadmisi →','Explore new knowledge →'));
+  W.prop(researchBar,'value',s.researchPercent||0);W.attr(researchBar,'aria-label',researchTitle);
   const image=s.researchActiveId?window.KuningriigidTechArtV293?.src(s.researchActiveId,{age:s.researchActiveAge,name:s.research}):art('cmd_research');
   if(image&&researchPic.getAttribute('src')!==image)researchPic.src=image;
   [...queue.children].forEach((b,i)=>{
-   const tech=s.researchQueue?.[i];b.dataset.tech=tech?.id||'';b.classList.toggle('empty',!tech);
-   b.title=tech?.name||tr('Lisa avastus järjekorda','Add discovery to queue');b.setAttribute('aria-label',b.title);
+   const tech=s.researchQueue?.[i];W.data(b,'tech',tech?.id||'');b.classList.toggle('empty',!tech);
+   const label=tech?.name||tr('Lisa avastus järjekorda','Add discovery to queue');
+   W.attr(b,'title',label);W.attr(b,'aria-label',label);
    const pic=b.querySelector('img'),src=tech&&window.KuningriigidTechArtV293?.src(tech.id,tech);if(src&&pic.getAttribute('src')!==src)pic.src=src;
   });
-  const sel=s.selection||{};selectedName.textContent=sel.name||tr('Sinu kuningriik','Your kingdom');
-  selectedInfo.disabled=sel.kind==='none';
-  selectedState.textContent=sel.kind==='none'?s.age:$('commandstate')?.textContent||s.age;
+  const sel=s.selection||{};W.text(selectedName,sel.name||tr('Sinu kuningriik','Your kingdom'));
+  W.prop(selectedInfo,'disabled',sel.kind==='none');
+  W.text(selectedState,sel.kind==='none'?s.age:$('commandstate')?.textContent||s.age);
   const originalPortrait=$('commandhud')?.querySelector('.v263-portrait:not([hidden])')?.getAttribute('src')||art(sel.kind==='none'?'cmd_map':sel.kind==='city'?'cmd_city':'unit_settler');
   const p=window.KuningriigidArtV306?.portraitSrc?.(sel,originalPortrait)||originalPortrait;
   if(portrait.getAttribute('src')!==p)portrait.src=p;
   const choices=window.KuningriigidSelectionV300?.actions?.(sel,s.view)||[];
   [...actions.children].forEach((b,i)=>{
-   const a=choices[i];b.hidden=!a;if(!a)return;b.disabled=!!a.disabled;
-   const label=tr(a.ee,a.en);b.title=label;b.setAttribute('aria-label',label);b.querySelector('span').textContent=label;
+   const a=choices[i];W.prop(b,'hidden',!a);if(!a)return;W.prop(b,'disabled',!!a.disabled);
+   const label=tr(a.ee,a.en);W.attr(b,'title',label);W.attr(b,'aria-label',label);W.text(b.querySelector('span'),label);
    const src=window.KuningriigidArtV306?.actionSrc?.(a.icon)||(['move','attack','stop','focus'].includes(a.icon)?'ui-art-v303/action_'+a.icon+'.webp':'ui-art-v300/action_'+a.icon+'.svg');
    const im=b.querySelector('img');if(im.getAttribute('src')!==src)im.src=src;
-   b.setAttribute('aria-pressed',String((a.icon==='move'||a.icon==='attack')&&sel.order===a.icon));
+   W.attr(b,'aria-pressed',String((a.icon==='move'||a.icon==='attack')&&sel.order===a.icon));
   });
   if(mapCanvas&&mapCanvas.parentElement!==$('v304-map-host'))$('v304-map-host').append(mapCanvas);
   syncBlocking();

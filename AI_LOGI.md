@@ -787,3 +787,26 @@ Maailmakaart 398 → 270, maailmakaardi lähivaade 406 → 275, detailkaart 550 
 ### Pooleli / järgmised
 Kasutaja seadmel FPS mõõtmata; 94. käigu salvestusega mõõtmata (faili polnud hoidlas). Kandidaadid: maailmakaardi linnad ja varemed instantsideks, kaktuse kauguse-LOD, V50-inimeste osad samasse partiisüsteemi. Vt `MUUDATUSED_V349.md`.
 
+---
+
+## 2026-11-14 · Claude (Anthropic) · V350 – UI kirjutab DOM-i ainult muutuse korral
+
+### Ülesanne
+Uurida, kuidas UI kiiremaks saada, nii et see ei hoiaks FPS-i tagasi, ja panna parandused peavoogu.
+
+### Mis tehti
+- `civilization.js` `frame()`: päevakella `title` üks kord, käigukell 0,25 s sammuga, `#buildhint` peidetakse ainult nähtavana.
+- Uus `ui-write-v350.js`: `text`, `attr`, `prop`, `data` kirjutavad ainult muutuse korral ega võitle tõlkijaga.
+- `ui-v304.js` `update()` ja `ui-v306.js` `sync()` kasutavad neid; ilma abifailita jäävad vanad otsekirjutused.
+- `ui-art-v263.js`: vaatleja eirab `#v304-hud`, `#resources`, `#dayclock-v235`, `#toast`, `#clock`; `getComputedStyle` üks kord; klassid ainult muutuse korral.
+- `localization.js`: `translateEstonian` aeglase tee vahemälu (4000 teksti).
+- Versioon V350 ja vahemälu võtmed `index.html`-is ja `boot-v83.js`-is.
+
+### Testimine
+- `node tests/ui-writes-v350.mjs` (kiirkontrollis); kiirkontroll 121 käsku läbis kohapeal.
+- `tests/ui-cost-v350-browser.cjs` (vajab Playwrighti ja Chrome'i): detailkaart 15 s, DOM-muudatusi 9802–9916 → 2651, stiili ümberarvutusi 885–923 → 68.
+- V349 ja V350 HUD võrreldud kuues sammus päris mängus: identne.
+
+### Pooleli
+- Riistvara FPS ja videokaardi kulu mõõtmata; suure riigiga mõõtmata.
+- `renderUI()` tingimusteta kirjutused iga 0,8 s, `ui-v264.js` kiipide ümberehitus, 12 taimerit, 39 CSS-faili.

@@ -6,6 +6,8 @@
  if(!window.KINGDOMS_UI304)return;
  const $=id=>document.getElementById(id),tr=(et,en)=>(document.documentElement.lang||'en').startsWith('et')?et:en;
  const img=(src,cls='')=>{const n=document.createElement('img');n.src=src;n.alt='';n.draggable=false;n.className=cls;return n;};
+  // V350: change-only writes, see ui-write-v350.js.
+ const W=window.KuningriigidUiWriteV350||{text(n,v){if(n)n.textContent=v;},attr(n,k,v){n?.setAttribute(k,v);},prop(n,k,v){if(n)n[k]=v;},data(n,k,v){if(n)n.dataset[k]=v;}};
  const click=id=>{const b=$(id);if(b&&!b.disabled)b.click();};
  const button=(label,src,action)=>{const b=document.createElement('button');b.type='button';b.title=label;b.setAttribute('aria-label',label);b.append(img(src));b.onclick=action;return b;};
  const paintedActions={city:'cmd_city',build:'cmd_build',recruit:'cmd_army',trade:'res_gold',info:'cmd_city',workers:'unit_worker',resources:'res_wood',world:'cmd_map',science:'cmd_research',journal:'cmd_research',explore:'cmd_explore',guard:'cmd_stop'};
@@ -47,19 +49,19 @@
   const readable={cities:['Linnad, ehitamine ja kaardid','Cities, construction and maps'],build:['Ehitus ja rajatised','Construction and structures'],armies:['Armeed','Armies'],trade:['Kaubandus','Trade'],diplomacy:['Diplomaatia','Diplomacy'],journal:['Sündmuste logi','Event journal']};
   function sync(){
    const state=window.kingdomsUiV288?.snapshot?.();
-   for(const b of cards){const label=readable[b.dataset.action];b.title=tr(...label);b.setAttribute('aria-label',b.title);}
-   const copy=research.querySelector('.v304-research-copy>small:first-child');if(copy)copy.textContent=tr('Avastus:','Discovery:');
+   for(const b of cards){const label=tr(...readable[b.dataset.action]);W.attr(b,'title',label);W.attr(b,'aria-label',label);}
+   const copy=research.querySelector('.v304-research-copy>small:first-child');if(copy)W.text(copy,tr('Avastus:','Discovery:'));
    const mobileLabels=[['Avastused','Research'],['Kaart','Map'],['Valik','Selection']];
-   root.querySelectorAll('.v304-mobile-tools button').forEach((b,i)=>{const label=tr(...mobileLabels[i]);b.title=label;b.setAttribute('aria-label',label);b.querySelector('span').textContent=label;});
+   root.querySelectorAll('.v304-mobile-tools button').forEach((b,i)=>{const label=tr(...mobileLabels[i]);W.attr(b,'title',label);W.attr(b,'aria-label',label);W.text(b.querySelector('span'),label);});
    if(state){
-    root.dataset.selectionKind=state.selection?.kind||'none';
-    root.dataset.view=state.view;
+    W.data(root,'selectionKind',state.selection?.kind||'none');
+    W.data(root,'view',state.view);
     // The large portrait is always real selection art. An empty selection shows
     // the illustrated kingdom overview instead of magnifying a tiny map icon.
     const kind=state.selection?.kind;
-    if(kind==='none')selectedImage.src='ui-art-v306/kingdom_portrait.webp';
-    pause.dataset.paused=String(!!state.paused);
-    pause.setAttribute('aria-label',state.paused?tr('Jätka mängu','Resume game'):tr('Peata mäng','Pause game'));
+    if(kind==='none'&&selectedImage.getAttribute('src')!=='ui-art-v306/kingdom_portrait.webp')selectedImage.src='ui-art-v306/kingdom_portrait.webp';
+    W.data(pause,'paused',String(!!state.paused));
+    W.attr(pause,'aria-label',state.paused?tr('Jätka mängu','Resume game'):tr('Peata mäng','Pause game'));
     if(!pause.querySelector('img'))pause.append(img(window.KuningriigidArtV306.pauseSrc(state.paused),'v306-pause-art'));
    }
   }
