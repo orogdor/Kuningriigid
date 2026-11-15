@@ -27,6 +27,7 @@ const server=http.createServer((req,res)=>{
   await page.locator('#newgame').click();
   await page.waitForFunction(()=>window.gameDebug?.generatedWorldV331&&document.getElementById('menu-status').hidden,null,{timeout:180000});
   const firstGameMs=Date.now()-coldStart;
+  if(!await page.evaluate(()=>gameDebug.saveForNativeV1()))throw Error('Saving the test world failed');
   await page.waitForFunction(()=>gameDebug.generatedWorldV331().persisted,null,{timeout:180000});
   const key=await page.evaluate(()=>gameDebug.terrainCacheV336().key);
   if(!key)throw Error('New world did not get a persistent cache key');
