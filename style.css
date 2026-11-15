@@ -236,3 +236,20 @@ body:has(#startmenu:not([hidden])) :is(header,#tools,#commandhud,#hud-resource-t
  .tech-info-actions{display:flex;flex-direction:row}
  .tech-tree-subtitle{min-width:125px}
 }
+
+#autosave-notice {
+ position: fixed;
+ z-index: 40;
+ top: 55px;
+ left: 50%;
+ transform: translateX(-50%);
+ max-width: calc(100vw - 24px);
+ padding: 8px 16px;
+ border: 1px solid #ceb575a0;
+ border-radius: 5px;
+ color: #fff1cc;
+ background: #1c332d;
+ font-size: 14px;
+ text-align: center;
+ pointer-events: none;
+}
