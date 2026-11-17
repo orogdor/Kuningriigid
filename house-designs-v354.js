@@ -44,9 +44,11 @@ const NEAR_DISTANCE=Math.round(({near:110,medium:180,far:280,ultra:420}[GRAPHICS
 // ?houses=old draws the earlier game models (only for comparison while testing).
 const START_ENABLED=(()=>{try{return new URLSearchParams(location.search).get('houses')!=='old';}catch{return true;}})();
 
-const state={enabled:START_ENABLED,frame:null,ready:null,next:1,waiting:new Map(),cache:new Map(),revision:0,listeners:new Set(),loader:new T.TextureLoader(),textures:new Map(),db:null};
+const state={progress:0,watchdog:0,errorListeners:new Set(),reported:false,enabled:START_ENABLED,frame:null,ready:null,next:1,waiting:new Map(),cache:new Map(),revision:0,listeners:new Set(),loader:new T.TextureLoader(),textures:new Map(),db:null};
 
 export function houseDesignsEnabledV354(){return state.enabled;}
+// Called once with the first error (shown to the player).
+export function onHouseDesignErrorV354(listener){state.errorListeners.add(listener);}
 export function onHouseDesignsChangedV354(listener){state.listeners.add(listener);return ()=>state.listeners.delete(listener);}
 function notify(){for(const listener of state.listeners){try{listener()}catch(error){console.warn('V354',error)}}}
 
@@ -66,17 +68,25 @@ function frame(){
  if(state.frame)return state.ready;
  const iframe=document.createElement('iframe');
  iframe.title='Building models';iframe.setAttribute('aria-hidden','true');iframe.tabIndex=-1;
- Object.assign(iframe.style,{position:'fixed',left:'-10000px',top:'0',width:'480px',height:'360px',border:'0',opacity:'0',pointerEvents:'none'});
+ // Inside the viewport and eager: phone browsers may never load a frame placed
+ // far off screen (lazy frame loading / data saver).
+ iframe.loading='eager';
+ Object.assign(iframe.style,{position:'fixed',left:'0',top:'0',width:'2px',height:'2px',border:'0',opacity:'0',pointerEvents:'none',zIndex:'-1'});
  iframe.src=FRAME_URL;
  state.frame=iframe;
- state.ready=new Promise(resolve=>{
+ const started=new Promise(resolve=>{
   const receive=event=>{
    if(event.origin!==location.origin||event.source!==iframe.contentWindow||event.data?.source!=='kuningriigid-designer')return;
    if(event.data.type==='ready')resolve();
-   if(event.data.type==='model'){state.waiting.get(event.data.requestId)?.(event.data);state.waiting.delete(event.data.requestId);}
+   if(event.data.type==='alive')state.progress=performance.now();
+   if(event.data.type==='model'){state.progress=performance.now();state.waiting.get(event.data.requestId)?.(event.data);state.waiting.delete(event.data.requestId);}
   };
   state.receive=receive;addEventListener('message',receive);
  });
+ // A designer that does not start (no WebGL, out of memory) must not leave the
+ // town empty: its buildings fall back to the older models.
+ state.ready=Promise.race([started,new Promise((_,reject)=>setTimeout(()=>reject(new Error('the house designer did not start')),60000))]);
+ state.ready.catch(()=>{if(state.frame===iframe){iframe.remove();state.frame=null;removeEventListener('message',state.receive);}});
  document.body.append(iframe);
  return state.ready;
 }
@@ -85,9 +95,24 @@ async function requestModel(id,design,segment){
  await frame();
  return new Promise(resolve=>{
   const requestId=state.next++;
+  if(!state.waiting.size)state.progress=performance.now();
   state.waiting.set(requestId,reply=>{resolve(reply);if(!state.waiting.size)closeWhenIdle();});
+  watchdog();
   state.frame.contentWindow.postMessage({source:'kuningriigid-game',type:'model',requestId,id,design,segment},location.origin);
  });
+}
+// Models are made one after another, so a long queue is fine as long as the
+// designer is alive (it sends a heartbeat every few seconds). If it goes quiet
+// for a minute (crashed or frozen frame) every waiting model fails and falls back.
+function watchdog(){
+ if(state.watchdog)return;
+ state.watchdog=setInterval(()=>{
+  if(!state.waiting.size){clearInterval(state.watchdog);state.watchdog=0;return;}
+  if(performance.now()-state.progress<60000)return;
+  const waiting=[...state.waiting.values()];state.waiting.clear();
+  state.frame?.remove();state.frame=null;state.ready=null;removeEventListener('message',state.receive);
+  for(const reply of waiting)reply({error:'the house designer stopped answering'});
+ },5000);
 }
 // The hidden designer holds its own WebGL context. Free it when no model has
 // been asked for a while, so phones keep memory for the game itself.
@@ -282,14 +307,18 @@ function load(key,id,design,segment){
  entry={key,id,status:'pending',template:null,error:null};
  state.cache.set(key,entry);
  (async()=>{
+  const started=performance.now();
   let packet=await readCached(key).then(v=>v&&fromCache(v)).catch(()=>null);
+  entry.cached=Boolean(packet);
   if(!packet){
    const reply=await requestModel(id,design,segment);
+   entry.timings=reply.model?.timings??null;
    if(reply.error||!reply.model)throw new Error(reply.error||'No model');
    packet=reply.model;writeCached(key,packet);
   }
-  entry.template=template(packet);entry.status='ready';
- })().catch(error=>{entry.status='failed';entry.error=String(error?.message||error);console.warn('V354 designer model',id,entry.error);})
+  entry.template=template(packet);entry.status='ready';entry.ms=Math.round(performance.now()-started);
+ })().catch(error=>{entry.status='failed';entry.error=String(error?.message||error);console.warn('V354 designer model',id,entry.error);
+  if(!state.reported){state.reported=true;for(const listener of state.errorListeners)try{listener(entry.error)}catch{}}})
   .finally(()=>{state.revision++;notify();});
  return entry;
 }
@@ -346,5 +375,8 @@ export function houseDesignStatusV354(){
  const counts={pending:0,ready:0,failed:0};for(const e of state.cache.values())counts[e.status]++;
  const triangles={};for(const e of state.cache.values())if(e.template)triangles[e.id]=e.template.stats;
  return {...counts,enabled:state.enabled,revision:state.revision,detail:DETAIL,textureLevels:TEXTURE_LEVELS,interiorDistance:INTERIOR_DISTANCE,nearDistance:NEAR_DISTANCE,
-  texturesLoaded:[...loaded.keys()].map(k=>k.split('/textures/')[1]),triangles};
+  texturesLoaded:[...loaded.keys()].map(k=>k.split('/textures/')[1]),triangles,
+  // How long each model took (ms from asking to ready; the designer's own steps).
+  times:Object.fromEntries([...state.cache.values()].filter(e=>e.ms!=null).map(e=>[e.id,{ms:e.ms,cached:e.cached,...(e.timings??{})}])),
+  errors:[...state.cache.values()].filter(e=>e.error).map(e=>e.id+': '+e.error)};
 }

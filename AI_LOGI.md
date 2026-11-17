@@ -899,3 +899,11 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 ### Parandus 2026-11-17 (4) – mustad majad raw.githack lingil
 - Põhjus: githack suunab suured failid raw.githubusercontent.com-i (teine päritolu). `house-designs-v354.js` laadis tekstuure `new Image()`-iga ilma `crossOrigin`-ita → pilt "tainted", WebGL keeldus (`texSubImage2D SecurityError` igas kaadris), majad mustad ja mäng aeglane. Nüüd `img.crossOrigin='anonymous'`. Kontrollitud kasutaja enda brauseris (RTX 2080 S): 19 mudelit 31 s-ga, vigu pole.
 - Kujundaja eksport: teine ümberehitus ainult siis, kui tuli uusi tekstuurifaile; läbimine ja lihtsustamine annavad vahepeal mängule kaadri; lihtsustamise võtmed numbrilised. Linna nimesilt tõlgitakse.
+
+## 2026-11-17 · Claude (Anthropic) · V354 – mobiilis majad ei laadi (354e)
+
+- Mobiilis ei tulnud maju (emulatsioonis kõik 19 mudelit valmis, päris telefonis mitte). Tõenäoline põhjus: peidetud kujundaja iframe asus `left:-10000px` ja telefoni brauser ei laadinud/ei käivitanud seda → kõik hooned jäid ootele.
+- `house-designs-v354.js`: iframe on nüüd vaateala sees (2×2 px, opacity 0, z-index -1, `loading='eager'`). Käivituse ajapiir 60 s. Kujundaja saadab iga 3 s `alive` sõnumi (`majaehitaja/index.html`); kui 60 s ei tule ühtegi sõnumit, saavad kõik ootel hooned vea → vana mudel. `onHouseDesignErrorV354(listener)` – esimene viga näidatakse mängijale (`say`, civilization.js).
+- Mooduli võti `house-designs-v354.js?v=354e` (civilization.js ja testid).
+- `exportModel`: töö 40 ms viiludena (oli 12 ms) ja tekstuure oodatakse ainult siis, kui mõni fail pole veel valmis (iga ootus annab mängule kaadri; aeglases seadmes on kaader kallis). Ühe faili laadimisviga ei kukuta enam mudelit. SwiftShaderis 19 mudelit 640 s → 300 s. `houseDesignStatusV354()` annab nüüd ka `times` (iga mudeli ajad) ja `errors`.
+- NB: ajapiir ei tohi lugeda postitamisest – mudelid tehakse järjest ja SwiftShaderis võtab üks mitu minutit.

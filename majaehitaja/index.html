@@ -4426,6 +4426,7 @@ if(embeddedDesigner){
     });
   });
   window.parent.postMessage({source:'kuningriigid-designer',type:'ready'},location.origin);
+  setInterval(()=>window.parent.postMessage({source:'kuningriigid-designer',type:'alive'},location.origin),3000);
 }
   function closest(p,a,b) {
     const dx=b.x-a.x, dy=b.y-a.y;
@@ -90665,13 +90666,25 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
     // baked into one batch per material so a town can repeat the house cheaply.
     ,async exportModel(state,display){
       const timings={},clock=name=>{const now=performance.now();timings[name]=Math.round(now-(clock.last??now));clock.last=now;};clock('start');
+      // Work in slices of ~40 ms. Every pause lets the game draw a frame, and on a
+      // slow device (phone, software rendering) a frame can cost more than the
+      // slice itself, so very short slices made a model take tens of seconds.
+      let slice=performance.now();
+      const breathe=async()=>{if(performance.now()-slice>40){await new Promise(r=>setTimeout(r,0));slice=performance.now();}};
       const knownAssets=assets.size;
       openDoors=true;
       try{rebuild(state,display,true,false);}finally{openDoors=false;}
       lastState=undefined;
       const pending=()=>[...assets.values()];
       clock('rebuild');
-      for(let round=0;round<3;round++){await Promise.all(pending());await new Promise(r=>setTimeout(r,60));}
+      // Wait only for files not seen finished yet: every wait also lets the game
+      // draw a frame, which is slow on phones and software rendering.
+      const settled=assets.settledV354??=new WeakSet();
+      for(let round=0;round<3;round++){
+        const waiting=pending().filter(p=>!settled.has(p));if(!waiting.length)break;
+        await Promise.all(waiting.map(p=>Promise.resolve(p).catch(()=>{}).finally(()=>settled.add(p))));
+        await new Promise(r=>setTimeout(r,0));
+      }
       clock('textures');
       // A building that needed new texture files is built again now that they are
       // in (some surfaces take their relief from them). Later buildings reuse the
@@ -90722,10 +90735,9 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
         return key;
       }
       const objects=[];building.traverse(object=>objects.push(object));
-      let slice=performance.now();
       for(const object of objects){
         // Give the game a frame now and then: this page shares its thread.
-        if(performance.now()-slice>12){await new Promise(r=>setTimeout(r,0));slice=performance.now();}
+        await breathe();
         if(!object.isMesh||!object.visible||skip.test(object.name||''))continue;
         const material=Array.isArray(object.material)?object.material[0]:object.material;
         if(!material||material.visible===false)continue;
@@ -90811,7 +90823,7 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
         }
         return {...batch,positions,normals,uvs,colors,indices,count:counts.length};
       }
-      for(const [source,cell] of [[midBatches,.07],[farBatches,.16]])for(const [key,batch] of source)if(batch.count>600){source.set(key,simplify(batch,cell));await new Promise(r=>setTimeout(r,0));}
+      for(const [source,cell] of [[midBatches,.07],[farBatches,.16]])for(const [key,batch] of source)if(batch.count>600){source.set(key,simplify(batch,cell));await breathe();}
       clock('simplify');out.timings=timings;
       for(const [list,source] of [[out.meshes,batches],[out.mid,midBatches],[out.far,farBatches]])for(const batch of source.values()){
         const positions=new Float32Array(batch.positions),normals=new Float32Array(batch.normals),uvs=new Float32Array(batch.uvs);

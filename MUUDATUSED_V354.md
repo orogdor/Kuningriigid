@@ -74,3 +74,9 @@ Haru `test/majaehitus`. Peaharu ei muudetud.
 - Mudelid ehitatakse igal käivitusel uuesti (SwiftShaderis 3–6 s hoone kohta, päris videokaardil kiiremini). Selle aja on ekraanil vana mudel.
 - Kavandatud hoone mudel ei muuda mängureegleid (mahutavus, hind, ehitusaeg).
 - NativeThreeBridge'i (APK/EXE) liides kontrollimata.
+
+## Mobiil (354e)
+
+- Peidetud kujundaja on vaateala sees ja laaditakse kohe (`loading=eager`); varem ekraanist kaugel olev iframe võis telefonis jääda laadimata.
+- Mudelid valmivad aeglases seadmes umbes kaks korda kiiremini (pikemad tööviilud, tarbetu tekstuuriootus ära). `houseDesignStatusV354()` näitab iga mudeli aegu ja vigu.
+- Kui kujundaja ei käivitu 60 s jooksul või lakkab vastamast (südamelöök iga 3 s), näidatakse ootel hoonetel vana mudelit ja mängija saab teate põhjusega.
