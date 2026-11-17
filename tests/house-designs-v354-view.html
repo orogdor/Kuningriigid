@@ -4,7 +4,7 @@
 // Shows designer models through the game's own module and renderer.
 // ?ids=hall:0,house:0 (game type:age) · window.viewReady resolves when drawn.
 import * as T from '../vendor/three.module.js';
-import {designedBuildingModelV354,houseDesignStatusV354,designerIdV354} from '../house-designs-v354.js?v=354b';
+import {designedBuildingModelV354,houseDesignStatusV354,designerIdV354} from '../house-designs-v354.js?v=354c';
 const list=(new URLSearchParams(location.search).get('ids')||'hall:0,house:0,lumber:0,well:0').split(',').map(x=>{const [type,age]=x.split(':');return {type,age:Number(age)};});
 const renderer=new T.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=T.ACESFilmicToneMapping;
 document.body.append(renderer.domElement);
@@ -14,6 +14,14 @@ const ground=new T.Mesh(new T.PlaneGeometry(400,400),new T.MeshStandardMaterial(
 const camera=new T.PerspectiveCamera(35,innerWidth/innerHeight,.1,500);
 const placed=new Map();
 const cols=Math.ceil(Math.sqrt(list.length)),gap=14;
+// Test hooks: move the camera, read what each building draws.
+window.viewCamera=(x,y,z,tx,ty,tz)=>{camera.position.set(x,y,z);camera.lookAt(tx,ty,tz);fixed=true;};
+let fixed=false;
+const loop=()=>{renderer.render(scene,camera);requestAnimationFrame(loop);};
+window.viewLevels=()=>[...placed.values()].map(m=>{const i=m.levels?m.levels.findIndex(l=>l.object.visible):-1;return {name:m.name,level:i,distance:+camera.position.distanceTo(m.getWorldPosition(new T.Vector3())).toFixed(0)};});
+window.viewInfo=()=>renderer.info.render;
+// Show one level of every building (for side-by-side quality checks).
+window.viewForce=level=>{for(const m of placed.values()){m.autoUpdate=level==null;if(level!=null)m.levels.forEach((l,i)=>l.object.visible=i===Math.min(level,m.levels.length-1));}};
 window.viewReady=new Promise(resolve=>{
  const tick=()=>{
   for(const [i,item] of list.entries()){
@@ -22,11 +30,12 @@ window.viewReady=new Promise(resolve=>{
    if(model){model.position.set((i%cols-(cols-1)/2)*gap,0,(Math.floor(i/cols)-(Math.ceil(list.length/cols)-1)/2)*gap);scene.add(model);placed.set(i,model);}
   }
   const span=cols*gap,cam=(new URLSearchParams(location.search).get('cam')||'').split(',').map(Number);
-  if(cam.length===6){camera.position.set(cam[0],cam[1],cam[2]);camera.lookAt(cam[3],cam[4],cam[5]);}
+  if(fixed){}
+  else if(cam.length===6){camera.position.set(cam[0],cam[1],cam[2]);camera.lookAt(cam[3],cam[4],cam[5]);}
   else{camera.position.set(span*.55,span*.62,span*.85);camera.lookAt(0,1.5,0);}
   renderer.render(scene,camera);
   const s=houseDesignStatusV354();
-  if(placed.size+s.failed>=list.filter(x=>designerIdV354(x.type,x.age)).length&&s.pending===0)setTimeout(()=>{renderer.render(scene,camera);resolve(s);},1500);
+  if(placed.size+s.failed>=list.filter(x=>designerIdV354(x.type,x.age)).length&&s.pending===0)setTimeout(()=>{requestAnimationFrame(loop);resolve(s);},1500);
   else setTimeout(tick,500);
  };
  tick();

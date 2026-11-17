@@ -6,8 +6,8 @@
 import * as T from './vendor/three.module.js';
 
 // Bump when the designer export changes, so cached models are rebuilt.
-const MODEL_VERSION='354d';
-const FRAME_URL=new URL('./majaehitaja/index.html?embed=1&worker=1&textures=medium',import.meta.url).href;
+const MODEL_VERSION='354f';
+const FRAME_URL=new URL('./majaehitaja/index.html?embed=1&worker=1&textures=low',import.meta.url).href;
 // Designer ids (catalog keys) in majaehitaja/index.html.
 const DESIGNER_IDS=new Set(['hall','house','hunter','fisher','farm','lumber','mason','pottery_kiln','study','barracks','watchtower','archery','palisade','woodgate','quarry','claypit','well','pasture','field',
  'library','scriptorium','market','warehouse','cellar','vegetable_garden','flax_farm','weaver','cartwright','coppermine','tinmine','bronze_foundry','road_depot','harbor','bridge','forester','saw','mill','bakery','gatehouse','reinforced_wall','stonewall','stonetower',
@@ -27,10 +27,20 @@ const LOT={hall:[5.6,5.0],house:[4,3.6],warehouse:[5.6,5],cellar:[5,4.4],study:[
  market:[5.5,5.1],pasture:[4.8,4.8],fisher:[4.9,4.6],harbor:[5.3,8.3],gatehouse:[5.4,5.1],watchtower:[4.7,4.6],stonetower:[5.2,5.0],woodgate:[3.5,2.1],
  library:[5,5],academy:[5.2,5.2],stable:[5,6],orchard:[5,5],gem_mine:[5,6],jeweler:[5,5],vegetable_garden:[5,5],flax_farm:[5,5],weaver:[5,5]};
 const METRE=1/1.05; // one game unit is about 1.05 m
-// Beyond this camera distance the lighter version is drawn. It follows the
-// graphics "view distance" so phones keep their frame rate.
-const NEAR_DISTANCE=(()=>{let view='far';try{view=JSON.parse(localStorage.getItem('kingdoms-graphics-v226')||'{}').viewDistance||view;}catch{}
- return {near:110,medium:180,far:280,ultra:420}[view]??280;})();
+// Quality follows the graphics settings (read at start-up):
+//  - building detail: texture resolution of the three levels and how close the
+//    camera must be before furniture inside a roofed building is drawn;
+//  - view distance and LOD: where the light far level starts;
+//  - texture filtering: anisotropy.
+const GRAPHICS=(()=>{try{return JSON.parse(localStorage.getItem('kingdoms-graphics-v226')||'{}')||{};}catch{return {};}})();
+const DETAIL=['low','medium','high'].includes(GRAPHICS.buildingDetail)?GRAPHICS.buildingDetail:'high';
+// texture level of [near, middle, far]
+const TEXTURE_LEVELS={high:['high','medium','low'],medium:['medium','low','low'],low:['medium','low','low']}[DETAIL];
+const ANISOTROPY={low:1,medium:2,high:4}[GRAPHICS.texture]??4;
+// Inside a roofed building furniture, floor and hearth are drawn only this close.
+const INTERIOR_DISTANCE={low:25,medium:40,high:55}[DETAIL];
+// Beyond this the far level (large parts only, low textures) is drawn.
+const NEAR_DISTANCE=Math.round(({near:110,medium:180,far:280,ultra:420}[GRAPHICS.viewDistance]??280)*({performance:.75,balanced:1,quality:1.4}[GRAPHICS.lod]??1));
 // ?houses=old draws the earlier game models (only for comparison while testing).
 const START_ENABLED=(()=>{try{return new URLSearchParams(location.search).get('houses')!=='old';}catch{return true;}})();
 
@@ -111,7 +121,7 @@ async function writeCached(key,packet){
   const textures={};
   for(const [ref,entry] of Object.entries(packet.textures)){const {bitmap,...rest}=entry;textures[ref]=bitmap?{...rest,blob:await bitmapBlob(bitmap)}:rest;}
   const strip=list=>(list||[]).map(({material,positions,normals,uvs,colors,indices,cast})=>({material,positions,normals,uvs,colors,indices,cast}));
-  const value={meshes:strip(packet.meshes),far:strip(packet.far),textures,collision:packet.collision,footprint:packet.footprint};
+  const value={meshes:strip(packet.meshes),mid:strip(packet.mid),far:strip(packet.far),textures,collision:packet.collision,footprint:packet.footprint};
   db.transaction('models','readwrite').objectStore('models').put(value,MODEL_VERSION+':'+key);
  }catch(error){console.warn('V354 model cache',error);}
 }
@@ -131,30 +141,78 @@ export function designKeyV354(design){
  return key;
 }
 
-function texture(ref,packet,cache){
- const entry=ref&&packet.textures[ref];if(!entry)return null;
- const setup=t=>{t.wrapS=entry.wrapS;t.wrapT=entry.wrapT;t.repeat.set(...entry.repeat);t.offset.set(...entry.offset);t.rotation=entry.rotation||0;
-  if(entry.srgb)t.colorSpace=T.SRGBColorSpace;t.anisotropy=4;t.name='V354 '+(entry.url?entry.url.split('/textures/')[1]:ref);};
- if(entry.url){
-  if(!state.textures.has(entry.url)){const t=state.loader.load(entry.url);t.flipY=entry.flipY;setup(t);state.textures.set(entry.url,t);}
-  return state.textures.get(entry.url);
+// ---------------------------------------------------------------- textures
+// File textures are loaded only when a building level that uses them is first
+// drawn, at that level's resolution. Until then the material shows the best
+// version of the same file already in memory (or plain colour).
+const loaded=new Map(),loading=new Map();
+const levelUrl=(url,level)=>url.replace(/\/(high|medium|low)-/,'/'+level+'-');
+const RANK={low:0,medium:1,high:2};
+function setupTexture(t,entry,ref){
+ t.wrapS=entry.wrapS;t.wrapT=entry.wrapT;t.repeat.set(...entry.repeat);t.offset.set(...entry.offset);t.rotation=entry.rotation||0;
+ if(entry.srgb)t.colorSpace=T.SRGBColorSpace;t.anisotropy=ANISOTROPY;t.name='V354 '+(entry.url?entry.url.split('/textures/')[1]:ref);
+ return t;
+}
+function fileKey(entry,level){return levelUrl(entry.url,level)+(entry.crop?'#crop':'');}
+// The best already loaded version of this file, if any.
+function placeholder(entry,level){
+ let best=null;
+ for(const l of ['high','medium','low']){if(RANK[l]>RANK[level]&&best)break;const t=loaded.get(fileKey(entry,l));if(t)best=t;}
+ return best;
+}
+function loadFile(entry,level,ref){
+ const key=fileKey(entry,level);
+ if(loaded.has(key))return Promise.resolve(loaded.get(key));
+ if(!loading.has(key)){
+  const url=levelUrl(entry.url,level);
+  const job=new Promise((resolve,reject)=>{const img=new Image();img.decoding='async';img.onload=()=>resolve(img);img.onerror=reject;img.src=url;})
+   .catch(()=>level==='medium'?null:new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=levelUrl(entry.url,'medium');}).catch(()=>null))
+   .then(img=>{
+    if(!img)return null;
+    let t;
+    if(entry.crop){ // first tile of a variation atlas
+     const edge=entry.crop.edge,size=img.height-edge*2; // every atlas level has an 8 px border
+     const canvas=document.createElement('canvas');canvas.width=canvas.height=size;
+     canvas.getContext('2d').drawImage(img,edge,edge,size,size,0,0,size,size);
+     t=new T.CanvasTexture(canvas);t.flipY=entry.flipY;
+    }else{t=new T.Texture(img);t.flipY=entry.flipY;t.needsUpdate=true;}
+    setupTexture(t,entry,ref);loaded.set(key,t);return t;
+   });
+  loading.set(key,job);
  }
- if(!entry.bitmap)return null;
- if(!cache.has(ref)){const t=new T.Texture(entry.bitmap);t.flipY=false;t.needsUpdate=true;setup(t);cache.set(ref,t);}
+ return loading.get(key);
+}
+function bitmapTexture(ref,entry,cache){
+ if(!cache.has(ref)){const t=new T.Texture(entry.bitmap);t.flipY=false;t.needsUpdate=true;setupTexture(t,entry,ref);cache.set(ref,t);}
  return cache.get(ref);
 }
-function material(desc,packet,cache){
+// Called on the first draw of a mesh: brings in its material's textures.
+function activate(renderer,scene,camera,geometry,material){
+ const pending=material?.userData?.texturesV354;if(!pending)return;
+ material.userData.texturesV354=null;
+ for(const [slot,entry,level,ref] of pending){
+  const now=placeholder(entry,level);if(now&&!material[slot]){material[slot]=now;material.needsUpdate=true;}
+  loadFile(entry,level,ref).then(t=>{if(t&&material[slot]!==t){material[slot]=t;material.needsUpdate=true;}});
+ }
+}
+const SLOTS=['map','normalMap','roughnessMap','bumpMap','alphaMap','emissiveMap','aoMap'];
+function material(desc,packet,level,bitmaps){
  const common={color:desc.color,opacity:desc.opacity,transparent:desc.transparent,depthWrite:desc.depthWrite,side:desc.side,vertexColors:desc.vertexColors,alphaTest:desc.alphaTest};
  const m=desc.type==='MeshBasicMaterial'?new T.MeshBasicMaterial(common):
   new T.MeshStandardMaterial({...common,roughness:desc.roughness,metalness:desc.metalness,emissive:desc.emissive,emissiveIntensity:desc.emissiveIntensity});
- m.name='V354 '+(desc.name||desc.type);
- if(m.isMeshBasicMaterial){const t=texture(desc.map,packet,cache);if(t)m.map=t;return m;}
- for(const slot of ['map','normalMap','roughnessMap','bumpMap','alphaMap','emissiveMap','aoMap']){const t=texture(desc[slot],packet,cache);if(t)m[slot]=t;}
- if(m.normalMap&&desc.normalScale)m.normalScale.set(...desc.normalScale);
- if(m.bumpMap)m.bumpScale=desc.bumpScale??1;
+ m.name='V354 '+(desc.name||desc.type)+' · '+level;
+ const pending=[];
+ for(const slot of m.isMeshBasicMaterial?['map']:SLOTS){
+  const ref=desc[slot],entry=ref&&packet.textures[ref];if(!entry)continue;
+  if(entry.url)pending.push([slot,entry,level,ref]);
+  else if(entry.bitmap)m[slot]=bitmapTexture(ref,entry,bitmaps);
+ }
+ if(pending.length)m.userData.texturesV354=pending;
+ if(desc.normalScale)m.normalScale?.set(...desc.normalScale);
+ if(desc.bumpMap)m.bumpScale=desc.bumpScale??1;
  return m;
 }
-function group(parts,packet,textures,materials,box){
+function group(parts,packet,level,bitmaps,materials,box){
  const g=new T.Group();
  for(const part of parts||[]){
   const geometry=new T.BufferGeometry();
@@ -164,8 +222,8 @@ function group(parts,packet,textures,materials,box){
   if(part.colors)geometry.setAttribute('color',new T.BufferAttribute(part.colors,3));
   geometry.setIndex(new T.BufferAttribute(part.indices,1));
   geometry.computeBoundingBox();geometry.computeBoundingSphere();geometry.userData.houseDesignV354=true;
-  const key=JSON.stringify(part.material);
-  if(!materials.has(key))materials.set(key,material(part.material,packet,textures));
+  const key=level+'|'+JSON.stringify(part.material);
+  if(!materials.has(key))materials.set(key,material(part.material,packet,level,bitmaps));
   const mesh=new T.Mesh(geometry,materials.get(key));
   mesh.castShadow=part.cast&&!part.material.transparent;mesh.receiveShadow=true;mesh.name='V354 '+(part.material.name||'part');
   // Low decals (contact shade, yard ground) never decide the size.
@@ -175,15 +233,17 @@ function group(parts,packet,textures,materials,box){
  return g;
 }
 function template(packet){
- const textures=new Map(),materials=new Map(),box=new T.Box3();
- const near=group(packet.meshes,packet,textures,materials,box);
- const far=packet.far?.length?group(packet.far,packet,textures,materials,null):near;
+ const bitmaps=new Map(),materials=new Map(),box=new T.Box3();
+ const near=group(packet.meshes,packet,TEXTURE_LEVELS[0],bitmaps,materials,box);
+ const mid=packet.mid?.length?group(packet.mid,packet,TEXTURE_LEVELS[1],bitmaps,materials,null):null;
+ const far=packet.far?.length?group(packet.far,packet,TEXTURE_LEVELS[2],bitmaps,materials,null):null;
  if(box.isEmpty())box.setFromObject(near);
- return {near,far,box,footprint:packet.footprint,collision:packet.collision||[]};
+ const triangles=g=>g?g.children.reduce((n,m)=>n+m.geometry.index.count/3,0):0;
+ return {near,mid,far,box,footprint:packet.footprint,collision:packet.collision||[],stats:{near:triangles(near),mid:triangles(mid),far:triangles(far)}};
 }
 function copyOf(source){
  const g=new T.Group();
- for(const mesh of source.children){const copy=new T.Mesh(mesh.geometry,mesh.material);copy.castShadow=mesh.castShadow;copy.receiveShadow=true;copy.name=mesh.name;g.add(copy);}
+ for(const mesh of source.children){const copy=new T.Mesh(mesh.geometry,mesh.material);copy.castShadow=mesh.castShadow;copy.receiveShadow=true;copy.name=mesh.name;copy.onBeforeRender=activate;g.add(copy);}
  return g;
 }
 // How the designer model is sized for the game.
@@ -194,7 +254,7 @@ function fitting(type){
  return 'lot';
 }
 function placedTemplate(entry,type){
- const {near,far,box,collision}=entry.template;
+ const {near,mid,far,box,collision}=entry.template;
  const w=Math.max(.1,box.max.x-box.min.x),d=Math.max(.1,box.max.z-box.min.z);
  const fit=fitting(type);
  let sx,sz,sy;
@@ -206,7 +266,8 @@ function placedTemplate(entry,type){
  const level=source=>{const g=copyOf(source);g.scale.set(sx,sy,sz);g.position.set(cx,0,cz);const root=new T.Group();root.add(g);return root;};
  const lod=new T.LOD();lod.name='V354 '+entry.id;
  lod.addLevel(level(near),0);
- if(far!==near)lod.addLevel(level(far),NEAR_DISTANCE);
+ if(mid)lod.addLevel(level(mid),INTERIOR_DISTANCE);
+ if(far)lod.addLevel(level(far),NEAR_DISTANCE);
  // Wall segments [ax,az,bx,bz,radius] in the model's own frame (before its rotation).
  const walls=collision.map(([ax,az,bx,bz,r])=>[ax*sx+cx,az*sz+cz,bx*sx+cx,bz*sz+cz,r*Math.min(sx,sz)]);
  lod.userData.houseDesignV354={id:entry.id,key:entry.key,scale:sx,halfW:w*sx/2,halfD:d*sz/2,collision:walls};
@@ -281,5 +342,7 @@ export function hitsDesignedWallsV354(model,x,z,radius=.22){
 }
 export function houseDesignStatusV354(){
  const counts={pending:0,ready:0,failed:0};for(const e of state.cache.values())counts[e.status]++;
- return {...counts,enabled:state.enabled,revision:state.revision,nearDistance:NEAR_DISTANCE};
+ const triangles={};for(const e of state.cache.values())if(e.template)triangles[e.id]=e.template.stats;
+ return {...counts,enabled:state.enabled,revision:state.revision,detail:DETAIL,textureLevels:TEXTURE_LEVELS,interiorDistance:INTERIOR_DISTANCE,nearDistance:NEAR_DISTANCE,
+  texturesLoaded:[...loaded.keys()].map(k=>k.split('/textures/')[1]),triangles};
 }

@@ -890,3 +890,8 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 - `civilization.js`: `townBuildingModel` kasutab kujundajat enne vana mudelit; graafikalüliti eemaldatud; minu lisatud tekstid inglise keeles.
 - `locale-en-v354.js` + `localization.js`: mängu eestikeelsete jääkide tõlked. `tests/ui-writes-v350.mjs` ootab nüüd `localization.js?v=354a`.
 - Maa ja taeva puudumist raw.githack lingil ei õnnestunud järele teha (kohalikult on olemas; pilvebrauseris WebGL puudub). Soovitus: rawcdn.githack.com commit'i link.
+
+### Täiendus 2026-11-17 (3) – kvaliteet ja detailitasemed
+- Kujundaja eksport: kolm partiide komplekti (lähedal kõik; keskel ilma katusega ruumi sisustuseta; kaugel suured osad), keskmine ja kauge lihtsustatud tippude ruudustikuga (`simplify`, 7 cm / 16 cm, suuna ja UV-plaadi järgi lahus). Varieeruvate atlaste kohta saadetakse faili aadress ja lõikamise serv, mitte valmis pilt.
+- `house-designs-v354.js`: tekstuuride tase graafika `buildingDetail` järgi, laadimine `onBeforeRender` ajal (esimene joonistus), ajutiselt parim juba laaditud versioon; `INTERIOR_DISTANCE` 25/40/55, `NEAR_DISTANCE` × LOD; `MODEL_VERSION` 354f; tööleht `textures=low`.
+- Uus `tests/house-designs-v354-lod-browser.cjs`.

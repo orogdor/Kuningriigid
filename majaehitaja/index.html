@@ -90677,7 +90677,18 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
       building.updateMatrixWorld(true);
       const skip=/meadow|Meadow|Sandy shore|Coastal water/;
       const sphere=new core.Sphere();
-      const batches=new Map(),farBatches=new Map(),textures=new Map(),jobs=[];
+      const batches=new Map(),midBatches=new Map(),farBatches=new Map(),textures=new Map(),jobs=[],partStats=new Map();
+      // Inside a roofed building, low things (floor, furniture, hearth) are seen only
+      // from close by: the middle and far levels leave them out.
+      const rooms=display.enclosed.map(poly=>poly.map(p=>place(p)));
+      const deepInside=(x,z)=>rooms.some(poly=>{
+        let inside=false;
+        for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a.z>z)!==(b.z>z)&&x<(b.x-a.x)*(z-a.z)/(b.z-a.z)+a.x)inside=!inside;}
+        if(!inside)return false;
+        for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[j],b=poly[i],ex=b.x-a.x,ez=b.z-a.z,l=ex*ex+ez*ez,t=l?Math.max(0,Math.min(1,((x-a.x)*ex+(z-a.z)*ez)/l)):0;
+          if(Math.hypot(a.x+ex*t-x,a.z+ez*t-z)<.3)return false;}
+        return true;
+      });
       const normalMatrix=new core.Matrix3(),v=V(0,0,0),n=V(0,0,0);
       const stochastic=material=>material.customProgramCacheKey?.()==='hut-stochastic-height-v1';
       function textureRef(texture,crop){
@@ -90687,7 +90698,11 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
           const image=texture.image,entry={wrapS:texture.wrapS,wrapT:texture.wrapT,flipY:texture.flipY,srgb:texture.colorSpace===T.SRGBColorSpace,
             repeat:[texture.repeat.x,texture.repeat.y],offset:[texture.offset.x,texture.offset.y],rotation:texture.rotation};
           textures.set(key,entry);
-          if(!crop&&image instanceof HTMLImageElement&&image.src&&!image.src.startsWith('data:'))entry.url=image.src;
+          const file=image instanceof HTMLImageElement&&image.src&&!image.src.startsWith('data:');
+          // Variation atlases from files: the game crops the first tile itself at the
+          // resolution it needs (high near, low far).
+          if(crop&&file){entry.url=image.src;entry.crop={edge:crop.edge};entry.wrapS=entry.wrapT=T.RepeatWrapping;entry.repeat=[1,1];entry.offset=[0,0];}
+          else if(!crop&&file)entry.url=image.src;
           else{
             const width=image.width||image.videoWidth,height=image.height||image.videoHeight;
             let source=image,sx=0,sy=0,sw=width,sh=height;
@@ -90706,8 +90721,11 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
         // Far level: only the larger parts (no thatch tips, pebbles, small tools).
         if(!geometry.boundingSphere)geometry.computeBoundingSphere();
         sphere.copy(geometry.boundingSphere).applyMatrix4(object.matrixWorld);
-        const far=material!==strawTips&&sphere.radius>=.42;
-        for(const [target,wanted] of [[batches,true],[farBatches,far]]){
+        const interior=rooms.length>0&&sphere.center.y+sphere.radius<1.2&&deepInside(sphere.center.x,sphere.center.z);
+        const far=!interior&&material!==strawTips&&sphere.radius>=.42;
+        const tris=(geometry.index?geometry.index.count:position.count)/3,label=(object.name||material.name||material.type)+(far?' [far]':interior?' [in]':'');
+        partStats.set(label,(partStats.get(label)||0)+tris);
+        for(const [target,wanted] of [[batches,true],[midBatches,!interior],[farBatches,far]]){
         if(!wanted)continue;
         let batch=target.get(material.uuid);
         if(!batch){
@@ -90725,7 +90743,7 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
           batch={material:target===batches?desc:batches.get(material.uuid)?.material??desc,positions:[],normals:[],uvs:[],colors:[],indices:[],count:0,cast:false};
           target.set(material.uuid,batch);
         }
-        batch.cast||=object.castShadow;
+        batch.cast||=object.castShadow&&!interior;
         normalMatrix.getNormalMatrix(object.matrixWorld);
         const normal=geometry.getAttribute('normal'),uv=geometry.getAttribute('uv'),color=geometry.getAttribute('color');
         const base=batch.count;
@@ -90748,8 +90766,38 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
       const collision=walkWalls.filter(w=>w.min<1.8).map(w=>[w.a.x,w.a.y,w.b.x,w.b.y,w.radius]);
       const out={meshes:[],textures:Object.fromEntries(textures),transfer:[],collision,
         footprint:footprint.length?{minX:Math.min(...xs),maxX:Math.max(...xs),minZ:Math.min(...zs),maxZ:Math.max(...zs)}:null};
-      out.far=[];
-      for(const [list,source] of [[out.meshes,batches],[out.far,farBatches]])for(const batch of source.values()){
+      out.mid=[];out.far=[];out.parts=[...partStats].sort((a,b)=>b[1]-a[1]).slice(0,25);
+      // Lighter copies for the middle and far levels: vertices are merged on a grid
+      // (kept apart by facing direction and texture tile, so edges and seams stay).
+      function simplify(batch,cell){
+        const map=new Map(),positions=[],normals=[],uvs=[],colors=[],counts=[],remap=new Int32Array(batch.count);
+        const P=batch.positions,N=batch.normals,U=batch.uvs,C=batch.colors,hasColor=C.length>0;
+        for(let i=0;i<batch.count;i++){
+          const x=P[i*3],y=P[i*3+1],z=P[i*3+2],nx=N[i*3],ny=N[i*3+1],nz=N[i*3+2];
+          const ax=Math.abs(nx),ay=Math.abs(ny),az=Math.abs(nz);
+          const face=ax>=ay&&ax>=az?(nx>0?0:1):ay>=az?(ny>0?2:3):(nz>0?4:5);
+          const key=Math.floor(x/cell)+','+Math.floor(y/cell)+','+Math.floor(z/cell)+','+face+','+Math.floor(U[i*2])+','+Math.floor(U[i*2+1]);
+          let k=map.get(key);
+          if(k===undefined){k=counts.length;map.set(key,k);counts.push(0);positions.push(0,0,0);normals.push(0,0,0);uvs.push(0,0);if(hasColor)colors.push(0,0,0);}
+          counts[k]++;positions[k*3]+=x;positions[k*3+1]+=y;positions[k*3+2]+=z;normals[k*3]+=nx;normals[k*3+1]+=ny;normals[k*3+2]+=nz;
+          uvs[k*2]+=U[i*2];uvs[k*2+1]+=U[i*2+1];if(hasColor){colors[k*3]+=C[i*3];colors[k*3+1]+=C[i*3+1];colors[k*3+2]+=C[i*3+2];}
+          remap[i]=k;
+        }
+        for(let k=0;k<counts.length;k++){
+          const c=counts[k];for(let j=0;j<3;j++){positions[k*3+j]/=c;if(hasColor)colors[k*3+j]/=c;}uvs[k*2]/=c;uvs[k*2+1]/=c;
+          const l=Math.hypot(normals[k*3],normals[k*3+1],normals[k*3+2])||1;for(let j=0;j<3;j++)normals[k*3+j]/=l;
+        }
+        const indices=[],I=batch.indices,seen=new Set();
+        for(let t=0;t<I.length;t+=3){
+          const a=remap[I[t]],b=remap[I[t+1]],c=remap[I[t+2]];
+          if(a===b||b===c||a===c)continue;
+          const key=a<b?(a<c?a+','+(b<c?b+','+c:c+','+b):c+','+a+','+b):(b<c?b+','+(a<c?a+','+c:c+','+a):c+','+b+','+a);
+          if(seen.has(key))continue;seen.add(key);indices.push(a,b,c);
+        }
+        return {...batch,positions,normals,uvs,colors,indices,count:counts.length};
+      }
+      for(const [source,cell] of [[midBatches,.07],[farBatches,.16]])for(const [key,batch] of source)if(batch.count>600)source.set(key,simplify(batch,cell));
+      for(const [list,source] of [[out.meshes,batches],[out.mid,midBatches],[out.far,farBatches]])for(const batch of source.values()){
         const positions=new Float32Array(batch.positions),normals=new Float32Array(batch.normals),uvs=new Float32Array(batch.uvs);
         const colors=batch.colors.length?new Float32Array(batch.colors):null;
         const indices=batch.count>65535?new Uint32Array(batch.indices):new Uint16Array(batch.indices);

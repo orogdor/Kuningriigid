@@ -1,0 +1,11 @@
+<!doctype html><meta charset="utf-8"><title>V354 designer export probe</title>
+<body><script>
+// Asks the hidden designer for a model and keeps the raw reply (sizes, parts).
+const frame=document.createElement('iframe');frame.src='../majaehitaja/index.html?embed=1&worker=1&textures=medium';
+frame.style.cssText='width:640px;height:480px';document.body.append(frame);
+let next=1;const waiting=new Map();
+addEventListener('message',e=>{if(e.data?.source==='kuningriigid-designer'&&e.data.type==='model'){waiting.get(e.data.requestId)?.(e.data);waiting.delete(e.data.requestId);}});
+window.requestModel=(id,design=null)=>new Promise(resolve=>{const requestId=next++;waiting.set(requestId,resolve);
+  frame.contentWindow.postMessage({source:'kuningriigid-game',type:'model',requestId,id,design},location.origin);});
+window.frameReady=new Promise(r=>addEventListener('message',e=>{if(e.data?.type==='ready')r();}));
+</script></body>

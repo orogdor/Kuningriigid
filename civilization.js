@@ -126,7 +126,7 @@ import {buildDetailWorldObjects} from './detail-world-objects.js?v=123a';
 import {createVillageLife} from './village-life-v76.js?v=224';
 import * as T from './vendor/three.module.js';
 import {startEnglishCardsV354} from './ui-english-v354.js?v=354a';
-import {designedBuildingModelV354,houseDesignStampV354,canDesignV354,designerIdV354,houseDesignsEnabledV354,hitsDesignedWallsV354,pendingBuildingV354,designFailedV354} from './house-designs-v354.js?v=354b';
+import {designedBuildingModelV354,houseDesignStampV354,canDesignV354,designerIdV354,houseDesignsEnabledV354,hitsDesignedWallsV354,pendingBuildingV354,designFailedV354} from './house-designs-v354.js?v=354c';
 import {createStoneLoad} from './stone-equipment-v234.js';
 import {WORK_SPOTS_V284,workSpotV284,applyWorkSpotV284} from './stone-work-spots-v284.js?v=284a';
 import {DETAIL_X,DETAIL_Z,DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z,tileDelta} from './detail-scale-v123.js';

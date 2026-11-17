@@ -1,5 +1,24 @@
 # V354 katse – majaehitaja hooned mängus
 
+## Täiendus 2026-11-17 (3): kvaliteet ja detailitasemed
+
+Igal kujundaja hoonel on kolm taset (`THREE.LOD`):
+
+| Tase | Millal | Sisu | Tekstuurid (hoonete detail kõrge / keskmine / madal) |
+|---|---|---|---|
+| Lähedal | kaamera kuni 55 / 40 / 25 ühikut | kõik, ka sisustus, põrand ja tulease katusega hoone sees | high / medium / medium |
+| Keskmine | sealt kuni kaugeni | ilma katusealuse sisustuseta, tipud ühendatud 7 cm ruudustikule | medium / low / low |
+| Kaugel | alates 280 (nähtavuskaugus × LOD-seade) | ainult suured osad (pole kõrsi, kivikesi, tööriistu), 16 cm ruudustik | low |
+
+- Ruudustikule ühendamisel hoitakse lahus eri suunas pinnad ja tekstuuriplaadid, nii et servad ja tekstuuri õmblused jäävad. Näiteks kiviaja peamaja 159 000 → 75 500 → 30 400 kolmnurka, elamu 102 000 → 37 000 → 15 000.
+- Tekstuurifailid laaditakse alles siis, kui hoone tase esimest korda ekraanile joonistatakse, ja ainult selle taseme resolutsioonis. Seni kasutatakse sama faili juba laaditud väiksemat versiooni. Kaugel olevate hoonete pärast high-tekstuure ei laeta. Varieeruvate tekstuuride (õled, puit, kivi, savi, punutis) esimene plaat lõigatakse mängus iga taseme jaoks eraldi (512 / 256 / 128 px).
+- Sisustus katusega hoone sees ei heida varju.
+- Tekstuuride filtreerimise seade annab anisotroopia (1× / 2× / 4×).
+- Peidetud kujundaja laeb ainult madalad tekstuurid (tal on vaja ainult failide nimesid). Mudelivahemälu versioon `354f`.
+- Kontroll: `tests/house-designs-v354-lod-browser.cjs` (tasemed, kolmnurgad, laaditud failid kaugel, keskel ja lähedal).
+- Seaded loetakse mängu käivitamisel; muudetud graafikaseade jõustub majadele pärast uuesti laadimist.
+
+
 ## Täiendus 2026-11-17 (2): kõik hooned kujundajast, uksed lahti, inglise keel
 
 - **Vanu mudeleid kiviajast rauaajani enam ei kasutata.** Kõik hoonetüübid tulevad majaehitajast, ka müürid (sirge 7-ühikuline lõik, mille mäng venitab: puitvall, madal/kõrge kivivall, Müür II = muldvall palissaadiga), väravad, tornid, põld (venitatakse põllu suuruseks), karjamaa, kalur, sadam ja turg. Kui kujundajal pole hoone jaoks selle ajastu versiooni (nt kelder või metsnik kiviajal), võetakse lähim olemasolev. Vanaks jääb ainult sild (järgib jõekaldaid) ja ajastud alates keskajast (kujundajas neid pole).

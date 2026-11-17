@@ -29,6 +29,8 @@ assert.match(page,/type!=='model'/);
 assert.match(page,/const collision=walkWalls\.filter/,'the designer sends its walk-mode walls');
 assert.match(page,/if\(designerWorker\|\|view!=='plan'/,'the worker page never draws plan thumbnails into the export scene');
 assert.match(page,/openDoors=true/,'exported doors stand open');
+assert.match(page,/\[midBatches,!interior\]/,'furniture inside roofed buildings is left out of the middle level');
+assert.match(page,/function simplify\(batch,cell\)/,'middle and far levels are simplified');
 assert.match(page,/<html lang="en">/,'the designer is in English');
 assert.doesNotMatch(page.slice(page.indexOf("<script>'use strict'"),page.indexOf('</script><script>(()=>{')),/'[^'\n]*[õäöü][^'\n]*'/,'no Estonian texts left in the designer code');
 const civ=fs.readFileSync(new URL('../civilization.js',import.meta.url),'utf8');
@@ -36,4 +38,7 @@ assert.match(civ,/houseDesignStampV354\(b\.type,age,b\.houseDesignV354,b\.woodFo
 assert.match(civ,/entry\.designStamp!==designStamp/,'the active tile rebuilds when the model is ready');
 assert.match(civ,/applyDesignTemplateV354\(r\.building,city\)/,'a placed building takes the type design');
 assert.match(civ,/v354-design-icon/,'build menu cards have a design icon');
-console.log('PASS: walk collision, build menu design, designer ids, kept game models, design keys, designer export hooks, rebuild stamps');
+const module=fs.readFileSync(new URL('../house-designs-v354.js',import.meta.url),'utf8');
+assert.match(module,/copy\.onBeforeRender=activate/,'textures load on the first draw of a level');
+assert.match(module,/lod\.addLevel\(level\(mid\),INTERIOR_DISTANCE\)/,'three levels of detail');
+console.log('PASS: levels of detail and lazy textures, walk collision, build menu design, designer ids, kept game models, design keys, designer export hooks, rebuild stamps');
