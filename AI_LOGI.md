@@ -895,3 +895,7 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 - Kujundaja eksport: kolm partiide komplekti (lähedal kõik; keskel ilma katusega ruumi sisustuseta; kaugel suured osad), keskmine ja kauge lihtsustatud tippude ruudustikuga (`simplify`, 7 cm / 16 cm, suuna ja UV-plaadi järgi lahus). Varieeruvate atlaste kohta saadetakse faili aadress ja lõikamise serv, mitte valmis pilt.
 - `house-designs-v354.js`: tekstuuride tase graafika `buildingDetail` järgi, laadimine `onBeforeRender` ajal (esimene joonistus), ajutiselt parim juba laaditud versioon; `INTERIOR_DISTANCE` 25/40/55, `NEAR_DISTANCE` × LOD; `MODEL_VERSION` 354f; tööleht `textures=low`.
 - Uus `tests/house-designs-v354-lod-browser.cjs`.
+
+### Parandus 2026-11-17 (4) – mustad majad raw.githack lingil
+- Põhjus: githack suunab suured failid raw.githubusercontent.com-i (teine päritolu). `house-designs-v354.js` laadis tekstuure `new Image()`-iga ilma `crossOrigin`-ita → pilt "tainted", WebGL keeldus (`texSubImage2D SecurityError` igas kaadris), majad mustad ja mäng aeglane. Nüüd `img.crossOrigin='anonymous'`. Kontrollitud kasutaja enda brauseris (RTX 2080 S): 19 mudelit 31 s-ga, vigu pole.
+- Kujundaja eksport: teine ümberehitus ainult siis, kui tuli uusi tekstuurifaile; läbimine ja lihtsustamine annavad vahepeal mängule kaadri; lihtsustamise võtmed numbrilised. Linna nimesilt tõlgitakse.
