@@ -359,11 +359,41 @@ function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1){
  return final;
 }
 function visualBuildingAge(b){if(['bronze-siege','iron-siege'].includes(s.demo)&&b.team===1)return 1;return b.previewAge===0&&game.upgrade(b.team)===0?0:game.buildingAge(b.team,b.type)}
+function openHouseDesignerV354(building,city){
+ if(!building||city?.team!==0||!city.economy.buildings.includes(building)||building.type!=='hall'||visualBuildingAge(building)!==0)return;
+ const overlay=document.createElement('div');
+ Object.assign(overlay.style,{position:'fixed',inset:'0',zIndex:'10000',background:'#101820',display:'flex',flexDirection:'column'});
+ const bar=document.createElement('div');
+ Object.assign(bar.style,{display:'flex',alignItems:'center',gap:'12px',padding:'8px',color:'#f5e6c5'});
+ const label=document.createElement('span');label.textContent='Peamaja kavand · testversioon';
+ const apply=document.createElement('button');apply.textContent='Salvesta kavand';apply.disabled=true;
+ const cancel=document.createElement('button');cancel.textContent='Sulge';
+ const frame=document.createElement('iframe');
+ frame.title='Peamaja kujundamine';frame.src='./majaehitaja/index.html?embed=1';
+ Object.assign(frame.style,{width:'100%',flex:'1',border:'0',background:'#101820'});
+ bar.append(label,apply,cancel);overlay.append(bar,frame);document.body.append(overlay);
+ let initialized=false;
+ const close=()=>{window.removeEventListener('message',receive);overlay.remove();};
+ const send=(type,data={})=>frame.contentWindow?.postMessage({source:'kuningriigid-game',type,...data},location.origin);
+ const receive=event=>{
+  if(event.origin!==location.origin||event.source!==frame.contentWindow||event.data?.source!=='kuningriigid-designer')return;
+  if(event.data.type==='ready'&&!initialized){initialized=true;send('open',{design:building.houseDesignV354??null});apply.disabled=false;}
+  if(event.data.type==='design'){
+   if(!city.economy.buildings.includes(building)||!event.data.design||event.data.design.id!=='hall')return;
+   building.houseDesignV354=event.data.design;
+   say('Peamaja kavand salvestatud. Mängukaardi mudeli ühendamine on järgmine etapp.');
+   close();
+  }
+ };
+ window.addEventListener('message',receive);
+ cancel.addEventListener('click',close);apply.addEventListener('click',()=>send('save'));
+}
 function updateBuildingInfo(){
  if(!buildingInspector){
   buildingInspector=createBuildingInspector($('building-inspector'),{
    close:()=>{selectedBuilding=null;renderUI()},
    onWorkers:()=>setCityTab('workers'),
+   onDesign:()=>openHouseDesignerV354(selectedBuilding,activeCity()),
    onUpgrade:target=>{
     const result=target==='house'?game.upgradeHouseV218(activeCity(),selectedBuilding):
      game.upgradeWallV184(activeCity(),selectedBuilding,target);
