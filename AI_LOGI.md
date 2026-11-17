@@ -943,3 +943,21 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 - Päris NativeThreeBridge exe kontroll. Mängusisene kujundamisaken (✎) on endiselt iframe.
 
 - 2026-11-17: PR #83 ühendatud main-i (68f3adb).
+
+---
+
+## 2026-11-17 · Claude (Anthropic) · V356 – kõrguskaardiga maapind ja teed
+
+### Ülesanne
+Kasutada maapinna tekstuuridel ja teedel kõrguskaarti, et teed ja maastik oleksid ilusamad. Muudatus läheb GitHubi main-i.
+
+### Mis tehti
+- `ground-materials-v232.js`: muru/mulla/metsapinnase fotod segatakse kõrguse järgi (foto heledus = kõrgus). Kaalud teravdatakse `inout`-ina, et normaal ja karedus kasutaksid sama segu.
+- `landscape-v149.js` `roadMaterial` (ainult detailkaart): iga teepinna kõrgus `rH` ja kalle `rG` (uv ühikutes). Reljeef `r356Perturb` kaudu: `dHdxy = rG · dFdx/dFdy(uv)`. Teeserv on kõrgusega segatud muruga. Tugevus `ROAD_BUMP_V356`.
+- Vahemälu võtmed `?v=356` (index.html importmap, ground-materials import).
+
+### Testimine
+`preview-road-relief-v356.html?view=wide|close|stones`; MUUDATUSED_V356.md loetleb läbinud testid.
+
+### Pooleli
+Päris seadme FPS ja telefoni visuaalne kontroll.

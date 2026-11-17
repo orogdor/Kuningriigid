@@ -28,7 +28,19 @@ vec3 groundWeights232(vec2 q){
  float forest=uGroundForest232*(.68+.25*l149n(q*.13));
  return vec3((1.0-dirt)*(1.0-forest),dirt*(1.0-forest),forest);
 }
-vec3 groundColor232(vec2 uv,vec3 w){return groundSample232(uGround232_grass_color,uv).rgb*w.x+groundSample232(uGround232_soil_color,uv).rgb*w.y+groundSample232(uGround232_forest_color,uv).rgb*w.z;}
+// V356: height blend. The brightness of each photograph is its height (stones, clods and grass tips
+// are lighter than the hollows between them), so where two grounds meet the higher one wins pixel by
+// pixel: soil shows between grass tufts and grass grows over soil, not a blurry cross-fade.
+// The weights are sharpened in place (inout) so normal and roughness use the same mix.
+float groundLum232(vec3 c){return dot(c,vec3(.30,.59,.11));}
+vec3 groundColor232(vec2 uv,inout vec3 w){
+ vec3 g=groundSample232(uGround232_grass_color,uv).rgb,s=groundSample232(uGround232_soil_color,uv).rgb,f=groundSample232(uGround232_forest_color,uv).rgb;
+ vec3 h=vec3(groundLum232(g)*1.7,groundLum232(s)*1.25,groundLum232(f)*1.35)*.55+w;
+ float top=max(h.x,max(h.y,h.z))-.22;
+ vec3 b=max(h-vec3(top),vec3(0.0))*step(vec3(.001),w);
+ w=b/max(b.x+b.y+b.z,1e-4);
+ return g*w.x+s*w.y+f*w.z;
+}
 vec3 groundNormal232(vec2 uv,vec3 w){return normalize((groundSample232(uGround232_grass_normal,uv).xyz*w.x+groundSample232(uGround232_soil_normal,uv).xyz*w.y+groundSample232(uGround232_forest_normal,uv).xyz*w.z)*2.0-1.0);}
 float groundRough232(vec2 uv,vec3 w){return groundSample232(uGround232_grass_rough,uv).r*w.x+groundSample232(uGround232_soil_rough,uv).r*w.y+groundSample232(uGround232_forest_rough,uv).r*w.z;}
 `;
