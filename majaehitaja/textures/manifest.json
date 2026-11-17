@@ -1,0 +1,856 @@
+{
+  "atlas-clay": {
+    "levels": {
+      "high": {
+        "tileSize": 512,
+        "padding": 8,
+        "stride": 528,
+        "width": 2640,
+        "height": 528
+      },
+      "medium": {
+        "tileSize": 256,
+        "padding": 8,
+        "stride": 272,
+        "width": 1360,
+        "height": 272
+      },
+      "low": {
+        "tileSize": 128,
+        "padding": 8,
+        "stride": 144,
+        "width": 720,
+        "height": 144
+      }
+    },
+    "maps": [
+      "color",
+      "relief"
+    ],
+    "heightEncoding": "16-bit R:G; B roughness"
+  },
+  "atlas-stone": {
+    "levels": {
+      "high": {
+        "tileSize": 512,
+        "padding": 8,
+        "stride": 528,
+        "width": 2640,
+        "height": 528
+      },
+      "medium": {
+        "tileSize": 256,
+        "padding": 8,
+        "stride": 272,
+        "width": 1360,
+        "height": 272
+      },
+      "low": {
+        "tileSize": 128,
+        "padding": 8,
+        "stride": 144,
+        "width": 720,
+        "height": 144
+      }
+    },
+    "maps": [
+      "color",
+      "relief"
+    ],
+    "heightEncoding": "16-bit R:G; B roughness"
+  },
+  "atlas-straw": {
+    "levels": {
+      "high": {
+        "tileSize": 512,
+        "padding": 8,
+        "stride": 528,
+        "width": 2640,
+        "height": 528
+      },
+      "medium": {
+        "tileSize": 256,
+        "padding": 8,
+        "stride": 272,
+        "width": 1360,
+        "height": 272
+      },
+      "low": {
+        "tileSize": 128,
+        "padding": 8,
+        "stride": 144,
+        "width": 720,
+        "height": 144
+      }
+    },
+    "maps": [
+      "color",
+      "relief"
+    ],
+    "heightEncoding": "16-bit R:G; B roughness"
+  },
+  "atlas-weave": {
+    "levels": {
+      "high": {
+        "tileSize": 512,
+        "padding": 8,
+        "stride": 528,
+        "width": 2640,
+        "height": 528
+      },
+      "medium": {
+        "tileSize": 256,
+        "padding": 8,
+        "stride": 272,
+        "width": 1360,
+        "height": 272
+      },
+      "low": {
+        "tileSize": 128,
+        "padding": 8,
+        "stride": 144,
+        "width": 720,
+        "height": 144
+      }
+    },
+    "maps": [
+      "color",
+      "relief"
+    ],
+    "heightEncoding": "16-bit R:G; B roughness"
+  },
+  "atlas-wood": {
+    "levels": {
+      "high": {
+        "tileSize": 512,
+        "padding": 8,
+        "stride": 528,
+        "width": 2640,
+        "height": 528
+      },
+      "medium": {
+        "tileSize": 256,
+        "padding": 8,
+        "stride": 272,
+        "width": 1360,
+        "height": 272
+      },
+      "low": {
+        "tileSize": 128,
+        "padding": 8,
+        "stride": 144,
+        "width": 720,
+        "height": 144
+      }
+    },
+    "maps": [
+      "color",
+      "relief"
+    ],
+    "heightEncoding": "16-bit R:G; B roughness"
+  },
+  "bronze-band-0": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 512
+      },
+      "medium": {
+        "width": 512,
+        "height": 256
+      },
+      "low": {
+        "width": 256,
+        "height": 128
+      }
+    },
+    "maps": [
+      "color",
+      "bump"
+    ]
+  },
+  "bronze-band-1": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 512
+      },
+      "medium": {
+        "width": 512,
+        "height": 256
+      },
+      "low": {
+        "width": 256,
+        "height": 128
+      }
+    },
+    "maps": [
+      "color",
+      "bump"
+    ]
+  },
+  "bronze-band-2": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 512
+      },
+      "medium": {
+        "width": 512,
+        "height": 256
+      },
+      "low": {
+        "width": 256,
+        "height": 128
+      }
+    },
+    "maps": [
+      "color",
+      "bump"
+    ]
+  },
+  "bronze-thatch": {
+    "levels": {
+      "high": {
+        "width": 2048,
+        "height": 1024
+      },
+      "medium": {
+        "width": 1024,
+        "height": 512
+      },
+      "low": {
+        "width": 512,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "bump"
+    ]
+  },
+  "contact-shadow": {
+    "levels": {
+      "high": {
+        "width": 384,
+        "height": 384
+      },
+      "medium": {
+        "width": 192,
+        "height": 192
+      },
+      "low": {
+        "width": 96,
+        "height": 96
+      }
+    },
+    "maps": [
+      "color"
+    ]
+  },
+  "land-dirt": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "land-earth": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "land-hide": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "prestige-amphora": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "bump"
+    ]
+  },
+  "prestige-meander": {
+    "levels": {
+      "high": {
+        "width": 1536,
+        "height": 408
+      },
+      "medium": {
+        "width": 768,
+        "height": 204
+      },
+      "low": {
+        "width": 384,
+        "height": 102
+      }
+    },
+    "maps": [
+      "color",
+      "bump"
+    ]
+  },
+  "prestige-palm": {
+    "levels": {
+      "high": {
+        "width": 896,
+        "height": 1024
+      },
+      "medium": {
+        "width": 448,
+        "height": 512
+      },
+      "low": {
+        "width": 224,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "bump"
+    ]
+  },
+  "proc-bark": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-brick": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-clayroof": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-cutstone": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "normalEncoding": "lossless RGB8 tangent space"
+  },
+  "proc-cyclopean": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "normalEncoding": "lossless RGB8 tangent space"
+  },
+  "proc-flags": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "normalEncoding": "lossless RGB8 tangent space"
+  },
+  "proc-fresco": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-limestone": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "normalEncoding": "lossless RGB8 tangent space"
+  },
+  "proc-marble": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "normalEncoding": "lossless RGB8 tangent space"
+  },
+  "proc-mudbrick": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-plank": {
+    "levels": {
+      "high": {
+        "width": 2048,
+        "height": 2048
+      },
+      "medium": {
+        "width": 1024,
+        "height": 1024
+      },
+      "low": {
+        "width": 512,
+        "height": 512
+      }
+    },
+    "maps": [
+      "color",
+      "normal",
+      "relief",
+      "roughness"
+    ],
+    "heightEncoding": "16-bit unsigned grayscale, black is lowest",
+    "reliefSpanMeters": 0.018
+  },
+  "proc-plaster": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-reticulatum": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-romanbrick": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-roofplank": {
+    "levels": {
+      "high": {
+        "width": 2048,
+        "height": 2048
+      },
+      "medium": {
+        "width": 1024,
+        "height": 1024
+      },
+      "low": {
+        "width": 512,
+        "height": 512
+      }
+    },
+    "maps": [
+      "color",
+      "normal",
+      "relief",
+      "roughness"
+    ],
+    "heightEncoding": "16-bit unsigned grayscale, black is lowest",
+    "reliefSpanMeters": 0.022
+  },
+  "proc-shingle": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-sod": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ]
+  },
+  "proc-stone": {
+    "levels": {
+      "high": {
+        "width": 1024,
+        "height": 1024
+      },
+      "medium": {
+        "width": 512,
+        "height": 512
+      },
+      "low": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "normalEncoding": "lossless RGB8 tangent space"
+  },
+  "proc-tile": {
+    "levels": {
+      "high": {
+        "width": 2048,
+        "height": 2048
+      },
+      "medium": {
+        "width": 1024,
+        "height": 1024
+      },
+      "low": {
+        "width": 512,
+        "height": 512
+      }
+    },
+    "maps": [
+      "color",
+      "normal",
+      "relief",
+      "roughness"
+    ],
+    "heightEncoding": "16-bit unsigned grayscale, black is lowest",
+    "reliefSpanMeters": 0.05
+  },
+  "forge-wood": {
+    "levels": {
+      "high": {
+        "width": 512,
+        "height": 512,
+        "normalWidth": 256,
+        "normalHeight": 256
+      },
+      "medium": {
+        "width": 256,
+        "height": 256,
+        "normalWidth": 128,
+        "normalHeight": 128
+      },
+      "low": {
+        "width": 128,
+        "height": 128,
+        "normalWidth": 64,
+        "normalHeight": 64
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "source": "https://huggingface.co/datasets/nasttam/editor3d-biblioteca/tree/main/texturas/acg-Wood049",
+    "original": "https://ambientcg.com/a/Wood049",
+    "license": "CC0-1.0"
+  },
+  "forge-stone": {
+    "levels": {
+      "high": {
+        "width": 512,
+        "height": 512,
+        "normalWidth": 256,
+        "normalHeight": 256
+      },
+      "medium": {
+        "width": 256,
+        "height": 256,
+        "normalWidth": 128,
+        "normalHeight": 128
+      },
+      "low": {
+        "width": 128,
+        "height": 128,
+        "normalWidth": 64,
+        "normalHeight": 64
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "source": "https://huggingface.co/datasets/nasttam/editor3d-biblioteca/tree/main/texturas/acg-Rock032",
+    "original": "https://ambientcg.com/a/Rock032",
+    "license": "CC0-1.0"
+  },
+  "mine-rock": {
+    "levels": {
+      "high": {
+        "width": 512,
+        "height": 512,
+        "normalWidth": 256,
+        "normalHeight": 256
+      },
+      "medium": {
+        "width": 256,
+        "height": 256,
+        "normalWidth": 128,
+        "normalHeight": 128
+      },
+      "low": {
+        "width": 128,
+        "height": 128,
+        "normalWidth": 64,
+        "normalHeight": 64
+      }
+    },
+    "maps": [
+      "color",
+      "normal"
+    ],
+    "source": "https://huggingface.co/datasets/nasttam/editor3d-biblioteca/tree/main/texturas/acg-Rock032",
+    "derivedFrom": "forge-stone",
+    "license": "CC0-1.0"
+  }
+}

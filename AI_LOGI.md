@@ -856,3 +856,64 @@ Kasutaja küsis FPS-analüüsi ja seejärel, kas meri ja jõed saaksid kasutada 
 - Jõed, maastiku tükkideks jagamine ja LOD, detailkaardi ehitamise eelarve, maailma pakkimine workerisse.
 - NativeThreeBridge, päris graafikakaart ja 94. käigu salvestus mõõtmata.
 
+
+---
+
+## 2026-11-17 · Claude (Anthropic) · V354 katse – majaehitaja hooned mängus (haru `test/majaehitus`)
+
+### Ülesanne
+ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand salvestub hoonele). Kasutaja palus töö lõpetada: kujundaja koos demo kasutajaliidesega mängus, uued majad mängus kasutusel koos kõigi tekstuuridega. Ainult testharus, `main` muutmata.
+
+### Mis tehti
+- `majaehitaja/index.html`: `hutView.exportModel()` ehitab hoone, ootab tekstuurid ära, ehitab uuesti ja saadab võrgud materjalide kaupa ühendatult (puhvrid, tekstuuride aadressid, lõuendtekstuurid ImageBitmapina). Peidetud tööleht (`?embed=1&worker=1&textures=medium`) vastab `model` päringutele. `open` võtab hoone ID, mitte ainult `hall`. Töölehel ei joonistata plaani pisipilti (see ehitas sama stseeni ümber ja segas eksporti). Demo navigeerimislingid on mängu sees peidetud.
+- Uus `house-designs-v354.js`: peidetud kujundaja, mudelite vahemälu, mänguhoone → kujundaja ID (`hall`, `hall@1`, `hall@2` jne), suurus krundi järgi (FOOTPRINTS), `THREE.LOD` (lähedal kujundaja mudel, kaugel vana mängumudel; kaugus graafika nähtavuskauguse järgi 140–560).
+- `civilization.js`: `townBuildingModel(...,design)` kasutab kujundaja mudelit; detailkaardi ja voogedastuse templid sisaldavad mudeli olekut, et hoone vahetuks valmimisel. `openHouseDesignerV354` töötab kõigi kujundatavate hoonetega (salvesta, taasta algne, Esc, mäng pausil). Graafikamenüüs lüliti „Majaehitaja hooned (katse)”. ChatGPT CRLF-reavahetused taastatud LF-iks.
+- `building-inspector-v82.js`: nupp „✎ Kujunda hoone / Muuda kujundust” kujundatavatel hoonetel.
+- Vana mudel jääb: müürid, väravad, tornid, põllud, karjamaa, sild, turg, kalur, sadam; ajastud 3+.
+
+### Testimine
+- `tests/house-designs-v354.mjs` (staatiline), `tests/house-designs-v354-browser.cjs` (Stonetown: 13 kujundaja mudelit, peamaja kavandi salvestamine üle mängu, kavand hoonel), `tests/house-designs-v354-view.html` (mudelid mängu renderdajas). Kiirkontroll 127/127.
+
+### Pooleli
+- Kujundaja mudelid on üksikasjalikud (kiviaja maja ~100 000 kolmnurka). Päris seadmel FPS mõõtmata; vajadusel lihtsustatud keskmine LOD.
+- Kujundaja shaderiefektid (stohhastiline tekstuur, fresko vöö) asendatakse mängus tavalise tekstuuriga.
+- Mudelid ehitatakse igal käivitusel uuesti (pole IndexedDB vahemälu). NativeThreeBridge'is kontrollimata.
+
+### Täiendus 2026-11-17 (kasutaja soov)
+- Kujundamine käib ehitusmenüüst: kaardil ✎ ikoon → tüübi kavand `s.houseDesignTemplatesV354[type]`, kopeeritakse paigutamisel (`applyDesignTemplateV354`) hoone `houseDesignV354` väljale. Peamaja jääb hoone info nupu peale (pole ehitusmenüüs).
+- Kokkupõrge: kujundaja `walkWalls` (jalutusrežiimi seinad, uksed vabad) eksporditakse mudeliga; `walkBlocked` kasutab neid (`hitsDesignedWallsV354`) krundi ristküliku asemel. Navigatsioonivõrk muutmata.
+- Testid täiendatud (`tests/house-designs-v354.mjs`, `tests/house-designs-v354-browser.cjs`).
+
+### Täiendus 2026-11-17 (2) – kasutaja: vanad mudelid ära, uksed lahti, kõik inglise keeles
+- `house-designs-v354.js` ümber kirjutatud: kõik hoonetüübid ajastutel 0–2 (v.a sild) kujundajast; lähim ajastu, kui täpset pole; müürid kujundaja lõiguna (`segment` päring), värav 7 ühikut, põld venitatud; kauge LOD sama mudeli suurtest osadest; IndexedDB vahemälu; ootel hoone = tühi grupp (`pendingBuildingV354`), külad kasutavad ootamise ajal vana mudelit.
+- `majaehitaja/index.html`: `openDoors` (uksed lahti ekspordis), kaldavesi/liiv välja, kauge LOD partiid, `segment` päring; kogu kasutajaliides inglise keelde (tekstid asendatud lähtekoodis, `fmt` kasutab punkti).
+- `civilization.js`: `townBuildingModel` kasutab kujundajat enne vana mudelit; graafikalüliti eemaldatud; minu lisatud tekstid inglise keeles.
+- `locale-en-v354.js` + `localization.js`: mängu eestikeelsete jääkide tõlked. `tests/ui-writes-v350.mjs` ootab nüüd `localization.js?v=354a`.
+- Maa ja taeva puudumist raw.githack lingil ei õnnestunud järele teha (kohalikult on olemas; pilvebrauseris WebGL puudub). Soovitus: rawcdn.githack.com commit'i link.
+
+### Täiendus 2026-11-17 (3) – kvaliteet ja detailitasemed
+- Kujundaja eksport: kolm partiide komplekti (lähedal kõik; keskel ilma katusega ruumi sisustuseta; kaugel suured osad), keskmine ja kauge lihtsustatud tippude ruudustikuga (`simplify`, 7 cm / 16 cm, suuna ja UV-plaadi järgi lahus). Varieeruvate atlaste kohta saadetakse faili aadress ja lõikamise serv, mitte valmis pilt.
+- `house-designs-v354.js`: tekstuuride tase graafika `buildingDetail` järgi, laadimine `onBeforeRender` ajal (esimene joonistus), ajutiselt parim juba laaditud versioon; `INTERIOR_DISTANCE` 25/40/55, `NEAR_DISTANCE` × LOD; `MODEL_VERSION` 354f; tööleht `textures=low`.
+- Uus `tests/house-designs-v354-lod-browser.cjs`.
+
+### Parandus 2026-11-17 (4) – mustad majad raw.githack lingil
+- Põhjus: githack suunab suured failid raw.githubusercontent.com-i (teine päritolu). `house-designs-v354.js` laadis tekstuure `new Image()`-iga ilma `crossOrigin`-ita → pilt "tainted", WebGL keeldus (`texSubImage2D SecurityError` igas kaadris), majad mustad ja mäng aeglane. Nüüd `img.crossOrigin='anonymous'`. Kontrollitud kasutaja enda brauseris (RTX 2080 S): 19 mudelit 31 s-ga, vigu pole.
+- Kujundaja eksport: teine ümberehitus ainult siis, kui tuli uusi tekstuurifaile; läbimine ja lihtsustamine annavad vahepeal mängule kaadri; lihtsustamise võtmed numbrilised. Linna nimesilt tõlgitakse.
+
+## 2026-11-17 · Claude (Anthropic) · V354 – mobiilis majad ei laadi (354e)
+
+- Mobiilis ei tulnud maju (emulatsioonis kõik 19 mudelit valmis, päris telefonis mitte). Tõenäoline põhjus: peidetud kujundaja iframe asus `left:-10000px` ja telefoni brauser ei laadinud/ei käivitanud seda → kõik hooned jäid ootele.
+- `house-designs-v354.js`: iframe on nüüd vaateala sees (2×2 px, opacity 0, z-index -1, `loading='eager'`). Käivituse ajapiir 60 s. Kujundaja saadab iga 3 s `alive` sõnumi (`majaehitaja/index.html`); kui 60 s ei tule ühtegi sõnumit, saavad kõik ootel hooned vea → vana mudel. `onHouseDesignErrorV354(listener)` – esimene viga näidatakse mängijale (`say`, civilization.js).
+- Mooduli võti `house-designs-v354.js?v=354e` (civilization.js ja testid).
+- `exportModel`: töö 40 ms viiludena (oli 12 ms) ja tekstuure oodatakse ainult siis, kui mõni fail pole veel valmis (iga ootus annab mängule kaadri; aeglases seadmes on kaader kallis). Ühe faili laadimisviga ei kukuta enam mudelit. SwiftShaderis 19 mudelit 640 s → 300 s. `houseDesignStatusV354()` annab nüüd ka `times` (iga mudeli ajad) ja `errors`.
+- NB: ajapiir ei tohi lugeda postitamisest – mudelid tehakse järjest ja SwiftShaderis võtab üks mitu minutit.
+
+## 2026-11-17 · Claude (Anthropic) · V354 – kiirem laadimine ja suurem FPS (354f)
+
+- Mõõtmine (Stonetown, SwiftShader, kaader): vanad mudelid ~150 joonistust ja 0,5–0,9 M kolmnurka; uued majad ~650–750 joonistust ja ~4 M kolmnurka (pool varjukaardis).
+- `house-designs-v354.js`:
+  - `HouseLOD` (LOD alamklass): taseme valik `pixelScale` järgi (pildi kõrgus / 1080, kaamera fov; ainult vähendab kaugusi), hüsterees 8 %.
+  - Varjukoopiad: iga taseme jaoks ühe võrra lihtsam koopia (`copyOf(source,{shadow:true})`), kiht `SHADOW_LAYER_V354`=5; päikese varjukaamera kiht lülitatakse sisse `shadowTexel()`-is. Ekraanil olevad võrgud ei heida varju. Kui varjutekslel > 9 cm, võetakse veel üks tase lihtsam.
+  - Instantsimine: stseeni lõpus grupp `V354 instances`; `scene.onBeforeRender` nullib loendurid, iga `HouseLOD.update` lisab oma maatriksi (kaamera vaatekoonuse ja päikese varjukasti kontrolliga). Hoone enda võrgud jäävad peidetuna alles (hiirega valimine, mõõtmed). Kummituse (eraldi materjalid) puhul joonistatakse hoone tavaliselt. `forceLevelV354` testidele.
+- `civilization.js`: iga 4 s `preloadHouseDesignsV354` mängija hoonetele (aktiivne linn ees) – mudelid valmivad enne linna avamist.
+- Test `tests/house-designs-v354-view.html?shadows=1&instancing=0` võrdlus: 9 hoonet 161 → 57 joonistust, pilt sama.
