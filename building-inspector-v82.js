@@ -76,7 +76,7 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle,onUpgrade
   root.hidden=false;
   root.setAttribute('aria-label',data.name+' · '+data.eraName);
   const nextKey=[data.type,data.position.x,data.position.z,data.status,data.hp,data.maxHp,data.assigned,
-   data.needed,data.efficiency,data.progress,data.disabled,data.input,data.production,data.age,JSON.stringify(data.wallUpgrade),JSON.stringify(data.upgradeOptions),data.description].join('|');
+   data.needed,data.efficiency,data.progress,data.disabled,data.input,data.production,data.age,JSON.stringify(data.wallUpgrade),JSON.stringify(data.upgradeOptions),data.description,data.designable,data.designed].join('|');
   if(currentKey===nextKey)return;
   currentKey=nextKey;
   title.textContent=(data.icon||'⌂')+' '+data.name;
@@ -100,7 +100,7 @@ export function createBuildingInspector(root,{close,onWorkers,onToggle,onUpgrade
   if(data.researchActivity!=null)detail.append(line('Teadustöö aktiivsus',Math.round(data.researchActivity*100)+'%'));
   actions.replaceChildren();
   if(data.owner){
-   if(data.type==='hall'&&data.age===0&&data.ready){const design=document.createElement('button');design.type='button';design.dataset.action='design';design.textContent='✎ Kujunda peamaja · katse';design.addEventListener('click',onDesign);actions.append(design);}
+   if(data.designable&&data.ready){const design=document.createElement('button');design.type='button';design.dataset.action='design';design.textContent=data.designed?'✎ Muuda kujundust':'✎ Kujunda hoone';design.addEventListener('click',onDesign);actions.append(design);}
    for(const option of data.upgradeOptions||[]){const up=document.createElement('button');up.type='button';up.textContent='⬆ '+(option.target==='house'?'Suurem elamu (×2)':option.target==='stone'?'Kiviks':'Kõrgemaks')+' · '+readable(option.cost,{});up.addEventListener('click',()=>onUpgrade?.(option.target));actions.append(up);}
    {const rotate=document.createElement('button');rotate.type='button';rotate.dataset.action='rotate';rotate.textContent='⟳ Pööra 90°';rotate.addEventListener('click',onRotate);actions.append(rotate);if(data.type!=='hall'){const remove=document.createElement('button');remove.type='button';remove.dataset.action='delete';remove.textContent='✕ Kustuta hoone';remove.addEventListener('click',onDelete);actions.append(remove);}}
    if(!data.ready){const pause=document.createElement('button');pause.type='button';pause.dataset.action='pause-construction';pause.textContent=data.disabled?'▶ Jätka ehitust':'Ⅱ Peata ehitus';pause.addEventListener('click',onPauseConstruction);actions.append(pause);}

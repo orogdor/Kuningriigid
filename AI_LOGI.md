@@ -856,3 +856,25 @@ Kasutaja küsis FPS-analüüsi ja seejärel, kas meri ja jõed saaksid kasutada 
 - Jõed, maastiku tükkideks jagamine ja LOD, detailkaardi ehitamise eelarve, maailma pakkimine workerisse.
 - NativeThreeBridge, päris graafikakaart ja 94. käigu salvestus mõõtmata.
 
+
+---
+
+## 2026-11-17 · Claude (Anthropic) · V354 katse – majaehitaja hooned mängus (haru `test/majaehitus`)
+
+### Ülesanne
+ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand salvestub hoonele). Kasutaja palus töö lõpetada: kujundaja koos demo kasutajaliidesega mängus, uued majad mängus kasutusel koos kõigi tekstuuridega. Ainult testharus, `main` muutmata.
+
+### Mis tehti
+- `majaehitaja/index.html`: `hutView.exportModel()` ehitab hoone, ootab tekstuurid ära, ehitab uuesti ja saadab võrgud materjalide kaupa ühendatult (puhvrid, tekstuuride aadressid, lõuendtekstuurid ImageBitmapina). Peidetud tööleht (`?embed=1&worker=1&textures=medium`) vastab `model` päringutele. `open` võtab hoone ID, mitte ainult `hall`. Töölehel ei joonistata plaani pisipilti (see ehitas sama stseeni ümber ja segas eksporti). Demo navigeerimislingid on mängu sees peidetud.
+- Uus `house-designs-v354.js`: peidetud kujundaja, mudelite vahemälu, mänguhoone → kujundaja ID (`hall`, `hall@1`, `hall@2` jne), suurus krundi järgi (FOOTPRINTS), `THREE.LOD` (lähedal kujundaja mudel, kaugel vana mängumudel; kaugus graafika nähtavuskauguse järgi 140–560).
+- `civilization.js`: `townBuildingModel(...,design)` kasutab kujundaja mudelit; detailkaardi ja voogedastuse templid sisaldavad mudeli olekut, et hoone vahetuks valmimisel. `openHouseDesignerV354` töötab kõigi kujundatavate hoonetega (salvesta, taasta algne, Esc, mäng pausil). Graafikamenüüs lüliti „Majaehitaja hooned (katse)”. ChatGPT CRLF-reavahetused taastatud LF-iks.
+- `building-inspector-v82.js`: nupp „✎ Kujunda hoone / Muuda kujundust” kujundatavatel hoonetel.
+- Vana mudel jääb: müürid, väravad, tornid, põllud, karjamaa, sild, turg, kalur, sadam; ajastud 3+.
+
+### Testimine
+- `tests/house-designs-v354.mjs` (staatiline), `tests/house-designs-v354-browser.cjs` (Stonetown: 13 kujundaja mudelit, peamaja kavandi salvestamine üle mängu, kavand hoonel), `tests/house-designs-v354-view.html` (mudelid mängu renderdajas). Kiirkontroll 127/127.
+
+### Pooleli
+- Kujundaja mudelid on üksikasjalikud (kiviaja maja ~100 000 kolmnurka). Päris seadmel FPS mõõtmata; vajadusel lihtsustatud keskmine LOD.
+- Kujundaja shaderiefektid (stohhastiline tekstuur, fresko vöö) asendatakse mängus tavalise tekstuuriga.
+- Mudelid ehitatakse igal käivitusel uuesti (pole IndexedDB vahemälu). NativeThreeBridge'is kontrollimata.

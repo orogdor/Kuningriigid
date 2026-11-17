@@ -2560,7 +2560,7 @@ function ensureHut(){
 }
 function scheduleThumb(){clearTimeout(thumbTimer);thumbTimer=setTimeout(drawThumb,160);}
 function drawThumb(){
-  if(view!=='plan'||!ensureHut())return;
+  if(designerWorker||view!=='plan'||!ensureHut())return;
   const project=wholeProject(), ground=lowerFloor?geometry(project):display;
   const withRoof=roof&&(ground.structures.length>0||Boolean(project.upper?.rooms?.length));
   try{
@@ -2799,6 +2799,7 @@ $('#m-reset').onclick=()=>{
 
 /* ---------- Persistence ---------- */
 const embeddedDesigner=new URLSearchParams(location.search).get('embed')==='1';
+const designerWorker=embeddedDesigner&&new URLSearchParams(location.search).get('worker')==='1';
 const STORE=embeddedDesigner?'kuningriigid-embedded-designer-v354':'kuningriigid-kiviaeg-ehitaja-v2';
 let persistTimer;
 function persist(){
@@ -4378,20 +4379,46 @@ if(demoProject&&Object.hasOwn(catalog,demoProject)){
   loadProject(demoProject);
   if(view!=='3D')show3DView();
 }
+let embeddedId='hall';
 if(embeddedDesigner){
+  // Inside the game the demo navigation links would leave the designer.
+  for(const link of document.querySelectorAll('a.back,a.brand')){link.removeAttribute('href');if(link.classList.contains('back'))link.hidden=true;}
   window.addEventListener('message',event=>{
     if(event.origin!==location.origin||event.source!==window.parent||event.data?.source!=='kuningriigid-game')return;
     if(event.data.type==='open'){
-      const saved=event.data.design?.id==='hall'?cleanState(event.data.design):null;
-      projects.clear();history=[];future=[];useProject(saved??seed('hall'));
+      // V354: the game names the building; the default design is used when it has none.
+      embeddedId=Object.hasOwn(catalog,event.data.id)?event.data.id:'hall';
+      const saved=event.data.design?.id===embeddedId?cleanState(event.data.design):null;
+      projects.clear();history=[];future=[];useProject(saved??seed(embeddedId));
       viewEra=eraOf(state.id);lastOfEra[viewEra]=state.id;planView={s:1,x:0,y:0};
       select(defaultCategory(),true);refresh();draw();
     }
     if(event.data.type==='save'){
       const project=wholeProject();
-      if(project.id!=='hall'){say('Vali peamaja kavand.',true);return;}
+      if(project.id!==embeddedId){say('Vali uuesti '+catalog[embeddedId].name.toLowerCase()+' kavand.',true);return;}
       window.parent.postMessage({source:'kuningriigid-designer',type:'design',design:project},location.origin);
     }
+  });
+  // V354: the game also asks the designer to build finished 3D models.
+  let modelQueue=Promise.resolve();
+  const webglReady=()=>window.hutWebGL?Promise.resolve():new Promise(resolve=>window.addEventListener('onni-webgl-ready',resolve,{once:true}));
+  window.addEventListener('message',event=>{
+    if(event.origin!==location.origin||event.source!==window.parent||event.data?.source!=='kuningriigid-game'||event.data.type!=='model')return;
+    const {requestId,design,id}=event.data;
+    modelQueue=modelQueue.then(async()=>{
+      const reply=data=>window.parent.postMessage({source:'kuningriigid-designer',type:'model',requestId,...data},location.origin,data.model?.transfer??[]);
+      const saved={state,lowerFloor,projectCache};
+      try{
+        await webglReady();
+        if(!ensureHut())throw new Error('WebGL puudub');
+        const project=design?cleanState(design):Object.hasOwn(catalog,id)?seed(id):null;
+        if(!project)throw new Error('Tundmatu hoone '+id);
+        useProject(project);
+        const model=await hutView.exportModel(state,geometry(state));
+        reply({model});
+      }catch(error){reply({error:String(error?.message||error)});}
+      finally{state=saved.state;lowerFloor=saved.lowerFloor;projectCache=saved.projectCache;}
+    });
   });
   window.parent.postMessage({source:'kuningriigid-designer',type:'ready'},location.origin);
 }
@@ -85391,6 +85418,7 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
         Object.assign(material,{map:color,normalMap:null,roughnessMap:null});
         material.color.set(tint);
         material.customProgramCacheKey=()=> 'hut-stochastic-height-v1';
+        material.userData.hutRelief=relief;
         material.onBeforeCompile=shader=>{
           shader.uniforms.hutRelief={value:relief};
           shader.uniforms.hutAtlas={value:new T.Vector3(size,edge,stride)};
@@ -90621,6 +90649,90 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
       if(kind==='fresco'){g.fillStyle='#8f2e1c';g.fillRect(0,86,128,42);for(let x=0;x<128;x+=16){g.fillStyle=(x/16)%2?'#d8ad52':'#26406f';g.fillRect(x,72,16,12);}g.fillStyle='#222';g.fillRect(0,84,128,3);}
       return c.toDataURL('image/jpeg',.85);}
     ,snapshot(){if(!lastState)return null;render();return canvas.toDataURL('image/png');}
+    // V354: the game asks for the finished building as plain buffers. Meshes are
+    // baked into one batch per material so a town can repeat the house cheaply.
+    ,async exportModel(state,display){
+      rebuild(state,display,true,false);
+      lastState=undefined;
+      const pending=()=>[...assets.values()];
+      for(let round=0;round<3;round++){await Promise.all(pending());await new Promise(r=>setTimeout(r,60));}
+      // Build again now that the textures are in: nothing else may run between
+      // this rebuild and reading the meshes (the plan thumbnail reuses the scene).
+      rebuild(state,display,true,false);lastState=undefined;
+      building.updateMatrixWorld(true);
+      const skip=/meadow|Meadow/;
+      const batches=new Map(),textures=new Map(),jobs=[];
+      const normalMatrix=new core.Matrix3(),v=V(0,0,0),n=V(0,0,0);
+      const stochastic=material=>material.customProgramCacheKey?.()==='hut-stochastic-height-v1';
+      function textureRef(texture,crop){
+        if(!texture?.image)return null;
+        const key=texture.uuid+(crop?':crop':'');
+        if(!textures.has(key)){
+          const image=texture.image,entry={wrapS:texture.wrapS,wrapT:texture.wrapT,flipY:texture.flipY,srgb:texture.colorSpace===T.SRGBColorSpace,
+            repeat:[texture.repeat.x,texture.repeat.y],offset:[texture.offset.x,texture.offset.y],rotation:texture.rotation};
+          textures.set(key,entry);
+          if(!crop&&image instanceof HTMLImageElement&&image.src&&!image.src.startsWith('data:'))entry.url=image.src;
+          else{
+            const width=image.width||image.videoWidth,height=image.height||image.videoHeight;
+            let source=image,sx=0,sy=0,sw=width,sh=height;
+            if(crop){const edge=crop.edge,size=crop.size;sx=edge;sy=edge;sw=size;sh=size;entry.wrapS=entry.wrapT=T.RepeatWrapping;entry.repeat=[1,1];entry.offset=[0,0];}
+            jobs.push(createImageBitmap(source,sx,sy,sw,sh,{imageOrientation:entry.flipY?'flipY':'none'}).then(bitmap=>{entry.bitmap=bitmap;}).catch(()=>{}));
+          }
+        }
+        return key;
+      }
+      building.traverse(object=>{
+        if(!object.isMesh||!object.visible||skip.test(object.name||''))return;
+        const material=Array.isArray(object.material)?object.material[0]:object.material;
+        if(!material||material.visible===false)return;
+        const geometry=object.geometry,position=geometry.getAttribute('position');
+        if(!position||!position.count)return;
+        let batch=batches.get(material.uuid);
+        if(!batch){
+          const crop=stochastic(material)&&material.map?.image?{edge:8,size:material.map.image.height-16}:null;
+          const variation=stochastic(material);
+          const desc={type:material.type,color:material.color?.getHex()??0xffffff,roughness:material.roughness??1,metalness:material.metalness??0,
+            emissive:material.emissive?.getHex()??0,emissiveIntensity:material.emissiveIntensity??1,opacity:material.opacity,transparent:material.transparent,
+            depthWrite:material.depthWrite,side:material.side,vertexColors:Boolean(material.vertexColors),alphaTest:material.alphaTest||0,
+            normalScale:material.normalScale?[material.normalScale.x,material.normalScale.y]:null,bumpScale:material.bumpScale??1,name:material.name||''};
+          if(variation){
+            desc.map=textureRef(material.map,crop);
+            const relief=material.userData?.hutRelief;
+            if(relief)desc.bumpMap=textureRef(relief,crop),desc.bumpScale=1.2;
+          }else for(const slot of ['map','normalMap','roughnessMap','bumpMap','alphaMap','emissiveMap','aoMap'])if(material[slot])desc[slot]=textureRef(material[slot]);
+          batch={material:desc,positions:[],normals:[],uvs:[],colors:[],indices:[],count:0,cast:false};
+          batches.set(material.uuid,batch);
+        }
+        batch.cast||=object.castShadow;
+        normalMatrix.getNormalMatrix(object.matrixWorld);
+        const normal=geometry.getAttribute('normal'),uv=geometry.getAttribute('uv'),color=geometry.getAttribute('color');
+        const base=batch.count;
+        for(let i=0;i<position.count;i++){
+          v.fromBufferAttribute(position,i).applyMatrix4(object.matrixWorld);batch.positions.push(v.x,v.y,v.z);
+          if(normal){n.fromBufferAttribute(normal,i).applyMatrix3(normalMatrix).normalize();batch.normals.push(n.x,n.y,n.z);}else batch.normals.push(0,1,0);
+          if(uv)batch.uvs.push(uv.getX(i),uv.getY(i));else batch.uvs.push(0,0);
+          if(batch.material.vertexColors){if(color)batch.colors.push(color.getX(i),color.getY(i),color.getZ(i));else batch.colors.push(1,1,1);}
+        }
+        const det=object.matrixWorld.determinant()<0;
+        if(geometry.index){const index=geometry.index;for(let i=0;i<index.count;i+=3){const a=index.getX(i),b=index.getX(i+1),c=index.getX(i+2);if(det)batch.indices.push(base+a,base+c,base+b);else batch.indices.push(base+a,base+b,base+c);}}
+        else for(let i=0;i+2<position.count;i+=3){if(det)batch.indices.push(base+i,base+i+2,base+i+1);else batch.indices.push(base+i,base+i+1,base+i+2);}
+        batch.count+=position.count;
+      });
+      await Promise.all(jobs);
+      const footprint=[...display.floors.flat(),...display.walls.flatMap(w=>[w.a,w.b]),...display.fences.flatMap(f=>[f.a,f.b])].map(p=>place(p));
+      const xs=footprint.map(p=>p.x),zs=footprint.map(p=>p.z);
+      const out={meshes:[],textures:Object.fromEntries(textures),transfer:[],
+        footprint:footprint.length?{minX:Math.min(...xs),maxX:Math.max(...xs),minZ:Math.min(...zs),maxZ:Math.max(...zs)}:null};
+      for(const batch of batches.values()){
+        const positions=new Float32Array(batch.positions),normals=new Float32Array(batch.normals),uvs=new Float32Array(batch.uvs);
+        const colors=batch.colors.length?new Float32Array(batch.colors):null;
+        const indices=batch.count>65535?new Uint32Array(batch.indices):new Uint16Array(batch.indices);
+        out.meshes.push({material:batch.material,positions,normals,uvs,colors,indices,cast:batch.cast});
+        out.transfer.push(positions.buffer,normals.buffer,uvs.buffer,indices.buffer);if(colors)out.transfer.push(colors.buffer);
+      }
+      for(const entry of textures.values())if(entry.bitmap)out.transfer.push(entry.bitmap);
+      return out;
+    }
     ,textureLevel
   };
 }
