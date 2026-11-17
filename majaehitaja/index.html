@@ -90664,16 +90664,25 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
     // V354: the game asks for the finished building as plain buffers. Meshes are
     // baked into one batch per material so a town can repeat the house cheaply.
     ,async exportModel(state,display){
+      const timings={},clock=name=>{const now=performance.now();timings[name]=Math.round(now-(clock.last??now));clock.last=now;};clock('start');
+      const knownAssets=assets.size;
       openDoors=true;
       try{rebuild(state,display,true,false);}finally{openDoors=false;}
       lastState=undefined;
       const pending=()=>[...assets.values()];
+      clock('rebuild');
       for(let round=0;round<3;round++){await Promise.all(pending());await new Promise(r=>setTimeout(r,60));}
-      // Build again now that the textures are in: nothing else may run between
-      // this rebuild and reading the meshes (the plan thumbnail reuses the scene).
-      openDoors=true;
-      try{rebuild(state,display,true,false);}finally{openDoors=false;}
-      lastState=undefined;
+      clock('textures');
+      // A building that needed new texture files is built again now that they are
+      // in (some surfaces take their relief from them). Later buildings reuse the
+      // loaded files and skip this. The worker page never draws plan thumbnails,
+      // which would rebuild this scene while waiting.
+      if(assets.size>knownAssets){
+        openDoors=true;
+        try{rebuild(state,display,true,false);}finally{openDoors=false;}
+        lastState=undefined;
+      }
+      clock('rebuild2');
       building.updateMatrixWorld(true);
       const skip=/meadow|Meadow|Sandy shore|Coastal water/;
       const sphere=new core.Sphere();
@@ -90712,12 +90721,16 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
         }
         return key;
       }
-      building.traverse(object=>{
-        if(!object.isMesh||!object.visible||skip.test(object.name||''))return;
+      const objects=[];building.traverse(object=>objects.push(object));
+      let slice=performance.now();
+      for(const object of objects){
+        // Give the game a frame now and then: this page shares its thread.
+        if(performance.now()-slice>12){await new Promise(r=>setTimeout(r,0));slice=performance.now();}
+        if(!object.isMesh||!object.visible||skip.test(object.name||''))continue;
         const material=Array.isArray(object.material)?object.material[0]:object.material;
-        if(!material||material.visible===false)return;
+        if(!material||material.visible===false)continue;
         const geometry=object.geometry,position=geometry.getAttribute('position');
-        if(!position||!position.count)return;
+        if(!position||!position.count)continue;
         // Far level: only the larger parts (no thatch tips, pebbles, small tools).
         if(!geometry.boundingSphere)geometry.computeBoundingSphere();
         sphere.copy(geometry.boundingSphere).applyMatrix4(object.matrixWorld);
@@ -90758,7 +90771,8 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
         else for(let i=0;i+2<position.count;i+=3){if(det)batch.indices.push(base+i,base+i+2,base+i+1);else batch.indices.push(base+i,base+i+1,base+i+2);}
         batch.count+=position.count;
         }
-      });
+      }
+      clock('traverse');
       await Promise.all(jobs);
       const footprint=[...display.floors.flat(),...display.walls.flatMap(w=>[w.a,w.b]),...display.fences.flatMap(f=>[f.a,f.b])].map(p=>place(p));
       const xs=footprint.map(p=>p.x),zs=footprint.map(p=>p.z);
@@ -90776,7 +90790,8 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
           const x=P[i*3],y=P[i*3+1],z=P[i*3+2],nx=N[i*3],ny=N[i*3+1],nz=N[i*3+2];
           const ax=Math.abs(nx),ay=Math.abs(ny),az=Math.abs(nz);
           const face=ax>=ay&&ax>=az?(nx>0?0:1):ay>=az?(ny>0?2:3):(nz>0?4:5);
-          const key=Math.floor(x/cell)+','+Math.floor(y/cell)+','+Math.floor(z/cell)+','+face+','+Math.floor(U[i*2])+','+Math.floor(U[i*2+1]);
+          // one number: grid cell (±1024 cells), facing (6) and texture tile (±64)
+          const key=((((Math.floor(x/cell)+1024)*2048+Math.floor(y/cell)+1024)*2048+Math.floor(z/cell)+1024)*6+face)*16384+((Math.floor(U[i*2])&127)*128+(Math.floor(U[i*2+1])&127));
           let k=map.get(key);
           if(k===undefined){k=counts.length;map.set(key,k);counts.push(0);positions.push(0,0,0);normals.push(0,0,0);uvs.push(0,0);if(hasColor)colors.push(0,0,0);}
           counts[k]++;positions[k*3]+=x;positions[k*3+1]+=y;positions[k*3+2]+=z;normals[k*3]+=nx;normals[k*3+1]+=ny;normals[k*3+2]+=nz;
@@ -90787,16 +90802,17 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
           const c=counts[k];for(let j=0;j<3;j++){positions[k*3+j]/=c;if(hasColor)colors[k*3+j]/=c;}uvs[k*2]/=c;uvs[k*2+1]/=c;
           const l=Math.hypot(normals[k*3],normals[k*3+1],normals[k*3+2])||1;for(let j=0;j<3;j++)normals[k*3+j]/=l;
         }
-        const indices=[],I=batch.indices,seen=new Set();
+        const indices=[],I=batch.indices,seen=new Set(),M=counts.length+1;
         for(let t=0;t<I.length;t+=3){
           const a=remap[I[t]],b=remap[I[t+1]],c=remap[I[t+2]];
           if(a===b||b===c||a===c)continue;
-          const key=a<b?(a<c?a+','+(b<c?b+','+c:c+','+b):c+','+a+','+b):(b<c?b+','+(a<c?a+','+c:c+','+a):c+','+b+','+a);
+          const lo=Math.min(a,b,c),hi=Math.max(a,b,c),mid=a+b+c-lo-hi,key=M<200000?(lo*M+mid)*M+hi:lo+','+mid+','+hi;
           if(seen.has(key))continue;seen.add(key);indices.push(a,b,c);
         }
         return {...batch,positions,normals,uvs,colors,indices,count:counts.length};
       }
-      for(const [source,cell] of [[midBatches,.07],[farBatches,.16]])for(const [key,batch] of source)if(batch.count>600)source.set(key,simplify(batch,cell));
+      for(const [source,cell] of [[midBatches,.07],[farBatches,.16]])for(const [key,batch] of source)if(batch.count>600){source.set(key,simplify(batch,cell));await new Promise(r=>setTimeout(r,0));}
+      clock('simplify');out.timings=timings;
       for(const [list,source] of [[out.meshes,batches],[out.mid,midBatches],[out.far,farBatches]])for(const batch of source.values()){
         const positions=new Float32Array(batch.positions),normals=new Float32Array(batch.normals),uvs=new Float32Array(batch.uvs);
         const colors=batch.colors.length?new Float32Array(batch.colors):null;

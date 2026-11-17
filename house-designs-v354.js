@@ -6,7 +6,7 @@
 import * as T from './vendor/three.module.js';
 
 // Bump when the designer export changes, so cached models are rebuilt.
-const MODEL_VERSION='354f';
+const MODEL_VERSION='354g';
 const FRAME_URL=new URL('./majaehitaja/index.html?embed=1&worker=1&textures=low',import.meta.url).href;
 // Designer ids (catalog keys) in majaehitaja/index.html.
 const DESIGNER_IDS=new Set(['hall','house','hunter','fisher','farm','lumber','mason','pottery_kiln','study','barracks','watchtower','archery','palisade','woodgate','quarry','claypit','well','pasture','field',
@@ -142,6 +142,8 @@ export function designKeyV354(design){
 }
 
 // ---------------------------------------------------------------- textures
+// Hosts may redirect big files to another origin (raw.githack → GitHub), so
+// images are always requested with CORS; otherwise WebGL refuses them.
 // File textures are loaded only when a building level that uses them is first
 // drawn, at that level's resolution. Until then the material shows the best
 // version of the same file already in memory (or plain colour).
@@ -165,8 +167,8 @@ function loadFile(entry,level,ref){
  if(loaded.has(key))return Promise.resolve(loaded.get(key));
  if(!loading.has(key)){
   const url=levelUrl(entry.url,level);
-  const job=new Promise((resolve,reject)=>{const img=new Image();img.decoding='async';img.onload=()=>resolve(img);img.onerror=reject;img.src=url;})
-   .catch(()=>level==='medium'?null:new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=levelUrl(entry.url,'medium');}).catch(()=>null))
+  const job=new Promise((resolve,reject)=>{const img=new Image();img.crossOrigin='anonymous';img.decoding='async';img.onload=()=>resolve(img);img.onerror=reject;img.src=url;})
+   .catch(()=>level==='medium'?null:new Promise((resolve,reject)=>{const img=new Image();img.crossOrigin='anonymous';img.onload=()=>resolve(img);img.onerror=reject;img.src=levelUrl(entry.url,'medium');}).catch(()=>null))
    .then(img=>{
     if(!img)return null;
     let t;

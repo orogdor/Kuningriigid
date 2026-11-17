@@ -25,7 +25,7 @@ const assert=(ok,msg)=>{if(!ok){console.error('FAIL',msg);process.exitCode=1;}el
  const city=await page.evaluate(()=>{const g=gameDebug.gameV249();g.seen=()=>true;const c=g.s.cities.find(c=>c.team===0);return {c:c.c,r:c.r,types:c.economy?.buildings?.map(b=>b.type)};});
  console.log('city',JSON.stringify(city));
  await page.evaluate(t=>gameDebug.openTileV249(t.c,t.r),city);
- const status=await page.evaluate(async()=>{const m=await import('./house-designs-v354.js?v=354c');const t=performance.now();
+ const status=await page.evaluate(async()=>{const m=await import('./house-designs-v354.js?v=354d');const t=performance.now();
   while(performance.now()-t<1200000){const s=m.houseDesignStatusV354();if(s.ready+s.failed>0&&s.pending===0)break;await new Promise(r=>setTimeout(r,1000));}
   await new Promise(r=>setTimeout(r,4000));return m.houseDesignStatusV354();});
  console.log('designs',JSON.stringify(status));
