@@ -917,3 +917,7 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
   - Instantsimine: stseeni lõpus grupp `V354 instances`; `scene.onBeforeRender` nullib loendurid, iga `HouseLOD.update` lisab oma maatriksi (kaamera vaatekoonuse ja päikese varjukasti kontrolliga). Hoone enda võrgud jäävad peidetuna alles (hiirega valimine, mõõtmed). Kummituse (eraldi materjalid) puhul joonistatakse hoone tavaliselt. `forceLevelV354` testidele.
 - `civilization.js`: iga 4 s `preloadHouseDesignsV354` mängija hoonetele (aktiivne linn ees) – mudelid valmivad enne linna avamist.
 - Test `tests/house-designs-v354-view.html?shadows=1&instancing=0` võrdlus: 9 hoonet 161 → 57 joonistust, pilt sama.
+
+## 2026-11-17 · Claude (Anthropic) · V354 peaharusse
+
+- Kasutaja palvel liideti `test/majaehitus` peaharusse (PR #81, squash, main oli muutmata harust saadik). GitHub Pages näitab V354 faile.
