@@ -40,5 +40,8 @@ assert.match(civ,/applyDesignTemplateV354\(r\.building,city\)/,'a placed buildin
 assert.match(civ,/v354-design-icon/,'build menu cards have a design icon');
 const module=fs.readFileSync(new URL('../house-designs-v354.js',import.meta.url),'utf8');
 assert.match(module,/copy\.onBeforeRender=activate/,'textures load on the first draw of a level');
-assert.match(module,/lod\.addLevel\(level\(mid\),INTERIOR_DISTANCE\)/,'three levels of detail');
-console.log('PASS: levels of detail and lazy textures, walk collision, build menu design, designer ids, kept game models, design keys, designer export hooks, rebuild stamps');
+assert.match(module,/lod\.addLevel\(level\(mid\),INTERIOR_DISTANCE,/,'three levels of detail');
+assert.match(module,/copy\.layers\.set\(SHADOW_LAYER\)/,'shadows come from a lighter copy on its own layer');
+assert.match(module,/o\.shadow\.camera\.layers\.enable\(SHADOW_LAYER\)/,'the lights see the shadow layer');
+assert.match(module,/function pixelScale/,'level distances follow the picture size');
+console.log('PASS: levels of detail and lazy textures, shadow copies, pixel-based distances, walk collision, build menu design, designer ids, kept game models, design keys, designer export hooks, rebuild stamps');

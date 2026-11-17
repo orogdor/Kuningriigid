@@ -80,3 +80,10 @@ Haru `test/majaehitus`. Peaharu ei muudetud.
 - Peidetud kujundaja on vaateala sees ja laaditakse kohe (`loading=eager`); varem ekraanist kaugel olev iframe võis telefonis jääda laadimata.
 - Mudelid valmivad aeglases seadmes umbes kaks korda kiiremini (pikemad tööviilud, tarbetu tekstuuriootus ära). `houseDesignStatusV354()` näitab iga mudeli aegu ja vigu.
 - Kui kujundaja ei käivitu 60 s jooksul või lakkab vastamast (südamelöök iga 3 s), näidatakse ootel hoonetel vana mudelit ja mängija saab teate põhjusega.
+
+## Jõudlus (354f)
+
+- Sama mudeliga hooned (nt 12 elamut) joonistatakse koos, üks joonistus mudeli osa kohta. Pilt jääb samaks.
+- Varjud tulevad hoone lihtsamast koopiast, mida ekraanile ei joonistata. Varjukaardi täpsus on niikuinii jämedam kui see koopia, seega varjud näevad välja samad.
+- Väiksema pildi (telefon, madalam eraldusvõime, automaatne eraldusvõime) korral lähevad hooned kergemale tasemele varem, sest detail poleks niikuinii näha.
+- Mängija linnade hoonete mudeleid hakatakse tegema kohe mängu alguses, mitte alles linna avamisel.

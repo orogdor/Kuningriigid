@@ -215,6 +215,7 @@ function bitmapTexture(ref,entry,cache){
 }
 // Called on the first draw of a mesh: brings in its material's textures.
 function activate(renderer,scene,camera,geometry,material){
+ state.bufferHeight=renderer.domElement.height;
  const pending=material?.userData?.texturesV354;if(!pending)return;
  material.userData.texturesV354=null;
  for(const [slot,entry,level,ref] of pending){
@@ -268,10 +269,141 @@ function template(packet){
  const triangles=g=>g?g.children.reduce((n,m)=>n+m.geometry.index.count/3,0):0;
  return {near,mid,far,box,footprint:packet.footprint,collision:packet.collision||[],stats:{near:triangles(near),mid:triangles(mid),far:triangles(far)}};
 }
-function copyOf(source){
+function copyOf(source,{shadow=false}={}){
  const g=new T.Group();
- for(const mesh of source.children){const copy=new T.Mesh(mesh.geometry,mesh.material);copy.castShadow=mesh.castShadow;copy.receiveShadow=true;copy.name=mesh.name;copy.onBeforeRender=activate;g.add(copy);}
+ for(const mesh of source.children){
+  if(shadow&&!mesh.castShadow)continue;
+  const copy=new T.Mesh(mesh.geometry,mesh.material);copy.name=mesh.name;
+  if(shadow){copy.castShadow=true;copy.receiveShadow=false;copy.layers.set(SHADOW_LAYER);}
+  else{copy.castShadow=false;copy.receiveShadow=true;copy.onBeforeRender=activate;}
+  g.add(copy);
+ }
  return g;
+}
+// Shadows come from a lighter copy of the building, drawn only into the shadow
+// map (its own layer; the light's shadow camera sees that layer, the game camera
+// does not). The shadow copy is one step coarser than what is on screen: the
+// shadow map texel (6–30 cm) is coarser than the merge grid, so the shadow looks
+// the same while the shadow pass draws far fewer triangles.
+export const SHADOW_LAYER_V354=5;
+const SHADOW_LAYER=SHADOW_LAYER_V354;
+const lightChecks=new WeakMap();
+// The lights of the scene must see the shadow layer. Checked every few seconds
+// (lights can be replaced when the graphics settings change). Returns the size
+// of one shadow map texel in metres (the sun follows the camera and zoom).
+function shadowTexel(object){
+ let root=object;while(root.parent)root=root.parent;
+ const now=performance.now();let check=lightChecks.get(root);
+ if(!check||now-check.time>3000){
+  check={time:now,lights:root.children.filter(o=>o.isDirectionalLight&&o.shadow)};lightChecks.set(root,check);
+  for(const o of check.lights)o.shadow.camera.layers.enable(SHADOW_LAYER);
+ }
+ let texel=1;
+ for(const o of check.lights)if(o.castShadow){const c=o.shadow.camera;texel=Math.min(texel,(c.right-c.left)/Math.max(256,o.shadow.mapSize.x));}
+ return texel;
+}
+// Level distances are set for a 1080-pixel-high picture. A smaller picture
+// (phone, lower resolution setting, adaptive resolution) shows the same detail
+// with fewer pixels, so the lighter levels can start sooner; never later.
+const eye=new T.Vector3(),here=new T.Vector3(),TAN_BASE=Math.tan(43*Math.PI/360);
+function pixelScale(camera){
+ const h=state.bufferHeight||1080,fov=camera.isPerspectiveCamera?Math.tan(camera.fov*Math.PI/360):TAN_BASE;
+ return Math.max(.45,Math.min(1,h/1080*TAN_BASE/fov));
+}
+// Identical buildings (same model) are drawn together: one instanced draw per
+// part and level instead of one per building. Each building still keeps its own
+// meshes (hidden) for picking with the mouse, bounds and the preview ghost.
+// ?instancing=0 turns this off (comparison while testing).
+const INSTANCING=(()=>{try{return new URLSearchParams(location.search).get('instancing')!=='0';}catch{return true;}})();
+const scenes=new WeakMap();
+const tmpMatrix=new T.Matrix4(),tmpSphere=new T.Sphere(),viewProjection=new T.Matrix4();
+function sceneBatches(root){
+ let entry=scenes.get(root);if(entry)return entry;
+ const container=new T.Group();container.name='V354 instances';
+ entry={container,batches:new Map(),frustum:new T.Frustum(),shadowFrustum:new T.Frustum(),shadowCulling:false,stamp:0};scenes.set(root,entry);root.add(container);
+ // Every render of this scene starts empty; the buildings add themselves while
+ // the renderer walks the scene, before anything is drawn. The container is kept
+ // as the scene's last child so the buildings are visited before it.
+ const before=root.onBeforeRender;
+ root.onBeforeRender=function(renderer,scene,camera,...rest){
+  for(const batch of entry.batches.values()){if(batch.count){batch.count=0;for(const mesh of batch.meshes){mesh.count=0;mesh.visible=false;}}}
+  if(root.children[root.children.length-1]!==container){root.remove(container);root.add(container);}
+  viewProjection.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);entry.frustum.setFromProjectionMatrix(viewProjection);
+  // Shadow copies outside the sun's shadow box are left out. The box is the one
+  // drawn last frame (the sun follows the camera), so test with a margin.
+  const sun=lightChecks.get(root)?.lights.find(o=>o.castShadow);
+  entry.shadows=Boolean(sun&&renderer.shadowMap.enabled)||!lightChecks.has(root);
+  entry.shadowCulling=Boolean(sun&&renderer.shadowMap.enabled);
+  if(entry.shadowCulling){const c=sun.shadow.camera;c.updateMatrixWorld();viewProjection.multiplyMatrices(c.projectionMatrix,c.matrixWorldInverse);entry.shadowFrustum.setFromProjectionMatrix(viewProjection);}
+  return before.call(this,renderer,scene,camera,...rest);
+ };
+ return entry;
+}
+function batchFor(scene,source,shadow){
+ const key=source.uuid+(shadow?':shadow':'');
+ let batch=scene.batches.get(key);if(batch)return batch;
+ batch={count:0,capacity:0,meshes:[],source,shadow,scene};scene.batches.set(key,batch);
+ grow(batch,8);
+ return batch;
+}
+function grow(batch,capacity){
+ const old=batch.meshes;batch.meshes=[];
+ const parts=batch.source.children.filter(m=>!batch.shadow||m.castShadow);
+ parts.forEach((part,i)=>{
+  const mesh=new T.InstancedMesh(part.geometry,part.material,capacity);
+  mesh.name=part.name;mesh.frustumCulled=false;mesh.count=0;mesh.visible=false;
+  mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);
+  if(batch.shadow){mesh.castShadow=true;mesh.receiveShadow=false;mesh.layers.set(SHADOW_LAYER);}
+  else{mesh.castShadow=false;mesh.receiveShadow=true;mesh.onBeforeRender=activate;}
+  if(old[i]){mesh.instanceMatrix.array.set(old[i].instanceMatrix.array.subarray(0,batch.capacity*16));batch.scene.container.remove(old[i]);old[i].dispose();}
+  batch.meshes.push(mesh);batch.scene.container.add(mesh);
+ });
+ batch.capacity=capacity;
+}
+function addInstance(batch,matrix){
+ if(batch.count>=batch.capacity)grow(batch,batch.capacity*2);
+ const i=batch.count++;
+ for(const mesh of batch.meshes){matrix.toArray(mesh.instanceMatrix.array,i*16);mesh.count=batch.count;mesh.visible=true;mesh.instanceMatrix.needsUpdate=true;}
+}
+const placedInfo=new WeakMap();
+class HouseLOD extends T.LOD{
+ update(camera){
+  const levels=this.levels;
+  if(this.forceLevelV354!=null){
+   const f=Math.min(this.forceLevelV354,levels.length-1);levels.forEach((l,i)=>l.object.visible=i===f);this._currentLevel=f;
+  }else if(levels.length>1){
+   eye.setFromMatrixPosition(camera.matrixWorld);here.setFromMatrixPosition(this.matrixWorld);
+   const distance=eye.distanceTo(here)/camera.zoom,scale=pixelScale(camera);
+   levels[0].object.visible=true;let i=1;
+   for(;i<levels.length;i++){
+    let limit=levels[i].distance*scale;if(levels[i].object.visible)limit-=limit*levels[i].hysteresis;
+    if(distance>=limit){levels[i-1].object.visible=false;levels[i].object.visible=true;}else break;
+   }
+   this._currentLevel=i-1;for(;i<levels.length;i++)levels[i].object.visible=false;
+  }
+  const info=placedInfo.get(this);if(!info)return;
+  // one step coarser than on screen; two when the shadow texel is coarser than
+  // the middle level's merge grid as well
+  const step=shadowTexel(this)>.09?1:0;
+  const level=this.getCurrentLevel(),shadowIndex=Math.min(info.shadowSources.length-1,level+step);
+  // The building ghost (and anything else that gave this building its own
+  // materials) is drawn on its own.
+  let root=this;while(root.parent)root=root.parent;
+  const instanced=INSTANCING&&root.isScene&&info.probe?.material===info.probeMaterial;
+  if(instanced!==info.instanced){
+   info.instanced=instanced;
+   for(const l of levels)l.object.traverse(o=>{if(o.isMesh)o.visible=!instanced;});
+  }
+  for(const copy of info.shadowCopies)copy.visible=false;
+  if(!instanced){info.shadowCopies[shadowIndex].visible=true;return;}
+  const scene=sceneBatches(root);
+  tmpMatrix.multiplyMatrices(this.matrixWorld,info.base);
+  tmpSphere.copy(info.sphere).applyMatrix4(tmpMatrix);
+  if(scene.shadowCulling){tmpSphere.radius=tmpSphere.radius*1.25+8;}
+  if(scene.shadows!==false&&(!scene.shadowCulling||scene.shadowFrustum.intersectsSphere(tmpSphere)))addInstance(batchFor(scene,info.shadowSources[shadowIndex],true),tmpMatrix);
+  tmpSphere.copy(info.sphere).applyMatrix4(tmpMatrix);
+  if(scene.frustum.intersectsSphere(tmpSphere))addInstance(batchFor(scene,info.levelSources[level],false),tmpMatrix);
+ }
 }
 // How the designer model is sized for the game.
 function fitting(type){
@@ -290,11 +422,20 @@ function placedTemplate(entry,type){
  else if(fit==='field'){sx=16/w;sz=16/d;sy=METRE;}
  else{const [rx,rz]=LOT[type]??[4.8,5];const s=METRE*Math.max(.7,Math.min(1.3,Math.min(2*rx/(w*METRE),2*rz/(d*METRE))));sx=sz=sy=s;}
  const cx=-(box.min.x+box.max.x)/2*sx,cz=-(box.min.z+box.max.z)/2*sz;
- const level=source=>{const g=copyOf(source);g.scale.set(sx,sy,sz);g.position.set(cx,0,cz);const root=new T.Group();root.add(g);return root;};
- const lod=new T.LOD();lod.name='V354 '+entry.id;
+ const level=(source,options)=>{const g=copyOf(source,options);g.scale.set(sx,sy,sz);g.position.set(cx,0,cz);const root=new T.Group();root.add(g);return root;};
+ const lod=new HouseLOD();lod.name='V354 '+entry.id;
  lod.addLevel(level(near),0);
- if(mid)lod.addLevel(level(mid),INTERIOR_DISTANCE);
- if(far)lod.addLevel(level(far),NEAR_DISTANCE);
+ if(mid)lod.addLevel(level(mid),INTERIOR_DISTANCE,.08);
+ if(far)lod.addLevel(level(far),NEAR_DISTANCE,.08);
+ // shadow copy for each on-screen level: near→mid, mid→far, far→far
+ const levelSources=[near,mid,far].filter(Boolean);
+ const shadowSources=[mid??far??near,far??mid??near,far??mid??near].slice(0,levelSources.length);
+ const made=new Map(),shadowCopies=shadowSources.map(source=>{if(!made.has(source)){const g=level(source,{shadow:true});g.name='V354 shadow';lod.add(g);made.set(source,g);}return made.get(source);});
+ shadowCopies.forEach((copy,i)=>copy.visible=i===0);
+ const base=new T.Matrix4().compose(new T.Vector3(cx,0,cz),new T.Quaternion(),new T.Vector3(sx,sy,sz));
+ const sphere=box.getBoundingSphere(new T.Sphere());
+ const probe=lod.levels[0].object.children[0].children[0];
+ placedInfo.set(lod,{levelSources,shadowSources,shadowCopies,base,sphere,probe,probeMaterial:probe?.material,instanced:false});
  // Wall segments [ax,az,bx,bz,radius] in the model's own frame (before its rotation).
  const walls=collision.map(([ax,az,bx,bz,r])=>[ax*sx+cx,az*sz+cz,bx*sx+cx,bz*sz+cz,r*Math.min(sx,sz)]);
  lod.userData.houseDesignV354={id:entry.id,key:entry.key,scale:sx,halfW:w*sx/2,halfD:d*sz/2,collision:walls};

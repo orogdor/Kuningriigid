@@ -907,3 +907,13 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 - Mooduli võti `house-designs-v354.js?v=354e` (civilization.js ja testid).
 - `exportModel`: töö 40 ms viiludena (oli 12 ms) ja tekstuure oodatakse ainult siis, kui mõni fail pole veel valmis (iga ootus annab mängule kaadri; aeglases seadmes on kaader kallis). Ühe faili laadimisviga ei kukuta enam mudelit. SwiftShaderis 19 mudelit 640 s → 300 s. `houseDesignStatusV354()` annab nüüd ka `times` (iga mudeli ajad) ja `errors`.
 - NB: ajapiir ei tohi lugeda postitamisest – mudelid tehakse järjest ja SwiftShaderis võtab üks mitu minutit.
+
+## 2026-11-17 · Claude (Anthropic) · V354 – kiirem laadimine ja suurem FPS (354f)
+
+- Mõõtmine (Stonetown, SwiftShader, kaader): vanad mudelid ~150 joonistust ja 0,5–0,9 M kolmnurka; uued majad ~650–750 joonistust ja ~4 M kolmnurka (pool varjukaardis).
+- `house-designs-v354.js`:
+  - `HouseLOD` (LOD alamklass): taseme valik `pixelScale` järgi (pildi kõrgus / 1080, kaamera fov; ainult vähendab kaugusi), hüsterees 8 %.
+  - Varjukoopiad: iga taseme jaoks ühe võrra lihtsam koopia (`copyOf(source,{shadow:true})`), kiht `SHADOW_LAYER_V354`=5; päikese varjukaamera kiht lülitatakse sisse `shadowTexel()`-is. Ekraanil olevad võrgud ei heida varju. Kui varjutekslel > 9 cm, võetakse veel üks tase lihtsam.
+  - Instantsimine: stseeni lõpus grupp `V354 instances`; `scene.onBeforeRender` nullib loendurid, iga `HouseLOD.update` lisab oma maatriksi (kaamera vaatekoonuse ja päikese varjukasti kontrolliga). Hoone enda võrgud jäävad peidetuna alles (hiirega valimine, mõõtmed). Kummituse (eraldi materjalid) puhul joonistatakse hoone tavaliselt. `forceLevelV354` testidele.
+- `civilization.js`: iga 4 s `preloadHouseDesignsV354` mängija hoonetele (aktiivne linn ees) – mudelid valmivad enne linna avamist.
+- Test `tests/house-designs-v354-view.html?shadows=1&instancing=0` võrdlus: 9 hoonet 161 → 57 joonistust, pilt sama.
