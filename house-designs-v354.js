@@ -123,10 +123,10 @@ function template(packet){
   group.add(mesh);
  }
  if(box.isEmpty())box.setFromObject(group);
- return {group,box,footprint:packet.footprint};
+ return {group,box,footprint:packet.footprint,collision:packet.collision||[]};
 }
 function placedTemplate(entry,type){
- const {group,box}=entry.template;
+ const {group,box,collision}=entry.template;
  const [rx,rz]=LOT[type]??[4.8,5];
  const w=Math.max(.1,box.max.x-box.min.x),d=Math.max(.1,box.max.z-box.min.z);
  const fit=Math.min(2*rx/(w*METRE),2*rz/(d*METRE));
@@ -137,7 +137,10 @@ function placedTemplate(entry,type){
  inner.scale.setScalar(scale);
  inner.position.set(-(box.min.x+box.max.x)/2*scale,0,-(box.min.z+box.max.z)/2*scale);
  root.add(inner);
- root.userData.houseDesignV354={id:entry.id,key:entry.key,scale,halfW:w*scale/2,halfD:d*scale/2};
+ // Wall segments [ax,az,bx,bz,radius] in the model's own frame (before its rotation).
+ const ox=inner.position.x,oz=inner.position.z;
+ const walls=collision.map(([ax,az,bx,bz,r])=>[ax*scale+ox,az*scale+oz,bx*scale+ox,bz*scale+oz,r*scale]);
+ root.userData.houseDesignV354={id:entry.id,key:entry.key,scale,halfW:w*scale/2,halfD:d*scale/2,collision:walls};
  return root;
 }
 
@@ -189,6 +192,18 @@ export function preloadHouseDesignsV354(list){
   if(canUseDesign(type,age,design))load(designKeyV354(design),design.id,design);
   else{const id=designerIdV354(type,age);if(id)load('default:'+id,id,null);}
  }
+}
+// Walk collision against a designer building's walls. model: the placed
+// building root (position, rotation.y, scale); radius: walker radius.
+export function hitsDesignedWallsV354(model,x,z,radius=.22){
+ const walls=model?.userData?.houseDesignV354?.collision;if(!walls)return null;
+ const dx=x-model.position.x,dz=z-model.position.z,a=model.rotation.y,c=Math.cos(a),s=Math.sin(a);
+ const lx=(dx*c-dz*s)/(model.scale.x||1),lz=(dx*s+dz*c)/(model.scale.z||1);
+ for(const [ax,az,bx,bz,r] of walls){
+  const ex=bx-ax,ez=bz-az,len=ex*ex+ez*ez,t=len?Math.max(0,Math.min(1,((lx-ax)*ex+(lz-az)*ez)/len)):0;
+  const px=ax+ex*t-lx,pz=az+ez*t-lz;if(px*px+pz*pz<(r+radius)*(r+radius))return true;
+ }
+ return false;
 }
 export function houseDesignStatusV354(){
  const counts={pending:0,ready:0,failed:0};for(const e of state.cache.values())counts[e.status]++;

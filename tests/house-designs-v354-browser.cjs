@@ -39,6 +39,25 @@ const assert=(ok,msg)=>{if(!ok){console.error('FAIL',msg);process.exitCode=1;}el
  await page.evaluate(()=>gameDebug.focusHallV354?.(20));
  await page.waitForTimeout(2500);
  await page.screenshot({path:path.join(out,'hall-v354.png'),timeout:240000});
+ // Walk collision follows the designer walls (doors open, yard free).
+ const walls=await page.evaluate(()=>{const p=gameDebug.designWallPointV354('house');if(!p)return null;
+  return {...p,wallBlocked:gameDebug.walkBlockedV354(p.wall.x,p.wall.z),centreBlocked:gameDebug.walkBlockedV354(p.centre.x,p.centre.z)};});
+ console.log('walls',JSON.stringify(walls));
+ assert(walls?.segments>0&&walls.wallBlocked===true,'walker collides with a designer wall');
+ assert(walls.centreBlocked===false,'the inside of a designer house is walkable');
+ // Build menu: the design icon on a building card, a type design, and a new building with it.
+ const icons=await page.evaluate(async()=>{document.getElementById('citytab-build')?.click();await new Promise(r=>setTimeout(r,1500));
+  return [...document.querySelectorAll('#tray .v354-design-icon')].map(i=>i.closest('[data-building]')?.dataset.building);});
+ console.log('design icons',JSON.stringify(icons));
+ assert(icons.includes('house'),'build menu card has a design icon');
+ assert(await page.evaluate(()=>gameDebug.openTypeDesignerV354('house')),'type designer opens from the build menu');
+ await page.waitForFunction(()=>{const f=document.querySelector('.house-designer-v354 iframe');let id=null;try{id=f?.contentWindow?.eval?.('state.id')}catch{}return id==='house'&&!document.querySelector('.house-designer-v354 button:disabled');},null,{timeout:120000});
+ await page.evaluate(()=>{const w=document.querySelector('.house-designer-v354 iframe').contentWindow;w.eval("push({...state,roofMat:'sod'})");});
+ await page.evaluate(()=>[...document.querySelectorAll('.house-designer-v354 button')].find(b=>b.textContent.startsWith('Salvesta')).click());
+ await page.waitForFunction(()=>!document.querySelector('.house-designer-v354'),null,{timeout:60000});
+ const placed=await page.evaluate(()=>{for(let r=20;r<90;r+=6)for(let a=0;a<6.28;a+=.4){const p=gameDebug.placeV354('house',Math.round(Math.cos(a)*r),Math.round(Math.sin(a)*r));if(!p.error)return p;}return null;});
+ console.log('placed',JSON.stringify(placed));
+ assert(placed?.designed===true,'a house placed after designing gets the type design');
  // Save a changed hall design through the in-game designer overlay.
  assert(await page.evaluate(()=>gameDebug.openDesignerV354('hall')),'designer opens over the game');
  const designer=page.frameLocator('.house-designer-v354 iframe');

@@ -90721,7 +90721,9 @@ function createHutView(T, canvas, atlasUrl, landscapeUrl, variationUrl) {
       await Promise.all(jobs);
       const footprint=[...display.floors.flat(),...display.walls.flatMap(w=>[w.a,w.b]),...display.fences.flatMap(f=>[f.a,f.b])].map(p=>place(p));
       const xs=footprint.map(p=>p.x),zs=footprint.map(p=>p.z);
-      const out={meshes:[],textures:Object.fromEntries(textures),transfer:[],
+      // Walls the walk mode collides with (door openings stay free), in metres.
+      const collision=walkWalls.filter(w=>w.min<1.8).map(w=>[w.a.x,w.a.y,w.b.x,w.b.y,w.radius]);
+      const out={meshes:[],textures:Object.fromEntries(textures),transfer:[],collision,
         footprint:footprint.length?{minX:Math.min(...xs),maxX:Math.max(...xs),minZ:Math.min(...zs),maxZ:Math.max(...zs)}:null};
       for(const batch of batches.values()){
         const positions=new Float32Array(batch.positions),normals=new Float32Array(batch.normals),uvs=new Float32Array(batch.uvs);

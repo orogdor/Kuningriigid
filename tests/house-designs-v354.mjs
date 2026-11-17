@@ -2,7 +2,7 @@
 // designer page answers model requests (static checks, no browser).
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {designerIdV354,canDesignV354,designKeyV354} from '../house-designs-v354.js';
+import {designerIdV354,canDesignV354,designKeyV354,hitsDesignedWallsV354} from '../house-designs-v354.js';
 assert.equal(designerIdV354('hall',0),'hall');
 assert.equal(designerIdV354('hall',1),'hall@1');
 assert.equal(designerIdV354('hall',2),'hall@2');
@@ -15,11 +15,20 @@ for(const kept of ['palisade','stonewall','watchtower','field','bridge','market'
 const design={id:'hall',rooms:[],wallStyle:'clay'};
 assert.equal(designKeyV354(design),designKeyV354(design));
 assert.notEqual(designKeyV354(design),designKeyV354({...design,wallStyle:'stone'}));
+// Walk collision: one wall along x from -2 to 2 at z=0, radius .2, building turned 90°.
+const model={position:{x:10,z:5},rotation:{y:Math.PI/2},scale:{x:1,z:1},userData:{houseDesignV354:{collision:[[-2,0,2,0,.2]]}}};
+assert.equal(hitsDesignedWallsV354(model,10,5),true,'on the wall');
+assert.equal(hitsDesignedWallsV354(model,10,6),true,'turned wall runs along z in the world');
+assert.equal(hitsDesignedWallsV354(model,11,5),false,'beside the turned wall');
+assert.equal(hitsDesignedWallsV354({position:{x:0,z:0},rotation:{y:0},scale:{x:1,z:1},userData:{}},0,0),null,'no designer walls');
 const page=fs.readFileSync(new URL('../majaehitaja/index.html',import.meta.url),'utf8');
 assert.match(page,/async exportModel\(state,display\)/);
 assert.match(page,/type!=='model'/);
+assert.match(page,/const collision=walkWalls\.filter/,'the designer sends its walk-mode walls');
 assert.match(page,/if\(designerWorker\|\|view!=='plan'/,'the worker page never draws plan thumbnails into the export scene');
 const civ=fs.readFileSync(new URL('../civilization.js',import.meta.url),'utf8');
 assert.match(civ,/houseDesignStampV354\(b\.type,age,b\.houseDesignV354\)/,'stream tiles rebuild when the model is ready');
 assert.match(civ,/entry\.designStamp!==designStamp/,'the active tile rebuilds when the model is ready');
-console.log('PASS: designer ids, kept game models, design keys, designer export hooks, rebuild stamps');
+assert.match(civ,/applyDesignTemplateV354\(r\.building,city\)/,'a placed building takes the type design');
+assert.match(civ,/v354-design-icon/,'build menu cards have a design icon');
+console.log('PASS: walk collision, build menu design, designer ids, kept game models, design keys, designer export hooks, rebuild stamps');

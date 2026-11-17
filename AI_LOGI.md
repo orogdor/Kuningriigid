@@ -878,3 +878,8 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 - Kujundaja mudelid on üksikasjalikud (kiviaja maja ~100 000 kolmnurka). Päris seadmel FPS mõõtmata; vajadusel lihtsustatud keskmine LOD.
 - Kujundaja shaderiefektid (stohhastiline tekstuur, fresko vöö) asendatakse mängus tavalise tekstuuriga.
 - Mudelid ehitatakse igal käivitusel uuesti (pole IndexedDB vahemälu). NativeThreeBridge'is kontrollimata.
+
+### Täiendus 2026-11-17 (kasutaja soov)
+- Kujundamine käib ehitusmenüüst: kaardil ✎ ikoon → tüübi kavand `s.houseDesignTemplatesV354[type]`, kopeeritakse paigutamisel (`applyDesignTemplateV354`) hoone `houseDesignV354` väljale. Peamaja jääb hoone info nupu peale (pole ehitusmenüüs).
+- Kokkupõrge: kujundaja `walkWalls` (jalutusrežiimi seinad, uksed vabad) eksporditakse mudeliga; `walkBlocked` kasutab neid (`hitsDesignedWallsV354`) krundi ristküliku asemel. Navigatsioonivõrk muutmata.
+- Testid täiendatud (`tests/house-designs-v354.mjs`, `tests/house-designs-v354-browser.cjs`).
