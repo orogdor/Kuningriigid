@@ -24,7 +24,7 @@ const query=process.argv[2]||'';
  await page.waitForTimeout(1500);
  await page.evaluate(()=>{const g=gameDebug.gameV249();g.seen=()=>true;const c=g.s.cities.find(c=>c.team===0);gameDebug.openTileV249(c.c,c.r);});
  const t0=Date.now();
- for(;;){const s=await page.evaluate(async()=>{const m=await import('./house-designs-v354.js?v=354f');const s=m.houseDesignStatusV354();return {ready:s.ready,failed:s.failed,pending:s.pending,enabled:s.enabled};});
+ for(;;){const s=await page.evaluate(async()=>{const m=await import('./house-designs-v354.js?v=355a');const s=m.houseDesignStatusV354();return {ready:s.ready,failed:s.failed,pending:s.pending,enabled:s.enabled};});
   if(!s.enabled||(s.pending===0&&s.ready+s.failed>0))break; if(Date.now()-t0>1500000)break; await page.waitForTimeout(15000);}
  console.log('ready after',Math.round((Date.now()-t0)/1000),'s');
  for(const z of [30,60,110,200]){
