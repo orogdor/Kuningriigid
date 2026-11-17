@@ -941,3 +941,5 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 
 ### Pooleli
 - Päris NativeThreeBridge exe kontroll. Mängusisene kujundamisaken (✎) on endiselt iframe.
+
+- 2026-11-17: PR #83 ühendatud main-i (68f3adb).
