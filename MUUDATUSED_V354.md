@@ -1,5 +1,18 @@
 # V354 katse – majaehitaja hooned mängus
 
+## Täiendus 2026-11-17 (2): kõik hooned kujundajast, uksed lahti, inglise keel
+
+- **Vanu mudeleid kiviajast rauaajani enam ei kasutata.** Kõik hoonetüübid tulevad majaehitajast, ka müürid (sirge 7-ühikuline lõik, mille mäng venitab: puitvall, madal/kõrge kivivall, Müür II = muldvall palissaadiga), väravad, tornid, põld (venitatakse põllu suuruseks), karjamaa, kalur, sadam ja turg. Kui kujundajal pole hoone jaoks selle ajastu versiooni (nt kelder või metsnik kiviajal), võetakse lähim olemasolev. Vanaks jääb ainult sild (järgib jõekaldaid) ja ajastud alates keskajast (kujundajas neid pole).
+- **Kauge tase on samast mudelist:** väikesed detailid (katuse kõrred, kivikesed, tööriistad) jäetakse ära. Vahetuskaugus: nähtavuskaugus lähedal 110, keskmine 180, kaugel 280, ultra 420.
+- **Mudelite vahemälu (IndexedDB `kingdoms-house-models-v354`).** Esimesel käivitusel ehitatakse mudel kujundajas (selle aja on hoone asemel tühi koht), järgmistel kordadel loetakse see brauserist kohe. Versioonivõti `MODEL_VERSION` (`354d`).
+- **Uksed on lahti:** nahkeesriie on üles rullitud, punutud uks ja laudadega uksed on lahti keeratud. Majja saab sisse kõndida.
+- **Inglise keel:** majaehitaja kogu kasutajaliides on inglise keeles (`<html lang="en">`, tekstid ja teated). Mängu enda eestikeelsed jäägid on tõlgitud failis `locale-en-v354.js` (u 450 paari; külade nimed jäävad pärimusnimedeks, sõna „küla” → „village”).
+- Alumised maalitud käsukaardid (linnad, ehitus, armeed, kaubandus, diplomaatia, sündmused) kasutavad inglise keeles ingliskeelse pealkirjaga koopiaid (`ui-art-v306/card_*_en.webp`, `ui-english-v354.js`). Muudes maalitud piltides võib veel eestikeelset teksti olla.
+- Peidetud kujundaja suletakse 20 s pärast viimast mudelit, et tema WebGL-kontekst ei võtaks telefonis mälu.
+- Graafikamenüü lüliti on eemaldatud (vanu mudeleid ei kasutata). Võrdluseks töötab URL `?houses=old`.
+
+## Esimene osa
+
 Haru `test/majaehitus`. Peaharu ei muudetud.
 
 ## Mis muutus

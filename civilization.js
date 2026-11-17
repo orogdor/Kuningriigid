@@ -125,7 +125,8 @@ import {createWorldAtlasProps} from './world-props.js?v=123a';
 import {buildDetailWorldObjects} from './detail-world-objects.js?v=123a';
 import {createVillageLife} from './village-life-v76.js?v=224';
 import * as T from './vendor/three.module.js';
-import {designedBuildingModelV354,houseDesignStampV354,canDesignV354,designerIdV354,houseDesignsEnabledV354,setHouseDesignsEnabledV354,hitsDesignedWallsV354} from './house-designs-v354.js?v=354a';
+import {startEnglishCardsV354} from './ui-english-v354.js?v=354a';
+import {designedBuildingModelV354,houseDesignStampV354,canDesignV354,designerIdV354,houseDesignsEnabledV354,hitsDesignedWallsV354,pendingBuildingV354,designFailedV354} from './house-designs-v354.js?v=354b';
 import {createStoneLoad} from './stone-equipment-v234.js';
 import {WORK_SPOTS_V284,workSpotV284,applyWorkSpotV284} from './stone-work-spots-v284.js?v=284a';
 import {DETAIL_X,DETAIL_Z,DETAIL_TILE_X,DETAIL_TILE_Z,DETAIL_HALF_X,DETAIL_HALF_Z,tileDelta} from './detail-scale-v123.js';
@@ -351,18 +352,23 @@ function detailVillageV276(site,tile){
  const g=new T.Group();g.name='V276 village '+l.id;const raiders=villageTypeV276(l)==='raiders',team=raiders?1:2;
  const c=worldToDetailV276(tile,site.cell.x,site.cell.z);
  for(const [i,b] of villageLayoutV276(l).entries()){
-  const m=townBuildingModel(b.type,team,villageAgeV278(game,l),0,i*37+7,1);if(!m)continue;
+  const m=townBuildingModel(b.type,team,villageAgeV278(game,l),0,i*37+7,1,null,{fallback:true});if(!m)continue;
   const x=c.x+b.x,z=c.z+b.z;m.position.set(x,ground(tile,x,z),z);m.rotation.y=b.buildingRotationV228||0;g.add(m);
  }
  g.userData.worldProp='village';g.userData.villageTypeV276=raiders?'raiders':'traders';return g;
 }
 let villageGlowTexV276=null;function villageGlowTextureV276(){if(villageGlowTexV276)return villageGlowTexV276;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');if(g?.createRadialGradient){const r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(255,220,150,1)');r.addColorStop(.35,'rgba(255,170,80,.55)');r.addColorStop(1,'rgba(255,140,40,0)');g.fillStyle=r;g.fillRect(0,0,128,128);}villageGlowTexV276=new T.CanvasTexture(c);villageGlowTexV276.colorSpace=T.SRGBColorSpace;return villageGlowTexV276;}
-function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1,design=null){
+function townBuildingModel(type,team,age,stage=0,seed=0,woodFortTier=1,design=null,{fallback=false}={}){
+ // V354: Stone–Iron Age buildings come from the house designer. The old game
+ // model is used only for later ages, the bridge, or if a model fails to build.
+ if(canDesignV354(type,age)&&!(['bronze-siege','iron-siege'].includes(s.demo)&&team===1)){
+  const designed=designedBuildingModelV354(type,age,design,{tier:woodFortTier});
+  if(designed){const bx=new T.Box3().setFromObject(designed);if(!bx.isEmpty())designed.userData.boundsV253={minX:bx.min.x,maxX:bx.max.x,minZ:bx.min.z,maxZ:bx.max.z,halfW:Math.max(-bx.min.x,bx.max.x)};return designed;}
+  if(!fallback&&!designFailedV354(type,age,design,woodFortTier))return pendingBuildingV354(type);
+ }
  const base=baseTownBuildingModelV2234(type,team,age,stage,seed,woodFortTier);
  const model=base?.userData.stoneNearLOD?base:stoneBuildingModel(type,age,seed,base)||base;
- let final=stoneFortLOD(nextStoneBatchLOD(nextStoneBuildingLOD(model,type,age,seed),type,age,seed),type,age,stage,woodFortTier,seed);
- // V354: house designer model near the camera, the game model further away.
- if(final&&!(['bronze-siege','iron-siege'].includes(s.demo)&&team===1)){const designed=designedBuildingModelV354(type,age,design,final);if(designed)final=designed;}
+ const final=stoneFortLOD(nextStoneBatchLOD(nextStoneBuildingLOD(model,type,age,seed),type,age,seed),type,age,stage,woodFortTier,seed);
  if(final){const bx=new T.Box3().setFromObject(final);if(!bx.isEmpty())final.userData.boundsV253={minX:bx.min.x,maxX:bx.max.x,minZ:bx.min.z,maxZ:bx.max.z,halfW:Math.max(-bx.min.x,bx.max.x)};} // V253: real model size, used to keep door torches outside the walls
  return final;
 }
@@ -380,9 +386,9 @@ function openDesignerOverlayV354({id,title,design,canReset,onSave,onReset}){
  const label=document.createElement('span');label.textContent=title;label.style.flex='1';
  const button=text=>{const el=document.createElement('button');el.type='button';el.textContent=text;
   Object.assign(el.style,{padding:'6px 14px',border:'1px solid #c99c4f',borderRadius:'6px',background:'#1c3348',color:'#f5e6c5',cursor:'pointer'});return el;};
- const apply=button('Salvesta ja ehita');apply.disabled=true;
- const reset=button('Taasta algne');reset.hidden=!canReset;
- const cancel=button('Sulge');
+ const apply=button('Save and build');apply.disabled=true;
+ const reset=button('Restore original');reset.hidden=!canReset;
+ const cancel=button('Close');
  const frame=document.createElement('iframe');
  frame.title=title;frame.src='./majaehitaja/index.html?embed=1';
  Object.assign(frame.style,{width:'100%',flex:'1',border:'0',background:'#101820'});
@@ -408,11 +414,11 @@ function houseDesignTemplateV354(type,age){const design=s.houseDesignTemplatesV3
 function openTypeDesignerV354(type,city,choose){
  if(city?.team!==0)return;
  const age=game.buildingAge(city.team,type),id=designerIdV354(type,age);
- if(!id){say('Seda hoonet ei saa praegu kujundada.');return;}
- const name=game.buildingName?.(city.team,type)||type,current=houseDesignTemplateV354(type,age);
- openDesignerOverlayV354({id,title:'Kujunda: '+name+' · kehtib järgmistele ehitustele',design:current,canReset:Boolean(current),
-  onSave:design=>{s.houseDesignTemplatesV354={...(s.houseDesignTemplatesV354||{}),[type]:design};say(name+': kavand salvestatud. Vali ehituskoht – uus hoone ehitatakse selle järgi.');choose?.();},
-  onReset:()=>{if(s.houseDesignTemplatesV354)delete s.houseDesignTemplatesV354[type];say(name+': uued hooned ehitatakse algse kujundusega.');}});
+ if(!id){say('This building cannot be designed now.');return;}
+ const name=translateEstonian(game.buildingName?.(city.team,type)||type),current=houseDesignTemplateV354(type,age);
+ openDesignerOverlayV354({id,title:'Design: '+name+' · used for the next buildings you place',design:current,canReset:Boolean(current),
+  onSave:design=>{s.houseDesignTemplatesV354={...(s.houseDesignTemplatesV354||{}),[type]:design};say(name+': design saved. Choose a building site – the new building follows it.');choose?.();},
+  onReset:()=>{if(s.houseDesignTemplatesV354)delete s.houseDesignTemplatesV354[type];say(name+': new buildings use the original design.');}});
 }
 // Copies the type design to a building the player just placed.
 function applyDesignTemplateV354(building,city){
@@ -424,11 +430,11 @@ function applyDesignTemplateV354(building,city){
 function openHouseDesignerV354(building,city){
  if(!building||city?.team!==0||!city.economy.buildings.includes(building)||!building.ready)return;
  const id=designerIdV354(building.type,visualBuildingAge(building));
- if(!id){say('Seda hoonet ei saa praegu kujundada.');return;}
- const name=game.buildingName?.(city.team,building.type)||building.type;
- openDesignerOverlayV354({id,title:'Kujunda: '+name,design:building.houseDesignV354,canReset:Boolean(building.houseDesignV354),
-  onSave:design=>{if(!city.economy.buildings.includes(building))return;building.houseDesignV354=design;say(name+': uus kujundus salvestatud. Mudel ilmub kaardile mõne hetke pärast.');},
-  onReset:()=>{delete building.houseDesignV354;say(name+': algne kujundus taastatud.');}});
+ if(!id){say('This building cannot be designed now.');return;}
+ const name=translateEstonian(game.buildingName?.(city.team,building.type)||building.type);
+ openDesignerOverlayV354({id,title:'Design: '+name,design:building.houseDesignV354,canReset:Boolean(building.houseDesignV354),
+  onSave:design=>{if(!city.economy.buildings.includes(building))return;building.houseDesignV354=design;say(name+': new design saved. The model appears on the map in a moment.');},
+  onReset:()=>{delete building.houseDesignV354;say(name+': original design restored.');}});
 }
 function updateBuildingInfo(){
  if(!buildingInspector){
@@ -909,7 +915,7 @@ function* buildDetailTileV242(entry){
  entry.roadStamp=tileKey(tile)+':'+(s.roadRevision||0)+':'+(s.visionRevision||0)+':'+nav.version+':'+(city?s.ages[city.team]:s.ages[0])+':'+plots.stamp;yield;
  entry.borders=createDetailBorders(game,tile);entry.decor.add(entry.borders);entry.borderStamp=game.territoryStamp+':'+(s.visionRevision||0);yield;
 }
-function streamBuildingStampV242(b){const age=visualBuildingAge(b);return [b.type,b.team,age,b.woodFortTierV1757,b.houseUpgradeLevelV218||0,b.buildingRotationV228,b.x,b.z,b.palisadeSpanV167,b.wallAngleV175,houseDesignStampV354(b.type,age,b.houseDesignV354)].join(':');}
+function streamBuildingStampV242(b){const age=visualBuildingAge(b);return [b.type,b.team,age,b.woodFortTierV1757,b.houseUpgradeLevelV218||0,b.buildingRotationV228,b.x,b.z,b.palisadeSpanV167,b.wallAngleV175,houseDesignStampV354(b.type,age,b.houseDesignV354,b.woodFortTierV1757)].join(':');}
 function makeStreamBuildingV242(b,tile,context){
   const age=visualBuildingAge(b),model=b.type==='bridge'?createBridgeBuilding(game,tile,(x,z)=>ground(tile,x,z)):townBuildingModel(b.type,b.team,age,0,buildingSeed(b),b.woodFortTierV1757,b.houseDesignV354);
   if(b.type==='field'){const d=fieldSize(b),q=!b.freeRotationV243&&Math.abs(Math.sin(b.buildingRotationV228||0))>.5;model.scale.set((q?d.depth:d.width)/16,1,(q?d.width:d.depth)/16);}
@@ -1227,7 +1233,7 @@ function updateWallBatches(){
  batchedWalls=models.map(model=>({model,matrix:model.matrix.clone()}));
 }
 function syncLocal(){if(view!=='local'||!activeTile)return;game.refreshTerritory();const borderStamp=game.territoryStamp+':'+(s.visionRevision||0);if(localBorderStamp!==borderStamp){if(localBorders){localBorders.removeFromParent();disposeNetwork(localBorders)}localBorders=createDetailBorders(game,activeTile);environment.add(localBorders);localBorderStamp=borderStamp;}if(localCrossingRevision!==(s.crossingRevision||0)){localCrossingRevision=s.crossingRevision||0;if(localRivers){localRivers.removeFromParent();disposeNetwork(localRivers)}localRivers=createRiverNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:345}:activeTile,quality,(x,z)=>ground(activeTile,x,z));environment.add(localRivers);for(const {holder} of detailObjectHolders.values())holder.userData.siteStamp=null;}syncDetailWorldObjects();const city=activeCity(),age=city?game.upgrade(city.team):0,world=game.localWorld(activeTile),nav=detailNav(),vegetationNav=s.battle?game.nav(activeTile):nav,vegetationCrossing=activeTile.river&&(activeTile.bridge||activeTile.ford)?crossingFrame(game,activeTile):null;const plots=s.battle?{rects:[],stamp:''}:plotRects(activeTile),roadStamp=tileKey(activeTile)+':'+(s.roadRevision||0)+':'+(s.visionRevision||0)+':'+nav.version+':'+(city?s.ages[city.team]:s.ages[0])+':'+plots.stamp;if(detailRoadStamp!==roadStamp){if(detailWorldRoads){detailWorldRoads.removeFromParent();disposeNetwork(detailWorldRoads)}detailWorldRoads=createUnifiedRoadNetwork(game,'detail',s.battle?{...activeTile,tacticalRadius:345}:activeTile,plots.rects,(x,z)=>ground(activeTile,x,z));environment.add(detailWorldRoads);detailRoadStamp=roadStamp}const wildDtV255=wildTimeV255==null?0:Math.max(0,Math.min(.25,s.time-wildTimeV255));wildTimeV255=s.time;for(const r of world.resources){let v=resourceModels.get(r.id);if(!v){v=resourceView(r);resourceModels.set(r.id,v)}v.position.set(r.x,r.kind==='fish'?.18:ground(activeTile,r.x,r.z),r.z);v.visible=!r.removed&&r.amount>0&&!(r.depositSite&&city?.economy.buildings.some(b=>b.depositId===r.id&&b.hp>0));if(r.kind==='tree'){for(const child of v.children){const p=child.userData.forestCompanionV329;if(p){const i=vegetationNav.index(p.x,p.z);child.visible=i>=0&&nav.open(p.x,p.z)&&vegetationNav.roadStrength(i)<4&&!plots.rects.some(b=>Math.abs(p.x-b[0])<b[2]+3&&Math.abs(p.z-b[1])<b[3]+3);}}const gV274=r.matureAt>s.time?Math.max(0,Math.min(1,(s.time-(r.plantedAt??s.time))/Math.max(1,r.matureAt-(r.plantedAt??s.time)))):1;v.scale.setScalar(.22+.78*gV274);}if(['tree','berry','game'].includes(r.kind)){const water=riverNear(game,activeTile.x+r.x/3,activeTile.z+r.z/2.6);v.visible&&=!activeTile.mountain&&water.distance>=water.width*1.55&&!insideCrossing(vegetationCrossing,activeTile.x+r.x/3,activeTile.z+r.z/2.6);}if(r.kind==='game'){if(age===0&&v.visible){const st=wildlifeV255.update(r,{time:s.time,dt:wildDtV255,people:humansV255,hunters:huntersV255,open:(x,z)=>nav.open(x,z)});v.position.set(st.x,ground(activeTile,st.x,st.z),st.z);v.rotation.y=wildlifeVisualHeadingV257(st.heading);wildlifeV255.pose(v,st,s.time,r.id);}else v.rotation.y=Math.sin(s.time*.18+r.id)*.4;}if(r.kind==='fish')v.position.y+=Math.sin(s.time*2+r.id)*.04;if(r.plantedAt!=null)v.scale.setScalar(.25+.75*Math.min(1,(s.time-r.plantedAt)/20))}
- if(city&&city.districtOf==null){const parent=game.parentCity(city),title=parent.name+' · '+parent.economy.realms[parent.team].pop;let label=localModels.get('city-label');if(label?.title!==title){if(label){people.remove(label.model);label.model.material.map?.dispose();label.model.material.map=null}const model=cityBanner(title,parent.team),hall=city.economy.buildings.find(b=>b.type==='hall');model.position.set(hall.x,ground(activeTile,hall.x,hall.z)+26,hall.z-14);/* V282: higher and behind the hall so the town stays visible */people.add(model);localModels.set('city-label',{model,title})}}if(city?.districtOf!=null&&!localModels.has('region-hub')){const hub=new T.Group();box(hub,0,1.7,0,.1,3.4,.1,'#826b47');box(hub,.5,2.8,0,1,.65,.07,city.team?'#b5725c':'#94b7a0');hub.position.y=ground(activeTile,0,0);localObjects.add(hub);localModels.set('region-hub',{model:hub,age})}if(city){for(const b of city.economy.buildings.filter(b=>!b.virtual)){const buildingAge=visualBuildingAge(b),section=s.battle?.siegeSections?.find(w=>w.index===city.economy.buildings.indexOf(b)),stage=(b.bronzeWall||['palisade','stonewall','reinforced_wall','gatehouse'].includes(b.type))?damageStage(section?.hp??b.hp,section?.maxHp??b.damageMaxHp??b.hp):0;let entry=localModels.get(b);const designStamp=houseDesignStampV354(b.type,buildingAge,b.houseDesignV354);if(!entry||entry.age!==buildingAge||entry.stage!==stage||entry.type!==b.type||entry.woodTier!==b.woodFortTierV1757||entry.houseTier!==(b.houseUpgradeLevelV218||0)||entry.designStamp!==designStamp){if(entry)localObjects.remove(entry.model);const model=b.type==='bridge'?createBridgeBuilding(game,activeTile,(x,z)=>ground(activeTile,x,z)):townBuildingModel(b.type,b.team,buildingAge,stage,buildingSeed(b),b.woodFortTierV1757,b.houseDesignV354);
+ if(city&&city.districtOf==null){const parent=game.parentCity(city),title=parent.name+' · '+parent.economy.realms[parent.team].pop;let label=localModels.get('city-label');if(label?.title!==title){if(label){people.remove(label.model);label.model.material.map?.dispose();label.model.material.map=null}const model=cityBanner(title,parent.team),hall=city.economy.buildings.find(b=>b.type==='hall');model.position.set(hall.x,ground(activeTile,hall.x,hall.z)+26,hall.z-14);/* V282: higher and behind the hall so the town stays visible */people.add(model);localModels.set('city-label',{model,title})}}if(city?.districtOf!=null&&!localModels.has('region-hub')){const hub=new T.Group();box(hub,0,1.7,0,.1,3.4,.1,'#826b47');box(hub,.5,2.8,0,1,.65,.07,city.team?'#b5725c':'#94b7a0');hub.position.y=ground(activeTile,0,0);localObjects.add(hub);localModels.set('region-hub',{model:hub,age})}if(city){for(const b of city.economy.buildings.filter(b=>!b.virtual)){const buildingAge=visualBuildingAge(b),section=s.battle?.siegeSections?.find(w=>w.index===city.economy.buildings.indexOf(b)),stage=(b.bronzeWall||['palisade','stonewall','reinforced_wall','gatehouse'].includes(b.type))?damageStage(section?.hp??b.hp,section?.maxHp??b.damageMaxHp??b.hp):0;let entry=localModels.get(b);const designStamp=houseDesignStampV354(b.type,buildingAge,b.houseDesignV354,b.woodFortTierV1757);if(!entry||entry.age!==buildingAge||entry.stage!==stage||entry.type!==b.type||entry.woodTier!==b.woodFortTierV1757||entry.houseTier!==(b.houseUpgradeLevelV218||0)||entry.designStamp!==designStamp){if(entry)localObjects.remove(entry.model);const model=b.type==='bridge'?createBridgeBuilding(game,activeTile,(x,z)=>ground(activeTile,x,z)):townBuildingModel(b.type,b.team,buildingAge,stage,buildingSeed(b),b.woodFortTierV1757,b.houseDesignV354);
  if(b.type==='field'){const d=fieldSize(b),q=!b.freeRotationV243&&Math.abs(Math.sin(b.buildingRotationV228||0))>.5;model.scale.set((q?d.depth:d.width)/16,1,(q?d.width:d.depth)/16);}if(b.type==='market')model.scale.set(2,1,2);
  if(b.type==='house'&&b.houseUpgradeLevelV218)model.scale.set(1.12,1.42,1.10);
  model.userData.buildingRef=b;model.userData.buildingAge=buildingAge;model.userData.streamTeamV242=b.team;
@@ -1562,7 +1568,7 @@ function renderUIImpl(){updateBuildingInfo();syncResourceLayer();const resourceC
    if(!error&&houseDesignsEnabledV354()&&canDesignV354(type,game.buildingAge(localCity.team,type))){
     const designed=Boolean(houseDesignTemplateV354(type,game.buildingAge(localCity.team,type)));
     const icon=document.createElement('span');icon.className='v354-design-icon';icon.setAttribute('role','button');icon.tabIndex=0;
-    icon.textContent='✎';icon.title=designed?'Muuda selle hoone kavandit':'Kujunda see hoone enne ehitamist';icon.setAttribute('aria-label',icon.title);
+    icon.textContent='✎';icon.title=designed?'Change the design of this building':'Design this building before you build it';icon.setAttribute('aria-label',icon.title);
     Object.assign(icon.style,{position:'absolute',top:'4px',right:'4px',zIndex:'3',width:'26px',height:'26px',display:'grid',placeItems:'center',borderRadius:'50%',
      border:'1px solid #c99c4f',background:designed?'#c99c4f':'#1c3348e6',color:designed?'#1c1208':'#f5e6c5',font:'15px/1 Georgia,serif',cursor:'pointer',boxShadow:'0 1px 4px #000a'});
     const open=event=>{event.preventDefault();event.stopPropagation();openTypeDesignerV354(type,localCity,error||missing?null:()=>action?.call(original));};
@@ -2265,11 +2271,7 @@ function sampleV51FPS(dt){if(menuOpen||document.hidden)return;fpsFrames++;fpsSec
  if((highFpsSeconds>=12||!graphicsV226.adaptiveResolution)&&v51Resolution<1){v51Resolution=1;renderer.setPixelRatio(graphicsRuntime.pixelRatio());highFpsSeconds=0}
 }
 
-buildGraphicsMenuV226(graphicsV226,graphicsChangeV226);{// V354: switch between the house designer buildings and the older game models.
- const body=document.querySelector('#menu-graphics-v226 .graphics-v226-body');
- if(body&&!document.getElementById('house-designs-v354-toggle')){const row=document.createElement('label');row.className='graphics-v226-row';row.id='house-designs-v354-toggle';
-  const title=document.createElement('span');title.textContent='Majaehitaja hooned (katse)';const box=document.createElement('input');box.type='checkbox';box.checked=houseDesignsEnabledV354();
-  box.addEventListener('change',()=>setHouseDesignsEnabledV354(box.checked));row.append(title,box);body.prepend(row);}}
+buildGraphicsMenuV226(graphicsV226,graphicsChangeV226);startEnglishCardsV354();
 $('seedinfo').textContent='Maailma seeme: '+s.seed;if(sessionStorage.getItem('kingdoms-civ-start')){sessionStorage.removeItem('kingdoms-civ-start');menuOpen=false;$('startmenu').hidden=true}applyQuality();resize();if(s.battle?.fortress&&!s.battle.towerGarrisonVersion){const city=s.cities.find(c=>c.id===s.battle.fortress.cityId);if(city)addTowerGuards(city,s,s.battle);}if(s.battle)initializeMen(s.battle,game.battleNavigation(s.battle));if(s.battle)openTile(game.cell(s.battle.cell));else openWorld();worldSync();if(sampleDemo){menuOpen=false;$('startmenu').hidden=true;const city=v220CityDemo?s.cities.find(c=>c.id===s.v220City?.cityId):freshBronzeV219Demo?s.cities.find(c=>c.id===s.bronzeFreshV219?.cityId):freshBronzeV217Demo?s.cities.find(c=>c.id===s.bronzeFreshV217?.cityId):realZeroV206Demo?s.cities.find(c=>c.id===s.zeroTestV206?.targetCityId):wallTakeoverV205Demo?s.cities.find(c=>c.id===s.wallTakeoverV205?.targetCityId):wallV184Demo?s.cities.find(c=>c.id===s.wallTestV184?.targetCityId):bronzeV183Demo?s.cities.find(c=>c.id===s.bronzeTestV183?.targetCityId):aiMountainV176Demo?s.cities.find(c=>c.id===s.mountainTestV176?.targetCityId):aiStoneV174Demo?s.cities.find(c=>c.id===s.stoneTestV174?.targetCityId):aiStoneV173Demo?s.cities.find(c=>c.id===s.stoneTestV173?.targetCityId):aiStoneV172Demo?s.cities.find(c=>c.id===s.stoneTestV172?.targetCityId):aiStoneV171Demo?s.cities.find(c=>c.id===s.stoneTestV171?.targetCityId):aiMedievalV159Demo?s.cities.find(c=>c.id===s.medievalTestV159?.targetCityId):aiMedievalV153Demo?s.cities.find(c=>c.id===s.medievalTestV153?.targetCityId):aiMedievalV151Demo?s.cities.find(c=>c.id===s.medievalTestV151?.targetCityId):aiMedievalV147Demo?s.cities.find(c=>c.id===s.medievalTestV147?.targetCityId):aiMedievalV146Demo?s.cities.find(c=>c.id===s.medievalTestV146?.targetCityId):aiMedievalV145Demo?s.cities.find(c=>c.id===s.medievalTestV145?.targetCityId):aiMedievalV144Demo?s.cities.find(c=>c.id===s.medievalTestV144?.targetCityId):aiModernV140Demo?s.cities.filter(c=>c.team===0).sort((a,b)=>game.allBuildings(b).filter(x=>x.hp>0&&!x.virtual).length-game.allBuildings(a).filter(x=>x.hp>0&&!x.virtual).length)[0]:s.cities.find(c=>c.team===0);if(city&&!s.battle)openTile(game.cell(city));if(aiMountainV176Demo){paused=true;$('pause').textContent='▶';zoom=200;focus.set(s.mountainTestV176.origin.x,5,s.mountainTestV176.origin.z);say('Kaljuvärava · võtad üle ühe AI linna mäe kõrval, käigul '+s.mountainTestV176.turn+'. ▶ jätkab mängu.');}if(trafficDemo){paused=true;$('pause').textContent='▶';zoom=170;focus.set(0,5,0);say('Salgad liiguvad kohe värava ette ja ootavad seal läbimise järjekorda. Alustamiseks vajuta ▶.');}if(v220CityDemo){
   paused=true;$('pause').textContent='▶';zoom=185;
   const m=s.v220City;

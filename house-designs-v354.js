@@ -1,9 +1,12 @@
-// V354: buildings drawn by the house designer (majaehitaja/) inside the game.
-// A hidden designer page builds each model once. The finished meshes arrive as
-// plain buffers with their textures and are shared by every copy of that
-// building. The previous game model stays as the distant level of detail.
+// V354: every Stone, Bronze and Iron Age building is drawn by the house designer
+// (majaehitaja/). A hidden designer page builds each model once; the meshes
+// arrive as plain buffers with their textures, are kept in IndexedDB between
+// sessions and are shared by every copy of that building. Near the camera the
+// full model is drawn, further away a lighter version of the same model.
 import * as T from './vendor/three.module.js';
 
+// Bump when the designer export changes, so cached models are rebuilt.
+const MODEL_VERSION='354d';
 const FRAME_URL=new URL('./majaehitaja/index.html?embed=1&worker=1&textures=medium',import.meta.url).href;
 // Designer ids (catalog keys) in majaehitaja/index.html.
 const DESIGNER_IDS=new Set(['hall','house','hunter','fisher','farm','lumber','mason','pottery_kiln','study','barracks','watchtower','archery','palisade','woodgate','quarry','claypit','well','pasture','field',
@@ -12,42 +15,47 @@ const DESIGNER_IDS=new Set(['hall','house','hunter','fisher','farm','lumber','ma
  'hall@1','house@1','hunter@1','fisher@1','farm@1','lumber@1','mason@1','pottery_kiln@1','barracks@1','archery@1','woodgate@1','quarry@1','claypit@1','well@1','pasture@1','field@1',
  'hall@2','house@2','hunter@2','fisher@2','farm@2','lumber@2','mason@2','pottery_kiln@2','barracks@2','archery@2','woodgate@2','quarry@2','claypit@2','well@2','pasture@2','field@2',
  'library@2','market@2','warehouse@2','cellar@2','vegetable_garden@2','flax_farm@2','weaver@2','cartwright@2','coppermine@2','tinmine@2','bronze_foundry@2','road_depot@2','harbor@2','bridge@2','forester@2','saw@2','mill@2','bakery@2','gatehouse@2','reinforced_wall@2','stonewall@2','stonetower@2']);
-const ERA_OF={library:1,scriptorium:1,market:1,warehouse:1,cellar:1,vegetable_garden:1,flax_farm:1,weaver:1,cartwright:1,coppermine:1,tinmine:1,bronze_foundry:1,road_depot:1,harbor:1,bridge:1,forester:1,saw:1,mill:1,bakery:1,gatehouse:1,reinforced_wall:1,stonewall:1,stonetower:1,
- academy:2,smith:2,smelter:2,mine:2,coal:2,stable:2,watermill:2,siegeworkshop:2,orchard:2,gem_mine:2,jeweler:2};
-// Game objects with their own geometry rules (drawn walls, fields, piers,
-// bridges, tower guards, the doubled market square) keep their game model.
-const KEEP_GAME_MODEL=new Set(['palisade','woodgate','gatehouse','stonewall','reinforced_wall','stonetower','watchtower','field','bridge','pasture','fisher','harbor','market','road']);
+// The game bridge follows the river banks; roads are not buildings.
+const KEEP_GAME_MODEL=new Set(['bridge','road']);
+// Drawn walls: one straight piece, 7 game units long, stretched by the game.
+const WALL_PIECES={palisade:tier=>tier===2?'rampart':'palisadeLine',stonewall:()=>'stoneLine',reinforced_wall:()=>'highStone'};
 // Half extents of each building lot in game units (navigation.js FOOTPRINTS).
 const LOT={hall:[5.6,5.0],house:[4,3.6],warehouse:[5.6,5],cellar:[5,4.4],study:[5,5],lumber:[4.8,5],quarry:[4.6,5],hunter:[4.6,5],farm:[4.8,5],well:[3.2,3.2],
  barracks:[5,5],saw:[5,5],mill:[4.8,5],bakery:[5,5],archery:[5,5],forester:[4.8,5],claypit:[4.7,4.4],pottery_kiln:[4.7,4.6],mason:[4.8,5],cartwright:[5,6],coppermine:[5,6],
- tinmine:[5,6],bronze_foundry:[5.3,6],road_depot:[5.2,5],scriptorium:[5,5],smith:[5,6],smelter:[5,6],coal:[5,6],mine:[5,6],watermill:[6,5],siegeworkshop:[5,6]};
+ tinmine:[5,6],bronze_foundry:[5.3,6],road_depot:[5.2,5],scriptorium:[5,5],smith:[5,6],smelter:[5,6],coal:[5,6],mine:[5,6],watermill:[6,5],siegeworkshop:[5,6],
+ // the game draws the market twice as large (scale 2)
+ market:[5.5,5.1],pasture:[4.8,4.8],fisher:[4.9,4.6],harbor:[5.3,8.3],gatehouse:[5.4,5.1],watchtower:[4.7,4.6],stonetower:[5.2,5.0],woodgate:[3.5,2.1],
+ library:[5,5],academy:[5.2,5.2],stable:[5,6],orchard:[5,5],gem_mine:[5,6],jeweler:[5,5],vegetable_garden:[5,5],flax_farm:[5,5],weaver:[5,5]};
 const METRE=1/1.05; // one game unit is about 1.05 m
-// Beyond this camera distance the old, lighter game model is drawn. It follows
-// the graphics "view distance" so phones keep their frame rate.
+// Beyond this camera distance the lighter version is drawn. It follows the
+// graphics "view distance" so phones keep their frame rate.
 const NEAR_DISTANCE=(()=>{let view='far';try{view=JSON.parse(localStorage.getItem('kingdoms-graphics-v226')||'{}').viewDistance||view;}catch{}
- return {near:140,medium:240,far:380,ultra:560}[view]??380;})();
-// ?houses=old or localStorage kingdoms-house-designs-v354=off keeps the old models.
-const START_ENABLED=(()=>{try{return new URLSearchParams(location.search).get('houses')!=='old'&&localStorage.getItem('kingdoms-house-designs-v354')!=='off';}catch{return true;}})();
+ return {near:110,medium:180,far:280,ultra:420}[view]??280;})();
+// ?houses=old draws the earlier game models (only for comparison while testing).
+const START_ENABLED=(()=>{try{return new URLSearchParams(location.search).get('houses')!=='old';}catch{return true;}})();
 
-const state={enabled:START_ENABLED,frame:null,ready:null,next:1,waiting:new Map(),cache:new Map(),revision:0,listeners:new Set(),loader:new T.TextureLoader(),textures:new Map()};
+const state={enabled:START_ENABLED,frame:null,ready:null,next:1,waiting:new Map(),cache:new Map(),revision:0,listeners:new Set(),loader:new T.TextureLoader(),textures:new Map(),db:null};
 
-export function setHouseDesignsEnabledV354(on){if(state.enabled===!!on)return;state.enabled=!!on;try{localStorage.setItem('kingdoms-house-designs-v354',on?'on':'off');}catch{}state.revision++;notify();}
 export function houseDesignsEnabledV354(){return state.enabled;}
 export function onHouseDesignsChangedV354(listener){state.listeners.add(listener);return ()=>state.listeners.delete(listener);}
 function notify(){for(const listener of state.listeners){try{listener()}catch(error){console.warn('V354',error)}}}
 
-// The designer building id for a game building type at a game age (0–2).
+// The designer building id for a game building type at a game age (0–2). When
+// the designer has no version for that age, the nearest one is used.
 export function designerIdV354(type,age){
  if(age==null||age<0||age>2||KEEP_GAME_MODEL.has(type))return null;
- for(let era=age;era>=0;era--){const id=era?type+'@'+era:type;if(DESIGNER_IDS.has(id)&&(era>0||(ERA_OF[type]??0)<=age))return id;}
+ // A plain id is that building's first era; a later era adds '@1' or '@2'.
+ for(let era=age;era>=1;era--)if(DESIGNER_IDS.has(type+'@'+era))return type+'@'+era;
+ if(DESIGNER_IDS.has(type))return type;
+ for(let era=age+1;era<=2;era++)if(DESIGNER_IDS.has(type+'@'+era))return type+'@'+era;
  return null;
 }
-export function canDesignV354(type,age){return Boolean(designerIdV354(type,age));}
+export function canDesignV354(type,age){return state.enabled&&Boolean(designerIdV354(type,age));}
 
 function frame(){
  if(state.frame)return state.ready;
  const iframe=document.createElement('iframe');
- iframe.title='Hoonete mudelid';iframe.setAttribute('aria-hidden','true');iframe.tabIndex=-1;
+ iframe.title='Building models';iframe.setAttribute('aria-hidden','true');iframe.tabIndex=-1;
  Object.assign(iframe.style,{position:'fixed',left:'-10000px',top:'0',width:'480px',height:'360px',border:'0',opacity:'0',pointerEvents:'none'});
  iframe.src=FRAME_URL;
  state.frame=iframe;
@@ -57,19 +65,62 @@ function frame(){
    if(event.data.type==='ready')resolve();
    if(event.data.type==='model'){state.waiting.get(event.data.requestId)?.(event.data);state.waiting.delete(event.data.requestId);}
   };
-  addEventListener('message',receive);
+  state.receive=receive;addEventListener('message',receive);
  });
  document.body.append(iframe);
  return state.ready;
 }
-async function requestModel(id,design){
+async function requestModel(id,design,segment){
+ clearTimeout(state.idle);
  await frame();
  return new Promise(resolve=>{
-  const requestId=state.next++;state.waiting.set(requestId,resolve);
-  state.frame.contentWindow.postMessage({source:'kuningriigid-game',type:'model',requestId,id,design},location.origin);
+  const requestId=state.next++;
+  state.waiting.set(requestId,reply=>{resolve(reply);if(!state.waiting.size)closeWhenIdle();});
+  state.frame.contentWindow.postMessage({source:'kuningriigid-game',type:'model',requestId,id,design,segment},location.origin);
  });
 }
+// The hidden designer holds its own WebGL context. Free it when no model has
+// been asked for a while, so phones keep memory for the game itself.
+function closeWhenIdle(){
+ clearTimeout(state.idle);
+ state.idle=setTimeout(()=>{if(state.waiting.size||!state.frame)return;state.frame.remove();state.frame=null;state.ready=null;removeEventListener('message',state.receive);},20000);
+}
 
+// ---------------------------------------------------------------- IndexedDB
+function database(){
+ if(state.db)return state.db;
+ state.db=new Promise(resolve=>{
+  try{const open=indexedDB.open('kingdoms-house-models-v354',1);
+   open.onupgradeneeded=()=>open.result.createObjectStore('models');
+   open.onsuccess=()=>resolve(open.result);open.onerror=()=>resolve(null);}catch{resolve(null);}
+ });
+ return state.db;
+}
+async function readCached(key){
+ const db=await database();if(!db)return null;
+ return new Promise(resolve=>{try{const r=db.transaction('models').objectStore('models').get(MODEL_VERSION+':'+key);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>resolve(null);}catch{resolve(null);}});
+}
+async function bitmapBlob(bitmap){
+ const canvas=typeof OffscreenCanvas==='function'?new OffscreenCanvas(bitmap.width,bitmap.height):Object.assign(document.createElement('canvas'),{width:bitmap.width,height:bitmap.height});
+ canvas.getContext('2d').drawImage(bitmap,0,0);
+ return canvas.convertToBlob?canvas.convertToBlob({type:'image/webp',quality:.92}):new Promise(r=>canvas.toBlob(r,'image/webp',.92));
+}
+async function writeCached(key,packet){
+ const db=await database();if(!db)return;
+ try{
+  const textures={};
+  for(const [ref,entry] of Object.entries(packet.textures)){const {bitmap,...rest}=entry;textures[ref]=bitmap?{...rest,blob:await bitmapBlob(bitmap)}:rest;}
+  const strip=list=>(list||[]).map(({material,positions,normals,uvs,colors,indices,cast})=>({material,positions,normals,uvs,colors,indices,cast}));
+  const value={meshes:strip(packet.meshes),far:strip(packet.far),textures,collision:packet.collision,footprint:packet.footprint};
+  db.transaction('models','readwrite').objectStore('models').put(value,MODEL_VERSION+':'+key);
+ }catch(error){console.warn('V354 model cache',error);}
+}
+async function fromCache(value){
+ for(const entry of Object.values(value.textures))if(entry.blob){try{entry.bitmap=await createImageBitmap(entry.blob,{imageOrientation:'none'});}catch{}delete entry.blob;}
+ return value;
+}
+
+// ---------------------------------------------------------------- building
 function hashText(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(36);}
 const designKeys=new WeakMap();
 // Saved designs are replaced, never edited in place, so the key is kept per object.
@@ -80,118 +131,141 @@ export function designKeyV354(design){
  return key;
 }
 
-function texture(ref,packet){
+function texture(ref,packet,cache){
  const entry=ref&&packet.textures[ref];if(!entry)return null;
- const key=entry.url??ref+':'+packet.key;
- if(state.textures.has(key))return state.textures.get(key);
- let t;
- if(entry.url){t=state.loader.load(entry.url);t.flipY=entry.flipY;}
- else if(entry.bitmap){t=new T.Texture(entry.bitmap);t.flipY=false;t.needsUpdate=true;}
- else return null;
- t.wrapS=entry.wrapS;t.wrapT=entry.wrapT;t.repeat.set(...entry.repeat);t.offset.set(...entry.offset);t.rotation=entry.rotation||0;
- if(entry.srgb)t.colorSpace=T.SRGBColorSpace;
- t.anisotropy=4;t.name='V354 '+(entry.url?entry.url.split('/textures/')[1]:ref);
- if(entry.url)state.textures.set(key,t);
- return t;
+ const setup=t=>{t.wrapS=entry.wrapS;t.wrapT=entry.wrapT;t.repeat.set(...entry.repeat);t.offset.set(...entry.offset);t.rotation=entry.rotation||0;
+  if(entry.srgb)t.colorSpace=T.SRGBColorSpace;t.anisotropy=4;t.name='V354 '+(entry.url?entry.url.split('/textures/')[1]:ref);};
+ if(entry.url){
+  if(!state.textures.has(entry.url)){const t=state.loader.load(entry.url);t.flipY=entry.flipY;setup(t);state.textures.set(entry.url,t);}
+  return state.textures.get(entry.url);
+ }
+ if(!entry.bitmap)return null;
+ if(!cache.has(ref)){const t=new T.Texture(entry.bitmap);t.flipY=false;t.needsUpdate=true;setup(t);cache.set(ref,t);}
+ return cache.get(ref);
 }
-function material(desc,packet){
+function material(desc,packet,cache){
  const common={color:desc.color,opacity:desc.opacity,transparent:desc.transparent,depthWrite:desc.depthWrite,side:desc.side,vertexColors:desc.vertexColors,alphaTest:desc.alphaTest};
  const m=desc.type==='MeshBasicMaterial'?new T.MeshBasicMaterial(common):
   new T.MeshStandardMaterial({...common,roughness:desc.roughness,metalness:desc.metalness,emissive:desc.emissive,emissiveIntensity:desc.emissiveIntensity});
- if(m.isMeshBasicMaterial){const t=texture(desc.map,packet);if(t)m.map=t;m.name='V354 '+(desc.name||desc.type);return m;}
- for(const slot of ['map','normalMap','roughnessMap','bumpMap','alphaMap','emissiveMap','aoMap']){const t=texture(desc[slot],packet);if(t)m[slot]=t;}
+ m.name='V354 '+(desc.name||desc.type);
+ if(m.isMeshBasicMaterial){const t=texture(desc.map,packet,cache);if(t)m.map=t;return m;}
+ for(const slot of ['map','normalMap','roughnessMap','bumpMap','alphaMap','emissiveMap','aoMap']){const t=texture(desc[slot],packet,cache);if(t)m[slot]=t;}
  if(m.normalMap&&desc.normalScale)m.normalScale.set(...desc.normalScale);
  if(m.bumpMap)m.bumpScale=desc.bumpScale??1;
- m.name='V354 '+(desc.name||desc.type);
  return m;
 }
-function template(packet){
- const group=new T.Group();group.name='V354 designer model';
- const box=new T.Box3(),local=new T.Box3();
- for(const part of packet.meshes){
-  const g=new T.BufferGeometry();
-  g.setAttribute('position',new T.BufferAttribute(part.positions,3));
-  g.setAttribute('normal',new T.BufferAttribute(part.normals,3));
-  g.setAttribute('uv',new T.BufferAttribute(part.uvs,2));
-  if(part.colors)g.setAttribute('color',new T.BufferAttribute(part.colors,3));
-  g.setIndex(new T.BufferAttribute(part.indices,1));
-  g.computeBoundingBox();g.computeBoundingSphere();g.userData.houseDesignV354=true;
-  const mesh=new T.Mesh(g,material(part.material,packet));
+function group(parts,packet,textures,materials,box){
+ const g=new T.Group();
+ for(const part of parts||[]){
+  const geometry=new T.BufferGeometry();
+  geometry.setAttribute('position',new T.BufferAttribute(part.positions,3));
+  geometry.setAttribute('normal',new T.BufferAttribute(part.normals,3));
+  geometry.setAttribute('uv',new T.BufferAttribute(part.uvs,2));
+  if(part.colors)geometry.setAttribute('color',new T.BufferAttribute(part.colors,3));
+  geometry.setIndex(new T.BufferAttribute(part.indices,1));
+  geometry.computeBoundingBox();geometry.computeBoundingSphere();geometry.userData.houseDesignV354=true;
+  const key=JSON.stringify(part.material);
+  if(!materials.has(key))materials.set(key,material(part.material,packet,textures));
+  const mesh=new T.Mesh(geometry,materials.get(key));
   mesh.castShadow=part.cast&&!part.material.transparent;mesh.receiveShadow=true;mesh.name='V354 '+(part.material.name||'part');
   // Low decals (contact shade, yard ground) never decide the size.
-  if(!part.material.transparent){local.copy(g.boundingBox);if(local.max.y>.06)box.union(local);}
-  group.add(mesh);
+  if(box&&!part.material.transparent&&geometry.boundingBox.max.y>.06)box.union(geometry.boundingBox);
+  g.add(mesh);
  }
- if(box.isEmpty())box.setFromObject(group);
- return {group,box,footprint:packet.footprint,collision:packet.collision||[]};
+ return g;
+}
+function template(packet){
+ const textures=new Map(),materials=new Map(),box=new T.Box3();
+ const near=group(packet.meshes,packet,textures,materials,box);
+ const far=packet.far?.length?group(packet.far,packet,textures,materials,null):near;
+ if(box.isEmpty())box.setFromObject(near);
+ return {near,far,box,footprint:packet.footprint,collision:packet.collision||[]};
+}
+function copyOf(source){
+ const g=new T.Group();
+ for(const mesh of source.children){const copy=new T.Mesh(mesh.geometry,mesh.material);copy.castShadow=mesh.castShadow;copy.receiveShadow=true;copy.name=mesh.name;g.add(copy);}
+ return g;
+}
+// How the designer model is sized for the game.
+function fitting(type){
+ if(WALL_PIECES[type])return 'wall';
+ if(type==='woodgate')return 'gate';
+ if(type==='field')return 'field';
+ return 'lot';
 }
 function placedTemplate(entry,type){
- const {group,box,collision}=entry.template;
- const [rx,rz]=LOT[type]??[4.8,5];
+ const {near,far,box,collision}=entry.template;
  const w=Math.max(.1,box.max.x-box.min.x),d=Math.max(.1,box.max.z-box.min.z);
- const fit=Math.min(2*rx/(w*METRE),2*rz/(d*METRE));
- const scale=METRE*Math.max(.7,Math.min(1.3,fit));
- const root=new T.Group();root.name='V354 '+entry.id;
- const inner=new T.Group();
- for(const mesh of group.children){const copy=new T.Mesh(mesh.geometry,mesh.material);copy.castShadow=mesh.castShadow;copy.receiveShadow=true;copy.name=mesh.name;inner.add(copy);}
- inner.scale.setScalar(scale);
- inner.position.set(-(box.min.x+box.max.x)/2*scale,0,-(box.min.z+box.max.z)/2*scale);
- root.add(inner);
+ const fit=fitting(type);
+ let sx,sz,sy;
+ if(fit==='wall'){sx=sz=sy=METRE;}
+ else if(fit==='gate'){sx=sz=sy=7/w;}
+ else if(fit==='field'){sx=16/w;sz=16/d;sy=METRE;}
+ else{const [rx,rz]=LOT[type]??[4.8,5];const s=METRE*Math.max(.7,Math.min(1.3,Math.min(2*rx/(w*METRE),2*rz/(d*METRE))));sx=sz=sy=s;}
+ const cx=-(box.min.x+box.max.x)/2*sx,cz=-(box.min.z+box.max.z)/2*sz;
+ const level=source=>{const g=copyOf(source);g.scale.set(sx,sy,sz);g.position.set(cx,0,cz);const root=new T.Group();root.add(g);return root;};
+ const lod=new T.LOD();lod.name='V354 '+entry.id;
+ lod.addLevel(level(near),0);
+ if(far!==near)lod.addLevel(level(far),NEAR_DISTANCE);
  // Wall segments [ax,az,bx,bz,radius] in the model's own frame (before its rotation).
- const ox=inner.position.x,oz=inner.position.z;
- const walls=collision.map(([ax,az,bx,bz,r])=>[ax*scale+ox,az*scale+oz,bx*scale+ox,bz*scale+oz,r*scale]);
- root.userData.houseDesignV354={id:entry.id,key:entry.key,scale,halfW:w*scale/2,halfD:d*scale/2,collision:walls};
- return root;
+ const walls=collision.map(([ax,az,bx,bz,r])=>[ax*sx+cx,az*sz+cz,bx*sx+cx,bz*sz+cz,r*Math.min(sx,sz)]);
+ lod.userData.houseDesignV354={id:entry.id,key:entry.key,scale:sx,halfW:w*sx/2,halfD:d*sz/2,collision:walls};
+ return lod;
 }
 
-function load(key,id,design){
+function load(key,id,design,segment){
  let entry=state.cache.get(key);
  if(entry)return entry;
  entry={key,id,status:'pending',template:null,error:null};
  state.cache.set(key,entry);
- requestModel(id,design).then(reply=>{
-  if(reply.error||!reply.model){entry.status='failed';entry.error=reply.error||'Mudel puudub';console.warn('V354 designer model',id,entry.error);return;}
-  reply.model.key=key;
-  entry.template=template(reply.model);entry.status='ready';
- }).catch(error=>{entry.status='failed';entry.error=String(error);}).finally(()=>{state.revision++;notify();});
+ (async()=>{
+  let packet=await readCached(key).then(v=>v&&fromCache(v)).catch(()=>null);
+  if(!packet){
+   const reply=await requestModel(id,design,segment);
+   if(reply.error||!reply.model)throw new Error(reply.error||'No model');
+   packet=reply.model;writeCached(key,packet);
+  }
+  entry.template=template(packet);entry.status='ready';
+ })().catch(error=>{entry.status='failed';entry.error=String(error?.message||error);console.warn('V354 designer model',id,entry.error);})
+  .finally(()=>{state.revision++;notify();});
  return entry;
 }
-
-// Stamp for stream rebuilds: changes when the model for this building finishes.
-export function houseDesignStampV354(type,age,design){
- if(!state.enabled)return 'off';
- const id=design?.id&&canUseDesign(type,age,design)?design.id:designerIdV354(type,age);
- if(!id)return 'none';
- const key=design&&canUseDesign(type,age,design)?designKeyV354(design):'default:'+id;
- return key+':'+(state.cache.get(key)?.status??'new');
-}
 function canUseDesign(type,age,design){return Boolean(design?.id)&&design.id===designerIdV354(type,age);}
-
-// Returns a model (designer level near, game model far), or null while the
-// designer model is still being built or the type keeps its game model.
-export function designedBuildingModelV354(type,age,design,gameModel){
- if(!state.enabled)return null;
+function request(type,age,design,tier){
  const own=canUseDesign(type,age,design);
  const id=own?design.id:designerIdV354(type,age);
  if(!id)return null;
- const entry=load(own?designKeyV354(design):'default:'+id,id,own?design:null);
- if(entry.status!=='ready')return null;
- const near=placedTemplate(entry,type);
- const lod=new T.LOD();lod.name='V354 '+id+' LOD';
- lod.addLevel(near,0);
- if(gameModel){gameModel.name||='V354 far game model';lod.addLevel(gameModel,NEAR_DISTANCE);}
- lod.userData.houseDesignV354=near.userData.houseDesignV354;
- if(gameModel)for(const key of ['stoneNearLOD','stoneModelV221'])if(gameModel.userData[key]!=null)lod.userData[key]=gameModel.userData[key];
- return lod;
+ const kind=WALL_PIECES[type]?.(tier);
+ const segment=kind?{length:7/METRE,kind}:null;
+ const key=(own?designKeyV354(design):'default:'+id)+(segment?':piece:'+kind:'');
+ return {key,id,design:own?design:null,segment};
 }
 
-// Starts building the default models a town will need, before they are seen.
+// Stamp for stream rebuilds: changes when the model for this building finishes.
+export function houseDesignStampV354(type,age,design,tier){
+ if(!state.enabled)return 'off';
+ const r=request(type,age,design,tier);
+ if(!r)return 'none';
+ return r.key+':'+(state.cache.get(r.key)?.status??'new');
+}
+
+// The designer model for a building, or null while it is still being built.
+export function designedBuildingModelV354(type,age,design,{tier=1}={}){
+ if(!state.enabled)return null;
+ const r=request(type,age,design,tier);
+ if(!r)return null;
+ const entry=load(r.key,r.id,r.design,r.segment);
+ return entry.status==='ready'?placedTemplate(entry,type):null;
+}
+// True while the designer model of this building has failed to build.
+export function designFailedV354(type,age,design,tier=1){const r=request(type,age,design,tier);return Boolean(r&&state.cache.get(r.key)?.status==='failed');}
+// An empty stand-in while the designer model is being built.
+export function pendingBuildingV354(type){const g=new T.Group();g.name='V354 pending '+type;g.userData.houseDesignPendingV354=true;return g;}
+
+// Starts building the models a town needs, before they are seen.
 export function preloadHouseDesignsV354(list){
  if(!state.enabled)return;
- for(const {type,age,design} of list){
-  if(canUseDesign(type,age,design))load(designKeyV354(design),design.id,design);
-  else{const id=designerIdV354(type,age);if(id)load('default:'+id,id,null);}
- }
+ for(const {type,age,design,tier} of list){const r=request(type,age,design,tier);if(r)load(r.key,r.id,r.design,r.segment);}
 }
 // Walk collision against a designer building's walls. model: the placed
 // building root (position, rotation.y, scale); radius: walker radius.
@@ -207,5 +281,5 @@ export function hitsDesignedWallsV354(model,x,z,radius=.22){
 }
 export function houseDesignStatusV354(){
  const counts={pending:0,ready:0,failed:0};for(const e of state.cache.values())counts[e.status]++;
- return {...counts,enabled:state.enabled,revision:state.revision};
+ return {...counts,enabled:state.enabled,revision:state.revision,nearDistance:NEAR_DISTANCE};
 }

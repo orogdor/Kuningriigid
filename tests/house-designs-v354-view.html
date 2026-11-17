@@ -4,7 +4,7 @@
 // Shows designer models through the game's own module and renderer.
 // ?ids=hall:0,house:0 (game type:age) · window.viewReady resolves when drawn.
 import * as T from '../vendor/three.module.js';
-import {designedBuildingModelV354,houseDesignStatusV354,designerIdV354} from '../house-designs-v354.js?v=354a';
+import {designedBuildingModelV354,houseDesignStatusV354,designerIdV354} from '../house-designs-v354.js?v=354b';
 const list=(new URLSearchParams(location.search).get('ids')||'hall:0,house:0,lumber:0,well:0').split(',').map(x=>{const [type,age]=x.split(':');return {type,age:Number(age)};});
 const renderer=new T.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=T.ACESFilmicToneMapping;
 document.body.append(renderer.domElement);
@@ -18,10 +18,12 @@ window.viewReady=new Promise(resolve=>{
  const tick=()=>{
   for(const [i,item] of list.entries()){
    if(placed.has(i))continue;
-   const model=designedBuildingModelV354(item.type,item.age,null,null);
+   const model=designedBuildingModelV354(item.type,item.age,null);
    if(model){model.position.set((i%cols-(cols-1)/2)*gap,0,(Math.floor(i/cols)-(Math.ceil(list.length/cols)-1)/2)*gap);scene.add(model);placed.set(i,model);}
   }
-  const span=cols*gap;camera.position.set(span*.55,span*.62,span*.85);camera.lookAt(0,1.5,0);
+  const span=cols*gap,cam=(new URLSearchParams(location.search).get('cam')||'').split(',').map(Number);
+  if(cam.length===6){camera.position.set(cam[0],cam[1],cam[2]);camera.lookAt(cam[3],cam[4],cam[5]);}
+  else{camera.position.set(span*.55,span*.62,span*.85);camera.lookAt(0,1.5,0);}
   renderer.render(scene,camera);
   const s=houseDesignStatusV354();
   if(placed.size+s.failed>=list.filter(x=>designerIdV354(x.type,x.age)).length&&s.pending===0)setTimeout(()=>{renderer.render(scene,camera);resolve(s);},1500);

@@ -3,11 +3,12 @@ import {ENGLISH_V120_PAIRS} from './locale-en-v120.js?v=120a';
 import {ENGLISH_V155_PAIRS} from './locale-en-v155.js?v=155a';
 import {TECH_UNLOCKS_EN_V120} from './research-unlocks-en-v120.js?v=120a';
 import {ENGLISH_V282_PAIRS,ENGLISH_V282_PATTERNS} from './locale-en-v282.js?v=282a';
+import {ENGLISH_V354_PAIRS} from './locale-en-v354.js?v=354a';
 
 const buildVersion=typeof document!=='undefined'?(document.title.match(/V(\d+(?:\.\d+)?)/)?.[1]||'96'):'96';
 // V63: The save file stores gameplay, not language. Language is a separate,
 // reversible presentation preference, defaulting to English for every device.
-const english=new Map([...ENGLISH_PAIRS,...ENGLISH_V120_PAIRS,...ENGLISH_V155_PAIRS.filter(([a,b])=>a!==b),...ENGLISH_V282_PAIRS]);
+const english=new Map([...ENGLISH_PAIRS,...ENGLISH_V120_PAIRS,...ENGLISH_V155_PAIRS.filter(([a,b])=>a!==b),...ENGLISH_V282_PAIRS,...ENGLISH_V354_PAIRS]);
 const sorted=[...english].filter(([s])=>s.length>=3).sort((a,b)=>b[0].length-a[0].length)
  .map(([source,target])=>({source,target,re:new RegExp('(?<![\\p{L}])'+[...source].map(c=>'.*+?^${}()|[]\\'.includes(c)?'\\'+c:c).join('')+'(?![\\p{L}])','gu')}));
 let language='en',binding=[],observer=null;

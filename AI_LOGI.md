@@ -883,3 +883,10 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 - Kujundamine käib ehitusmenüüst: kaardil ✎ ikoon → tüübi kavand `s.houseDesignTemplatesV354[type]`, kopeeritakse paigutamisel (`applyDesignTemplateV354`) hoone `houseDesignV354` väljale. Peamaja jääb hoone info nupu peale (pole ehitusmenüüs).
 - Kokkupõrge: kujundaja `walkWalls` (jalutusrežiimi seinad, uksed vabad) eksporditakse mudeliga; `walkBlocked` kasutab neid (`hitsDesignedWallsV354`) krundi ristküliku asemel. Navigatsioonivõrk muutmata.
 - Testid täiendatud (`tests/house-designs-v354.mjs`, `tests/house-designs-v354-browser.cjs`).
+
+### Täiendus 2026-11-17 (2) – kasutaja: vanad mudelid ära, uksed lahti, kõik inglise keeles
+- `house-designs-v354.js` ümber kirjutatud: kõik hoonetüübid ajastutel 0–2 (v.a sild) kujundajast; lähim ajastu, kui täpset pole; müürid kujundaja lõiguna (`segment` päring), värav 7 ühikut, põld venitatud; kauge LOD sama mudeli suurtest osadest; IndexedDB vahemälu; ootel hoone = tühi grupp (`pendingBuildingV354`), külad kasutavad ootamise ajal vana mudelit.
+- `majaehitaja/index.html`: `openDoors` (uksed lahti ekspordis), kaldavesi/liiv välja, kauge LOD partiid, `segment` päring; kogu kasutajaliides inglise keelde (tekstid asendatud lähtekoodis, `fmt` kasutab punkti).
+- `civilization.js`: `townBuildingModel` kasutab kujundajat enne vana mudelit; graafikalüliti eemaldatud; minu lisatud tekstid inglise keeles.
+- `locale-en-v354.js` + `localization.js`: mängu eestikeelsete jääkide tõlked. `tests/ui-writes-v350.mjs` ootab nüüd `localization.js?v=354a`.
+- Maa ja taeva puudumist raw.githack lingil ei õnnestunud järele teha (kohalikult on olemas; pilvebrauseris WebGL puudub). Soovitus: rawcdn.githack.com commit'i link.
