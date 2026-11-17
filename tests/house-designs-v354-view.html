@@ -4,7 +4,7 @@
 // Shows designer models through the game's own module and renderer.
 // ?ids=hall:0,house:0 (game type:age) · window.viewReady resolves when drawn.
 import * as T from '../vendor/three.module.js';
-import {designedBuildingModelV354,houseDesignStatusV354,designerIdV354} from '../house-designs-v354.js?v=354f';
+import {designedBuildingModelV354,houseDesignStatusV354,designerIdV354} from '../house-designs-v354.js?v=355a';
 const list=(new URLSearchParams(location.search).get('ids')||'hall:0,house:0,lumber:0,well:0').split(',').map(x=>{const [type,age]=x.split(':');return {type,age:Number(age)};});
 const renderer=new T.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=T.ACESFilmicToneMapping;
 document.body.append(renderer.domElement);

@@ -1,13 +1,15 @@
 // V354: every Stone, Bronze and Iron Age building is drawn by the house designer
-// (majaehitaja/). A hidden designer page builds each model once; the meshes
-// arrive as plain buffers with their textures, are kept in IndexedDB between
-// sessions and are shared by every copy of that building. Near the camera the
-// full model is drawn, further away a lighter version of the same model.
+// (majaehitaja/). Each model is built once; the meshes are kept in IndexedDB
+// between sessions and are shared by every copy of that building. Near the
+// camera the full model is drawn, further away a lighter version of the same model.
+// V355: the models are built by the designer's own code as a module of the game
+// (house-builder-v355.js, generated from majaehitaja/index.html), with the
+// game's three.js. No hidden designer page (iframe) any more, so the buildings
+// are drawn in NativeThreeBridge as well.
 import * as T from './vendor/three.module.js';
 
 // Bump when the designer export changes, so cached models are rebuilt.
 const MODEL_VERSION='354g';
-const FRAME_URL=new URL('./majaehitaja/index.html?embed=1&worker=1&textures=low',import.meta.url).href;
 // Designer ids (catalog keys) in majaehitaja/index.html.
 const DESIGNER_IDS=new Set(['hall','house','hunter','fisher','farm','lumber','mason','pottery_kiln','study','barracks','watchtower','archery','palisade','woodgate','quarry','claypit','well','pasture','field',
  'library','scriptorium','market','warehouse','cellar','vegetable_garden','flax_farm','weaver','cartwright','coppermine','tinmine','bronze_foundry','road_depot','harbor','bridge','forester','saw','mill','bakery','gatehouse','reinforced_wall','stonewall','stonetower',
@@ -44,7 +46,7 @@ const NEAR_DISTANCE=Math.round(({near:110,medium:180,far:280,ultra:420}[GRAPHICS
 // ?houses=old draws the earlier game models (only for comparison while testing).
 const START_ENABLED=(()=>{try{return new URLSearchParams(location.search).get('houses')!=='old';}catch{return true;}})();
 
-const state={progress:0,watchdog:0,errorListeners:new Set(),reported:false,enabled:START_ENABLED,frame:null,ready:null,next:1,waiting:new Map(),cache:new Map(),revision:0,listeners:new Set(),loader:new T.TextureLoader(),textures:new Map(),db:null};
+const state={errorListeners:new Set(),reported:false,enabled:START_ENABLED,cache:new Map(),revision:0,listeners:new Set(),loader:new T.TextureLoader(),textures:new Map(),db:null};
 
 export function houseDesignsEnabledV354(){return state.enabled;}
 // Called once with the first error (shown to the player).
@@ -64,61 +66,17 @@ export function designerIdV354(type,age){
 }
 export function canDesignV354(type,age){return state.enabled&&Boolean(designerIdV354(type,age));}
 
-function frame(){
- if(state.frame)return state.ready;
- const iframe=document.createElement('iframe');
- iframe.title='Building models';iframe.setAttribute('aria-hidden','true');iframe.tabIndex=-1;
- // Inside the viewport and eager: phone browsers may never load a frame placed
- // far off screen (lazy frame loading / data saver).
- iframe.loading='eager';
- Object.assign(iframe.style,{position:'fixed',left:'0',top:'0',width:'2px',height:'2px',border:'0',opacity:'0',pointerEvents:'none',zIndex:'-1'});
- iframe.src=FRAME_URL;
- state.frame=iframe;
- const started=new Promise(resolve=>{
-  const receive=event=>{
-   if(event.origin!==location.origin||event.source!==iframe.contentWindow||event.data?.source!=='kuningriigid-designer')return;
-   if(event.data.type==='ready')resolve();
-   if(event.data.type==='alive')state.progress=performance.now();
-   if(event.data.type==='model'){state.progress=performance.now();state.waiting.get(event.data.requestId)?.(event.data);state.waiting.delete(event.data.requestId);}
-  };
-  state.receive=receive;addEventListener('message',receive);
- });
- // A designer that does not start (no WebGL, out of memory) must not leave the
- // town empty: its buildings fall back to the older models.
- state.ready=Promise.race([started,new Promise((_,reject)=>setTimeout(()=>reject(new Error('the house designer did not start')),60000))]);
- state.ready.catch(()=>{if(state.frame===iframe){iframe.remove();state.frame=null;removeEventListener('message',state.receive);}});
- document.body.append(iframe);
- return state.ready;
+// The builder module is large (the designer's catalog and 3D code), so it is
+// loaded only when the first building is needed. Models are made one after
+// another; a model that fails falls back to the older game model.
+let builder=null;
+function houseBuilder(){
+ builder??=import('./house-builder-v355.js?v=355a').catch(error=>{builder=null;throw error;});
+ return builder;
 }
 async function requestModel(id,design,segment){
- clearTimeout(state.idle);
- await frame();
- return new Promise(resolve=>{
-  const requestId=state.next++;
-  if(!state.waiting.size)state.progress=performance.now();
-  state.waiting.set(requestId,reply=>{resolve(reply);if(!state.waiting.size)closeWhenIdle();});
-  watchdog();
-  state.frame.contentWindow.postMessage({source:'kuningriigid-game',type:'model',requestId,id,design,segment},location.origin);
- });
-}
-// Models are made one after another, so a long queue is fine as long as the
-// designer is alive (it sends a heartbeat every few seconds). If it goes quiet
-// for a minute (crashed or frozen frame) every waiting model fails and falls back.
-function watchdog(){
- if(state.watchdog)return;
- state.watchdog=setInterval(()=>{
-  if(!state.waiting.size){clearInterval(state.watchdog);state.watchdog=0;return;}
-  if(performance.now()-state.progress<60000)return;
-  const waiting=[...state.waiting.values()];state.waiting.clear();
-  state.frame?.remove();state.frame=null;state.ready=null;removeEventListener('message',state.receive);
-  for(const reply of waiting)reply({error:'the house designer stopped answering'});
- },5000);
-}
-// The hidden designer holds its own WebGL context. Free it when no model has
-// been asked for a while, so phones keep memory for the game itself.
-function closeWhenIdle(){
- clearTimeout(state.idle);
- state.idle=setTimeout(()=>{if(state.waiting.size||!state.frame)return;state.frame.remove();state.frame=null;state.ready=null;removeEventListener('message',state.receive);},20000);
+ try{const {buildHouseModelV355}=await houseBuilder();return {model:await buildHouseModelV355({id,design,segment})};}
+ catch(error){return {error:String(error?.message||error)};}
 }
 
 // ---------------------------------------------------------------- IndexedDB

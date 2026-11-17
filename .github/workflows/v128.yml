@@ -83,6 +83,12 @@ jobs:
           node scripts/test-stone-warriors-v261.mjs
       - name: V235 day cycle and city torch regression
         run: node scripts/test-daynight-v235.mjs
+      - name: V355 house builder module is up to date with the house designer
+        run: |
+          node --check house-builder-v355.js
+          node --check house-designs-v354.js
+          node tests/house-builder-v355.mjs
+          node tests/house-designs-v354.mjs
       - name: V348 instanced town-light parts
         run: node tests/torch-batches-v348.mjs
       - name: V349 rigid part batches, merged tree primitives, far atlas

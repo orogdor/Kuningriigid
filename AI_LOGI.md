@@ -921,3 +921,23 @@ ChatGPT alustas peamaja kujundaja ühendamist (kujundaja avaneb mängus, kavand 
 ## 2026-11-17 · Claude (Anthropic) · V354 peaharusse
 
 - Kasutaja palvel liideti `test/majaehitus` peaharusse (PR #81, squash, main oli muutmata harust saadik). GitHub Pages näitab V354 faile.
+
+---
+
+## 2026-11-17 · Claude (Anthropic) · V355 – majaehitaja hooned mängu enda koodiga
+
+### Ülesanne
+- NativeThreeBridge ei joonistanud V354 maju: mootoris pole iframe'e, peidetud majaehitaja leht ei käivitunud. Kasutaja soovis, et majade ehitamine oleks korralikult mängu three.js osa.
+
+### Mis tehti
+- `house-builder-v355.js` (genereeritud): majaehitaja hoonete kood ES-moodulina, mängu three.js-iga, ilma UI, rendereri ja iframe'ita. `buildHouseModelV355({id,design,segment})` annab sama paketi kui majaehitaja leht varem.
+- `tools/house-builder-v355/build.mjs` teeb mooduli failist `majaehitaja/index.html`. **Kui muudad majaehitajat, käivita see uuesti** (vajab acorn + eslint-scope). `tests/house-builder-v355.mjs` (CI) kontrollib sha256-ga, et moodul on ajakohane.
+- `house-designs-v354.js` kasutab moodulit; iframe, postMessage ja 60 s valvur eemaldatud. Mängu import `?v=355a`.
+
+### Testid
+- `CHROMIUM_PATH=... node tests/house-builder-v355-browser.cjs` – kõik 107 hoonet identsed vana iframe'i teega.
+- `node tests/house-designs-v354-browser.cjs` – päris mäng läbis.
+- NativeThreeBridge Node-hostis maja valmib ja joonistub.
+
+### Pooleli
+- Päris NativeThreeBridge exe kontroll. Mängusisene kujundamisaken (✎) on endiselt iframe.
