@@ -5,7 +5,7 @@
 // Everything is procedural in the shaders (no texture downloads); geometry counts stay the same.
 import * as T from './vendor/three.module.js';
 import {WATER_STYLE_V326,waterNodeMaterialV326} from './water-style-v326.js';
-import {groundUniforms232,GROUND_GLSL232} from './ground-materials-v232.js';
+import {groundUniforms232,GROUND_GLSL232} from './ground-materials-v232.js?v=356';
 import {DETAIL_X,DETAIL_Z} from './detail-scale-v123.js';
 import {CLOUD_TIME,CLOUD_SHADE_V226,TERRAIN_BLEND_V226,WATER_SKY_V251,SEA_EFFECT_V226} from './atmosphere-v158.js?v=161a';
 
@@ -240,6 +240,15 @@ export function waterMaterial(scope='world',tile=null,{sea=false,scale=1,scaleZ=
 export function animate(mesh){mesh.onBeforeRender=tick;return mesh;}
 
 // ---------------------------------------------------------------- roads
+// V356: road relief (detail map). Height of the bumps in scene units per unit of rH slope.
+const ROAD_BUMP_V356=.40;
+const ROAD_RELIEF_V356=`
+float vR356H=.5;vec2 vR356G=vec2(0.0);
+float r356Rut(float a,float bend){return (1.0-smoothstep(.055,.18,abs(a-(.47+bend))))+(1.0-smoothstep(.065,.21,abs(a-(.67+bend*.6))));}
+vec3 r356Perturb(vec3 p,vec3 n,vec2 dHdxy,float face){
+ vec3 sx=dFdx(p),sy=dFdy(p),r1=cross(sy,n),r2=cross(n,sx);float det=dot(sx,r1)*face;
+ vec3 grad=sign(det)*(dHdxy.x*r1+dHdxy.y*r2);return normalize(abs(det)*n-grad);
+}`;
 // attributes: uv.x across (-1 edge .. +1 edge, |u|>1 is the soft verge), uv.y along (metres),
 // aLevel 1 dirt track, 2 gravel, 3 cobbles, 4 flagstone highway.
 export function roadMaterial(scope='world',tile=null){
@@ -250,7 +259,7 @@ export function roadMaterial(scope='world',tile=null){
   inject(shader,{map,
    vertexHead:'attribute float aLevel;varying vec3 vL149P;varying vec2 vL149U;varying float vL149L;',
    vertexBody:`vL149P=${map.pos};vL149U=uv;vL149L=aLevel;`,
-   fragHead:'varying vec3 vL149P;varying vec2 vL149U;varying float vL149L;',
+   fragHead:'varying vec3 vL149P;varying vec2 vL149U;varying float vL149L;'+(detail?ROAD_RELIEF_V356:''),
    color:`
  // V251: era-appropriate road surfaces. aLevel = surface (1..7) + 10 for a highway (traffic level 4).
  //  1 footpath (Stone Age, no wheels yet)  2 cart track with wheel ruts  3 gravel road with crown and ditches
@@ -260,15 +269,19 @@ export function roadMaterial(scope='world',tile=null){
  vec3 dirt=${detail?'vec3(.39,.32,.23)':'vec3(.45,.38,.28)'}*(.86+n*.22);
  vec3 grass=vec3(.29,.35,.23);
  vec3 col=dirt;float paved=0.0;
+ // V356: surface height rH (0 hollow .. 1 high) and its slope rG in uv units, worked out per surface
+ float rH=.5;vec2 rG=vec2(0.0);float su=u<0.0?-1.0:1.0;
  if(sf<1.5){ // footpath: a trodden earth line, worn darker in the middle, grass closing in
   float wear=1.0-smoothstep(.15,.75,au+(n-.5)*.25);
   col=mix(mix(dirt,grass,.35),dirt*.92,wear);
   col*=.92+.10*l149n(wp*2.3+1.7);
+  ${detail?`{float w2=1.0-smoothstep(.15,.75,au+.02+(n-.5)*.25);rH=.58-wear*.22+(nf-.5)*.2;rG.x=-(w2-wear)/.02*.22*su;}`:''}
  }else if(sf<2.5){ // cart track: two wheel ruts, grassy crown
   float bend=(l149n(wp*.20+vec2(4.0,9.0))-.5)*.12;
   float rut=1.0-smoothstep(.055,.18,abs(au-(.47+bend)));
   float rut2=1.0-smoothstep(.065,.21,abs(au-(.67+bend*.6)));
   col*=1.0-(rut+rut2)*.19;
+  ${detail?`{float r0=r356Rut(au,bend),r1=r356Rut(au+.02,bend);rH=.66-r0*.42+(nf-.5)*.12;rG.x=-(r1-r0)/.02*.42*.30*su;}`:''}
   col=mix(col,grass*(.85+nf*.25),(1.0-smoothstep(0.0,.28,au))*.45);
   col*=.90+.12*l149n(wp*1.65+3.1);
  }else if(sf<3.5){ // gravel: pebbles, lighter cambered crown, darker ditches
@@ -277,22 +290,35 @@ export function roadMaterial(scope='world',tile=null){
   col*=1.06-.14*smoothstep(.15,.9,au);
   col=mix(col,vec3(.30,.28,.22),smoothstep(.86,1.0,au)*.55);
   float track=1.0-smoothstep(.06,.2,abs(au-.45));col*=1.0-track*.07;
+  ${detail?`{ // loose rounded pebbles on a cambered crown, ditches at the sides
+   vec2 gp=vec2(u*9.0,v*15.0);gp.x+=floor(gp.y)*.5+(l149h(vec2(floor(gp.y),3.7))-.5)*.6;
+   vec2 pf=fract(gp)-.5+(vec2(l149h(floor(gp)+1.3),l149h(floor(gp)+5.9))-.5)*.25;float pk=.45+.55*l149h(floor(gp)+9.1);
+   float dome=max(0.0,1.0-dot(pf,pf)*3.2);
+   rH=.30+dome*pk*.40+(1.0-au)*.28-smoothstep(.86,1.0,au)*.2;
+   rG=vec2(-6.4*pf.x*pk*.40*9.0,-6.4*pf.y*pk*.40*15.0)*.30*step(.001,dome)+vec2(-.28*su-(smoothstep(.86,1.0,au+.02)-smoothstep(.86,1.0,au))/.02*.2*su,0.0);
+   col*=.94+dome*pk*.10;}`:''}
  }else if(sf<4.5){ // cobblestones: rounded, uneven, earth in the joints
   paved=1.0;
   // packed irregular stones: Voronoi cells around jittered centres, narrow earthy joints
-  vec2 g=vec2(u*4.0,v*${detail?'2.3':'.9'});vec2 gi=floor(g),gf=fract(g);float d1=8.0,d2=8.0;vec2 sid=vec2(0.0);
+  vec2 g=vec2(u*4.0,v*${detail?'2.3':'.9'});vec2 gi=floor(g),gf=fract(g);float d1=8.0,d2=8.0;vec2 sid=vec2(0.0),dv=vec2(0.0);
   for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec2 o=vec2(float(i),float(j));vec2 c=o+.5+(vec2(l149h(gi+o),l149h(gi+o+7.3))-.5)*.7;
-   float d=length((gf-c)*vec2(1.0,1.1));if(d<d1){d2=d1;d1=d;sid=gi+o;}else if(d<d2)d2=d;}
+   float d=length((gf-c)*vec2(1.0,1.1));if(d<d1){d2=d1;d1=d;sid=gi+o;dv=gf-c;}else if(d<d2)d2=d;}
   float stone=l149h(sid+3.1),edge=d2-d1;
   vec3 rock=mix(vec3(.36,.34,.30),vec3(.52,.49,.43),stone)*(.9+nf*.14);
   rock*=.86+.22*smoothstep(.0,.35,edge); // rounded tops catch the light
   col=mix(vec3(.21,.19,.15),rock,smoothstep(.03,.09,edge));
+  ${detail?`{ // each stone a low dome, sunk into the earthy joints
+   float top=smoothstep(.02,.12,edge);rH=top*(.55+.35*(1.0-min(1.0,d1*d1*2.0)))+stone*.08;
+   rG=-4.0*dv*vec2(1.0,1.21)*vec2(4.0,2.3)*.35*top;}`:''}
  }else if(sf<5.5){ // dressed setts in running bond between kerbstones
   paved=1.0;
   vec2 g=vec2(u*5.0,v*${detail?'2.6':'1.0'});g.x+=floor(g.y)*.5;vec2 id=floor(g),f=fract(g)-.5;
   float stone=l149h(id);vec3 rock=mix(vec3(.50,.47,.42),vec3(.60,.57,.51),stone)*(.92+nf*.12);
   float joint=max(smoothstep(.42,.48,abs(f.x)),smoothstep(.40,.48,abs(f.y)));
   col=mix(rock,vec3(.26,.24,.21),joint*.85);
+  ${detail?`{ // pillowed setts: flat tops, rounded arrises, deep joints
+   vec2 af=abs(f)*2.0;float px=1.0-pow(af.x,6.0),pz=1.0-pow(af.y,6.0);rH=px*pz*.85+stone*.06;
+   rG=vec2(-12.0*pow(af.x,5.0)*sign(f.x)*pz*5.0,-12.0*pow(af.y,5.0)*sign(f.y)*px*2.6)*.85*.5;}`:''}
   float kerb=smoothstep(.84,.88,au)*(1.0-smoothstep(1.0,1.04,au));
   col=mix(col,vec3(.62,.60,.56)*(.9+nf*.15),kerb);
  }else if(sf<6.5){ // macadam: compacted crushed stone, paler wheel bands, kerbs
@@ -322,11 +348,24 @@ export function roadMaterial(scope='world',tile=null){
  float shoulder=smoothstep(.77+fray+paved*.18,1.13+fray,au);
  col=mix(col,mix(dirt,grass,smoothstep(1.04,1.5,au)),shoulder);
  float a=1.0-smoothstep(.94+fray,1.42+fray-paved*.2,au);
+ ${detail?`// V356: height-blended verge. Where the road surface is high (pebbles, stones, the crown) it
+ // shows through the grass; in its hollows the meadow (with its own clump height) closes in.
+ {float gN=l149n(wp*9.0+vec2(3.3,7.1))*.55+l149n(wp*23.0+1.9)*.45;
+  float hb=a+(rH-.5)*.55*(1.0-paved*.7)+(.5-gN)*.55*(1.0-paved*.8);
+  a=smoothstep(.22,.72,hb)*smoothstep(0.0,.22,a);
+  vR356G=rG*(1.0-shoulder*.7);vR356H=rH;}`:''}
  a*=.92+.07*l149n(wp*1.8);
  a*=sf<1.5?.78:sf<2.5?.86:.96;
  diffuseColor=vec4(col,a);`});
+  if(detail)shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+ { // V356: relief from the analytic surface slope (chain rule through the smooth road uv, so no
+   // noise derivatives and no triangle-edge dots); fades out where a pixel covers several stones.
+  float fade=1.0-smoothstep(.05,.22,fwidth(vL149U.y)+fwidth(vL149U.x)*.5);
+  vec2 dHdxy=vec2(dot(vR356G,dFdx(vL149U)),dot(vR356G,dFdy(vL149U)))*${ROAD_BUMP_V356.toFixed(3)}*fade;
+  normal=r356Perturb(-vViewPosition,normal,dHdxy,faceDirection);
+ }`);
  };
- material.customProgramCacheKey=()=>'road-v251-eras-'+scope;
+ material.customProgramCacheKey=()=>'road-v356-relief-'+scope;
  return material;
 }
 

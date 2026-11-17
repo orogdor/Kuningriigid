@@ -1,0 +1,38 @@
+<!doctype html><meta charset="utf-8"><title>V356 road relief</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="module">
+// V356 visual check: detail-map terrain + every road surface, views: ?view=wide|close|stones
+import * as T from './vendor/three.module.js';
+const q=new URLSearchParams(location.search);
+const L=await import('./landscape-v149.js?v=356');
+const W=+(q.get('w')||1280),H=+(q.get('h')||720);
+const r=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});r.setSize(W,H);document.body.appendChild(r.domElement);
+r.toneMapping=T.ACESFilmicToneMapping;r.outputColorSpace=T.SRGBColorSpace;
+const scene=new T.Scene();scene.background=new T.Color('#9db4c8');
+scene.add(new T.HemisphereLight('#dfe9f5','#4b4635',1.1));
+const sun=new T.DirectionalLight('#fff3dc',2.6);sun.position.set(-40,30,-25);scene.add(sun);
+const tile={x:10,z:10};
+// terrain: flat-ish meadow
+const tg=new T.PlaneGeometry(120,80,120,80);tg.rotateX(-Math.PI/2);
+const col=[],aL=[];const P=tg.attributes.position;
+for(let i=0;i<P.count;i++){const x=P.getX(i),z=P.getZ(i);P.setY(i,Math.sin(x*.05)*.4+Math.cos(z*.07)*.3);col.push(.46,.55,.33);aL.push(4,0);}
+tg.setAttribute('color',new T.Float32BufferAttribute(col,3));tg.setAttribute('aL161',new T.Float32BufferAttribute(aL,2));tg.computeVertexNormals();
+const terrain=new T.Mesh(tg,L.terrainMaterial('detail',tile));scene.add(terrain);
+// roads: one ribbon per surface level, running along z
+const pos=[],uv=[],lvl=[],idx=[];const half=2.6,len=70;
+[1,2,3,4,5,6,17].forEach((level,k)=>{
+ const cx=-48+k*16,base=pos.length/3;
+ for(let s=0;s<=140;s++){const z=-len/2+s*len/140;
+  for(const u of [-1.5,-1,1,1.5]){const x=cx+u*half;pos.push(x,Math.sin(x*.05)*.4+Math.cos(z*.07)*.3+.02,z);uv.push(u,z/4.5);lvl.push(level);}
+  if(s){const r0=base+(s-1)*4,r1=base+s*4;for(let j=0;j<3;j++)idx.push(r0+j,r1+j,r0+j+1,r1+j,r1+j+1,r0+j+1);}}
+});
+const rg=new T.BufferGeometry();rg.setAttribute('position',new T.Float32BufferAttribute(pos,3));rg.setAttribute('uv',new T.Float32BufferAttribute(uv,2));
+rg.setAttribute('aLevel',new T.Float32BufferAttribute(lvl,1));rg.setIndex(idx);rg.computeVertexNormals();
+const road=new T.Mesh(rg,L.roadMaterial('detail',tile));road.renderOrder=10;scene.add(road);
+const cam=new T.PerspectiveCamera(42,W/H,.1,500);
+const view=q.get('view')||'wide';
+if(view==='stones'){cam.position.set(-4,3.2,24);cam.lookAt(2,0,14);}else if(view==='close'){cam.position.set(-34,7,22);cam.lookAt(-26,0,6);}else{cam.position.set(0,34,52);cam.lookAt(0,0,0);}
+const t0=performance.now();
+function frame(){r.render(scene,cam);if(performance.now()-t0<4000)requestAnimationFrame(frame);else document.title='ready';}
+frame();
+</script>

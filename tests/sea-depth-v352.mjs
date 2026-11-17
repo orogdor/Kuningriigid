@@ -60,5 +60,7 @@ const atlas=readFileSync(new URL('../atlas-style.js',import.meta.url),'utf8');
 assert.ok(atlas.includes('const depthMapV352=T.GPU_MODE_V225?null:atlasSeaDepthTextureV352(game,seaSource,{texel:SEA_TEXEL_V352})'));
 assert.ok(atlas.includes('const geo=depthMapV352?atlasSeaPlaneV352(depthMapV352.box):atlasSeaGeometryV326(game,seaSource)'));
 const index=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-for(const key of ['"./atlas-sea-v326.js": "./atlas-sea-v326.js?v=352"','"./sea-v158.js?v=161a": "./sea-v158.js?v=352"','"./landscape-v149.js": "./landscape-v149.js?v=352"'])assert.ok(index.includes(key),key);
+for(const key of ['"./atlas-sea-v326.js": "./atlas-sea-v326.js?v=352"','"./sea-v158.js?v=161a": "./sea-v158.js?v=352"'])assert.ok(index.includes(key),key);
+// V356: landscape-v149.js may carry a newer cache key than 352
+assert.ok(+(index.match(/"\.\/landscape-v149\.js": "\.\/landscape-v149\.js\?v=(\d+)"/)?.[1]||0)>=352,'landscape-v149 cache key');
 console.log('PASS V352 world sea depth texture equals the V326 sea mesh values ('+checked+' triangles checked)');
