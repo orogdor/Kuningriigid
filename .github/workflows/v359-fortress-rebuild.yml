@@ -1,0 +1,47 @@
+name: V359 fortress model regeneration
+
+on:
+  push:
+    branches:
+      - feature/stone-fortifications-v359
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-fortresses:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/stone-fortifications-v359
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated builder dependencies
+        run: npm install --no-save --prefix /tmp/fortress-builder acorn eslint-scope
+      - name: Rebuild master designer and generated game model
+        env:
+          HOUSE_BUILDER_NODE_MODULES: /tmp/fortress-builder/node_modules
+        run: |
+          node tools/stone-fortifications-v359/patch-v359.mjs
+          node tools/stone-fortifications-v359/patch-v359-extra.mjs
+          node tools/house-builder-v355/build.mjs
+          node --check house-builder-v355.js
+      - name: Update and run regression checks
+        run: |
+          node -e "const fs=require('fs'),p='tests/house-builder-v355.mjs';let s=fs.readFileSync(p,'utf8');if(!s.includes('v=358a'))throw Error('Original cache version changed');fs.writeFileSync(p,s.replace('v=358a','v=359a'));"
+          node tests/house-builder-v355.mjs
+          node tests/fortress-v359.mjs
+      - name: Commit regenerated model to feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add majaehitaja/index.html house-builder-v355.js house-designs-v354.js tests/house-builder-v355.mjs
+          if ! git diff --cached --quiet; then
+            git commit -m 'V359: regenerate stone walls, towers and gates'
+            git push origin HEAD:feature/stone-fortifications-v359
+          fi
