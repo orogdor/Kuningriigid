@@ -17,11 +17,16 @@ function portrait(){
  if(!hud.dataset.v350Position){hud.dataset.v350Position='1';if(getComputedStyle(hud).position==='static')hud.style.position='relative';}
  if(hud.classList.contains('v263-has-portrait')!==show)hud.classList.toggle('v263-has-portrait',show);
 }
+function icons(root){
+ for(const icon of root.querySelectorAll('.v121-build-card[data-building] .v121-card-icon:not(.v263-art)')){
+  const type=icon.closest('[data-building]').dataset.building;if(ART_BUILDINGS.has(type))icon.classList.add('v263-art');}
+}
+// V357: a freshly rendered menu root gets the icons before it replaces the live one.
+if(typeof window!=='undefined')(window.KuningriigidMenuPrepareV357||=[]).push(icons);
 function decorate(){
  portrait();
  for(const id of BUTTONS){const el=document.getElementById(id);if(!el)continue;if(!el.classList.contains('v263-btn'))el.classList.add('v263-btn');strip(el);}
- for(const icon of document.querySelectorAll('.v121-build-card[data-building] .v121-card-icon:not(.v263-art)')){
-  const type=icon.closest('[data-building]').dataset.building;if(ART_BUILDINGS.has(type))icon.classList.add('v263-art');}
+ icons(document);
 }
 const ART_BUILDINGS=new Set(["hall", "house", "lumber", "forester", "quarry", "hunter", "well", "farm", "pasture", "cellar", "mason", "watchtower", "stonewall", "barracks"]);
 let queued=false;

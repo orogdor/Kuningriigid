@@ -49,6 +49,8 @@
    }
   }
   function decorate(){filters();for(const card of menu.querySelectorAll(select))paint(card);}
+  // V357: decorate a freshly rendered (not yet attached) menu root the same way.
+  (window.KuningriigidMenuPrepareV357||=[]).push(root=>{for(const card of root.querySelectorAll(select))paint(card);});
   measure();decorate();
   new MutationObserver(decorate).observe(menu,{childList:true,subtree:true});
   // Opening/closing also changes whether the source cards are measurable.

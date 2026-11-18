@@ -961,3 +961,15 @@ Kasutada maapinna tekstuuridel ja teedel kõrguskaarti, et teed ja maastik oleks
 
 ### Pooleli
 Päris seadme FPS ja telefoni visuaalne kontroll.
+
+---
+
+## 2026-11-18 · Claude (Anthropic) · V357 – ehitusmenüü pildid ei vilgu NativeThreeBridge'is
+
+### Mis tehti
+- Põhjus: `renderUI` + `patchMenu` eemaldasid igal värskendusel UI-nahkade (`ui-v310.js`, `ui-art-v263.js`) muudatused ja nahad lisasid need MutationObserveriga tagasi. Iga kaardi pilt eemaldati ja lisati uuesti, mis NativeThreeBridge'is vilkus.
+- Parandus: `prepareMenuV357(root)` `civilization.js`-is. Nahad registreerivad `globalThis.KuningriigidMenuPrepareV357` massiivi funktsiooni, mis kaunistab värske juure enne paikamist.
+- **Uus UI-nahk, mis muudab `#tray`/`#actions` jms sisu, peab registreerima sama konksu**, muidu hakkab see jälle vilkuma.
+
+### Testimine
+Chrome MutationObserver: ehitusmenüü kaartides 0 muudatust 10 s jooksul (enne 57 pilti). Vt MUUDATUSED_V357.md.

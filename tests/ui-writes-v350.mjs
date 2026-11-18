@@ -69,7 +69,8 @@ const index=read('index.html');
 assert.ok(index.indexOf('ui-write-v350.js')>0&&index.indexOf('ui-write-v350.js')<index.indexOf('ui-v304.js'),'helper loads before the HUD');
 assert.match(index,/<title>Kuningriigid · V3\d\d<\/title>/);
 assert.match(index,/boot-v83\.js\?v=3\d\da/);
-for(const key of ['ui-v304.js?v=350a','ui-v306.js?v=350a','ui-art-v263.js?v=350a','"./localization.js?v=155a": "./localization.js?v=354a"'])assert.ok(index.includes(key),key);
+assert.match(index,/ui-art-v263\.js\?v=3[5-9]\da/,'ui-art-v263 cache key 350 or newer');
+for(const key of ['ui-v304.js?v=350a','ui-v306.js?v=350a','"./localization.js?v=155a": "./localization.js?v=354a"'])assert.ok(index.includes(key),key);
 
 // --- translation cache gives the same answers as the uncached path -----------------------------
 const loc=await import('../localization.js');
