@@ -1,0 +1,24 @@
+
+  function defenseCornerCaps(fences){
+    const points=new Map(),corners=new Set();
+    for(const f of fences)if(f.kind==='highStone')for(const p of [f.a,f.b]){
+      const key=p.x.toFixed(2)+','+p.y.toFixed(2);
+      if(!points.has(key))points.set(key,{point:p,count:0});
+      points.get(key).count++;
+    }
+    for(const [key,{point,count}] of points)if(count>1){
+      corners.add(key);
+      const c=place(point),half=wallWalk.width*.43;
+      // Square bonded corner, matching the sample's tower silhouettes,
+      // not a foreign cylinder in the middle of rectangular masonry.
+      mesoCoursesV361(V(c.x-half,0,c.z),V(c.x+half,0,c.z),
+        -.09,wallWalk.deck-.10,wallWalk.width*.90,
+        773+Math.floor(c.x*23+c.z*17),true,.28);
+      const paving=new T.MeshStandardMaterial({color:0xcbb38b,roughness:1});
+      block(building,half*2+.06,.14,half*2+.06,paving,
+        c.clone().setY(wallWalk.deck-.07)).name='V361 bonded square wall corner coping';
+      defensiveWalkways.push((x,z)=>
+        Math.abs(x-c.x)<half&&Math.abs(z-c.z)<half?wallWalk.deck:null);
+    }
+    return corners;
+  }
