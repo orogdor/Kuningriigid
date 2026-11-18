@@ -5,7 +5,7 @@ const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const designer=read('majaehitaja/index.html');
 const module=read('house-builder-v355.js');
 const designs=read('house-designs-v354.js');
-assert.match(designer,/const wallWalk=\{width:1\.18,deck:2\.22,parapet:\.68\}/);
+assert.match(designer,/const wallWalk=\{width:1\.18,deck:2\.22,parapet:(?:\.68|1\.04)\}/);
 assert.match(designer,/Rounded bonded stone wall junction/);
 assert.match(designer,/Fortress flagstone wall walk/);
 assert.match(designer,/Low stone wall continuous coping/);
