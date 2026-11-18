@@ -1,0 +1,198 @@
+
+  // V361 – Mesopotamian / ancient Near Eastern fortification language.
+  // Faceted coursed masonry with a battered foot, and smooth white wave crests.
+  const mesoPlasterV361=new T.MeshStandardMaterial({
+    color:0xffffff,vertexColors:true,roughness:.96,side:T.DoubleSide
+  });
+  const mesoStoneV361=new T.MeshStandardMaterial({
+    color:0xffffff,vertexColors:true,roughness:.96,side:T.DoubleSide
+  });
+  const mesoWoodV361=new T.MeshStandardMaterial({color:0x795536,roughness:.95});
+  const mesoIronV361=new T.MeshStandardMaterial({color:0x3d403d,roughness:.69,metalness:.33});
+  function mesoCoursesV361(a,b,bottom,top,width,seed,bronze,batter=0,capEnds=false){
+    const len=a.distanceTo(b),height=top-bottom;
+    if(len<.025||height<.04)return;
+    const axis=b.clone().sub(a).normalize(),out=V(-axis.z,0,axis.x);
+    const C=(bronze?[0xc09b6f,0xc7a57d,0xb48b5e,0xd0ae83,0xb89569,0xc8a173]:
+      [0xcab18c,0xd2bc99,0xbfa582,0xd7c0a1,0xc8aa85,0xcdb38c]).map(hex=>new T.Color(hex));
+    const joint=new T.Color(bronze?0x765d46:0x7e6a51);
+    const batch=terrainBatch(1.0);
+    const at=(u,y,n)=>a.clone().addScaledVector(axis,u).addScaledVector(out,n).setY(y);
+    const half=y=>width*.5+(top-y)/height*batter*.5;
+    for(const sign of [-1,1]){
+      batch.face([at(0,bottom,sign*half(bottom)),at(len,bottom,sign*half(bottom)),
+        at(len,top,sign*half(top)),at(0,top,sign*half(top))],joint);
+      const rows=Math.max(2,Math.ceil(height/(bronze?.31:.265))),dy=height/rows;
+      for(let row=0;row<rows;row++){
+        const lo=bottom+row*dy,hi=lo+dy,stepWidth=bronze?.69:.59;
+        let x=-(row%2?stepWidth*.48:0),i=0;
+        while(x<len-.005){
+          const k=seed*119+row*53+i*139+sign*23;
+          const course=stepWidth*(.86+noise(k+1)*.27);
+          const l=Math.max(0,x),r=Math.min(len,x+course);
+          x+=course;i++;
+          if(r-l<.055)continue;
+          const gap=Math.min(.013,(r-l)*.08,dy*.10);
+          const ch=Math.min(.032,(r-l)*.15,dy*.16);
+          const depth=sign*(half((lo+hi)*.5)+.012+noise(k+4)*.008);
+          const front=[
+            at(l+gap+ch,lo+gap+ch,depth),
+            at(r-gap-ch,lo+gap+ch,depth),
+            at(r-gap-ch,hi-gap-ch,depth),
+            at(l+gap+ch,hi-gap-ch,depth)];
+          const inner=[
+            at(l+gap,lo+gap,sign*half(lo)),
+            at(r-gap,lo+gap,sign*half(lo)),
+            at(r-gap,hi-gap,sign*half(hi)),
+            at(l+gap,hi-gap,sign*half(hi))];
+          const color=C[Math.floor(noise(k+13)*C.length)].clone();
+          batch.face(front,color);
+          for(let j=0;j<4;j++){
+            const n=(j+1)%4;
+            batch.face([inner[j],inner[n],front[n],front[j]],
+              color.clone().multiplyScalar(j===2?1.09:.85));
+          }
+        }
+      }
+    }
+    // The wall footprint and end caps are solid even at free segment ends.
+    if(capEnds)for(const u of [0,len]){
+      const color=C[1].clone().multiplyScalar(.87);
+      batch.face([at(u,bottom,-half(bottom)),at(u,bottom,half(bottom)),
+        at(u,top,half(top)),at(u,top,-half(top))],color);
+    }
+    batch.draw(building,'V361 sandstone bonded ashlar and battered base',mesoStoneV361);
+  }
+  function mesoWaveV361(a,b,base,thickness,crestHeight,seed,corbels=true){
+    const len=a.distanceTo(b);
+    if(len<.08)return;
+    const axis=b.clone().sub(a).normalize(),out=V(-axis.z,0,axis.x);
+    const heading=-Math.atan2(axis.z,axis.x),n=Math.max(1,Math.round(len/1.05));
+    const segments=n*24;
+    const at=(u,y,d)=>a.clone().addScaledVector(axis,u).addScaledVector(out,d).setY(y);
+    const crest=u=>base+crestHeight*(.69+.31*Math.cos(Math.PI*2*n*(u/len)));
+    const plaster=new T.Color(0xe8d8ba),stone=new T.Color(0xf3e5cb);
+    const panel=terrainBatch(.94);
+    for(let i=0;i<segments;i++){
+      const u=len*i/segments,v=len*(i+1)/segments;
+      const c1=crest(u),c2=crest(v),variation=1+(noise(seed*13+i*29)-.5)*.044;
+      for(const s of [-1,1]){
+        const d=thickness*.5*s;
+        panel.face([at(u,base,d),at(v,base,d),at(v,c2,d),at(u,c1,d)],
+          plaster.clone().multiplyScalar(variation));
+      }
+      // A flat thickness across the smoothly undulating crest; it is
+      // actual solid geometry, not a flat billboard or rectangular merlon.
+      panel.face([at(u,c1,thickness*.5),at(v,c2,thickness*.5),
+        at(v,c2,-thickness*.5),at(u,c1,-thickness*.5)],stone);
+    }
+    for(const u of [0,len]){
+      panel.face([at(u,base,-thickness*.5),at(u,base,thickness*.5),
+        at(u,crest(u),thickness*.5),at(u,crest(u),-thickness*.5)],plaster);
+    }
+    panel.draw(building,'V361 smooth plaster wave crenellations',mesoPlasterV361);
+    const trim=new T.MeshStandardMaterial({color:0xdbcbab,roughness:.95});
+    block(building,len+.018,.10,thickness+.14,trim,
+      a.clone().lerp(b,.5).setY(base+.055),heading).name='V361 pale plaster parapet stringcourse';
+    if(!corbels)return;
+    const corbelsCount=Math.max(1,Math.floor(len/.70));
+    for(let i=0;i<corbelsCount;i++){
+      const t=(i+.5)/corbelsCount;
+      for(const sign of [-1,1]){
+        const p=a.clone().lerp(b,t).addScaledVector(out,sign*(thickness*.5+.13)).setY(base-.13);
+        block(building,.12,.11,.28,mesoWoodV361,p,heading,.9).name='V361 exposed cedar parapet corbel';
+      }
+    }
+  }
+  // Plastered upper storey with authentic spaced embrasures. The lower
+  // courses end before this band on Bronze towers; the Iron tower retains
+  // its existing structural inner walls and stairs beneath the cladding.
+  function mesoUpperTowerV361(a,b,base,top,thickness,seed,backSlits=false){
+    const len=a.distanceTo(b);
+    if(len<.18||top-base<.25)return;
+    const axis=b.clone().sub(a).normalize(),out=V(-axis.z,0,axis.x);
+    const rot=-Math.atan2(axis.z,axis.x);
+    const plaster=new T.MeshStandardMaterial({color:0xe8dcc4,roughness:.98});
+    const at=(u,y,n=0)=>a.clone().addScaledVector(axis,u).addScaledVector(out,n).setY(y);
+    const band=.15,openHeight=top-base-2*band;
+    block(building,len+.02,band,thickness+.08,plaster,
+      at(len*.5,base+band*.5),rot).name='V361 tower plaster lower sill';
+    block(building,len+.02,band,thickness+.08,plaster,
+      at(len*.5,top-band*.5),rot).name='V361 tower plaster upper lintel';
+    const count=Math.max(1,Math.floor(len/1.02));
+    const aperture=Math.min(.24,len/(count*5));
+    let cursor=0;
+    for(let i=0;i<count;i++){
+      const middle=(i+.5)/count*len;
+      const left=middle-aperture*.5,right=middle+aperture*.5;
+      if(left>cursor){
+        block(building,left-cursor+.025,openHeight,thickness+.08,plaster,
+          at((left+cursor)*.5,base+band+openHeight*.5),rot)
+          .name='V361 plaster pilaster between embrasures';
+      }
+      if(backSlits){
+        block(building,aperture*.93,openHeight*.88,.024,mesoIronV361,
+          at(middle,base+band+openHeight*.5,thickness*.53),rot)
+          .name='V361 inset dark upper tower embrasure';
+      }
+      cursor=right;
+    }
+    if(cursor<len)
+      block(building,len-cursor+.025,openHeight,thickness+.08,plaster,
+        at((len+cursor)*.5,base+band+openHeight*.5),rot)
+        .name='V361 plaster end pilaster';
+    block(building,len+.04,.065,thickness+.18,mesoWoodV361,
+      at(len*.5,base-.055),rot).name='V361 tower cedar upper floor band';
+  }
+  function mesoGateStoneV361(gate){
+    const {size,height,jamb,hinges,tips}=gateProfile(gate);
+    const from=place(gate.a),to=place(gate.b),axis=to.clone().sub(from).normalize();
+    const out=V(-axis.z,0,axis.x),center=from.clone().lerp(to,.5);
+    const heading=-Math.atan2(axis.z,axis.x),open=Boolean(gate.open);
+    const bronze=gate.gateType==='lintel';
+    const at=(u,y,n=0)=>center.clone().addScaledVector(axis,u).addScaledVector(out,n).setY(y);
+    const half=size*.5,pier=Math.min(.68,Math.max(.42,size*.20));
+    const passageHeight=Math.max(1.90,height+.08),crown=wallWalk.deck+1.10;
+    for(const sign of [-1,1]){
+      const mid=sign*(half-pier*.48);
+      const A=at(mid-pier*.48,0),B=at(mid+pier*.48,0);
+      mesoCoursesV361(A,B,-.04,crown,1.33,89+sign,bronze,.32,true);
+      // Each pylon stands beyond the passage; no hidden box bridges the road.
+      walkBarrier(at(mid,0,-.60),at(mid,0,.60),pier*.52,0,crown);
+      for(const side of [-1,1]){
+        const p=at(mid,crown-.12,side*.68);
+        block(building,pier+.12,.14,.16,mesoWoodV361,p,heading)
+          .name='V361 gate cedar lintel corbel';
+      }
+    }
+    // A massive bridge above the free gateway, still allowing the road through.
+    mesoCoursesV361(at(-half,0),at(half,0),passageHeight,crown,1.24,113,bronze,.04);
+    const lintel=new T.MeshStandardMaterial({color:0xdac4a0,roughness:.97});
+    block(building,size+.07,.19,1.40,lintel,
+      at(0,passageHeight+.095),heading,.90).name='V361 deep sandstone gate lintel';
+    mesoWaveV361(at(-half-.08,0,-.62),at(half+.08,0,-.62),crown,.31,.89,88,true);
+    mesoWaveV361(at(-half-.08,0,.62),at(half+.08,0,.62),crown,.31,.89,94,false);
+    for(let i=0;i<2;i++){
+      const a=place(hinges[i]),b=place(tips[i]),len=a.distanceTo(b);
+      if(len<.05)continue;
+      const rotation=-Math.atan2(b.z-a.z,b.x-a.x);
+      const leafHeight=passageHeight-.17;
+      const lerp=(t,y)=>a.clone().lerp(b,t).setY(y);
+      const count=Math.max(3,Math.ceil(len/.18));
+      for(let j=0;j<count;j++){
+        block(building,len/count+.008,leafHeight,.11,materials.wood,
+          lerp((j+.5)/count,leafHeight*.5+.05),rotation,.92)
+          .name='V361 thick cedar city gate plank';
+      }
+      for(const y of [.38,leafHeight*.63,leafHeight-.18]){
+        block(building,len+.02,.075,.13,mesoIronV361,lerp(.5,y),rotation,.90)
+          .name='V361 gate wrought iron reinforcement';
+        for(let j=1;j<=5;j++){
+          mesh(building,new T.CylinderGeometry(.021,.021,.018,8),mesoIronV361,
+            lerp(j/6,y).addScaledVector(out,.087)).name='V361 gate iron rivet';
+        }
+      }
+      if(!open)walkBarrier(a,b,.16,0,leafHeight+.13);
+    }
+    if(!open)walkBarrier(from,to,.20,0,passageHeight);
+  }
