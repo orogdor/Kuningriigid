@@ -2,7 +2,7 @@ name: Kuningriigid latest GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'boot-v83.js', 'sapling-trees-v328.js', 'preview-v359.html']
+    paths: ['index.html', 'boot-v83.js', 'sapling-trees-v328.js', 'preview-v359.html', 'preview-v360.html']
   workflow_dispatch:
 permissions:
   contents: read
