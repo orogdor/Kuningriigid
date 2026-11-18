@@ -14,6 +14,6 @@ assert.match(builder,/^import \* as core from '\.\/vendor\/three\.module\.js';$/
 assert.doesNotMatch(builder,/createElement\('iframe'\)|postMessage|window\.parent/,'no designer page');
 assert.match(builder,/export function buildHouseModelV355\(/);
 const designs=read('house-designs-v354.js');
-assert.match(designs,/import\('\.\/house-builder-v355\.js\?v=355a'\)/,'the game builds its houses with the module');
+assert.match(designs,/import\('\.\/house-builder-v355\.js\?v=358a'\)/,'the game builds its houses with the module');
 assert.doesNotMatch(designs,/createElement\('iframe'\)/,'the game no longer opens a hidden designer page');
 console.log('house-builder-v355 ok');
