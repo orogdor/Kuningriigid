@@ -1,0 +1,148 @@
+
+  // V360 phase 1: actual coursed stone parapets, not smooth decorative strips.
+  // The crenels and their coping are constructed from individually faceted
+  // stones, so one huge repeated texture never fills an entire block.
+  function parapetMasonryV360(a,b,bottom,height,width,seed,bronze,coping=true){
+    const length=a.distanceTo(b);
+    if(length<.065||height<.045)return;
+    const axis=b.clone().sub(a).normalize(),normal=V(-axis.z,0,axis.x);
+    const angle=-Math.atan2(axis.z,axis.x);
+    const dark=new T.MeshStandardMaterial({color:bronze?0x655f56:0x80796b,roughness:1});
+    block(building,length,height,width*.83,dark,
+      a.clone().lerp(b,.5).setY(bottom+height*.5),angle)
+      .name='V360 parapet mortar core';
+    const tones=(bronze?[0x938671,0xa0937c,0x827867,0xa79a83,0x8a806f,0xb0a08b]:
+      [0xa49c8e,0xb4a99a,0x938c7f,0xc0b4a1,0xa9a08f,0x9b9589])
+      .map(c=>new T.Color(c));
+    const faceBatch=terrainBatch(.84);
+    const point=(x,y,z)=>a.clone().addScaledVector(axis,x).addScaledVector(normal,z).setY(y);
+    const courses=Math.max(2,Math.ceil(height/(bronze?.24:.20)));
+    const courseHeight=height/courses;
+    for(let row=0;row<courses;row++){
+      const shift=row%2?.25:0;
+      for(const side of [-1,1]){
+        let x=-shift,step=0;
+        while(x<length-.004){
+          const key=seed*83+row*103+step*43+side*29;
+          const run=(bronze?.48:.43)*(.82+noise(key)*.47);
+          const l=Math.max(0,x),r=Math.min(length,x+run);
+          x+=run;step++;
+          if(r-l<.065)continue;
+          const seam=Math.min(.014,(r-l)*.08,courseHeight*.09);
+          const left=l+seam,right=r-seam;
+          const low=bottom+row*courseHeight+seam;
+          const high=bottom+(row+1)*courseHeight-seam;
+          const bevel=Math.min(.034,(right-left)*.14,(high-low)*.20);
+          const inner=side*(width*.405);
+          const relief=side*(width*.487+.009+noise(key+3)*.012);
+          const rim=[
+            point(left,low,inner),point(right,low,inner),
+            point(right,high,inner),point(left,high,inner)
+          ];
+          const front=[
+            point(left+bevel,low+bevel,relief),
+            point(right-bevel,low+bevel,relief),
+            point(right-bevel,high-bevel,relief),
+            point(left+bevel,high-bevel,relief)
+          ];
+          const tone=tones[Math.floor(noise(key+9)*tones.length)];
+          faceBatch.face(front,tone);
+          for(let f=0;f<4;f++){
+            const next=(f+1)%4;
+            faceBatch.face([rim[f],rim[next],front[next],front[f]],
+              tone.clone().multiplyScalar(f===2?1.10:.78));
+          }
+        }
+      }
+    }
+    faceBatch.draw(building,'V360 bonded parapet stone faces');
+    if(!coping)return;
+    // Real individual coping blocks instead of a long plain cream rail.
+    const caps=terrainBatch(.84);
+    const n=Math.max(1,Math.ceil(length/(bronze?.52:.48)));
+    for(let i=0;i<n;i++){
+      const left=length*i/n+.009,right=length*(i+1)/n-.009;
+      if(right-left<.04)continue;
+      const y=bottom+height,upper=y+.085;
+      const side=width*.5+.052;
+      const bev=Math.min(.04,(right-left)*.11);
+      const at=(x,h,z)=>point(x,h,z);
+      // Winding points upward: prevents dark/striped backfaces and shadow acne.
+      const base=[
+        at(left,y,side),at(right,y,side),
+        at(right,y,-side),at(left,y,-side)
+      ];
+      const crown=[
+        at(left+bev,upper,side-bev),at(right-bev,upper,side-bev),
+        at(right-bev,upper,-side+bev),at(left+bev,upper,-side+bev)
+      ];
+      const tone=tones[Math.floor(noise(seed*37+i*31+71)*tones.length)]
+        .clone().multiplyScalar(1.07);
+      caps.face(crown,tone);
+      for(let j=0;j<4;j++){
+        const k=(j+1)%4;
+        caps.face([base[j],base[k],crown[k],crown[j]],
+          tone.clone().multiplyScalar(j===0?.81:j===1?.90:j===2?.94:.83));
+      }
+    }
+    caps.draw(building,'V360 separate parapet coping stones');
+  }
+  function highStoneWall(from,to,index,access,joins){
+    const length=from.distanceTo(to);
+    if(length<.08)return;
+    const axis=to.clone().sub(from).normalize(),side=V(-axis.z,0,axis.x);
+    const {width,deck,parapet}=wallWalk,heading=-Math.atan2(axis.z,axis.x);
+    const bronze=lastWallStyle!=='cutstone'&&lastWallStyle!=='limestone';
+    const stone=procMat(bronze?'cyclopean':'limestone');
+    const dress=procMat(bronze?'stone':'cutstone');
+    const center=from.clone().lerp(to,.5);
+    fortificationMasonry(from,to,-.06,.35,width+.22,index+414,bronze);
+    fortificationMasonry(from,to,.32,deck-.095,width,index+700,bronze);
+    block(building,length+.016,.15,width+.08,procMat('flags'),
+      center.clone().setY(deck-.075),heading,1.03).name='Fortress flagstone wall walk';
+    wallWalkBand(from,to,width*.89,deck,deck);
+    const pavingCount=Math.max(1,Math.ceil(length/1.08));
+    for(let i=1;i<pavingCount;i++){
+      const p=from.clone().lerp(to,i/pavingCount).setY(deck+.008);
+      block(building,.026,.016,width*.91,dress,p,heading,.97).name='Wall walk paving joint';
+    }
+    // Lower buttresses stay intact until the next (texture) stage.
+    const piers=Math.max(1,Math.floor(length/2.55));
+    for(const sign of [-1,1])for(let j=1;j<=piers;j++){
+      const t=j/(piers+1),p=from.clone().lerp(to,t).addScaledVector(side,sign*(width*.5+.055));
+      block(building,.33,deck-.29,.20,stone,p.clone().setY((deck-.29)/2),heading,.93)
+        .name='Fortification face buttress';
+      block(building,.43,.14,.32,dress,p.clone().setY(deck-.35),heading,.93)
+        .name='Buttress coping';
+    }
+    // One continuous tall inner parapet, one properly protective crenellated
+    // outer parapet. Both expose actual stone courses, never bare slabs.
+    for(const sign of [-1,1]){
+      const offset=side.clone().multiplyScalar(sign*(width*.5+.097));
+      const A=from.clone().add(offset),B=to.clone().add(offset);
+      const trimLo=joins?.[0]?Math.min(.44,.65/length):0;
+      const trimHi=joins?.[1]?Math.max(.56,1-.65/length):1;
+      const segments=access?.side===sign
+        ?[[trimLo,clamp((from.distanceTo(access.point)-access.gap)/length,trimLo,trimHi)],
+          [clamp((from.distanceTo(access.point)+access.gap)/length,trimLo,trimHi),trimHi]]
+        :[[trimLo,trimHi]];
+      const baseHeight=sign<0?.88:.55;
+      const widthParapet=sign<0?.34:.37;
+      for(const [lo,hi] of segments){
+        if(hi-lo<.001)continue;
+        const a=A.clone().lerp(B,lo),b=A.clone().lerp(B,hi),run=a.distanceTo(b);
+        parapetMasonryV360(a,b,deck,baseHeight,widthParapet,index+sign*157,bronze);
+        walkBarrier(a,b,.17,deck-.025,deck+parapet+.15);
+        if(sign<0)continue;
+        const n=Math.max(1,Math.round(run/.79)),bay=run/n;
+        for(let i=0;i<n;i+=2){
+          const left=bay*(i+.065),right=bay*(i+.935);
+          if(right-left<.22)continue;
+          const u=a.clone().lerp(b,left/run),v=a.clone().lerp(b,right/run);
+          parapetMasonryV360(u,v,deck+baseHeight+.05,.40,widthParapet+.05,
+            index+53+i*29,bronze);
+        }
+      }
+    }
+  }
+
