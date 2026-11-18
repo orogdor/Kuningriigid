@@ -1,0 +1,108 @@
+  function cellarChamber(state,display,spans,withRoof){
+    // A compact, load-bearing masonry cellar. The vault, front wall and turf
+    // cap share one footprint: no oversized free-hanging sheet of terrain.
+    const floor=display.enclosed[0];if(!floor?.length)return;
+    const center=place(roofCenter(floor));
+    const door=spans.find(span=>span.group==='outer'&&span.type==='door');
+    let front=V(0,0,1);
+    if(door){
+      const edge=place(door.b).sub(place(door.a)).normalize();
+      front=V(-edge.z,0,edge.x);
+      if(place(door.a).sub(center).dot(front)<0)front.negate();
+    }
+    const across=V(front.z,0,-front.x);
+    const corners=floor.map(p=>place(p).sub(center));
+    const halfWidth=Math.max(.7,...corners.map(p=>Math.abs(p.dot(across))));
+    const halfDepth=Math.max(.7,...corners.map(p=>Math.abs(p.dot(front))));
+    const point=(x,y,z)=>center.clone().addScaledVector(across,x).addScaledVector(front,z).setY(y);
+    const bronze=eraOf(state.id)===1;
+    const spring=1.72,rise=clamp(halfWidth*.49,.68,1.25),wallThickness=.38;
+    const wallStone=bronze?procMat('cyclopean'):procMat('limestone');
+    // The wall courses are independent of the roof toggle, so the open-roof
+    // designer view still shows the complete, enterable masonry chamber.
+    for(const [i,span] of spans.entries()){
+      const a=place(span.a),b=place(span.b);
+      const width=span.group==='outer'?wallThickness:.21;
+      if(span.type==='door'){
+        fortificationMasonry(a,b,1.53,spring,width,i+31,bronze);
+      }else if(span.type==='window'){
+        fortificationMasonry(a,b,0,.8,width,i+31,bronze);
+        fortificationMasonry(a,b,1.2,spring,width,i+47,bronze);
+      }else fortificationMasonry(a,b,0,spring,width,i+31,bronze);
+    }
+    if(door){
+      const a=place(door.a),b=place(door.b),length=a.distanceTo(b);
+      const heading=-Math.atan2(b.z-a.z,b.x-a.x);
+      for(const end of [a,b]){
+        block(building,.23,1.56,.51,procMat('cutstone'),end.clone().setY(.78),heading)
+          .name='Cellar entrance stone jamb';
+      }
+      block(building,length+.38,.19,.57,wallStone,a.clone().lerp(b,.5).setY(1.59),heading)
+        .name='Cellar stone lintel';
+      block(building,length+.24,.075,.66,procMat('flags'),a.clone().lerp(b,.5).setY(.016),heading)
+        .name='Cellar threshold';
+    }
+    if(!withRoof)return;
+    // Elliptical barrel vault with visible intrados, masonry courses, and
+    // solid gable infill at both ends. End walls and roof close without gaps.
+    const sections=24,depthCourses=5,stone=terrainBatch(.72);
+    const palette=(bronze?[0x978a73,0xa69a84,0xb0a48d,0x897f70,0xc0b29a]:
+      [0xb3ab9a,0xc7bca6,0xa69d8e,0xd0c4af,0xbab09b]).map(c=>new T.Color(c));
+    const arch=(u,z,outer)=>{
+      const angle=(u-.5)*Math.PI;
+      return point((halfWidth+(outer?.105:-.095))*Math.sin(angle),
+        spring+rise*Math.cos(angle)+(outer?.16:-.105),z);
+    };
+    for(let i=0;i<sections;i++){
+      const u0=i/sections,u1=(i+1)/sections;
+      for(let j=0;j<depthCourses;j++){
+        const z0=-halfDepth+2*halfDepth*j/depthCourses;
+        const z1=-halfDepth+2*halfDepth*(j+1)/depthCourses;
+        const color=palette[Math.floor(noise(200+i*61+j*31)*palette.length)];
+        stone.face([arch(u0,z0,true),arch(u0,z1,true),arch(u1,z1,true),arch(u1,z0,true)],color);
+        stone.face([arch(u1,z0,false),arch(u1,z1,false),arch(u0,z1,false),arch(u0,z0,false)],
+          color.clone().multiplyScalar(.78));
+        if(j===0||j===depthCourses-1){
+          const z=j===0?-halfDepth:halfDepth;
+          stone.face([arch(u0,z,false),arch(u1,z,false),arch(u1,z,true),arch(u0,z,true)],
+            color.clone().multiplyScalar(j===0?.80:1.10));
+        }
+      }
+      // Masonry spandrels fully close the front and back gable triangles.
+      for(const z of [-halfDepth,halfDepth]){
+        const x0=-halfWidth+2*halfWidth*u0,x1=-halfWidth+2*halfWidth*u1;
+        stone.face([point(x0,spring,z),point(x1,spring,z),arch(u1,z,false),arch(u0,z,false)],
+          palette[(i+Math.round(z>0?2:0))%palette.length]);
+      }
+    }
+    stone.draw(building,'Integrated stone barrel vault and end gables',fieldSurface);
+
+    // A close-fitting turf cap is laid directly over the stone vault. It
+    // stops short of the entrance to keep the stone front facade exposed.
+    const cover=terrainBatch(.75),rim=terrainBatch(.75);
+    const moss=new T.Color(0x777a4c),earth=new T.Color(0x836b49);
+    const roofFront=halfDepth-.26,roofBack=-halfDepth-.10;
+    const covered=(u,z)=>{
+      const base=arch(u,z,true);
+      const thinning=clamp(Math.min(u,1-u)*9,0,1);
+      const ripple=(noise(Math.round(u*100)*31+Math.round(z*40)*13)-.5)*.045;
+      base.y+=.055+.13*thinning+ripple;
+      return base;
+    };
+    for(let j=0;j<7;j++)for(let i=0;i<sections;i++){
+      const z0=roofBack+(roofFront-roofBack)*j/7;
+      const z1=roofBack+(roofFront-roofBack)*(j+1)/7;
+      const u0=i/sections,u1=(i+1)/sections;
+      const color=moss.clone().lerp(earth,.27+noise(i*53+j*29)*.45);
+      cover.face([covered(u0,z0),covered(u1,z0),covered(u1,z1),covered(u0,z1)],color);
+    }
+    for(let i=0;i<sections;i++){
+      const a=i/sections,b=(i+1)/sections;
+      rim.face([arch(a,roofFront,true),arch(b,roofFront,true),
+        covered(b,roofFront),covered(a,roofFront)],earth);
+      rim.face([covered(a,roofBack),covered(b,roofBack),
+        arch(b,roofBack,true),arch(a,roofBack,true)],earth);
+    }
+    cover.draw(building,'Turf fitted to cellar stone vault',fieldSoil);
+    rim.draw(building,'Exposed earth edge of cellar roof',fieldSoil);
+  }
