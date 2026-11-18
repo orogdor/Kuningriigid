@@ -1,0 +1,72 @@
+
+  // V361: square Near-Eastern watchtower / gatehouse using the same sandstone
+  // courses, timber corbels and scalloped plaster crest as the city wall.
+  function stoneTowerShell(state,display,spans,withRoof){
+    const bronze=eraOf(state.id)===1;
+    const deck=wallWalk.deck,top=deck+2.70*(state.wallScale??100)/100;
+    const wood=procMat('roofplank'),thickness=.57;
+    for(const [i,s] of spans.entries()){
+      const a=place(s.a),b=place(s.b),length=a.distanceTo(b);
+      if(length<.03)continue;
+      const heading=-Math.atan2(b.z-a.z,b.x-a.x);
+      const draw=(lo,hi,width=thickness,batter=0)=>
+        mesoCoursesV361(a,b,lo,hi,width,237+i*17,bronze,batter);
+      if(s.type==='door'){
+        if(withRoof)draw(1.86,top-.83);
+        block(building,length+.24,.23,thickness+.23,
+          new T.MeshStandardMaterial({color:0xd5bb96,roughness:1}),
+          a.clone().lerp(b,.5).setY(1.88),heading,.92)
+          .name='V361 monumental sandstone tower door lintel';
+        for(const p of [a,b])
+          block(building,.24,1.83,thickness+.18,mesoWoodV361,
+            p.clone().setY(.92),heading,.9)
+            .name='V361 tower entrance cedar jamb';
+      }else if(s.type==='window'){
+        draw(-.05,.98,thickness+.12,.10);
+        if(withRoof)draw(1.46,top-.83);
+        block(building,length+.06,.12,thickness+.10,
+          new T.MeshStandardMaterial({color:0xcba781,roughness:1}),
+          a.clone().lerp(b,.5).setY(.98),heading)
+          .name='V361 sandstone tower arrow slit sill';
+      }else{
+        draw(-.06,.37,thickness+.20,.20);
+        draw(.34,withRoof?top-.83:1.28,thickness,.08);
+      }
+    }
+    if(!withRoof)return;
+    for(const [i,floor] of display.enclosed.entries()){
+      const coords=floor.map(p=>place(p));
+      if(coords.length<3)continue;
+      const x0=Math.min(...coords.map(p=>p.x)),x1=Math.max(...coords.map(p=>p.x));
+      const z0=Math.min(...coords.map(p=>p.z)),z1=Math.max(...coords.map(p=>p.z));
+      const cx=(x0+x1)*.5,w=x1-x0,d=z1-z0;
+      if(w<.55||d<.55)continue;
+      // Readable, usable interior guard floor and ladder.
+      const access=Math.min(.76,d*.29),depth=d-access-.35;
+      if(depth>.17){
+        const boards=[],count=Math.max(1,Math.ceil(depth/.19));
+        for(let j=0;j<count;j++)
+          boards.push([w-.33,.115,depth/count-.007,cx,deck-.058,
+            z0+.17+(j+.5)*depth/count,0,j*.39]);
+        forgeBoards(building,boards,wood,'V361 tower lower cedar guard platform');
+        const fx=x0+Math.min(.59,w*.24),rear=z0+.17+depth;
+        const foot=Math.min(z1-.11,rear+access-.04);
+        for(const sign of [-1,1])
+          pole(building,V(fx+sign*.22,.03,foot),V(fx+sign*.22,deck+.20,rear),
+            .046,wood).name='V361 tower climb ladder post';
+        for(let y=.24;y<deck;y+=.25){
+          const z=foot+(rear-foot)*y/deck;
+          pole(building,V(fx-.22,y,z),V(fx+.22,y,z),.036,wood)
+            .name='V361 tower ladder rung';
+        }
+      }
+      buildFloor(floor,top-.15).material=wood;
+      for(const [j,a] of coords.entries()){
+        const b=coords[(j+1)%coords.length],len=a.distanceTo(b);
+        if(len<.07)continue;
+        mesoUpperTowerV361(a,b,top-.83,top-.08,thickness,401+i*131+j);
+        mesoWaveV361(a,b,top-.08,.40,.98,401+i*131+j,true);
+        walkBarrier(a,b,.21,top-.10,top+.93);
+      }
+    }
+  }
