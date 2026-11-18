@@ -24,7 +24,11 @@ jobs:
         env:
           HOUSE_BUILDER_NODE_MODULES: /tmp/v361-builder/node_modules
         run: |
-          node tools/mesopotamian-v361/patch-v361.mjs
+          if ! grep -q 'function mesoWaveV361(' majaehitaja/index.html; then
+            node tools/mesopotamian-v361/patch-v361.mjs
+          else
+            echo 'V361 generated model source already present'
+          fi
           node tools/house-builder-v355/build.mjs
           node --check house-builder-v355.js
       - name: Bump existing export tests and validate
@@ -32,8 +36,8 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),path='tests/house-builder-v355.mjs';
           const old=fs.readFileSync(path,'utf8');
-          if(!old.includes('v=358a'))throw Error('Expected main V358 model-cache version');
-          fs.writeFileSync(path,old.replace('v=358a','v=361a'));
+          if(old.includes('v=358a'))fs.writeFileSync(path,old.replace('v=358a','v=361a'));
+          else if(!old.includes('v=361a'))throw Error('Unexpected model-cache version');
           NODE
           node tests/house-builder-v355.mjs
           node tests/fortress-v361.mjs
