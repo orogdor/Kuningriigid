@@ -1,0 +1,54 @@
+name: V360 stone parapet regeneration
+
+on:
+  push:
+    branches:
+      - feature/stone-fortifications-v360
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-parapet:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/stone-fortifications-v360
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install builder dependencies
+        run: npm install --no-save --prefix /tmp/v360-builder acorn eslint-scope
+      - name: Rebuild V360 parapet and export model
+        env:
+          HOUSE_BUILDER_NODE_MODULES: /tmp/v360-builder/node_modules
+        run: |
+          node tools/stone-fortifications-v360/patch-v360-stage1.mjs
+          node tools/house-builder-v355/build.mjs
+          node --check house-builder-v355.js
+      - name: Update cached version and run regression tests
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          for(const p of ['tests/house-builder-v355.mjs','tests/fortress-v359.mjs']){
+            const old=fs.readFileSync(p,'utf8');
+            if(!old.includes('359a'))throw Error('Expected V359 cache in '+p);
+            fs.writeFileSync(p,old.replaceAll('359a','360a'));
+          }
+          NODE
+          node tests/house-builder-v355.mjs
+          node tests/fortress-v359.mjs
+          node tests/fortress-v360-stage1.mjs
+      - name: Commit generated source and model
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add majaehitaja/index.html house-builder-v355.js house-designs-v354.js tests/house-builder-v355.mjs tests/fortress-v359.mjs
+          if ! git diff --cached --quiet; then
+            git commit -m 'V360 stage 1: rebuilt high-stone wall parapet'
+            git push origin HEAD:feature/stone-fortifications-v360
+          fi
