@@ -9,7 +9,7 @@
 import * as T from './vendor/three.module.js';
 
 // Bump when the designer export changes, so cached models are rebuilt.
-const MODEL_VERSION='354g';
+const MODEL_VERSION='358a';
 // Designer ids (catalog keys) in majaehitaja/index.html.
 const DESIGNER_IDS=new Set(['hall','house','hunter','fisher','farm','lumber','mason','pottery_kiln','study','barracks','watchtower','archery','palisade','woodgate','quarry','claypit','well','pasture','field',
  'library','scriptorium','market','warehouse','cellar','vegetable_garden','flax_farm','weaver','cartwright','coppermine','tinmine','bronze_foundry','road_depot','harbor','bridge','forester','saw','mill','bakery','gatehouse','reinforced_wall','stonewall','stonetower',
@@ -71,7 +71,7 @@ export function canDesignV354(type,age){return state.enabled&&Boolean(designerId
 // another; a model that fails falls back to the older game model.
 let builder=null;
 function houseBuilder(){
- builder??=import('./house-builder-v355.js?v=355a').catch(error=>{builder=null;throw error;});
+ builder??=import('./house-builder-v355.js?v=358a').catch(error=>{builder=null;throw error;});
  return builder;
 }
 async function requestModel(id,design,segment){
