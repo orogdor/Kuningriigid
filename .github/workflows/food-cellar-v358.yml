@@ -1,0 +1,42 @@
+name: Rebuild food cellar V358
+on:
+  push:
+    branches: [fix/food-cellar-v358-from-scratch]
+    paths:
+      - .github/workflows/food-cellar-v358.yml
+      - tools/food-cellar-v358/**
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Patch only the food cellar in the large designer source
+        run: node tools/food-cellar-v358/apply.mjs
+      - name: Regenerate house builder from the updated source
+        run: |
+          npm install --prefix "$RUNNER_TEMP/house-builder-v358-deps" --no-save --no-audit --no-fund acorn eslint-scope
+          HOUSE_BUILDER_NODE_MODULES="$RUNNER_TEMP/house-builder-v358-deps/node_modules" node tools/house-builder-v355/build.mjs
+      - name: Validate source stamp and generated module
+        run: |
+          node --check house-builder-v355.js
+          node tests/house-builder-v355.mjs
+      - name: Commit generated sources to this branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add majaehitaja/index.html house-builder-v355.js
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+          else
+            git commit -m "Regenerate rebuilt Food cellar in designer and game module"
+            git push origin HEAD:refs/heads/fix/food-cellar-v358-from-scratch
+          fi
