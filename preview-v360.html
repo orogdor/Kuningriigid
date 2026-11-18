@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="et">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kuningriigid V360 – kivikaitserajatiste katse</title>
+<style>
+html,body{height:100%;margin:0;background:#141b20;color:#eef1e9;font:15px system-ui,Arial,sans-serif}
+header{box-sizing:border-box;height:52px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#26352f}
+header strong{white-space:nowrap}header span{font-size:13px;color:#c6ddd0}
+header a{color:#b9e5c6}#stage{height:calc(100% - 52px)}
+iframe{border:0;width:100%;height:100%;background:#e3e0d6}
+#status{padding:2rem;line-height:1.6}
+@media(max-width:650px){header{height:auto;min-height:52px;flex-wrap:wrap;padding:10px;}#stage{height:calc(100% - 80px)}}
+</style>
+</head><body>
+<header><strong>V360 – kivimüürid, tornid ja väravad</strong><span>Esimene etapp: kõrge kivimüür · peamängu ei muuda</span><a href="https://github.com/orogdor/Kuningriigid/tree/feature/stone-fortifications-v360">V360 tööharu</a></header>
+<div id="stage"><div id="status">Laen V360 majakujundaja katsemudeleid...</div></div>
+<script>
+(async () => {
+ const source='https://raw.githubusercontent.com/orogdor/Kuningriigid/feature/stone-fortifications-v360/majaehitaja/index.html';
+ const base='https://orogdor.github.io/Kuningriigid/majaehitaja/';
+ try {
+  const response=await fetch(source,{cache:'no-store'});
+  if(!response.ok)throw Error('GitHub '+response.status);
+  let html=await response.text();
+  if(!html.includes('V360 separate parapet coping stones'))throw Error('V360 geomeetria puudub allikas');
+  // Resolve normal designer textures and portraits from the published game.
+  html=html.replace(/<head([^>]*)>/i,'<head$1><base href="'+base+'">');
+  // Show the first repaired asset immediately; still allow choosing another model.
+  html=html.replace("const demoProject=new URLSearchParams(location.search).get('demo');","const demoProject='reinforced_wall';");
+  const frame=document.createElement('iframe');
+  frame.title='V360 kaitseehitiste 3D mudelikujundaja';
+  frame.setAttribute('allow','fullscreen');
+  frame.srcdoc=html;
+  const stage=document.getElementById('stage');
+  stage.replaceChildren(frame);
+ }catch(error){
+  document.getElementById('status').textContent='V360 laadimine ebaõnnestus: '+error.message;
+ }
+})();
+</script>
+</body></html>
