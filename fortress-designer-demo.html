@@ -386,25 +386,25 @@ function towerAt(parent,t){
 }
 function gateAt(parent,gate,segment){
  const g=lineGroup(gate.x,gate.z,segment.ang);parent.add(g);
- const W=gate.width||state.gateWidth,H=state.wallHeight,T=state.thickness;
+ const W=gate.width||state.gateWidth,H=state.wallHeight,wallDepth=state.thickness;
  const stone=brickMaterial(),post=W/2+.73,gateH=H+1.24;
  // Independent gate module: wall segments end before its opening.
  for(const sign of [-1,1]){
   const x=sign*post;
   g.add((()=>{
-   const p=createTaper(1.42,T+.50,T+.1,0,gateH,stone);p.position.x=x;return p;
+   const p=createTaper(1.42,wallDepth+.50,wallDepth+.1,0,gateH,stone);p.position.x=x;return p;
   })());
-  cube(g,x,.22,0,1.72,.43,T+.83,m.stoneDark);
-  cube(g,x,gateH+.04,0,1.68,.14,T+.36,m.floor);
-  for(let i=0;i<3;i++)cube(g,x,gateH-1.08+i*.34,sign*(T/2+.08),.36,.10,.20,m.woodLight);
+  cube(g,x,.22,0,1.72,.43,wallDepth+.83,m.stoneDark);
+  cube(g,x,gateH+.04,0,1.68,.14,wallDepth+.36,m.floor);
+  for(let i=0;i<3;i++)cube(g,x,gateH-1.08+i*.34,sign*(wallDepth/2+.08),.36,.10,.20,m.woodLight);
  }
  // Clear portal below a thick overhead crossbar and guard-walk.
  const beamTop=gateH+.08,bridgeLow=Math.max(H+1.02,gateH-.62);
- cube(g,0,(bridgeLow+beamTop)/2,0,W+.40,beamTop-bridgeLow,T+.30,stone);
- cube(g,0,beamTop+.07,0,W+1.8,.18,T+.55,m.floor);
+ cube(g,0,(bridgeLow+beamTop)/2,0,W+.40,beamTop-bridgeLow,wallDepth+.30,stone);
+ cube(g,0,beamTop+.07,0,W+1.8,.18,wallDepth+.55,m.floor);
  for(const side of [-1,1]){
   const wave=crenel(W+1.75,.43,beamTop+.19,state.parapet,m.plaster);
-  wave.position.z=side*(T/2+.08);g.add(wave);
+  wave.position.z=side*(wallDepth/2+.08);g.add(wave);
  }
  const width=W/2;
  for(const sign of [-1,1]){
@@ -422,7 +422,7 @@ function gateAt(parent,gate,segment){
   }
  }
  if(selected.type==='gate'&&selected.id===gate.id)
-  cube(g,0,gateH*.4,0,W+2.75,gateH*.8,T+.35,m.select,false);
+  cube(g,0,gateH*.4,0,W+2.75,gateH*.8,wallDepth+.35,m.select,false);
  return g;
 }
 function pathPieces(){
