@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="et">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Kuningriigid · Parameetriline kindlustuste kujundaja</title>
+<style>
+:root{--g:#e6bd77;--bg:#071a29;--panel:#0a2434;--txt:#ecdfc4}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#0c1820;color:var(--txt);font:14px system-ui,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #eac27b;outline-offset:2px}
+header{height:60px;display:flex;align-items:center;gap:16px;background:linear-gradient(#0d3046,#071827);border-bottom:2px solid #bd8b4c;padding:0 16px;position:relative;z-index:5;box-shadow:0 2px 12px #0008}
+.logo{font:bold 21px Georgia,serif;color:#f4d18f;white-space:nowrap}.subtitle{font:17px Georgia,serif;color:#eee0bd}.subinfo{font-size:11px;color:#b9a88c;margin-top:3px}
+.topright{margin-left:auto;display:flex;gap:8px}.navbtn{padding:9px 12px;background:#14334a;border:1px solid #9a7544;color:#eed1a4;border-radius:6px}
+main{display:grid;grid-template-columns:220px minmax(0,1fr) 320px;height:calc(100dvh - 60px);min-height:0}
+aside{background:linear-gradient(150deg,#0d293b,#071926);border:1px solid #8e6c42;box-shadow:inset 0 0 0 2px #223b48;overflow:auto;scrollbar-width:thin;scrollbar-color:#85613d #0a2030;padding:14px;z-index:2}
+#left{border-radius:0 0 8px 0}#right{border-radius:0 0 0 8px}
+h2{font:19px Georgia,serif;color:#f8cd81;margin:2px 0 12px}h3{font:16px Georgia,serif;color:#f2cb83;margin:18px 0 8px;border-bottom:1px solid #705535;padding-bottom:7px}
+p{line-height:1.5}.muted{font-size:12px;color:#b6ac99}.tool{width:100%;padding:14px 10px;margin:0 0 9px;border:1px solid #876942;background:#122e40;color:#ead8b9;border-radius:8px;text-align:left;display:flex;gap:12px;align-items:center;font:15px Georgia,serif}
+.tool strong{font-weight:normal}.tool .symbol{font-size:27px;min-width:32px;text-align:center;color:#e9c17d}.tool.active,.preset.active{background:linear-gradient(#5c4a2a,#152a35);border-color:#ffda92;box-shadow:inset 0 0 0 1px #dfb66f,0 0 10px #ab874a70}
+.tool:hover,.navbtn:hover,.preset:hover{filter:brightness(1.16)}
+.preset{width:100%;border:1px solid #786042;background:#0e2838;color:#e8d6b8;text-align:left;padding:10px;border-radius:7px;margin-bottom:7px}
+hr{border:0;border-top:1px solid #6a5137;margin:14px 0}.row{display:flex;align-items:center;gap:6px}.statusmark{color:#a9db9f;font-weight:bold}
+#viewport{position:relative;min-width:0;min-height:0;background:radial-gradient(circle at 50% 38%,#b0bba8,#8b9d8e);touch-action:none}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#floatTop{position:absolute;top:16px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#082338de;color:#ead1a2;border:1px solid #9f8250;padding:9px 13px;border-radius:23px;font-size:12px;pointer-events:none;max-width:90%;overflow:hidden;text-overflow:ellipsis}
+#floatBottom{position:absolute;bottom:18px;left:16px;right:16px;display:flex;gap:10px;justify-content:space-between;align-items:end;pointer-events:none}
+#dims{background:#071d2cdd;padding:9px 13px;border:1px solid #be985b;border-radius:9px;color:#f8d99b;font-size:13px;line-height:1.5}
+#orbitcontrols{display:flex;gap:7px;pointer-events:auto}.iconbutton{width:39px;height:39px;background:linear-gradient(#1b4862,#0a2234);border:1px solid #d0a867;border-radius:50%;color:#f4d59b;font-size:21px}
+#right{padding:14px 15px}.group{margin-bottom:15px}.group label{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px;color:#e8d4ad;font-size:12px}.valuebox{width:77px;height:30px;border:1px solid #977343;border-radius:5px;background:#102b3c;color:#ffe1a5;text-align:right;padding:3px 6px;appearance:textfield}.valuebox::-webkit-inner-spin-button,.valuebox::-webkit-outer-spin-button{appearance:none}
+input[type=range]{width:100%;accent-color:#dfb468;cursor:pointer;height:17px}
+.choose{width:100%;background:#102e41;color:#f3d49b;border:1px solid #967449;border-radius:5px;padding:8px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}.pill{background:#123346;color:#e5cfaa;border:1px solid #81613c;padding:8px;border-radius:7px;flex:1;font-size:12px;white-space:nowrap}.pill.active{background:#6f552a;border-color:#ffe09f;color:#fff0c6}
+.switch{display:flex;gap:7px;align-items:center;justify-content:space-between;padding:7px 0;color:#e8d3ad;font-size:13px}.switch input{accent-color:#e7bf79;width:18px;height:18px}
+.btn{background:linear-gradient(#204936,#123020);border:1px solid #dbb57a;color:#ffe2a9;padding:11px 12px;border-radius:7px;width:100%;font-weight:bold}
+.tip{margin-top:10px;background:#142f3b;border-left:3px solid #d8a969;padding:9px;color:#cebd9e;font:12px/1.5 system-ui}
+#mobileToggle{display:none}
+.toast{position:absolute;z-index:7;top:75px;left:50%;transform:translateX(-50%);background:#102b3b;border:1px solid #d7b37b;border-radius:8px;padding:11px 18px;color:#ffdb9e;box-shadow:0 4px 20px #0008;display:none}
+@media(max-width:1020px){main{grid-template-columns:165px minmax(0,1fr) 280px}.tool{font-size:13px}.logo{font-size:18px}.subtitle{font-size:15px}}
+@media(max-width:760px){header{height:58px;padding:0 8px;gap:8px}.logo{font-size:17px}.subtitle,.subinfo{display:none}.topright{gap:5px}.navbtn{padding:8px 9px;font-size:12px}#mobileToggle{display:block}
+main{height:calc(100dvh - 58px);grid-template-columns:74px minmax(0,1fr)}#left{padding:7px 5px}#left h2,#left h3,#left hr,#left p,#left .preset,#left .muted{display:none}
+.tool{flex-direction:column;gap:1px;padding:8px 2px;font-size:10px;min-height:68px;text-align:center}.tool .symbol{font-size:24px}.tool strong{font-size:11px}
+#right{display:none;position:absolute;z-index:10;left:84px;right:7px;top:68px;bottom:8px;border-radius:10px;max-height:calc(100dvh - 76px);padding:14px}
+#right.open{display:block}#floatTop{font-size:10px;top:9px;width:90%;text-align:center}#floatBottom{bottom:10px;left:7px;right:7px;align-items:end}
+#dims{font-size:10px;padding:7px;max-width:55%}.iconbutton{height:34px;width:34px;font-size:18px}
+}
+</style></head>
+<body>
+<header><div class="logo">♜ Kuningriigid</div><div><div class="subtitle">Kindlustuste 3D-disainer</div><div class="subinfo">Muuda mõõte, materjale, katust ja detaile – mudel muutub kohe</div></div>
+<div class="topright"><button class="navbtn" id="reset">↶ Algseis</button><button class="navbtn" id="save">💾 Salvesta</button><button class="navbtn" id="mobileToggle">⚙ Seaded</button></div></header>
+<main>
+<aside id="left"><h2>Ehitusosa</h2>
+<button class="tool active" data-kind="wall"><span class="symbol">▤</span><strong>Müür</strong></button>
+<button class="tool" data-kind="tower"><span class="symbol">♜</span><strong>Torn</strong></button>
+<button class="tool" data-kind="gate"><span class="symbol">▥</span><strong>Värav</strong></button>
+<hr><h3>Valmiskujundused</h3><div id="presets">
+<button class="preset" data-preset="ancient">🏺 Muistne kivimüür</button>
+<button class="preset" data-preset="gallery">🏠 Katusega müürikäik</button>
+<button class="preset" data-preset="watchtower">♜ Vahitorn</button>
+<button class="preset" data-preset="roofedTower">🏰 Katusega torn</button>
+<button class="preset" data-preset="citygate">▥ Linnavärav</button>
+</div><hr><p class="muted">Pööra mudelit hiirega lohistades. Suumi kerimisega või kahe sõrmega.</p>
+<div class="tip">See on <strong>eraldi katse</strong>, mitte põhimängu hoonete või müüride muutmine.</div>
+</aside>
+<section id="viewport"><div id="floatTop">Vali vasakult ehitis ja kujunda selle iga osa ise</div><div id="floatBottom">
+<div id="dims"></div><div id="orbitcontrols"><button class="iconbutton" id="zoomIn" title="Lähemale">＋</button><button class="iconbutton" id="zoomOut" title="Kaugemale">－</button><button class="iconbutton" id="home" title="Taasta vaade">⌂</button></div>
+</div></section>
+<aside id="right"><h2 id="panelTitle">Müüri parameetrid</h2>
+<div class="group" id="dimensionFields"></div>
+<h3>Materjal ja viimistlus</h3>
+<div class="group"><label for="material">Konstruktsiooni materjal</label><select class="choose" id="material">
+<option value="sand">Liivakivi</option><option value="stone">Hall kivi</option><option value="brick">Punane tellis</option><option value="plaster">Hele krohv</option><option value="wood">Puit</option></select></div>
+<h3>Kaitserinnatis</h3><div class="pills" id="crestOptions">
+<button class="pill" data-crest="wave">∿ Laineline</button><button class="pill" data-crest="square">▥ Sakiline</button><button class="pill" data-crest="plain">─ Sirge</button><button class="pill" data-crest="none">✕ Puudub</button>
+</div>
+<div class="group" style="margin-top:12px" id="crestHeightField"></div>
+<h3>Katus / katmine</h3>
+<label class="switch">Katus <input type="checkbox" id="roof"></label>
+<div class="group"><label for="roofType">Katuse kuju</label><select class="choose" id="roofType"><option value="gable">Viilkatus</option><option value="hip">Kelpkatus</option><option value="flat">Lamekatus</option><option value="cone">Telkkatus</option></select></div>
+<div class="group"><label for="roofMat">Katuse materjal</label><select class="choose" id="roofMat"><option value="tile">Savi- / kivikatus</option><option value="wood">Laudkatus</option><option value="stone">Kiviplaadid</option></select></div>
+<h3>Avad ja detailid</h3>
+<div id="detailOptions"></div>
+<div class="tip" id="desctip">Määra seinte kõrgus, paksus, käigutee ja rinnatise kuju.</div>
+<hr><button class="btn" id="export">✓ Kopeeri kujunduse andmed</button>
+</aside>
+</main>
+<div class="toast" id="toast"></div>
+<script type="module">
+import * as THREE from './vendor/three.module.js';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const defaults={
+ wall:{kind:'wall',length:11,width:2.7,height:5.3,thickness:.55,crestHeight:.95,crest:'wave',material:'sand',roof:false,roofType:'gable',roofMat:'tile',door:false,windows:false,open:false,opening:3.2},
+ tower:{kind:'tower',length:5.4,width:5.0,height:9.2,thickness:.65,crestHeight:1,crest:'wave',material:'sand',roof:true,roofType:'hip',roofMat:'tile',door:true,windows:true,open:false,opening:3.2},
+ gate:{kind:'gate',length:10,width:3.3,height:7.3,thickness:.70,crestHeight:1.05,crest:'wave',material:'sand',roof:false,roofType:'gable',roofMat:'tile',door:true,windows:true,open:false,opening:3.6}
+};
+const presets={
+ ancient:{...defaults.wall},gallery:{...defaults.wall,roof:true,roofType:'gable',roofMat:'wood',crest:'plain',width:3.2},
+ watchtower:{...defaults.tower,roof:false},roofedTower:{...defaults.tower,roof:true,roofType:'hip'},
+ citygate:{...defaults.gate}
+};
+let models=JSON.parse(JSON.stringify(defaults));let p=models.wall,active='wall',animation=null;
+const scene=new THREE.Scene();scene.background=new THREE.Color('#a0b2ad');scene.fog=new THREE.Fog('#a0b2ad',38,92);
+const container=$('#viewport'),renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.65));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.17;
+container.prepend(renderer.domElement);
+const camera=new THREE.PerspectiveCamera(42,1,.1,160),lookAt=new THREE.Vector3(0,3.35,0);
+let camTheta=.61,camPhi=1.08,camRadius=24;
+const updateCamera=()=>{camera.position.set(camRadius*Math.sin(camPhi)*Math.sin(camTheta),camRadius*Math.cos(camPhi)+lookAt.y,camRadius*Math.sin(camPhi)*Math.cos(camTheta));camera.lookAt(lookAt)};
+function fit(){const w=container.clientWidth,h=container.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(1,h);camera.updateProjectionMatrix();updateCamera()}addEventListener('resize',fit);fit();
+scene.add(new THREE.HemisphereLight(0xe3f0f4,0x665848,2.3));
+const sun=new THREE.DirectionalLight(0xffe7be,2.5);sun.position.set(-19,28,17);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
+sun.shadow.camera.left=-22;sun.shadow.camera.right=22;sun.shadow.camera.top=22;sun.shadow.camera.bottom=-22;sun.shadow.normalBias=.035;scene.add(sun);
+const fill=new THREE.DirectionalLight(0xbfcdd8,.75);fill.position.set(14,16,-15);scene.add(fill);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(180,180),new THREE.MeshStandardMaterial({color:0x8b9473,roughness:1}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;floor.position.y=-.025;scene.add(floor);
+const grid=new THREE.GridHelper(32,32,0xc4b58c,0x949778);grid.position.y=.003;grid.material.transparent=true;grid.material.opacity=.16;scene.add(grid);
+const mount=new THREE.Group();scene.add(mount);
+const textures={};const mats=new Map();
+const palettes={
+ sand:['#b69b76','#d5b990','#aa8b62','#d4b28b'],
+ stone:['#797d7d','#a0a6a1','#707873','#b0b1a6'],
+ brick:['#9e5642','#b96a4a','#854b3c','#c57a5c'],
+ plaster:['#e0d2ba','#e9dcc7','#d7c5ac','#eee0c5'],
+ wood:['#765239','#9f7149','#624731','#b08658'],
+ tile:['#934b36','#b76543','#854333','#c07a52']
+};
+function makeTexture(key){
+ const arr=palettes[key]||palettes.sand;
+ const c=document.createElement('canvas');c.width=512;c.height=512;const ctx=c.getContext('2d');ctx.fillStyle='#5d4f40';ctx.fillRect(0,0,512,512);
+ if(key==='plaster'){ctx.fillStyle=arr[1];ctx.fillRect(0,0,512,512);for(let i=0;i<1700;i++){const x=(i*173)%512,y=(i*397)%512;ctx.fillStyle=i%3===0?'#d4c5ac':'#f1e4d1';ctx.globalAlpha=.07;ctx.fillRect(x,y,2+(i%4),2+(i%3));}ctx.globalAlpha=1;}
+ else if(key==='wood'){
+  for(let i=0;i<17;i++){const x=i*31;ctx.fillStyle=arr[i%4];ctx.fillRect(x,0,30,512);ctx.fillStyle='rgba(24,17,8,.19)';ctx.fillRect(x,0,2,512);for(let j=0;j<12;j++){ctx.fillStyle='rgba(34,19,8,.13)';ctx.fillRect(x+6+(j%4)*4,j*44,1,30);}}
+ }else{
+  const rows=key==='tile'?13:8,h=512/rows,cols=key==='brick'?8:5,w=512/cols;
+  for(let row=0;row<rows;row++)for(let col=-1;col<=cols;col++){
+   const x=col*w+(row%2?-.45*w:0),y=row*h;
+   ctx.fillStyle=arr[(row*7+col*11+24)%4];ctx.fillRect(x+2,y+2,w-4,h-4);
+   ctx.fillStyle='rgba(255,255,255,.11)';ctx.fillRect(x+4,y+3,w-8,2);
+   ctx.fillStyle='rgba(34,23,16,.12)';ctx.fillRect(x+4,y+h-6,w-8,3);
+  }
+ }
+ const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.anisotropy=4;return texture;
+}
+Object.keys(palettes).forEach(k=>textures[k]=makeTexture(k));
+function material(key,x=1,y=1){
+ const cacheKey=key+':'+Math.round(x*2)/2+':'+Math.round(y*2)/2;
+ if(!mats.has(cacheKey)){const tex=textures[key].clone();tex.needsUpdate=true;tex.repeat.set(Math.max(.45,x/2),Math.max(.5,y/.9));
+ mats.set(cacheKey,new THREE.MeshStandardMaterial({map:tex,roughness:.96,side:THREE.DoubleSide}));}
+ return mats.get(cacheKey);
+}
+const flat=(color)=>new THREE.MeshStandardMaterial({color,roughness:.93,side:THREE.DoubleSide});
+const limestone=flat(0xd9cab0),edgeMat=flat(0xcbb493),darkWood=flat(0x69452c),metal=flat(0x373e42),darkVoid=flat(0x292d28),gold=flat(0xe4c57a),red=flat(0xbb7854);
+function box(parent,x,y,z,l,h,w,mat){const mesh=new THREE.Mesh(new THREE.BoxGeometry(Math.max(.005,l),Math.max(.005,h),Math.max(.005,w)),mat);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh}
+function tri(parent,pts,mat){
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts.flatMap(v=>[v[0],v[1],v[2]]),3));g.computeVertexNormals();
+ const mesh=new THREE.Mesh(g,mat);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
+}
+function beam(parent,a,b,r,mat){
+ const va=new THREE.Vector3(...a),vb=new THREE.Vector3(...b);const delta=vb.clone().sub(va);
+ const obj=new THREE.Mesh(new THREE.CylinderGeometry(r,r,delta.length(),7),mat);
+ obj.position.copy(va).add(vb).multiplyScalar(.5);obj.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),delta.normalize());obj.castShadow=true;parent.add(obj);return obj;
+}
+function drawCrest(parent,length,thickness,y,z,style,height,alongZ=false){
+ if(style==='none')return;
+ const node=new THREE.Group();node.position.set(0,y,z);if(alongZ)node.rotation.y=Math.PI/2;parent.add(node);
+ const base=.20,top=style==='plain'?.38:height;
+ box(node,0,base/2,0,length,base,thickness,limestone);
+ if(style==='plain'){box(node,0,base+.18,0,length,.36,thickness,limestone);return;}
+ if(style==='square'){
+  const bays=Math.max(2,Math.ceil(length/.76));for(let i=0;i<bays;i++){
+   if(i%2===0)box(node,-length/2+(i+.5)*length/bays,base+top*.46,0,length/bays+.02,top*.92,thickness,limestone);
+  }return;
+ }
+ // Smooth wave crenels built as solid extruded shape, not a row of cubes.
+ const n=Math.max(1,Math.round(length/1.1)),segments=n*18;
+ const path=new THREE.Shape();path.moveTo(-length/2,base);path.lineTo(length/2,base);
+ for(let i=segments;i>=0;i--){
+  const t=i/segments;
+  const wave=.42+.58*(.5+.5*Math.cos(t*n*2*Math.PI));
+  path.lineTo(-length/2+length*t,base+height*wave);
+ }
+ path.closePath();
+ const geom=new THREE.ExtrudeGeometry(path,{depth:thickness,bevelEnabled:false,curveSegments:6,steps:1});
+ const mesh=new THREE.Mesh(geom,limestone);mesh.position.z=-thickness/2;mesh.castShadow=true;mesh.receiveShadow=true;node.add(mesh);
+}
+function taper(parent,L,W,H,mat,offset=0){
+ const bottom=W+offset,top=W, coords=[
+ [-L/2,0,-bottom/2],[L/2,0,-bottom/2],[L/2,0,bottom/2],[-L/2,0,bottom/2],
+ [-L/2,H,-top/2],[L/2,H,-top/2],[L/2,H,top/2],[-L/2,H,top/2]
+ ],faces=[[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7],[4,5,6,7]];
+ const a=[],uv=[];
+ for(const f of faces)for(const i of [0,1,2,0,2,3]){
+  const j=f[i],v=coords[j];a.push(...v);uv.push(v[0]/1.7+v[2]/1.7,v[1]/.75+v[2]/3);
+ }
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(a,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.computeVertexNormals();
+ const mesh=new THREE.Mesh(g,mat);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
+}
+function roof(parent,L,W,y,type,key){
+ const roofmat=material(key,L,W),over=.38;L+=over*2;W+=over*2;
+ if(type==='flat'){box(parent,0,y+.13,0,L,.26,W,roofmat);return;}
+ if(type==='cone'){
+  const geo=new THREE.ConeGeometry(Math.max(L,W)*.78,Math.max(1.2,W*.38),4);
+  const mesh=new THREE.Mesh(geo,roofmat);mesh.rotation.y=Math.PI/4;mesh.position.y=y+Math.max(1.2,W*.38)/2;
+  mesh.castShadow=true;parent.add(mesh);return;
+ }
+ const rise=type==='hip'?W*.35:W*.43;
+ if(type==='hip'){
+  const A=[-L/2,y,-W/2],B=[L/2,y,-W/2],C=[L/2,y,W/2],D=[-L/2,y,W/2],
+  x=Math.max(0,L*.5-W*.3),R=[-x,y+rise,0],S=[x,y+rise,0];
+  for(const v of [[A,B,S],[A,S,R],[D,C,S],[D,S,R],[A,R,D],[B,C,S]])tri(parent,v,roofmat);
+ }else{
+  const e=W/2,len=Math.hypot(e,rise),angle=Math.atan2(rise,e);
+  for(const sign of [-1,1]){
+   const slab=box(parent,0,y+rise/2,sign*W/4,L,.14,len,roofmat);
+   slab.rotation.x=-sign*angle;
+  }
+  for(const x of [-L/2,L/2])tri(parent,[[x,y,-W/2],[x,y,W/2],[x,y+rise,0]],material('plaster',1,2));
+ }
+ box(parent,0,y+rise,0,L+.08,.10,.14,darkWood);
+}
+function posts(parent,L,W,bottom,top){
+ for(const x of [-L/2+.12,L/2-.12])for(const z of [-W/2+.12,W/2-.12]){
+  box(parent,x,(bottom+top)/2,z,.19,top-bottom,.19,material('wood',1,top-bottom));
+ }
+ for(const z of [-W/2+.13,W/2-.13])beam(parent,[-L/2+.12,top,z],[L/2-.12,top,z],.12,darkWood);
+}
+function buildWall(){
+ const {length:L,width:W,height:H,crest,crestHeight:CH,roof:hasRoof,roofType,roofMat}=p;
+ const bodyH=H-.08;
+ taper(mount,L,W,bodyH,material(p.material,L,H),.40);
+ box(mount,0,H-.09,0,L+.1,.19,W+.1,material('stone',L,W));
+ for(const s of [-1,1])drawCrest(mount,L+.03,.36,H+.03,s*(W/2+.02),crest,CH);
+ // Distinct stone face footing and cap, no long floating rail.
+ box(mount,0,.16,0,L+.15,.32,W+.5,material(p.material,L,1));
+ for(let i=1;i<Math.round(L/1.45);i++){
+  const x=-L/2+i*L/Math.round(L/1.45);
+  box(mount,x,H+.02,0,.018,.016,W*.70,edgeMat);
+ }
+ if(p.windows){for(let i=1;i<=Math.max(1,Math.floor(L/2.5));i++){
+  const x=-L/2+i*L/(Math.max(1,Math.floor(L/2.5))+1);
+  box(mount,x,H*.56,W/2+.025,.13,.56,.042,darkVoid);
+ }}
+ if(p.door){
+  // Side access demonstration, not a floating slab through the entire wall.
+  box(mount,-L*.29,H*.39,W/2+.07,1.22,2.35,.12,darkWood);
+  box(mount,-L*.29,H*.39,W/2+.15,.86,1.99,.1,material('wood',1,2));
+ }
+ if(hasRoof){
+  const bottom=H+CH+.24;
+  posts(mount,L-.3,W+.34,H+.1,bottom);
+  roof(mount,L,W+.55,bottom,roofType,roofMat);
+ }
+}
+function facadeZ(z,L,H,T,door,windows){
+ const plankWidth=door?1.35:0,doorH=Math.min(2.35,H*.41);
+ if(door){
+  const w=(L-plankWidth)/2;
+  box(mount,-(L+plankWidth)/4,H/2,z,w,H,T,material(p.material,w,H));
+  box(mount,(L+plankWidth)/4,H/2,z,w,H,T,material(p.material,w,H));
+  box(mount,0,(H+doorH)/2,z,plankWidth,H-doorH,T,material(p.material,plankWidth,H));
+  const hinge=box(mount,-.48,doorH/2,z+Math.sign(z)*T*.56,.13,doorH*.95,.12,material('wood',1,2));
+  box(mount,plankWidth*.32,doorH*.5,z+Math.sign(z)*T*.53,.18,doorH*.89,.10,darkWood);
+ }else{
+  box(mount,0,H/2,z,L,H,T,material(p.material,L,H));
+ }
+ if(windows)for(let x of [-L*.25,L*.25])box(mount,x,H*.70,z+Math.sign(z)*(T/2+.008),.18,.73,.024,darkVoid);
+}
+function facadeX(x,W,H,T,sideDoor,windows){
+ if(sideDoor){
+  const openW=1.25,start=H*.49,openH=Math.min(1.9,H*.3);
+  const remainder=(W-openW)/2;
+  for(const s of [-1,1])
+   box(mount,x,H/2,s*(openW+remainder)/2,T,H,remainder,material(p.material,W,H));
+  box(mount,x,start/2,0,T,start,openW,material(p.material,1,H));
+  box(mount,x,(start+openH+H)/2,0,T,H-start-openH,openW,material(p.material,1,H));
+  box(mount,x+Math.sign(x)*(T/2+.05),start+.09,0,.68,.17,openW+.18,material('wood',2,1));
+  box(mount,x+Math.sign(x)*(T/2+.04),(start+openH)/2,-.44,.08,openH-.05,.22,darkWood);
+ }else box(mount,x,H/2,0,T,H,W,material(p.material,W,H));
+ if(windows)for(const z of [-W*.27,W*.27])
+  box(mount,x+Math.sign(x)*(T/2+.008),H*.74,z,.024,.80,.15,darkVoid);
+}
+function buildTower(){
+ const {length:L,width:W,height:H,thickness:T,crestHeight:CH,crest,roof:hasRoof,roofType,roofMat}=p;
+ facadeZ(-W/2,L,H,T,false,p.windows);
+ facadeZ(W/2,L,H,T,p.door,p.windows);
+ facadeX(-L/2,W,H,T,true,p.windows);
+ facadeX(L/2,W,H,T,true,p.windows);
+ // Full-height corner quoins bind the four separate faces.
+ for(const x of [-L/2,L/2])for(const z of [-W/2,W/2]){
+  box(mount,x,H/2,z,T*1.07,H,T*1.07,material(p.material,1,H));
+  for(let y=.25;y<H;y+=1.22)box(mount,x,y,z,T*1.19,.12,T*1.19,edgeMat);
+ }
+ const floors=Math.max(1,Math.floor(H/2.6));
+ for(let i=1;i<=floors;i++)box(mount,0,H*i/(floors+1),0,L-T*2,.13,W-T*2,material('wood',L,W));
+ box(mount,0,H-.08,0,L-T*1.2,.22,W-T*1.2,material('wood',L,W));
+ if(crest!=='none'){
+  for(const s of [-1,1]){
+   drawCrest(mount,L,.42,H,s*W/2,crest,CH,false);
+   const group=new THREE.Group();group.rotation.y=Math.PI/2;
+   // Side railing rotates about the origin.
+   drawCrest(group,W,.42,H,s*L/2,crest,CH,false);mount.add(group);
+  }
+ }
+ if(hasRoof){const eave=H+CH+.28;posts(mount,L-.42,W-.42,H+.09,eave);roof(mount,L,W,eave,roofType,roofMat);}
+}
+function gateLeaf(x,openH,doorWidth,sign,open){
+ const g=new THREE.Group();g.position.set(sign*doorWidth/2,0,0);g.rotation.y=open?sign*.95:0;mount.add(g);
+ box(g,-sign*doorWidth/4,openH/2,0,doorWidth/2-.025,openH-.05,.21,material('wood',doorWidth,openH));
+ for(const y of [.5,openH*.67,openH-.3]){
+  box(g,-sign*doorWidth/4,y,.13,doorWidth/2-.08,.09,.08,metal);
+  for(let j=1;j<=4;j++)box(g,-sign*doorWidth*j/10,y,.185,.034,.034,.026,edgeMat);
+ }
+}
+function buildGate(){
+ const {length:L,width:W,height:H,thickness:T,opening:O,crest,crestHeight:CH,roof:hasRoof,roofType,roofMat}=p;
+ const opening=Math.min(O,L-2.0),post=(L-opening)/2,gateH=Math.min(4.1,H*.65);
+ for(const s of [-1,1]){
+  const x=s*(opening/2+post/2);
+  const w=post-.06;
+  // Two independent gate pylons, no wall built across passage.
+  taper(mount,w,W,H,material(p.material,w,H),.14).position.x=x;
+  box(mount,x,.16,0,w+.15,.32,W+.34,material(p.material,2,1));
+  for(const y of [.30,H*.49,H-.19])box(mount,x,y,0,w+.17,.15,W+.2,edgeMat);
+  if(p.windows)box(mount,x,H*.73,W/2+.04,.19,.68,.035,darkVoid);
+ }
+ box(mount,0,(gateH+H)/2,0,opening+.25,H-gateH,W+.18,material(p.material,opening,H-gateH));
+ box(mount,0,gateH+.12,0,opening+.4,.23,W+.4,edgeMat);
+ box(mount,0,H+.08,0,L+.12,.20,W+.2,material('stone',L,1));
+ if(p.door){for(const s of [-1,1])gateLeaf(0,gateH,opening,s,p.open);}
+ if(crest!=='none'){
+  for(const s of [-1,1])drawCrest(mount,L+.1,.41,H+.15,s*(W/2+.02),crest,CH);
+  const side=new THREE.Group();side.rotation.y=Math.PI/2;drawCrest(side,W,.41,H+.15,L/2,crest,CH);drawCrest(side,W,.41,H+.15,-L/2,crest,CH);mount.add(side);
+ }
+ if(hasRoof){const y=H+CH+.4;posts(mount,L-.55,W-.42,H+.14,y);roof(mount,L,W,y,roofType,roofMat);}
+ // Entrance threshold, separate from closed doors.
+ box(mount,0,.045,0,opening+.12,.09,W+.32,material('stone',opening,W));
+}
+const helper=new THREE.Group();scene.add(helper);
+function dimensionGuides(){
+ while(helper.children.length){const obj=helper.children.pop();obj.parent=null;obj.geometry?.dispose();}
+ const lx=p.length/2,wx=p.width/2,H=p.height,verts=[
+ [-lx,-.1,wx+1.1],[lx,-.1,wx+1.1],
+ [-lx,-.1,wx+.9],[-lx,-.1,wx+1.3],[lx,-.1,wx+.9],[lx,-.1,wx+1.3],
+ [lx+1.0,0,wx],[lx+1.0,H,wx],
+ [lx+.8,0,wx],[lx+1.2,0,wx],[lx+.8,H,wx],[lx+1.2,H,wx]
+ ];
+ const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.Float32BufferAttribute(verts.flat(),3));
+ const mesh=new THREE.LineSegments(geom,new THREE.LineBasicMaterial({color:0xffd481,depthTest:false}));helper.add(mesh);
+}
+function rebuild(){
+ mount.traverse(o=>{if(o.geometry)o.geometry.dispose()});mount.clear();
+ if(p.kind==='wall')buildWall();else if(p.kind==='tower')buildTower();else buildGate();
+ dimensionGuides();
+ $('#dims').textContent=(p.kind==='wall'?'Müür':p.kind==='tower'?'Torn':'Värav')+' · '+p.length.toFixed(1)+' × '+p.width.toFixed(1)+' × '+p.height.toFixed(1)+' m';
+ $('#floatTop').textContent=p.kind==='wall'?'Müüri pikkus, paksus ja katusevariant muutuvad reaalajas':p.kind==='tower'?'Torni mõõtmed, korrused, uksed ja katus':'Iseseisev värav: muuda ava laiust, katust ja väravalehti';
+}
+const numeric={
+ length:['Pikkus',3,20,.25],width:['Laius / sügavus',1.5,9,.1],height:['Kõrgus',2.6,16,.25],
+ thickness:['Seina paksus',.3,1.7,.05],crestHeight:['Rinnatise kõrgus',.3,1.9,.05],opening:['Väravaava laius',2,8,.2]
+};
+function numericRow(key){
+ const [name,min,max,step]=numeric[key];
+ return '<div class="group"><label><span>'+name+'</span><span><input class="valuebox" aria-label="'+name+'" data-number="'+key+'" type="number" min="'+min+'" max="'+max+'" step="'+step+'" value="'+Number(p[key]).toFixed(2)+'"> m</span></label><input type="range" data-range="'+key+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+p[key]+'"></div>';
+}
+function refresh(){
+ $('#panelTitle').textContent=p.kind==='wall'?'Müürilõigu mõõtmed':p.kind==='tower'?'Torni mõõtmed':'Värava mõõtmed';
+ $('#dimensionFields').innerHTML=(p.kind==='wall'?['length','width','height','thickness']:p.kind==='tower'?['length','width','height','thickness']:['length','width','height','thickness','opening']).map(numericRow).join('');
+ $('#crestHeightField').innerHTML=numericRow('crestHeight');
+ $('#material').value=p.material;$('#roof').checked=p.roof;$('#roofType').value=p.roofType;$('#roofMat').value=p.roofMat;
+ $('#roofType').disabled=!p.roof;$('#roofMat').disabled=!p.roof;
+ $$('#crestOptions .pill').forEach(b=>b.classList.toggle('active',b.dataset.crest===p.crest));
+ $('#detailOptions').innerHTML=
+  '<label class="switch">'+(p.kind==='gate'?'Puidust väravalehed':'Uksed / sissepääs')+'<input data-flag="door" type="checkbox" '+(p.door?'checked':'')+'></label>'+
+  '<label class="switch">Laskepilud / avad<input data-flag="windows" type="checkbox" '+(p.windows?'checked':'')+'></label>'+
+  (p.kind==='gate'?'<label class="switch">Värav avatud<input data-flag="open" type="checkbox" '+(p.open?'checked':'')+'></label>':'');
+ $('#desctip').textContent=p.kind==='wall'?'Muuda müüriprofiili. Katuse lisamisel tekib puidust postidega kaetud käigutee.':p.kind==='tower'?'Tornil on õõnes sisemus, platvormid ja eraldi ukseavad külgedel müürikäigule.':'Värav on iseseisev 3D-ehitis, milles ava jääb kahe kiviposti vahele.';
+ $$('.tool').forEach(b=>b.classList.toggle('active',b.dataset.kind===p.kind));
+}
+function switchKind(kind){
+ active=kind;p=models[kind];camRadius=kind==='wall'?25:kind==='tower'?22:25;lookAt.y=kind==='tower'?4.5:3.4;
+ updateCamera();refresh();rebuild();
+}
+$$('[data-kind]').forEach(b=>b.addEventListener('click',()=>switchKind(b.dataset.kind)));
+$$('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
+ models[b.dataset.preset.startsWith('watch')||b.dataset.preset==='roofedTower'?'tower':b.dataset.preset==='citygate'?'gate':'wall']=JSON.parse(JSON.stringify(presets[b.dataset.preset]));
+ const kind=b.dataset.preset==='citygate'?'gate':(b.dataset.preset==='watchtower'||b.dataset.preset==='roofedTower'?'tower':'wall');
+ switchKind(kind);
+ $$('.preset').forEach(x=>x.classList.toggle('active',x===b));
+}));
+const inspector=$('#right');
+inspector.addEventListener('input',e=>{
+ const k=e.target.dataset.range||e.target.dataset.number;
+ if(!k)return;let v=Number(e.target.value);
+ if(!Number.isFinite(v))return;let [_,min,max,step]=numeric[k];
+ v=Math.max(min,Math.min(max,v));
+ if(k==='opening')v=Math.min(v,p.length-1.9);
+ if(k==='width'&&p.kind==='wall')v=Math.max(1.5,v);
+ p[k]=v;
+ const peer=inspector.querySelector('[data-'+(e.target.dataset.range?'number':'range')+'="'+k+'"]');
+ if(peer)peer.value=v;
+ rebuild();
+});
+inspector.addEventListener('change',e=>{
+ if(e.target.dataset.number||e.target.dataset.range){refresh();return;}
+ if(e.target.dataset.flag){p[e.target.dataset.flag]=e.target.checked;rebuild();return;}
+ if(['material','roofType','roofMat'].includes(e.target.id)){p[e.target.id]=e.target.value;rebuild();return;}
+ if(e.target.id==='roof'){p.roof=e.target.checked;refresh();rebuild();}
+});
+$('#crestOptions').addEventListener('click',e=>{
+ const b=e.target.closest('[data-crest]');if(!b)return;p.crest=b.dataset.crest;refresh();rebuild();
+});
+$('#reset').addEventListener('click',()=>{models=JSON.parse(JSON.stringify(defaults));switchKind(active);showToast('Algmõõdud taastatud');});
+function showToast(t){const el=$('#toast');el.textContent=t;el.style.display='block';clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>el.style.display='none',2300);}
+$('#save').addEventListener('click',()=>{
+ try{localStorage.setItem('kuningriigid-parametric-fort-v1',JSON.stringify(models));showToast('Kõik kolm kujundust salvestatud sellesse brauserisse');}
+ catch(e){showToast('Brauser ei luba salvestada');}
+});
+$('#export').addEventListener('click',()=>{
+ const text=JSON.stringify(models,null,2);
+ if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>showToast('Kujunduse andmed kopeeritud')).catch(()=>showToast('Kopeerimine ei õnnestunud'));
+ else showToast('Kopeerimine pole selles brauseris saadaval');
+});
+$('#mobileToggle').addEventListener('click',()=>{
+ const opened=$('#right').classList.toggle('open');$('#mobileToggle').textContent=opened?'✕ Sulge':'⚙ Seaded';
+});
+$('#zoomIn').addEventListener('click',()=>{camRadius=Math.max(10,camRadius*.82);updateCamera()});
+$('#zoomOut').addEventListener('click',()=>{camRadius=Math.min(50,camRadius*1.22);updateCamera()});
+$('#home').addEventListener('click',()=>{camTheta=.61;camPhi=1.08;camRadius=24;updateCamera()});
+let drag=null,pinch=0;
+renderer.domElement.addEventListener('pointerdown',e=>{
+ renderer.domElement.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY,a:camTheta,b:camPhi};
+});
+renderer.domElement.addEventListener('pointermove',e=>{
+ if(!drag||drag.id!==e.pointerId)return;
+ camTheta=drag.a-(e.clientX-drag.x)*.008;camPhi=Math.max(.22,Math.min(1.43,drag.b+(e.clientY-drag.y)*.008));updateCamera();
+});
+renderer.domElement.addEventListener('pointerup',()=>drag=null);
+renderer.domElement.addEventListener('pointercancel',()=>drag=null);
+renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();camRadius=Math.max(10,Math.min(50,camRadius*(e.deltaY>0?1.1:.9)));updateCamera()},{passive:false});
+renderer.domElement.addEventListener('touchstart',e=>{if(e.touches.length===2){pinch=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);drag=null;}},{passive:true});
+renderer.domElement.addEventListener('touchmove',e=>{if(e.touches.length===2){
+ const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+ if(pinch)camRadius=Math.max(10,Math.min(50,camRadius*pinch/d));pinch=d;updateCamera();
+}},{passive:true});
+let restored=false;
+try{const item=JSON.parse(localStorage.getItem('kuningriigid-parametric-fort-v1'));if(item&&item.wall&&item.tower&&item.gate){models=item;restored=true;}}catch(e){}
+switchKind('wall');if(restored)showToast('Salvestatud kujundused taastatud');
+let last=0;function animate(ms){requestAnimationFrame(animate);if(ms-last<20)return;last=ms;renderer.render(scene,camera);}
+requestAnimationFrame(animate);
+</script></body></html>
