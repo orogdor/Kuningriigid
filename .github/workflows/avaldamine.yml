@@ -2,7 +2,7 @@ name: Kuningriigid latest GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'boot-v83.js', 'sapling-trees-v328.js', 'preview-v359.html', 'preview-v360.html', 'house-builder-v355.js', 'house-designs-v354.js', 'majaehitaja/index.html', 'fortress-designer-demo.html']
+    paths: ['index.html', 'boot-v83.js', 'sapling-trees-v328.js', 'preview-v359.html', 'preview-v360.html', 'house-builder-v355.js', 'house-designs-v354.js', 'majaehitaja/index.html', 'fortress-designer-demo.html', 'fortress-parameter-demo.html']
   workflow_dispatch:
 permissions:
   contents: read
