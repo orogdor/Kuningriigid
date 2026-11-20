@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="et">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Kuningriigid · Parameetriline kindlustuste kujundaja</title>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Kuningriigid · Parameetriline kindlustuste kujundaja</title><link rel="icon" href="data:,">
 <style>
 :root{--g:#e6bd77;--bg:#071a29;--panel:#0a2434;--txt:#ecdfc4}
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#0c1820;color:var(--txt);font:14px system-ui,Arial,sans-serif}
@@ -140,7 +140,7 @@ function makeTexture(key){
 Object.keys(palettes).forEach(k=>textures[k]=makeTexture(k));
 function material(key,x=1,y=1){
  const cacheKey=key+':'+Math.round(x*2)/2+':'+Math.round(y*2)/2;
- if(!mats.has(cacheKey)){const tex=textures[key].clone();tex.needsUpdate=true;tex.repeat.set(Math.max(.45,x/2),Math.max(.5,y/.9));
+ if(!mats.has(cacheKey)){const tex=textures[key].clone();tex.needsUpdate=true;tex.repeat.set(Math.max(.5,x/(key==='tile'?2.8:key==='brick'?3.0:3.8)),Math.max(.6,y/(key==='tile'?2.8:key==='brick'?2.8:3.6)));
  mats.set(cacheKey,new THREE.MeshStandardMaterial({map:tex,roughness:.96,side:THREE.DoubleSide}));}
  return mats.get(cacheKey);
 }
@@ -148,7 +148,7 @@ const flat=(color)=>new THREE.MeshStandardMaterial({color,roughness:.93,side:THR
 const limestone=flat(0xd9cab0),edgeMat=flat(0xcbb493),darkWood=flat(0x69452c),metal=flat(0x373e42),darkVoid=flat(0x292d28),gold=flat(0xe4c57a),red=flat(0xbb7854);
 function box(parent,x,y,z,l,h,w,mat){const mesh=new THREE.Mesh(new THREE.BoxGeometry(Math.max(.005,l),Math.max(.005,h),Math.max(.005,w)),mat);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh}
 function tri(parent,pts,mat){
- const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts.flatMap(v=>[v[0],v[1],v[2]]),3));g.computeVertexNormals();
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts.flatMap(v=>[v[0],v[1],v[2]]),3));g.setAttribute('uv',new THREE.Float32BufferAttribute(pts.flatMap(v=>[(v[0]+v[2])*.27,(v[1]+v[2])*.21]),2));g.computeVertexNormals();
  const mesh=new THREE.Mesh(g,mat);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
 }
 function beam(parent,a,b,r,mat){
