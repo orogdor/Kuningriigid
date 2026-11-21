@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111e2c">
+<title>Kuningriigid · Linnuse töökoda</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../ui-v304.css">
+<link rel="stylesheet" href="./workshop.css">
+</head>
+<body class="v304-active">
+<main id="workshop">
+  <div id="stage">
+    <canvas id="view" aria-label="Linnuse 3D-eelvaade"></canvas>
+    <p id="loading" class="v304-panel" role="status">Laen mängu graafikat…</p>
+    <div class="stage-tools">
+      <div class="control-group v304-panel" role="group" aria-label="Eelvaate ulatus">
+        <button id="assembly" type="button" aria-pressed="true">Koos</button>
+        <button id="solo" type="button" aria-pressed="false">Eraldi</button>
+      </div>
+      <div class="control-group v304-panel" role="group" aria-label="Kaamera">
+        <button id="zoom-out" type="button" aria-label="Suumi välja" title="Suumi välja">−</button>
+        <button id="zoom-in" type="button" aria-label="Suumi sisse" title="Suumi sisse">+</button>
+        <button id="reset-view" type="button" aria-label="Algvaade" title="Algvaade">⟲</button>
+      </div>
+    </div>
+    <div id="view-help">Lohista pööramiseks · rullikuga suumi</div>
+    <div class="part-dock v304-panel" role="group" aria-label="Kujundatav osa">
+      <button class="part-card" data-part="wall" type="button" aria-pressed="false">
+        <img data-asset="ui-art-v263/bld_stonewall.webp" alt=""><span>Müür</span>
+      </button>
+      <button class="part-card" data-part="gate" type="button" aria-pressed="true">
+        <img data-asset="ui-art-v304/tech/stone_fortifications.webp" alt=""><span>Värav</span>
+      </button>
+      <button class="part-card" data-part="tower" type="button" aria-pressed="false">
+        <img data-asset="ui-art-v263/bld_watchtower.webp" alt=""><span>Torn</span>
+      </button>
+    </div>
+  </div>
+</main>
+<div id="v304-hud">
+  <section class="v304-top v304-panel" aria-label="Linnuse töökoja tööriistad">
+    <div class="workshop-heading">
+      <img data-asset="ui-art-v263/cmd_build.webp" alt="">
+      <div><span>Kuningriigid</span><h1>Linnuse töökoda</h1></div>
+    </div>
+    <div class="file-tools">
+      <button type="button" id="undo" title="Võta tagasi (Ctrl+Z)" aria-label="Võta tagasi" disabled>↶</button>
+      <button type="button" id="redo" title="Tee uuesti (Ctrl+Shift+Z)" aria-label="Tee uuesti" disabled>↷</button>
+      <button type="button" id="read-file">Ava JSON</button>
+      <button type="button" id="save-file">Salvesta JSON</button>
+      <input type="file" id="file-input" accept=".json,application/json" hidden>
+    </div>
+  </section>
+  <section class="v304-panel inspector" id="inspector" aria-labelledby="part-title">
+    <div class="inspector-head">
+      <img id="part-icon" alt="">
+      <div><h2 id="part-title">Värav</h2><div id="part-summary"></div></div>
+    </div>
+    <form id="part-fields"></form>
+    <div class="presets">
+      <h3>Näidiskomplektid</h3>
+      <div role="group" aria-label="Näidiskomplektid">
+        <button type="button" data-preset="limestone">Paelinnus</button>
+        <button type="button" data-preset="fieldstone">Kivilinnus</button>
+        <button type="button" data-preset="timber">Puitlinnus</button>
+      </div>
+    </div>
+  </section>
+</div>
+<div id="status" class="v304-panel" role="status" hidden></div>
+<script type="module" src="./workshop.js"></script>
+</body>
+</html>
