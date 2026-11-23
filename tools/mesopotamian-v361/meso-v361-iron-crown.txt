@@ -1,9 +1,0 @@
-    if(withRoof){
-      // V361: iron tower now has the same open Babylonian guard platform.
-      buildFloor(display.enclosed[0],top-.15).material=wood;
-      for(const [i,e] of edges_.entries()){
-        mesoUpperTowerV361(e.a,e.b,top-.83,top-.08,thickness,621+i*47,true);
-        mesoWaveV361(e.a,e.b,top-.08,.39,.99,621+i*47,true);
-        walkBarrier(e.a,e.b,.21,top-.08,top+.96);
-      }
-    }
