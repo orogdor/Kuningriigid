@@ -1,5 +1,7 @@
 # Godoti pordi tööjärg
 
+Õue plaanijoonis kasutab nüüd aia, palissaadi, kõrge kivimüüri ja värava jaoks eraldi veebikujundaja joonistusviise. Värav lõikab aiast ava ja selle avatud lehed on plaanil nähtavad; kontrolliti nähtavat väravanäidet.
+
 Mängu detailvaates kohandatakse kujundatud õue pind tegeliku maastiku kõrgusele. Varem võis ebatasane maapind osa õuest varjata; parandust kontrolliti mängu lähivaates ning pööratud ja skaleeritud maja automaatkatses. Samuti kontrolliti, et ühest kujundusest tehtud teised majad säilitavad oma sõltumatu õue.
 
 Plaanile lisati veebikujundaja eeskujul postide, sammaste, varikatuste, viljapuude, maardlavarude ja mõnede töövahendite erisümbolid. Nende ühine joonistus kontrolliti graafikakaardiga; kõiki võimalikke esemeid ei ole ühekaupa võrreldud.

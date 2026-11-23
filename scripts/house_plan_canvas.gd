@@ -2,6 +2,7 @@ extends Control
 const Plan=preload("res://scripts/house_plan_geometry.gd")
 const Paper=preload("res://assets/house_designer/plan-paper.svg")
 const Edit=preload("res://scripts/house_plan_edit.gd")
+const Fence=preload("res://scripts/house_fence.gd")
 const Catalog=preload("res://data/house_editor_catalog.json")
 signal changed(design: Dictionary)
 signal message(text: String)
@@ -102,8 +103,7 @@ func _draw() -> void:
  var geometry:=Plan.plan_geometry(plan)
  for floor in geometry.floors:
   if floor.size()>=3:draw_colored_polygon(floor,Color("bb8d546b"));draw_polyline(PackedVector2Array(Array(floor)+[floor[0]]),Color("694729"),2)
- for fence in plan.get("fences",[]):
-  draw_line(Plan.point(fence.a),Plan.point(fence.b),Color("6b4c2b"),8)
+ for fence in Fence.layout(plan):draw_plan_fence(fence)
  for wall in geometry.walls:
   for span in Plan.split_wall(wall,plan):draw_plan_wall(span,plan)
  for item in plan.get("items",[]):draw_plan_item(item)
@@ -141,7 +141,7 @@ func draw_plan_dimensions(plan: Dictionary,geometry: Dictionary) -> void:
   if angle>PI/2:angle-=PI
   if angle< -PI/2:angle+=PI
   draw_plan_tag("%.1f m" % (length/Plan.PX_PER_M),position,angle)
- for fence in plan.get("fences",[]):
+ for fence in Fence.layout(plan):
   if fence.get("kind","")=="gateLine":continue
   var a:=Plan.point(fence.a);var b:=Plan.point(fence.b);var length:=a.distance_to(b)
   if length*scale<60:continue
@@ -153,6 +153,22 @@ func draw_plan_dimensions(plan: Dictionary,geometry: Dictionary) -> void:
   if room.get("type","")=="round":
    var center:=Plan.point(room.a);var radius:=float(room.r)
    draw_plan_tag("Ø %.1f m" % (radius*2/Plan.PX_PER_M),center-Vector2(0,radius+20/scale))
+
+func draw_plan_fence(fence: Dictionary) -> void:
+ var a:=Plan.point(fence.a);var b:=Plan.point(fence.b);var kind:=str(fence.get("kind","rail"))
+ if kind=="highStone":
+  draw_line(a,b,Color("4f5046"),16);draw_line(a,b,Color("a9a594"),11)
+  var count:=floori(a.distance_to(b)/16)
+  for i in range(0,count,2):draw_line(a.lerp(b,(float(i)+0.5)/maxi(1,count)),a.lerp(b,minf(1.0,(float(i)+1.5)/maxi(1,count))),Color("77786a"),6)
+  return
+ if kind=="gateLine":
+  draw_dashed_line(a,b,Color("a17c45"),5,7)
+  var profile:=Fence.gate_profile(fence)
+  for i in 2:
+   var hinge:Vector2=profile.hinges[i];var tip:Vector2=profile.tips[i]
+   draw_circle(hinge,8 if profile.stone else 5,Color("8f8273" if profile.stone else "68492e"));draw_line(hinge,tip,Color("805a34" if fence.get("open",true) else "9c3d27"),3.2)
+  return
+ draw_line(a,b,Color("626459" if kind=="stoneLine" else "61462d"),10 if kind=="palisadeLine" else 5)
 
 func draw_plan_item(item: Dictionary) -> void:
  var type:=str(item.get("type",""));var p:=Plan.point(item.point);var dims:Array=Catalog.data.itemSizes.get(type,[20,20]);var bounds:=Rect2(p-Vector2(float(dims[0]),float(dims[1]))/2,Vector2(float(dims[0]),float(dims[1])))
