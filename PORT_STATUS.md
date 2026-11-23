@@ -4,6 +4,8 @@ Algallikas: https://github.com/orogdor/Kuningriigid, `main`-haru commit `2d9ff39
 
 ## Hetkeseis 23. novembril
 
+GitHubis on eraldi sirvitav lähtekooduharu `godot-port-lahtekood`. Lisatud on Windowsi ja Androidi ekspordiseaded ning sisuuenduste kontrolli alus. Uuendused rakenduvad alles pärast uuenduskanalisse avaldamist ja mängu taaskäivitamist; esimese täieliku mõlema platvormi ehituse ning uuenduse otsast lõpuni toimimine vajab kontrolli. Androidi APK-versioonide üksteise peale paigaldamiseks tuleb kasutada sama allkirjastusvõtit.
+
 See on mängitav Godoti vaheversioon, mitte veel kinnitatud 1:1 port. Käivita `KAIVITA.bat`. Mäng kasutab eraldi Godoti salvestusi; veebimängu varasema salvestuse saab importida, kui eksport sisaldab täielikke maailmaandmeid ja käimasolevat lahingut ei ole.
 
 Uue mängu menüüs on kõik kolm algset maailmatüüpi. Maailmakaart, detailkaardi naaberruudud, esimese isiku vaade, varajaste majade kujundamine, linnamajandus, uurimine, väed, laevad ja vastaste põhikäitumine on proovimiseks olemas. Uute hoonete kujundaja avaneb ka maailmakaardi ehitusmenüüst. Poolelioleva kaitseringi ja teiste mänguolukordade käsitlemist on laiendatud allpool kirjeldatud ulatuses.

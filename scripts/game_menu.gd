@@ -24,6 +24,7 @@ var graphics_controls: Dictionary={}
 var performance_layer: CanvasLayer
 var performance_label: Label
 var performance_clock:=0.0
+var update_label: Label
 const SETTINGS_PATH:="user://kuningriigid_godot_settings.cfg"
 var was_loading:=false
 
@@ -121,6 +122,11 @@ func _ready() -> void:
 	import_dialog=FileDialog.new();import_dialog.access=FileDialog.ACCESS_FILESYSTEM
 	import_dialog.file_mode=FileDialog.FILE_MODE_OPEN_FILE;import_dialog.add_filter("*.json ; JSON-fail")
 	import_dialog.file_selected.connect(import_game);add_child(import_dialog)
+	var updates: Node=get_node_or_null("/root/GameUpdates")
+	if updates!=null:
+		add_button(content,"Kontrolli uuendusi",updates.check)
+		update_label=add_label(content,updates.status,12,Color("d9e4d8"));update_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		updates.status_changed.connect(func(value):update_label.text=value)
 	add_button(content,"⏻ Sulge mäng",func():get_tree().quit())
 	var footer:=add_label(content,"60 mängusekundit = 1 käik. Menüü ja pausi ajal mäng seisab.",11,Color("aabeb1"));footer.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var theme:=Theme.new();theme.default_font_size=14

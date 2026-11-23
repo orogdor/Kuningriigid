@@ -2,9 +2,10 @@ name: Godot Windows and Android builds
 on:
   push:
     branches: [godot-port-lahtekood]
+    tags: ['godot-content-*']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -41,6 +42,12 @@ jobs:
         run: |
           mkdir -p build/windows
           Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release "Windows Desktop" build/windows/Kuningriigid.exe
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kuningriigid-Godot-Windows
+          path: build/windows/
+          if-no-files-found: error
       - name: Export Android test APK
         env:
           GODOT_ANDROID_KEYSTORE_DEBUG_PATH: /tmp/kuningriigid-debug.keystore
@@ -49,15 +56,31 @@ jobs:
         run: |
           mkdir -p build/android
           Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-debug Android build/android/Kuningriigid-test.apk
-      - name: Upload Windows build
-        uses: actions/upload-artifact@v4
-        with:
-          name: Kuningriigid-Godot-Windows
-          path: build/windows/
-          if-no-files-found: error
       - name: Upload Android test build
         uses: actions/upload-artifact@v4
         with:
           name: Kuningriigid-Godot-Android-test
           path: build/android/*.apk
           if-no-files-found: error
+      - name: Build and publish content updates
+        if: startsWith(github.ref, 'refs/tags/godot-content-')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-pack "Windows Desktop" build/windows-update.pck
+          Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-pack Android build/android-update.pck
+          windows_sha=$(sha256sum build/windows-update.pck | cut -d' ' -f1)
+          android_sha=$(sha256sum build/android-update.pck | cut -d' ' -f1)
+          windows_size=$(stat -c%s build/windows-update.pck)
+          android_size=$(stat -c%s build/android-update.pck)
+          gh release create "$GITHUB_REF_NAME" build/windows-update.pck build/android-update.pck --verify-tag --prerelease --latest=false --title "Godot content $GITHUB_REF_NAME" --notes "Godot 0.1.0 compatible content update."
+          base_url="https://github.com/orogdor/Kuningriigid/releases/download/$GITHUB_REF_NAME"
+          jq -n --argjson rev "$GITHUB_RUN_NUMBER" --arg wu "$base_url/windows-update.pck" --arg ws "$windows_sha" --argjson wz "$windows_size" --arg au "$base_url/android-update.pck" --arg as "$android_sha" --argjson az "$android_size" '{schema:1,base:"0.1.0",revision:$rev,packages:{Windows:{url:$wu,sha256:$ws,size:$wz},Android:{url:$au,sha256:$as,size:$az}}}' > "$RUNNER_TEMP/manifest.json"
+          git fetch origin godot-update-channel
+          git switch --detach FETCH_HEAD
+          cp "$RUNNER_TEMP/manifest.json" manifest.json
+          git add manifest.json
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -m "Publish Godot content $GITHUB_REF_NAME"
+          git push origin HEAD:refs/heads/godot-update-channel
