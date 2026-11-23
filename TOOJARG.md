@@ -1,5 +1,7 @@
 # Godoti pordi tööjärg
 
+Plaanil kuvatakse nüüd seina- ja aialõikude pikkused ning ümara ruumi läbimõõt; uue õue või ruumi lohistamisel näidatakse mõõte ja pindala. Õue lohistamise vaadet kontrolliti graafikakaardiga.
+
 Plaanil on tulekolde, korvi, pingi ja magamisaseme joonistus veebikujundaja eeskujul; vaadet kontrolliti nähtavalt. Kõigi eriesemete plaanisümbolid ei ole veel üksikasjaliselt üle toodud.
 
 Kahekorruselise maja 3D-eelvaates järgib peidetud katusega korruste nähtavus veebikujundajat: alumist korrust vaadates peitub ülemine korrus koos trepi ja tugedega, ülemise korruse valimisel ilmub see tagasi. Mõlemat vahetust ja katuse taastamist kontrolliti.

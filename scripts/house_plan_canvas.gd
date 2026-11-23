@@ -107,13 +107,52 @@ func _draw() -> void:
  for wall in geometry.walls:
   for span in Plan.split_wall(wall,plan):draw_plan_wall(span,plan)
  for item in plan.get("items",[]):draw_plan_item(item)
+ draw_plan_dimensions(plan,geometry)
  if drag:
   var shape:=Plan.candidate(tool,drag_start,drag_end,Edit.LIMITS[clampi(era,0,2)])
   if not shape.is_empty() and shape.has("type"):
    var poly:=Plan.room_polygon(shape)
    if poly.size()>2:draw_polyline(PackedVector2Array(Array(poly)+[poly[0]]),Color("2b6540"),3)
   else:draw_line(drag_start,drag_end,Color("2b6540"),3)
+  if shape.get("type","")=="rect":
+   var a:=Plan.point(shape.a);var b:=Plan.point(shape.b);var dimensions:Vector2=(b-a).abs()/Plan.PX_PER_M
+   draw_plan_tag("%.1f × %.1f m · %.1f m²" % [dimensions.x,dimensions.y,dimensions.x*dimensions.y],(a+b)/2)
+  elif shape.get("type","")=="round":
+   var radius:float=float(shape.r)/Plan.PX_PER_M;draw_plan_tag("Ø %.1f m · %.1f m²" % [radius*2,PI*radius*radius],Plan.point(shape.a))
+  else:draw_plan_tag("%.1f m" % (drag_start.distance_to(drag_end)/Plan.PX_PER_M),(drag_start+drag_end)/2)
  draw_set_transform_matrix(Transform2D.IDENTITY)
+
+func draw_plan_tag(text: String,point: Vector2,angle:=0.0) -> void:
+ var scale:=maxf(0.1,minf(size.x/960.0,size.y/625.0)*view_scale);var font:=ThemeDB.fallback_font;var font_size:=maxi(8,roundi(11.0/scale));var width:=font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x+10.0/scale;var height:=17.0/scale
+ draw_set_transform_matrix(plan_transform()*Transform2D(angle,point))
+ var rect:=Rect2(-width/2,-height/2,width,height);draw_rect(rect,Color("f7ecd2e6"));draw_rect(rect,Color("8a6633"),false,1.0/scale)
+ draw_string(font,Vector2(-width/2+5.0/scale,height*0.26),text,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,Color("3b2713"))
+ draw_set_transform_matrix(plan_transform())
+
+func draw_plan_dimensions(plan: Dictionary,geometry: Dictionary) -> void:
+ var scale:=maxf(0.1,minf(size.x/960.0,size.y/625.0)*view_scale)
+ for wall in geometry.walls:
+  if wall.get("curved",false):continue
+  var a:Vector2=wall.a;var b:Vector2=wall.b;var length:=a.distance_to(b)
+  if length*scale<46:continue
+  var normal:=Vector2(a.y-b.y,b.x-a.x)/length;var outer:bool=wall.group=="outer";var middle:Vector2=(a+b)/2;var position:Vector2=middle+normal*(17.0 if outer else 12.0)/scale
+  if outer and Edit.in_floor(position,geometry.floors):position=middle-normal*17.0/scale
+  var angle:=atan2(b.y-a.y,b.x-a.x)
+  if angle>PI/2:angle-=PI
+  if angle< -PI/2:angle+=PI
+  draw_plan_tag("%.1f m" % (length/Plan.PX_PER_M),position,angle)
+ for fence in plan.get("fences",[]):
+  if fence.get("kind","")=="gateLine":continue
+  var a:=Plan.point(fence.a);var b:=Plan.point(fence.b);var length:=a.distance_to(b)
+  if length*scale<60:continue
+  var normal:=Vector2(a.y-b.y,b.x-a.x)/length;var angle:=atan2(b.y-a.y,b.x-a.x)
+  if angle>PI/2:angle-=PI
+  if angle< -PI/2:angle+=PI
+  draw_plan_tag("%.1f m" % (length/Plan.PX_PER_M),(a+b)/2+normal*15/scale,angle)
+ for room in plan.get("rooms",[]):
+  if room.get("type","")=="round":
+   var center:=Plan.point(room.a);var radius:=float(room.r)
+   draw_plan_tag("Ø %.1f m" % (radius*2/Plan.PX_PER_M),center-Vector2(0,radius+20/scale))
 
 func draw_plan_item(item: Dictionary) -> void:
  var type:=str(item.get("type",""));var p:=Plan.point(item.point);var dims:Array=Catalog.data.itemSizes.get(type,[20,20]);var bounds:=Rect2(p-Vector2(float(dims[0]),float(dims[1]))/2,Vector2(float(dims[0]),float(dims[1])))
