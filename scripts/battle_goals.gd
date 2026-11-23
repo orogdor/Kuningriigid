@@ -102,5 +102,7 @@ static func tactical_goal(unit: Dictionary,nearest: Dictionary,squads: Array,bat
   if anchor!=null and Doctrine.distance(unit,nearest)>float(stats.range)*0.85:
    var x:=float(anchor.x)-side*5
    return {"x":maxf(float(unit.x),x) if side>0 else minf(float(unit.x),x),"z":deployment.get("z",unit.z)}
+  if anchor==null and unit.kind in ["slinger","archer","bronze_archer","iron_archer","javelinman"] and Doctrine.distance(unit,nearest)>float(stats.range)*0.8:
+   return {"x":float(nearest.x)-side*float(stats.range)*0.7,"z":nearest.z}
   return null
  return Contact.contact_goal(unit,nearest)

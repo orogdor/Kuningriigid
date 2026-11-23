@@ -109,6 +109,15 @@ func build(cells: Array, c: int, r: int, terrain_color: Color, biome: String, se
 	else:visual_heights=PackedVector4Array()
 	instance.mesh=cache_host.detail_mesh_for(c,r,heights,visual_heights) if cache_host!=null and cache_host.has_method("detail_mesh_for") else Terrain.build_mesh(heights,Vector2.ZERO,visual_heights)
 	GroundMaterial.attach(instance,terrain_color,1.0 if core_forest else 0.0)
+	if cache_host!=null and cache_host.has_method("terrain_color") and cache_host.has_method("is_forest_core"):
+		var neighbours={"ground_w":Vector2i(-1,0),"ground_e":Vector2i(1,0),"ground_n":Vector2i(0,-1),"ground_s":Vector2i(0,1),"ground_nw":Vector2i(-1,-1),"ground_ne":Vector2i(1,-1),"ground_sw":Vector2i(-1,1),"ground_se":Vector2i(1,1)}
+		for key in neighbours:
+			var pos: Vector2i=Vector2i(c,r)+neighbours[key];var tint:=terrain_color;var forest:=1.0 if core_forest else 0.0
+			if pos.x>=0 and pos.y>=0 and pos.x<Terrain.Grid.COLS and pos.y<Terrain.Grid.ROWS:
+				var index:=pos.y*Terrain.Grid.COLS+pos.x
+				if cells[index].land:tint=cache_host.terrain_color(index);forest=1.0 if cache_host.is_forest_core(index) else 0.0
+			instance.set_instance_shader_parameter(key,Color(tint.r,tint.g,tint.b,forest))
+		instance.set_instance_shader_parameter("blend_neighbours",true)
 	add_child(instance)
 	var water := MeshInstance3D.new()
 	var plane := PlaneMesh.new()

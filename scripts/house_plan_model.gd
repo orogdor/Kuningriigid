@@ -3,21 +3,33 @@ const Plan=preload("res://scripts/house_plan_geometry.gd")
 const PlanCollision=preload("res://scripts/house_plan_collision.gd")
 const Fence=preload("res://scripts/house_fence.gd")
 const Catalog=preload("res://data/house_editor_catalog.json")
+const ReedShader=preload("res://scripts/house_reed.gdshader")
 const PALETTE={"clay":"c18b54","weave":"a18353","stone":"a4a292","wood":"986741","bamboo":"9a805d","mudbrick":"c99b63","cutstone":"d3cab2","plank":"b5895a","brick":"b8573c","plaster":"efe7d3","halftimber":"ece2c9","hide":"b58d65","turf":"9a9462","stave":"c09872","minoanRed":"8e2a1d","minoanBlack":"1d1b1b"}
 const TEXTURES={"hide":"land-hide","clay":"atlas-clay","weave":"atlas-weave","stone":"proc-stone","wood":"atlas-wood","bamboo":"atlas-wood","mudbrick":"proc-mudbrick","cutstone":"proc-cutstone","plank":"proc-plank","brick":"proc-brick","plaster":"proc-plaster","halftimber":"proc-plaster","cyclopean":"proc-cyclopean","fresco":"proc-fresco","limestone":"proc-limestone","stave":"atlas-wood","turf":"land-earth","prestigePlaster":"proc-plaster","marble":"proc-marble","reticulatum":"proc-reticulatum","romanbrick":"proc-romanbrick","floor":"land-dirt","reed":"atlas-straw","thatch":"atlas-straw","sod":"proc-sod","bark":"proc-bark","shingle":"proc-shingle","tile":"proc-tile","earth":"proc-clayroof","roofplank":"proc-roofplank"}
 static var model_cache:Dictionary={}
 static var cache_order:Array[String]=[]
 var roof_material:="reed"
+var roof_vents:Array[Vector2]=[]
 var origin:=Vector2(480,312)
 var materials:Dictionary={}
+var reed_surface: ShaderMaterial
 
 func material_for(style: String) -> StandardMaterial3D:
  if materials.has(style):return materials[style]
  var material:=StandardMaterial3D.new();material.albedo_color=Color(str(PALETTE.get(style,"ffffff")));material.roughness=1.0;material.cull_mode=BaseMaterial3D.CULL_DISABLED
+ if style in ["reed","thatch"]:material.albedo_color=Color("756b5c")
  var key:=str(TEXTURES.get(style,""));var file:="res://assets/house_designer/"+key+".webp"
  if key.begins_with("proc-"):material.albedo_color=Color.WHITE
  if not key.is_empty() and ResourceLoader.exists(file):material.albedo_texture=load(file);material.texture_filter=BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS;material.uv1_scale=Vector3(2,2,1)
+ if style in ["reed","thatch"]:material.uv1_scale=Vector3(0.2,1,1)
  materials[style]=material;return material
+
+func roof_surface_material() -> Material:
+ if roof_material not in ["reed","thatch"]:return material_for(roof_material)
+ if reed_surface==null:
+  reed_surface=ShaderMaterial.new();reed_surface.shader=ReedShader
+  reed_surface.set_shader_parameter("reed_atlas",load("res://assets/house_designer/atlas-straw.webp"))
+ return reed_surface
 
 func local(p: Vector2,height:=0.0) -> Vector3:
  return Vector3((p.x-origin.x)/Plan.PX_PER_M,height,(p.y-origin.y)/Plan.PX_PER_M)
@@ -31,7 +43,11 @@ func rebuild(design: Dictionary) -> void:
  var lifts:=[0.0,0.67,0.87];var doors:=[1.32,1.45,1.60];var curved_doors:=[1.53,1.50,1.62];var windows:=[Vector2(0.73,1.33),Vector2(0.86,1.30),Vector2(0.96,1.45)]
  var lift:float=lifts[era];lift+=(0.88+lift)*(float(design.get("wallScale",100))/100-1.0)
  var height:=0.88+lift
+ if not design.get("upperLevel",false):
+  if design.get("yard") is Array:add_yard(design.yard,design,era)
+  if design.get("plot") is Array and not design.get("field") is Dictionary and not design.get("yard") is Array:add_yard(design.plot,design,era)
  for floor in geometry.floors:add_floor(floor)
+ if design.get("field") is Dictionary and design.get("plot") is Array:add_field(design.plot,design.field)
  var fence_index:=0;var stair:=Fence.wall_stair_plan(design)
  for fence in Fence.layout(design):add_fence(fence,fence_index,stair);fence_index+=1
  if not stair.is_empty():add_defense_stair(stair)
@@ -70,6 +86,17 @@ func rebuild(design: Dictionary) -> void:
   for polygon in upper_polys:
    if polygons_overlap(lower_poly,polygon):overlap=true;break
   if not overlap:
+   roof_vents.clear()
+   var low:=Vector2(INF,INF);var high:=Vector2(-INF,-INF)
+   for p in lower_poly:
+    var at:=local(p);low=low.min(Vector2(at.x,at.z));high=high.max(Vector2(at.x,at.z))
+   for item in design.get("items",[]):
+    if item.get("type","")!="fire":continue
+    var fire:=Plan.point(item.point);var inside:=false
+    for floor in geometry.floors:
+     if Plan.inside(fire,floor):inside=true;break
+    var at:=local(fire);var position:=Vector2(at.x,at.z)
+    if inside and position.x>low.x-0.65 and position.x<high.x+0.65 and position.y>low.y-0.65 and position.y<high.y+0.65:roof_vents.append(position)
    var roof_start:=get_child_count();add_roof(room,design,lift)
    for index in range(roof_start,get_child_count()):get_child(index).set_meta("house_roof",true)
  var towers:=Fence.tower_positions(design)
@@ -86,9 +113,58 @@ func rebuild(design: Dictionary) -> void:
  if upper is Dictionary and not upper.get("rooms",[]).is_empty():
   var plan:Dictionary=design.duplicate(true);plan.erase("upper");plan.merge(upper.duplicate(true),true)
   plan.plot=null;plan.yard=null;plan.pier=null;plan.openSite=false;plan.upperLevel=true
-  add_floor_link(design,plan,geometry.floors,height+0.145)
-  var second:Node3D=load("res://scripts/house_plan_model.gd").new();second.name="SecondStorey";second.rebuild(plan)
+  var upper_start:=get_child_count();add_floor_link(design,plan,geometry.floors,height+0.145)
+  for index in range(upper_start,get_child_count()):get_child(index).set_meta("house_upper",true)
+  var second:Node3D=load("res://scripts/house_plan_model.gd").new();second.name="SecondStorey";second.set_meta("house_upper",true);second.rebuild(plan)
   second.position=Vector3((second.origin.x-origin.x)/Plan.PX_PER_M,height+0.145,(second.origin.y-origin.y)/Plan.PX_PER_M);add_child(second)
+
+# The web designer blends a packed-earth compound into the surrounding meadow.
+func yard_noise(seed: float) -> float:
+ var value:=sin(seed*79.32+17.0)*43758.54
+ return value-floor(value)
+
+func yard_cover(x: float,z: float) -> float:
+ return clampf(0.53+0.24*sin(x*1.23-z*0.52)*cos(x*0.51+z*0.97)+0.19*sin(x*0.42+z*0.64)+0.10*cos(z*2.18+x*1.12),0.06,0.96)
+
+func add_yard(boundary: Array,design: Dictionary,era: int) -> void:
+ if boundary.size()<3:return
+ var verts:Array[Vector3]=[];var center:=Vector3.ZERO
+ for p in boundary:
+  var point:=local(Plan.point(p),0.003);verts.append(point);center+=point
+ center/=verts.size()
+ if era==1 and design.get("bronzePrestige",false) and design.get("build","")!="tower" and (not design.get("openSite",false) or design.get("id","")=="mason@1"):
+  var polygon:=PackedVector2Array()
+  for point in verts:polygon.append(Vector2(point.x,point.z))
+  var triangles:=Geometry2D.triangulate_polygon(polygon);var paved:=SurfaceTool.new();paved.begin(Mesh.PRIMITIVE_TRIANGLES)
+  var material:=StandardMaterial3D.new();material.albedo_texture=load("res://assets/house_designer/proc-flags.webp");material.roughness=1;material.cull_mode=BaseMaterial3D.CULL_DISABLED;paved.set_material(material)
+  for index in triangles:paved.set_uv(Vector2(verts[index].x,verts[index].z)*0.81);paved.add_vertex(verts[index])
+  paved.generate_normals();var node:=MeshInstance3D.new();node.name="CourtyardPaving";node.mesh=paved.commit();add_child(node);return
+ var rim:Array[Vector3]=[]
+ for i in verts.size():
+  var a:=verts[i];var b:=verts[(i+1)%verts.size()];var count:=maxi(3,ceili(a.distance_to(b)*6))
+  for j in count:
+   var p:=a.lerp(b,float(j)/count);var direction:=p-center;direction.y=0
+   var wave:=0.16+0.23*yard_noise(i*317+j)+0.12*sin(j*0.70+i)
+   if direction.length_squared()>0:p-=direction.normalized()*wave
+   rim.append(p)
+ if rim.size()<3:return
+ var points:=PackedVector3Array([center]);var colors:=PackedColorArray();var uvs:=PackedVector2Array([Vector2(center.x,center.z)*0.47]);var indices:=PackedInt32Array();var cols:=rim.size()
+ var color_at=func(p:Vector3,t:float,index:int) -> Color:
+  var patches:=yard_cover(p.x*0.81+0.46,p.z*0.81)
+  var color:=Color("d2b89a").lerp(Color("8b8260"),patches*0.66+t*0.14).lerp(Color("b8a889"),yard_noise(index*81)*0.36)
+  var edge:=0.74+patches*0.05;var fade:=clampf((t-edge)/(1-edge),0,1)
+  color.a=(1-fade*fade*(3-2*fade))*(0.58+patches*0.41);return color
+ colors.append(color_at.call(center,0.0,0))
+ for r in range(1,10):
+  for i in cols:
+   var t:=float(r)/9.0;var p:=center.lerp(rim[i],t);points.append(p);uvs.append(Vector2(p.x,p.z)*0.47);colors.append(color_at.call(p,t,i+r*cols))
+   var j:=1+(r-1)*cols+i;var k:=1+(r-1)*cols+(i+1)%cols
+   if r==1:indices.append_array(PackedInt32Array([0,k,j]))
+   else:indices.append_array(PackedInt32Array([j-cols,k-cols,j,k-cols,k,j]))
+ var arrays:=[];arrays.resize(Mesh.ARRAY_MAX);arrays[Mesh.ARRAY_VERTEX]=points;var normals:=PackedVector3Array();normals.resize(points.size());normals.fill(Vector3.UP);arrays[Mesh.ARRAY_NORMAL]=normals;arrays[Mesh.ARRAY_TEX_UV]=uvs;arrays[Mesh.ARRAY_COLOR]=colors;arrays[Mesh.ARRAY_INDEX]=indices
+ var mesh:=ArrayMesh.new();mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+ var material:=StandardMaterial3D.new();material.albedo_texture=load("res://assets/house_designer/land-dirt.webp");material.vertex_color_use_as_albedo=true;material.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA;material.depth_draw_mode=BaseMaterial3D.DEPTH_DRAW_DISABLED;material.cull_mode=BaseMaterial3D.CULL_DISABLED;material.roughness=0.98;mesh.surface_set_material(0,material)
+ var node:=MeshInstance3D.new();node.name="WeatheredYard";node.mesh=mesh;add_child(node)
 
 func classical_bounds(room: Dictionary,design: Dictionary) -> Dictionary:
  var polygon:=Plan.room_polygon(room);var lo:=Vector2(INF,INF);var hi:=Vector2(-INF,-INF)
@@ -306,6 +382,133 @@ func polygons_overlap(a: PackedVector2Array,b: PackedVector2Array) -> bool:
    if not Plan.crosses(x.a,x.b,y.a,y.b).is_empty() and not Plan.crosses(y.a,y.b,x.a,x.b).is_empty():return true
  return false
 
+# A field is an open plot rather than a roofed building. Its selected crop
+# and edge are part of the saved design and must also appear in the preview.
+func add_field(plot: Array,field: Dictionary) -> void:
+ if plot.size()<3:return
+ var low:=Vector2(INF,INF);var high:=Vector2(-INF,-INF)
+ for point in plot:
+  var p:=local(Plan.point(point));low=low.min(Vector2(p.x,p.z));high=high.max(Vector2(p.x,p.z))
+ var size:=high-low
+ if size.x<0.1 or size.y<0.1:return
+ var center:=(low+high)/2;var margin:=minf(0.6 if field.get("edge","")=="ditch" else 0.44 if field.get("edge","")=="rail" else 0.4,minf(size.x,size.y)*0.2)
+ var soil_material:=StandardMaterial3D.new();soil_material.albedo_color=Color("705038");soil_material.roughness=1.0
+ var soil:=MeshInstance3D.new();var base:=BoxMesh.new();base.size=Vector3(size.x-2*margin,0.045,size.y-2*margin);soil.mesh=base;soil.material_override=soil_material;soil.position=Vector3(center.x,0,center.y);soil.name="FieldSoil";add_child(soil)
+ var crop:=str(field.get("crop","barley"))
+ var inner:=size-Vector2.ONE*margin*2;var broad:=crop=="beans";var lanes:=2 if broad else 3
+ var rows:=clampi(roundi(inner.y/(0.44 if broad else 0.53)),1,32);var pitch:=inner.y/rows
+ add_field_furrows(center,inner,rows)
+ if crop!="fallow":
+  var colors={"barley":"c3a15c","wheat":"cbaa59","rye":"b2aa69","beans":"779948"}
+  var crop_material:=StandardMaterial3D.new();crop_material.albedo_color=Color(str(colors.get(crop,"b79b55")));crop_material.roughness=1.0;crop_material.cull_mode=BaseMaterial3D.CULL_DISABLED
+  var leaf_colors={"barley":"918447","wheat":"8f7c42","rye":"73794a","beans":"51723d"}
+  var leaf_material:=StandardMaterial3D.new();leaf_material.albedo_color=Color(str(leaf_colors.get(crop,"78814c")));leaf_material.roughness=1.0;leaf_material.cull_mode=BaseMaterial3D.CULL_DISABLED
+  var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES);surface.set_material(leaf_material)
+  var heads:=SurfaceTool.new();heads.begin(Mesh.PRIMITIVE_TRIANGLES);heads.set_material(crop_material)
+  var columns:=clampi(roundi(inner.x/(0.26 if broad else 0.19)),1,maxi(1,floori(1140.0/(rows*lanes))))
+  var heights={"barley":0.46,"wheat":0.55,"rye":0.63,"beans":0.27}
+  for row in rows:
+   for lane in lanes:
+    for col in columns:
+     var k:=73+row*307+col*23+lane*887
+     if fence_noise(k+18)<0.054:continue
+     var x:=((col+0.5+(fence_noise(k)-0.5)*0.68+(lane-(lanes-1)/2.0)*0.21)/columns-0.5)*inner.x
+     var lateral:float=(lane-(lanes-1)/2.0)*(0.22 if broad else 0.15)+(fence_noise(k+3)-0.5)*0.14
+     var shift:=pitch*(0.051*sin(x*4.3+row*0.85)+0.032*sin(x*8.8-row))
+     var z:float=(row+0.5)*pitch-inner.y/2+lateral*pitch+shift
+     var height:float=float(heights.get(crop,0.46))*(0.74+fence_noise(k+5)*0.46)
+     var root:=Vector3(center.x+x,0.06,center.y+z);var tip:=root+Vector3((fence_noise(k+6)-0.5)*0.09,height,(fence_noise(k+7)-0.5)*0.12)
+     var angle:=fence_noise(k+16)*TAU;var direction:=Vector3(cos(angle),0,sin(angle));var perpendicular:=Vector3(-direction.z,0,direction.x)
+     if broad:
+      for j in 5:
+       var theta:=j*TAU/5+angle;var axis:=Vector3(cos(theta),0,sin(theta));var sideways:=Vector3(-axis.z,0,axis.x)
+       var end:=root+axis*height*0.62+Vector3.UP*height*0.58;var middle:=root.lerp(end,0.6)+Vector3.UP*height*0.37
+       add_field_quad(surface,root,middle-sideways*height*0.22,end,middle+sideways*height*0.22)
+     else:
+      for vertex in [root-direction*0.006,root+direction*0.006,tip]:surface.add_vertex(vertex)
+      for sign_ in [-1.0,1.0]:
+       var stem:=root.lerp(tip,0.36 if sign_>0 else 0.62);var bend:Vector3=stem+direction*sign_*0.054+Vector3.UP*0.055
+       add_field_quad(surface,stem,bend-perpendicular*0.013,bend+direction*sign_*0.079-Vector3.UP*0.023,bend+perpendicular*0.013)
+      var length:=0.151 if crop=="wheat" else 0.124;var half:=0.016 if crop=="rye" else 0.022;var awn:=0.081 if crop=="barley" else 0.053 if crop=="rye" else 0.022
+      for axis in [direction,perpendicular]:
+       var bottom:Vector3=tip-axis*0.014-Vector3.UP*length*0.60;var peak:Vector3=tip+axis*0.012+Vector3.UP*length*0.32
+       add_field_quad(heads,bottom,tip+axis*half-Vector3.UP*length*0.30,tip+axis*0.011+Vector3.UP*length*0.34,tip-axis*half-Vector3.UP*length*0.25)
+       for vertex in [peak-axis*0.009,peak+axis*0.009,peak+axis*0.023+Vector3.UP*awn]:heads.add_vertex(vertex)
+  surface.generate_normals();var plants:=MeshInstance3D.new();plants.name="FieldPlants";plants.mesh=surface.commit();add_child(plants)
+  if not broad:heads.generate_normals();var ears:=MeshInstance3D.new();ears.name="FieldEars";ears.mesh=heads.commit();add_child(ears)
+ var corners:=[Vector3(low.x,0,low.y),Vector3(high.x,0,low.y),Vector3(high.x,0,high.y),Vector3(low.x,0,high.y)]
+ var edge:=str(field.get("edge","ridge"))
+ add_field_margin(low,high,margin,edge)
+ for i in 4:
+  var a:Vector3=corners[i];var b:Vector3=corners[(i+1)%4]
+  if edge=="rail":
+   if i==2 and a.distance_to(b)>2.5:
+    var gap:=0.54/a.distance_to(b);add_field_rail(a,a.lerp(b,0.5-gap));add_field_rail(a.lerp(b,0.5+gap),b)
+   else:add_field_rail(a,b)
+  elif edge=="stones":
+   var count:=floori(a.distance_to(b)/0.31);var stone_mesh:=SphereMesh.new();stone_mesh.radius=0.06;stone_mesh.height=0.07;stone_mesh.radial_segments=7;stone_mesh.rings=4
+   for j in count:
+    var n:=j+i*31
+    if fence_noise(n+9)<0.19:continue
+    var t:float=(j+0.5+(fence_noise(n)-0.5)*0.60)/count
+    var point:Vector3=a.lerp(b,t);var inward:=Vector3(center.x-point.x,0,center.y-point.z).normalized();point+=inward*margin*0.4;point.y=0.04
+    var stone:=MeshInstance3D.new();stone.name="FieldStone";stone.mesh=stone_mesh;stone.material_override=material_for("stone");stone.position=point;add_child(stone)
+
+func add_field_quad(surface: SurfaceTool,a: Vector3,b: Vector3,c: Vector3,d: Vector3) -> void:
+ for point in [a,b,c,a,c,d]:surface.add_vertex(point)
+
+func add_field_rail(a: Vector3,b: Vector3) -> void:
+ add_pole(a+Vector3.UP*0.3,b+Vector3.UP*0.3,0.035,"wood");get_child(get_child_count()-1).name="FieldRail";get_child(get_child_count()-1).set_meta("field_rail",true)
+ add_pole(a+Vector3.UP*0.6,b+Vector3.UP*0.6,0.035,"wood")
+ var posts:=maxi(1,ceili(a.distance_to(b)/0.8))
+ for j in posts+1:add_column(a.lerp(b,float(j)/posts),0.75,0.05,"wood")
+
+func add_field_margin(low: Vector2,high: Vector2,margin: float,edge: String) -> void:
+ var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+ var material:StandardMaterial3D=material_for("floor").duplicate();material.vertex_color_use_as_albedo=true;surface.set_material(material)
+ var ditch:=edge=="ditch";var ridge:=edge=="ridge"
+ var sections:=[Vector2(0,-0.049),Vector2(0.30,0.026 if ditch else 0.037 if ridge else -0.018),Vector2(0.52,-0.046 if ditch else 0.066 if ridge else -0.015),Vector2(0.69,-0.038 if ditch else 0.021 if ridge else -0.013),Vector2(0.84,0.035 if ditch else -0.012),Vector2(1,-0.012)]
+ var outer:=[Vector2(low.x,low.y),Vector2(high.x,low.y),Vector2(high.x,high.y),Vector2(low.x,high.y)]
+ var inner:=[low+Vector2(margin,margin),Vector2(high.x-margin,low.y+margin),high-Vector2(margin,margin),Vector2(low.x+margin,high.y-margin)]
+ for side in 4:
+  var a:Vector2=outer[side];var b:Vector2=outer[(side+1)%4];var ia:Vector2=inner[side];var ib:Vector2=inner[(side+1)%4]
+  var length:=a.distance_to(b);var steps:=maxi(2,ceili(length/0.15))
+  var cross=func(t:float,f:float,h:float) -> Vector3:
+   var wobble:float=(sin(t*length*16+side)*0.075+sin(t*length*8.7)*0.105)*sin(PI*t)*maxf(0,1-f)
+   var p:=a.lerp(b,t).lerp(ia.lerp(ib,t),f+wobble)
+   return Vector3(p.x,h+0.010*sin(t*length*6.3+side)*sin(PI*t)*sin(f*PI),p.y)
+  for j in steps:
+   var t0:=float(j)/steps;var t1:=float(j+1)/steps
+   for k in range(1,sections.size()):
+    var first:Vector2=sections[k-1];var last:Vector2=sections[k]
+    var tint:=0.48 if ditch and (k==3 or k==4) else 0.06+fence_noise(side*331+j*11+k)*0.18
+    var color:=Color("c3a181").lerp(Color("685e49"),tint)
+    var points:=[cross.call(t0,first.x,first.y),cross.call(t1,first.x,first.y),cross.call(t1,last.x,last.y),cross.call(t0,last.x,last.y)]
+    for index in [0,1,2,0,2,3]:
+     var p:Vector3=points[index];surface.set_color(color);surface.set_uv(Vector2(p.x,p.z)*0.48);surface.add_vertex(p)
+ surface.generate_normals();var border:=MeshInstance3D.new();border.name="FieldBorder";border.mesh=surface.commit();add_child(border)
+
+func add_field_furrows(center: Vector2,size: Vector2,rows: int) -> void:
+ var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+ var material:StandardMaterial3D=material_for("floor").duplicate();material.vertex_color_use_as_albedo=true;surface.set_material(material)
+ var pitch:=size.y/rows;var cuts:=clampi(ceili(size.x/0.19),5,48)
+ var profile:=[Vector2(-0.5,0),Vector2(-0.32,0.025),Vector2(-0.15,0.058),Vector2(0,0.079),Vector2(0.16,0.061),Vector2(0.34,0.027),Vector2(0.5,0)]
+ for row in rows:
+  var z_center:float=(row+0.5)*pitch-size.y/2
+  var point=func(x:float,t:float,h:float) -> Vector3:
+   var shift:=pitch*(0.051*sin(x*4.3+row*0.85)+0.032*sin(x*8.8-row))
+   return Vector3(center.x+x,0.009+h*clampf((size.x/2-absf(x))/0.29,0,1),center.y+z_center+t*pitch+(1-2*absf(t))*shift)
+  for j in cuts:
+   var x0:=size.x*(float(j)/cuts-0.5);var x1:=size.x*(float(j+1)/cuts-0.5)
+   for k in range(1,profile.size()):
+    var pa:Vector2=profile[k-1];var pb:Vector2=profile[k]
+    var tint:float=(1-absf(k-3.5)/3.5)*0.79+fence_noise(73+row*27+j*7+k)*0.13
+    var color:=Color("8f7660").lerp(Color("d4af87"),tint)
+    var points:=[point.call(x0,pa.x,pa.y),point.call(x0,pb.x,pb.y),point.call(x1,pb.x,pb.y),point.call(x1,pa.x,pa.y)]
+    for index in [0,1,2,0,2,3]:
+     var p:Vector3=points[index];surface.set_color(color);surface.set_uv(Vector2(p.x,p.z)*0.48);surface.add_vertex(p)
+ surface.generate_normals();var furrows:=MeshInstance3D.new();furrows.name="FieldFurrows";furrows.mesh=surface.commit();add_child(furrows)
+
 func add_floor(poly: PackedVector2Array,height:=0.008,gallery:=false) -> void:
  if poly.size()<3:return
  var triangles:=Geometry2D.triangulate_polygon(poly)
@@ -319,11 +522,62 @@ func add_wall(span: Dictionary,low: float,high: float) -> void:
  if high<=low:return
  var a:=local(span.a);var b:=local(span.b);var delta:=b-a
  if delta.length()<0.016:return
- var mesh:=BoxMesh.new();mesh.size=Vector3(delta.length(),high-low,0.19 if span.group=="outer" else 0.115)
+ var style:=str(span.finish);var width:=0.19 if span.group=="outer" else 0.115
+ var mesh:=BoxMesh.new();mesh.size=Vector3(delta.length(),high-low,width*0.37 if style in ["wood","stave","bamboo","weave"] else width)
  var node:=MeshInstance3D.new();node.name="HouseWall";node.mesh=mesh;node.material_override=material_for(str(span.finish));node.position=(a+b)/2+Vector3(0,(low+high)/2,0);node.rotation.y=-atan2(delta.z,delta.x);add_child(node)
+ if style=="wood":
+  var rows:=maxi(1,roundi((high-low)/0.19));var row_height:float=(high-low)/rows
+  for i in rows:
+   var y:=low+(i+0.5)*row_height
+   add_pole(a+Vector3.UP*y,b+Vector3.UP*y,row_height*0.53,"wood")
+   get_child(get_child_count()-1).name="HouseWallLog"
+ elif style in ["stave","bamboo"]:
+  var count:=maxi(1,roundi(delta.length()/(0.061 if style=="bamboo" else 0.2)))
+  var radius:float=delta.length()/count*0.49
+  for i in count:
+   var p:=a.lerp(b,(i+0.5)/count)
+   add_pole(p+Vector3.UP*low,p+Vector3.UP*high,radius,"bamboo" if style=="bamboo" else "wood")
+   get_child(get_child_count()-1).name="HouseWallStave"
+ elif style=="weave":add_woven_wall(a,b,low,high,width)
+ elif style=="halftimber":
+  var side:=Vector3(-delta.z,0,delta.x).normalized();var posts:=maxi(1,roundi(delta.length()))
+  for sign_ in [-1.0,1.0]:
+   var offset:Vector3=side*sign_*(width/2+0.012)
+   for y in [low+0.03,high-0.03]:add_wall_brace(a+offset+Vector3.UP*y,b+offset+Vector3.UP*y,0.035)
+   for i in posts+1:
+    var p:=a.lerp(b,float(i)/posts)+offset
+    add_wall_brace(p+Vector3.UP*low,p+Vector3.UP*high,0.035)
+    if i<posts:
+     var q:=a.lerp(b,float(i+1)/posts)+offset
+     add_wall_brace((p if i%2==1 else q)+Vector3.UP*(low+0.05),(q if i%2==1 else p)+Vector3.UP*(high-0.05),0.028)
 
-# The first roof surface follows the source designer's sample function; finer
-# thatch, vents, roof materials and era-specific roof details are still pending.
+func add_wall_brace(a: Vector3,b: Vector3,radius: float) -> void:
+ if a.distance_to(b)<0.001:return
+ add_pole(a,b,radius,"wood");get_child(get_child_count()-1).name="HouseWallBrace"
+
+func add_woven_wall(a: Vector3,b: Vector3,low: float,high: float,width: float) -> void:
+ var length:=a.distance_to(b)
+ if length<0.08 or high-low<0.09:return
+ var axis:Vector3=(b-a).normalized();var side:=Vector3(-axis.z,0,axis.x)
+ var bays:=maxi(1,roundi(length/0.22));var courses:=maxi(1,roundi((high-low)/0.052));var segments:=bays*8;var sides:=7
+ var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES);surface.set_material(material_for("wood"))
+ for course in courses:
+  var y:=low+(course+0.5)*(high-low)/courses;var radius:=0.016+fence_noise(course*47+2)*0.008
+  var sample=func(step: int,ring: int) -> Vector3:
+   var u:=float(step)/segments;var theta:=float(ring)/sides*TAU
+   var weave:=cos(u*bays*PI+course*PI);var bend:=sin(u*12+fence_noise(course*47)*6)*0.009+sin(u*31+course*47)*0.004
+   return a.lerp(b,u)+Vector3.UP*(y+bend+cos(theta)*radius)+side*(weave*(width*0.40+0.012)+sin(theta)*radius)
+  for step in segments:
+   for ring in sides:
+    var points:=[sample.call(step,ring),sample.call(step+1,ring),sample.call(step,ring+1),sample.call(step+1,ring+1)]
+    var uv:=[Vector2(float(step)/segments*length*3.2,float(ring)/sides*0.28),Vector2(float(step+1)/segments*length*3.2,float(ring)/sides*0.28),Vector2(float(step)/segments*length*3.2,float(ring+1)/sides*0.28),Vector2(float(step+1)/segments*length*3.2,float(ring+1)/sides*0.28)]
+    for index in [3,2,1,2,0,1]:surface.set_uv(uv[index]);surface.add_vertex(points[index])
+ surface.generate_normals();var mesh:=MeshInstance3D.new();mesh.name="HouseWovenBranches";mesh.mesh=surface.commit();add_child(mesh)
+ for i in bays+1:
+  var p:=a.lerp(b,float(i)/bays);add_pole(p+Vector3.UP*low,p+Vector3.UP*high,width*0.28,"wood")
+
+# The roof surface and reed courses follow the source designer's sampling;
+# vents and finer era-specific roof details remain to be ported.
 func add_roof(room: Dictionary,design: Dictionary,lift: float) -> void:
  var roof_form:=str(design.get("roofForm","gable"))
  if roof_form=="terrace":add_terrace_roof(room,design,lift);return
@@ -350,6 +604,7 @@ func add_roof(room: Dictionary,design: Dictionary,lift: float) -> void:
     var y:float=eave+(shoulder-eave)*pow(t/inset,0.81) if t<inset else shoulder+(pitch-shoulder)*pow((t-inset)/(1-inset),0.90)
     return local(Vector2(v,u) if transpose else Vector2(u,v),y+lift-0.018)
    roof_grid(sample,32,48)
+   roof_courses(sample,32,clampi(roundi(width*1.7),5,12),false)
    for end in [along0,along1]:
     var along_t:float=(end-along0+16)/(along1-along0+32)
     roof_end(sample,along_t,inset,0.88+lift)
@@ -369,6 +624,7 @@ func add_roof(room: Dictionary,design: Dictionary,lift: float) -> void:
    var y:float=eave+(seat_height-eave)*pow(t/seat,0.85) if t<=seat else seat_height+(peak-seat_height)*pow((t-seat)/(1-seat),0.90)
    return local(p,y+sin(s*PI*6)*0.011*(1-t)+lift-0.018)
   roof_grid(sample,maxi(outline.size()*3,72),38)
+  roof_courses(sample,maxi(outline.size()*3,72),clampi(roundi(radius*3.2),6,11),true)
 
 func add_terrace_roof(room: Dictionary,design: Dictionary,lift: float) -> void:
  var floor:=Plan.room_polygon(room)
@@ -432,14 +688,88 @@ func add_classical_roof(room: Dictionary,design: Dictionary,lift: float,form: St
   surface.generate_normals();var node:=MeshInstance3D.new();node.name="RoofDeckPediment";node.mesh=surface.commit();add_child(node)
 
 func roof_grid(sample: Callable,columns: int,rows: int) -> void:
- var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES);surface.set_material(material_for(roof_material))
+ var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES);surface.set_material(roof_surface_material())
  for row in rows:
   for col in columns:
    var s0:=float(col)/columns;var s1:=float(col+1)/columns;var t0:=float(row)/rows;var t1:=float(row+1)/rows
    var quad:=[sample.call(s0,t0),sample.call(s1,t0),sample.call(s0,t1),sample.call(s1,t1)]
    var uv:=[Vector2(s0*3.8,t0*2.3),Vector2(s1*3.8,t0*2.3),Vector2(s0*3.8,t1*2.3),Vector2(s1*3.8,t1*2.3)]
-   for idx in [3,2,1,2,0,1]:surface.set_uv(uv[idx]);surface.add_vertex(quad[idx])
+   emit_roof_triangle(surface,[quad[3],quad[2],quad[1]],[uv[3],uv[2],uv[1]])
+   emit_roof_triangle(surface,[quad[2],quad[0],quad[1]],[uv[2],uv[0],uv[1]])
  surface.generate_normals();var node:=MeshInstance3D.new();node.name="RoofDeck";node.mesh=surface.commit();add_child(node)
+
+# Each overlapping course is raised at its lower edge, as in the web roof.
+func roof_courses(sample: Callable,columns: int,count: int,perimeter: bool) -> void:
+ if roof_material not in ["reed","thatch"]:return
+ var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES);surface.set_material(roof_surface_material())
+ for layer in count:
+  for row in 3:
+   for col in columns:
+    var points:Array=[];var uvs:Array=[]
+    for corner in [Vector2i(0,0),Vector2i(1,0),Vector2i(0,1),Vector2i(1,1)]:
+     var i:int=col+corner.x;var along:=float(row+corner.y)/3.0
+     var index:int=i%columns if perimeter else i
+     var point:Vector3=sample.call(float(index)/columns,(layer+along*1.07)/count)
+     point.y+=(1.0-along)*(0.057+(fence_noise(index+layer*383)-0.5)*0.102)
+     points.append(point);uvs.append(Vector2(float(i)/columns*(5.2 if perimeter else 2.6),along*0.26+layer*0.231))
+    emit_roof_triangle(surface,[points[3],points[2],points[1]],[uvs[3],uvs[2],uvs[1]])
+    emit_roof_triangle(surface,[points[2],points[0],points[1]],[uvs[2],uvs[0],uvs[1]])
+ surface.generate_normals();var node:=MeshInstance3D.new();node.name="OverlappingReedCourses";node.mesh=surface.commit();add_child(node)
+ add_reed_fringe(sample,columns,count)
+
+func add_reed_fringe(sample: Callable,columns: int,count: int) -> void:
+ var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+ var material:=StandardMaterial3D.new();material.vertex_color_use_as_albedo=true;material.roughness=1.0;material.cull_mode=BaseMaterial3D.CULL_DISABLED;surface.set_material(material)
+ var strands:=0;var fringe:=columns*3
+ for i in fringe:
+  var s:float=(i+fence_noise(i)*0.91)/fringe
+  var density:float=0.28+0.25*pow(sin(s*43+sin(s*81)),2)
+  if fence_noise(i+17)>density:continue
+  var base:Vector3=sample.call(s,0.027/count);var upper:Vector3=sample.call(s,0.34/count)
+  var slope:Vector3=(upper-base).normalized();var tip:Vector3=base-slope*(0.018+pow(fence_noise(i+5),2)*0.051)
+  tip.y-=0.007+fence_noise(i+8)*0.018;base.y+=0.031
+  var skip:=false
+  for vent in roof_vents:
+   if absf((tip.x+base.x)/2-vent.x)<0.32 and absf((tip.z+base.z)/2-vent.y)<0.32:skip=true;break
+  if skip:continue
+  var direction:=tip-base;var side:=Vector3(direction.z,0,-direction.x).normalized()*(0.0017+fence_noise(i+9)*0.0024)
+  var shade:=fence_noise(i+10);var color:=Color.from_hsv(0.083+shade*0.025,0.37,0.28+shade*0.12)
+  for vertex in [[base+side,0.84],[base-side,0.91],[tip,1.0]]:
+   surface.set_color(color*float(vertex[1]));surface.add_vertex(vertex[0])
+  strands+=1
+ if strands>0:
+  surface.generate_normals();var node:=MeshInstance3D.new();node.name="ReedEaveFringe";node.mesh=surface.commit();add_child(node)
+
+# Clip each roof triangle around the same square smoke vents as the web model.
+func emit_roof_triangle(surface: SurfaceTool,points: Array,uvs: Array) -> void:
+ var pieces:Array=[[{"point":points[0],"uv":uvs[0]},{"point":points[1],"uv":uvs[1]},{"point":points[2],"uv":uvs[2]}]]
+ for vent in roof_vents:
+  var next:Array=[]
+  for polygon in pieces:
+   var remaining:Array=polygon
+   for boundary in [[0,vent.x-0.25,1],[0,vent.x+0.25,-1],[1,vent.y-0.25,1],[1,vent.y+0.25,-1]]:
+    if remaining.size()<3:break
+    var parts:=split_roof_polygon(remaining,int(boundary[0]),float(boundary[1]),float(boundary[2]))
+    if parts[1].size()>=3:next.append(parts[1])
+    remaining=parts[0]
+  pieces=next
+ for polygon in pieces:
+  for i in range(1,polygon.size()-1):
+   for vertex in [polygon[0],polygon[i],polygon[i+1]]:
+    surface.set_uv(vertex.uv);surface.add_vertex(vertex.point)
+
+func split_roof_polygon(polygon: Array,axis: int,limit: float,sign_: float) -> Array:
+ var inside:Array=[];var outside:Array=[]
+ for i in polygon.size():
+  var a:Dictionary=polygon[i];var b:Dictionary=polygon[(i+1)%polygon.size()]
+  var pa:Vector3=a.point;var pb:Vector3=b.point
+  var da:=((pa.x if axis==0 else pa.z)-limit)*sign_;var db:=((pb.x if axis==0 else pb.z)-limit)*sign_
+  if da>=0:inside.append(a)
+  else:outside.append(a)
+  if (da>=0)!=(db>=0):
+   var t:=da/(da-db);var crossing={"point":pa.lerp(pb,t),"uv":Vector2(a.uv).lerp(Vector2(b.uv),t)}
+   inside.append(crossing);outside.append(crossing)
+ return [inside,outside]
 
 static func from_design(design: Dictionary) -> Node3D:
  var key:=JSON.stringify(design)
@@ -458,7 +788,7 @@ static func clear_cache() -> void:
  model_cache.clear();cache_order.clear()
 
 func roof_end(sample: Callable,along: float,inset: float,base: float) -> void:
- var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES);surface.set_material(material_for(roof_material))
+ var surface:=SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES);surface.set_material(roof_surface_material())
  for i in 24:
   var t0:=lerpf(inset,1.0,float(i)/24);var t1:=lerpf(inset,1.0,float(i+1)/24)
   var a:Vector3=sample.call(along,t0);var b:Vector3=sample.call(along,t1);var c:=Vector3(a.x,minf(a.y,base),a.z);var d:=Vector3(b.x,minf(b.y,base),b.z)

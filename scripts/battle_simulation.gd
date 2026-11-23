@@ -143,7 +143,7 @@ func move_anchor(unit: Dictionary,squads: Array,battle: Dictionary,arrival_goals
   if goal==null:goal=unit.get("anchor",unit)
  if goal==null:goal=Support.supply_goal(battle,unit)
  if goal==null and nearest!=null:
-  if unit.get("routing",false) or unit.get("manualOrder",false) or unit.get("attackTargetSource")!=null or unit.get("combatMode","auto")!="manual" or unit.team!=0 or unit.get("advance",false) or unit.get("civilian",false) or Tactics.horse(unit) or unit.team==0 or Doctrine.distance(unit,nearest)<30:
+  if unit.get("routing",false) or unit.get("manualOrder",false) or unit.get("attackTargetSource")!=null or (unit.get("combatMode","auto")!="manual" and (unit.team!=0 or unit.get("advance",false) or unit.get("civilian",false) or Tactics.horse(unit) or unit.team==0 or Doctrine.distance(unit,nearest)<30)):
    goal=Assault.assault_goal(battle,unit)
    if goal==null:goal=Doctrine.marching_goal(unit,nearest,Goals.tactical_goal(unit,nearest,squads,battle,stats,nav))
  if goal!=null and (not unit.get("guardPost",false) or unit.get("routing",false)):
@@ -250,7 +250,8 @@ func move_fighter(actor: Dictionary,agents: Array,squads: Array,battle: Dictiona
  if unit.get("siegeBuildingId")==null and unit.get("resupplyCamp")==null:goal=Doctrine.keep_advance(unit,man,goal,d,target)
  if man.get("yieldGoal")!=null and float(man.get("yieldUntil",0))>float(battle.elapsed) and Doctrine.distance(man,man.yieldGoal)>0.3:goal=man.yieldGoal
  if nav!=null:goal=nav.waypoint(man,goal,float(battle.elapsed))
- goal=crowd.waypoint(man,goal,nearby(bins,man),open,radius_of,dt,3.0 if nav!=null else 1.0)
+ var crowd_tolerance:=0.000000001 if int(DATA.data.troops.get(unit.kind,{}).get("age",99))<=2 else 0.0
+ goal=crowd.waypoint(man,goal,nearby(bins,man),open,radius_of,dt,3.0 if nav!=null else 1.0,crowd_tolerance)
  var old: Dictionary={"x":man.x,"z":man.z};remove_bin(bins,man);var peers:=nearby(bins,man);var length:=Doctrine.distance(man,goal)
  var step:=minf(length,float(stats.speed)*(1.1 if man.get("routing",false) else 1.0)*(1-float(man.fatigue)*0.0025)*dt)
  var fraction:=step/length if length!=0 else 0.0;var dx: float=(float(goal.x)-float(man.x))*fraction;var dz: float=(float(goal.z)-float(man.z))*fraction

@@ -39,7 +39,7 @@ func clear(a: Dictionary,b: Dictionary,peers: Array,own: float,open: Callable,ra
   if pow(px+dx*t,2)+pow(pz+dz*t,2)<radius*radius:return false
  return line_clear(a,b,open,cell_size)
 
-func waypoint(agent: Dictionary,goal: Dictionary,others: Array,open: Callable,radius_of: Callable,dt:=0.05,cell_size:=1.0) -> Dictionary:
+func waypoint(agent: Dictionary,goal: Dictionary,others: Array,open: Callable,radius_of: Callable,dt:=0.05,cell_size:=1.0,tolerance:=0.0) -> Dictionary:
  var own:=float(radius_of.call(agent));var peers: Array=[]
  for p in others:
   if not is_same(p,agent):peers.append(p)
@@ -75,14 +75,14 @@ func waypoint(agent: Dictionary,goal: Dictionary,others: Array,open: Callable,ra
  for k in nodes.size():
   var at:=-1
   for i in nodes.size():
-   if closed[i]==0 and (at<0 or costs[i]<costs[at]):at=i
+   if closed[i]==0 and (at<0 or costs[i]<costs[at]-tolerance):at=i
   if at<0 or not is_finite(costs[at]) or at==1:break
   closed[at]=1
   for i in range(1,nodes.size()):
    if closed[i]!=0:continue
    var left: bool=(float(goal.x)-float(agent.x))*(float(nodes[i].z)-float(agent.z))-(float(goal.z)-float(agent.z))*(float(nodes[i].x)-float(agent.x))>0
    var cost: float=costs[at]+distance(nodes[at],nodes[i])*(1.001 if left else 1.0)
-   if cost<costs[i] and clear(nodes[at],nodes[i],peers,own,open,radius_of,cell_size):costs[i]=cost;prev[i]=at
+   if cost<costs[i]-tolerance and clear(nodes[at],nodes[i],peers,own,open,radius_of,cell_size):costs[i]=cost;prev[i]=at
  var path: Array=[]
  if prev[1]>=0:
   var at:=1

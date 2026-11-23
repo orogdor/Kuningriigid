@@ -158,6 +158,10 @@ var battle_nav: Variant=null
 var battle_sim: Variant=null
 var battle_view: Node3D=null
 var detail_root: Node3D
+var detail_loading_overlay: ColorRect
+var detail_loading_initial:=false
+var detail_loading_previous:=false
+var detail_loading_seconds:=0.0
 var detail_button: Button
 var found_button: Button
 var research_row: VBoxContainer
@@ -1512,6 +1516,9 @@ func build_ui() -> void:
 	layer.add_child(hud)
 	layer.move_child(panel,layer.get_child_count()-1)
 	panel.visible=false
+	var loading_layer:=CanvasLayer.new();loading_layer.layer=30;add_child(loading_layer)
+	detail_loading_overlay=ColorRect.new();detail_loading_overlay.color=Color(0.03,0.06,0.09,0.96);detail_loading_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);detail_loading_overlay.visible=false;loading_layer.add_child(detail_loading_overlay)
+	var loading_text:=Label.new();loading_text.text="Detailkaardi maastik ja mets laadivad…";loading_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;loading_text.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;loading_text.add_theme_font_size_override("font_size",24);loading_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);detail_loading_overlay.add_child(loading_text)
 
 func toggle_simulation_pause() -> void:
 	simulation_paused=not simulation_paused
@@ -2008,17 +2015,9 @@ func migration_suggestions() -> Array:
 	return Settlement.site_suggestions(game,settler,cell_at,prepare_suggestion_cell)
 
 func prepare_suggestion_cell(cell: Dictionary) -> void:
-	var c:=int(cell.c);var r:=int(cell.r);var index:=r*Grid.COLS+c
-	var biome:=visual_biome(index);var value:=Geography.noise(c+181,r+43,int(game.seed))
-	var start:=false
-	for item in starts:
-		if int(item.c)==c and int(item.r)==r:start=true;break
-	var forest: bool=is_forest_core(index)
-	var wood: bool=biome in ["forest","jungle","taiga","lush_river","grassland"] or (biome=="steppe" and value>0.35) or start
-	cell.deposits.wood=wood
-	cell.deposits.stone=float(cell.h)>16 or value<0.3 or start
-	cell.deposits.game=start or (wood and Geography.noise(c+731,r+85,int(game.seed))>0.28)
-	cell.deposits.grain=not forest and value>0.24
+	# Suggestions must use the actual world's geography version, just like
+	# candidate selection and the city created from the chosen cell.
+	city_cell_data(cell)
 func found_suggested_migration_city() -> void:
 	if settler.get("embarked")!=null:return
 	var suggestions:=migration_suggestions()
@@ -2078,6 +2077,15 @@ func update_camera_keys(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	DetailView.poll_nature_assets();DetailView.poll_tree_assets();DetailGroundMaterial.poll()
+	if is_instance_valid(detail_loading_overlay):
+		if detail_mode and not detail_loading_previous:detail_loading_initial=true;detail_loading_seconds=0.0
+		if detail_mode and detail_loading_initial and is_instance_valid(detail_root):
+			var waiting: bool=bool(detail_root.tree_pending) or detail_root.forest_fill!=null or (not detail_root.tree_counts.is_empty() and bool(detail_root.tree_lod_dirty))
+			detail_loading_seconds+=delta
+			detail_loading_overlay.visible=waiting and detail_loading_seconds<15.0
+			if not detail_loading_overlay.visible:detail_loading_initial=false
+		else:detail_loading_overlay.visible=false
+		detail_loading_previous=detail_mode
 	if is_instance_valid(building_preview) and (not build_placement_mode or not detail_mode or not city_created or settler_mode):clear_building_preview()
 	if is_instance_valid(fpv_walker):fpv_walker.update(delta)
 	if not is_instance_valid(fpv_walker) or not fpv_walker.active:
@@ -2159,6 +2167,10 @@ func _process(delta: float) -> void:
 			else:select_after_city_loss(captured)
 			refresh_settler_options();update_status("Asunik tabati.")
 	tick_field_battle(delta)
+	# During the migration rival settlers must plan before any city exists.
+	if game.cities.is_empty() and float(game.time)-float(game.get("lastAIResearchPlan",0))>=12.0:
+		game.lastAIResearchPlan=game.time
+		for team in [1,2,3]:manage_ai_settlers(team)
 	if not game.cities.is_empty():
 		for city in game.cities:
 			var runtime:=ensure_city_runtime(city)
@@ -2302,6 +2314,11 @@ func _process(delta: float) -> void:
 		detail_root.update_wildlife({},elapsed,delta,local_nav,[{"x":settler.x,"z":settler.z}])
 	elif detail_mode and detail_root!=null and detail_inspection:detail_root.update_wildlife({},elapsed,delta,null)
 	for moving in game.settlers:
+		# The web game advances settlers before AI orders are issued. Do not
+		# consume part of the current frame immediately for a new migration path.
+		if moving.has("aiMigrationPathIssuedAt"):
+			var just_issued:bool=moving.aiMigrationPathIssuedAt==game.time;moving.erase("aiMigrationPathIssuedAt")
+			if just_issued:continue
 		var events:=Movement.advance_settler(moving,delta,elapsed<120.0,func(x,y):return Roads.road_boost(game,x,y,game.time),func(x,y):Roads.record_step(game,x,y,"settler",game.time))
 		if not events.is_empty():
 			settler_local_navs.erase(str(int(moving.id)))
@@ -4002,6 +4019,7 @@ func place_ai_building(city: Dictionary,runtime: Dictionary,type: String,parent:
 		if check.has("error"):continue
 		var proposed={"type":type,"x":target.x,"z":target.y}
 		if coast_type:proposed.landEntry=coast_data.landEntry
+		if not nav.preserves_access(proposed,city.economy.buildings,city.world.get("workers",{}),city.economy.get("cargo",[])):continue
 		var entry: Variant=nav.nearest(LocalNav.door(proposed),9)
 		if entry==null or nav.route(depot,entry,false)==null:continue
 		if type=="farm" and ai_field_site(city,runtime,proposed,parent)==null:continue
@@ -4154,14 +4172,20 @@ func finish_rallies() -> void:
 func manage_ai_settlers(team: int) -> void:
 	for person in game.settlers.duplicate():
 		if int(person.team)!=team or person.get("embarked")!=null or not person.get("path",[]).is_empty():continue
+		if migration_active() and person.has("chosenSiteV274"):continue
 		if not person.get("landed",false):
 			var goal: Variant=person.get("aiSettlementGoal")
 			var destination: Variant=goal if goal is Dictionary and int(goal.c)==int(person.c) and int(goal.r)==int(person.r) else choose_ai_settlement_tile(person)
-			if destination==null:person.aiSeaNeeded=true;continue
+			if destination==null:
+				person.aiSeaNeeded=game.cities.any(func(c):return int(c.team)==team)
+				continue
 			person.aiSeaNeeded=false
 			if int(destination.c)!=int(person.c) or int(destination.r)!=int(person.r):
 				var path: Variant=merchant_land_path(person,destination,team)
-				if path is Array and not path.is_empty():person.path=path;person.aiSettlementGoal={"c":destination.c,"r":destination.r};continue
+				if path is Array and not path.is_empty():
+					person.path=path;person.aiSettlementGoal={"c":destination.c,"r":destination.r}
+					if migration_active() and int(game.ages[team])<=2:person.aiMigrationPathIssuedAt=game.time
+					continue
 			person.landed=true;person.localTarget=null;person.erase("aiSettlementGoal")
 		if person.get("localTarget")!=null:continue
 		var c:=int(person.c);var r:=int(person.r);var key:=str(c)+":"+str(r)
@@ -4182,6 +4206,8 @@ func manage_ai_settlers(team: int) -> void:
 				var p:=Vector2(x,z)
 				if not Settlement.site_rule(person,p,game.cities,false,false,passable,world.resources).is_empty() or nav.route(person,{"x":x,"z":z})==null:continue
 				if Vector2(float(person.x),float(person.z)).distance_to(p)<1:
+					if migration_active():
+						person.chosenSiteV274={"c":c,"r":r,"x":x,"z":z};found=true;break
 					var missing:=AISettlement.missing_resources(game,team,city_cell_data,is_coast)
 					var result:=Settlement.found_city(game,person,world)
 					if result.has("city"):
@@ -4196,47 +4222,68 @@ func manage_ai_settlers(team: int) -> void:
 			person.landed=false;person.aiSeaNeeded=true
 
 func prepare_ai_settlement_cell(cell: Dictionary) -> void:
-	prepare_suggestion_cell(cell)
-	var c:=int(cell.c);var r:=int(cell.r);var start:=false
-	for p in starts:
-		if int(p.c)==c and int(p.r)==r:start=true;break
-	var water: bool=start or is_coast(c,r) or cell.get("river",false) or Geography.noise(c+19,r+29,int(game.seed))>0.58
-	var ore: bool=float(cell.h)>16 and Geography.noise(c,r+883,int(game.seed))>0.35
-	cell.deposits.water=water;cell.deposits.ore=ore;cell.deposits.oil=not cell.mountain and Geography.noise(c+615,r+399,int(game.seed))>0.76
-	cell.deposits.clay=start or (water and Geography.noise(c+240,r+340,int(game.seed))>0.28)
-	cell.deposits.copper=start or (ore and Geography.noise(c+370,r+470,int(game.seed))>0.38)
-	cell.deposits.tin=start or (ore and Geography.noise(c+390,r+490,int(game.seed))>0.52)
+	# Use the same geography-version-aware deposits as the actual city.
+	city_cell_data(cell)
 
 func choose_ai_settlement_tile(person: Dictionary) -> Variant:
 	var team:=int(person.team);var own: Array=[]
 	for city in game.cities:
 		if int(city.team)==team:own.append(city)
-	if own.is_empty():return null
+	var first_city:=own.is_empty();var span:=9 if first_city else 26
 	var missing:=AISettlement.missing_resources(game,team,city_cell_data,is_coast);var options: Array=[]
 	var c0:=int(person.c);var r0:=int(person.r)
-	for r in range(maxi(0,r0-26),mini(Grid.ROWS-1,r0+26)+1):
-		for c in range(maxi(0,c0-26),mini(Grid.COLS-1,c0+26)+1):
+	for r in range(maxi(0,r0-span),mini(Grid.ROWS-1,r0+span)+1):
+		for c in range(maxi(0,c0-span),mini(Grid.COLS-1,c0+span)+1):
 			var d:=absi(c-c0)+absi(r-r0);var key:=str(c)+":"+str(r);var cell: Dictionary=grid[r*Grid.COLS+c]
-			if d>26 or not cell.land or cell.mountain or territory_allocation.get("territory",{}).has(key) or key in person.get("aiRejectedSites",[]):continue
+			if d>span or not cell.land or cell.mountain or territory_allocation.get("territory",{}).has(key) or key in person.get("aiRejectedSites",[]):continue
 			var near:=999
 			for city in game.cities:near=mini(near,maxi(absi(c-int(city.c)),absi(r-int(city.r))))
 			if near<Settlement.AI_SPACING:continue
 			var own_dist:=999
 			for city in own:own_dist=mini(own_dist,maxi(absi(c-int(city.c)),absi(r-int(city.r))))
 			prepare_ai_settlement_cell(cell)
-			var score: float=AISettlement.score(cell,missing,is_coast(c,r))*3+(8 if cell.deposits.get("wood",false) else 0)-d*1.5-own_dist*6
+			if first_city and (not cell.deposits.get("wood",false) or not cell.deposits.get("stone",false)):continue
+			var score: float=AISettlement.score(cell,missing,is_coast(c,r))*3+(8 if cell.deposits.get("wood",false) else 0)-d*1.5-(0 if first_city else own_dist*6)
 			options.append({"c":c,"r":r,"score":score,"order":options.size()})
 	options.sort_custom(func(a,b):return a.order<b.order if a.score==b.score else a.score>b.score)
-	var max_path:=16 if int(game.ages[team])<=1 else 64;var distances:=ai_settlement_distances(Vector2i(c0,r0),max_path)
+	var max_path:=64 if first_city else 16 if int(game.ages[team])<=1 else 64;var distances:=ai_settlement_distances(Vector2i(c0,r0),max_path)
 	var best: Variant=null;var best_value:=-INF;var tried:=0;var calls:=0
 	for candidate in options:
 		if tried>=12 or calls>=200:break
 		if maxi(absi(int(candidate.c)-c0),absi(int(candidate.r)-r0))>max_path:continue
 		calls+=1;var key:=str(int(candidate.c))+":"+str(int(candidate.r))
 		if not distances.has(key):continue
+		if first_city:
+			if ai_sea_site_ok(person,candidate):
+				return AISettlement.first_village_site(candidate,func(tile):return ai_first_village_survey(person,candidate,tile))
+			continue
 		tried+=1;var value: float=candidate.score-int(distances[key])*2.5
 		if value>best_value:best_value=value;best=candidate
 	return best
+
+func ai_first_village_survey(person: Dictionary,target: Dictionary,tile: Dictionary) -> Variant:
+	var c:=int(tile.c);var r:=int(tile.r)
+	if c<0 or r<0 or c>=Grid.COLS or r>=Grid.ROWS:return null
+	var key:=str(c)+":"+str(r);var cell:Dictionary=grid[r*Grid.COLS+c]
+	if not cell.land or cell.mountain or territory_allocation.get("territory",{}).has(key):return null
+	prepare_ai_settlement_cell(cell)
+	if not cell.deposits.get("wood",false) or not cell.deposits.get("stone",false):return null
+	var path:Variant=merchant_land_path(person,tile,int(person.team))
+	if not path is Array or path.size()>64:return null
+	var heights:=DetailTerrainScript.tile_heights(grid,c,r);var visual:=detail_visual_for(c,r);var river:=river_navigation_for(c,r,heights)
+	var coast:=is_coast(c,r) or bool(cell.mountain)
+	# Navigation.passable in the web source is the continuous terrain test,
+	# not the grid mask containing trees or other temporary obstacles.
+	var passable=func(x,z):return absf(x)<(132.0 if coast else 109.5) and absf(z)<(117.0 if coast else 94.5) and DetailTerrainScript.detail_height(heights,x,z)>0.2 and DetailTerrainScript.visual_sample(visual,x,z).z>0.05 and river.passable(x,z)
+	for dx in [-4,0,4]:
+		for dz in [-4,0,4]:
+			if not passable.call(-18+dx,-12+dz):return null
+	# The web's provisional city has no id, so its natural-plan seed is NaN;
+	# the reservation falls back to the rectangular terrain survey.
+	var fake={"id":0,"team":int(person.team),"economy":{"buildings":[{"type":"hall","hp":1200,"ready":true,"x":-18,"z":-12}]}}
+	var survey:Variant=AIStoneDefenses.reserve(game,fake,{"nav":null},Callable(),passable)
+	if not survey is Dictionary:return null
+	return {"cell":tile,"blocked":int(survey.terrainBlockedAtFounding),"water":bool(cell.deposits.get("water",false)),"coast":is_coast(c,r),"distance":absi(c-int(target.c))+absi(r-int(target.r))}
 
 func ai_settlement_distances(start: Vector2i,limit: int) -> Dictionary:
 	var queue: Array[Vector2i]=[start];var distances: Dictionary={str(start.x)+":"+str(start.y):0};var head:=0

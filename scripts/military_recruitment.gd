@@ -24,6 +24,7 @@ static func queue_land_unit(state: Dictionary,city: Dictionary,kind: String,grad
   var name: String=ECON.DATA.data.troops.get(replacement if replacement!=null else "cavalry",{}).get("name",kind)
   return {"error":"Asendatud: "+name}
  var tech: String=RESEARCH.data.unit_tech.get(kind,"")
+ if kind=="chariot" and "wheel" not in state.research[team].known:return {"error":"Uuri: "+str(RESEARCH.data.techs.wheel.name)}
  if not tech.is_empty() and tech not in state.research[team].known:return {"error":"Uuri: "+str(RESEARCH.data.techs[tech].name)}
  var d: Dictionary=ECON.DATA.data.troops.get(kind,{})
  if d.is_empty() or int(d.get("age",0))>int(state.ages[team]):return {"error":"See üksus ei ole veel avatud."}

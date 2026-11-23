@@ -6,6 +6,20 @@ const Minerals=preload("res://scripts/mineral_sites.gd")
 const DATA=preload("res://data/build_rules.json")
 const WEIGHT={"wood":22,"stone":22,"water":28,"grain":30,"game":14,"fish":12,"clay":16,"copper":30,"tin":30,"ore":60,"oil":100}
 const AGE={"wood":0,"stone":0,"water":0,"grain":0,"game":0,"fish":0,"clay":0,"copper":1,"tin":1,"ore":1,"oil":5}
+
+# V169: a first village prefers a dry reserved defensive perimeter. The
+# assessment callback performs the terrain, route and perimeter survey.
+static func first_village_site(target: Dictionary,assess: Callable) -> Dictionary:
+ var best: Variant=assess.call(target)
+ if best is Dictionary and int(best.blocked)==0:return target
+ for offset in [Vector2i(1,0),Vector2i(-1,0),Vector2i(0,1),Vector2i(0,-1),Vector2i(1,-1),Vector2i(-1,-1),Vector2i(1,1),Vector2i(-1,1)]:
+  var candidate={"c":int(target.c)+offset.x,"r":int(target.r)+offset.y}
+  var next: Variant=assess.call(candidate)
+  if not next is Dictionary:continue
+  var score:float=float(next.blocked)*100+(0 if next.water else 6)+int(next.distance)*2+(0 if next.coast else 1)
+  var old_score:float=INF if not best is Dictionary else float(best.blocked)*100+(0 if best.water else 6)+int(best.distance)*2+(0 if best.coast else 1)
+  if score<old_score:best=next
+ return best.cell if best is Dictionary else target
 static func policy(time: float,age: int,cities: int,pending: int,pop: float,food: float,last: float,has_settlement: bool) -> Dictionary:
  var capacity:=mini(12,maxi(2,2+floori(maxf(0,time)/(26*60))));var interval:=360 if age<=1 else 420 if age<=3 else 600
  var concentrate: bool=(age==0 and cities>=2) or (age==1 and cities>=2 and pop<30)

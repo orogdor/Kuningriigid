@@ -1,0 +1,462 @@
+{
+  "itemCost": {
+    "fire": {
+      "stone": 4
+    },
+    "bed": {
+      "wood": 3,
+      "reed": 2
+    },
+    "basket": {
+      "reed": 1
+    },
+    "bench": {
+      "wood": 2
+    },
+    "table": {
+      "wood": 4
+    },
+    "shelf": {
+      "wood": 3
+    },
+    "jar": {
+      "clay": 2
+    },
+    "hide": {},
+    "rack": {
+      "wood": 3
+    },
+    "net": {
+      "reed": 2
+    },
+    "fish": {},
+    "logs": {},
+    "stone": {},
+    "workbench": {
+      "wood": 4
+    },
+    "grain": {
+      "reed": 1
+    },
+    "crop": {},
+    "trough": {
+      "wood": 2
+    },
+    "target": {
+      "reed": 2,
+      "wood": 1
+    },
+    "spears": {
+      "wood": 3
+    },
+    "kiln": {
+      "clay": 10,
+      "stone": 4
+    },
+    "well": {
+      "stone": 14,
+      "wood": 2
+    },
+    "tower": {
+      "wood": 40
+    },
+    "quarrySite": {},
+    "claySite": {},
+    "tools": {
+      "wood": 1,
+      "stone": 1
+    },
+    "post": {
+      "wood": 2
+    },
+    "column": {
+      "cutstone": 4
+    },
+    "pillar": {
+      "clay": 5,
+      "wood": 1
+    },
+    "anvil": {
+      "bronze": 2,
+      "stone": 1
+    },
+    "forge": {
+      "stone": 6,
+      "clay": 3
+    },
+    "furnace": {
+      "clay": 10,
+      "stone": 6
+    },
+    "loom": {
+      "wood": 4,
+      "plank": 1
+    },
+    "barrel": {
+      "plank": 2
+    },
+    "crate": {
+      "plank": 2
+    },
+    "quern": {
+      "stone": 3
+    },
+    "oven": {
+      "clay": 8,
+      "stone": 4
+    },
+    "bookshelf": {
+      "plank": 3
+    },
+    "desk": {
+      "plank": 3
+    },
+    "stall": {
+      "plank": 3,
+      "reed": 1
+    },
+    "cart": {
+      "plank": 5,
+      "bronze": 1
+    },
+    "coalPile": {
+      "wood": 6
+    },
+    "swords": {
+      "iron": 3,
+      "wood": 1
+    },
+    "manger": {
+      "plank": 2
+    },
+    "boat": {
+      "plank": 12
+    },
+    "waterwheel": {
+      "plank": 10,
+      "iron": 1
+    },
+    "millstone": {
+      "stone": 6,
+      "cutstone": 2
+    },
+    "shaft": {
+      "wood": 10,
+      "plank": 4
+    },
+    "catapult": {
+      "plank": 14,
+      "iron": 2
+    },
+    "stoneTower": {
+      "stone": 40,
+      "cutstone": 12
+    },
+    "bridgeSpan": {
+      "plank": 20,
+      "stone": 10
+    },
+    "roadStones": {
+      "stone": 8
+    },
+    "chest": {
+      "plank": 2,
+      "bronze": 1
+    },
+    "scrolls": {
+      "reed": 1
+    },
+    "wheelParts": {
+      "plank": 3
+    },
+    "canopy": {
+      "wood": 6,
+      "reed": 4
+    },
+    "woodshed": {
+      "wood": 8,
+      "reed": 3
+    },
+    "banner": {
+      "wood": 2
+    },
+    "wellRoof": {
+      "stone": 14,
+      "wood": 6,
+      "reed": 2
+    },
+    "wellSweep": {
+      "stone": 14,
+      "wood": 8
+    },
+    "signpost": {
+      "plank": 2
+    },
+    "bronzeToolBench": {
+      "wood": 5,
+      "bronze": 1
+    },
+    "bronzeCrucibleRack": {
+      "wood": 3,
+      "clay": 2
+    },
+    "bronzeQuenchTrough": {
+      "stone": 4
+    },
+    "bronzeOreShelter": {
+      "wood": 5,
+      "reed": 3
+    },
+    "workShelter": {
+      "wood": 10,
+      "reed": 5
+    },
+    "stockShelter": {
+      "wood": 7,
+      "reed": 3
+    },
+    "sideShelter": {
+      "wood": 10,
+      "reed": 5
+    },
+    "sideStockShelter": {
+      "wood": 7,
+      "reed": 3
+    },
+    "longShelter": {
+      "wood": 12,
+      "reed": 6
+    },
+    "clothRack": {
+      "wood": 3,
+      "reed": 2
+    },
+    "sawBench": {
+      "wood": 5
+    },
+    "breadBoard": {
+      "wood": 4
+    },
+    "jewelBench": {
+      "wood": 4,
+      "bronze": 1
+    },
+    "periodMeal": {
+      "wood": 2,
+      "clay": 2
+    },
+    "periodHearthKit": {
+      "wood": 1,
+      "clay": 2
+    },
+    "periodPantry": {
+      "wood": 3,
+      "clay": 2
+    },
+    "periodSeat": {
+      "wood": 2,
+      "reed": 1
+    },
+    "periodDrying": {
+      "wood": 3,
+      "reed": 1
+    },
+    "periodHunt": {
+      "wood": 3
+    },
+    "periodFish": {
+      "wood": 3,
+      "reed": 1
+    },
+    "periodHarvest": {
+      "wood": 1,
+      "reed": 2
+    },
+    "periodCraft": {
+      "wood": 3,
+      "stone": 1
+    },
+    "periodTimber": {
+      "wood": 3
+    },
+    "periodStone": {
+      "stone": 4,
+      "wood": 1
+    },
+    "periodPottery": {
+      "wood": 3,
+      "clay": 3
+    },
+    "periodWriting": {
+      "wood": 3,
+      "clay": 1
+    },
+    "periodGuard": {
+      "wood": 3,
+      "reed": 1
+    },
+    "periodCargo": {
+      "wood": 3,
+      "reed": 1
+    },
+    "periodMarket": {
+      "wood": 3,
+      "clay": 1
+    },
+    "periodWeaving": {
+      "wood": 1,
+      "reed": 3
+    },
+    "periodFlour": {
+      "stone": 3,
+      "reed": 1
+    },
+    "periodGarden": {
+      "clay": 3,
+      "reed": 1
+    },
+    "periodWillowBasket": {
+      "reed": 2
+    },
+    "periodWaterStand": {
+      "stone": 3,
+      "clay": 2
+    },
+    "periodReedMat": {
+      "reed": 3,
+      "clay": 1
+    },
+    "periodYardBench": {
+      "wood": 3
+    }
+  },
+  "wallCost": {
+    "clay": {
+      "clay": 2.5,
+      "wood": 1
+    },
+    "weave": {
+      "wood": 2
+    },
+    "stone": {
+      "stone": 4
+    },
+    "wood": {
+      "wood": 3
+    },
+    "bamboo": {
+      "wood": 2.2
+    },
+    "mudbrick": {
+      "clay": 3,
+      "reed": 0.4
+    },
+    "cutstone": {
+      "cutstone": 2.5,
+      "stone": 1
+    },
+    "plank": {
+      "plank": 2.5
+    },
+    "brick": {
+      "clay": 3.5,
+      "wood": 1
+    },
+    "plaster": {
+      "stone": 2,
+      "clay": 1.5
+    },
+    "halftimber": {
+      "plank": 1.4,
+      "clay": 1.6
+    },
+    "marble": {
+      "cutstone": 4
+    },
+    "cyclopean": {
+      "stone": 7
+    },
+    "reticulatum": {
+      "stone": 2.5,
+      "clay": 1
+    },
+    "romanbrick": {
+      "clay": 3,
+      "stone": 0.5
+    },
+    "fresco": {
+      "stone": 2,
+      "clay": 1.5
+    },
+    "limestone": {
+      "stone": 3.5,
+      "clay": 0.5
+    },
+    "turf": {
+      "reed": 0.5
+    },
+    "stave": {
+      "wood": 3.5
+    },
+    "prestigePlaster": {
+      "clay": 3,
+      "wood": 1.1
+    }
+  },
+  "fenceCost": {
+    "rail": {
+      "wood": 1
+    },
+    "palisadeLine": {
+      "wood": 3
+    },
+    "stoneLine": {
+      "stone": 3
+    },
+    "gateLine": {
+      "wood": 4
+    },
+    "highStone": {
+      "stone": 6,
+      "cutstone": 2
+    },
+    "rampart": {
+      "wood": 3,
+      "stone": 2
+    }
+  },
+  "roofCostOf": {
+    "earth": {
+      "clay": 2,
+      "wood": 0.4
+    },
+    "tile": {
+      "clay": 3.4,
+      "wood": 0.6
+    },
+    "bark": {
+      "wood": 1.6
+    },
+    "sod": {
+      "wood": 1.2,
+      "reed": 0.4
+    },
+    "plank": {
+      "plank": 2.6
+    },
+    "shingle": {
+      "wood": 2.2,
+      "plank": 0.6
+    }
+  },
+  "fieldEdgeCost": {
+    "ridge": {},
+    "stones": {
+      "stone": 1
+    },
+    "rail": {
+      "wood": 1
+    },
+    "ditch": {}
+  }
+}

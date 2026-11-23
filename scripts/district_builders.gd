@@ -73,7 +73,7 @@ static func tick(state: Dictionary,parent: Dictionary,dt: float,context_at: Call
   worker.job="%s:%s:%s%s" % [ctx.c,ctx.r,task.index,":upgrade" if task.has("owner") else ""];job.assigned=float(job.assigned)+share;job.efficiency=float(job.efficiency)+share
   attach(parent,worker,context_at)
   if float(job.get("materialsRemaining",0))>0:
-   if worker.get("materialJob")!=worker.job:worker.materialJob=worker.job;worker.materialLoad=0.0;worker.materialDepot=null
+   if worker.get("materialJob")!=worker.job:worker.materialJob=worker.job;worker.materialLoad=0.0;worker.carried=0.0;worker.materialDepot=null
    var depot:Variant=find_depot(contexts,ctx,worker,path_for)
    if depot==null:worker.status="Puudub ligipääsetav ladu";continue
    if float(worker.get("materialLoad",0))<=0:

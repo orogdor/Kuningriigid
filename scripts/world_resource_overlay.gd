@@ -163,7 +163,8 @@ func draw_detail_city_banner() -> void:
 	var font: Font=host.game_hud.ui_bold if host.game_hud.ui_bold!=null else get_theme_default_font()
 	var font_size:=maxi(9,roundi(14*scale));var name:=str(city.get("name","Linn"));var population:=str(floori(float(city.economy.realms[city.team].pop)))
 	draw_string(font,Vector2(x+28*scale,y+19*scale),name,HORIZONTAL_ALIGNMENT_LEFT,110*scale,font_size,Color("f4ead2"))
-	draw_string(font,Vector2(x+width-32*scale,y+19*scale),"♟ "+population,HORIZONTAL_ALIGNMENT_LEFT,29*scale,maxi(8,roundi(11*scale)),Color("e6c77e"))
+	var pop_text:="♟ "+population;var pop_size:=maxi(8,roundi(11*scale));var pop_width:=font.get_string_size(pop_text,HORIZONTAL_ALIGNMENT_LEFT,-1,pop_size).x
+	draw_string(font,Vector2(x+width-pop_width-5*scale,y+19*scale),pop_text,HORIZONTAL_ALIGNMENT_LEFT,-1,pop_size,Color("e6c77e"))
 
 func draw_city_banners() -> void:
 	var scale:=clampf(get_viewport_rect().size.y/941.0,0.65,1.4)

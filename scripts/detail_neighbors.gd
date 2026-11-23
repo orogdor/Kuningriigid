@@ -31,7 +31,17 @@ func setup(host: Node,center: Vector2i) -> void:
 			tile.set_meta("visual_heights",color_heights)
 			var ground:=MeshInstance3D.new();ground.mesh=host.detail_mesh_for(c,r,heights,color_heights)
 			ground.set_instance_shader_parameter("detail_uv_offset",Vector2(dc*225,dr*195))
-			GroundMaterial.attach(ground,host.terrain_color(index),1.0 if host.visual_biome(index) in ["forest","taiga","jungle"] else 0.0);tile.add_child(ground)
+			var ground_color: Color=host.terrain_color(index)
+			var ground_forest:=1.0 if host.is_forest_core(index) else 0.0
+			GroundMaterial.attach(ground,ground_color,ground_forest)
+			var adjacent={"ground_w":Vector2i(-1,0),"ground_e":Vector2i(1,0),"ground_n":Vector2i(0,-1),"ground_s":Vector2i(0,1),"ground_nw":Vector2i(-1,-1),"ground_ne":Vector2i(1,-1),"ground_sw":Vector2i(-1,1),"ground_se":Vector2i(1,1)}
+			for key in adjacent:
+				var pos: Vector2i=Vector2i(c,r)+adjacent[key];var tint:=ground_color;var forest:=ground_forest
+				if pos.x>=0 and pos.y>=0 and pos.x<Grid.COLS and pos.y<Grid.ROWS:
+					var other:=pos.y*Grid.COLS+pos.x
+					if host.grid[other].land:tint=host.terrain_color(other);forest=1.0 if host.is_forest_core(other) else 0.0
+				ground.set_instance_shader_parameter(key,Color(tint.r,tint.g,tint.b,forest))
+			ground.set_instance_shader_parameter("blend_neighbours",true);tile.add_child(ground)
 			var water:=MeshInstance3D.new();var plane:=PlaneMesh.new();plane.size=Vector2(225,195);water.mesh=plane;water.material_override=host.detail_ocean_for(c,r,heights,color_heights);tile.add_child(water)
 			tile.set_meta("river_segments",host.detail_landscape_for(tile,c,r,heights,color_heights))
 			if not add_known_nature(host,tile,Vector2i(c,r),heights,index) and (host.grid[index].land or host.grid[index].get("deposits",{}).get("fish",false)):

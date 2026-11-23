@@ -97,6 +97,7 @@ static func update(b: Dictionary,dt: float) -> void:
   for man in men:ids.append(str(man.id))
   var stamp: String=str(u.formation)+":"+",".join(ids)
   if u.get("slotStamp")!=stamp:
+   var tolerance:=0.000000001 if int(ECON.data.troops.get(u.kind,{}).get("age",99))<=2 else 0.0
    var available: Array=[];var unassigned: Array=[]
    for i in men.size():available.append(i);unassigned.append(i)
    while not unassigned.is_empty():
@@ -104,7 +105,7 @@ static func update(b: Dictionary,dt: float) -> void:
     for mi in unassigned:
      for si in available:
       var goal:=world_slot(u,{"slotIndex":si},men.size());var cost:=dist(men[mi],goal)
-      if cost<best_cost:best_cost=cost;best_man=mi;best_slot=si
+      if cost<best_cost-tolerance:best_cost=cost;best_man=mi;best_slot=si
     men[best_man].slotIndex=best_slot;available.erase(best_slot);unassigned.erase(best_man)
    u.slotStamp=stamp
   var ready:=0

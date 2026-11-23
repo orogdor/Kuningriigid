@@ -1,5 +1,6 @@
 extends Control
 const Plan=preload("res://scripts/house_plan_geometry.gd")
+const Paper=preload("res://assets/house_designer/plan-paper.svg")
 const Edit=preload("res://scripts/house_plan_edit.gd")
 const Catalog=preload("res://data/house_editor_catalog.json")
 signal changed(design: Dictionary)
@@ -31,20 +32,20 @@ func _ready() -> void:
 func load_design(data: Dictionary,design_era: int) -> void:
  design=data.duplicate(true);era=design_era;active_floor=0;view_scale=1.0;view_offset=Vector2.ZERO;panning=false;history.clear();future.clear();queue_redraw()
 
-func apply_design(next: Dictionary) -> void:
- history.append(design.duplicate(true))
- if history.size()>100:history.pop_front()
+func apply_design(next: Dictionary,previous_floor: int=-1) -> void:
+ history.append({"design":design.duplicate(true),"floor":active_floor if previous_floor<0 else previous_floor})
+ if history.size()>250:history.pop_front()
  future.clear();design=next;queue_redraw();changed.emit(design)
 
 func undo() -> void:
  if history.is_empty():return
- future.append(design.duplicate(true));design=history.pop_back()
+ future.append({"design":design.duplicate(true),"floor":active_floor});var entry:Dictionary=history.pop_back();design=entry.design;active_floor=int(entry.floor)
  if not design.has("upper"):active_floor=0
  queue_redraw();changed.emit(design)
 
 func redo() -> void:
  if future.is_empty():return
- history.append(design.duplicate(true));design=future.pop_back()
+ history.append({"design":design.duplicate(true),"floor":active_floor});var entry:Dictionary=future.pop_back();design=entry.design;active_floor=int(entry.floor)
  if not design.has("upper"):active_floor=0
  queue_redraw();changed.emit(design)
 
@@ -72,36 +73,45 @@ func plan_position(p: Vector2) -> Vector2:
  return plan_transform().affine_inverse()*p
 
 func _draw() -> void:
- draw_rect(Rect2(Vector2.ZERO,size),Color("d6c6a3"))
+ draw_rect(Rect2(Vector2.ZERO,size),Color("101b26"))
  if design.is_empty():return
  var plan:=current_plan()
  draw_set_transform_matrix(plan_transform())
- draw_rect(Rect2(Vector2.ZERO,Vector2(960,625)),Color("dccba4"))
- for x in range(30,931,10):draw_line(Vector2(x,40),Vector2(x,580),Color(0.38,0.31,0.22,0.09),1)
- for y in range(40,581,10):draw_line(Vector2(30,y),Vector2(930,y),Color(0.38,0.31,0.22,0.09),1)
+ draw_texture_rect(Paper,Rect2(Vector2.ZERO,Vector2(960,625)),false)
+ var definition:Dictionary=Catalog.data.catalog.get(str(design.get("id","")),{})
+ if view_scale>=1.8:
+  for x in range(10,960,20):draw_line(Vector2(x,0),Vector2(x,625),Color("65492712"),1)
+  for y in range(10,625,20):draw_line(Vector2(0,y),Vector2(960,y),Color("65492712"),1)
+ for x in range(0,961,20):draw_line(Vector2(x,0),Vector2(x,625),Color("65492738" if x%100==0 else "6549271a"),1)
+ for y in range(0,626,20):draw_line(Vector2(0,y),Vector2(960,y),Color("65492738" if y%100==0 else "6549271a"),1)
+ if str(design.get("id",""))=="fisher" or definition.get("base","")=="fisher" or definition.get("coast",false):
+  draw_rect(Rect2(0,524,960,25),Color("d8c499"))
+  draw_polygon(PackedVector2Array([Vector2(0,548),Vector2(960,548),Vector2(960,625),Vector2(0,625)]),PackedColorArray([Color("5d8a84"),Color("5d8a84"),Color("3f6a68"),Color("3f6a68")]))
+  for y in range(558,625,14):draw_line(Vector2(0,y),Vector2(960,y),Color("96b5a1"),1)
  for key in ["plot","yard"]:
   if plan.get(key)!=null and plan[key] is Array:
    var p:=PackedVector2Array()
    for q in plan[key]:p.append(Plan.point(q))
-   if p.size()>=3:draw_colored_polygon(p,Color(0.48,0.53,0.30,0.20));draw_polyline(PackedVector2Array(Array(p)+[p[0]]),Color("8b7c4e"),3)
+   if p.size()>=3:
+    draw_colored_polygon(p,Color("c8a56c46"))
+    for i in p.size():draw_dashed_line(p[i],p[(i+1)%p.size()],Color("83623c"),2,6)
+ if plan.get("field") is Dictionary and plan.get("plot") is Array:draw_field(plan.plot,plan.field)
  if plan.get("pier") is Dictionary:
   var pier:=Plan.pier_outline(plan.pier)
   if pier.size()>=3:draw_colored_polygon(pier,Color("ad8962"));draw_polyline(PackedVector2Array(Array(pier)+[pier[0]]),Color("654b32"),2)
  var geometry:=Plan.plan_geometry(plan)
  for floor in geometry.floors:
-  if floor.size()>=3:draw_colored_polygon(floor,Color("c4ac7a"))
+  if floor.size()>=3:draw_colored_polygon(floor,Color("bb8d546b"));draw_polyline(PackedVector2Array(Array(floor)+[floor[0]]),Color("694729"),2)
  for fence in plan.get("fences",[]):
   draw_line(Plan.point(fence.a),Plan.point(fence.b),Color("6b4c2b"),8)
- for wall in geometry.walls:draw_line(wall.a,wall.b,Color("513621") if wall.group=="outer" else Color("6d5034"),10 if wall.group=="outer" else 7)
- for opening in plan.get("openings",[]):
-  var p:=Plan.point(opening.point);var hit:=Plan.nearest_wall(p,geometry.walls,2.0)
-  if not hit.is_empty():
-   var direction:Vector2=(hit.edge.b-hit.edge.a).normalized();var width:=22.0 if opening.type=="door" else 15.0
-   draw_line(p-direction*width,p+direction*width,Color("d4ba89") if opening.type=="door" else Color("a4c0bd"),12)
+ for wall in geometry.walls:
+  for span in Plan.split_wall(wall,plan):draw_plan_wall(span,plan)
  for item in plan.get("items",[]):
   var p:=Plan.point(item.point);var dims:Array=Catalog.data.itemSizes.get(item.type,[20,20]);var bounds:=Rect2(p-Vector2(float(dims[0]),float(dims[1]))/2,Vector2(float(dims[0]),float(dims[1])))
   draw_rect(bounds,Color(0.47,0.32,0.17,0.45));draw_rect(bounds,Color("60472d"),false,2)
-  draw_string(ThemeDB.fallback_font,p+Vector2(4,-4),str(item.type),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("443222"))
+  var item_info: Array=Catalog.data.items.get(item.type,[str(item.type),20,20,"•"])
+  var symbol:=str(item_info[3]) if item_info.size()>3 else "•"
+  draw_string(ThemeDB.fallback_font,Vector2(bounds.position.x,p.y+5),symbol,HORIZONTAL_ALIGNMENT_CENTER,bounds.size.x,16,Color("443222"))
  if drag:
   var shape:=Plan.candidate(tool,drag_start,drag_end,Edit.LIMITS[clampi(era,0,2)])
   if not shape.is_empty() and shape.has("type"):
@@ -109,6 +119,53 @@ func _draw() -> void:
    if poly.size()>2:draw_polyline(PackedVector2Array(Array(poly)+[poly[0]]),Color("2b6540"),3)
   else:draw_line(drag_start,drag_end,Color("2b6540"),3)
  draw_set_transform_matrix(Transform2D.IDENTITY)
+
+func draw_plan_wall(span: Dictionary,plan: Dictionary) -> void:
+ var a:Vector2=span.a;var b:Vector2=span.b;var kind:=str(span.get("type",""));var outer:bool=span.group=="outer"
+ if kind=="door":draw_line(a,b,Color("eacb83"),3);return
+ if kind=="window":draw_line(a,b,Color("774d29"),9);draw_line(a,b,Color("e5bf75"),4);return
+ var palette={"clay":["69472f","c18b54"],"weave":["523a25","a18353"],"stone":["55574c","a4a292"],"wood":["4c3023","986741"],"bamboo":["514332","9a805d"],"mudbrick":["6c4c2c","c99b63"],"cutstone":["6d6858","d3cab2"],"plank":["5a3b24","b5895a"],"brick":["6b2c1e","b8573c"],"plaster":["8a8170","efe7d3"],"halftimber":["4a3020","ece2c9"],"limestone":["8b8670","e3dcc4"],"turf":["4d4a2c","7f7c4a"],"stave":["4b3020","8f6440"],"marble":["9d988c","f1ece2"],"cyclopean":["5f5a4e","a59c86"],"reticulatum":["7f6f4f","c3b48c"],"romanbrick":["6c3420","c06a44"],"fresco":["7a2a1a","ecdcbc"],"prestigePlaster":["9b492e","eee0c3"]}
+ var finish:=str(span.get("finish","stone"));var colors:Array=palette.get(finish,palette.stone)
+ if outer and plan.get("build","wall")=="open":
+  draw_dashed_line(a,b,Color(colors[0]),3,6)
+  var count:=maxi(1,roundi(a.distance_to(b)/90));for i in range(count+1):draw_circle(a.lerp(b,float(i)/count),7,Color(colors[0]))
+  return
+ if finish=="stone":
+  var width:=13.0 if outer else 8.0;var length:=a.distance_to(b)
+  if length<1:return
+  draw_line(a,b,Color("4a4a40"),width*0.75)
+  var count:=maxi(1,roundi(length/(width*0.95)));var tones=["a4a292","8f8e80","b3ae9c","9a9686"]
+  for i in count:
+   var seed:=roundi(a.x*7+a.y*13+i*31);var n:=sin(seed*12.9898)*43758.5453;var q:=absf(fmod(n,1.0));var point:=a.lerp(b,(float(i)+0.5)/count);var radius:=width*(0.36+q*0.16)
+   draw_circle(point,radius+1,Color("55574c"));draw_circle(point,radius,Color(tones[mini(3,floori(q*4))]))
+  return
+ draw_line(a,b,Color(colors[0]),12 if outer else 7);draw_line(a,b,Color(colors[1]),7 if outer else 4)
+
+func draw_field(plot: Array,field: Dictionary) -> void:
+ if plot.size()<3:return
+ var low:=Vector2(INF,INF);var high:=Vector2(-INF,-INF)
+ for point in plot:
+  var p:=Plan.point(point);low=low.min(p);high=high.max(p)
+ var rect:=Rect2(low,high-low);var edge:=str(field.get("edge","ridge"));var crop:=str(field.get("crop","barley"))
+ var margin:=minf(40,minf(rect.size.x,rect.size.y)*0.5)
+ var edge_colors={"ridge":"a98a5a","stones":"b5ad98","rail":"b39566","ditch":"7d9a8e"}
+ var crop_colors={"barley":"d8b85a","wheat":"c99a3e","rye":"a3954f","beans":"6f8a4a","fallow":"9aa06a"}
+ draw_rect(rect,Color(str(edge_colors.get(edge,"a98a5a"))))
+ var inner:=rect.grow(-margin);draw_rect(inner,Color("b8ad7c" if crop=="fallow" else "9a6b40"))
+ var y:=inner.position.y+12
+ while y<inner.end.y:
+  draw_line(Vector2(inner.position.x+6,y),Vector2(inner.end.x-6,y),Color(str(crop_colors.get(crop,"d8b85a"))),2 if crop=="fallow" else 7);y+=24
+ if edge=="stones":
+  var x:=low.x+8
+  while x<high.x:draw_circle(Vector2(x,low.y+10),7,Color("8f8a78"));draw_circle(Vector2(x,high.y-10),7,Color("8f8a78"));x+=22
+  y=low.y+8
+  while y<high.y:draw_circle(Vector2(low.x+10,y),7,Color("8f8a78"));draw_circle(Vector2(high.x-10,y),7,Color("8f8a78"));y+=22
+ else:
+  var inset:=6.0 if edge=="rail" else 8.0 if edge=="ditch" else 10.0
+  var color:=Color("61462d" if edge=="rail" else "4f7f7a" if edge=="ditch" else "7d6236")
+  draw_rect(rect.grow(-inset),color,false,4 if edge=="rail" else 8 if edge=="ditch" else 10)
+ var display_scale:=maxf(0.1,minf(size.x/960.0,size.y/625.0)*view_scale)
+ draw_string(ThemeDB.fallback_font,Vector2(low.x,high.y+14/display_scale),"↔ Põllu suurust saab mängus muuta",HORIZONTAL_ALIGNMENT_CENTER,rect.size.x,roundi(10/display_scale),Color("5b3d1f"))
 
 func _gui_input(event: InputEvent) -> void:
  if design.is_empty():return
@@ -197,7 +254,7 @@ func add_floor() -> bool:
  if design.has("upper") or design.get("openSite",false) or design.get("build","")=="tower" or design.get("rooms",[]).is_empty():return false
  var next:Dictionary=design.duplicate(true)
  next.upper={"rooms":[],"inner":[],"openings":[],"items":[],"fences":[],"wallRuns":[],"wallFinishes":[],"wallStyle":design.get("wallStyle","wood"),"wallScale":design.get("wallScale",100),"roofForm":"gable" if design.get("roofForm","")=="battlement" else design.get("roofForm","gable"),"roofMat":design.get("roofMat","reed"),"roofHeight":design.get("roofHeight",75),"build":"wall","base":"none","columns":design.get("columns","post"),"porch":"none"}
- apply_design(next);active_floor=1;queue_redraw();return true
+ active_floor=1;apply_design(next,0);queue_redraw();return true
 
 func copy_floor_walls() -> void:
  if active_floor!=1 or not design.has("upper") or not design.upper.get("rooms",[]).is_empty():return
@@ -207,4 +264,5 @@ func copy_floor_walls() -> void:
 
 func remove_floor() -> void:
  if active_floor!=1 or not design.has("upper"):return
- var next:Dictionary=design.duplicate(true);next.erase("upper");active_floor=0;apply_design(next)
+ var next:Dictionary=design.duplicate(true);next.erase("upper");active_floor=0;apply_design(next,1)
+

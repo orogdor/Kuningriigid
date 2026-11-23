@@ -480,7 +480,7 @@ static func repair_old(state: Dictionary,city: Dictionary,context_for: Callable,
 
 # Founding reserves a corridor for the first Stone Age curtain. This is a
 # plan only: it creates no wall and spends no material.
-static func reserve(state: Dictionary,city: Dictionary,runtime: Dictionary,natural_plan: Callable=Callable()) -> Variant:
+static func reserve(state: Dictionary,city: Dictionary,runtime: Dictionary,natural_plan: Callable=Callable(),terrain_passable: Callable=Callable()) -> Variant:
  if int(state.ages[int(city.team)])!=0:return null
  var hall:Variant=null
  for b in city.economy.buildings:
@@ -499,7 +499,7 @@ static func reserve(state: Dictionary,city: Dictionary,runtime: Dictionary,natur
       var count:=ceili(half/3)
       for k in range(-count,count+1):
        var step:=float(k)*half/count;var x:float=float(slot.x)+(0 if slot.wallAxis else step);var z:float=float(slot.z)+(step if slot.wallAxis else 0)
-       if not nav.is_open(x,z):bad+=1;break
+       if not (terrain_passable.call(x,z) if terrain_passable.is_valid() else nav.is_open(x,z)):bad+=1;break
      var score:float= -bad*25-absf(float(candidate.rx)-56)*0.2-absf(float(candidate.rz)-56)*0.2-(absi(dx)+absi(dz))*0.06
      if score>best_score:best_score=score;candidate.reservedV168=true;candidate.terrainBlockedAtFounding=bad;best=candidate
  return best

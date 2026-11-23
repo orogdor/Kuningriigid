@@ -48,7 +48,7 @@ static func tick_worker(state: Dictionary,city: Dictionary,worker: Dictionary,jo
 	var job_key:=str(int(city.c))+":"+str(int(city.r))+":"+str(job_index)+(":upgrade" if not owner.is_empty() else "")
 	if float(job.get("materialsRemaining",0))>0:
 		if worker.get("materialJob")!=job_key:
-			worker.materialLoad=0.0;worker.materialJob=job_key;worker.materialDepot=null
+			worker.materialLoad=0.0;worker.carried=0.0;worker.materialJob=job_key;worker.materialDepot=null
 		if float(worker.get("materialLoad",0))<=0:
 			var depot: Variant=usable_depot(city,worker,job,nav)
 			if depot==null:worker.status="Puudub ligipääsetav ladu";return false
