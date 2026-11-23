@@ -156,6 +156,34 @@ func draw_plan_dimensions(plan: Dictionary,geometry: Dictionary) -> void:
 
 func draw_plan_item(item: Dictionary) -> void:
  var type:=str(item.get("type",""));var p:=Plan.point(item.point);var dims:Array=Catalog.data.itemSizes.get(type,[20,20]);var bounds:=Rect2(p-Vector2(float(dims[0]),float(dims[1]))/2,Vector2(float(dims[0]),float(dims[1])))
+ var radius:=minf(bounds.size.x,bounds.size.y)/2
+ if type=="post":draw_circle(p,9,Color("5d3f25"));draw_circle(p,6,Color("9b7046"));return
+ if type=="column":draw_circle(p,15,Color("6d6858"));draw_circle(p,12,Color("d6cdb5"));draw_circle(p,7,Color("b3ab95"));return
+ if type=="pillar":
+  var pillar:=Rect2(p-Vector2(14,14),Vector2(28,28));draw_rect(pillar,Color("b25a3e"));draw_rect(pillar,Color("5e2a1c"),false,2);draw_line(p+Vector2(-14,0),p+Vector2(14,0),Color("5e2a1c"),1);return
+ if type=="fruitTree":
+  draw_circle(p,radius,Color("6f8a4a"));draw_circle(p-Vector2.ONE*radius*0.3,radius*0.45,Color("8aa35c"));draw_circle(p+Vector2(radius*0.35,radius*0.2),5,Color("c4472f"));draw_circle(p+Vector2(-radius*0.4,radius*0.35),5,Color("c4472f"));return
+ if type=="saplings":
+  for i in 6:draw_circle(p+Vector2(-bounds.size.x*0.38+(i%3)*bounds.size.x*0.38,-bounds.size.y*0.22+floori(float(i)/3)*bounds.size.y*0.44),8,Color("6f8a4a"))
+  return
+ if type in ["hay","coalPile","quern","millstone","barrel"]:
+  var tones={"hay":["c9a64f","e1c46e"],"coalPile":["3a3029","57473a"],"quern":["7a7868","b7b29f"],"millstone":["7a7868","b7b29f"],"barrel":["7a5432","a57a4c"]};var pair:Array=tones[type]
+  draw_circle(p,radius,Color(pair[0]));draw_circle(p,radius*(0.82 if type in ["quern","millstone"] else 0.7 if type=="barrel" else 0.55),Color(pair[1]))
+  if type in ["quern","millstone"]:draw_circle(p,radius*0.18,Color("6a6656"))
+  return
+ if type=="stoneTower":
+  draw_rect(bounds,Color("a9a594"));draw_rect(bounds,Color("4f5046"),false,4);var inner:=Rect2(p-bounds.size*0.32,bounds.size*0.64);draw_rect(inner,Color("8d8a7b"));draw_rect(inner,Color("4f5046"),false,2);return
+ if type in ["workShelter","stockShelter","longShelter","sideShelter","sideStockShelter","canopy","woodshed"]:
+  draw_rect(bounds,Color("c7a46a99"));draw_rect(bounds,Color("7a5a32"),false,2)
+  if type in ["sideShelter","sideStockShelter"]:
+   var y:=bounds.position.y+8
+   while y<bounds.end.y:draw_line(Vector2(bounds.position.x+2,y),Vector2(bounds.end.x-2,y),Color("9c7a46"),1.2);y+=14
+  else:
+   var x:=bounds.position.x+8
+   while x<bounds.end.x:draw_line(Vector2(x,bounds.position.y+2),Vector2(x,bounds.end.y-2),Color("9c7a46"),1.2);x+=14
+  for sign_x in [-1,1]:
+   for sign_y in ([-1,1] if type in ["workShelter","stockShelter","longShelter","sideShelter","sideStockShelter"] else [1]):draw_circle(p+Vector2(sign_x*(bounds.size.x/2-6),sign_y*(bounds.size.y/2-6)),5,Color("5d3f25"))
+  return
  if type=="fire":
   var ring:=PackedVector2Array()
   for i in 12:ring.append(p+Vector2(cos(TAU*i/12)*23,sin(TAU*i/12)*19))

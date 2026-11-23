@@ -1,5 +1,7 @@
 # Godoti pordi tööjärg
 
+Plaanile lisati veebikujundaja eeskujul postide, sammaste, varikatuste, viljapuude, maardlavarude ja mõnede töövahendite erisümbolid. Nende ühine joonistus kontrolliti graafikakaardiga; kõiki võimalikke esemeid ei ole ühekaupa võrreldud.
+
 Plaanil kuvatakse nüüd seina- ja aialõikude pikkused ning ümara ruumi läbimõõt; uue õue või ruumi lohistamisel näidatakse mõõte ja pindala. Õue lohistamise vaadet kontrolliti graafikakaardiga.
 
 Plaanil on tulekolde, korvi, pingi ja magamisaseme joonistus veebikujundaja eeskujul; vaadet kontrolliti nähtavalt. Kõigi eriesemete plaanisümbolid ei ole veel üksikasjaliselt üle toodud.
