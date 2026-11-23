@@ -1,5 +1,7 @@
 # Godoti pordi tööjärg
 
+Mängu detailvaates kohandatakse kujundatud õue pind tegeliku maastiku kõrgusele. Varem võis ebatasane maapind osa õuest varjata; parandust kontrolliti mängu lähivaates ning pööratud ja skaleeritud maja automaatkatses. Samuti kontrolliti, et ühest kujundusest tehtud teised majad säilitavad oma sõltumatu õue.
+
 Plaanile lisati veebikujundaja eeskujul postide, sammaste, varikatuste, viljapuude, maardlavarude ja mõnede töövahendite erisümbolid. Nende ühine joonistus kontrolliti graafikakaardiga; kõiki võimalikke esemeid ei ole ühekaupa võrreldud.
 
 Plaanil kuvatakse nüüd seina- ja aialõikude pikkused ning ümara ruumi läbimõõt; uue õue või ruumi lohistamisel näidatakse mõõte ja pindala. Õue lohistamise vaadet kontrolliti graafikakaardiga.

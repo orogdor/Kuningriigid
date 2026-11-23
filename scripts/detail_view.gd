@@ -214,6 +214,20 @@ func create_designed_building(type: String,age: int,design: Dictionary={},tier:=
 	wrapper.add_child(raw)
 	return wrapper
 
+# Designed yards follow the rendered terrain instead of clipping into slopes.
+# Duplicate the mesh because cached designs can be reused at different sites.
+func conform_designed_yard(model: Node3D) -> void:
+	for candidate in model.find_children("*","MeshInstance3D",true,false):
+		if candidate.name not in ["WeatheredYard","CourtyardPaving"] or not candidate.mesh is ArrayMesh:continue
+		var original:ArrayMesh=candidate.mesh;var adjusted:=ArrayMesh.new()
+		for surface in original.get_surface_count():
+			var arrays:=original.surface_get_arrays(surface);var vertices:PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+			var to_detail:Transform3D=global_transform.affine_inverse()*candidate.global_transform;var to_yard:=to_detail.affine_inverse()
+			for i in vertices.size():
+				var at:Vector3=to_detail*vertices[i];at.y=display_height(at.x,at.z)+0.025;vertices[i]=to_yard*at
+			arrays[Mesh.ARRAY_VERTEX]=vertices;adjusted.add_surface_from_arrays(original.surface_get_primitive_type(surface),arrays);adjusted.surface_set_material(surface,original.surface_get_material(surface))
+		candidate.mesh=adjusted
+
 func add_nature(biome: String) -> void:
 	var rocks: Array[Transform3D] = []
 	for resource in resources:
@@ -418,7 +432,7 @@ func place_hall(x: float, z: float,age:=0,rotation:=0.0,design: Dictionary={}) -
 	if hall_model==null:return
 	hall_model.position = Vector3(x,display_height(x,z),z)
 	hall_model.rotation.y=rotation
-	add_child(hall_model)
+	add_child(hall_model);conform_designed_yard(hall_model)
 	person.visible = false
 
 
@@ -479,7 +493,7 @@ func sync_buildings(city: Dictionary,age:=0) -> void:
 				if b.has("baseY"):
 					y=y+float(b.baseY)-Terrain.detail_height(heights,b.x,b.z) if b.get("riverBankV276",false) else float(b.baseY)
 				model.position=Vector3(b.x,y+(0.12 if b.type=="field" else 0.0),b.z)
-				configure_wall_transform(model,b);building_root.add_child(model)
+				configure_wall_transform(model,b);building_root.add_child(model);conform_designed_yard(model)
 				model.set_meta("building_index",building_index)
 				var id: String=model.get_meta("designer_id","")
 				for entry in MODEL_ANIMATIONS.data.get(id,[]):
