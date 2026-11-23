@@ -106,12 +106,7 @@ func _draw() -> void:
   draw_line(Plan.point(fence.a),Plan.point(fence.b),Color("6b4c2b"),8)
  for wall in geometry.walls:
   for span in Plan.split_wall(wall,plan):draw_plan_wall(span,plan)
- for item in plan.get("items",[]):
-  var p:=Plan.point(item.point);var dims:Array=Catalog.data.itemSizes.get(item.type,[20,20]);var bounds:=Rect2(p-Vector2(float(dims[0]),float(dims[1]))/2,Vector2(float(dims[0]),float(dims[1])))
-  draw_rect(bounds,Color(0.47,0.32,0.17,0.45));draw_rect(bounds,Color("60472d"),false,2)
-  var item_info: Array=Catalog.data.items.get(item.type,[str(item.type),20,20,"•"])
-  var symbol:=str(item_info[3]) if item_info.size()>3 else "•"
-  draw_string(ThemeDB.fallback_font,Vector2(bounds.position.x,p.y+5),symbol,HORIZONTAL_ALIGNMENT_CENTER,bounds.size.x,16,Color("443222"))
+ for item in plan.get("items",[]):draw_plan_item(item)
  if drag:
   var shape:=Plan.candidate(tool,drag_start,drag_end,Edit.LIMITS[clampi(era,0,2)])
   if not shape.is_empty() and shape.has("type"):
@@ -119,6 +114,25 @@ func _draw() -> void:
    if poly.size()>2:draw_polyline(PackedVector2Array(Array(poly)+[poly[0]]),Color("2b6540"),3)
   else:draw_line(drag_start,drag_end,Color("2b6540"),3)
  draw_set_transform_matrix(Transform2D.IDENTITY)
+
+func draw_plan_item(item: Dictionary) -> void:
+ var type:=str(item.get("type",""));var p:=Plan.point(item.point);var dims:Array=Catalog.data.itemSizes.get(type,[20,20]);var bounds:=Rect2(p-Vector2(float(dims[0]),float(dims[1]))/2,Vector2(float(dims[0]),float(dims[1])))
+ if type=="fire":
+  var ring:=PackedVector2Array()
+  for i in 12:ring.append(p+Vector2(cos(TAU*i/12)*23,sin(TAU*i/12)*19))
+  draw_colored_polygon(ring,Color("534c42"));draw_polyline(PackedVector2Array(Array(ring)+[ring[0]]),Color("a79a7b"),3)
+  draw_colored_polygon(PackedVector2Array([p+Vector2(-9,8),p+Vector2(-3,-7),p+Vector2(2,-13),p+Vector2(8,7)]),Color("ef9350"));return
+ if type=="basket":
+  var basket:=PackedVector2Array()
+  for i in 16:basket.append(p+Vector2(cos(TAU*i/16)*12,sin(TAU*i/16)*10))
+  draw_colored_polygon(basket,Color("966536"));draw_polyline(PackedVector2Array(Array(basket)+[basket[0]]),Color("543d2b"),3);draw_line(p+Vector2(-8,0),p+Vector2(8,0),Color("d7ad67"),2);return
+ if type in ["bed","bench"]:
+  draw_rect(bounds,Color("a78560" if type=="bed" else "93633d"));draw_rect(bounds,Color("62472f"),false,3)
+  if type=="bed":draw_rect(Rect2(bounds.position+Vector2(5,4),Vector2(13,maxf(0,bounds.size.y-8))),Color("dbc6a3"))
+  return
+ draw_rect(bounds,Color("bd9d6c"));draw_rect(bounds,Color("705736"),false,2)
+ var info:Array=Catalog.data.items.get(type,[type,20,20,"•"]);var symbol:=str(info[3]) if info.size()>3 else "•"
+ draw_string(ThemeDB.fallback_font,Vector2(bounds.position.x,p.y+5),symbol,HORIZONTAL_ALIGNMENT_CENTER,bounds.size.x,17,Color("44311f"))
 
 func draw_plan_wall(span: Dictionary,plan: Dictionary) -> void:
  var a:Vector2=span.a;var b:Vector2=span.b;var kind:=str(span.get("type",""));var outer:bool=span.group=="outer"

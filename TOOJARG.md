@@ -1,5 +1,7 @@
 # Godoti pordi tööjärg
 
+Plaanil on tulekolde, korvi, pingi ja magamisaseme joonistus veebikujundaja eeskujul; vaadet kontrolliti nähtavalt. Kõigi eriesemete plaanisümbolid ei ole veel üksikasjaliselt üle toodud.
+
 Kahekorruselise maja 3D-eelvaates järgib peidetud katusega korruste nähtavus veebikujundajat: alumist korrust vaadates peitub ülemine korrus koos trepi ja tugedega, ülemise korruse valimisel ilmub see tagasi. Mõlemat vahetust ja katuse taastamist kontrolliti.
 
 Plaanivaade kasutab veebikujundaja paberitoone, 20-ühikulist ruudustikku ja rannaplaani värve. Mängust avatud olemasoleval peamajal muudeti lisaks katusele õuepiiri, kontrolliti õuemudeli tekkimist detailvaates ning õue säilimist pärast salvestuse laadimist. Headless-kontrollis väljastas Godoti tühi renderdaja ühe tekstuurihoiatusena „Parameter t is null“; kontrollväited läbisid ning graafikakaardiga eelvaade avanes.
