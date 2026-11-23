@@ -7,6 +7,7 @@ const Catalog=preload("res://data/house_editor_catalog.json")
 signal changed(design: Dictionary)
 signal message(text: String)
 var design:Dictionary={}
+var show_dimensions:=true
 var tool:="rect"
 var style:="hide"
 var wall_brush:=""
@@ -50,8 +51,11 @@ func redo() -> void:
  if not design.has("upper"):active_floor=0
  queue_redraw();changed.emit(design)
 
+func base_scale() -> float:
+ return maxf(0.001,minf(maxf(1,size.x-20)/960.0,maxf(1,size.y-30)/625.0))
+
 func plan_transform() -> Transform2D:
- var scale_factor:=minf(size.x/960.0,size.y/625.0);var offset:=(size-Vector2(960,625)*scale_factor)/2
+ var scale_factor:=base_scale();var offset:=(size-Vector2(960,625)*scale_factor)/2
  return Transform2D(0,Vector2(scale_factor*view_scale,scale_factor*view_scale),0,offset+view_offset*scale_factor)
 
 func clamp_view() -> void:
@@ -60,7 +64,7 @@ func clamp_view() -> void:
  view_offset.y=clampf(view_offset.y,625.0-625.0*view_scale,0.0)
 
 func zoom_at(screen:Vector2,factor:float) -> void:
- var base:=minf(size.x/960.0,size.y/625.0)
+ var base:=base_scale()
  if base<=0:return
  var inset:Vector2=(size-Vector2(960,625)*base)/2
  var cursor:Vector2=(screen-inset)/base
@@ -107,7 +111,7 @@ func _draw() -> void:
  for wall in geometry.walls:
   for span in Plan.split_wall(wall,plan):draw_plan_wall(span,plan)
  for item in plan.get("items",[]):draw_plan_item(item)
- draw_plan_dimensions(plan,geometry)
+ if show_dimensions:draw_plan_dimensions(plan,geometry)
  if drag:
   var shape:=Plan.candidate(tool,drag_start,drag_end,Edit.LIMITS[clampi(era,0,2)])
   if not shape.is_empty() and shape.has("type"):
@@ -120,17 +124,18 @@ func _draw() -> void:
   elif shape.get("type","")=="round":
    var radius:float=float(shape.r)/Plan.PX_PER_M;draw_plan_tag("Ø %.1f m · %.1f m²" % [radius*2,PI*radius*radius],Plan.point(shape.a))
   else:draw_plan_tag("%.1f m" % (drag_start.distance_to(drag_end)/Plan.PX_PER_M),(drag_start+drag_end)/2)
+ draw_rect(Rect2(Vector2.ZERO,Vector2(960,625)),Color("8a6a38"),false,4)
  draw_set_transform_matrix(Transform2D.IDENTITY)
 
 func draw_plan_tag(text: String,point: Vector2,angle:=0.0) -> void:
- var scale:=maxf(0.1,minf(size.x/960.0,size.y/625.0)*view_scale);var font:=ThemeDB.fallback_font;var font_size:=maxi(8,roundi(11.0/scale));var width:=font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x+10.0/scale;var height:=17.0/scale
+ var scale:=maxf(0.1,base_scale()*view_scale);var font:=ThemeDB.fallback_font;var font_size:=maxi(8,roundi(11.0/scale));var width:=font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x+10.0/scale;var height:=17.0/scale
  draw_set_transform_matrix(plan_transform()*Transform2D(angle,point))
  var rect:=Rect2(-width/2,-height/2,width,height);draw_rect(rect,Color("f7ecd2e6"));draw_rect(rect,Color("8a6633"),false,1.0/scale)
  draw_string(font,Vector2(-width/2+5.0/scale,height*0.26),text,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,Color("3b2713"))
  draw_set_transform_matrix(plan_transform())
 
 func draw_plan_dimensions(plan: Dictionary,geometry: Dictionary) -> void:
- var scale:=maxf(0.1,minf(size.x/960.0,size.y/625.0)*view_scale)
+ var scale:=maxf(0.1,base_scale()*view_scale)
  for wall in geometry.walls:
   if wall.get("curved",false):continue
   var a:Vector2=wall.a;var b:Vector2=wall.b;var length:=a.distance_to(b)
@@ -261,7 +266,7 @@ func draw_field(plot: Array,field: Dictionary) -> void:
   var inset:=6.0 if edge=="rail" else 8.0 if edge=="ditch" else 10.0
   var color:=Color("61462d" if edge=="rail" else "4f7f7a" if edge=="ditch" else "7d6236")
   draw_rect(rect.grow(-inset),color,false,4 if edge=="rail" else 8 if edge=="ditch" else 10)
- var display_scale:=maxf(0.1,minf(size.x/960.0,size.y/625.0)*view_scale)
+ var display_scale:=maxf(0.1,base_scale()*view_scale)
  draw_string(ThemeDB.fallback_font,Vector2(low.x,high.y+14/display_scale),"↔ Põllu suurust saab mängus muuta",HORIZONTAL_ALIGNMENT_CENTER,rect.size.x,roundi(10/display_scale),Color("5b3d1f"))
 
 func _gui_input(event: InputEvent) -> void:
@@ -283,7 +288,7 @@ func _gui_input(event: InputEvent) -> void:
    else:panning=false
    accept_event();return
  if event is InputEventMouseMotion and panning:
-  var base:=minf(size.x/960.0,size.y/625.0)
+  var base:=base_scale()
   if base>0:view_offset=pan_origin+(event.position-pan_start)/base;clamp_view();queue_redraw()
   accept_event();return
  if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:

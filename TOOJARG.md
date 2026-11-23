@@ -1,5 +1,7 @@
 # Godoti pordi tööjärg
 
+Majaehitaja paigutus ja pildid viidi veebiversiooni eeskujule: päis, ajastute ja korruste valik, ringikujulised ülevaated, ehituskategooriad ja valikukaardid. Telefonivaates saab kategooriaid ja kaarte puutega kerida. Kivi-, pronksi- ja rauaaja hooneid saab sirvida; mängu salvestamiseks tuleb tagasi valida algne hoone. Arvuti- ja telefonisuuruses aknaid ning puutesündmusi kontrolliti; päris Android-seadet ei ole selles kontrollis kasutatud.
+
 Õue plaanijoonis kasutab nüüd aia, palissaadi, kõrge kivimüüri ja värava jaoks eraldi veebikujundaja joonistusviise. Värav lõikab aiast ava ja selle avatud lehed on plaanil nähtavad; kontrolliti nähtavat väravanäidet.
 
 Mängu detailvaates kohandatakse kujundatud õue pind tegeliku maastiku kõrgusele. Varem võis ebatasane maapind osa õuest varjata; parandust kontrolliti mängu lähivaates ning pööratud ja skaleeritud maja automaatkatses. Samuti kontrolliti, et ühest kujundusest tehtud teised majad säilitavad oma sõltumatu õue.

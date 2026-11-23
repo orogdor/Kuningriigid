@@ -49,7 +49,7 @@ func run_test():
  scene.open_type_house_designer("house",0)
  assert(is_instance_valid(scene.house_designer_layer),"House designer did not open from the game")
  var panel=scene.house_designer_layer.get_child(0);var changed:Dictionary=panel.canvas.design.duplicate(true);changed.roofHeight=110
- panel.accepted.emit(changed);panel.queue_free()
+ panel.canvas.design=changed;panel.save_current_design()
  assert(scene.game.houseDesignTemplatesV354.house.roofHeight==110,"Saving the editor must update the game template")
  assert(scene.save_partial(false,"user://house_design_roundtrip.json"),"Game save failed")
  scene.game.houseDesignTemplatesV354.house.roofHeight=70
@@ -69,7 +69,7 @@ func run_test():
  assert(is_instance_valid(scene.house_designer_layer),"Existing building designer did not open")
  var existing_panel=scene.house_designer_layer.get_child(0);var changed_hall:Dictionary=existing_panel.canvas.design.duplicate(true);changed_hall.roofHeight=120;changed_hall.yard[0].x-=10
  var yard_corner_x:float=changed_hall.yard[0].x
- existing_panel.accepted.emit(changed_hall);existing_panel.queue_free()
+ existing_panel.canvas.design=changed_hall;existing_panel.save_current_design()
  assert(float(hall.houseDesignV354.roofHeight)==120,"Existing hall design was not saved")
  assert(scene.detail_root.hall_model.find_child("RoofDeck",true,false)!=null,"Designed hall model was not installed in detail view")
  assert(scene.detail_root.hall_model.find_child("WeatheredYard",true,false)!=null,"Designed yard was not installed in detail view")

@@ -5,7 +5,7 @@ var design: Dictionary={}
 func show_design(value: Dictionary) -> void:
  design=value.duplicate(true);queue_redraw()
 func _draw() -> void:
- draw_rect(Rect2(Vector2.ZERO,size),Color("122b40"))
+ draw_circle(size/2,minf(size.x,size.y)/2,Color("122b40"))
  if design.is_empty() or size.x<=0 or size.y<=0:return
  var geometry:=Plan.plan_geometry(design);var cloud:=PackedVector2Array()
  for key in ["yard","plot"]:
