@@ -1,0 +1,20 @@
+name: Restore Godot source branch
+on:
+  push:
+    branches: [godot-paki-taastamine]
+    paths: [.github/workflows/restore-godot-source.yml]
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify and restore original project
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat pakiosad/osa-*.bin > "$RUNNER_TEMP/godot.bundle"
+          echo "0fa0717485b1e2be649e4ab9a6a55fafcbbc31f15c613b5b19901c319d950f1c  $RUNNER_TEMP/godot.bundle" | sha256sum -c -
+          git fetch "$RUNNER_TEMP/godot.bundle" refs/heads/godot-vaheversioon-2026-11-23
+          git push origin FETCH_HEAD:refs/heads/godot-port-lahtekood
