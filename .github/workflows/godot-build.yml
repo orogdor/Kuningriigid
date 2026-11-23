@@ -66,16 +66,31 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/godot-content-')
         env:
           GH_TOKEN: ${{ github.token }}
+          ANDROID_RELEASE_KEYSTORE_B64: ${{ secrets.GODOT_ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.GODOT_ANDROID_KEY_ALIAS }}
+          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.GODOT_ANDROID_KEY_PASSWORD }}
         shell: bash
         run: |
           set -euo pipefail
+          if [ -z "$ANDROID_RELEASE_KEYSTORE_B64" ] || [ -z "$ANDROID_RELEASE_KEY_ALIAS" ] || [ -z "$ANDROID_RELEASE_KEY_PASSWORD" ]; then
+            echo "Missing the persistent Android release signing secrets." >&2
+            exit 1
+          fi
+          printf '%s' "$ANDROID_RELEASE_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/android-release.keystore"
+          export GODOT_ANDROID_KEYSTORE_RELEASE_PATH="$RUNNER_TEMP/android-release.keystore"
+          export GODOT_ANDROID_KEYSTORE_RELEASE_USER="$ANDROID_RELEASE_KEY_ALIAS"
+          export GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD="$ANDROID_RELEASE_KEY_PASSWORD"
+          sed -i "s|^version/code=.*|version/code=$GITHUB_RUN_NUMBER|" export_presets.cfg
+          sed -i "s|^version/name=.*|version/name=\"$GITHUB_REF_NAME\"|" export_presets.cfg
+          Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release Android build/android/Kuningriigid.apk
+          (cd build/windows && zip -q -r ../Kuningriigid-Windows.zip .)
           Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-pack "Windows Desktop" build/windows-update.pck
           Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-pack Android build/android-update.pck
           windows_sha=$(sha256sum build/windows-update.pck | cut -d' ' -f1)
           android_sha=$(sha256sum build/android-update.pck | cut -d' ' -f1)
           windows_size=$(stat -c%s build/windows-update.pck)
           android_size=$(stat -c%s build/android-update.pck)
-          gh release create "$GITHUB_REF_NAME" build/windows-update.pck build/android-update.pck --verify-tag --prerelease --latest=false --title "Godot content $GITHUB_REF_NAME" --notes "Godot 0.1.0 compatible content update."
+          gh release create "$GITHUB_REF_NAME" build/Kuningriigid-Windows.zip build/android/Kuningriigid.apk build/windows-update.pck build/android-update.pck --verify-tag --prerelease --latest=false --title "Godot content $GITHUB_REF_NAME" --notes "Godot 0.1.0 compatible content update."
           base_url="https://github.com/orogdor/Kuningriigid/releases/download/$GITHUB_REF_NAME"
           jq -n --argjson rev "$GITHUB_RUN_NUMBER" --arg wu "$base_url/windows-update.pck" --arg ws "$windows_sha" --argjson wz "$windows_size" --arg au "$base_url/android-update.pck" --arg as "$android_sha" --argjson az "$android_size" '{schema:1,base:"0.1.0",revision:$rev,packages:{Windows:{url:$wu,sha256:$ws,size:$wz},Android:{url:$au,sha256:$as,size:$az}}}' > "$RUNNER_TEMP/manifest.json"
           git fetch origin godot-update-channel
