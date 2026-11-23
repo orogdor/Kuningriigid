@@ -25,6 +25,8 @@ try {
   if ((Get-FileHash -Algorithm SHA256 -LiteralPath $bundle).Hash.ToLowerInvariant() -ne $expected) { throw 'Allalaaditud paki kontrollsumma ei sobi.' }
   & git clone --branch $branch -- $bundle $destination
   if ($LASTEXITCODE -ne 0) { throw 'Projekti taastamine ebaõnnestus.' }
+  & git -C $destination remote remove origin
+  if ($LASTEXITCODE -ne 0) { throw 'Ajutise varukoopia viidet ei õnnestunud eemaldada.' }
   Write-Host "Valmis: $destination"
 } finally {
   if (Test-Path -LiteralPath $temp) { Remove-Item -LiteralPath $temp -Recurse -Force }
