@@ -1,0 +1,1056 @@
+{
+  "approved": true,
+  "generator": "V345 make_trees.py",
+  "trees": [
+    {
+      "id": "pine_01",
+      "species": "pine",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 944,
+        "bytes": 300156,
+        "sha256": "4c2ef31a15828df8f88ae383eccc4caf62560a91a8fc5cb8ad93e6eba0375a81",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -3.506648302078247,
+          -3.322125196456909,
+          0.0
+        ],
+        [
+          2.930506467819214,
+          3.9420032501220703,
+          17.695253372192383
+        ]
+      ],
+      "mid": {
+        "triangles": 142,
+        "bytes": 250876,
+        "sha256": "e8fcda0df4d732f6c3be13b6e74d6928b89dfb7ac96ada689e4e1184c3829138",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 253600,
+        "sha256": "f3a6d3b6d01ddd6a794514b0f5ca6d334f5a9d9e329c05ec30989f3d9eea16aa"
+      }
+    },
+    {
+      "id": "pine_02",
+      "species": "pine",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1106,
+        "bytes": 308808,
+        "sha256": "40687c1e0473da878d52c8544a425385b328a2b52f05097426dcccffa38be046",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -3.9432992935180664,
+          -3.5746688842773438,
+          0.0
+        ],
+        [
+          4.547979354858398,
+          4.091543197631836,
+          19.994827270507812
+        ]
+      ],
+      "mid": {
+        "triangles": 128,
+        "bytes": 249888,
+        "sha256": "73dc7a9286cf495d5d6ac5d1fab31251b605de6bb4db633aa0544be11405d85b",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 239204,
+        "sha256": "9ac61fef944d8a809a69ca88f33e71e8e2dd78973bb3faf1cad4fd6666ff9158"
+      }
+    },
+    {
+      "id": "pine_03",
+      "species": "pine",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 692,
+        "bytes": 284436,
+        "sha256": "7b09e0b003a0692fce4aaa3e1e9bbc5b0ec60ad89a2fff3560e8868c6e979ef6",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -3.076655626296997,
+          -2.6110806465148926,
+          0.0
+        ],
+        [
+          3.486800193786621,
+          3.285388946533203,
+          15.329489707946777
+        ]
+      ],
+      "mid": {
+        "triangles": 120,
+        "bytes": 249332,
+        "sha256": "c8c0d8efa34f3bbfc107515cb8664baf05103095b7a170cd63192fd8ec5887d1",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 252772,
+        "sha256": "43f8977d7f6f9a101a97f5eb9968d6ce1bb547baeb12d4ed1a86f70b1f5b4bd4"
+      }
+    },
+    {
+      "id": "pine_04",
+      "species": "pine",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1230,
+        "bytes": 315568,
+        "sha256": "61155da673bcbee9edcb1a62bb6ccac7377698196b02c06cc4968debd17c079b",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.942185878753662,
+          -3.5754549503326416,
+          0.0
+        ],
+        [
+          3.8633482456207275,
+          4.251673221588135,
+          22.044933319091797
+        ]
+      ],
+      "mid": {
+        "triangles": 130,
+        "bytes": 250028,
+        "sha256": "1af09bdb31ea1172c0d6ab9761dc47aac0c24e473ce013e99dfa3e18788f8661",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 243344,
+        "sha256": "7f14588b199eb54b5cf97c5d615e231d96c1690b543a815d633b6cca6fe795a3"
+      }
+    },
+    {
+      "id": "pine_05",
+      "species": "pine",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1052,
+        "bytes": 307332,
+        "sha256": "df17e1935ab3fbaece2cab0862ce5ee44d8a4e9b0672e20c24fe58c0fea6df2c",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -3.972200632095337,
+          -3.637176752090454,
+          0.0
+        ],
+        [
+          3.4359004497528076,
+          3.1015946865081787,
+          18.169208526611328
+        ]
+      ],
+      "mid": {
+        "triangles": 156,
+        "bytes": 251856,
+        "sha256": "be9876bbb4ff09d9daa6b344499e4ba733530680c427283e26e0224a24516d33",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 252940,
+        "sha256": "a2e564be3ab838015352653d4921748bfe4296b7184de159068ff5095ab1e751"
+      }
+    },
+    {
+      "id": "spruce_01",
+      "species": "spruce",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1546,
+        "bytes": 368768,
+        "sha256": "2d9eb85d91414c0a2adaaba8adabb8b542ce78fe74ba7edafb9fc08e10e4dbea",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -3.8435158729553223,
+          -3.809337615966797,
+          0.0
+        ],
+        [
+          4.1157073974609375,
+          4.04044771194458,
+          16.34217071533203
+        ]
+      ],
+      "mid": {
+        "triangles": 240,
+        "bytes": 297648,
+        "sha256": "190b43059b501bec24b018199493a51bd67a0c4ba5176bfdb0218e93bd0b51fd",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 307464,
+        "sha256": "6502b658b120639686e262777696b297e2a6f15a6c6d3e8691b1d230baa58748"
+      }
+    },
+    {
+      "id": "spruce_02",
+      "species": "spruce",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1956,
+        "bytes": 392860,
+        "sha256": "023207b1d893a54832ef2df50948858bf3105303311a8f6c073745a5fe5dc7d1",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.091915130615234,
+          -4.363918781280518,
+          0.0
+        ],
+        [
+          4.485471725463867,
+          4.5873847007751465,
+          19.634462356567383
+        ]
+      ],
+      "mid": {
+        "triangles": 242,
+        "bytes": 297784,
+        "sha256": "8c08a6de1764fb20d7b9f5ae81073c1836ca71b6518eea88be7629f7b57c9691",
+        "density": 0.865
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 301088,
+        "sha256": "0b4b4389415c81c1297dda2e32c7c2ffb3827609213eae5a5363a99fa70ba036"
+      }
+    },
+    {
+      "id": "spruce_03",
+      "species": "spruce",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1150,
+        "bytes": 349500,
+        "sha256": "c59f21b62592ab0e2f071d0b6a4560c783ace953cf0686fc9271341bf7394697",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -3.1241917610168457,
+          -3.4109461307525635,
+          0.0
+        ],
+        [
+          3.5050923824310303,
+          3.8980352878570557,
+          13.969659805297852
+        ]
+      ],
+      "mid": {
+        "triangles": 212,
+        "bytes": 295688,
+        "sha256": "2efb79f89ae4d295df162c533b4cd97e66631abde73d40aa18978f892fe04019",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 295288,
+        "sha256": "d43963e18e1de76ac1312b57bc601f3ab0579e3ff84b099e5c6f5b92d545ac8a"
+      }
+    },
+    {
+      "id": "spruce_04",
+      "species": "spruce",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1914,
+        "bytes": 387620,
+        "sha256": "d822f19df20e2ede68ec3fe5a1150fd836927505b431f1ec0159d248443e2142",
+        "density": 0.865
+      },
+      "boundsZUp": [
+        [
+          -4.883389949798584,
+          -4.747827529907227,
+          0.0
+        ],
+        [
+          4.604214668273926,
+          4.5762858390808105,
+          21.750078201293945
+        ]
+      ],
+      "mid": {
+        "triangles": 250,
+        "bytes": 298344,
+        "sha256": "baeb07ddb923d334ba2bbc027e5cf3d8e3565cd22a3642b5774813c3ad2cb894",
+        "density": 0.865
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 290668,
+        "sha256": "6e5a138245c3f864eaa8615a356d0c9f0ee2c8b1055b437831b3bb5607a87071"
+      }
+    },
+    {
+      "id": "spruce_05",
+      "species": "spruce",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1672,
+        "bytes": 376436,
+        "sha256": "81580fe09de3ab309baf072f5e99cc8a789a8133e86c1e68c8f0aecc989701ca",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.212584018707275,
+          -4.1408538818359375,
+          0.0
+        ],
+        [
+          4.337934494018555,
+          3.844435453414917,
+          18.096302032470703
+        ]
+      ],
+      "mid": {
+        "triangles": 242,
+        "bytes": 297788,
+        "sha256": "a7dcb5ae098eb5b58f155687d92d21294cd5e2b7cd376476c27eae6bbba66bf6",
+        "density": 0.93
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 301768,
+        "sha256": "f264e09880f5eded11e6f1c91461fd89b884cc16f73164f39bf778ae5a43da54"
+      }
+    },
+    {
+      "id": "oak_01",
+      "species": "oak",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1320,
+        "bytes": 186240,
+        "sha256": "59019334da1164ea6aa01432460d5159b7a38ae3c22af1e4e86ea67d7bbad070",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -7.916095733642578,
+          -8.438432693481445,
+          0.0
+        ],
+        [
+          7.933363914489746,
+          7.87333345413208,
+          15.335702896118164
+        ]
+      ],
+      "mid": {
+        "triangles": 224,
+        "bytes": 119900,
+        "sha256": "9f097d1c0ca2aa5e13a3f11969130fbbbf2b29de605321775be1478ebde81e84",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 391444,
+        "sha256": "7ba258f082e43c03c1b484c3135c344a0bb8f9e09f2de039872538e3c0e82099"
+      }
+    },
+    {
+      "id": "oak_02",
+      "species": "oak",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1428,
+        "bytes": 192048,
+        "sha256": "224cdd91bc8e0ba79ca5d1f9500fb32306ec6826b5eb6728ed1f75c0a697a5a2",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -11.889758110046387,
+          -11.874143600463867,
+          0.0
+        ],
+        [
+          12.186819076538086,
+          11.172264099121094,
+          16.765729904174805
+        ]
+      ],
+      "mid": {
+        "triangles": 242,
+        "bytes": 120780,
+        "sha256": "307c84e2941674bfabbc84ed6102f0a80acbb18cc9ab8c4d1baf4ee11b0d160e",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 345148,
+        "sha256": "1dfc05e70eae54c3659405879a42a0615909f59a23f7961e5b2d5bd23c5068f8"
+      }
+    },
+    {
+      "id": "oak_03",
+      "species": "oak",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1212,
+        "bytes": 180440,
+        "sha256": "f7cbde88b172d006a31975089fb62ad6dbcb2f7b5c50438b4b4829a57bca9514",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -6.456626892089844,
+          -6.946076393127441,
+          0.0
+        ],
+        [
+          7.017178058624268,
+          6.960765361785889,
+          13.493865013122559
+        ]
+      ],
+      "mid": {
+        "triangles": 206,
+        "bytes": 119024,
+        "sha256": "0ffcf4bd24d05b626f9770f48845c960968a4880f7399e517aa7c40e083b9943",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 371356,
+        "sha256": "d066669a4ec209c8ace57d3acf8788e2bd2ba16be4f90103a35b8861ae2e3023"
+      }
+    },
+    {
+      "id": "oak_04",
+      "species": "oak",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1428,
+        "bytes": 192044,
+        "sha256": "67c8aefadf47ddf45724f119841be4c9bf0a427c6a9c486ac1e5cac29143a027",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -12.553228378295898,
+          -11.68826675415039,
+          0.0
+        ],
+        [
+          9.917386054992676,
+          12.08608341217041,
+          18.333232879638672
+        ]
+      ],
+      "mid": {
+        "triangles": 242,
+        "bytes": 120780,
+        "sha256": "343bd0f38b6a57031a4eda33a20fca5a70d4154ac0447648234e07b3f34fbc9a",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 363304,
+        "sha256": "800fcb2126b4ed4a95e885e5861aa7e44c62fb75d9b7dff2ec6746cd697f48b0"
+      }
+    },
+    {
+      "id": "oak_05",
+      "species": "oak",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1320,
+        "bytes": 186240,
+        "sha256": "f00556caa90f9e42faea636be1c9a92bb4977ed0fc7e23b0d8b2c8765051da3a",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -8.688957214355469,
+          -9.117990493774414,
+          0.0
+        ],
+        [
+          8.331914901733398,
+          9.83449935913086,
+          17.081897735595703
+        ]
+      ],
+      "mid": {
+        "triangles": 224,
+        "bytes": 119900,
+        "sha256": "6aa49437838db84852c5c1d57ceb88f796de55ed50cff9bdbf5ca6e229464663",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 364312,
+        "sha256": "29aac02df5f100f2aa8781f9b929f5ffaa0af2e3886f1acac10f94ec009f3008"
+      }
+    },
+    {
+      "id": "lime_01",
+      "species": "lime",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1306,
+        "bytes": 173188,
+        "sha256": "be21741aa7d5100b2a6d013933b36a4ac2ef0c8b003d1ebf640d874f52d328a0",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -8.78212833404541,
+          -7.3705549240112305,
+          0.0
+        ],
+        [
+          8.320781707763672,
+          7.079756736755371,
+          18.466968536376953
+        ]
+      ],
+      "mid": {
+        "triangles": 246,
+        "bytes": 109856,
+        "sha256": "e1bfb8ce5574a206d73a96bdec998b7886a9422d2fdce216ef35fc79fab24dcc",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 398204,
+        "sha256": "413740f5c271c788f3adbe13e3b5537d69891d43703061570e5502bb7ee9d01d"
+      }
+    },
+    {
+      "id": "lime_02",
+      "species": "lime",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1396,
+        "bytes": 177860,
+        "sha256": "5add2e53aff277e811aa0c73ad14d65645ec7c5fd07a56b93ffff0c248b24b12",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -10.206181526184082,
+          -7.754749298095703,
+          0.0
+        ],
+        [
+          9.522598266601562,
+          7.3880534172058105,
+          21.540386199951172
+        ]
+      ],
+      "mid": {
+        "triangles": 244,
+        "bytes": 109328,
+        "sha256": "25b0b59399eb11d3c76b7ae0b520ad17319eca7bcf21e7fd48c4fce7c8f6cfc8",
+        "density": 0.865
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 403088,
+        "sha256": "6772edc24c51b22469bf4b4572066af63b093bf5b7a2b2d5317f2a492a3019c8"
+      }
+    },
+    {
+      "id": "lime_03",
+      "species": "lime",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1216,
+        "bytes": 168520,
+        "sha256": "7abc5de36139adf27fc8e282b4cacab23283758ab02c97043405ee10a47e8d70",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.870512962341309,
+          -5.865037441253662,
+          0.0
+        ],
+        [
+          6.082279205322266,
+          6.246008396148682,
+          17.6407527923584
+        ]
+      ],
+      "mid": {
+        "triangles": 228,
+        "bytes": 108976,
+        "sha256": "af3c7ef92632c9e42cccbeaa361e63bdae81aba657dae213b07c7a8621578645",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 451192,
+        "sha256": "2fe0dfecf1f70ff2b0e7d5e406ac6c0e257aeae088cc7d7b39027f9a59419a25"
+      }
+    },
+    {
+      "id": "lime_04",
+      "species": "lime",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1396,
+        "bytes": 177856,
+        "sha256": "9fccfad36273a70cd5e50db4c48016870697562a9c124cff13239601c8a77ba9",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -11.419485092163086,
+          -9.743465423583984,
+          0.0
+        ],
+        [
+          8.81557846069336,
+          9.23522663116455,
+          21.422199249267578
+        ]
+      ],
+      "mid": {
+        "triangles": 246,
+        "bytes": 109472,
+        "sha256": "f2a245025e3b0f64ce3bec6f61b57503f01bbe99f132f0e96635e70b3b18c6f6",
+        "density": 0.865
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 419356,
+        "sha256": "ede12c97c754c3727989dfe483e19d590baafe197297f9ddf0ebc316c96be414"
+      }
+    },
+    {
+      "id": "lime_05",
+      "species": "lime",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1306,
+        "bytes": 173192,
+        "sha256": "bef9bad5df8fde3c181b9793b61a59fdbdc5a196e373e8a047faa6ec51734198",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -10.002814292907715,
+          -9.502227783203125,
+          0.0
+        ],
+        [
+          7.536496162414551,
+          6.7335991859436035,
+          20.280078887939453
+        ]
+      ],
+      "mid": {
+        "triangles": 246,
+        "bytes": 109852,
+        "sha256": "fafd21248f563ea33fbf0f437eefcc508798c7752591a32c3437d863ea31cd4f",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 407540,
+        "sha256": "8c42a2d3018434a909d9d06284470332bc154a85e6c16d52e9e1d2ada084e3cb"
+      }
+    },
+    {
+      "id": "birch_01",
+      "species": "birch",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1068,
+        "bytes": 183384,
+        "sha256": "c447d6a2a4ac0aa937a83c18f7bb61f61440b024b975db1c29d1b9be7093cfb7",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.846634387969971,
+          -4.528517246246338,
+          0.0
+        ],
+        [
+          4.499840259552002,
+          4.35861349105835,
+          17.45639991760254
+        ]
+      ],
+      "mid": {
+        "triangles": 204,
+        "bytes": 132524,
+        "sha256": "0fa940dfe2b9dbefecb6d090054e9732d89d2abc35f05e38ebd2d1de50c097a9",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 435840,
+        "sha256": "0440cff936e376e9b2a8ee37b4e9fa564bad715cb61e969dca9511c599c8d7fc"
+      }
+    },
+    {
+      "id": "birch_02",
+      "species": "birch",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1170,
+        "bytes": 188896,
+        "sha256": "6488b4f23df70ae3b7f0a845452200142a0a6f17a412486c0d1c0c25cca39662",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.740736484527588,
+          -5.122096061706543,
+          0.0
+        ],
+        [
+          5.30575704574585,
+          5.136019706726074,
+          19.270471572875977
+        ]
+      ],
+      "mid": {
+        "triangles": 222,
+        "bytes": 133400,
+        "sha256": "870d8813c0524e58c9dc4cffde4002500b020df0cb12ce9b5137d1722eaa4fc1",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 441164,
+        "sha256": "d69a7892e467814b3c4bda50926003d0aeb00c327f029d53331d953654a76b56"
+      }
+    },
+    {
+      "id": "birch_03",
+      "species": "birch",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 966,
+        "bytes": 177880,
+        "sha256": "7ebd8c8e56a8801a5a44fb41241949dc8e6fab5b3c48db8f368a9870d1df34a3",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -3.684420347213745,
+          -3.8605449199676514,
+          0.0
+        ],
+        [
+          5.146899223327637,
+          3.7351298332214355,
+          15.279339790344238
+        ]
+      ],
+      "mid": {
+        "triangles": 186,
+        "bytes": 131644,
+        "sha256": "417a9b84c1165f29f8bec9b7d01dd3b2f0f709be6f249870373b344d3261d380",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 428124,
+        "sha256": "068ee96b83a68eeba17692fca62585d981db36474be08a1845c267ffd7705f90"
+      }
+    },
+    {
+      "id": "birch_04",
+      "species": "birch",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1170,
+        "bytes": 188896,
+        "sha256": "7824f15aec6bc89d9d56e21fe23aa1dbf72489a1542f3e7a34152e392ee822de",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.791233539581299,
+          -5.321291446685791,
+          0.0
+        ],
+        [
+          4.455024719238281,
+          4.992455959320068,
+          20.06039810180664
+        ]
+      ],
+      "mid": {
+        "triangles": 222,
+        "bytes": 133396,
+        "sha256": "8711fd8675249a6a89ab54bc3ecb87c986b347f98c0d836cf599c0c1e5de0fbe",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 438380,
+        "sha256": "9708302e7690781f4fb5bd6df3551285caefcb45f0c161d821518080050e22ee"
+      }
+    },
+    {
+      "id": "birch_05",
+      "species": "birch",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 1068,
+        "bytes": 183388,
+        "sha256": "6fb20504c108f5c3a19ceb9f8f73525b74fc95475e88a5b07a953270490cf256",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.785700798034668,
+          -4.172800540924072,
+          0.0
+        ],
+        [
+          5.7212395668029785,
+          5.379880905151367,
+          18.25660514831543
+        ]
+      ],
+      "mid": {
+        "triangles": 204,
+        "bytes": 132520,
+        "sha256": "c89a1a7f5a1405832504bdbc9a649f20c87a77a27648e976d775df3d4bf37c5a",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 400020,
+        "sha256": "6c746bb7bb989e29b5750a10c5e6f4a3092867b07f4d28d0685409f045ab5ce6"
+      }
+    },
+    {
+      "id": "palm_01",
+      "species": "palm",
+      "variant": 1,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 222224,
+        "sha256": "f00854360576335ea43903bde7c1b3e92f5dfd079e52990ea2d504ebf7ea2c2b",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -6.144310474395752,
+          -6.0927581787109375,
+          0.0
+        ],
+        [
+          4.63822078704834,
+          5.529337406158447,
+          12.787697792053223
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 215472,
+        "sha256": "6ea754b39180b83c375ff17913219c016de1c3e65b9d67a1cd48665a776de433",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 238976,
+        "sha256": "9371b8a3c457849b6606d935aacb01c4f03d7fafe9de9e65d9728e4b852edfe2"
+      }
+    },
+    {
+      "id": "palm_02",
+      "species": "palm",
+      "variant": 2,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 222224,
+        "sha256": "f74c63fabea99825a22f6a71eaf207661deac352a360cff368d4346ee1061b96",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.817974090576172,
+          -3.678788661956787,
+          0.0
+        ],
+        [
+          5.815366268157959,
+          7.005742073059082,
+          14.173798561096191
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 215468,
+        "sha256": "f1064679f9479fd80a8f329531db6d909ea9f295122f428a9f08e754306e5283",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 251664,
+        "sha256": "8f0930a772fd707506d23f48b73abbccea54079f9f2023aa1331c7612c7b8ff8"
+      }
+    },
+    {
+      "id": "palm_03",
+      "species": "palm",
+      "variant": 3,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 222220,
+        "sha256": "c8d3e66d538023a08d637d069167d5441b716dd3d7542ec7d5ca80fa856bdf0c",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -5.660891532897949,
+          -4.285628795623779,
+          0.0
+        ],
+        [
+          5.9691033363342285,
+          6.07138729095459,
+          11.090121269226074
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 215468,
+        "sha256": "beb8ff6fc5254fbedbc27a3df538b05407469d52eb28cbd56454dc850d0f2943",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 249752,
+        "sha256": "3d3014816c9a8bec71a3b0d52ef9dcc6ed66f3be9296e50dbcf198d9334a02db"
+      }
+    },
+    {
+      "id": "palm_04",
+      "species": "palm",
+      "variant": 4,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 222220,
+        "sha256": "32c749d8d72cef1ff5743b39a4af900798f055d55ba41ce07c0347394ba2be9e",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.053040504455566,
+          -6.465446949005127,
+          0.0
+        ],
+        [
+          6.906040668487549,
+          5.197301387786865,
+          15.70926284790039
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 215464,
+        "sha256": "410d151c8c6218324bb4a00f5027e9d8b6c5ca38a9d79f83e2002b0594866a83",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 224928,
+        "sha256": "51bb6997d587bb8d0ae92933d07f04312d2ca752b891cdcd679ea2a29f69c069"
+      }
+    },
+    {
+      "id": "palm_05",
+      "species": "palm",
+      "variant": 5,
+      "generator": "tools/forest-trees-v345/make_trees.py",
+      "near": {
+        "triangles": 220,
+        "bytes": 222224,
+        "sha256": "cfdceb38de7804a7bce2929d9421bb59e63dbe4b6e2fed024815214059323e8e",
+        "density": 1.0
+      },
+      "boundsZUp": [
+        [
+          -4.465304374694824,
+          -5.4305419921875,
+          0.0
+        ],
+        [
+          6.879410266876221,
+          6.2695136070251465,
+          13.549843788146973
+        ]
+      ],
+      "mid": {
+        "triangles": 72,
+        "bytes": 215468,
+        "sha256": "90084073836a6076c778a8c753d60f75c0164e15ec10fd2b0bc0775fef525311",
+        "density": 1.0
+      },
+      "far": {
+        "triangles": 6,
+        "bytes": 228448,
+        "sha256": "ded403436fe3c4ec4d22de3803b0438f5cd8b366a42511850a7d7b92951a62b4"
+      }
+    }
+  ]
+}

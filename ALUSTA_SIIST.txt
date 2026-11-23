@@ -1,0 +1,17 @@
+KUNINGRIIGID GODOTIS – KUIDAS PROOVIDA
+
+See on pooleliolev mängitav vaheversioon. Täielik 1:1 vastavus veebimänguga ei ole veel valmis.
+
+KÄIVITAMINE
+Ava KAIVITA.bat. Selles arvutis kasutab see kaustas E:\cargame olevat Godot 4.7.2 versiooni. Mängu saab avada ka Godotis project.godot failist.
+
+MAJAKUJUNDAJA
+Pärast linna rajamist vali linna ehitusmenüü. Sobiva ehitise kaardil vajuta paremas ülanurgas pliiatsit ✎. Kujunda maja ning salvesta: see plaan rakendub järgmistele sama tüüpi hoonetele. Detailkaardil saab valmis hoone valida ja selle infost vajutada „Kujunda“. Praegu on kujundaja varaste ajastute ehitiste jaoks; kõik hoonetüübid ei ole veel toetatud.
+
+ESIMESE ISIKU VAADE
+Ava detailkaart ja vajuta „Kõnni“. Klõpsa maastikul asukohta. Liigu WASD või nooleklahvidega ja vaata hiirega; Shift paneb jooksma, tühik hüppama, Tab vabastab hiire ja Esc lõpetab kõndimise. Avastatud naaberruutu liikudes laaditakse selle detailkaart.
+
+VEEBIMÄNGU SALVESTUSE IMPORT
+Ava mängu menüüst salvestuste vaheleht ja vali „Impordi veebi või Godoti salvestus (.json)“. Veebimängu eksport peab sisaldama täielikke maailmaandmeid; käimasoleva lahinguga salvestust veel importida ei saa. Algset imporditud faili ei muudeta. Avatud mäng salvestub edaspidi ka Godoti automaatsalvestusse; kui seal on teine tähtis mäng, salvesta see enne eraldi salvestuskohta või ekspordi.
+
+Täpsem ülevaade tehtust ja pooleliolevast tööst on failis PORT_STATUS.md.

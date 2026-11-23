@@ -1,0 +1,1 @@
+{"transport":{"name":"Transpordilaev","time":45,"cost":{"wood":70,"plank":30,"bread":10},"hp":360,"damage":2,"capacity":6,"unitBalanceVersion":99},"warship":{"name":"Sõjalaev","time":60,"cost":{"wood":90,"plank":45,"stone":20,"bread":15},"hp":560,"damage":18,"capacity":0,"unitBalanceVersion":99}}
