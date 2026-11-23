@@ -4,6 +4,9 @@ on:
     branches: [godot-port-lahtekood]
     tags: ['godot-content-*']
   workflow_dispatch:
+concurrency:
+  group: godot-build-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:

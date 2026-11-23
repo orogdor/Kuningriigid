@@ -10,6 +10,7 @@ const META := DIR + "/active.cfg"
 const MAX_BYTES := 1610612736
 var request: HTTPRequest
 var downloading := false
+var busy := false
 var expected := ""
 var revision := 0
 var status := "Uuendusi ei ole kontrollitud."
@@ -60,13 +61,18 @@ func check() -> void:
 	if OS.has_feature("editor"):
 		announce("Uuenduste kontroll töötab eksporditud mängus.")
 		return
-	if not is_instance_valid(request) or request.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED: return
+	if not is_instance_valid(request) or busy: return
 	downloading = false
+	request.timeout = 30.0
 	request.download_file = ""
 	announce("Kontrollin mängu uuendusi…")
-	if request.request(CHANNEL) != OK: announce("Uuendusi ei saanud kontrollida.")
+	busy = true
+	if request.request(CHANNEL) != OK:
+		busy = false
+		announce("Uuendusi ei saanud kontrollida.")
 
 func _completed(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	busy = false
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
 		if downloading and FileAccess.file_exists(DIR + "/download.tmp"): DirAccess.remove_absolute(ProjectSettings.globalize_path(DIR + "/download.tmp"))
 		announce("Uuendusi ei saanud alla laadida või kontrollida.")
@@ -93,9 +99,12 @@ func _completed(result: int, code: int, _headers: PackedStringArray, body: Packe
 	revision = new_revision
 	expected = package.sha256
 	request.download_file = DIR + "/download.tmp"
+	request.timeout = 1800.0
 	downloading = true
 	announce("Laen mängu uuendust alla…")
+	busy = true
 	if request.request(package.url) != OK:
+		busy = false
 		downloading = false
 		announce("Uuendust ei saanud alla laadida.")
 
@@ -117,3 +126,4 @@ func finish_download() -> void:
 		announce("Uuendust ei saanud aktiveerida.")
 		return
 	announce("Uuendus on valmis. Taaskäivita mäng, et see rakendada.")
+
